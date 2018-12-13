@@ -1,0 +1,80 @@
+\hypertarget{structData}{}\section{Data Struct Reference}
+\label{structData}\index{Data@{Data}}
+
+
+\hyperlink{structData}{Data} structure handling point data and contact data.  
+
+
+
+
+{\ttfamily \#include $<$Coarsing.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structData_a52baee43793f5f03088eb32a36f4c6fb}\label{structData_a52baee43793f5f03088eb32a36f4c6fb}} 
+int \hyperlink{structData_a52baee43793f5f03088eb32a36f4c6fb}{random\+\_\+test} (int N, int Ncf, int d, v2d box)
+\begin{DoxyCompactList}\small\item\em Randomly fill the data structure. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structData_aba0bdd673b8a3d0401deb7da3e479735}\label{structData_aba0bdd673b8a3d0401deb7da3e479735}} 
+int \hyperlink{structData_aba0bdd673b8a3d0401deb7da3e479735}{compute\+\_\+lpq} (int d)
+\begin{DoxyCompactList}\small\item\em Compute lpq from contact id\textquotesingle{}s and atom locations. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structData_a3be03de44986fc55905076acc5cdae2e}\label{structData_a3be03de44986fc55905076acc5cdae2e}} 
+int {\bfseries N}
+\item 
+\mbox{\Hypertarget{structData_a50ac6cb209a74ccda8482434f27dad76}\label{structData_a50ac6cb209a74ccda8482434f27dad76}} 
+double $\ast$ {\bfseries mass}
+\item 
+\mbox{\Hypertarget{structData_a24e794ed02025d5f4bb90d223d18a909}\label{structData_a24e794ed02025d5f4bb90d223d18a909}} 
+double $\ast$ {\bfseries Imom}
+\item 
+\mbox{\Hypertarget{structData_a64e7c2a261c99a49c6a069a549c1de42}\label{structData_a64e7c2a261c99a49c6a069a549c1de42}} 
+vector$<$ double $\ast$ $>$ {\bfseries pos}
+\item 
+\mbox{\Hypertarget{structData_ad9eb9c715b1138b189d0b837807a9269}\label{structData_ad9eb9c715b1138b189d0b837807a9269}} 
+vector$<$ double $\ast$ $>$ {\bfseries vel}
+\item 
+\mbox{\Hypertarget{structData_a1cbe3b0b910376fe41418a80e8884f35}\label{structData_a1cbe3b0b910376fe41418a80e8884f35}} 
+vector$<$ double $\ast$ $>$ {\bfseries omega}
+\item 
+\mbox{\Hypertarget{structData_a9943c2f12cbe674a2660d5e370ad6192}\label{structData_a9943c2f12cbe674a2660d5e370ad6192}} 
+v2d {\bfseries vel\+\_\+fluc}
+\item 
+\mbox{\Hypertarget{structData_ac752e81ef5cfd30eb36d0135ddc3ce9c}\label{structData_ac752e81ef5cfd30eb36d0135ddc3ce9c}} 
+v2d \hyperlink{structData_ac752e81ef5cfd30eb36d0135ddc3ce9c}{rot\+\_\+fluc}
+\begin{DoxyCompactList}\small\item\em Should not be externally provided but calculated, using the function {\itshape Coarsing\+::compute\+\_\+fluc\+\_\+vel()} \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structData_a783cd6858ac404d58cd9c3087554e741}\label{structData_a783cd6858ac404d58cd9c3087554e741}} 
+int {\bfseries Ncf}
+\item 
+\mbox{\Hypertarget{structData_a8e4044c32ca108735ac12f42be2ca7c1}\label{structData_a8e4044c32ca108735ac12f42be2ca7c1}} 
+double $\ast$ {\bfseries id1}
+\item 
+\mbox{\Hypertarget{structData_aceab4d0bbe0b13734353bd1a67172485}\label{structData_aceab4d0bbe0b13734353bd1a67172485}} 
+double $\ast$ {\bfseries id2}
+\item 
+\mbox{\Hypertarget{structData_a3cf4988534226aa1a566dfffb629f473}\label{structData_a3cf4988534226aa1a566dfffb629f473}} 
+vector$<$ double $\ast$ $>$ {\bfseries pospq}
+\item 
+\mbox{\Hypertarget{structData_aa46a77763360df63a36f61d06ffb339b}\label{structData_aa46a77763360df63a36f61d06ffb339b}} 
+vector$<$ double $\ast$ $>$ {\bfseries lpq}
+\item 
+\mbox{\Hypertarget{structData_a486a5f50a69db7164ab0304464028935}\label{structData_a486a5f50a69db7164ab0304464028935}} 
+vector$<$ double $\ast$ $>$ {\bfseries fpq}
+\item 
+\mbox{\Hypertarget{structData_a2f41a3378af42030c55ea80b7027e9da}\label{structData_a2f41a3378af42030c55ea80b7027e9da}} 
+vector$<$ double $\ast$ $>$ {\bfseries mpq}
+\item 
+\mbox{\Hypertarget{structData_ab25c53d90730b3488150cad41641c5d6}\label{structData_ab25c53d90730b3488150cad41641c5d6}} 
+vector$<$ double $\ast$ $>$ {\bfseries mqp}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{structData}{Data} structure handling point data and contact data. 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Coarsing.\+h\item 
+Coarsing.\+cpp\end{DoxyCompactItemize}

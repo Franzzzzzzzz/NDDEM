@@ -1,0 +1,56 @@
+
+variable d equal 0.0015
+variable peau equal  2*$d
+variable rho equal 2500
+
+atom_style     granular
+boundary       p p p
+
+
+newton          off
+communicate     single vel yes
+units          si
+region         reg block 0 1 0 1 0 1  units box
+create_box     1 reg
+
+neighbor        ${peau} bin
+#neigh_modify   every 1 check yes
+neigh_modify    delay 0 
+
+
+pair_style      gran model hooke/stiffness tangential history tangential_damping on limitForce off absolute_damping on
+pair_coeff      * *
+fix             m1 all property/global kn peratomtypepair 1 8.1e5
+fix             m2 all property/global kt peratomtypepair 1 0
+fix             m3 all property/global gamman_abs peratomtypepair 1 0.1
+fix             m4 all property/global gammat_abs peratomtypepair 1 0
+fix             m5 all property/global coefficientFriction peratomtypepair 1 0.5
+
+timestep        0.000001
+
+#fix             floor all wall/gran model hooke/stiffness tangential history primitive type 1 zplane 0 store_force yes tangential_damping on limitForce off absolute_damping on
+#fix             ceiling all wall/gran model hooke/stiffness tangential history primitive type 1 zplane 1 store_force yes tangential_damping on limitForce off absolute_damping on
+
+create_atoms 1 single 0.4999 0.5005 0.0001
+create_atoms 1 single 0.5 0.5 0.6
+
+set     atom 1 diameter $d density ${rho}
+set     atom 2 diameter $d density ${rho}
+
+group gp2 id 2
+
+velocity gp2 set 0 0 1
+
+
+#fix     1 all gravity 10 chute 180
+
+#fix 2 frozen freeze
+
+dump dumping all custom 1 dump.myforce id x y z vz
+#dump dumping2 all atom/vtk 100 dump.atom-*.vtk
+
+fix             integr all nve/sphere
+
+thermo_style custom step
+thermo 10000
+run 1000000

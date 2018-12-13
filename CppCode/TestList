@@ -1,0 +1,32 @@
++: test that passed. -: tests left to do. !: Failed tests (should be solved before moving on).
+
+in.test1 (kn+gamman)
++ 1 ball bouncing on top wall, d0, kn+gamman
++ 1 ball bouncing on top wall, d4 
++ 1 ball going through a PBC
++ 1 ball bouncing on bot wall, d1
+
+in.test2 (kn+gamman)
++ 1 ball bouncing on another ball, no dimension mix
++ 1 ball bouncing on another ball, dimension mix
++ 2 balls bouncing against each other through PBC, no dimension mix
++ 2 balls bouncing against each other through PBC, dimension mix
+
+in.test3 (kn+kt+gamman+gammat)
++ 1 ball, constant omega (no torque), orientation over time
++ 1 ball, constant side force
++ 1 ball, I=infinity, omega=0, friction on a plane, sin displacement, through PBC (took a long time, had to go similar to liggghts implementation instead of Luding's one).
++ 1 ball, I=infinity, omega!=0, friction on a plane
++ 1 ball, I finite, friction on a plane (make the ball rotate at constant speed by rolling) WARN Need a pretty small kt or it diverges
+
+in.test4 
++ 1 ball falling on another one, and rolling on it, then hitting a plane, in 3D
++ Then same through PBC
+- Then same in >=5D. HARD TO DO ACTUALLY, because density and everything has to be adjusted to match the increase in dimension number ...
+  -> 2 solution: either adapt the density so that we have the same particle mass in every dimension, which also leads to same moment of inertia.
+  ->             or we adapt all the contact constants so that the accelartions F/m don't explode when m goes very small as d increases. 
+- 3 or 4 balls in gear configuration, 1 rotate, what happens to the others? 
+
+in.test5
+- Pouring on a plane
+- incline plane flow

@@ -1,0 +1,22 @@
+# Balls bouncing on a plate 3D 1N
+dimensions 3 2
+#boundary 2 WALL 0 0.9 
+boundary 0 PBC 0 0.01
+boundary 1 PBC 0 0.01
+boundary 2 PBC 0 0.01
+location 0 0.005 0.005 0.005
+location 1 0.0051 0.00475 0
+velocity 1 0 0 0.5
+#freeze 0
+#gravity 0 0 10 
+radius -1 0.00075
+mass -1 .0000044
+set Kn 8.1e5
+set Kt 0
+set GammaN 0.1
+set GammaT 0
+set Mu 0.5
+set T 1
+set dt 0.000001
+set tdump 100
+set dumpkind 3
