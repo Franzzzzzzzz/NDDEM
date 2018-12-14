@@ -52,7 +52,7 @@ public:
  void finalise () { while (it!=v.end()) it=v.erase(it) ; }
  list <cp> v ;
  Action * default_action () {return (&def) ; }
- int cid=0 ; 
+ int cid=0 ;
 
 private:
  list<cp>::iterator it ;
@@ -65,7 +65,7 @@ inline bool operator== (const cp &a, const cp &b) {return (a.i==b.i && a.j==b.j)
 
 //============================================================================================================
 //------------------ Quite slow unfortunately. Probably better to use the list implementation ----------------
-class sparsevector
+/*class sparsevector
 {
 public:
     sparsevector (int m) : max_size(m) {}
@@ -84,5 +84,5 @@ private:
     bool isdeleted (const cp &a) {return (a.i<0) ;}
 } ;
 
-
+*/
 #endif

@@ -16,7 +16,7 @@ Contacts::Contacts (Parameters &P)
   ptrP=&P ;
 }
 //-------------------------------------------------------------------------------------
-void Contacts::clean_history ()
+/*void Contacts::clean_history ()
 {
   map<pair <int,int>, pair <bool, v1d> >::iterator iter = History.begin();
   map<pair <int,int>, pair <bool, v1d> >::iterator endIter = History.end();
@@ -30,13 +30,12 @@ void Contacts::clean_history ()
       ++iter;
     }
   }
-}
+}*/
 //--------------------------------------------------------------------------------------
 //---------------------- particle particle contact ----------------------------
-Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
-                                     cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
+void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
+                                  cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
 {
-  static Action res ;
   //Contact properties:
   //contactlength=Tools::normdiff(Xi,Xj) ;
   /*double R=ri*ri+2*ri*rj+rj*rj, sum=0 ;
@@ -49,7 +48,7 @@ Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;
-  if (ovlp<=0) {res.setzero(d) ; return res ;}
+  if (ovlp<=0) {Result.setzero(d) ; return ;}
   //printf("%g %g %g %g\n", ri, rj, Xi[2], Xj[2]) ; fflush(stdout) ;
   Tools::vMinus(cn, Xi, Xj) ; //cn=(Xi-Xj) ;
   cn /= contactlength ;
@@ -96,18 +95,16 @@ Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri
   //Update contact history
   //History[make_pair(i,j)]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
-  res.set(Fn, Ft, Torquei, Torquej) ;
-  return res ;
+  Result.set(Fn, Ft, Torquei, Torquej) ;
 }
 
 //---------------------- particle wall contact ----------------------------
-Action Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
-                                 int j, int orient, cp & Contact)
+void Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
+                               int j, int orient, cp & Contact)
 {
-  Action res ;
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
-  if (ovlp<=0) {res.setzero(d) ; return res ;}
+  if (ovlp<=0) {Result.setzero(d) ; return ;}
   Tools::unitvec(cn, d, j) ;
   cn=cn*(-orient) ; // l give the orientation (+1 or -1)
 
@@ -147,6 +144,6 @@ Action Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
 
   //History[make_pair(i,-(2*j+k+1))]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
-  res.set(Fn, Ft, Torquei, Torquej) ;
-  return (res) ;
+  Result.set(Fn, Ft, Torquei, Torquej) ;
+  return ;
 }

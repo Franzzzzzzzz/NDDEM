@@ -14,7 +14,7 @@ int ContactList::insert(const cp &a)
         if ((*it)==a)
         {
             it->contactlength=a.contactlength ;
-            it->isghost=a.isghost ; 
+            it->isghost=a.isghost ;
             it++ ;
         }
         else {it=v.insert(it,a) ; it++ ; }
@@ -32,10 +32,12 @@ int ContactList::insert(const cp &a)
 
 
 
+
+
 //=================================================================
 // Sparse vector implementation, probably shouldn't use
 //-----------------------------------------------
-void sparsevector::insert_in_place (vector <cp> & v1) //WORKS
+/*void sparsevector::insert_in_place (vector <cp> & v1) //WORKS
 {
     if (vin.size()==0) return ;
     int last=v1.size()-1 ;
@@ -95,5 +97,5 @@ int sparsevector::find_next_insertion (vector <cp> &v, cp &a)
      }
     }
     return idx ;
-}
+}*/
 //==============================================================
