@@ -19,7 +19,7 @@ int ContactList::insert(const cp &a)
         }
         else {it=v.insert(it,a) ; it++ ; }
     }
-    return (cid++) ;
+    return 0 ;
 }
 
 
