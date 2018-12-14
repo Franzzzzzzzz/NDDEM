@@ -125,16 +125,16 @@ int main (int argc, char *argv[])
    // Contact detection (sequential, can be paralelised easily with openmp)
 
    Benchmark::start_clock("Contacts") ;
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir)
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared (stdout)
    {
      int ID = omp_get_thread_num();
      cp tmpcp(0,0,d,0,nullptr) ;
      double sum=0, sum2 ;
      ContactList & CLp = MP.CLp[ID] ;
-     ContactList & CLw = MP.CLp[ID] ;
-     int Nbeg = MP.share[ID], Nend=MP.share[ID] ;
+     ContactList & CLw = MP.CLw[ID] ;
+     int Nbeg = MP.share[ID], Nend=MP.share[ID+1] ;
      CLp.reset() ; CLw.reset();
-
+     printf("B") ; fflush(stdout) ;
      for (int i=Nbeg ; i< Nend; i++)
      {
          tmpcp.setinfo(CLp.default_action());
@@ -146,7 +146,7 @@ int main (int argc, char *argv[])
              if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
              {
                  tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.isghost=0 ;
-                 CLp.insert(tmpcp) ;
+                 CLp.insert(tmpcp) ; //printf("[%d %d]", i, j) ;
              }
 
              // Ghost contact detection (if particle j is near a pbc, it has a ghost, and we detect the possible contact or i w/ the j-ghost)
@@ -168,6 +168,7 @@ int main (int argc, char *argv[])
                  }
              }
          }
+         printf("A") ; fflush(stdout) ;
 
          tmpcp.setinfo(CLw.default_action());
          for (int j=0 ; j<d ; j++) // Wall contacts
@@ -194,19 +195,21 @@ int main (int argc, char *argv[])
    }// End parallel section
    Benchmark::stop_clock("Contacts");
 
+   printf("C") ; fflush(stdout) ;
    //-------------------------------------------------------------------------------
    // Force and torque computation
    Benchmark::start_clock("Forces");
    Tools::setgravity(F, P.g, P.m); Tools::setzero(Torque);
 
    //Particle - particle contacts
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Torque)
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Torque) shared(stdout)
    {
      int ID = omp_get_thread_num();
      Contacts & C = MP.C[ID] ;
 
      for (auto it = MP.CLp[ID].v.begin() ; it!=MP.CLp[ID].v.end() ; it++)
      {
+             printf("D") ; fflush(stdout) ;
       if (it->isghost==0)
       {
           C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
