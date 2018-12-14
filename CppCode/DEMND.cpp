@@ -1,9 +1,10 @@
 #include "DEMND.h"
 #include <signal.h>
 #include "Benchmark.h"
-long int cid=0 ; //DEBUG
 
-int Tools::d=0 ;
+#define OMP_NUM_THREADS 1
+
+unsigned int Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
 vector < vector <int> > Tools::MIndexAS ;
 vector < double > Tools::Eye ;
@@ -29,7 +30,7 @@ int main (int argc, char *argv[])
  Parameters P(dd,NN) ;
  Tools::initialise(P.d) ;
  if (!Tools::check_initialised(P.d)) printf("ERR: Something terribly wrong happened\n") ;
- assert(P.d<(sizeof(int)*8-1)) ;
+ assert(P.d<(unsigned int)(sizeof(int)*8-1)) ;
  // Array initialisations
  int N=P.N ; int d=P.d ;
  std::vector < std::vector <double> > X (N, std::vector <double> (d, 0)) ;
@@ -57,8 +58,11 @@ int main (int argc, char *argv[])
      P.load_datafile (argv[3], X, V, Omega) ;
  if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64) P.xmlout->header(d, argv[3]) ;
 
- Contacts C(P) ; //Initialize the Contact class object
- ContactList CLp, CLg, CLw ;
+ //Contacts C(P) ; //Initialize the Contact class object No More
+ //ContactList CLp, CLw ; NO MORE
+ //Multiprocessor setup
+ omp_set_num_threads(OMP_NUM_THREADS) ;
+ Multiproc MP(N, OMP_NUM_THREADS, P) ;
 
  Action Act ;
  clock_t tnow, tprevious ; tprevious=clock() ;
@@ -67,7 +71,6 @@ int main (int argc, char *argv[])
 
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
-   //bool isdumptime = (ti % P.tdump==0) ;
    if (ti%P.tinfo==0)
    {
      tnow = clock();
@@ -86,12 +89,6 @@ int main (int argc, char *argv[])
    Benchmark::start_clock("Verlet 1st");
    for (int i=0 ; i<N ; i++)
    {
-     //BEGIN TEST
-     //Tools::setzero(FOld[0]) ;
-     //V[0][0]=cos(t*2*M_PI)*(t<0.5?1:-1) ; V[0][2]=sin(t*2*M_PI) ; V[0][1]=0 ;
-     //V[0][1]=0 ; V[0][0]=0.2-t ; V[0][2]=(0.5-t) ;
-     //Omega[0][0]=0 ; Omega[0][1]=0 ; Omega[0][2]=-1 ;
-     //END TEST
     for (int dd=0 ; dd<d ; dd++)
         X[i][dd] += V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
 
@@ -119,8 +116,7 @@ int main (int argc, char *argv[])
     for (int j=0 ; j<d ; j++, mask<<=1)
     {
      if (P.Boundaries[j][3] != 0) continue ;
-     //if      (X[i][j] < P.Boundaries[j][0] + 2*P.r[i]) { tmpghost[0]=i ; tmpghost[1]=j ; Ghosts.push_back(tmpghost) ; Ghosts_deltas.push_back( P.Boundaries[j][2]) ; }
-     //else if (X[i][j] > P.Boundaries[j][1] - 2*P.r[i]) { tmpghost[0]=i ; tmpghost[1]=j ; Ghosts.push_back(tmpghost) ; Ghosts_deltas.push_back(-P.Boundaries[j][2]) ; }
+
      if      (X[i][j] <= P.Boundaries[j][0] + 2*P.r[i]) {Ghost[i] |= mask ; } //Ghost_dir [i] |= mask*0 ;
      else if (X[i][j] >= P.Boundaries[j][1] - 2*P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
@@ -131,81 +127,78 @@ int main (int argc, char *argv[])
    //---------- Velocity Verlet step 2 : compute the forces and torques
    // Contact detection (sequential, can be paralelised easily with openmp)
 
-   Benchmark::start_clock("Contacts");
-   cp tmpcp(0,0,d,0,nullptr) ; double sum=0, sum2 ;
-   CLp.reset() ; CLg.reset() ; CLw.reset();
-
-   for (int i=0 ; i<N ; i++)
+   Benchmark::start_clock("Contacts") ;
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir)
    {
-       Benchmark::start_clock("Contacts_part");
-       tmpcp.setinfo(CLp.default_action());
+     int ID = omp_get_thread_num();
+     cp tmpcp(0,0,d,0,nullptr) ;
+     double sum=0, sum2 ;
+     ContactList & CLp = MP.CLp[ID] ;
+     ContactList & CLw = MP.CLp[ID] ;
+     int Nbeg = MP.share[ID], Nend=MP.share[ID] ;
+     CLp.reset() ; CLw.reset();
 
+     for (int i=Nbeg ; i< Nend; i++)
+     {
+         tmpcp.setinfo(CLp.default_action());
 
-       for (int j=i+1 ; j<N ; j++) // Regular particles
-       {
-           sum=0 ;
-           for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-           if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
-           {
-               tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.isghost=0 ;
-               CLp.insert(tmpcp) ;
+         for (int j=i+1 ; j<N ; j++) // Regular particles
+         {
+             sum=0 ;
+             for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+             if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
+             {
+                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.isghost=0 ;
+                 CLp.insert(tmpcp) ;
+             }
 
-               //if (CLp.cid>345090 && CLp.cid<345110 && i==0 && j==1) printf("#n %d %d %g %g\n", i, j, X[i][0], X[j][0]) ;
-           }
+             // Ghost contact detection (if particle j is near a pbc, it has a ghost, and we detect the possible contact or i w/ the j-ghost)
+             if (Ghost[j]) //j has at least 1 ghost
+             {
+                 u_int32_t gst = Ghost[j], gst_dir=Ghost_dir[j] ;
+                 for (u_int8_t n=0 ; gst ; gst>>=1, gst_dir>>=1, n++ )
+                 {
+                     if (gst&1)
+                     {
+                         double Delta= (gst_dir&1?-1:1) * P.Boundaries[n][2] ;
+                         sum2= sum + Delta*(2*(X[j][n]-X[i][n]) + Delta) ;
+                         if (sum2<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
+                         {
+                          tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum2) ; tmpcp.isghost = (n+1) * (gst_dir&1?-1:1) ;
+                          CLp.insert(tmpcp) ;
+                         }
+                     }
+                 }
+             }
+         }
 
-           // Test with ghosts
-           if (Ghost[j]) //j has at least 1 ghost
-           {
-               u_int32_t gst = Ghost[j], gst_dir=Ghost_dir[j] ;
-               for (u_int8_t n=0 ; gst ; gst>>=1, gst_dir>>=1, n++ )
-               {
-                   if (gst&1)
-                   {
-                       double Delta= (gst_dir&1?-1:1) * P.Boundaries[n][2] ;
-                       sum2= sum + Delta*(2*(X[j][n]-X[i][n]) + Delta) ;
-                       if (sum2<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
-                       {
-                        tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum2) ; tmpcp.isghost = (n+1) * (gst_dir&1?-1:1) ;
-                        CLp.insert(tmpcp) ;
-                       }
-                   }
-               }
-           }
-       }
-       Benchmark::stop_clock("Contacts_part");
+         tmpcp.setinfo(CLw.default_action());
+         for (int j=0 ; j<d ; j++) // Wall contacts
+         {
+              if (P.Boundaries[j][3]!=1) continue ;
 
-       Benchmark::start_clock("Contacts_bound");
-       tmpcp.setinfo(CLw.default_action());
-       for (int j=0 ; j<d ; j++) // Wall contacts
-       {
-            if (P.Boundaries[j][3]!=1) continue ;
+              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+              if (tmpcp.contactlength<P.r[i])
+              {
+                  tmpcp.i=i ; tmpcp.j=(2*j+0);
+                  CLw.insert(tmpcp) ;
+              }
 
-            tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
-            if (tmpcp.contactlength<P.r[i])
-            {
-                tmpcp.i=i ; tmpcp.j=(2*j+0);
-                CLw.insert(tmpcp) ;
-            }
-
-            tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
-            if (tmpcp.contactlength<P.r[i])
-            {
-                tmpcp.i=i ; tmpcp.j=(2*j+1);
-                CLw.insert(tmpcp) ;
-            }
-       }
-       Benchmark::stop_clock("Contacts_bound");
-   }
-   CLp.finalise() ;
-   CLg.finalise() ;
-   CLw.finalise() ;
+              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+              if (tmpcp.contactlength<P.r[i])
+              {
+                  tmpcp.i=i ; tmpcp.j=(2*j+1);
+                  CLw.insert(tmpcp) ;
+              }
+         }
+     } // END contact detection
+     CLp.finalise() ;
+     CLw.finalise() ;
+   }// End parallel section
    Benchmark::stop_clock("Contacts");
 
    //-------------------------------------------------------------------------------
    // Force and torque computation
-   // DEBUG
-   //static FILE * outdebug=fopen("Debug.txt", "w") ;
-
    Benchmark::start_clock("Forces");
    Tools::setzero(F) ; Tools::setzero(Fcorr) ; Tools::setzero(TorqueCorr) ;
    v1d tmp, previous ;
@@ -213,67 +206,40 @@ int main (int argc, char *argv[])
    Tools::setzero(Torque);
 
    //Particle - particle contacts
-   for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Torque)
    {
-    if (it->isghost==0)
-    {
-        Act = C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                              X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
-    }
-    else
-    {
-        Act=C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                             X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
-    }
+     int ID = omp_get_thread_num();
+     Contacts & C = MP.C[ID] ;
 
-    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
-    Tools::vSubFew(F[it->j], Act.Fn, Act.Ft, Fcorr[it->j]) ;
-    Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
-    Tools::vAddOne(Torque[it->j], Act.Torquej, TorqueCorr[it->j]) ;
+     for (auto it = MP.CLp[ID].v.begin() ; it!=MP.CLp[ID].v.end() ; it++)
+     {
+      if (it->isghost==0)
+      {
+          C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; //cid++ ;
+      }
+      else
+      {
+          C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                               X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; //cid++ ;
+      }
+      //Tools::vAdd(F[it->i], C.Result.Fn, C.Result.Ft) ; Tools::vSub(F[it->j], C.Result.Fn, C.Result.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+      //Torque[it->i] += C.Result.Torquei ; Torque[it->j] += C.Result.Torquej ;
+      Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
+      Tools::vSubFew(F[it->j], Act.Fn, Act.Ft, Fcorr[it->j]) ;
+      Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
+      Tools::vAddOne(Torque[it->j], Act.Torquej, TorqueCorr[it->j]) ;
+     }
 
-/*    tmp=(Act.Fn+Act.Ft)-Fcorr[it->i] ;
-    previous=F[it->i] ;
-    F[it->i] += tmp ;
-    Fcorr[it->i] = F[it->i]-previous-tmp ;
-
-    tmp=(-Act.Fn-Act.Ft)-Fcorr[it->j] ;
-    previous=F[it->j] ;
-    F[it->j] += tmp ;
-    Fcorr[it->j] = F[it->j]-previous-tmp ;
-
-    tmp=(Act.Torquei)-TorqueCorr[it->i] ;
-    previous=Torque[it->i] ;
-    Torque[it->i] += tmp ;
-    TorqueCorr[it->i] = Torque[it->i]-previous-tmp ;
-
-    tmp=(Act.Torquej)-TorqueCorr[it->j] ;
-    previous=Torque[it->j] ;
-    Torque[it->j] += tmp ;
-    TorqueCorr[it->j] = Torque[it->j]-previous-tmp ; */
-
-    //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-    //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
-   }
-
-   for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
-   {
-    Act=C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
-    //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
-    //Torque[it->i] += Act.Torquei ;
-
-    /*tmp=(Act.Fn+Act.Ft)-Fcorr[it->i] ;
-    previous=F[it->i] ;
-    F[it->i] += tmp ;
-    Fcorr[it->i] = F[it->i]-previous-tmp ;
-
-    tmp=(Act.Torquei)-TorqueCorr[it->i] ;
-    previous=Torque[it->i] ;
-    Torque[it->i] += tmp ;
-    TorqueCorr[it->i] = Torque[it->i]-previous-tmp ;*/
-    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
-    Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
-   }
-
+     for (auto it = MP.CLw[ID].v.begin() ; it!=MP.CLw[ID].v.end() ; it++)
+     {
+      C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
+      //Tools::vAdd(F[it->i], C.Result.Fn, C.Result.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
+      //Torque[it->i] += C.Result.Torquei ;    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
+      Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
+      Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
+     }
+   } // END PARALLEL SECTION
    Benchmark::stop_clock("Forces");
 
    //---------- Velocity Verlet step 3 : compute the new velocities
@@ -287,9 +253,7 @@ int main (int argc, char *argv[])
     Tools::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
     FOld[i]=F[i] ;
     TorqueOld[i]=Torque[i] ;
-    //if (ti > 388800 && ti<389000)  fprintf(outdebug, "{%d %g %g|%g}",i, X[i][0], X[i][2], Omega[i][1] );
    }
-   C.clean_history() ; //Contact history cleaning and preparation for the next iteration
 
    Benchmark::stop_clock("Verlet last");
 

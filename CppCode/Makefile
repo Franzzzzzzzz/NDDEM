@@ -12,15 +12,15 @@ CC=/opt/local/bin/g++-mp-6
 #LDFLAGS=-L/opt/local/lib -L/home/franz/Logiciels/matlab2009/bin/glnx86
 
 
-SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp
+SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
-LDFLAGS=-L/opt/local/lib
+LDFLAGS=-L/opt/local/lib -fopenmp
 LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -DNETCDF -I/opt/local/include
+all: CFLAGS+=-g -O3 -DNETCDF -Wall -I/opt/local/include -fopenmp
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+=-lnetcdf
 #info:#
