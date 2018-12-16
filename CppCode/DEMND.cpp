@@ -137,7 +137,6 @@ int main (int argc, char *argv[])
      ContactList & CLw = MP.CLw[ID] ;
      int Nbeg = MP.share[ID], Nend=MP.share[ID+1] ;
      CLp.reset() ; CLw.reset();
-     printf("B") ; fflush(stdout) ;
      for (int i=Nbeg ; i< Nend; i++)
      {
          tmpcp.setinfo(CLp.default_action());
@@ -171,7 +170,6 @@ int main (int argc, char *argv[])
                  }
              }
          }
-         printf("A") ; fflush(stdout) ;
 
          tmpcp.setinfo(CLw.default_action());
          for (int j=0 ; j<d ; j++) // Wall contacts
@@ -198,7 +196,6 @@ int main (int argc, char *argv[])
    }// End parallel section
    Benchmark::stop_clock("Contacts");
 
-   printf("C") ; fflush(stdout) ;
    //-------------------------------------------------------------------------------
    // Force and torque computation
    Benchmark::start_clock("Forces");
@@ -208,14 +205,23 @@ int main (int argc, char *argv[])
    Tools::setzero(Torque);
 
    //Particle - particle contacts
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Torque) shared(stdout)
-   {
-     int ID = omp_get_thread_num();
+   //#pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Torque) shared(stdout)
+   int nn=0, nm=0, no=0 ;  ;
+   for (int ID=0 ;ID<MP.P ; ID++) {
+     //int ID = omp_get_thread_num();
+     MP.tmp_j[ID].resize(0) ;
+     MP.tmp_forcen[ID].resize(0) ;
+     MP.tmp_forcet[ID].resize(0) ;
+     MP.tmp_torque[ID].resize(0) ;
      Contacts & C = MP.C[ID] ;
-
+     for (auto it = MP.CLw[ID].v.begin() ; it!=MP.CLw[ID].v.end() ; it++)
+     {
+      C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
+      Tools::vAdd(F[it->i], C.Result.Fn, C.Result.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
+      Torque[it->i] += C.Result.Torquei ;
+     }
      for (auto it = MP.CLp[ID].v.begin() ; it!=MP.CLp[ID].v.end() ; it++)
      {
-             printf("D") ; fflush(stdout) ;
       if (it->isghost==0)
       {
           C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
@@ -243,6 +249,17 @@ int main (int argc, char *argv[])
       Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
      }
    } // END PARALLEL SECTION
+
+   // Now processing the remaining forces sequencially
+   for (int i=MP.P-1 ; i>=0 ; i--)
+   {
+       for (uint j=0 ; j<MP.tmp_j[i].size() ; j++)
+       {
+           //Tools::vSub(F[MP.tmp_j[i][j]], MP.tmp_forcen[i][j], MP.tmp_forcet[i][j]) ;
+           //Torque[MP.tmp_j[i][j]] += MP.tmp_torque[i][j] ; no++ ;
+       }
+   }
+   //printf("%d %d %d\n", nn, nm, no) ;
    Benchmark::stop_clock("Forces");
 
    //---------- Velocity Verlet step 3 : compute the new velocities

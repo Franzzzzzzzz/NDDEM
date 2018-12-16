@@ -14,11 +14,7 @@ set Kt 8e4
 set GammaN 0.1
 set GammaT 0.1
 set Mu 0.5
-<<<<<<< HEAD
 set T 1
-=======
-set T 10
->>>>>>> Broken (work in progress)
 set dt 0.000001
 set dumpkind VTK
 set tdump 10000
