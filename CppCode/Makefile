@@ -1,4 +1,5 @@
-CC=/opt/local/bin/g++-mp-6
+#CC=/opt/local/bin/g++-mp-6
+CC=g++
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include
@@ -20,7 +21,7 @@ LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -DNETCDF -Wall -I/opt/local/include -fopenmp
+all: CFLAGS+=-g -DNETCDF -Wall -I/opt/local/include -fopenmp
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+=-lnetcdf
 #info:#

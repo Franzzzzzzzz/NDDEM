@@ -8,7 +8,7 @@ void Multiproc::disp_share()
     printf("%d ", i) ;
   printf("\n") ;   
   for (int i=0 ; i<P ; i++)
-    printf("%.1f", ((N-share[i]- (share[i+1]-share[i])/2)*(share[i+1]-share[i]))/double((N*N-1)/2*P)*100) ;
+    printf("%.1f ", ((N-share[i]- (share[i+1]-share[i])/2)*(share[i+1]-share[i]))/double((N*N-1)/2)*100) ;
   printf("\n--------\n") ;
 }
 //=====================================================

@@ -11,7 +11,6 @@
 #include "Parameters.h"
 #include "Tools.h"
 #include "ContactList.h"
-extern long int cid ;
 
 class Contacts
 {
