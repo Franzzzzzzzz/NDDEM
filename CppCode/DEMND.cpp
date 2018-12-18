@@ -41,6 +41,9 @@ int main (int argc, char *argv[])
  std::vector < std::vector <double> > Torque (N, std::vector <double> (d*(d-1)/2, 0)) ;
  std::vector < std::vector <double> > TorqueOld (N, std::vector <double> (d*(d-1)/2, 0)) ;
 
+ std::vector < std::vector <double> > Fcorr (N, std::vector <double> (d, 0)) ;
+ std::vector < std::vector <double> > TorqueCorr (N, std::vector <double> (d*(d-1)/2, 0)) ;
+
  vector <u_int32_t> Ghost (N, 0) ;
  vector <u_int32_t> Ghost_dir (N, 0) ;
 
@@ -164,42 +167,12 @@ int main (int argc, char *argv[])
                        {
                         tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum2) ; tmpcp.isghost = (n+1) * (gst_dir&1?-1:1) ;
                         CLp.insert(tmpcp) ;
-                        //if (CLp.cid>345090 && CLp.cid<345110 && i==0 && j==1) printf("#g %d %d %g %g\n", i, j, X[i][0], X[j][0]) ;
                        }
                    }
                }
            }
        }
        Benchmark::stop_clock("Contacts_part");
-
-       //TEST
-       /*for (auto i : CLp.v)
-       {
-         if (i.isghost!=0) printf("%d %d %d\n", i.i, i.j, i.isghost) ;
-       }*/
-
-
-
-       /*Benchmark::start_clock("Contacts_ghost");
-       //printf("%d ", Nghosts) ;
-       tmpcp.setinfo(CLg.default_action());
-       double sum=0, save ; v1d * ghst ;
-       for (int j=0; j<Nghosts ; j++) // Ghost particles
-       {
-           if (i==Ghosts[j][0]) continue ;
-           ghst= &(X[Ghosts[j][0]]) ;
-           save=(*ghst)[Ghosts[j][1]] ;
-           //Xg=X[Ghosts[j][0]]+Tools::unitvec(Ghosts[j][1])*Ghosts_deltas[j] ;
-           (*ghst)[Ghosts[j][1]] += Ghosts_deltas[j] ;
-           for (int k=0 ; k<d ; k++) sum+= (X[i][k]-(*ghst)[k])*(X[i][k]-(*ghst)[k]) ;
-           if (sum<(P.r[i]+P.r[Ghosts[j][0]])*(P.r[i]+P.r[Ghosts[j][0]]))
-           {
-               tmpcp.i=i ; tmpcp.j=Ghosts[j][0] ; tmpcp.contactlength=sqrt(sum) ;
-               CLg.insert(tmpcp) ;
-           }
-           (*ghst)[Ghosts[j][1]] = save ;
-       }
-       Benchmark::stop_clock("Contacts_ghost");*/
 
        Benchmark::start_clock("Contacts_bound");
        tmpcp.setinfo(CLw.default_action());
@@ -234,7 +207,10 @@ int main (int argc, char *argv[])
    //static FILE * outdebug=fopen("Debug.txt", "w") ;
 
    Benchmark::start_clock("Forces");
-   Tools::setgravity(F, P.g, P.m); Tools::setzero(Torque);
+   Tools::setzero(F) ; Tools::setzero(Fcorr) ; Tools::setzero(TorqueCorr) ;
+   v1d tmp, previous ;
+   Tools::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
+   Tools::setzero(Torque);
 
    //Particle - particle contacts
    for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
@@ -249,73 +225,56 @@ int main (int argc, char *argv[])
         Act=C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
                              X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
     }
-    Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-    Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
-    //if (ti > 388800 && ti<389000) fprintf(outdebug, "[%c %ld %d %d %d %g %g|%g %g %g %g|%g] ", it->isghost?'g':'n', cid, CLp.cid, it->i, it->j, Act.Torquei[1], Act.Torquej[1], Act.Fn[0], Act.Fn[2], Act.Ft[0], Act.Ft[2], it->contactlength-0.0015) ;
-    //if (isdumptime) {it->setinfo(Act);}
+
+    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
+    Tools::vSubFew(F[it->j], Act.Fn, Act.Ft, Fcorr[it->j]) ;
+    Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
+    Tools::vAddOne(Torque[it->j], Act.Torquej, TorqueCorr[it->j]) ;
+
+/*    tmp=(Act.Fn+Act.Ft)-Fcorr[it->i] ;
+    previous=F[it->i] ;
+    F[it->i] += tmp ;
+    Fcorr[it->i] = F[it->i]-previous-tmp ;
+
+    tmp=(-Act.Fn-Act.Ft)-Fcorr[it->j] ;
+    previous=F[it->j] ;
+    F[it->j] += tmp ;
+    Fcorr[it->j] = F[it->j]-previous-tmp ;
+
+    tmp=(Act.Torquei)-TorqueCorr[it->i] ;
+    previous=Torque[it->i] ;
+    Torque[it->i] += tmp ;
+    TorqueCorr[it->i] = Torque[it->i]-previous-tmp ;
+
+    tmp=(Act.Torquej)-TorqueCorr[it->j] ;
+    previous=Torque[it->j] ;
+    Torque[it->j] += tmp ;
+    TorqueCorr[it->j] = Torque[it->j]-previous-tmp ; */
+
+    //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+    //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
    }
 
-   /*for (auto it = CLg.v.begin() ; it!=CLg.v.end() ; it++)
-   {
-    Act = C.particle_ghost (X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                            X[Ghosts[it->j][0]]+Tools::unitvec(Ghosts[it->j][1])*Ghosts_deltas[it->j], V[Ghosts[it->j][0]], Omega[Ghosts[it->j][0]], P.r[Ghosts[it->j][0]], *it) ;
-    Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ;
-    Torque[it->i] += Act.Torquei ;
-    //if (isdumptime) {it->setinfo(Act);}
-   }*/
    for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
    {
     Act=C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
-    Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
-    Torque[it->i] += Act.Torquei ;
-    //if (ti > 388800 && ti<389000) fprintf(outdebug, "[w %d %g]", it->i, Act.Torquei[1]) ;
-    //if (isdumptime) {it->setinfo(Act);}
+    //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
+    //Torque[it->i] += Act.Torquei ;
+
+    /*tmp=(Act.Fn+Act.Ft)-Fcorr[it->i] ;
+    previous=F[it->i] ;
+    F[it->i] += tmp ;
+    Fcorr[it->i] = F[it->i]-previous-tmp ;
+
+    tmp=(Act.Torquei)-TorqueCorr[it->i] ;
+    previous=Torque[it->i] ;
+    Torque[it->i] += tmp ;
+    TorqueCorr[it->i] = Torque[it->i]-previous-tmp ;*/
+    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
+    Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
    }
-   //if (ti > 388800 && ti<389000)  fprintf(outdebug, "\n") ;
 
    Benchmark::stop_clock("Forces");
-
-   /* Force computation superseeded by the contact lists ...
-   Tools::setzero(F) ; Tools::setzero(Torque) ;
-   for (int i=0 ; i<N ; i++)
-   {
-    F[i]+= P.g * P.m[i] ;
-
-    //-----Particle - particle contacts
-    for (int j=i+1 ; j<N ; j++)
-    {
-      Act=C.particle_particle(X[i], V[i], Omega[i], P.r[i], i, X[j], V[j], Omega[j], P.r[j], j) ;
-      F[i] += (Act.Fn + Act.Ft) ;
-      F[j] -= (Act.Fn + Act.Ft) ;
-      Torque[i] += Act.Torquei ;
-      Torque[j] += Act.Torquej ;
-    }
-
-    //-----Particle - ghosts contacts
-    for (int j=0 ; j<Nghosts ; j++)
-    {
-
-      Act=C.particle_ghost (X[i], V[i], Omega[i], P.r[i], i,
-            X[Ghosts[j][0]]+Tools::unitvec(Ghosts[j][1])*Ghosts_deltas[j], V[Ghosts[j][0]], Omega[Ghosts[j][0]], P.r[Ghosts[j][0]], N+Ghosts[j][0]) ;
-      F[i] += (Act.Fn + Act.Ft) ;
-      Torque[i] += Act.Torquei ;
-
-    }
-
-    //---------Particle - Walls contacts
-    for (int j=0 ; j<d ; j++)
-    {
-      if (P.Boundaries[j][3]!=1) continue ;
-      Act=C.particle_wall(X[i],V[i],Omega[i],P.r[i],i,j,0,-1,P.Boundaries[j][0]) ;
-      F[i] += (Act.Fn+Act.Ft) ;
-      Torque[i] += Act.Torquei ;
-      Act=C.particle_wall(X[i],V[i],Omega[i],P.r[i],i,j,1, 1,P.Boundaries[j][1]) ;
-
-      F[i] += (Act.Fn+Act.Ft) ;
-      Torque[i] += Act.Torquei ;
-    }
-   }*/
-
 
    //---------- Velocity Verlet step 3 : compute the new velocities
    Benchmark::start_clock("Verlet last");
