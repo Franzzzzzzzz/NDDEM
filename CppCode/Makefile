@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 CC=/opt/local/bin/g++-mp-6
 #CC=g++
+=======
+#CC=/opt/local/bin/g++-mp-6
+CC=g++
+>>>>>>> 5ca1534495ad4b238ed2fc2b2ebea90f0f391fe1
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include

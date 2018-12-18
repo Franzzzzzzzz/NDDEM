@@ -14,7 +14,11 @@ set Kt 8e4
 set GammaN 0.1
 set GammaT 0.1
 set Mu 0.5
+<<<<<<< HEAD
 set T 1
+=======
+set T 10
+>>>>>>> 5ca1534495ad4b238ed2fc2b2ebea90f0f391fe1
 set dt 0.000001
 set dumpkind VTK
 set tdump 10000

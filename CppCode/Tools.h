@@ -88,6 +88,7 @@ static void vPlus (v1d & res, cv1d &a, double b)  {for (uint i=0 ; i<a.size() ; 
 static void vPlus (v1d & res, cv1d &a, cv1d & b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]+b[i] ; }
 static void vDiv   (v1d & res, cv1d &a, double b) {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]/b ; }
 static void vDiv   (v1d & res, cv1d &a, cv1d & b) {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]/b[i] ; }
+<<<<<<< HEAD
 static void vAddFew (v1d &res , cv1d &a, cv1d &b)    {for (uint i=0 ; i<a.size() ; i++) res[i] += a[i]+b[i] ; }
 static void vAddScaled (v1d &res , double d, cv1d &a, cv1d &b) {for (uint i=0 ; i<a.size() ; i++) res[i] += d*(a[i]+b[i]) ; }
 static void vAddScaled (v1d &res , double d, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] += d*a[i] ; }
@@ -144,6 +145,14 @@ static void vSubOne (v1d & res, cv1d &a, v1d & Corr)
   Corr[i] = res[i]-Previous-Tmp ;
   }
 }
+=======
+static void vAdd (v1d &res , cv1d &a, cv1d &b)    {for (uint i=0 ; i<a.size() ; i++) res[i] += a[i]+b[i] ; }
+static void vAddScaled (v1d &res , double d, cv1d &a, cv1d &b) {for (uint i=0 ; i<a.size() ; i++) res[i] += d*(a[i]+b[i]) ; }
+static void vAddScaled (v1d &res , double d, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] += d*a[i] ; }
+static void vSub (v1d &res , cv1d &a, cv1d &b)                 {for (uint i=0 ; i<a.size() ; i++) res[i] -= (a[i]+b[i]) ; }
+static void vSubScaled (v1d &res , double d, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] -= d*a[i] ; }
+static void vScaledSum (v1d &res , double d, cv1d &a, cv1d &b) {for (uint i=0 ; i<a.size() ; i++) res[i] += d*a[i]+b[i] ; }
+>>>>>>> 5ca1534495ad4b238ed2fc2b2ebea90f0f391fe1
 
 // Sign function
 static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; }
