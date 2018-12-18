@@ -206,7 +206,7 @@ int main (int argc, char *argv[])
 
    //Particle - particle contacts
    //#pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Torque) shared(stdout)
-   int nn=0, nm=0, no=0 ;  ;
+   
    for (int ID=0 ;ID<MP.P ; ID++) {
      //int ID = omp_get_thread_num();
      MP.tmp_j[ID].resize(0) ;
@@ -214,12 +214,7 @@ int main (int argc, char *argv[])
      MP.tmp_forcet[ID].resize(0) ;
      MP.tmp_torque[ID].resize(0) ;
      Contacts & C = MP.C[ID] ;
-     for (auto it = MP.CLw[ID].v.begin() ; it!=MP.CLw[ID].v.end() ; it++)
-     {
-      C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
-      Tools::vAdd(F[it->i], C.Result.Fn, C.Result.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
-      Torque[it->i] += C.Result.Torquei ;
-     }
+
      for (auto it = MP.CLp[ID].v.begin() ; it!=MP.CLp[ID].v.end() ; it++)
      {
       if (it->isghost==0)

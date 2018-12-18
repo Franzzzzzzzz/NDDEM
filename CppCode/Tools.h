@@ -81,67 +81,67 @@ static v1d  wedgeproduct (cv1d &a, cv1d &b) ;
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; // Overloaded faster operation
 
 // Faster vector operations
-static void vMul  (v1d & res, cv1d &a, double b)  {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]*b ; }
-static void vMul  (v1d & res, cv1d &a, cv1d & b)  {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]*b[i] ; }
-static void vMinus (v1d & res, cv1d &a, cv1d & b) {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]-b[i] ; }
-static void vPlus (v1d & res, cv1d &a, double b)  {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]+b ; }
-static void vPlus (v1d & res, cv1d &a, cv1d & b)  {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]+b[i] ; }
-static void vDiv   (v1d & res, cv1d &a, double b) {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]/b ; }
-static void vDiv   (v1d & res, cv1d &a, cv1d & b) {for (int i=0 ; i<a.size() ; i++) res[i]=a[i]/b[i] ; }
-static void vAddFew (v1d &res , cv1d &a, cv1d &b)    {for (int i=0 ; i<a.size() ; i++) res[i] += a[i]+b[i] ; }
-static void vAddScaled (v1d &res , double d, cv1d &a, cv1d &b) {for (int i=0 ; i<a.size() ; i++) res[i] += d*(a[i]+b[i]) ; }
-static void vAddScaled (v1d &res , double d, cv1d &a)          {for (int i=0 ; i<a.size() ; i++) res[i] += d*a[i] ; }
-static void vSubFew (v1d &res , cv1d &a, cv1d &b)                 {for (int i=0 ; i<a.size() ; i++) res[i] -= (a[i]+b[i]) ; }
-static void vSubScaled (v1d &res , double d, cv1d &a)          {for (int i=0 ; i<a.size() ; i++) res[i] -= d*a[i] ; }
-static void vScaledSum (v1d &res , double d, cv1d &a, cv1d &b) {for (int i=0 ; i<a.size() ; i++) res[i] += d*a[i]+b[i] ; }
+static void vMul  (v1d & res, cv1d &a, double b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]*b ; }
+static void vMul  (v1d & res, cv1d &a, cv1d & b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]*b[i] ; }
+static void vMinus (v1d & res, cv1d &a, cv1d & b) {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]-b[i] ; }
+static void vPlus (v1d & res, cv1d &a, double b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]+b ; }
+static void vPlus (v1d & res, cv1d &a, cv1d & b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]+b[i] ; }
+static void vDiv   (v1d & res, cv1d &a, double b) {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]/b ; }
+static void vDiv   (v1d & res, cv1d &a, cv1d & b) {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]/b[i] ; }
+static void vAddFew (v1d &res , cv1d &a, cv1d &b)    {for (uint i=0 ; i<a.size() ; i++) res[i] += a[i]+b[i] ; }
+static void vAddScaled (v1d &res , double d, cv1d &a, cv1d &b) {for (uint i=0 ; i<a.size() ; i++) res[i] += d*(a[i]+b[i]) ; }
+static void vAddScaled (v1d &res , double d, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] += d*a[i] ; }
+static void vSubFew (v1d &res , cv1d &a, cv1d &b)                 {for (uint i=0 ; i<a.size() ; i++) res[i] -= (a[i]+b[i]) ; }
+static void vSubScaled (v1d &res , double d, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] -= d*a[i] ; }
+static void vScaledSum (v1d &res , double d, cv1d &a, cv1d &b) {for (uint i=0 ; i<a.size() ; i++) res[i] += d*a[i]+b[i] ; }
 
 // Vector operation with floating point error correction (Kahan summation algorithm)
 static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr)
 {
-  static vector <double> Tmp1(d*d, 0), Previous(d*d,0) ;
+  double Tmp, Previous ;
 
-  for (int i=0 ; i<a.size() ; i++)
+  for (uint i=0 ; i<a.size() ; i++)
   {
-  Tmp1[i]=(a[i]+b[i])-Corr[i] ;
-  Previous[i]=res[i] ;
-  res[i] += Tmp1[i] ;
-  Corr[i] = res[i]-Previous[i]-Tmp1[i] ;
+  Tmp=(a[i]+b[i])-Corr[i] ;
+  Previous=res[i] ;
+  res[i] += Tmp ;
+  Corr[i] = res[i]-Previous-Tmp ;
   }
 }
 static void vSubFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr)
 {
-  static vector <double> Tmp1(d*d, 0), Previous(d*d,0) ;
+  double Tmp, Previous ;
 
-  for (int i=0 ; i<a.size() ; i++)
+  for (uint i=0 ; i<a.size() ; i++)
   {
-  Tmp1[i]=(-a[i]-b[i])-Corr[i] ;
-  Previous[i]=res[i] ;
-  res[i] += Tmp1[i] ;
-  Corr[i] = res[i]-Previous[i]-Tmp1[i] ;
+  Tmp=(-a[i]-b[i])-Corr[i] ;
+  Previous=res[i] ;
+  res[i] += Tmp ;
+  Corr[i] = res[i]-Previous-Tmp ;
   }
 }
 static void vAddOne (v1d & res, cv1d &a, v1d & Corr)
 {
-  static vector <double> Tmp1(d*d, 0), Previous(d*d,0) ;
+  double Tmp, Previous;
 
-  for (int i=0 ; i<a.size() ; i++)
+  for (uint i=0 ; i<a.size() ; i++)
   {
-  Tmp1[i]=a[i]-Corr[i] ;
-  Previous[i]=res[i] ;
-  res[i] += Tmp1[i] ;
-  Corr[i] = res[i]-Previous[i]-Tmp1[i] ;
+  Tmp=a[i]-Corr[i] ;
+  Previous=res[i] ;
+  res[i] += Tmp ;
+  Corr[i] = res[i]-Previous-Tmp ;
   }
 }
 static void vSubOne (v1d & res, cv1d &a, v1d & Corr)
 {
-  static vector <double> Tmp1(d*d, 0), Previous(d*d,0) ;
+  double Tmp, Previous ;
 
-  for (int i=0 ; i<a.size() ; i++)
+  for (uint i=0 ; i<a.size() ; i++)
   {
-  Tmp1[i]=-a[i]-Corr[i] ;
-  Previous[i]=res[i] ;
-  res[i] += Tmp1[i] ;
-  Corr[i] = res[i]-Previous[i]-Tmp1[i] ;
+  Tmp=-a[i]-Corr[i] ;
+  Previous=res[i] ;
+  res[i] += Tmp ;
+  Corr[i] = res[i]-Previous-Tmp ;
   }
 }
 
