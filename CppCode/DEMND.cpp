@@ -131,7 +131,7 @@ int main (int argc, char *argv[])
    // Contact detection (sequential, can be paralelised easily with openmp)
 
    Benchmark::start_clock("Contacts");
-   cp tmpcp(0,0,d,0,nullptr) ; double sum=0, sum2 ;
+   cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
    CLp.reset() ; CLw.reset();
 
    for (int i=0 ; i<N ; i++)
@@ -146,14 +146,20 @@ int main (int argc, char *argv[])
            for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
            if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
            {
-               tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.isghost=0 ;
+               tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
                CLp.insert(tmpcp) ;
 
                //if (CLp.cid>345090 && CLp.cid<345110 && i==0 && j==1) printf("#n %d %d %g %g\n", i, j, X[i][0], X[j][0]) ;
            }
 
+           if (Ghost[j])
+           {
+             tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+             CLp.check_ghost(Ghost[j], 0, sum, 0, P, X[i], X[j], (P.r[i]+P.r[j])*(P.r[i]+P.r[j]), tmpcp) ;
+           }
+
            // Test with ghosts
-           if (Ghost[j]) //j has at least 1 ghost
+           /*if (Ghost[j]) //j has at least 1 ghost
            {
                u_int32_t gst = Ghost[j], gst_dir=Ghost_dir[j] ;
                for (u_int8_t n=0 ; gst ; gst>>=1, gst_dir>>=1, n++ )
@@ -169,8 +175,8 @@ int main (int argc, char *argv[])
                        }
                    }
                }
-           }
-       }
+           }*/
+         }
        Benchmark::stop_clock("Contacts_part");
 
        Benchmark::start_clock("Contacts_bound");
@@ -199,6 +205,10 @@ int main (int argc, char *argv[])
    CLw.finalise() ;
    Benchmark::stop_clock("Contacts");
 
+   // DEBUG
+   //for (auto i : CLp.v)
+  //  printf("%d %g %X %X %d %d\n", ti/P.tdump, i.contactlength, i.ghost, i.ghostdir, i.i, i.j) ;
+
    //-------------------------------------------------------------------------------
    // Force and torque computation
    // DEBUG
@@ -212,7 +222,7 @@ int main (int argc, char *argv[])
    //Particle - particle contacts
    for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
    {
-    if (it->isghost==0)
+    if (it->ghost==0)
     {
         C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
                               X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;

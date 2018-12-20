@@ -233,6 +233,33 @@ void Parameters::init_locations (char *line, v2d & X)
         }
 
     }
+    else if (!strcmp(line, "roughinclineplane"))
+    {
+      boost::random::mt19937 rng;
+      boost::random::uniform_01<boost::mt19937> rand(rng) ;
+      printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ;
+      auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
+      double delta=0.1*m ;
+      for (uint dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m+delta ;
+      Frozen[0]=true ;
+      for (int i=1 ; i<N ; i++)
+      {
+        X[i]=X[i-1] ;
+        for (uint dd=d-1 ; dd>=0 ; dd--)
+        {
+          X[i][dd] += 2*m+2*delta ;
+          if (X[i][dd]>Boundaries[dd][1]-m-delta)
+            X[i][dd] = Boundaries[dd][0]+m+delta ;
+          else
+            break ;
+        }
+        if (X[i][0]==Boundaries[0][0]+m+delta) Frozen[i]=true ;
+        // randomize the previous grain
+        for (uint dd=0 ; dd<d ; dd++)
+          X[i-1][dd] += (rand()-0.5)*2*delta ;
+      }
+
+    }
     else
         printf("ERR: no other initalisation location than square implemented\n") ;
 }

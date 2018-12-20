@@ -30,10 +30,15 @@ public:
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
     {
-        static vector <double> gst (d, 0) ;
-        gst=Xj ;
-        gst[abs(Contact.isghost)-1] += ptrP->Boundaries[abs(Contact.isghost)-1][2]*(Tools::sgn(Contact.isghost)) ;
-        return (particle_particle (Xi, Vi, Omegai, ri, gst, Vj, Omegaj, rj, Contact) ) ;
+        static vector <double> loc (d, 0) ;
+        loc=Xj ;
+        u_int32_t gh=Contact.ghost, ghd=Contact.ghostdir ;
+        for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
+        {
+          if (gh&1)
+            loc[n] += ptrP->Boundaries[n][2] * ((ghd&1)?-1:1) ;
+        }
+        return (particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ) ;
     }
 
     Action Act ;

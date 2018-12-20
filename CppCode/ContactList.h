@@ -26,7 +26,8 @@ public:
      i=c.i ;
      if (c.i<0) return *this ; //is a deleted element, just keep moving
      j=c.j ; // copy everything else if it is not a deleted element
-     isghost=c.isghost ;
+     ghost=c.ghost ;
+     ghostdir=c.ghostdir ;
      tspr=c.tspr ;
      contactlength=c.contactlength ;
      infos=c.infos ;
@@ -37,7 +38,8 @@ public:
 
  int i, j ;
  double contactlength ;
- int8_t isghost ;        // LIMIT d<128
+ //int8_t isghost ;        // LIMIT d<128
+ u_int32_t ghost, ghostdir ;
  vector <double> tspr;
  Action * infos ;
  bool owninfos ;
@@ -53,6 +55,8 @@ public:
  list <cp> v ;
  Action * default_action () {return (&def) ; }
  int cid=0 ;
+
+ void check_ghost (u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ; 
 
 private:
  list<cp>::iterator it ;

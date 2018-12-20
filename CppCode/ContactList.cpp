@@ -14,13 +14,41 @@ int ContactList::insert(const cp &a)
         if ((*it)==a)
         {
             it->contactlength=a.contactlength ;
-            it->isghost=a.isghost ;
+            it->ghost=a.ghost ;
+            it->ghostdir=a.ghostdir ;
             it++ ;
         }
         else {it=v.insert(it,a) ; it++ ; }
     }
     return (cid++) ;
 }
+
+
+//--------------------------------------
+void ContactList::check_ghost (u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp)
+{
+  if (gst==0) return ;
+  else
+  {
+    for ( ;(gst&1)==0; gst>>=1,n++) ;
+    check_ghost(gst-1, n, partialsum, mask, P, X1, X2, R, tmpcp) ; //Recursing without changing partial sum -> ie. skipping over this PBC and moving to the next
+    double Delta= (tmpcp.ghostdir&(1<<n)?-1:1) * P.Boundaries[n][2] ;
+    partialsum = partialsum + Delta*(2*(X2[n]-X1[n]) + Delta) ;
+    //printf("[%X %g %g %g]\n", tmpcp.ghostdir, P.Boundaries[n][2], sqrt(partialsum), sqrt(R)) ;
+    if (partialsum<R)
+    {
+     //tmpcp.i=i ; tmpcp.j=j ; //must be set up before calling
+     tmpcp.contactlength=sqrt(partialsum) ;
+     tmpcp.ghost=mask|(1<<n) ;
+     //tmpcp.ghostdir must be set up before calling
+     insert(tmpcp) ;
+     //printf("CONTACT\n") ;
+    }
+    check_ghost(gst-1, n, partialsum, mask|(1<<n), P, X1, X2, R, tmpcp ) ; // Recursing after changing partial sum -> looking for ghosts of ghosts...
+
+  }
+}
+
 
 
 //=================================================================
