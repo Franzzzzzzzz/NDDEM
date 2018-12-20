@@ -15,12 +15,12 @@ CC=/opt/local/bin/g++-mp-6
 SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
-LDFLAGS=-L/opt/local/lib
+LDFLAGS=-L/opt/local/lib -Wall
 LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -DNETCDF -I/opt/local/include
+all: CFLAGS+=-g -O3 -DNETCDF -I/opt/local/include -Wall
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+=-lnetcdf
 #info:#

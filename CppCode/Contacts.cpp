@@ -3,9 +3,9 @@
 #include "Contacts.h"
 
 
-Contacts::Contacts (Parameters &P)
+Contacts::Contacts (Parameters &P) : d(P.d), N(P.N), dt(P.dt), Kn(P.Kn), Kt(P.Kt), Mu(P.Mu), Gamman(P.Gamman), Gammat(P.Gammat), ptrP(&P)
 {
-  d=P.d ; N=P.N ; dt=P.dt ; Kn=P.Kn ; Kt=P.Kt ; Mu=P.Mu ; Gamman=P.Gamman ; Gammat=P.Gammat ;
+
   Torquei.resize(d*(d-1)/2, 0) ;
   Torquej.resize(d*(d-1)/2, 0) ;
   vrel.resize(d,0) ;
@@ -13,27 +13,12 @@ Contacts::Contacts (Parameters &P)
   rri.resize(d,0) ; rrj.resize(d,0) ; vn.resize(d,0) ; vt.resize(d,0) ;
   Fn.resize(d,0) ; Ft.resize(d,0) ; tvec.resize(d,0) ; Ftc.resize(d,0) ;
   tspr.resize(d,0) ; tsprc.resize(d,0) ;
-  ptrP=&P ;
+
 }
-//-------------------------------------------------------------------------------------
-void Contacts::clean_history ()
-{
-  map<pair <int,int>, pair <bool, v1d> >::iterator iter = History.begin();
-  map<pair <int,int>, pair <bool, v1d> >::iterator endIter = History.end();
-  for(; iter != endIter; )
-  {
-    if (!iter->second.first)
-      History.erase(iter++);
-    else
-    {
-      iter->second.first=false ;
-      ++iter;
-    }
-  }
-}
+
 //--------------------------------------------------------------------------------------
 //---------------------- particle particle contact ----------------------------
-Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
+void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
                                      cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
 {
   static Action res ;
@@ -49,7 +34,7 @@ Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;
-  if (ovlp<=0) {res.setzero(d) ; return res ;}
+  if (ovlp<=0) {Act.setzero(d) ; return ;}
   //printf("%g %g %g %g\n", ri, rj, Xi[2], Xj[2]) ; fflush(stdout) ;
   Tools::vMinus(cn, Xi, Xj) ; //cn=(Xi-Xj) ;
   cn /= contactlength ;
@@ -65,8 +50,6 @@ Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri
   Fn=cn*(ovlp*Kn) - vn*Gamman ; //TODO
 
   //Tangential force computation: retrieve contact or create new contact
-  //history=History[make_pair(i,j)] ;
-  //tspr=history.second ;
   tspr=Contact.tspr ;
   if (tspr.size()==0) tspr.resize(d,0) ;
 
@@ -96,18 +79,17 @@ Action Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri
   //Update contact history
   //History[make_pair(i,j)]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
-  res.set(Fn, Ft, Torquei, Torquej) ;
-  return res ;
+  Act.set(Fn, Ft, Torquei, Torquej) ;
+  return ;
 }
 
 //---------------------- particle wall contact ----------------------------
-Action Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
+void Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
                                  int j, int orient, cp & Contact)
 {
-  Action res ;
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
-  if (ovlp<=0) {res.setzero(d) ; return res ;}
+  if (ovlp<=0) {Act.setzero(d) ; return ;}
   Tools::unitvec(cn, d, j) ;
   cn=cn*(-orient) ; // l give the orientation (+1 or -1)
 
@@ -147,6 +129,6 @@ Action Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
 
   //History[make_pair(i,-(2*j+k+1))]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
-  res.set(Fn, Ft, Torquei, Torquej) ;
-  return (res) ;
+  Act.set(Fn, Ft, Torquei, Torquej) ;
+  return ;
 }

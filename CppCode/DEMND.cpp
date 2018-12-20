@@ -3,7 +3,7 @@
 #include "Benchmark.h"
 long int cid=0 ; //DEBUG
 
-int Tools::d=0 ;
+uint Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
 vector < vector <int> > Tools::MIndexAS ;
 vector < double > Tools::Eye ;
@@ -58,9 +58,8 @@ int main (int argc, char *argv[])
  if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64) P.xmlout->header(d, argv[3]) ;
 
  Contacts C(P) ; //Initialize the Contact class object
- ContactList CLp, CLg, CLw ;
+ ContactList CLp, CLw ;
 
- Action Act ;
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
  double dt=P.dt ;
@@ -133,7 +132,7 @@ int main (int argc, char *argv[])
 
    Benchmark::start_clock("Contacts");
    cp tmpcp(0,0,d,0,nullptr) ; double sum=0, sum2 ;
-   CLp.reset() ; CLg.reset() ; CLw.reset();
+   CLp.reset() ; CLw.reset();
 
    for (int i=0 ; i<N ; i++)
    {
@@ -197,7 +196,6 @@ int main (int argc, char *argv[])
        Benchmark::stop_clock("Contacts_bound");
    }
    CLp.finalise() ;
-   CLg.finalise() ;
    CLw.finalise() ;
    Benchmark::stop_clock("Contacts");
 
@@ -208,7 +206,6 @@ int main (int argc, char *argv[])
 
    Benchmark::start_clock("Forces");
    Tools::setzero(F) ; Tools::setzero(Fcorr) ; Tools::setzero(TorqueCorr) ;
-   v1d tmp, previous ;
    Tools::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
    Tools::setzero(Torque);
 
@@ -217,39 +214,19 @@ int main (int argc, char *argv[])
    {
     if (it->isghost==0)
     {
-        Act = C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+        C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
                               X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
     }
     else
     {
-        Act=C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+        C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
                              X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
     }
 
-    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
-    Tools::vSubFew(F[it->j], Act.Fn, Act.Ft, Fcorr[it->j]) ;
-    Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
-    Tools::vAddOne(Torque[it->j], Act.Torquej, TorqueCorr[it->j]) ;
-
-/*    tmp=(Act.Fn+Act.Ft)-Fcorr[it->i] ;
-    previous=F[it->i] ;
-    F[it->i] += tmp ;
-    Fcorr[it->i] = F[it->i]-previous-tmp ;
-
-    tmp=(-Act.Fn-Act.Ft)-Fcorr[it->j] ;
-    previous=F[it->j] ;
-    F[it->j] += tmp ;
-    Fcorr[it->j] = F[it->j]-previous-tmp ;
-
-    tmp=(Act.Torquei)-TorqueCorr[it->i] ;
-    previous=Torque[it->i] ;
-    Torque[it->i] += tmp ;
-    TorqueCorr[it->i] = Torque[it->i]-previous-tmp ;
-
-    tmp=(Act.Torquej)-TorqueCorr[it->j] ;
-    previous=Torque[it->j] ;
-    Torque[it->j] += tmp ;
-    TorqueCorr[it->j] = Torque[it->j]-previous-tmp ; */
+    Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+    Tools::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+    Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+    Tools::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
 
     //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
     //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
@@ -257,21 +234,12 @@ int main (int argc, char *argv[])
 
    for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
    {
-    Act=C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
+    C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
     //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
     //Torque[it->i] += Act.Torquei ;
 
-    /*tmp=(Act.Fn+Act.Ft)-Fcorr[it->i] ;
-    previous=F[it->i] ;
-    F[it->i] += tmp ;
-    Fcorr[it->i] = F[it->i]-previous-tmp ;
-
-    tmp=(Act.Torquei)-TorqueCorr[it->i] ;
-    previous=Torque[it->i] ;
-    Torque[it->i] += tmp ;
-    TorqueCorr[it->i] = Torque[it->i]-previous-tmp ;*/
-    Tools::vAddFew(F[it->i], Act.Fn, Act.Ft, Fcorr[it->i]) ;
-    Tools::vAddOne(Torque[it->i], Act.Torquei, TorqueCorr[it->i]) ;
+    Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+    Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
    }
 
    Benchmark::stop_clock("Forces");
@@ -287,9 +255,7 @@ int main (int argc, char *argv[])
     Tools::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
     FOld[i]=F[i] ;
     TorqueOld[i]=Torque[i] ;
-    //if (ti > 388800 && ti<389000)  fprintf(outdebug, "{%d %g %g|%g}",i, X[i][0], X[i][2], Omega[i][1] );
    }
-   C.clean_history() ; //Contact history cleaning and preparation for the next iteration
 
    Benchmark::stop_clock("Verlet last");
 
