@@ -3,7 +3,7 @@ dimensions 3 100
 boundary 0 WALL 0 0.02
 boundary 1 PBC 0 0.005
 boundary 2 PBC 0 0.005
-gravity -7 3 0
+gravity -7 0 0
 radius -1 0.00075
 set rho 2500
 auto location roughinclineplane
@@ -22,4 +22,5 @@ set T 1
 set dt 0.000001
 set dumpkind VTK
 set tdump 10000
+event 0.5 gravity 0 3 0
 EOF

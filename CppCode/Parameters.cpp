@@ -60,122 +60,152 @@ int Parameters::init_inertia ()
 void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
 {
   ifstream in ;
-  char line[5000] ; int id ;
-  in.open(path) ; std::vector <double> x (d,0) ; std::vector <double> omeg (d*(d-1)/2,0) ;
+  in.open(path) ;
   if (!in.is_open()) { printf("[Input] file cannot be open\n"); return ;}
 
   while (! in.eof())
   {
-      in>>line ;
-      if (line[0]=='#') {in.getline(line, 5000) ; continue ; } // The line is a comments
-      if (!strcmp(line, "boundary"))
-      {
-        in>>id ;
-        in>>line ;
-        if (!strcmp(line, "PBC")) Boundaries[id][3]=0 ;
-        else if (!strcmp(line, "WALL")) Boundaries[id][3]=1 ;
-        else printf("[Input] Unknown boundary condition, unchanged.\n") ;
-        in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
-        Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
-       printf("[INFO] Changing BC.\n") ;
-      }
-      else if (!strcmp(line, "location"))
-      {
-        in>>id ;
-        for (uint i=0 ; i<d ; i++) {in >> x[i] ; printf("%g ", x[i]) ; }
-        X[id]=x ;
-        printf("[INFO] Changing particle location.\n") ;
-      }
-      else if (!strcmp(line, "dimensions"))
-      {
-        int nn; uint dd ; in>>dd ; in>>nn ;
-        if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }
-      }
-      else if (!strcmp(line, "velocity"))
-      {
-        in>>id ;
-        for (uint i=0 ; i<d ; i++) in >> x[i] ;
-        V[id]=x ;
-        printf("[INFO] Changing particle velocity.\n") ;
-      }
-      else if (!strcmp(line, "omega"))
-      {
-        in>>id ;
-        for (uint i=0 ; i<d*(d-1)/2 ; i++) in >> omeg[i] ;
-        Omega[id]=omeg ;
-        printf("[INFO] Changing particle angular velocity.\n") ;
-      }
-      else if (!strcmp(line, "freeze"))
-      {
-        in>>id ;
-        Frozen[id]=true ;
-        printf("[INFO] Freezing particle.\n") ;
-      }
-      else if (!strcmp(line, "radius"))
-      {
-        in>>id ; double radius ; in>>radius ;
-        if (id==-1) for (int i=0 ; i<N ; i++) r[i]=radius ;
-        else r[id]=radius ;
-        printf("[INFO] Set radius of particle.\n") ;
-      }
-      else if (!strcmp(line, "mass"))
-      {
-        in>>id ; double mass ; in>>mass ;
-        if (id==-1) for (int i=0 ; i<N ; i++) m[i]=mass ;
-        else m[id]=mass ;
-        printf("[INFO] Set mass of particle.\n") ;
-      }
-      else if (!strcmp(line, "gravity"))
-      {
-        for (uint i=0 ; i<d ; i++) in >> x[i] ;
-        g=x ;
-        printf("[INFO] Changing gravity.\n") ;
-      }
-      else if (!strcmp(line, "set"))
-      {
-       in>>line ;
-       if (!strcmp(line, "Kn")) in>>Kn ;
-       else if (!strcmp(line, "Kt")) in>>Kt ;
-       else if (!strcmp(line, "GammaN")) in>>Gamman ;
-       else if (!strcmp(line, "GammaT")) in>>Gammat ;
-       else if (!strcmp(line, "rho")) in>>rho ;
-       else if (!strcmp(line, "Mu")) in>>Mu ;
-       else if (!strcmp(line, "T")) in>>T ;
-       else if (!strcmp(line, "tdump")) in>>tdump ;
-       else if (!strcmp(line, "dumpkind"))
-       {
-           string word ;
-           in>>word ;
-           if (word=="CSV") dumpkind=ExportType::CSV ;
-           else if (word=="VTK") dumpkind=ExportType::VTK ;
-           else if (word=="NETCDFF") dumpkind=ExportType::NETCDFF ;
-           else if (word=="XML") dumpkind=ExportType::XML ;
-           else if (word=="XMLbase64") dumpkind=ExportType::XMLbase64 ;
-       }
-       else if (!strcmp(line, "tinfo")) in>>tinfo ;
-       else if (!strcmp(line, "dt")) in>>dt ;
-       else printf("[Input] Unknown parameter to set\n") ;
-
-       printf("[INFO] Setting a parameter.\n") ;
-      }
-      else if (!strcmp(line, "auto"))
-      {
-        in>>line ;
-        if (!strcmp(line, "mass")) init_mass() ;
-        else if (!strcmp(line, "inertia")) init_inertia() ;
-        else if (!strcmp(line, "location"))
-        {
-            in >> line ;
-            init_locations(line, X) ;
-            printf("[Input] Set all particle locations\n") ;
-        }
-        else printf("[WARN] Unknown auto command in input script\n") ;
-        printf("[Input] Doing an auto \n") ;
-      }
-      else
-          printf("[Input] Unknown command in input file |%s|\n", line) ;
+    interpret_command(in, X, V, Omega) ;
+  }
+}
+//-------------------------------------------------
+void Parameters::check_events(float time, v2d & X, v2d & V, v2d & Omega)
+{
+  while (events.size()>0 && events.begin()->first < time)
+  {
+    stringstream command ; command.str(events.begin()->second) ;
+    printf("\nThe following event is implemented now: %s\n", events.begin()->second.c_str()) ;
+    interpret_command(command, X,V,Omega) ;
+    events.erase(events.begin()) ;
   }
 
+}
+//------------------------------------------------------
+void Parameters::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
+{
+char line[5000] ; int id ;
+std::vector <double> x (d,0) ; std::vector <double> omeg (d*(d-1)/2,0) ;
+
+in>>line;
+if (line[0]=='#') {in.getline(line, 5000) ; return ; } // The line is a comments
+
+if (!strcmp(line,"event"))
+{
+  float time ;
+  in >> time ;
+  in.getline (line, 5000) ;
+  //command.str(line) ;
+  events.insert(make_pair(time,line)) ;
+  printf("[INFO] Registering an event: %s\n", events.begin()->second.c_str()) ;
+  return ;
+}
+
+if (!strcmp(line, "boundary"))
+{
+  in>>id ;
+  in>>line ;
+  if (!strcmp(line, "PBC")) Boundaries[id][3]=0 ;
+  else if (!strcmp(line, "WALL")) Boundaries[id][3]=1 ;
+  else printf("[Input] Unknown boundary condition, unchanged.\n") ;
+  in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
+  Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
+ printf("[INFO] Changing BC.\n") ;
+}
+else if (!strcmp(line, "location"))
+{
+  in>>id ;
+  for (uint i=0 ; i<d ; i++) {in >> x[i] ; printf("%g ", x[i]) ; }
+  X[id]=x ;
+  printf("[INFO] Changing particle location.\n") ;
+}
+else if (!strcmp(line, "dimensions"))
+{
+  int nn; uint dd ; in>>dd ; in>>nn ;
+  if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }
+}
+else if (!strcmp(line, "velocity"))
+{
+  in>>id ;
+  for (uint i=0 ; i<d ; i++) in >> x[i] ;
+  V[id]=x ;
+  printf("[INFO] Changing particle velocity.\n") ;
+}
+else if (!strcmp(line, "omega"))
+{
+  in>>id ;
+  for (uint i=0 ; i<d*(d-1)/2 ; i++) in >> omeg[i] ;
+  Omega[id]=omeg ;
+  printf("[INFO] Changing particle angular velocity.\n") ;
+}
+else if (!strcmp(line, "freeze"))
+{
+  in>>id ;
+  Frozen[id]=true ;
+  printf("[INFO] Freezing particle.\n") ;
+}
+else if (!strcmp(line, "radius"))
+{
+  in>>id ; double radius ; in>>radius ;
+  if (id==-1) for (int i=0 ; i<N ; i++) r[i]=radius ;
+  else r[id]=radius ;
+  printf("[INFO] Set radius of particle.\n") ;
+}
+else if (!strcmp(line, "mass"))
+{
+  in>>id ; double mass ; in>>mass ;
+  if (id==-1) for (int i=0 ; i<N ; i++) m[i]=mass ;
+  else m[id]=mass ;
+  printf("[INFO] Set mass of particle.\n") ;
+}
+else if (!strcmp(line, "gravity"))
+{
+  for (uint i=0 ; i<d ; i++) in >> x[i] ;
+  g=x ;
+  printf("[INFO] Changing gravity.\n") ;
+}
+else if (!strcmp(line, "set"))
+{
+ in>>line ;
+ if (!strcmp(line, "Kn")) in>>Kn ;
+ else if (!strcmp(line, "Kt")) in>>Kt ;
+ else if (!strcmp(line, "GammaN")) in>>Gamman ;
+ else if (!strcmp(line, "GammaT")) in>>Gammat ;
+ else if (!strcmp(line, "rho")) in>>rho ;
+ else if (!strcmp(line, "Mu")) in>>Mu ;
+ else if (!strcmp(line, "T")) in>>T ;
+ else if (!strcmp(line, "tdump")) in>>tdump ;
+ else if (!strcmp(line, "dumpkind"))
+ {
+     string word ;
+     in>>word ;
+     if (word=="CSV") dumpkind=ExportType::CSV ;
+     else if (word=="VTK") dumpkind=ExportType::VTK ;
+     else if (word=="NETCDFF") dumpkind=ExportType::NETCDFF ;
+     else if (word=="XML") dumpkind=ExportType::XML ;
+     else if (word=="XMLbase64") dumpkind=ExportType::XMLbase64 ;
+ }
+ else if (!strcmp(line, "tinfo")) in>>tinfo ;
+ else if (!strcmp(line, "dt")) in>>dt ;
+ else printf("[Input] Unknown parameter to set\n") ;
+
+ printf("[INFO] Setting a parameter.\n") ;
+}
+else if (!strcmp(line, "auto"))
+{
+  in>>line ;
+  if (!strcmp(line, "mass")) init_mass() ;
+  else if (!strcmp(line, "inertia")) init_inertia() ;
+  else if (!strcmp(line, "location"))
+  {
+      in >> line ;
+      init_locations(line, X) ;
+      printf("[Input] Set all particle locations\n") ;
+  }
+  else printf("[WARN] Unknown auto command in input script\n") ;
+  printf("[Input] Doing an auto \n") ;
+}
+else
+    printf("[Input] Unknown command in input file |%s|\n", line) ;
 }
 
 

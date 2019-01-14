@@ -269,6 +269,8 @@ int main (int argc, char *argv[])
 
    Benchmark::stop_clock("Verlet last");
 
+   // Check events
+   P.check_events(t, X,V,Omega) ; 
 
    // Output something at some point I guess
    if (ti % P.tdump==0)

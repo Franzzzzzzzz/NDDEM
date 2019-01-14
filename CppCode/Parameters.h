@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "Typedefs.h"
 #include "Tools.h"
 #include "Xml.h"
@@ -54,6 +55,8 @@ public :
     vector <bool> Frozen ;
     vector < vector <double> > Boundaries ;
 
+    map<float, string> events ;
+
 // Useful functions
     int set_boundaries() ;
     //int init_particles(v2d & X, v2d & A) ;
@@ -62,6 +65,8 @@ public :
     int init_inertia() ;
 
     void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ;
+    void check_events(float time, v2d & X, v2d & V, v2d & Omega) ;
+    void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ;
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ;
     void add_particle (v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ;
     void init_locations (char *line, v2d & X) ;
