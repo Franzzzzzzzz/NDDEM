@@ -1,7 +1,7 @@
 #include "DEMND.h"
 #include <signal.h>
 #include "Benchmark.h"
-long int cid=0 ; //DEBUG
+#define OMP_NUM_THREADS 2
 
 uint Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
@@ -57,8 +57,10 @@ int main (int argc, char *argv[])
      P.load_datafile (argv[3], X, V, Omega) ;
  if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64) P.xmlout->header(d, argv[3]) ;
 
- Contacts C(P) ; //Initialize the Contact class object
- ContactList CLp, CLw ;
+ //Contacts C(P) ; //Initialize the Contact class object
+ //ContactList CLp, CLw ;
+ omp_set_num_threads(OMP_NUM_THREADS) ;
+ Multiproc MP(N, OMP_NUM_THREADS, P) ;
 
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
@@ -77,20 +79,9 @@ int main (int argc, char *argv[])
    }
 
    //----- Velocity Verlet step 1 : compute the new positions
-   //TEST BEGIN
-   //printf("%g \n", P.m[0]) ;
-   //Tools::writeinline({X[0],V[0],Omega[0], X[1], V[1], Omega[1]}) ;
-   //P.display_info(ti, V, Omega, F, Torque, CLp.v.size(), CLg.v.size()) ;
-   //TEST END
    Benchmark::start_clock("Verlet 1st");
    for (int i=0 ; i<N ; i++)
    {
-     //BEGIN TEST
-     //Tools::setzero(FOld[0]) ;
-     //V[0][0]=cos(t*2*M_PI)*(t<0.5?1:-1) ; V[0][2]=sin(t*2*M_PI) ; V[0][1]=0 ;
-     //V[0][1]=0 ; V[0][0]=0.2-t ; V[0][2]=(0.5-t) ;
-     //Omega[0][0]=0 ; Omega[0][1]=0 ; Omega[0][2]=-1 ;
-     //END TEST
     for (int dd=0 ; dd<d ; dd++)
         X[i][dd] += V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
 
@@ -104,12 +95,7 @@ int main (int argc, char *argv[])
 
     for (int dd=0 ; dd<d *d ; dd++)
         A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;
-
-    //X[i] = X[i]+V[i]*dt + FOld[i] * (dt * dt / P.m[i] /2.) ;
-    //A[i]= A[i] +
-    //    Tools::matmult (Tools::skewexpand(Omega[i]), A[i]) * dt +
-    //    Tools::matmult (Tools::skewexpand(TorqueOld[i])/P.I[i] + Tools::skewmatsquare(Omega[i]), A[i] ) * (dt * dt /2.) ;
-
+        
     P.perform_PBC(X[i]) ;
 
     // Find ghosts
@@ -131,78 +117,65 @@ int main (int argc, char *argv[])
    // Contact detection (sequential, can be paralelised easily with openmp)
 
    Benchmark::start_clock("Contacts");
-   cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
-   CLp.reset() ; CLw.reset();
 
-   for (int i=0 ; i<N ; i++)
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared (stdout)
    {
-       Benchmark::start_clock("Contacts_part");
-       tmpcp.setinfo(CLp.default_action());
+     int ID = omp_get_thread_num();
+     ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ;
+     cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
+     CLp.reset() ; CLw.reset();
+
+     for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+     {
+         //Benchmark::start_clock("Contacts_part");
+         tmpcp.setinfo(CLp.default_action());
 
 
-       for (int j=i+1 ; j<N ; j++) // Regular particles
-       {
-           sum=0 ;
-           for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-           if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
-           {
-               tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-               CLp.insert(tmpcp) ;
+         for (int j=i+1 ; j<N ; j++) // Regular particles
+         {
+             sum=0 ;
+             for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+             if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
+             {
+                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                 CLp.insert(tmpcp) ;
 
-               //if (CLp.cid>345090 && CLp.cid<345110 && i==0 && j==1) printf("#n %d %d %g %g\n", i, j, X[i][0], X[j][0]) ;
+                 //if (CLp.cid>345090 && CLp.cid<345110 && i==0 && j==1) printf("#n %d %d %g %g\n", i, j, X[i][0], X[j][0]) ;
+             }
+
+             if (Ghost[j])
+             {
+               tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+               CLp.check_ghost(Ghost[j], 0, sum, 0, P, X[i], X[j], (P.r[i]+P.r[j])*(P.r[i]+P.r[j]), tmpcp) ;
+             }
            }
+         //Benchmark::stop_clock("Contacts_part");
 
-           if (Ghost[j])
-           {
-             tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-             CLp.check_ghost(Ghost[j], 0, sum, 0, P, X[i], X[j], (P.r[i]+P.r[j])*(P.r[i]+P.r[j]), tmpcp) ;
-           }
+         //Benchmark::start_clock("Contacts_bound");
+         tmpcp.setinfo(CLw.default_action());
+         for (int j=0 ; j<d ; j++) // Wall contacts
+         {
+              if (P.Boundaries[j][3]!=1) continue ;
 
-           // Test with ghosts
-           /*if (Ghost[j]) //j has at least 1 ghost
-           {
-               u_int32_t gst = Ghost[j], gst_dir=Ghost_dir[j] ;
-               for (u_int8_t n=0 ; gst ; gst>>=1, gst_dir>>=1, n++ )
-               {
-                   if (gst&1)
-                   {
-                       double Delta= (gst_dir&1?-1:1) * P.Boundaries[n][2] ;
-                       sum2= sum + Delta*(2*(X[j][n]-X[i][n]) + Delta) ;
-                       if (sum2<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
-                       {
-                        tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum2) ; tmpcp.isghost = (n+1) * (gst_dir&1?-1:1) ;
-                        CLp.insert(tmpcp) ;
-                       }
-                   }
-               }
-           }*/
+              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+              if (tmpcp.contactlength<P.r[i])
+              {
+                  tmpcp.i=i ; tmpcp.j=(2*j+0);
+                  CLw.insert(tmpcp) ;
+              }
+
+              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+              if (tmpcp.contactlength<P.r[i])
+              {
+                  tmpcp.i=i ; tmpcp.j=(2*j+1);
+                  CLw.insert(tmpcp) ;
+              }
          }
-       Benchmark::stop_clock("Contacts_part");
-
-       Benchmark::start_clock("Contacts_bound");
-       tmpcp.setinfo(CLw.default_action());
-       for (int j=0 ; j<d ; j++) // Wall contacts
-       {
-            if (P.Boundaries[j][3]!=1) continue ;
-
-            tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
-            if (tmpcp.contactlength<P.r[i])
-            {
-                tmpcp.i=i ; tmpcp.j=(2*j+0);
-                CLw.insert(tmpcp) ;
-            }
-
-            tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
-            if (tmpcp.contactlength<P.r[i])
-            {
-                tmpcp.i=i ; tmpcp.j=(2*j+1);
-                CLw.insert(tmpcp) ;
-            }
-       }
-       Benchmark::stop_clock("Contacts_bound");
-   }
-   CLp.finalise() ;
-   CLw.finalise() ;
+         //Benchmark::stop_clock("Contacts_bound");
+     }
+     CLp.finalise() ;
+     CLw.finalise() ;
+   } //END PARALLEL SECTION
    Benchmark::stop_clock("Contacts");
 
    // DEBUG
@@ -220,37 +193,60 @@ int main (int argc, char *argv[])
    Tools::setzero(Torque);
 
    //Particle - particle contacts
-   for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout)
    {
-    if (it->ghost==0)
-    {
-        C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                              X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
-    }
-    else
-    {
-        C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                             X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ; cid++ ;
-    }
+     int ID = omp_get_thread_num();
+     ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ; Contacts & C =MP.C[ID] ;
 
-    Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-    Tools::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
-    Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
-    Tools::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+     for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
+     {
+      if (it->ghost==0)
+      {
+          C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+      }
+      else
+      {
+          C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                               X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+      }
 
-    //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-    //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+      Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+      Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+
+      if (MP.ismine(ID,it->j))
+      {
+        Tools::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+        Tools::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+      }
+      else
+        MP.delaying(ID, it->j, C.Act) ;
+
+      //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+      //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+     }
+
+     for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
+     {
+      C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
+      //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
+      //Torque[it->i] += Act.Torquei ;
+
+      Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+      Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+     }
    }
 
-   for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
+   // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
+   for (int i=0 ; i<MP.P ; i++)
    {
-    C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
-    //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
-    //Torque[it->i] += Act.Torquei ;
-
-    Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-    Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+     for (uint j=0 ; j<MP.delayed_size[i] ; j++)
+     {
+       Tools::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
+       Tools::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
+     }
    }
+   MP.delayed_clean() ;
 
    Benchmark::stop_clock("Forces");
 
@@ -270,7 +266,7 @@ int main (int argc, char *argv[])
    Benchmark::stop_clock("Verlet last");
 
    // Check events
-   P.check_events(t, X,V,Omega) ; 
+   P.check_events(t, X,V,Omega) ;
 
    // Output something at some point I guess
    if (ti % P.tdump==0)

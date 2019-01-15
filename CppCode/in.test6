@@ -18,9 +18,8 @@ set Kt 8e4
 set GammaN 0.1
 set GammaT 0.1
 set Mu 0.5
-set T 1
+set T 0.1
 set dt 0.000001
 set dumpkind VTK
 set tdump 10000
-event 0.5 gravity 0 3 0
 EOF

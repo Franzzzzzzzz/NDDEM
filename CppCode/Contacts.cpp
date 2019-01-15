@@ -21,16 +21,6 @@ Contacts::Contacts (Parameters &P) : d(P.d), N(P.N), dt(P.dt), Kn(P.Kn), Kt(P.Kt
 void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
                                      cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
 {
-  static Action res ;
-  //Contact properties:
-  //contactlength=Tools::normdiff(Xi,Xj) ;
-  /*double R=ri*ri+2*ri*rj+rj*rj, sum=0 ;
-  for (int i=0 ; i<d ; i++)
-  {
-      sum+=(Xi[i]-Xj[i])*(Xi[i]-Xj[i]) ;
-      if (sum > R ) goto nextcontact ; // This GOTO skips everything left on this contact
-  }
-  contactlength = sqrt(sum) ; */
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;

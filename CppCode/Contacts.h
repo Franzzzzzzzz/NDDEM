@@ -11,16 +11,15 @@
 #include "Parameters.h"
 #include "Tools.h"
 #include "ContactList.h"
-extern long int cid ;
+
 class Contacts
 {
 public:
     Contacts (Parameters &P) ;
-    void clean_history () ;
 
-    const int d, N ;
-    const double dt, Kn, Kt, Mu, Gamman, Gammat ;
-    const Parameters *ptrP ;
+    int d, N ; // These and following should really be const but that's a pain for assignements
+    double dt, Kn, Kt, Mu, Gamman, Gammat ;
+    Parameters *ptrP ;
     vector < double > Torquei,Torquej, vrel ;
 
     void particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,

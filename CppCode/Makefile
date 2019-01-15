@@ -12,7 +12,7 @@ CC=/opt/local/bin/g++-mp-6
 #LDFLAGS=-L/opt/local/lib -L/home/franz/Logiciels/matlab2009/bin/glnx86
 
 
-SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp
+SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
 LDFLAGS=-L/opt/local/lib -Wall
@@ -20,9 +20,9 @@ LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -DNETCDF -I/opt/local/include -Wall
+all: CFLAGS+=-g -O1 -DNETCDF -I/opt/local/include -Wall -fopenmp
 all: $(SOURCES) $(EXECUTABLE)
-all: LIBS+=-lnetcdf
+all: LIBS+=-lnetcdf -fopenmp
 #info:#
 #	@echo 'Compilation without Matlab or Boost or Tiff support. Use "make advanced" to activate them.'
 
