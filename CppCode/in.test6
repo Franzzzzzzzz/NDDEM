@@ -1,4 +1,5 @@
 # Incline plane flow
+directory Output
 dimensions 3 100
 boundary 0 WALL 0 0.02
 boundary 1 PBC 0 0.005

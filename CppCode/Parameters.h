@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <experimental/filesystem>
 #include "Typedefs.h"
 #include "Tools.h"
 #include "Xml.h"
@@ -29,7 +30,8 @@ public :
         Gamman(0.0001), //Normal damping
         Gammat(0),      //Tangential damping
         Mu(0.5),          // Friction coefficient
-        dumpkind(ExportType::NONE)    //How to dump: 0=nothing, 1=csv, 2=vtk
+        dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
+        Directory ("Output")
         {
          reset_ND(NN,dd) ;
          if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
@@ -54,6 +56,7 @@ public :
     vector <double> r, m, I, g ;
     vector <bool> Frozen ;
     vector < vector <double> > Boundaries ;
+    string Directory ;
 
     map<float, string> events ;
 

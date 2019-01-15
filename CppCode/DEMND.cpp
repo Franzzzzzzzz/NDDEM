@@ -95,7 +95,7 @@ int main (int argc, char *argv[])
 
     for (int dd=0 ; dd<d *d ; dd++)
         A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;
-        
+
     P.perform_PBC(X[i]) ;
 
     // Find ghosts
@@ -273,12 +273,12 @@ int main (int argc, char *argv[])
    {
     if (P.dumpkind==ExportType::CSV)
     {
-        char path[500] ; sprintf(path, "Output/dump-%05d.csv", ti) ;
+        char path[500] ; sprintf(path, "%s/dump-%05d.csv", P.Directory.c_str(), ti) ;
         Tools::savecsv(path, X, P.r) ;
     }
     else if (P.dumpkind==ExportType::VTK)
     {
-        char path[500] ; sprintf(path, "Output/dump-%05d.vtk", ti) ;
+        char path[500] ; sprintf(path, "%s/dump-%05d.vtk", P.Directory.c_str(), ti) ;
         Tools::savevtk(path, X, {"Omega", TensorType::SKEWTENSOR, &Omega}) ;
     }
     else if (P.dumpkind==ExportType::NETCDFF)

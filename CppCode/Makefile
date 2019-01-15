@@ -20,9 +20,9 @@ LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O1 -DNETCDF -I/opt/local/include -Wall -fopenmp
+all: CFLAGS+=-g -O3 -DNETCDF -I/opt/local/include -Wall -fopenmp -lstdc++fs
 all: $(SOURCES) $(EXECUTABLE)
-all: LIBS+=-lnetcdf -fopenmp
+all: LIBS+=-lnetcdf -fopenmp -lstdc++fs
 #info:#
 #	@echo 'Compilation without Matlab or Boost or Tiff support. Use "make advanced" to activate them.'
 

@@ -204,6 +204,11 @@ else if (!strcmp(line, "auto"))
   else printf("[WARN] Unknown auto command in input script\n") ;
   printf("[Input] Doing an auto \n") ;
 }
+else if (!strcmp(line, "directory"))
+{
+  in>>Directory ;
+  if (! experimental::filesystem::exists(line)) experimental::filesystem::create_directory(Directory);
+}
 else
     printf("[Input] Unknown command in input file |%s|\n", line) ;
 }
