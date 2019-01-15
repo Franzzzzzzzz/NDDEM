@@ -1,4 +1,4 @@
-    #include <cstdlib>
+#include <cstdlib>
 #include <cmath>
 #include <cstdio>
 #include <vector>
@@ -6,7 +6,8 @@
 #include <cstring>
 #include <omp.h>
 
-#include "Contacts.h"
+#include "Typedefs.h"
 #include "Parameters.h"
+#include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"

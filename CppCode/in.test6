@@ -2,25 +2,23 @@
 directory Output
 dimensions 3 100
 boundary 0 WALL 0 0.02
-boundary 1 PBC 0 0.005
+boundary 1 PBC 0 0.01
 boundary 2 PBC 0 0.005
-gravity -7 0 0
+#boundary 3 PBC 0 0.005
+gravity -10 0 0 
 radius -1 0.00075
 set rho 2500
 auto location roughinclineplane
-#location 0 0.199 1.005 0.005
-#location 1 0.199 1.299 0.005
-#location 2 0.199 1.299 0.9995
-#location 3 0.005 1.005 0.005
 auto mass
 auto inertia
 set Kn 8.1e5
-set Kt 8e4
+set Kt 8e5
 set GammaN 0.1
 set GammaT 0.1
 set Mu 0.5
-set T 0.1
+set T 1
 set dt 0.000001
 set dumpkind VTK
 set tdump 10000
+event 0.1 gravity -9.1 4.23 0
 EOF

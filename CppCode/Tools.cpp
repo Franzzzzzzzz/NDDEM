@@ -62,18 +62,26 @@ void Tools::savecsv (char path[], cv2d & X, cv1d &r)
  fclose(out) ;
 }
 //=====================================
-void Tools::savevtk (char path[], cv2d & X, TensorInfos data)
+void Tools::savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data)
 {
- FILE *out ;
+ FILE *out ; static bool warn = false ;
+
+ vector <float> projectioncenter  ; for (uint i=3 ; i<d ; i++) projectioncenter.push_back((P.Boundaries[i][1]+P.Boundaries[i][0])/2) ;
+
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
 
- if (d>3) printf("WARN: writevtk might misbehave with dimension higher than 3\n") ;
+ if (d>3 && warn==false) {
+   printf("WARN: writevtk might misbehave with dimension higher than 3. The 3d projection is always centered in all other dimensions\n") ;
+   warn=true ;
+ }
  fprintf(out, "# vtk DataFile Version 2.0\nMost Useless DEM (tm) output file\nASCII\nDATASET POLYDATA\n") ;
 
  fprintf(out, "POINTS %ld float\n", X.size()) ;
- for (uint i=0 ; i<X.size() ; i++) fprintf(out, "%g %g %g\n", X[i][0], X[i][1], X[i][2]) ;
+ for (uint i=0 ; i<X.size() ; i++) fprintf(out, "%g %g %g\n", X[i][0], X[i][1], d<3?0:X[i][2]) ;
  fprintf(out, "VERTICES %ld %ld\n", X.size(), 2*X.size()) ;
  for (uint i=0 ; i<X.size() ; i++) fprintf(out, "1 %d\n", i) ;
+
+ fprintf(out, "\nPOINT_DATA %ld", (*data.data).size()) ;
 
  for (uint j=3 ; j<X[0].size() ; j++)
  {
@@ -82,30 +90,39 @@ void Tools::savevtk (char path[], cv2d & X, TensorInfos data)
        fprintf(out, "%g ", X[i][j]) ;
  }
 
+ fprintf(out, "\n\nSCALARS RadiusProjected float 1 \nLOOKUP_TABLE default\n");
+ for (int i=0 ; i<P.N ; i++)
+ {
+   float value = P.r[i]*P.r[i] ;
+   for (uint j=3 ; j<d ; j++) value-=(X[i][j]-projectioncenter[j-3])*(X[i][j]-projectioncenter[j-3]) ;
+   if (value<0) fprintf(out, "%g ", 0.0) ;
+   else fprintf(out, "%g ", sqrt(value)) ;
+ }
+
  switch (data.order) {
-   case TensorType::SCALAR:  fprintf(out, "\nPOINT_DATA %ld\nSCALARS %s double 1 \nLOOKUP_TABLE default \n",(*data.data).size(), data.name.c_str()) ;//scalar
+   case TensorType::SCALAR:  fprintf(out, "\nSCALARS %s double 1 \nLOOKUP_TABLE default \n", data.name.c_str()) ;//scalar
             for (uint i=0 ; i<(*data.data).size() ; i++)
               fprintf(out, "%g ", (*data.data)[i][0]) ;
             break ;
-   case TensorType::VECTOR:  fprintf(out, "\nPOINT_DATA %ld\nVECTORS %s double \n",(*data.data).size(), data.name.c_str()) ;//vector
+   case TensorType::VECTOR:  fprintf(out, "\nVECTORS %s double \n", data.name.c_str()) ;//vector
             for (auto i : (*data.data))
               fprintf(out, "%g %g %g\n", i[0], i[1], i[2]) ;
             break ;
-   case TensorType::TENSOR:  fprintf(out, "\nPOINT_DATA %ld\nTENSORS %s double \n",(*data.data).size(), data.name.c_str()) ;//tensor
+   case TensorType::TENSOR:  fprintf(out, "\nTENSORS %s double \n", data.name.c_str()) ;//tensor
             for (auto i : (*data.data))
               fprintf(out, "%g %g %g %g %g %g %g %g %g\n", i[0], i[1], i[2], i[d], i[d+1], i[d+2], i[2*d], i[2*d+1], i[2*d+2]) ;
             break ;
-   case TensorType::SYMTENSOR:  fprintf(out, "\nPOINT_DATA %ld\nTENSORS %ssym double \n",(*data.data).size(), data.name.c_str()) ;//tensor
+   case TensorType::SYMTENSOR:  fprintf(out, "\nTENSORS %ssym double \n", data.name.c_str()) ;//tensor
             for (auto i : (*data.data))
               fprintf(out, "%g %g %g %g %g %g %g %g %g\n", i[0], i[1], i[2], i[1], i[d], i[d+1], i[2], i[d+1], i[2*d-1]) ;
             break ;
-   case TensorType::SKEWTENSOR:  fprintf(out, "\nPOINT_DATA %ld\nTENSORS %sskew double \n",(*data.data).size(), data.name.c_str()) ;//tensor
+   case TensorType::SKEWTENSOR:  fprintf(out, "\nTENSORS %sskew double \n", data.name.c_str()) ;//tensor
              for (v1d i : (*data.data))
                fprintf(out, "%g %g %g %g %g %g %g %g %g\n", 0.0, i[0], i[1], -i[0], 0.0, i[d-1], -i[1], -i[d-1], 0.0) ;
             break ;
-   default: fprintf(out, "\nPOINT_DATA %ld\nSCALARS %s double 1 \nLOOKUP_TABLE default \n",(*data.data).size(), data.name.c_str()) ;//scalar norm
+   default: break ; /*fprintf(out, "\nPOINT_DATA %ld\nSCALARS %s double 1 \nLOOKUP_TABLE default \n",(*data.data).size(), data.name.c_str()) ;//scalar norm
               for (uint i=0 ; i<(*data.data).size() ; i++)
-                 fprintf(out, "%g ", Tools::norm((*data.data)[i])) ;
+                 fprintf(out, "%g ", Tools::norm((*data.data)[i])) ;*/
  }
 
 

@@ -279,7 +279,7 @@ int main (int argc, char *argv[])
     else if (P.dumpkind==ExportType::VTK)
     {
         char path[500] ; sprintf(path, "%s/dump-%05d.vtk", P.Directory.c_str(), ti) ;
-        Tools::savevtk(path, X, {"Omega", TensorType::SKEWTENSOR, &Omega}) ;
+        Tools::savevtk(path, P, X, {"", TensorType::NONE, &Omega}) ;
     }
     else if (P.dumpkind==ExportType::NETCDFF)
         printf("WARN: netcdf writing haven't been tested and therefore is not plugged in\n") ;

@@ -7,13 +7,12 @@
 #include <cmath>
 #include <initializer_list>
 #include "Typedefs.h"
+#include "Parameters.h"
 
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/random.hpp>
 
 #define MAXDEFDIM 30
-
-using uint = unsigned int ;
 
 v1d operator* (v1d a, double b) ;
 v1d operator* (v1d a, cv1d b)   ;
@@ -28,7 +27,7 @@ v1d & operator*= (v1d & a, double b);
 v1d & operator+= (v1d & a, cv1d b) ;
 v1d & operator/= (v1d & a, double b) ;
 
-enum class TensorType {SCALAR, VECTOR, TENSOR, SYMTENSOR, SKEWTENSOR} ;
+enum class TensorType {SCALAR, VECTOR, TENSOR, SYMTENSOR, SKEWTENSOR, NONE} ;
 class TensorInfos
 {
 public :
@@ -58,7 +57,7 @@ static void setzero(v2d & a) {for (uint i=0 ; i<a.size() ; i++) for (uint j=0 ; 
 static void setzero(v1d & a) {for (uint i=0 ; i<a.size() ; i++) a[i]=0 ; }
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; }
 static void savecsv (char path[], cv2d & X, cv1d &r) ;
-static void savevtk (char path[], cv2d & X, TensorInfos data) ;
+static void savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data) ;
 
 static int write1D (char path[], v1d table) ;
 static int writeinline(initializer_list< v1d >) ;

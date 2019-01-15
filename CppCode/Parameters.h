@@ -10,7 +10,6 @@
 #include <map>
 #include <experimental/filesystem>
 #include "Typedefs.h"
-#include "Tools.h"
 #include "Xml.h"
 
 using namespace std ;
@@ -80,4 +79,5 @@ public :
     XMLWriter * xmlout ;
 } ;
 
+#include "Tools.h"
 #endif

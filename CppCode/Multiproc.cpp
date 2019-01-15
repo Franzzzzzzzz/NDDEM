@@ -40,12 +40,7 @@ for (int i=0 ; i<P ; i++)
   else printf("No solution ...") ;
 }
 
-share[P]=N ; printf("\n\n") ;
-
-for (int i=0 ; i<P ; i++) {
-//printf("%d ", res[i]) ;
-printf("%d ", (N-share[i]- (share[i+1]-share[i])/2)*(share[i+1]-share[i])) ;
-}
+share[P]=N ;
 }
 
 //-------------------------------------------------
