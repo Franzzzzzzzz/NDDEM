@@ -69,6 +69,7 @@ int main (int argc, char *argv[])
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
    //bool isdumptime = (ti % P.tdump==0) ;
+   P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
    if (ti%P.tinfo==0)
    {
      tnow = clock();

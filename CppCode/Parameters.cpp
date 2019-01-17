@@ -194,6 +194,11 @@ else if (!strcmp(line, "auto"))
 {
   in>>line ;
   if (!strcmp(line, "mass")) init_mass() ;
+  else if (!strcmp(line, "rho"))
+  {
+    rho= m[0]/Tools::Volume(r[0]) ;
+    printf("[Input] Using first particle mass to set rho: %g [M].[L]^-%d\n", rho, d) ;
+  }
   else if (!strcmp(line, "inertia")) init_inertia() ;
   else if (!strcmp(line, "location"))
   {
@@ -272,7 +277,7 @@ void Parameters::init_locations (char *line, v2d & X)
     {
       boost::random::mt19937 rng;
       boost::random::uniform_01<boost::mt19937> rand(rng) ;
-      printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ;
+      printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ;
       for (uint dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m+delta ;
@@ -293,7 +298,7 @@ void Parameters::init_locations (char *line, v2d & X)
         for (uint dd=0 ; dd<d ; dd++)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
       }
-
+      printf("BOO") ; fflush(stdout) ; 
     }
     else
         printf("ERR: no other initalisation location than square implemented\n") ;
@@ -309,17 +314,18 @@ if (first)
 {
  Rmax=*max_element(r.begin(), r.end()) ;
  mmax=*max_element(m.begin(), m.end()) ;
- first=false ;
  //printf("\e[10S\e[9A") ;
 }
 
 //printf("\e[s%c\n", letters[tint%4]) ;
-printf("\033%c %c\n", 0x37, letters[tint%4]) ;
+//printf("\033%c %c\n", 0x37, letters[tint%4]) ;
 if (tint%tinfo==0)
 {
- for (int i=0 ; i<(tint*100)/int(T/dt) ; i++) printf("#") ;
+  //for (int i=0 ; i<(tint*100)/int(T/dt) ; i++) printf("#") ;
   //printf("%d %d %d ",tint, T, (tint*100)/T) ;
- printf("\n NContacts: %d | Nghosts: %d \n", nct, ngst) ;
+ if (!first) printf("\e[8A") ;
+ printf("\e[80G") ;
+ printf("\n\e[80G NContacts: %d | Nghosts: %d \n", nct, ngst) ;
 
  double Vmax=Tools::norm(*max_element(V.begin(), V.end(), [](cv1d &a, cv1d &b) {return (Tools::normsq(a)<Tools::normsq(b)) ;})) ;
  double Omegamax=Tools::skewnorm(*max_element(Omega.begin(), Omega.end(), [](cv1d &a, cv1d &b) {return (Tools::skewnormsq(a)<Tools::skewnormsq(b)) ;})) ;
@@ -327,14 +333,16 @@ if (tint%tinfo==0)
  double Fmax=Tools::norm(*max_element(F.begin(), F.end(), [](cv1d &a, cv1d &b) {return (Tools::normsq(a)<Tools::normsq(b)) ;})) ;
 
  printf("\n") ;
- printf("Max V: %10g | V dt / R      = %10g \n", Vmax, Vmax*dt/Rmax) ;
- printf("Max O: %10g | Omega dt      = %10g \n", Omegamax, Omegamax*dt) ;
- printf("Max F: %10g | F dt dt / m r = %10g \n", Fmax, Fmax*dt*dt/(mmax*Rmax)) ;
- printf("Max M: %10g | M dt / m R R  = %10g \n", Torquemax, Torquemax*dt/(mmax*Rmax*Rmax)) ;
- printf("            | g dt dt / R   = %10g \n", Tools::norm(g)*dt*dt/Rmax) ;
-}
+ printf("\e[80G Max V: %15g | V dt / R      = %15g \n", Vmax, Vmax*dt/Rmax) ;
+ printf("\e[80G Max O: %15g | Omega dt      = %15g \n", Omegamax, Omegamax*dt) ;
+ printf("\e[80G Max F: %15g | F dt dt / m r = %15g \n", Fmax, Fmax*dt*dt/(mmax*Rmax)) ;
+ printf("\e[80G Max M: %15g | M dt / m R R  = %15g \n", Torquemax, Torquemax*dt/(mmax*Rmax*Rmax)) ;
+ printf("\e[80G                        | g dt dt / R   = %15g \n", Tools::norm(g)*dt*dt/Rmax) ;
 
 //printf("\e[u") ;
-printf("\\033%c", 0x38) ;
+//printf("\\033%c", 0x38) ;
+printf("\e[0G") ;
 fflush(stdout) ;
+}
+if (first) first=false ;
 }
