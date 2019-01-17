@@ -23,6 +23,8 @@ FLTO=
 all: CFLAGS+=-g -O3 -DNETCDF -I/opt/local/include -Wall -fopenmp -lstdc++fs
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+=-lnetcdf -fopenmp -lstdc++fs
+all:
+	@$(CC) -o xml2vtk xml2vtk.cpp Xml.cpp -lstdc++fs
 #info:#
 #	@echo 'Compilation without Matlab or Boost or Tiff support. Use "make advanced" to activate them.'
 

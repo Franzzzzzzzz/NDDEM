@@ -33,8 +33,16 @@ public:
     void close() ;
     void emergencyclose() ;
 
-private:
+    void openbranch (string name, vector < pair<string,string>> attributes) ;
+    void openbranch (string name) {return openbranch(name, {}) ; }
+    template <class T> void smallbranch (string name, T value) ;
+    template <class T> void smallbranch (string name, vector < pair<string,string>> attributes, T value) ;
+    bool closebranch() ;
+
     ofstream fic ;
+
+
+private:
     vector <pair<double,streampos>> index ;
     int encodebase64f (ostream &out, vector<double>& val) ;
     void encodebase64f_end (ostream &out) {static char lst[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" ; if (state!=0) out <<lst[remainer] ; remainer=state=0 ; }
@@ -42,12 +50,7 @@ private:
 
     stack<string> hierarchy;
 
-    void openbranch (string name, vector < pair<string,string>> attributes) ;
-    void openbranch (string name) {return openbranch(name, {}) ; }
-    template <class T> void smallbranch (string name, T value) ;
-    template <class T> void smallbranch (string name, vector < pair<string,string>> attributes, T value) ;
-    bool closebranch() ;
-    string quote (string a) {return "\""+a+"\"" ; }
+    string quote (string a) {return "'"+a+"'" ; }
 } ;
 //===============================================================
 class XMLReader_base
@@ -57,16 +60,19 @@ public:
     stack<string> tree ;
     ifstream fic ;
     std::pair<string, map<string,string>> gettag() ;
+    tuple <string, map<string,string> , std::vector<double> > gettagdata() ; 
     string getcontent() ;
 } ;
 
 class XMLReader : public XMLReader_base
 {
 public:
-    XMLReader(string path): XMLReader_base(path) {auto u=gettag() ; if (u.first!="demnd") printf("ERR:unexpected first entry (should be demnd)\n") ;
-        cout << "File date: "<< u.second["date"]<< "\nInput file: " << u.second["input"] <<"\nDimensions: "<< u.second["dimensions"] <<"\n" ;
+    XMLReader(string path): XMLReader_base(path) {tags=gettag() ; if (tags.first!="demnd") printf("ERR:unexpected first entry (should be demnd)\n") ;
+        cout << "File date: "<< tags.second["date"]<< "\nInput file: " << tags.second["input"] <<"\nDimensions: "<< tags.second["dimensions"] <<"\n" ;
     };
     int read_nextts(vector<string> &names, vector<vector<vector<double>>> & data) ;
     int decodebase64f (istream &in, vector<float>& val) ;
     int decodebase64f_2dd (istream &in, vector<vector<double>>& val) ;
+
+    std::pair<string, map<string,string>> tags ;
 } ;

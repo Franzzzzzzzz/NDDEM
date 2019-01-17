@@ -74,6 +74,8 @@ public :
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ;
     void quit_cleanly() ;
     void finalise();
+    void xml_header () ; 
+
 
 // For Xml Writing
     XMLWriter * xmlout ;

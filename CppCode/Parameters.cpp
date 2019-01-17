@@ -347,6 +347,20 @@ fflush(stdout) ;
 }
 if (first) first=false ;
 }
+//------------------------------------------
+void Parameters::xml_header ()
+{
+   xmlout->openbranch("boundaries", {make_pair("length", to_string(d*2))}) ;
+   for (uint i=0 ; i<d ; i++) xmlout->fic << Boundaries[i][0] << " " << Boundaries[i][1] << " " ;
+   xmlout->closebranch() ;
+
+   xmlout->openbranch("radius", {make_pair("length", to_string(N))}) ;
+   for (auto v: r) xmlout->fic << v << " " ;
+   xmlout->closebranch() ;
+}
+
+
+
 
 //-----------------------------------------
 void Parameters::quit_cleanly()

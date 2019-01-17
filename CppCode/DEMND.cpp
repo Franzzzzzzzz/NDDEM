@@ -59,8 +59,10 @@ int main (int argc, char *argv[])
  if (strcmp(argv[3], "default"))
      P.load_datafile (argv[3], X, V, Omega) ;
  if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64)
-   P.xmlout->header(d, argv[3]) ;
-
+   {
+     P.xmlout->header(d, argv[3]) ;
+     P.xml_header() ; 
+   }
  //Contacts C(P) ; //Initialize the Contact class object
  //ContactList CLp, CLw ;
  omp_set_num_threads(OMP_NUM_THREADS) ;
@@ -310,7 +312,7 @@ int main (int argc, char *argv[])
 //Tools::write1D ("Res.txt", TmpRes) ;
 //Tools::writeinline_close() ;
 Benchmark::write_all();
-P.finalise() ; 
+P.finalise() ;
 printf("This is the end ...\n") ;
 return 0 ;
 }

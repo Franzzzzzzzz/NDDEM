@@ -172,6 +172,17 @@ pair <string,map<string,string>> XMLReader_base::gettag()
         return (make_pair(tree.top(), tmp)) ;
     }
 }
+//----------------------------------------------------------
+tuple <string, map<string,string> , std::vector<double> > XMLReader_base::gettagdata()
+{
+    auto tag=gettag() ;
+    vector <double> values ;
+    int length= stoi(tag.second["length"]) ;
+    values.resize(length, 0) ;
+    for (int i=0 ; i<length ; i++) fic >> values[i] ;
+    gettag() ;
+    return (make_tuple(tag.first, tag.second, values)) ;
+}
 //------------------------------------------------
 string XMLReader_base::getcontent()
 {
@@ -187,7 +198,7 @@ int XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>>
  map <string, string> prop ;
  int n=0 ;
  auto a=gettag() ;
- if (a.first != "timestep") printf("ERR: not the right XML element (%s instead of timestep)\n", a.first.c_str()) ;
+ if (a.first != "timestep") {printf("ERR: not the right XML element (%s instead of timestep)\n", a.first.c_str()) ; return 1 ; }
  while (a.first !="/timestep")
  {
     a=gettag() ;
