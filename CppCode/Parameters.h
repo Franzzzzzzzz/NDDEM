@@ -33,8 +33,6 @@ public :
         Directory ("Output")
         {
          reset_ND(NN,dd) ;
-         if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
-             xmlout= new XMLWriter("dump.xml") ;
         }
 
     void reset_ND (int NN, int dd)
@@ -74,6 +72,8 @@ public :
     void init_locations (char *line, v2d & X) ;
 
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ;
+    void quit_cleanly() ;
+    void finalise();
 
 // For Xml Writing
     XMLWriter * xmlout ;

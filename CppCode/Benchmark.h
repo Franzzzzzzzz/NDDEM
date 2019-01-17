@@ -10,12 +10,12 @@ class Benchmark
 {
 public:
     // Disabled versions:
-    /*static void start_clock (const std::string &name) {}
+    static void start_clock (const std::string &name) {}
     static void stop_clock (const std::string &name) {}
-    static void write_all() {} ; */
+    static void write_all() {} ; 
 
 
-    static void start_clock (const std::string &name) {current.push(name) ; current_start.push(std::chrono::high_resolution_clock::now()) ;}
+/*    static void start_clock (const std::string &name) {current.push(name) ; current_start.push(std::chrono::high_resolution_clock::now()) ;}
     static void stop_clock (const std::string &name)
     {
         if (name!=current.top()) printf("Benchmark error: wrong stack %s\n", name.c_str()) ;
@@ -33,7 +33,7 @@ public:
      {
       printf("%10s | %10g | %10d | %10g |\n", v.first.c_str(), std::get<1>(v.second).count(), std::get<0>(v.second), std::get<1>(v.second).count()/std::get<0>(v.second)) ;
      }
-    }
+   }*/
 
 private:
     static std::map <std::string, std::tuple<int, std::chrono::duration<double>>> infos ;

@@ -1,47 +1,79 @@
 #include "Xml.h"
 
 
+void XMLWriter::openbranch (string name, vector < pair<string,string>> attributes)
+{
+  hierarchy.push(name) ;
+  for (uint i=0 ; i<hierarchy.size() ; i++) fic << " " ;
+  fic << "<" << name ;
+  for (auto i:attributes)
+  {
+    fic << " " <<i.first << '=' << i.second  ;
+  }
+  fic << ">\n" ;
+}
+bool XMLWriter::closebranch ()
+{
+  if (hierarchy.size()==0) return false ;
+  auto name=hierarchy.top() ; hierarchy.pop() ;
+  for (uint i=0 ; i<hierarchy.size()+1 ; i++) fic << " " ;
+  fic << "</" << name << ">\n" ;
+  return true ;
+}
+template <class T> void XMLWriter::smallbranch (string name, T value)
+{
+  for (uint i=0 ; i<hierarchy.size() ; i++) fic << " " ;
+  fic << " <" << name << '>' << value << "</" << name << ">\n" ;
+}
+template <class T> void XMLWriter::smallbranch (string name, vector < pair<string,string>> attributes, T value)
+{
+  for (uint i=0 ; i<hierarchy.size() ; i++) fic << " " ;
+  fic << " <" << name ;
+  for (auto i:attributes) fic << " " <<i.first << '=' << i.second  ;
+  fic << '>' << value << "</" << name << ">\n" ;
+}
+
 
 //---------------------------------------------------------------------------
 void XMLWriter::header (int dimension, string input)
 {
- std::time_t result = std::time(nullptr);
+ std::time_t result = std::time(nullptr); string temp ;
  char date[100] ; strcpy(date, std::asctime(std::localtime(&result))) ;
- date[strlen(date)-1]=0 ;
+ date[strlen(date)-1]=0 ; temp=date ;
  fic << "<?xml version='1.0' encoding='UTF-8'?>\n" ;
- fic << "<demnd date='"<< date << "' dimensions='" << dimension ;
- if (input!="") fic << "' input='"<< input ;
- fic <<  "'>\n" ;
+ openbranch("demnd", {make_pair("date", quote(temp)), make_pair("dimensions", to_string(dimension)), make_pair("input", quote(input))}) ;
 }
 //----------------------------------------------------------------------------
 void XMLWriter::writeTs (double ts, tuple<string,vector<vector<double>>*, ArrayType> a)
 {
  index.push_back(make_pair(float(ts), fic.tellp())) ;
- fic << " <timestep ts='" << float(ts) <<"'>\n" ;
+ openbranch("timestep", {make_pair("ts", to_string(ts))}) ;
  writeArray(get<0>(a), get<1>(a), get<2>(a) ) ;
- fic << " </timestep>\n" ;
+ closebranch() ;
 }
 void XMLWriter::startTS (double ts)
 {
  index.push_back(make_pair(float(ts), fic.tellp())) ;
- fic << " <timestep ts='" << float(ts) <<"'>\n" ;
+ openbranch("timestep", {make_pair("ts", to_string(ts))}) ;
 }
 void XMLWriter::stopTS ()
 {
- fic << " </timestep>\n" ;
+  closebranch() ;
 }
 //----------------------------------------------------------------------------
 void XMLWriter::writeArray(string name, vector<vector<double>>*x, ArrayType t, EncodingType te)
 {
- if (t==ArrayType::particles) fic << "  <particles>\n" ;
- else if (t==ArrayType::contacts) fic << "  <contacts>\n" ;
- else fic << "  <unknown>\n" ;
- fic << "   <name>" << name << "</name>\n" ;
- if (te==EncodingType::ascii) fic << "   <encoding>ascii</encoding>\n" ;
- else if (te==EncodingType::base64) fic << "   <encoding>base64</encoding>\n" ;
- fic << "   <nrows>" << x->size() << "</nrows>\n" ;
- fic << "   <ncols>" << (*x)[0].size() << "</ncols>\n" ;
- fic << "   <data length='" << x->size()*(*x)[0].size() << "'>" ;//<< setprecision(6);
+ if (t==ArrayType::particles) openbranch("particles") ; //fic << "  <particles>\n" ;
+ else if (t==ArrayType::contacts) openbranch("contacts") ; //fic << "  <contacts>\n" ;
+ else openbranch("unknown") ; //fic << "  <unknown>\n" ;
+ smallbranch("name", name) ; //fic << "   <name>" << name << "</name>\n" ;
+ if (te==EncodingType::ascii)      {smallbranch("encoding","ascii");}
+ else if (te==EncodingType::base64){smallbranch("encoding","base64");}
+
+ smallbranch("nrows", x->size()) ;
+ smallbranch("ncols", (*x)[0].size()) ;
+ openbranch("data", {make_pair("length", to_string(x->size()*(*x)[0].size()))}) ;
+
  int n=0 ;
  if (te==EncodingType::ascii)
  {
@@ -59,21 +91,38 @@ void XMLWriter::writeArray(string name, vector<vector<double>>*x, ArrayType t, E
      encodebase64f(fic, v) ;
    encodebase64f_end(fic);
  }
- fic << "\n   </data>\n" ;
- if (t==ArrayType::particles) fic << "  </particles>\n" ;
- else if (t==ArrayType::contacts) fic << "  </contacts>\n" ;
- else fic << "  </unknown>\n" ;
+ closebranch() ; closebranch() ;
 }
 //---------------------------------------------------------------
 void XMLWriter::close ()
 {
- fic << " <index>\n" ;
+ openbranch("index") ;
  for (auto v:index)
-     fic << "  <entry ts='" << v.first << "'>" << v.second << "</entry>\n" ;
- fic << " </index>\n" ;
- fic << "</demnd>\n" ;
+ {
+   smallbranch("entry",{make_pair("ts", to_string(v.first))}, v.second) ;
+ }
+
+ std::time_t result = std::time(nullptr);
+ string temp ; char date[100] ;
+ strcpy(date, std::asctime(std::localtime(&result))) ;
+ date[strlen(date)-1]=0 ; temp=date ;
+ while (closebranch()) ;
+ smallbranch("note", "Finish at "+temp) ;
+
  fic.close() ;
 }
+//---------------------------------------------------------------
+void XMLWriter::emergencyclose()
+{
+std::time_t result = std::time(nullptr);
+string temp ; char date[100] ;
+strcpy(date, std::asctime(std::localtime(&result))) ;
+date[strlen(date)-1]=0 ; temp=date ;
+while (closebranch()) ;
+smallbranch("note", "Emergency finish at "+temp) ;
+fic.close() ;
+}
+
 
 //=========================================================================================
 XMLReader_base::XMLReader_base (string path)

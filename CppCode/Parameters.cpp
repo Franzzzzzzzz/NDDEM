@@ -67,6 +67,9 @@ void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
   {
     interpret_command(in, X, V, Omega) ;
   }
+
+  if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
+    xmlout= new XMLWriter(Directory+".xml") ;
 }
 //-------------------------------------------------
 void Parameters::check_events(float time, v2d & X, v2d & V, v2d & Omega)
@@ -298,7 +301,6 @@ void Parameters::init_locations (char *line, v2d & X)
         for (uint dd=0 ; dd<d ; dd++)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
       }
-      printf("BOO") ; fflush(stdout) ; 
     }
     else
         printf("ERR: no other initalisation location than square implemented\n") ;
@@ -308,7 +310,6 @@ void Parameters::init_locations (char *line, v2d & X)
 void Parameters::display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int nct, int ngst)
 {
 static bool first=true ;
-static char letters[]={'|', '/', '-', '\\'} ;
 static double Rmax, mmax ;
 if (first)
 {
@@ -345,4 +346,16 @@ printf("\e[0G") ;
 fflush(stdout) ;
 }
 if (first) first=false ;
+}
+
+//-----------------------------------------
+void Parameters::quit_cleanly()
+{
+  if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
+    xmlout->emergencyclose() ;
+}
+void Parameters::finalise()
+{
+  if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
+    xmlout->close() ;
 }

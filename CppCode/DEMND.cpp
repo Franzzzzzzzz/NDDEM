@@ -12,9 +12,12 @@ vector <FILE *> Tools::outs ;
 boost::random::mt19937 Tools::rng ;
 boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
+Parameters * ptrP ; //Only for the signal handler ...
+
 void sig_handler (int p)
 {
     Benchmark::write_all() ;
+    ptrP->quit_cleanly() ;
     //printf("\n\n\n\n\n\n\n") ;
     std::exit(p) ;
 }
@@ -26,7 +29,7 @@ int main (int argc, char *argv[])
 
  if (argc<4) {printf("Usage: DEMND #dimensions #grains inputfile\n") ; std::exit(1) ; }
  int dd=atoi(argv[1]) ; int NN=atoi(argv[2]) ;
- Parameters P(dd,NN) ;
+ Parameters P(dd,NN) ; ptrP=&P ;
  Tools::initialise(P.d) ;
  if (!Tools::check_initialised(P.d)) printf("ERR: Something terribly wrong happened\n") ;
  assert(P.d<(sizeof(int)*8-1)) ;
@@ -55,7 +58,8 @@ int main (int argc, char *argv[])
  //P.init_particles(X, A) ;
  if (strcmp(argv[3], "default"))
      P.load_datafile (argv[3], X, V, Omega) ;
- if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64) P.xmlout->header(d, argv[3]) ;
+ if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64)
+   P.xmlout->header(d, argv[3]) ;
 
  //Contacts C(P) ; //Initialize the Contact class object
  //ContactList CLp, CLw ;
@@ -306,6 +310,7 @@ int main (int argc, char *argv[])
 //Tools::write1D ("Res.txt", TmpRes) ;
 //Tools::writeinline_close() ;
 Benchmark::write_all();
+P.finalise() ; 
 printf("This is the end ...\n") ;
 return 0 ;
 }
