@@ -1,5 +1,5 @@
 # Incline plane flow
-directory OutputAdimD
+directory OutputAdimD7
 dimensions 7 16704
 
 #set adimensional
