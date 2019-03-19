@@ -10,7 +10,7 @@ var group, wristband;
 var R,r; // parameters of torus
 var N; // number of dimensions
 var world = [];
-
+var ref_dim = {'N_0': 0}; // reference dimension
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false}
 
 init();
@@ -86,7 +86,7 @@ function build_world() {
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
     renderer.shadowMap.enabled = true;
-    if (window.viewerType == "VR") { renderer.vr.enabled = true; };
+    // if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
     if (window.viewerType == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
@@ -104,6 +104,7 @@ function build_world() {
         controller2.addEventListener( 'selectend', onSelectEnd );
         scene.add( controller2 );
 
+        controls = new THREE.TrackballControls( camera );
         console.log("VR mode loaded");
     } else if (window.viewerType == 'keyboard') {
         controls = new THREE.TrackballControls( camera );
@@ -122,6 +123,7 @@ function build_world() {
 
     if ( window.viewerType == 'anaglyph' ) {
         var gui = new dat.GUI();
+        gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
             for (i=3;i<N;i++) {
                 gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
@@ -134,6 +136,7 @@ function build_world() {
     else {
         var gui = dat.GUIVR.create('MuDEM');
         dat.GUIVR.enableMouse( camera, renderer );
+        gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
             for (i=3;i<N;i++) {
                 gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
@@ -142,12 +145,16 @@ function build_world() {
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         gui.position.set(0,1.5,0.5)
-        scene.add( gui );
+
         if (window.viewerType == "VR") {
+            controller2.add( gui );
             var input1 = dat.GUIVR.addInputObject( controller1 );
             var input2 = dat.GUIVR.addInputObject( controller2 );
             scene.add( input1 );
             scene.add( input2 );
+        }
+        else {
+            scene.add( gui );
         }
     }
 
