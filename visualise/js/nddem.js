@@ -8,14 +8,14 @@ var tempMatrix = new THREE.Matrix4();
 var group;
 var W_old; // keep past value of W
 var t_old;
-var N = 5; // number of dimensions
-var params = [];
+var N = 4; // number of dimensions
+var world = [];
 for (i=0;i<N;i++) {
-    params.push({});
-    params[i].min = 0;
-    params[i].max = 1;
-    params[i].cur = 0.5;
-    params[i].prev = 0.5;
+    world.push({});
+    world[i].min = 0;
+    world[i].max = 1;
+    world[i].cur = 0.5;
+    world[i].prev = 0.5;
 }
 
 
@@ -33,20 +33,33 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x808080 );
 
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-    camera.position.set(0,0.5,3);
+    if (N == 2) {
+        camera = new THREE.OrthographicCamera();// window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+        // camera.enableRotate = false
+        camera.position.set(0.5,0.5,1.5);
+        // camera.lookAt(0.5,0.5,0.5);
+    }
+    else {
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+        camera.position.set(0,0.5,3);
+    }
 
     var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
     var material = new THREE.MeshStandardMaterial( {
         color: 0xeeeeee,
         roughness: 1.0,
-        metalness: 0.0
+        metalness: 0.0,
     } );
+    material.transparent = true;
+    material.opacity = 0.5;
+    material.side = THREE.DoubleSide;
     var floor = new THREE.Mesh( geometry, material );
     floor.rotation.x = - Math.PI / 2;
-    floor.position.set(0.5,-0.1,0.5)
-    floor.receiveShadow = true;
+    floor.position.set(0.5,0,0.5)
+    floor.receiveShadow = false;
     scene.add( floor );
+    // floor.position.set(1.5,0,0.5)
+    // scene.add( floor );
 
     scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
@@ -107,17 +120,13 @@ function init() {
     dat.GUIVR.enableMouse( camera, renderer );
     if (N > 3) {
         for (i=3;i<N;i++) {
-            gui.add( params[i], 'cur').min(params[i].min).max(params[i].max).listen().name('X'+i).step(0.01) ;
+            gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).listen().name('X'+i).step(0.01) ;
         }
     }
     if (N == 4) {  }
     gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time (Up/Down)') ;
-    // gui.add( params, 'radius').min(0).max(10).step(0.01).listen().name('Cam Dist (R/F)') ;
-    // gui.add( params, 'theta').step(0.01).listen().name('Cam Incl (W/S)') ;
-    // gui.add( params, 'phi').step(0.01).listen().name('Cam Azim (A/D)') ;
-    // gui.open();
-    gui.position.set(0,1,1.2)
-    scene.add( gui ); // Add GUI to the scene
+    gui.position.set(0,1.5,0.5)
+    scene.add( gui );
 
 
     var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
@@ -204,8 +213,10 @@ function make_initial_spheres_CSV() {
         }
     });
 };
+
 function update_spheres_CSV(t) {
-    Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv", {
+    Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv"+"?_="+ (new Date).getTime(), { // definitely no caching
+    // Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv", {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -213,12 +224,26 @@ function update_spheres_CSV(t) {
         complete: function(results) {
             spheres = results.data;
             var numSpheres = spheres.length;
-            // var c = scene.getObjectByName('container');
             for (i = 0; i<numSpheres; i++) {
                 var object = group.children[i];
-                object.position.set(spheres[i].X,spheres[i].Y,spheres[i].Z);
-                var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                        Math.pow( (params[3].cur - spheres[i].W), 2) );
+                object.position.set(spheres[i].X0,spheres[i].X1,spheres[i].X2);
+                if (N == 2) {
+                    var R_draw = spheres[i].R;
+                             }
+                if (N == 3) {
+                    var R_draw = spheres[i].R;
+                             }
+                else if (N == 4) {
+                    var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
+                                            Math.pow( (world[3].cur - spheres[i].X3), 2)
+                                          );
+                             }
+                 else if (N == 5) {
+                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
+                                             Math.pow( (world[3].cur - spheres[i].X3), 2) -
+                                             Math.pow( (world[4].cur - spheres[i].X4), 2)
+                                         ); // FIXME - IS THIS RIGHT?
+                 }
                 if (isNaN(R_draw)) {
                     object.visible = false;
                 }
@@ -315,9 +340,11 @@ function cleanIntersected() {
 //
 
 function animate() {
-    if (params[3].cur != params[3].prev) {
-        update_spheres_CSV(time.cur);
-        params[3].prev = params[3].cur;
+    if (N > 3) {
+        if (world[3].cur != world[3].prev) {
+            update_spheres_CSV(time.cur);
+            world[3].prev = world[3].cur;
+        }
     }
     if (time.cur != time.prev) {
         update_spheres_CSV(time.cur);
@@ -334,24 +361,6 @@ function render() {
         intersectObjects( controller1 );
         intersectObjects( controller2 );
     }
-    if (window.viewerType == 'keyboard') {
-        document.onkeydown = function(e) {
-            switch (e.keyCode) {
-                case 37: // left key
-                    if (params[3].cur >= params[3].min) {params[3].cur -= 0.01}
-                    break;
-                case 39: // right key
-                    if (params[3].cur <= params[3].max) {params[3].cur += 0.01}
-                    break;
-                case 40: // down key
-                    if (time.cur >= 1) {time.cur -= 1}
-                    break;
-                case 38: // up key
-                    time.cur += 1;
-                    break;
-                }
-            }
-        }
     if (window.viewerType == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
 };
