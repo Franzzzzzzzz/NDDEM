@@ -17,7 +17,7 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('GET', "http://localhost:8000/data/in.test1"+"?_="+ (new Date).getTime(), true);
+    request.open('GET', "http://localhost:8000/data/"+window.fname+"?_="+ (new Date).getTime(), true);
     request.send(null);
     N = request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
