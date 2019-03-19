@@ -8,28 +8,18 @@ var tempMatrix = new THREE.Matrix4();
 var group, wristband;
 
 var R,r; // parameters of torus
-var N = 5; // number of dimensions
+var N; // number of dimensions
 var world = [];
-for (i=0;i<N;i++) {
-    world.push({});
-    world[i].min = 0.;
-    world[i].max = 1.;
-    world[i].cur = 0.5;
-    world[i].prev = 0.5;
-}
-
-
+var ref_dim = {'N_0': 0}; // reference dimension
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false}
 
 init();
-// animate();
-setTimeout( function(){ animate(); }, 1000 )
 
-async function load_in_file() {
+function init() {
     var request = new XMLHttpRequest();
-    request.open('GET', "http://localhost:8000/data/in.test1", true);
+    request.open('GET', "http://localhost:8000/CppCode/"+window.fname+"?_="+ (new Date).getTime(), true);
     request.send(null);
-    request.onreadystatechange = function () {
+    N = request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
             var type = request.getResponseHeader('Content-Type');
             if (type.indexOf("text") !== 1) {
@@ -37,22 +27,35 @@ async function load_in_file() {
                 for (i=0;i<lines.length;i++) {
                     l = lines[i].split(' ')
                     if (l[0] == 'dimensions') {
-                        N = l[1];
-                        console.log(N);
-                    }
-                    // if
+                        N = parseInt(l[1]);
+                        for (j=0;j<N;j++) {
+                            world.push({});
+                            world[j].min = 0.;
+                            world[j].max = 1.;
+                            world[j].cur = 0.5;
+                            world[j].prev = 0.5;
+                        }
 
+                    }
+                    else if (l[0] == 'boundary') {
+                        if (l[2] == 'WALL') {
+                            world[l[1]].min = parseFloat(l[3]);
+                            world[l[1]].max = parseFloat(l[4]);
+                            world[l[1]].cur = (world[l[1]].min + world[l[1]].max)/2.;
+                            world[l[1]].prev = world[l[1]].cur;
+                        }
+                    }
                 }
+                build_world();
+                animate();
             }
         }
     }
-    return N;
+
 
 }
 
-function init() {
-    // let a = await load_in_file();
-    // console.log("N = " + a);
+function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
@@ -83,7 +86,7 @@ function init() {
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
     renderer.shadowMap.enabled = true;
-    if (window.viewerType == "VR") { renderer.vr.enabled = true; };
+    // if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
     if (window.viewerType == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
@@ -101,6 +104,7 @@ function init() {
         controller2.addEventListener( 'selectend', onSelectEnd );
         scene.add( controller2 );
 
+        controls = new THREE.TrackballControls( camera );
         console.log("VR mode loaded");
     } else if (window.viewerType == 'keyboard') {
         controls = new THREE.TrackballControls( camera );
@@ -113,13 +117,13 @@ function init() {
     };
 
     // load_hyperspheres_VTK();
-    console.log(N);
     if ( N == 5 ) { add_torus(); }
     make_initial_spheres_CSV();
     update_spheres_CSV(0);
 
     if ( window.viewerType == 'anaglyph' ) {
         var gui = new dat.GUI();
+        gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
             for (i=3;i<N;i++) {
                 gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
@@ -132,6 +136,7 @@ function init() {
     else {
         var gui = dat.GUIVR.create('MuDEM');
         dat.GUIVR.enableMouse( camera, renderer );
+        gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
             for (i=3;i<N;i++) {
                 gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
@@ -140,12 +145,16 @@ function init() {
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         gui.position.set(0,1.5,0.5)
-        scene.add( gui );
+
         if (window.viewerType == "VR") {
+            controller2.add( gui );
             var input1 = dat.GUIVR.addInputObject( controller1 );
             var input2 = dat.GUIVR.addInputObject( controller2 );
             scene.add( input1 );
             scene.add( input2 );
+        }
+        else {
+            scene.add( gui );
         }
     }
 
@@ -272,13 +281,13 @@ function add_torus() {
 
 function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
-    loader.load("http://localhost:8000/data/vtk//dump-0.vtu", function ( geometry ) {
+    loader.load("http://localhost:8000/visualise/data/vtk//dump-0.vtu", function ( geometry ) {
         console.log(geometry);
     } );
 };
 
 function make_initial_spheres_CSV() {
-    Papa.parse("http://localhost:8000/data/csv/dump-"+0+".csv", {
+    Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+0+".csv", {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -309,8 +318,8 @@ function make_initial_spheres_CSV() {
 };
 
 function update_spheres_CSV(t) {
-    Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv"+"?_="+ (new Date).getTime(), { // definitely no caching
-    // Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv", {
+    Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+t+".csv"+"?_="+ (new Date).getTime(), { // definitely no caching
+    // Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+t+".csv", {
         download: true,
         dynamicTyping: true,
         header: true,
