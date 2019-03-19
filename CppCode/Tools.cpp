@@ -49,15 +49,18 @@ return 0 ;
 }
 
 //=====================================
-void Tools::savecsv (char path[], cv2d & X, cv1d &r)
+void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags)
 {
- FILE *out ;
+ FILE *out ; int dim ;
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
-
- fprintf(out, "X,Y,Z,W,R\n") ;
+ dim = X[0].size() ;
+ for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
+ fprintf(out, ",R,PBCFlags\n") ;
  for (uint i=0 ; i<X.size() ; i++)
  {
-  fprintf(out, "%.6g,%.6g,%.6g,%.6g,%.6g\n", X[i][0], X[i][1], X[i][2], X[i][3], r[i]) ;
+  for (int j=0 ; j<dim ; j++)
+    fprintf(out, "%.6g,", X[i][j]) ;
+  fprintf(out, "%g,%d\n", r[i],PBCFlags[i]) ;
  }
  fclose(out) ;
 }

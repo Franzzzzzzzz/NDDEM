@@ -48,6 +48,8 @@ int main (int argc, char *argv[])
  std::vector < std::vector <double> > TorqueCorr (N, std::vector <double> (d*(d-1)/2, 0)) ;
  std::vector < double > displacement (N, 0) ; double maxdisp[2] ;
 
+ std::vector <u_int32_t> PBCFlags (N, 0) ;
+
  vector <u_int32_t> Ghost (N, 0) ;
  vector <u_int32_t> Ghost_dir (N, 0) ;
 
@@ -113,7 +115,7 @@ int main (int argc, char *argv[])
     for (int dd=0 ; dd<d *d ; dd++)
         A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;
 
-    P.perform_PBC(X[i]) ;
+    P.perform_PBC(X[i], PBCFlags[i]) ;
 
     // Find ghosts
     Ghost[i]=0 ; Ghost_dir[i]=0 ;
@@ -334,7 +336,7 @@ int main (int argc, char *argv[])
     if (P.dumpkind==ExportType::CSV)
     {
         char path[500] ; sprintf(path, "%s/dump-%05d.csv", P.Directory.c_str(), ti) ;
-        Tools::savecsv(path, X, P.r) ;
+        Tools::savecsv(path, X, P.r, PBCFlags) ;
     }
     else if (P.dumpkind==ExportType::VTK)
     {
@@ -357,8 +359,7 @@ int main (int argc, char *argv[])
         P.xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::base64);
         P.xmlout->stopTS();
     }
-    else
-      continue ;
+    std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
    }
  }
 
