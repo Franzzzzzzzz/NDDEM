@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>ND-DEM Viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR, origin = https://threejs.org, expires = 2017-06-13 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR" data-expires="2017-06-13" content="ApAQvHfiHMQB7SmRhfvCUX61adJaTA6pAu0Ry439jjeipa5lGm1RcTQynFoHGGcaSJkWfMOv7qK6pwSUb95ClQgAAABKeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUiIsImV4cGlyeSI6MTQ5NzMxMjAwMH0=">
+		<style>
+			body {
+				margin: 0px;
+				overflow: hidden;
+			}
+            html {
+                width: 100%;
+                height: 100%;
+                background: #FFFFFF; /* Old browsers */
+                background: -moz-linear-gradient(top,  #FFFFFF 0%, #3B413C 100%); /* FF3.6-15 */
+                background: -webkit-linear-gradient(top,  #FFFFFF 0%,#3B413C 100%); /* Chrome10-25,Safari5.1-6 */
+                background: linear-gradient(to bottom,  #FFFFFF 0%,#3B413C 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+                filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ADA8B6', endColorstr='#FFEEDB',GradientType=0 ); /* IE6-9 */
+            }
+		</style>
+	</head>
+	<body>
+
+        <script>
+        var viewerType = "VR";
+        // var viewerType = "anaglyph";
+        // var viewerType = "keyboard";
+        </script>
+
+
+		<!-- <script src="node_modules/three/build/three.js"></script> -->
+		<script src="http://threejs.org/build/three.min.js"></script>
+        <!-- <script src="js/controls/VRControls.js"></script> -->
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/controls/TrackballControls.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+        <script src="js/effects/AnaglyphEffect.js"></script>
+		<script src="js/vr/WebVR.js"></script>
+
+		<script src="js/libs/dat.gui.min.js"></script>
+	    <script src="js/PapaParse-4.3.2/papaparse.min.js"></script>
+
+ 		<script src="nddem.js"></script>
+	</body>
+</html>

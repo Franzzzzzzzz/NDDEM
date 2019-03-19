@@ -3,7 +3,7 @@
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-import { Object3D } from '../core/Object3D';
+import { Object3D } from '../core/Object3D.js';
 
 function Audio( listener ) {
 
@@ -11,6 +11,7 @@ function Audio( listener ) {
 
 	this.type = 'Audio';
 
+	this.listener = listener;
 	this.context = listener.context;
 
 	this.gain = this.context.createGain();
@@ -19,8 +20,10 @@ function Audio( listener ) {
 	this.autoplay = false;
 
 	this.buffer = null;
+	this.detune = 0;
 	this.loop = false;
 	this.startTime = 0;
+	this.offset = 0;
 	this.playbackRate = 1;
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
@@ -45,6 +48,17 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		this.hasPlaybackControl = false;
 		this.sourceType = 'audioNode';
 		this.source = audioNode;
+		this.connect();
+
+		return this;
+
+	},
+
+	setMediaElementSource: function ( mediaElement ) {
+
+		this.hasPlaybackControl = false;
+		this.sourceType = 'mediaNode';
+		this.source = this.context.createMediaElementSource( mediaElement );
 		this.connect();
 
 		return this;
@@ -83,12 +97,15 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
-		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
-		source.start( 0, this.startTime );
+		this.startTime = this.context.currentTime;
+		source.start( this.startTime, this.offset );
 
 		this.isPlaying = true;
 
 		this.source = source;
+
+		this.setDetune( this.detune );
+		this.setPlaybackRate( this.playbackRate );
 
 		return this.connect();
 
@@ -103,9 +120,14 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		this.source.stop();
-		this.startTime = this.context.currentTime;
-		this.isPlaying = false;
+		if ( this.isPlaying === true ) {
+
+			this.source.stop();
+			this.source.onended = null;
+			this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+			this.isPlaying = false;
+
+		}
 
 		return this;
 
@@ -121,7 +143,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		}
 
 		this.source.stop();
-		this.startTime = 0;
+		this.source.onended = null;
+		this.offset = 0;
 		this.isPlaying = false;
 
 		return this;
@@ -202,6 +225,28 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
+	setDetune: function ( value ) {
+
+		this.detune = value;
+
+		if ( this.source.detune === undefined ) return; // only set detune when available
+
+		if ( this.isPlaying === true ) {
+
+			this.source.detune.setTargetAtTime( this.detune, this.context.currentTime, 0.01 );
+
+		}
+
+		return this;
+
+	},
+
+	getDetune: function () {
+
+		return this.detune;
+
+	},
+
 	getFilter: function () {
 
 		return this.getFilters()[ 0 ];
@@ -227,7 +272,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this.source.playbackRate.setValueAtTime( this.playbackRate, this.context.currentTime );
+			this.source.playbackRate.setTargetAtTime( this.playbackRate, this.context.currentTime, 0.01 );
 
 		}
 
@@ -289,7 +334,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	setVolume: function ( value ) {
 
-		this.gain.gain.value = value;
+		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
 
