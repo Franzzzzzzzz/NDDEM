@@ -62,7 +62,7 @@ public :
 // Useful functions
     int set_boundaries() ;
     //int init_particles(v2d & X, v2d & A) ;
-    void perform_PBC(v1d & X) ;
+    void perform_PBC(v1d & X, u_int32_t & PBCFlags) ;
     int init_mass() ;
     int init_inertia() ;
 

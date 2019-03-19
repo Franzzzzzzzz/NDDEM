@@ -15,13 +15,13 @@ int Parameters::set_boundaries()
     return 0 ;
 }
 //----------------------------------------------------
-void Parameters::perform_PBC(v1d & X)
+void Parameters::perform_PBC (v1d & X, u_int32_t & PBCFlag)
 {
  for (uint j=0 ; j<d ; j++)
  {
    if (Boundaries[j][3]!=0) continue ; // not a PBC
-   if      (X[j]<Boundaries[j][0]) X[j] += Boundaries[j][2] ;
-   else if (X[j]>Boundaries[j][1]) X[j] -= Boundaries[j][2] ;
+   if      (X[j]<Boundaries[j][0]) {X[j] += Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
+   else if (X[j]>Boundaries[j][1]) {X[j] -= Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
  }
 }
 //-----------------------------------------------------
