@@ -3,7 +3,7 @@ AKA Most Useless DEM.
 
 This git repository contains the code for discrete element numerical modelling of granular material in a general number of spatial dimensions. The Dropbox folder for the code **should not** be used anymore.  
 
-Additional information and project progress are available as a [https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS](Dropbox Paper).
+Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS).
 
 The code is split in different modules, with different purposes. Some of the important folders are given there:
 - CppCode: `cpp` Main DEM simulation *@franzzzzzzzz*
