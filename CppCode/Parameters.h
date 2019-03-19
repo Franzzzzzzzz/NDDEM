@@ -28,7 +28,8 @@ public :
         Kt(0.00001) ,   //Tangential stiffness
         Gamman(0.0001), //Normal damping
         Gammat(0),      //Tangential damping
-        Mu(0.5),          // Friction coefficient
+        Mu(0.5),        // Friction coefficient
+        skin(1.0), skinsqr(1.0),      // Skin size (for verlet list optimisation)
         dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         Directory ("Output")
         {
@@ -49,6 +50,7 @@ public :
     uint d ; int N, tdump, tinfo ;
     double T ;
     double dt, rho, Kn, Kt, Gamman, Gammat, Mu ;
+    double skin, skinsqr ;
     ExportType dumpkind ;
     vector <double> r, m, I, g ;
     vector <bool> Frozen ;
@@ -74,7 +76,7 @@ public :
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ;
     void quit_cleanly() ;
     void finalise();
-    void xml_header () ; 
+    void xml_header () ;
 
 
 // For Xml Writing

@@ -64,6 +64,7 @@ static int writeinline(initializer_list< v1d >) ;
 static int writeinline_close(void) ;
 
 static v1d randomize_vec (cv1d v) ;
+static std::pair <double, double> two_max_element (cv1d & v) ;
 
 static double Volume (double R) ;
 static double InertiaMomentum (double R, double rho) ;
