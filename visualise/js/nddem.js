@@ -8,28 +8,18 @@ var tempMatrix = new THREE.Matrix4();
 var group, wristband;
 
 var R,r; // parameters of torus
-var N = 5; // number of dimensions
+var N; // number of dimensions
 var world = [];
-for (i=0;i<N;i++) {
-    world.push({});
-    world[i].min = 0.;
-    world[i].max = 1.;
-    world[i].cur = 0.5;
-    world[i].prev = 0.5;
-}
-
 
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false}
 
 init();
-// animate();
-setTimeout( function(){ animate(); }, 1000 )
 
-async function load_in_file() {
+function init() {
     var request = new XMLHttpRequest();
-    request.open('GET', "http://localhost:8000/data/in.test1", true);
+    request.open('GET', "http://localhost:8000/data/in.test1"+"?_="+ (new Date).getTime(), true);
     request.send(null);
-    request.onreadystatechange = function () {
+    N = request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
             var type = request.getResponseHeader('Content-Type');
             if (type.indexOf("text") !== 1) {
@@ -37,22 +27,35 @@ async function load_in_file() {
                 for (i=0;i<lines.length;i++) {
                     l = lines[i].split(' ')
                     if (l[0] == 'dimensions') {
-                        N = l[1];
-                        console.log(N);
-                    }
-                    // if
+                        N = parseInt(l[1]);
+                        for (j=0;j<N;j++) {
+                            world.push({});
+                            world[j].min = 0.;
+                            world[j].max = 1.;
+                            world[j].cur = 0.5;
+                            world[j].prev = 0.5;
+                        }
 
+                    }
+                    else if (l[0] == 'boundary') {
+                        if (l[2] == 'WALL') {
+                            world[l[1]].min = parseFloat(l[3]);
+                            world[l[1]].max = parseFloat(l[4]);
+                            world[l[1]].cur = (world[l[1]].min + world[l[1]].max)/2.;
+                            world[l[1]].prev = world[l[1]].cur;
+                        }
+                    }
                 }
+                build_world();
+                animate();
             }
         }
     }
-    return N;
+
 
 }
 
-function init() {
-    // let a = await load_in_file();
-    // console.log("N = " + a);
+function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
@@ -113,7 +116,6 @@ function init() {
     };
 
     // load_hyperspheres_VTK();
-    console.log(N);
     if ( N == 5 ) { add_torus(); }
     make_initial_spheres_CSV();
     update_spheres_CSV(0);
