@@ -17,7 +17,7 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('GET', "http://localhost:8000/data/"+window.fname+"?_="+ (new Date).getTime(), true);
+    request.open('GET', "http://localhost:8000/CppCode/"+window.fname+"?_="+ (new Date).getTime(), true);
     request.send(null);
     N = request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
@@ -281,13 +281,13 @@ function add_torus() {
 
 function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
-    loader.load("http://localhost:8000/data/vtk//dump-0.vtu", function ( geometry ) {
+    loader.load("http://localhost:8000/visualise/data/vtk//dump-0.vtu", function ( geometry ) {
         console.log(geometry);
     } );
 };
 
 function make_initial_spheres_CSV() {
-    Papa.parse("http://localhost:8000/data/csv/dump-"+0+".csv", {
+    Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+0+".csv", {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -318,8 +318,8 @@ function make_initial_spheres_CSV() {
 };
 
 function update_spheres_CSV(t) {
-    Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv"+"?_="+ (new Date).getTime(), { // definitely no caching
-    // Papa.parse("http://localhost:8000/data/csv/dump-"+t+".csv", {
+    Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+t+".csv"+"?_="+ (new Date).getTime(), { // definitely no caching
+    // Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+t+".csv", {
         download: true,
         dynamicTyping: true,
         header: true,
