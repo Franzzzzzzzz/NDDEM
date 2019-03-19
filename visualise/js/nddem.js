@@ -19,7 +19,7 @@ for (i=0;i<N;i++) {
 }
 
 
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99}
+var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false}
 
 
 init();
@@ -44,34 +44,9 @@ function init() {
         camera.position.set(0,0.5,3);
     }
 
-    var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-    var material = new THREE.MeshStandardMaterial( {
-        color: 0xeeeeee,
-        roughness: 1.0,
-        metalness: 0.0,
-    } );
-    material.transparent = true;
-    material.opacity = 0.5;
-    material.side = THREE.DoubleSide;
-    var floor = new THREE.Mesh( geometry, material );
-    floor.rotation.x = - Math.PI / 2;
-    floor.position.set(0.5,0,0.5)
-    floor.receiveShadow = false;
-    scene.add( floor );
-    // floor.position.set(1.5,0,0.5)
-    // scene.add( floor );
+    // make_walls();
 
-    scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
-
-    var light = new THREE.DirectionalLight( 0xffffff );
-    light.position.set( 0, 6, 0 );
-    light.castShadow = true;
-    light.shadow.camera.top = 2;
-    light.shadow.camera.bottom = - 2;
-    light.shadow.camera.right = 2;
-    light.shadow.camera.left = - 2;
-    light.shadow.mapSize.set( 4096, 4096 );
-    scene.add( light );
+    make_lights();
 
     group = new THREE.Group();
     scene.add( group );
@@ -120,13 +95,19 @@ function init() {
     dat.GUIVR.enableMouse( camera, renderer );
     if (N > 3) {
         for (i=3;i<N;i++) {
-            gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).listen().name('X'+i).step(0.01) ;
+            gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i).step(0.01) ;
         }
     }
-    if (N == 4) {  }
-    gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time (Up/Down)') ;
+    gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
+    gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
     gui.position.set(0,1.5,0.5)
     scene.add( gui );
+    if (window.viewerType == "VR") {
+        var input1 = dat.GUIVR.addInputObject( controller1 );
+        var input2 = dat.GUIVR.addInputObject( controller2 );
+        scene.add( input1 );
+        scene.add( input2 );
+    }
 
 
     var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
@@ -141,6 +122,66 @@ function init() {
         };
     raycaster = new THREE.Raycaster();
     window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function make_lights() {
+    scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+
+    var light = new THREE.DirectionalLight( 0xffffff );
+    light.position.set( 0, 6, 0 );
+    light.castShadow = true;
+    light.shadow.camera.top = 2;
+    light.shadow.camera.bottom = - 2;
+    light.shadow.camera.right = 2;
+    light.shadow.camera.left = - 2;
+    light.shadow.mapSize.set( 4096, 4096 );
+    scene.add( light );
+}
+
+function make_walls() {
+    var axesHelper = new THREE.AxesHelper( 1 );
+    scene.add( axesHelper );
+
+    var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+    var material = new THREE.MeshStandardMaterial( {
+        color: 0xeeeeee,
+        roughness: 1.0,
+        metalness: 0.0,
+    } );
+    material.transparent = true;
+    material.opacity = 0.5;
+    material.side = THREE.DoubleSide;
+
+    var floor = new THREE.Mesh( geometry, material );
+    floor.rotation.x = - Math.PI / 2;
+    floor.position.set(0.5,0,0.5)
+    scene.add( floor );
+
+    var roof = new THREE.Mesh( geometry, material );
+    roof.rotation.x = - Math.PI / 2;
+    roof.position.set(0.5,1,0.5)
+    scene.add( roof );
+
+    var left_wall = new THREE.Mesh( geometry, material );
+    left_wall.rotation.y = - Math.PI / 2;
+    left_wall.position.set(0.5,1,0.5)
+    scene.add( left_wall );
+
+    var right_wall = new THREE.Mesh( geometry, material );
+    right_wall.rotation.y = - Math.PI / 2;
+    right_wall.position.set(0.5,1,0.5)
+    scene.add( right_wall );
+
+    if (N > 2) {
+        var front_wall = new THREE.Mesh( geometry, material );
+        front_wall.position.set(0.5,1,0.5)
+        scene.add( front_wall );
+
+        var back_wall = new THREE.Mesh( geometry, material );
+        front_wall.position.set(0.5,1,0.5)
+        scene.add( back_wall );
+    }
 
 }
 
@@ -342,14 +383,16 @@ function cleanIntersected() {
 function animate() {
     if (N > 3) {
         if (world[3].cur != world[3].prev) {
-            update_spheres_CSV(time.cur);
+            update_spheres_CSV(Math.floor(time.cur));
             world[3].prev = world[3].cur;
         }
     }
-    if (time.cur != time.prev) {
-        update_spheres_CSV(time.cur);
+    if (time.play) { time.cur += 0.5; };
+    if (Math.floor(time.cur) != time.prev) {
+        update_spheres_CSV(Math.floor(time.cur));
         time.prev = time.cur;
     }
+    if (time.cur > time.max) { time.cur -= time.max; }
     requestAnimationFrame( animate );
     if (window.viewerType == "keyboard" || window.viewerType == "anaglyph") { controls.update(); }
     renderer.setAnimationLoop( render );
