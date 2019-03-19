@@ -56,7 +56,9 @@ public:
  Action * default_action () {return (&def) ; }
  int cid=0 ;
 
- void check_ghost (u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ; 
+ void check_ghost    (u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
+ void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2,           cp & contact) ; 
+
 
 private:
  list<cp>::iterator it ;

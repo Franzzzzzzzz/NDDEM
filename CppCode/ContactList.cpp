@@ -45,9 +45,28 @@ void ContactList::check_ghost (u_int32_t gst, int n, double partialsum, u_int32_
      //printf("CONTACT\n") ;
     }
     check_ghost(gst-1, n, partialsum, mask|(1<<n), P, X1, X2, R, tmpcp ) ; // Recursing after changing partial sum -> looking for ghosts of ghosts...
-
   }
 }
+
+//----------------------------------------
+void ContactList::check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, cp & contact)
+{
+  if (gst==0) return ;
+  else
+  {
+    for ( ;(gst&1)==0; gst>>=1,n++) ;
+    check_ghost_dst(gst-1, n, partialsum, mask, P, X1, X2, contact) ;
+    double Delta= (contact.ghostdir&(1<<n)?-1:1) * P.Boundaries[n][2] ;
+    partialsum = partialsum + Delta*(2*(X2[n]-X1[n]) + Delta) ;
+    if (partialsum<contact.contactlength) // Found a lower distance with this ghost
+    {
+      contact.contactlength=partialsum ;
+      contact.ghost = mask|(1<<n) ;
+    }
+    check_ghost_dst(gst-1, n, partialsum, mask|(1<<n), P, X1, X2, contact) ;
+  }
+}
+
 
 
 

@@ -46,6 +46,7 @@ int main (int argc, char *argv[])
 
  std::vector < std::vector <double> > Fcorr (N, std::vector <double> (d, 0)) ;
  std::vector < std::vector <double> > TorqueCorr (N, std::vector <double> (d*(d-1)/2, 0)) ;
+ std::vector < double > displacement (N, 0) ; double maxdisp[2] ;
 
  vector <u_int32_t> Ghost (N, 0) ;
  vector <u_int32_t> Ghost_dir (N, 0) ;
@@ -61,8 +62,9 @@ int main (int argc, char *argv[])
  if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64)
    {
      P.xmlout->header(d, argv[3]) ;
-     P.xml_header() ; 
+     P.xml_header() ;
    }
+ displacement[0]=P.skinsqr*2 ;
  //Contacts C(P) ; //Initialize the Contact class object
  //ContactList CLp, CLw ;
  omp_set_num_threads(OMP_NUM_THREADS) ;
@@ -87,11 +89,19 @@ int main (int argc, char *argv[])
 
    //----- Velocity Verlet step 1 : compute the new positions
    Benchmark::start_clock("Verlet 1st");
+   double disp, totdisp ;
+   maxdisp[0] = 0 ; maxdisp[1] = 0 ;
    for (int i=0 ; i<N ; i++)
    {
+    totdisp=0 ;
     for (int dd=0 ; dd<d ; dd++)
-        X[i][dd] += V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
-
+    {
+        disp = V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
+        X[i][dd] += disp  ;
+        totdisp += disp*disp ;
+    }
+    displacement[i] += sqrt(totdisp) ;
+    if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; }
 
     Tools::skewexpand(tmpO, Omega[i]) ;
     Tools::matmult (tmpterm1, tmpO, A[i]);
@@ -113,8 +123,8 @@ int main (int argc, char *argv[])
      if (P.Boundaries[j][3] != 0) continue ;
      //if      (X[i][j] < P.Boundaries[j][0] + 2*P.r[i]) { tmpghost[0]=i ; tmpghost[1]=j ; Ghosts.push_back(tmpghost) ; Ghosts_deltas.push_back( P.Boundaries[j][2]) ; }
      //else if (X[i][j] > P.Boundaries[j][1] - 2*P.r[i]) { tmpghost[0]=i ; tmpghost[1]=j ; Ghosts.push_back(tmpghost) ; Ghosts_deltas.push_back(-P.Boundaries[j][2]) ; }
-     if      (X[i][j] <= P.Boundaries[j][0] + 2*P.r[i]) {Ghost[i] |= mask ; } //Ghost_dir [i] |= mask*0 ;
-     else if (X[i][j] >= P.Boundaries[j][1] - 2*P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+     if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; } //Ghost_dir [i] |= mask*0 ;
+     else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;
    }
@@ -125,64 +135,107 @@ int main (int argc, char *argv[])
 
    Benchmark::start_clock("Contacts");
 
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared (stdout)
+   bool recompute = true ;
+   // Should we recompute the neighbor list?
+   //auto res=Tools::two_max_element(displacement) ;
+   if (maxdisp[0]+maxdisp[1] > 0.7*(P.skin-P.r[0]*2)) {recompute=true ; std::fill(displacement.begin(), displacement.end(), 0);}
+   //else recompute=false ;
+
+   if (recompute)
    {
-     int ID = omp_get_thread_num();
-     ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ;
-     cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
-     CLp.reset() ; CLw.reset();
-
-     for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+     //printf("RECOMPUTE\n");
+     #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared (stdout)
      {
-         //Benchmark::start_clock("Contacts_part");
-         tmpcp.setinfo(CLp.default_action());
+       int ID = omp_get_thread_num();
+       ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ;
+       cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
+       CLp.reset() ; CLw.reset();
+
+       for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+       {
+           tmpcp.setinfo(CLp.default_action());
 
 
-         for (int j=i+1 ; j<N ; j++) // Regular particles
-         {
-             sum=0 ;
-             for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-             if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
-             {
-                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-                 CLp.insert(tmpcp) ;
+           for (int j=i+1 ; j<N ; j++) // Regular particles
+           {
+               sum=0 ;
+               if (Ghost[j])
+               {
+                 for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+                 if (sum<P.skinsqr)
+                 {
+                     tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                     CLp.insert(tmpcp) ;
+                 }
+                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+                 CLp.check_ghost(Ghost[j], 0, sum, 0, P, X[i], X[j], P.skinsqr, tmpcp) ;
+               }
+               else
+               {
+                 for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+                 if (sum<P.skinsqr)
+                 {
+                     tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                     CLp.insert(tmpcp) ;
+                 }
+               }
 
-                 //if (CLp.cid>345090 && CLp.cid<345110 && i==0 && j==1) printf("#n %d %d %g %g\n", i, j, X[i][0], X[j][0]) ;
+
              }
 
-             if (Ghost[j])
-             {
-               tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-               CLp.check_ghost(Ghost[j], 0, sum, 0, P, X[i], X[j], (P.r[i]+P.r[j])*(P.r[i]+P.r[j]), tmpcp) ;
-             }
+           tmpcp.setinfo(CLw.default_action());
+           for (int j=0 ; j<d ; j++) // Wall contacts
+           {
+                if (P.Boundaries[j][3]!=1) continue ;
+
+                tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+                if (tmpcp.contactlength<P.skin)
+                {
+                    tmpcp.i=i ; tmpcp.j=(2*j+0);
+                    CLw.insert(tmpcp) ;
+                }
+
+                tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+                if (tmpcp.contactlength<P.skin)
+                {
+                    tmpcp.i=i ; tmpcp.j=(2*j+1);
+                    CLw.insert(tmpcp) ;
+                }
            }
-         //Benchmark::stop_clock("Contacts_part");
+       }
+       CLp.finalise() ;
+       CLw.finalise() ;
+     } //END PARALLEL SECTION
+   }
+   else // Do not recompute the full contact list, but still compute the contact length and all.
+   {
+     #pragma omp parallel default(none) shared(MP) shared(P)  shared(d) shared(X) shared(Ghost) shared(Ghost_dir) shared(stdout)
+     {
+       int ID = omp_get_thread_num();
+       double sum=0 ;
+       ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ;
 
-         //Benchmark::start_clock("Contacts_bound");
-         tmpcp.setinfo(CLw.default_action());
-         for (int j=0 ; j<d ; j++) // Wall contacts
+       for (auto it = CLp.v.begin() ; it != CLp.v.end() ; it++)
+       {
+         sum=0 ;
+         for (int k=0 ; k<d ; k++) sum+= (X[it->i][k]-X[it->j][k])*(X[it->i][k]-X[it->j][k]) ;
+         it->contactlength=sum ; it->ghost=0 ; it->ghostdir=0 ; //WARNING: the contactlength is squared temporarily, to avoid computing unnecessary sqrt.
+         if (Ghost[it->j])
          {
-              if (P.Boundaries[j][3]!=1) continue ;
-
-              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
-              if (tmpcp.contactlength<P.r[i])
-              {
-                  tmpcp.i=i ; tmpcp.j=(2*j+0);
-                  CLw.insert(tmpcp) ;
-              }
-
-              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
-              if (tmpcp.contactlength<P.r[i])
-              {
-                  tmpcp.i=i ; tmpcp.j=(2*j+1);
-                  CLw.insert(tmpcp) ;
-              }
+           it->ghostdir=Ghost_dir[it->j] ;
+           CLp.check_ghost_dst(Ghost[it->j], 0, sum, 0, P, X[it->i], X[it->j], *it) ;
          }
-         //Benchmark::stop_clock("Contacts_bound");
+         it->contactlength=sqrt(it->contactlength) ; // Final squarerooting
+       }
+
+       for (auto it = CLw.v.begin() ; it != CLw.v.end() ; it++)
+       {
+         int w = it->j / 2, wdir=it->j % 2 ;
+         it->contactlength=fabs(X[it->i][w]-P.Boundaries[w][wdir]) ;
+       }
      }
-     CLp.finalise() ;
-     CLw.finalise() ;
-   } //END PARALLEL SECTION
+   }
+
    Benchmark::stop_clock("Contacts");
 
    // DEBUG

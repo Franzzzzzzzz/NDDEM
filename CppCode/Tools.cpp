@@ -170,6 +170,19 @@ v1d Tools::randomize_vec (cv1d v)
   for (uint i=0 ; i<res.size() ; i++) res[i]=res[i]/nr*n ;
   return (res) ;
 }
+//=============================================
+std::pair <double, double> Tools::two_max_element (cv1d & v)
+{
+  double m1=v[0],m2=v[1] ;
+  if (m1<m2) {double tmp ; tmp=m1 ; m1=m2 ; m2=tmp ;} ;
+
+  for (uint i=2 ; i<v.size() ; i++)
+  {
+    if (v[i] > m1) {m1=v[i] ; continue ; }
+    if (v[i] > m2) {m2=v[i] ; }
+  }
+  return (make_pair(m1,m2)) ;
+}
 
 //=========================================
 // All vector operators

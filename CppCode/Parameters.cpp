@@ -177,6 +177,7 @@ else if (!strcmp(line, "set"))
  else if (!strcmp(line, "Mu")) in>>Mu ;
  else if (!strcmp(line, "T")) in>>T ;
  else if (!strcmp(line, "tdump")) in>>tdump ;
+ else if (!strcmp(line, "skin")) {in >> skin ; skinsqr=skin*skin ; }
  else if (!strcmp(line, "dumpkind"))
  {
      string word ;
