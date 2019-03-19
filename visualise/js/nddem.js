@@ -21,12 +21,38 @@ for (i=0;i<N;i++) {
 
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false}
 
-
 init();
-animate();
+// animate();
+setTimeout( function(){ animate(); }, 1000 )
+
+async function load_in_file() {
+    var request = new XMLHttpRequest();
+    request.open('GET', "http://localhost:8000/data/in.test1", true);
+    request.send(null);
+    request.onreadystatechange = function () {
+        if (request.readyState === 4 && request.status === 200) {
+            var type = request.getResponseHeader('Content-Type');
+            if (type.indexOf("text") !== 1) {
+                lines = request.responseText.split('\n');
+                for (i=0;i<lines.length;i++) {
+                    l = lines[i].split(' ')
+                    if (l[0] == 'dimensions') {
+                        N = l[1];
+                        console.log(N);
+                    }
+                    // if
+
+                }
+            }
+        }
+    }
+    return N;
+
+}
 
 function init() {
-
+    // let a = await load_in_file();
+    // console.log("N = " + a);
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
@@ -50,14 +76,6 @@ function init() {
 
     group = new THREE.Group();
     scene.add( group );
-    // wristband = new THREE.Group();
-    // scene.add( wristband );
-
-    // make_random_objects();
-    // load_hyperspheres_VTK();
-    if ( N == 5 ) { add_torus(); }
-    make_initial_spheres_CSV();
-    update_spheres_CSV(0);
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -68,7 +86,7 @@ function init() {
     if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
-    if (window.viewerType == "VR") { document.body.appendChild( WEBVR.createButton( renderer ) ); };
+    if (window.viewerType == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
 
     // controllers
 
@@ -89,29 +107,47 @@ function init() {
         // var gui = new dat.GUI();
         console.log('Keyboard mode loaded');
     } else if (window.viewerType == 'anaglyph') {
-        controls = new THREE.TrackballControls( camera );
+        controls = new THREE.TrackballControls( camera, renderer.domElement );
         effect = new THREE.AnaglyphEffect( renderer );
         console.log('Anaglyph mode loaded');
     };
 
-    var gui = dat.GUIVR.create('MuDEM');
-    dat.GUIVR.enableMouse( camera, renderer );
-    if (N > 3) {
-        for (i=3;i<N;i++) {
-            gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
+    // load_hyperspheres_VTK();
+    console.log(N);
+    if ( N == 5 ) { add_torus(); }
+    make_initial_spheres_CSV();
+    update_spheres_CSV(0);
+
+    if ( window.viewerType == 'anaglyph' ) {
+        var gui = new dat.GUI();
+        if (N > 3) {
+            for (i=3;i<N;i++) {
+                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
+            }
+        }
+        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
+        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
+        gui.open();
+    }
+    else {
+        var gui = dat.GUIVR.create('MuDEM');
+        dat.GUIVR.enableMouse( camera, renderer );
+        if (N > 3) {
+            for (i=3;i<N;i++) {
+                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
+            }
+        }
+        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
+        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
+        gui.position.set(0,1.5,0.5)
+        scene.add( gui );
+        if (window.viewerType == "VR") {
+            var input1 = dat.GUIVR.addInputObject( controller1 );
+            var input2 = dat.GUIVR.addInputObject( controller2 );
+            scene.add( input1 );
+            scene.add( input2 );
         }
     }
-    gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-    gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
-    gui.position.set(0,1.5,0.5)
-    scene.add( gui );
-    if (window.viewerType == "VR") {
-        var input1 = dat.GUIVR.addInputObject( controller1 );
-        var input2 = dat.GUIVR.addInputObject( controller2 );
-        scene.add( input1 );
-        scene.add( input2 );
-    }
-
 
     var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
@@ -129,8 +165,8 @@ function init() {
 }
 
 function make_lights() {
-    var axesHelper = new THREE.AxesHelper( 1 );
-    scene.add( axesHelper );
+    // var axesHelper = new THREE.AxesHelper( 1 );
+    // scene.add( axesHelper );
 
     scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
@@ -189,8 +225,8 @@ function make_walls() {
 }
 
 function add_torus() {
-    R = 0.1;
-    r = 0.05;
+    R = 0.2;
+    r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
     var material = new THREE.MeshStandardMaterial( {
         color: 0xffffff,
@@ -202,11 +238,34 @@ function add_torus() {
     wristband.position.set(0.,0.,0.);
     wristband.castShadow = true;
     wristband.receiveShadow = true;
+
+    var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., 64, 32 );
+    var material = new THREE.MeshStandardMaterial( {
+        color: 0x000000,
+        roughness: 0.7,
+    } );
+    wristband_phi = new THREE.Mesh( geometry, material );
+    wristband_phi.position.set(0.,0.,0.);
+
+    var geometry = new THREE.TorusBufferGeometry( r, r/10., 64, 32 );
+    var material = new THREE.MeshStandardMaterial( {
+        color: 0x000000,
+        roughness: 0.7,
+    } );
+    wristband_theta = new THREE.Mesh( geometry, material );
+    wristband_theta.position.set(0.,R,0.);
+    wristband_theta.rotation.y = Math.PI/2;
+
+
     if (window.viewerType == "VR") {
         controller1.add( wristband );
+        controller1.add( wristband_phi );
+        controller1.add( wristband_theta );
     }
     else {
         scene.add( wristband );
+        scene.add( wristband_phi );
+        scene.add( wristband_theta );
     }
 
 }
@@ -238,11 +297,12 @@ function make_initial_spheres_CSV() {
                 object.castShadow = true;
                 object.receiveShadow = true;
                 group.add( object );
-
-                object2 = object.clone();
-                object2.scale.set(0.01,0.01,0.01);
-                object2.position.set(0.,0.,0.);
-                wristband.add(object2);
+                if (N == 5) {
+                    object2 = object.clone();
+                    object2.scale.set(0.01,0.01,0.01);
+                    object2.position.set(0.,0.,0.);
+                    wristband.add(object2);
+                }
             }
         }
     });
@@ -291,9 +351,7 @@ function update_spheres_CSV(t) {
                     var object2 = wristband.children[i];
                     phi = 2.*Math.PI*(world[3].cur - spheres[i].X3)/(world[3].max - world[3].min);
                     // theta   = 2.*Math.PI*(world[4].cur - spheres[i].X4)/(world[4].max - world[4].min);
-                    // theta = 2.*Math.PI*Math.random(); // FIXME
-                    theta = 2.*Math.PI*(world[4].cur - 0)/(world[4].max - world[4].min);// FIXME
-                    // console.log(phi);
+                    theta = 2.*Math.PI*(world[4].cur - 0)/(world[4].max - world[4].min) - Math.PI;// FIXME
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
                     z = r*Math.sin(theta);
