@@ -5,15 +5,15 @@ var controller1, controller2;
 var raycaster, intersected = [];
 var tempMatrix = new THREE.Matrix4();
 
-var group;
-var W_old; // keep past value of W
-var t_old;
-var N = 4; // number of dimensions
+var group, wristband;
+
+var R,r; // parameters of torus
+var N = 5; // number of dimensions
 var world = [];
 for (i=0;i<N;i++) {
     world.push({});
-    world[i].min = 0;
-    world[i].max = 1;
+    world[i].min = 0.;
+    world[i].max = 1.;
     world[i].cur = 0.5;
     world[i].prev = 0.5;
 }
@@ -50,9 +50,12 @@ function init() {
 
     group = new THREE.Group();
     scene.add( group );
+    // wristband = new THREE.Group();
+    // scene.add( wristband );
 
     // make_random_objects();
     // load_hyperspheres_VTK();
+    if ( N == 5 ) { add_torus(); }
     make_initial_spheres_CSV();
     update_spheres_CSV(0);
 
@@ -95,7 +98,7 @@ function init() {
     dat.GUIVR.enableMouse( camera, renderer );
     if (N > 3) {
         for (i=3;i<N;i++) {
-            gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i).step(0.01) ;
+            gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
         }
     }
     gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
@@ -126,6 +129,9 @@ function init() {
 }
 
 function make_lights() {
+    var axesHelper = new THREE.AxesHelper( 1 );
+    scene.add( axesHelper );
+
     scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
     var light = new THREE.DirectionalLight( 0xffffff );
@@ -140,9 +146,6 @@ function make_lights() {
 }
 
 function make_walls() {
-    var axesHelper = new THREE.AxesHelper( 1 );
-    scene.add( axesHelper );
-
     var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
     var material = new THREE.MeshStandardMaterial( {
         color: 0xeeeeee,
@@ -185,43 +188,28 @@ function make_walls() {
 
 }
 
-function make_random_objects() {
-    var geometries = [
-        new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
-        new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
-        new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
-        new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
-        new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
-    ];
+function add_torus() {
+    R = 0.1;
+    r = 0.05;
+    var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
+    var material = new THREE.MeshStandardMaterial( {
+        color: 0xffffff,
+        roughness: 0.7,
+        metalness: 0.5
+    } );
 
-    for ( var i = 0; i < 50; i ++ ) {
-
-        var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-        var material = new THREE.MeshStandardMaterial( {
-            color: Math.random() * 0xffffff,
-            roughness: 0.7,
-            metalness: 0.0
-        } );
-
-        var object = new THREE.Mesh( geometry, material );
-
-        object.position.x = Math.random() * 4 - 2;
-        object.position.y = Math.random() * 2;
-        object.position.z = Math.random() * 4 - 2;
-
-        object.rotation.x = Math.random() * 2 * Math.PI;
-        object.rotation.y = Math.random() * 2 * Math.PI;
-        object.rotation.z = Math.random() * 2 * Math.PI;
-
-        object.scale.setScalar( Math.random() + 0.5 );
-
-        object.castShadow = true;
-        object.receiveShadow = true;
-
-        group.add( object );
-
+    wristband = new THREE.Mesh( geometry, material );
+    wristband.position.set(0.,0.,0.);
+    wristband.castShadow = true;
+    wristband.receiveShadow = true;
+    if (window.viewerType == "VR") {
+        controller1.add( wristband );
     }
-};
+    else {
+        scene.add( wristband );
+    }
+
+}
 
 function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
@@ -250,6 +238,11 @@ function make_initial_spheres_CSV() {
                 object.castShadow = true;
                 object.receiveShadow = true;
                 group.add( object );
+
+                object2 = object.clone();
+                object2.scale.set(0.01,0.01,0.01);
+                object2.position.set(0.,0.,0.);
+                wristband.add(object2);
             }
         }
     });
@@ -281,8 +274,8 @@ function update_spheres_CSV(t) {
                              }
                  else if (N == 5) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].X3), 2) -
-                                             Math.pow( (world[4].cur - spheres[i].X4), 2)
+                                             Math.pow( (world[3].cur - spheres[i].X3), 2) //-
+                                             // Math.pow( (world[4].cur - spheres[i].X4), 2)
                                          ); // FIXME - IS THIS RIGHT?
                  }
                 if (isNaN(R_draw)) {
@@ -293,6 +286,19 @@ function update_spheres_CSV(t) {
                     object.scale.set(R_draw,R_draw,R_draw);
                     // console.log(object.material.color);
                 }
+
+                if ( N==5 ) {
+                    var object2 = wristband.children[i];
+                    phi = 2.*Math.PI*(world[3].cur - spheres[i].X3)/(world[3].max - world[3].min);
+                    // theta   = 2.*Math.PI*(world[4].cur - spheres[i].X4)/(world[4].max - world[4].min);
+                    // theta = 2.*Math.PI*Math.random(); // FIXME
+                    theta = 2.*Math.PI*(world[4].cur - 0)/(world[4].max - world[4].min);// FIXME
+                    // console.log(phi);
+                    x = (R + r*Math.cos(theta))*Math.cos(phi);
+                    y = (R + r*Math.cos(theta))*Math.sin(phi);
+                    z = r*Math.sin(theta);
+                    object2.position.set(x,y,z);
+                };
             }
         }
     });
@@ -382,9 +388,11 @@ function cleanIntersected() {
 
 function animate() {
     if (N > 3) {
-        if (world[3].cur != world[3].prev) {
-            update_spheres_CSV(Math.floor(time.cur));
-            world[3].prev = world[3].cur;
+        for (i=3;i<N;i++) {
+            if (world[i].cur != world[i].prev) {
+                update_spheres_CSV(Math.floor(time.cur));
+                world[i].prev = world[i].cur;
+            }
         }
     }
     if (time.play) { time.cur += 0.5; };
