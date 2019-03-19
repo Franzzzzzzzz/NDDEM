@@ -297,11 +297,20 @@ function make_initial_spheres_CSV() {
             // var c = new THREE.Color(1,1,1);
             var geometry = new THREE.SphereGeometry( 1, 32, 32 );
             for (var i = 0; i<numSpheres; i++) {
-                var material = new THREE.MeshStandardMaterial( {
-                    color: Math.random() * 0xffffff,
-                    roughness: 0.7,
-                    metalness: 0.0
-                } );
+                if (i == 0) {
+                    var material = new THREE.MeshStandardMaterial( {
+                        color: 0xFF00FF,
+                        roughness: 0.0,
+                        metalness: 0.0
+                    } );
+                }
+                else {
+                    var material = new THREE.MeshStandardMaterial( {
+                        color: 0xffffff,//Math.random() * 0xffffff,
+                        roughness: 0.7,
+                        metalness: 0.0
+                    } );
+                }
                 var object = new THREE.Mesh( geometry, material );
                 object.castShadow = true;
                 object.receiveShadow = true;
@@ -358,8 +367,7 @@ function update_spheres_CSV(t) {
 
                 if ( N==5 ) {
                     var object2 = wristband.children[i];
-                    phi = 2.*Math.PI*(world[3].cur - spheres[i].X3)/(world[3].max - world[3].min);
-                    // theta   = 2.*Math.PI*(world[4].cur - spheres[i].X4)/(world[4].max - world[4].min);
+                    phi = 2.*Math.PI*(world[3].cur - spheres[i].X3)/(world[3].max - world[3].min) + Math.PI/2.;
                     theta = 2.*Math.PI*(world[4].cur - 0)/(world[4].max - world[4].min) - Math.PI;// FIXME
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
