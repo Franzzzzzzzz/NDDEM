@@ -20,7 +20,7 @@ function init() {
     // request.open('GET', "http://localhost:8000/" + window.fname + window.inname + "?_="+ (new Date).getTime(), true);
     request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
     request.send(null);
-    N = request.onreadystatechange = function () {
+    request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
             var type = request.getResponseHeader('Content-Type');
             if (type.indexOf("text") !== 1) {
@@ -387,7 +387,8 @@ function make_initial_spheres_CSV() {
                 group.add( object );
                 if ( N > 3 ) {
                     object2 = object.clone();
-                    object2.scale.set(R/10.,R/10.,R/10.);
+                    var scale = 20.;
+                    object2.scale.set(R/scale,R/scale,R/scale);
                     object2.position.set(0.,0.,0.);
                     wristband.add(object2);
                     if ( N > 5 ) {
