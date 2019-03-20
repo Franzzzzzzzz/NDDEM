@@ -11,7 +11,7 @@ var R,r; // parameters of torus
 var N; // number of dimensions
 var world = [];
 var ref_dim = {'N_0': 0}; // reference dimension
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false}
+var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': true, 'rate': 0.1}
 
 init();
 
@@ -86,7 +86,7 @@ function build_world() {
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
     renderer.shadowMap.enabled = true;
-    // if (window.viewerType == "VR") { renderer.vr.enabled = true; };
+    if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
     if (window.viewerType == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
@@ -95,16 +95,16 @@ function build_world() {
 
     if (window.viewerType == "VR") {
         controller1 = renderer.vr.getController( 0 );
-        controller1.addEventListener( 'selectstart', onSelectStart );
-        controller1.addEventListener( 'selectend', onSelectEnd );
+        // controller1.addEventListener( 'selectstart', onSelectStart );
+        // controller1.addEventListener( 'selectend', onSelectEnd );
         scene.add( controller1 );
-
+        //
         controller2 = renderer.vr.getController( 1 );
-        controller2.addEventListener( 'selectstart', onSelectStart );
-        controller2.addEventListener( 'selectend', onSelectEnd );
+        // controller2.addEventListener( 'selectstart', onSelectStart );
+        // controller2.addEventListener( 'selectend', onSelectEnd );
         scene.add( controller2 );
-
-        controls = new THREE.TrackballControls( camera );
+        //
+        // controls = new THREE.TrackballControls( camera );
         console.log("VR mode loaded");
     } else if (window.viewerType == 'keyboard') {
         controls = new THREE.TrackballControls( camera );
@@ -135,7 +135,7 @@ function build_world() {
     }
     else {
         var gui = dat.GUIVR.create('MuDEM');
-        dat.GUIVR.enableMouse( camera, renderer );
+        //dat.GUIVR.enableMouse( camera, renderer );
         gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
             for (i=3;i<N;i++) {
@@ -147,29 +147,32 @@ function build_world() {
         gui.position.set(0,1.5,0.5)
 
         if (window.viewerType == "VR") {
+            gui.position.set(0,0,0.)
+            gui.rotation.x = -Math.PI/3.;
+            gui.scale.set(0.5,0.5,0.5);
             controller2.add( gui );
-            var input1 = dat.GUIVR.addInputObject( controller1 );
-            var input2 = dat.GUIVR.addInputObject( controller2 );
+            var input1 = dat.GUIVR.addInputObject( controller1, renderer );
+            //var input2 = dat.GUIVR.addInputObject( controller2 , renderer);
             scene.add( input1 );
-            scene.add( input2 );
+            //scene.add( input2 );
         }
         else {
             scene.add( gui );
         }
     }
 
-    var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
-
-    var line = new THREE.Line( geometry );
-    line.name = 'line';
-    line.scale.z = 5;
-
-    if (window.viewerType == "VR") {
-        controller1.add( line.clone() );
-        controller2.add( line.clone() );
-        };
-    raycaster = new THREE.Raycaster();
-    window.addEventListener( 'resize', onWindowResize, false );
+    // var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+    //
+    // var line = new THREE.Line( geometry );
+    // line.name = 'line';
+    // line.scale.z = 5;
+    //
+    // if (window.viewerType == "VR") {
+    //     controller1.add( line.clone() );
+    //     controller2.add( line.clone() );
+    //     };
+    // raycaster = new THREE.Raycaster();
+    // window.addEventListener( 'resize', onWindowResize, false );
 
 }
 
@@ -234,7 +237,7 @@ function make_walls() {
 }
 
 function add_torus() {
-    R = 0.2;
+    R = 0.1;
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
     var material = new THREE.MeshStandardMaterial( {
@@ -294,23 +297,23 @@ function make_initial_spheres_CSV() {
         complete: function(results) {
             spheres = results.data;
             var numSpheres = spheres.length;
-            // var c = new THREE.Color(1,1,1);
             var geometry = new THREE.SphereGeometry( 1, 32, 32 );
             for (var i = 0; i<numSpheres; i++) {
-                if (i == 0) {
+                // if (i == 0) {
+                //     var material = new THREE.MeshStandardMaterial( {
+                //         color: 0xFF00FF,
+                //         roughness: 0.0,
+                //         metalness: 0.0
+                //     } );
+                // }
+                // else {
                     var material = new THREE.MeshStandardMaterial( {
-                        color: 0xFF00FF,
-                        roughness: 0.0,
-                        metalness: 0.0
-                    } );
-                }
-                else {
-                    var material = new THREE.MeshStandardMaterial( {
-                        color: 0xffffff,//Math.random() * 0xffffff,
+                        // color: 0xffffff,
+                        color: Math.random() * 0xffffff,
                         roughness: 0.7,
                         metalness: 0.0
                     } );
-                }
+                // }
                 var object = new THREE.Mesh( geometry, material );
                 object.castShadow = true;
                 object.receiveShadow = true;
@@ -362,7 +365,6 @@ function update_spheres_CSV(t) {
                 else {
                     object.visible = true;
                     object.scale.set(R_draw,R_draw,R_draw);
-                    // console.log(object.material.color);
                 }
 
                 if ( N==5 ) {
@@ -470,7 +472,7 @@ function animate() {
             }
         }
     }
-    if (time.play) { time.cur += 0.5; };
+    if (time.play) { time.cur += time.rate; };
     if (Math.floor(time.cur) != time.prev) {
         update_spheres_CSV(Math.floor(time.cur));
         time.prev = time.cur;
@@ -482,11 +484,11 @@ function animate() {
 };
 
 function render() {
-    if (window.viewerType == "VR") {
-        cleanIntersected();
-        intersectObjects( controller1 );
-        intersectObjects( controller2 );
-    }
+    // if (window.viewerType == "VR") {
+    //     cleanIntersected();
+    //     intersectObjects( controller1 );
+    //     intersectObjects( controller2 );
+    // }
     if (window.viewerType == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
 };
