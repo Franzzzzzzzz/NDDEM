@@ -5,19 +5,20 @@ var controller1, controller2;
 var raycaster, intersected = [];
 var tempMatrix = new THREE.Matrix4();
 
-var group, wristband;
+var group, wristband, wristband1;
 
 var R,r; // parameters of torus
 var N; // number of dimensions
 var world = [];
 var ref_dim = {'N_0': 0}; // reference dimension
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': true, 'rate': 0.1}
+var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.1}
 
 init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('GET', "http://localhost:8000/CppCode/"+window.fname+"?_="+ (new Date).getTime(), true);
+    // request.open('GET', "http://localhost:8000/" + window.fname + window.inname + "?_="+ (new Date).getTime(), true);
+    request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
     request.send(null);
     N = request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
@@ -38,11 +39,16 @@ function init() {
 
                     }
                     else if (l[0] == 'boundary') {
-                        if (l[2] == 'WALL') {
+                        if (l[2] == 'WALL' || l[2] == 'PBC') {
                             world[l[1]].min = parseFloat(l[3]);
                             world[l[1]].max = parseFloat(l[4]);
                             world[l[1]].cur = (world[l[1]].min + world[l[1]].max)/2.;
                             world[l[1]].prev = world[l[1]].cur;
+                        }
+                    }
+                    else if (l[0] == 'set') {
+                        if (l[1] == 'T') {
+                            time.max = parseInt(l[2]) - 1;
                         }
                     }
                 }
@@ -69,9 +75,17 @@ function build_world() {
         // camera.lookAt(0.5,0.5,0.5);
     }
     else {
-        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-        camera.position.set(0,0.5,3);
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
+        camera.position.set(0.5*world[0].max,
+                            1.*world[1].max,
+                            -2.*world[0].max
+                        );
+        // camera.position.set(0.5*world[0].max,
+        //                     1.*world[1].max,
+        //                     -2.*world[0].max
+        //                 );
     }
+
 
     // make_walls();
 
@@ -107,21 +121,23 @@ function build_world() {
         // controls = new THREE.TrackballControls( camera );
         console.log("VR mode loaded");
     } else if (window.viewerType == 'keyboard') {
-        controls = new THREE.TrackballControls( camera );
+        controls = new THREE.TrackballControls( camera, renderer.domElement  );
+        aim_camera()
         // var gui = new dat.GUI();
         console.log('Keyboard mode loaded');
     } else if (window.viewerType == 'anaglyph') {
         controls = new THREE.TrackballControls( camera, renderer.domElement );
+        aim_camera()
         effect = new THREE.AnaglyphEffect( renderer );
         console.log('Anaglyph mode loaded');
     };
 
     // load_hyperspheres_VTK();
-    if ( N == 5 ) { add_torus(); }
+    if ( N > 3 ) { add_torus(); }
     make_initial_spheres_CSV();
     update_spheres_CSV(0);
 
-    if ( window.viewerType == 'anaglyph' ) {
+    if ( window.viewerType == 'anaglyph' || window.viewerType == 'keyboard' ) {
         var gui = new dat.GUI();
         gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
@@ -144,7 +160,6 @@ function build_world() {
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
-        gui.position.set(0,1.5,0.5)
 
         if (window.viewerType == "VR") {
             gui.position.set(0,0,0.)
@@ -172,19 +187,29 @@ function build_world() {
     //     controller2.add( line.clone() );
     //     };
     // raycaster = new THREE.Raycaster();
-    // window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener( 'resize', onWindowResize, false );
 
 }
 
+function aim_camera() {
+    controls.target0.set(
+        (world[0].min + world[0].max)/2.,
+        (world[1].min + world[1].max)/2.,
+        (world[2].min + world[2].max)/2.,
+    );
+    controls.up0.set( 1, 0, 0 ); // set z as up
+    controls.reset();
+}
+
 function make_lights() {
-    // var axesHelper = new THREE.AxesHelper( 1 );
-    // scene.add( axesHelper );
+    var axesHelper = new THREE.AxesHelper( 10 ); // X - red, Y - green, Z - blue
+    scene.add( axesHelper );
 
     scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
     var light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 0, 6, 0 );
-    light.castShadow = true;
+    // light.castShadow = true;
     light.shadow.camera.top = 2;
     light.shadow.camera.bottom = - 2;
     light.shadow.camera.right = 2;
@@ -237,7 +262,8 @@ function make_walls() {
 }
 
 function add_torus() {
-    R = 0.1;
+    if (window.viewerType == "VR") { R = 0.1; }
+    else { R = 0.5; }
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
     var material = new THREE.MeshStandardMaterial( {
@@ -247,7 +273,6 @@ function add_torus() {
     } );
 
     wristband = new THREE.Mesh( geometry, material );
-    wristband.position.set(0.,0.,0.);
     wristband.castShadow = true;
     wristband.receiveShadow = true;
 
@@ -257,40 +282,82 @@ function add_torus() {
         roughness: 0.7,
     } );
     wristband_phi = new THREE.Mesh( geometry, material );
-    wristband_phi.position.set(0.,0.,0.);
 
     var geometry = new THREE.TorusBufferGeometry( r, r/10., 64, 32 );
-    var material = new THREE.MeshStandardMaterial( {
-        color: 0x000000,
-        roughness: 0.7,
-    } );
     wristband_theta = new THREE.Mesh( geometry, material );
-    wristband_theta.position.set(0.,R,0.);
     wristband_theta.rotation.y = Math.PI/2;
 
 
     if (window.viewerType == "VR") {
+        wristband.position.set(0.,0.,0.);
+        wristband_phi.position.set(0.,0.,0.);
+        wristband_theta.position.set(0.,R,0.);
         controller1.add( wristband );
         controller1.add( wristband_phi );
         controller1.add( wristband_theta );
     }
     else {
+        wristband.position.set(      -3*R,0.5,  0.5);
+        wristband_phi.position.set(  -3*R,0.5,  0.5);
+        wristband_theta.position.set(-3*R,R+0.5,0.5);
         scene.add( wristband );
         scene.add( wristband_phi );
         scene.add( wristband_theta );
+    }
+
+    if ( N > 5 ) {
+        var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
+        var material = new THREE.MeshStandardMaterial( {
+            color: 0xffffff,
+            roughness: 0.7,
+            metalness: 0.5
+        } );
+
+        wristband1 = new THREE.Mesh( geometry, material );
+        wristband1.castShadow = true;
+        wristband1.receiveShadow = true;
+
+        var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., 64, 32 );
+        var material = new THREE.MeshStandardMaterial( {
+            color: 0x000000,
+            roughness: 0.7,
+        } );
+        wristband1_phi = new THREE.Mesh( geometry, material );
+
+        var geometry = new THREE.TorusBufferGeometry( r, r/10., 64, 32 );
+        wristband1_theta = new THREE.Mesh( geometry, material );
+        wristband1_theta.rotation.y = Math.PI/2;
+
+
+        if (window.viewerType == "VR") {
+            wristband1.position.set(0.,0.,0.);
+            wristband1_phi.position.set(0.,0.,0.);
+            wristband1_theta.position.set(0.,R,0.);
+            controller2.add( wristband1 );
+            controller2.add( wristband1_phi );
+            controller2.add( wristband1_theta );
+        }
+        else {
+            wristband1.position.set(      -3*R,2.5,  0.5);
+            wristband1_phi.position.set(  -3*R,2.5,  0.5);
+            wristband1_theta.position.set(-3*R,R+2.5,0.5);
+            scene.add( wristband1 );
+            scene.add( wristband1_phi );
+            scene.add( wristband1_theta );
+        }
     }
 
 }
 
 function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
-    loader.load("http://localhost:8000/visualise/data/vtk//dump-0.vtu", function ( geometry ) {
+    loader.load("http://localhost:8000/visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
         console.log(geometry);
     } );
 };
 
 function make_initial_spheres_CSV() {
-    Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+0+".csv", {
+    Papa.parse("http://localhost:8000/" + window.fname + "dump-00000.csv", {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -318,11 +385,15 @@ function make_initial_spheres_CSV() {
                 object.castShadow = true;
                 object.receiveShadow = true;
                 group.add( object );
-                if (N == 5) {
+                if ( N > 3 ) {
                     object2 = object.clone();
-                    object2.scale.set(0.01,0.01,0.01);
+                    object2.scale.set(R/10.,R/10.,R/10.);
                     object2.position.set(0.,0.,0.);
                     wristband.add(object2);
+                    if ( N > 5 ) {
+                        object3 = object2.clone();
+                        wristband1.add(object3);
+                    }
                 }
             }
         }
@@ -330,8 +401,8 @@ function make_initial_spheres_CSV() {
 };
 
 function update_spheres_CSV(t) {
-    Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+t+".csv"+"?_="+ (new Date).getTime(), { // definitely no caching
-    // Papa.parse("http://localhost:8000/visualise/data/csv/dump-"+t+".csv", {
+    // Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime(), { // definitely no caching
+    Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv", {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -341,7 +412,7 @@ function update_spheres_CSV(t) {
             var numSpheres = spheres.length;
             for (i = 0; i<numSpheres; i++) {
                 var object = group.children[i];
-                object.position.set(spheres[i].X0,spheres[i].X1,spheres[i].X2);
+                object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
                 if (N == 2) {
                     var R_draw = spheres[i].R;
                              }
@@ -350,13 +421,20 @@ function update_spheres_CSV(t) {
                              }
                 else if (N == 4) {
                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                            Math.pow( (world[3].cur - spheres[i].X3), 2)
+                                            Math.pow( (world[3].cur - spheres[i].x3), 2)
                                           );
                              }
                  else if (N == 5) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].X3), 2) //-
-                                             // Math.pow( (world[4].cur - spheres[i].X4), 2)
+                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
+                                             Math.pow( (world[4].cur - spheres[i].x4), 2)
+                                         ); // FIXME - IS THIS RIGHT?
+                 }
+                 else if (N == 6) {
+                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
+                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
+                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
+                                             Math.pow( (world[5].cur - spheres[i].x5), 2)
                                          ); // FIXME - IS THIS RIGHT?
                  }
                 if (isNaN(R_draw)) {
@@ -367,10 +445,38 @@ function update_spheres_CSV(t) {
                     object.scale.set(R_draw,R_draw,R_draw);
                 }
 
-                if ( N==5 ) {
+                if ( N == 4 ) {
                     var object2 = wristband.children[i];
-                    phi = 2.*Math.PI*(world[3].cur - spheres[i].X3)/(world[3].max - world[3].min) + Math.PI/2.;
-                    theta = 2.*Math.PI*(world[4].cur - 0)/(world[4].max - world[4].min) - Math.PI;// FIXME
+                    phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) + Math.PI/2.;
+                    x = (R + r)*Math.cos(phi);
+                    y = (R + r)*Math.sin(phi);
+                    z = 0.;
+                    object2.position.set(x,y,z);
+                };
+
+                if ( N > 4 ) {
+                    var object2 = wristband.children[i];
+                    phi = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) + Math.PI/2.;
+                    theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
+                    x = (R + r*Math.cos(theta))*Math.cos(phi);
+                    y = (R + r*Math.cos(theta))*Math.sin(phi);
+                    z = r*Math.sin(theta);
+                    object2.position.set(x,y,z);
+                };
+
+                if ( N == 6 ) {
+                    var object2 = wristband1.children[i];
+                    phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) + Math.PI/2.;
+                    x = (R + r)*Math.cos(phi);
+                    y = (R + r)*Math.sin(phi);
+                    z = 0.;
+                    object2.position.set(x,y,z);
+                };
+
+                if ( N == 7 ) {
+                    var object2 = wristband1.children[i];
+                    phi = 2.*Math.PI*(world[5].cur - spheres[i].x3)/(world[5].max - world[5].min) + Math.PI/2.;
+                    theta = 2.*Math.PI*(world[6].cur - spheres[i].x4)/(world[6].max - world[6].min) ;
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
                     z = r*Math.sin(theta);
