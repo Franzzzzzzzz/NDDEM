@@ -1,17 +1,18 @@
-var container;
-var camera, scene, controls, renderer;
-var controller1, controller2;
+var container; // main div element
+var camera, scene, controls, renderer; // UI elements
+var controller1, controller2; // VR controllers
 
-var raycaster, intersected = [];
-var tempMatrix = new THREE.Matrix4();
+var raycaster, intersected = []; // catching grains
+var tempMatrix = new THREE.Matrix4(); // catching grains
 
-var group, wristband, wristband1;
-
+var particles, wristband, wristband1, axesHelper; // groups of objects
 var R,r; // parameters of torus
 var N; // number of dimensions
-var world = [];
-var ref_dim = {'N_0': 0}; // reference dimension
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.1}
+var world = []; // properties that describe the domain
+var ref_dim = {'c': 0} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
+var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.1} // temporal properties
+var axeslength, fontsize; // axis properties
+
 
 init();
 
@@ -57,22 +58,32 @@ function init() {
             }
         }
     }
-
-
 }
 
 function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
-
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x808080 );
+    make_camera();
+    // make_walls();
+    make_axes();
+    make_lights();
+    add_renderer();
+    add_controllers();
+    if ( N > 3 ) { add_torus(); }
+    // load_hyperspheres_VTK();
+    make_initial_spheres_CSV();
+    update_spheres_CSV(0);
+    add_gui();
+    window.addEventListener( 'resize', onWindowResize, false );
 
+}
+
+function make_camera() {
     if (N == 2) {
-        camera = new THREE.OrthographicCamera();// window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
-        // camera.enableRotate = false
+        camera = new THREE.OrthographicCamera();
         camera.position.set(0.5,0.5,1.5);
-        // camera.lookAt(0.5,0.5,0.5);
     }
     else {
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
@@ -80,20 +91,9 @@ function build_world() {
                             1.*world[1].max,
                             -2.*world[0].max
                         );
-        // camera.position.set(0.5*world[0].max,
-        //                     1.*world[1].max,
-        //                     -2.*world[0].max
-        //                 );
     }
-
-
-    // make_walls();
-
-    make_lights();
-
-    group = new THREE.Group();
-    scene.add( group );
-
+}
+function add_renderer() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -104,9 +104,47 @@ function build_world() {
     container.appendChild( renderer.domElement );
 
     if (window.viewerType == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
+}
 
-    // controllers
+function add_gui() {
+    if ( window.viewerType == 'anaglyph' || window.viewerType == 'keyboard' ) {
+        var gui = new dat.GUI();
+        gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
+        if (N > 3) {
+            for (i=3;i<N;i++) {
+                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
+            }
+        }
+        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
+        gui.add( time, 'rate').min(0).max(1.0).name('Autoplay rate') ;
+        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
+        gui.open();
+    }
+    else {
+        var gui = dat.GUIVR.create('MuDEM');
+        //dat.GUIVR.enableMouse( camera, renderer );
+        gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension') ;
+        if (N > 3) {
+            for (i=3;i<N;i++) {
+                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
+            }
+        }
+        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
+        gui.add( time, 'rate').min(0).max(1.0).name('Autoplay rate') ;
+        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
 
+        gui.position.set(0,0,0.)
+        gui.rotation.x = -Math.PI/3.;
+        gui.scale.set(0.5,0.5,0.5);
+        controller2.add( gui );
+        var input1 = dat.GUIVR.addInputObject( controller1, renderer );
+        //var input2 = dat.GUIVR.addInputObject( controller2 , renderer);
+        scene.add( input1 );
+        //scene.add( input2 );
+    }
+}
+
+function add_controllers() {
     if (window.viewerType == "VR") {
         controller1 = renderer.vr.getController( 0 );
         // controller1.addEventListener( 'selectstart', onSelectStart );
@@ -120,6 +158,19 @@ function build_world() {
         //
         // controls = new THREE.TrackballControls( camera );
         console.log("VR mode loaded");
+
+        // var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+        //
+        // var line = new THREE.Line( geometry );
+        // line.name = 'line';
+        // line.scale.z = 5;
+        //
+        // if (window.viewerType == "VR") {
+        //     controller1.add( line.clone() );
+        //     controller2.add( line.clone() );
+        //     };
+        // raycaster = new THREE.Raycaster();
+
     } else if (window.viewerType == 'keyboard') {
         controls = new THREE.TrackballControls( camera, renderer.domElement  );
         aim_camera()
@@ -131,66 +182,7 @@ function build_world() {
         effect = new THREE.AnaglyphEffect( renderer );
         console.log('Anaglyph mode loaded');
     };
-
-    // load_hyperspheres_VTK();
-    if ( N > 3 ) { add_torus(); }
-    make_initial_spheres_CSV();
-    update_spheres_CSV(0);
-
-    if ( window.viewerType == 'anaglyph' || window.viewerType == 'keyboard' ) {
-        var gui = new dat.GUI();
-        gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
-        if (N > 3) {
-            for (i=3;i<N;i++) {
-                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
-            }
-        }
-        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
-        gui.open();
-    }
-    else {
-        var gui = dat.GUIVR.create('MuDEM');
-        //dat.GUIVR.enableMouse( camera, renderer );
-        gui.add( ref_dim, 'N_0').min(0).max(N).step(1).listen().name('Reference dimension') ;
-        if (N > 3) {
-            for (i=3;i<N;i++) {
-                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
-            }
-        }
-        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
-
-        if (window.viewerType == "VR") {
-            gui.position.set(0,0,0.)
-            gui.rotation.x = -Math.PI/3.;
-            gui.scale.set(0.5,0.5,0.5);
-            controller2.add( gui );
-            var input1 = dat.GUIVR.addInputObject( controller1, renderer );
-            //var input2 = dat.GUIVR.addInputObject( controller2 , renderer);
-            scene.add( input1 );
-            //scene.add( input2 );
-        }
-        else {
-            scene.add( gui );
-        }
-    }
-
-    // var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
-    //
-    // var line = new THREE.Line( geometry );
-    // line.name = 'line';
-    // line.scale.z = 5;
-    //
-    // if (window.viewerType == "VR") {
-    //     controller1.add( line.clone() );
-    //     controller2.add( line.clone() );
-    //     };
-    // raycaster = new THREE.Raycaster();
-    window.addEventListener( 'resize', onWindowResize, false );
-
 }
-
 function aim_camera() {
     controls.target0.set(
         (world[0].min + world[0].max)/2.,
@@ -201,10 +193,61 @@ function aim_camera() {
     controls.reset();
 }
 
-function make_lights() {
-    var axesHelper = new THREE.AxesHelper( 10 ); // X - red, Y - green, Z - blue
-    scene.add( axesHelper );
+function make_axes() {
+    if (typeof axesHelper == 'undefined') {
+        axeslength = 5 ; // length of axes vectors
+        fontsize = 0.5; // font size
+        axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
+        // axesHelper.position.set(world[ref_dim.N_0])
 
+        scene.add( axesHelper );
+    }
+
+    if (ref_dim.c != ref_dim.x) {
+        ref_dim.x = ref_dim.c;
+        if (ref_dim.c < N - 1) { ref_dim.y = ref_dim.c + 1; }
+        else { ref_dim.y = ref_dim.c + 1 - N; }
+        if (ref_dim.c < N - 2) { ref_dim.z = ref_dim.c + 2; }
+        else { ref_dim.z = ref_dim.c + 2 - N; }
+
+        if (axesHelper.children.length > 1 ) {
+            for( var i = axesHelper.children.length - 1; i >= 0; i--) {
+                obj = axesHelper.children[i];
+                axesHelper.remove(obj);
+            }
+        }
+        var loader = new THREE.FontLoader();
+    	loader.load( 'http://localhost:8000/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+    		var textGeo_x = new THREE.TextBufferGeometry( "x" + ref_dim.x, { font: font, size: fontsize, height: fontsize/2., } );
+    		var textMaterial_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+    		var mesh_x = new THREE.Mesh( textGeo_x, textMaterial_x );
+    		mesh_x.position.x = axeslength - 1.5*fontsize;
+            mesh_x.rotation.z = Math.PI;
+            mesh_x.rotation.y = Math.PI;
+            // mesh_x.position.y = -fontsize;
+    		axesHelper.add( mesh_x );
+
+            var textGeo_y = new THREE.TextGeometry( "x" + ref_dim.y, { font: font, size: fontsize, height: fontsize/2., } );
+    		var textMaterial_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+    		var mesh_y = new THREE.Mesh( textGeo_y, textMaterial_y );
+    		mesh_y.position.y = axeslength-fontsize*1.5;
+            mesh_y.rotation.z = -Math.PI/2.;
+            mesh_y.rotation.x = Math.PI;
+    		axesHelper.add( mesh_y );
+
+            var textGeo_z = new THREE.TextGeometry( "x" + ref_dim.z, { font: font, size: fontsize, height: fontsize/2., } );
+    		var textMaterial_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
+    		var mesh_z = new THREE.Mesh( textGeo_z, textMaterial_z );
+    		mesh_z.position.z = axeslength;//-fontsize;
+            mesh_z.rotation.z = -Math.PI/2.;
+            mesh_z.rotation.x = Math.PI/2.;
+    		axesHelper.add( mesh_z );
+        });
+
+    }
+}
+
+function make_lights() {
     scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
     var light = new THREE.DirectionalLight( 0xffffff );
@@ -362,6 +405,9 @@ function make_initial_spheres_CSV() {
         dynamicTyping: true,
         header: true,
         complete: function(results) {
+            particles = new THREE.Group();
+            scene.add( particles );
+
             spheres = results.data;
             var numSpheres = spheres.length;
             var geometry = new THREE.SphereGeometry( 1, 32, 32 );
@@ -384,7 +430,7 @@ function make_initial_spheres_CSV() {
                 var object = new THREE.Mesh( geometry, material );
                 object.castShadow = true;
                 object.receiveShadow = true;
-                group.add( object );
+                particles.add( object );
                 if ( N > 3 ) {
                     object2 = object.clone();
                     var scale = 20.;
@@ -407,12 +453,12 @@ function update_spheres_CSV(t) {
         download: true,
         dynamicTyping: true,
         header: true,
-        cache: false,
+        cache: true,
         complete: function(results) {
             spheres = results.data;
             var numSpheres = spheres.length;
             for (i = 0; i<numSpheres; i++) {
-                var object = group.children[i];
+                var object = particles.children[i];
                 object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
                 if (N == 2) {
                     var R_draw = spheres[i].R;
@@ -438,6 +484,14 @@ function update_spheres_CSV(t) {
                                              Math.pow( (world[5].cur - spheres[i].x5), 2)
                                          ); // FIXME - IS THIS RIGHT?
                  }
+                 else if (N == 7) {
+                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
+                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
+                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
+                                             Math.pow( (world[5].cur - spheres[i].x5), 2) -
+                                             Math.pow( (world[6].cur - spheres[i].x6), 2)
+                                         ); // FIXME - IS THIS RIGHT?
+                 }
                 if (isNaN(R_draw)) {
                     object.visible = false;
                 }
@@ -457,7 +511,7 @@ function update_spheres_CSV(t) {
 
                 if ( N > 4 ) {
                     var object2 = wristband.children[i];
-                    phi = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) + Math.PI/2.;
+                    phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) + Math.PI/2.;
                     theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
@@ -466,22 +520,22 @@ function update_spheres_CSV(t) {
                 };
 
                 if ( N == 6 ) {
-                    var object2 = wristband1.children[i];
+                    var object3 = wristband1.children[i];
                     phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) + Math.PI/2.;
                     x = (R + r)*Math.cos(phi);
                     y = (R + r)*Math.sin(phi);
                     z = 0.;
-                    object2.position.set(x,y,z);
+                    object3.position.set(x,y,z);
                 };
 
                 if ( N == 7 ) {
-                    var object2 = wristband1.children[i];
-                    phi = 2.*Math.PI*(world[5].cur - spheres[i].x3)/(world[5].max - world[5].min) + Math.PI/2.;
-                    theta = 2.*Math.PI*(world[6].cur - spheres[i].x4)/(world[6].max - world[6].min) ;
+                    var object3 = wristband1.children[i];
+                    phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) + Math.PI/2.;
+                    theta = 2.*Math.PI*(world[6].cur - spheres[i].x6)/(world[6].max - world[6].min) ;
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
                     z = r*Math.sin(theta);
-                    object2.position.set(x,y,z);
+                    object3.position.set(x,y,z);
                 };
             }
         }
@@ -518,7 +572,7 @@ function onSelectEnd( event ) {
         object.matrix.premultiply( controller.matrixWorld );
         object.matrix.decompose( object.position, object.quaternion, object.scale );
         object.material.emissive.b = 0;
-        group.add( object );
+        particles.add( object );
         controller.userData.selected = undefined;
     }
 };
@@ -530,7 +584,7 @@ function getIntersections( controller ) {
     raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
     raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
-    return raycaster.intersectObjects( group.children );
+    return raycaster.intersectObjects( particles.children );
 
 }
 
