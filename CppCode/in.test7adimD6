@@ -1,5 +1,5 @@
 # Incline plane flow
-directory OutputAdimD6
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D6
 dimensions 6 4913
 
 #set adimensional
@@ -25,9 +25,9 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 500
+set T 50
 set dt 0.0001
-set dumpkind XML
+set dumpkind CSV
 set tdump 10000
 event 20 gravity -0.9 0.42 0 0 0 0
 EOF

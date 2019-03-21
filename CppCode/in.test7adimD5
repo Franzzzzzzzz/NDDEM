@@ -1,5 +1,5 @@
 # Incline plane flow
-directory OutputAdimD5
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D5
 dimensions 5 1445
 
 #set adimensional
@@ -24,7 +24,7 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 500
+set T 50
 set dt 0.0001
 set dumpkind VTK
 set tdump 10000
