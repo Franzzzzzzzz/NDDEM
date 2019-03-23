@@ -1,4 +1,5 @@
 #include "Tools.h"
+#include "TinyPngOut.hpp"
 
 using namespace std ;
 // needed for Tools
@@ -11,9 +12,18 @@ vector <FILE *> Tools::outs ;
 boost::random::mt19937 Tools::rng ;
 boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
+void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d) ; 
+int write_img (int w, int h, uint8_t * px, int idx) ; 
 int csvread_A (char path[], v2d &result, int d) ; 
-int csvread_XR (char path[], v2d & result, v1d &R, int d)
+int csvread_XR (char path[], v2d & result, v1d &R, int d) ;
 
+vector<vector<float>> colors = {
+    {1,0,0},
+    {0,1,0},
+    {0,0,1},
+    {1,1,0},
+    {0,1,1},
+    {1,0,1}} ;
 //==================================================
 int main (int argc, char * argv[])
 {
@@ -25,6 +35,8 @@ int main (int argc, char * argv[])
  v1d View ; // Use NaN for the 3D coordinates (careful, should always follow each others
  int Nlambda=8, Ntheta=8 ; 
  v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
+ vector<uint8_t> img (Nlambda*Ntheta*3) ; 
+ 
  v2d X, A ; v1d R ; 
  int N = X.size() ; 
  
@@ -90,12 +102,10 @@ int main (int argc, char * argv[])
              rotate(sp.begin(), sp.begin()+(7-nrotate), sp.end()) ; 
              sp = Tools::matvecmult(A[i], sp) ;
              Tools::hyperspherical_xtophi (sp, phi) ; 
-             
-             
-             
+             phi2color (img.begin() + n*3, phi, d) ; 
              n++ ;
          }
-     
+     write_img(Ntheta, Nlambda, img.data(), i) ; 
  }
  
     
@@ -106,6 +116,50 @@ int main (int argc, char * argv[])
 
 
 // =============================
+void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
+{
+    float v ; int vbyte ; 
+
+    vector <float> ctmp (3,0) ; 
+    vector <float> cfinal(3,0) ; 
+    phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;  
+    for (int i=0 ; i<d-1 ; i++)
+    {
+        v = phi[i] / M_PI ;
+        if (v<0.5)
+          ctmp = colors[i]*(v*2) ; 
+        else
+          ctmp = (vector<float>(3,1.0) - colors[i]) * ((v-0.5)*2)  ;
+        cfinal += ctmp ; 
+    }
+    cfinal /= (d-1) ; 
+    for (int i=0 ; i<3 ; i++) 
+    {
+        vbyte = cfinal[i]*256 ; 
+        vbyte=vbyte>256?256:vbyte ; 
+        vbyte=vbyte<0?0:vbyte ; 
+        *(px+i) = vbyte ;
+    }
+    return ;
+}
+//-------------------------------------------------------
+int write_img (int w, int h, uint8_t * px, int idx)
+{
+	char path[500] ; 
+    sprintf(path, "Texture-%d.png", idx) ;
+	try {
+        
+		std::ofstream out(path, std::ios::binary);
+		TinyPngOut pngout(static_cast<uint32_t>(w), static_cast<uint32_t>(h), out);
+		pngout.write(px, static_cast<size_t>(w * h));
+		return EXIT_SUCCESS;
+		
+	} catch (const char *msg) {
+		std::cerr << msg << std::endl;
+		return EXIT_FAILURE;
+	}
+}
+//---------
 int csvread_A (char path[], v2d & result, int d)
 {
  FILE *in ; int n=0 ; double tmp ; 
@@ -130,6 +184,7 @@ int csvread_A (char path[], v2d & result, int d)
  fclose(in) ; 
  return 0 ; 
 }
+//-------
 int csvread_XR (char path[], v2d & result, v1d &R, int d)
 {
  FILE *in ; int n=0 ; double tmp ; 
@@ -143,7 +198,7 @@ int csvread_XR (char path[], v2d & result, v1d &R, int d)
      if (feof(in)) break ; 
      
      result.push_back(v1d (d,0)) ; 
-     r.push_back(0) ;
+     R.push_back(0) ;
      result[n][0]=tmp ; 
      for (int i=1 ; i<d ; i++)
          fscanf(in, "%lg%*c", &result[n][i]) ; 
