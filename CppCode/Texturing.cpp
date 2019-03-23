@@ -28,21 +28,25 @@ vector<vector<float>> colors = {
 int main (int argc, char * argv[])
 {
  
- int d = 3 ; 
+ int d ;
+ d = atoi(argv[1]) ;  
  Tools::initialise(d) ; 
  v1d phi (d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
  
- v1d View ; // Use NaN for the 3D coordinates (careful, should always follow each others
+ v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
+ for (int i=0 ; i<d ; i++) View[i]=atof(argv[i+2]) ; 
  int Nlambda=8, Ntheta=8 ; 
  v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
  vector<uint8_t> img (Nlambda*Ntheta*3) ; 
  
  v2d X, A ; v1d R ; 
+ csvread_XR (argv[argc-2], X, R, d) ;
+ csvread_A  (argv[argc-1], A, d) ;
  int N = X.size() ; 
  
  // Setting up the grid in latitude-longitude
- for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=M_PI/(2.*Nlambda)+M_PI/Nlambda*i ; 
- for (int i=0 ; i<Ntheta ; i++) thetagrid[i]=2*M_PI/(2.*Ntheta)+2*M_PI/Ntheta*i ; 
+ for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ; 
+ for (int i=0 ; i<Ntheta ; i++)  thetagrid[i] =2*M_PI/(2.*Ntheta )+2*M_PI/Ntheta *i ; 
  
  // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
  int nrotate = 0 ; 
@@ -107,9 +111,6 @@ int main (int argc, char * argv[])
          }
      write_img(Ntheta, Nlambda, img.data(), i) ; 
  }
- 
-    
-    
     
  return 0 ;    
 }
@@ -172,9 +173,9 @@ int csvread_A (char path[], v2d & result, int d)
      fscanf(in, "%lg%*c", &tmp) ; 
      if (feof(in)) break ; 
      
-     result.push_back(v1d (d,0)) ; 
+     result.push_back(v1d (d*d,0)) ; 
      result[n][0]=tmp ; 
-     for (int i=1 ; i<d ; i++)
+     for (int i=1 ; i<d*d ; i++)
          fscanf(in, "%lg%*c", &result[n][i]) ; 
          
      fscanf(in, "%*s%*c") ; 

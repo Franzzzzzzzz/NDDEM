@@ -1,4 +1,5 @@
 CC=/opt/local/bin/g++-mp-6
+#CC=g++
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include
@@ -27,6 +28,9 @@ all:
 	@$(CC) -o xml2vtk xml2vtk.cpp Xml.cpp -lstdc++fs
 #info:#
 #	@echo 'Compilation without Matlab or Boost or Tiff support. Use "make advanced" to activate them.'
+
+texture: 
+	$(CC) -g -Wall -O3 -o Texturing Texturing.cpp Tools.cpp TinyPngOut.cpp 
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(FLTO) $(OBJECTS) -o $@ $(LIBS)
