@@ -66,6 +66,9 @@ static int writeinline_close(void) ;
 static v1d randomize_vec (cv1d v) ;
 static std::pair <double, double> two_max_element (cv1d & v) ;
 
+static double hyperspherical_xtophi (cv1d &x, v1d &phi) ;
+static void   hyperspherical_phitox (double r, cv1d &phi, v1d &x) ;
+
 static double Volume (double R) ;
 static double InertiaMomentum (double R, double rho) ;
 
@@ -77,6 +80,7 @@ static v1d  skewexpand     (cv1d &A) ;
 static void skewexpand     (v1d & r, cv1d &A) ;
 static v1d  matmult (cv1d &A, cv1d &B) ;
 static void matmult (v1d &r, cv1d &A, cv1d &B) ;
+static v1d  matvecmult (cv1d &A, cv1d &B) ;
 static v1d  wedgeproduct (cv1d &a, cv1d &b) ;
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; // Overloaded faster operation
 
