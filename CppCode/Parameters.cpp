@@ -303,6 +303,51 @@ void Parameters::init_locations (char *line, v2d & X)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
       }
     }
+    else if (!strcmp(line, "roughinclineplane2"))
+    {
+      boost::random::mt19937 rng;
+      boost::random::uniform_01<boost::mt19937> rand(rng) ;
+      printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
+      auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
+      double delta=0.1*m ; int ddd ;
+      for (uint dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
+      Frozen[0]=true ; bool bottomlayer=true ;
+      for (int i=1 ; i<N ; i++)
+      {
+        printf("%d \n",bottomlayer) ;
+        X[i]=X[i-1] ;
+        for (ddd=d-1 ; ddd>=0 ; ddd--)
+        {
+          if (bottomlayer)
+          {
+            X[i][ddd]+= 2*m ;
+            if (X[i][ddd]>Boundaries[ddd][1]-m)
+              X[i][ddd] = Boundaries[ddd][0]+m ;
+            else
+              break ;
+          }
+          else
+          {
+            X[i][ddd] += 2*m+2*delta ;
+            if (X[i][ddd]>Boundaries[ddd][1]-m-delta)
+              X[i][ddd] = Boundaries[ddd][0]+m+delta ;
+            else
+              break ;
+          }
+        }
+        if (ddd==0) bottomlayer=false ;
+        if (bottomlayer)
+        {
+          Frozen[i-1]=true ;
+          X[i-1][0] += rand()*delta ; // Randomness only on x0, and only >r (above the bottom wall)
+        }
+        else
+        {
+          for (uint dd=0 ; dd<d ; dd++)
+            X[i-1][dd] += (rand()-0.5)*2*delta ;
+        }
+      }
+    }
     else
         printf("ERR: no other initalisation location than square implemented\n") ;
 }
