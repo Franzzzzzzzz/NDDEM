@@ -68,7 +68,7 @@ void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
     interpret_command(in, X, V, Omega) ;
   }
 
-  if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
+  if ((dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
     xmlout= new XMLWriter(Directory+".xml") ;
 }
 //-------------------------------------------------
@@ -182,11 +182,12 @@ else if (!strcmp(line, "set"))
  {
      string word ;
      in>>word ;
-     if (word=="CSV") dumpkind=ExportType::CSV ;
-     else if (word=="VTK") dumpkind=ExportType::VTK ;
-     else if (word=="NETCDFF") dumpkind=ExportType::NETCDFF ;
-     else if (word=="XML") dumpkind=ExportType::XML ;
-     else if (word=="XMLbase64") dumpkind=ExportType::XMLbase64 ;
+     if (word=="CSV") dumpkind |= ExportType::CSV ;
+     else if (word=="VTK") dumpkind |= ExportType::VTK ;
+     else if (word=="NETCDFF") dumpkind |= ExportType::NETCDFF ;
+     else if (word=="XML") dumpkind |= ExportType::XML ;
+     else if (word=="XMLbase64") dumpkind |= ExportType::XMLbase64 ;
+     else if (word=="CSVA") dumpkind |= ExportType::CSVA ;
  }
  else if (!strcmp(line, "tinfo")) in>>tinfo ;
  else if (!strcmp(line, "dt")) in>>dt ;
@@ -411,11 +412,11 @@ void Parameters::xml_header ()
 //-----------------------------------------
 void Parameters::quit_cleanly()
 {
-  if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
+  if ((dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
     xmlout->emergencyclose() ;
 }
 void Parameters::finalise()
 {
-  if (dumpkind==ExportType::XML || dumpkind==ExportType::XMLbase64)
+  if ( (dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
     xmlout->close() ;
 }

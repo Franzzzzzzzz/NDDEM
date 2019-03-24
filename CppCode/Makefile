@@ -29,8 +29,8 @@ all:
 #info:#
 #	@echo 'Compilation without Matlab or Boost or Tiff support. Use "make advanced" to activate them.'
 
-texture: 
-	$(CC) -g -Wall -O3 -o Texturing Texturing.cpp Tools.cpp TinyPngOut.cpp 
+texturing: 
+	$(CC) -g -Wall -O3 -I/opt/local/include -o Texturing Texturing.cpp Tools.cpp TinyPngOut.cpp 
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(FLTO) $(OBJECTS) -o $@ $(LIBS)

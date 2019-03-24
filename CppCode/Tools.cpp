@@ -64,6 +64,22 @@ void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & 
  }
  fclose(out) ;
 }
+//-----------------------------------------
+void Tools::savecsv (char path[], cv2d & A)
+{
+ FILE *out ; int dim ;
+ out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
+ dim = A[0].size() ;
+ for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
+ fprintf(out, "\n") ;
+ for (uint i=0 ; i<A.size() ; i++)
+ {
+  for (int j=0 ; j<dim ; j++)
+    fprintf(out, "%.6g,", A[i][j]) ;
+  fprintf(out, "\n") ;
+ }
+ fclose(out) ;
+}
 //=====================================
 void Tools::savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data)
 {
@@ -370,26 +386,26 @@ double Tools::InertiaMomentum (double R, double rho)
 double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVELY TESTED
 {
     double rsqr = normsq(x) ;
-    double r= sqrt(rsqr) ; 
+    double r= sqrt(rsqr) ;
     for (uint j=0 ; j<d-1 ; j++)
     {
        phi[j] = acos(x[j] /sqrt(rsqr)) ;
-       rsqr -= x[j]*x[j] ; 
+       rsqr -= x[j]*x[j] ;
     }
-    if (x[d-1]<0) phi[d-2] = 2*M_PI - phi[d-2] ;  
-    return r ; 
+    if (x[d-1]<0) phi[d-2] = 2*M_PI - phi[d-2] ;
+    return r ;
 }
 
 void Tools::hyperspherical_phitox (double r, cv1d &phi, v1d &x) // WARNING NOT EXTENSIVELY TESTED
 {
-    x = v1d (d,r) ; 
+    x = v1d (d,r) ;
     for (uint i=0 ; i<d-1 ; i++)
     {
-        x[i] *= cos(phi[i]) ; 
+        x[i] *= cos(phi[i]) ;
         for (uint j=i+1 ; j<d ; j++)
-            x[j] *= sin(phi[i]) ; 
+            x[j] *= sin(phi[i]) ;
     }
-    x[d-1] *= sin(phi[d-2]) ; 
+    x[d-1] *= sin(phi[d-2]) ;
 }
 
 

@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
  //P.init_particles(X, A) ;
  if (strcmp(argv[3], "default"))
      P.load_datafile (argv[3], X, V, Omega) ;
- if (P.dumpkind==ExportType::XML || P.dumpkind==ExportType::XMLbase64)
+ if ((P.dumpkind&ExportType::XML) || (P.dumpkind&ExportType::XMLbase64))
    {
      P.xmlout->header(d, argv[3]) ;
      P.xml_header() ;
@@ -105,7 +105,7 @@ int main (int argc, char *argv[])
     displacement[i] += sqrt(totdisp) ;
     if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; }
 
-    Tools::skewexpand(tmpO, Omega[i]) ;
+    /*Tools::skewexpand(tmpO, Omega[i]) ;
     Tools::matmult (tmpterm1, tmpO, A[i]);
     Tools::skewexpand(tmpT, TorqueOld[i]) ;
     Tools::skewmatsquare(tmpOO,Omega[i]) ;
@@ -113,7 +113,14 @@ int main (int argc, char *argv[])
     Tools::matmult(tmpterm2, tmpSUM, A[i]) ;
 
     for (int dd=0 ; dd<d *d ; dd++)
-        A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;
+        A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;*/
+    // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics)
+    Tools::skewexpand(tmpO, Omega[i]) ;
+    Tools::matmult(tmpterm1, tmpO, A[i]) ;
+    for (int dd=0 ; dd<d*d ; dd++)
+      A[i][dd] += tmpterm1[dd] * dt ;
+    if (i==30) printf("%g\n", A[i][0]*A[i][0]+A[i][3]*A[i][3]+A[i][6]*A[i][6]) ; 
+
 
     P.perform_PBC(X[i], PBCFlags[i]) ;
 
@@ -333,26 +340,31 @@ int main (int argc, char *argv[])
    // Output something at some point I guess
    if (ti % P.tdump==0)
    {
-    if (P.dumpkind==ExportType::CSV)
+    if (P.dumpkind&ExportType::CSV)
     {
         char path[500] ; sprintf(path, "%s/dump-%05d.csv", P.Directory.c_str(), ti) ;
         Tools::savecsv(path, X, P.r, PBCFlags) ;
     }
-    else if (P.dumpkind==ExportType::VTK)
+    if (P.dumpkind&ExportType::CSVA)
+    {
+        char path[500] ; sprintf(path, "%s/dumpA-%05d.csv", P.Directory.c_str(), ti) ;
+        Tools::savecsv(path, A) ;
+    }
+    if (P.dumpkind&ExportType::VTK)
     {
         char path[500] ; sprintf(path, "%s/dump-%05d.vtk", P.Directory.c_str(), ti) ;
         Tools::savevtk(path, P, X, {"", TensorType::NONE, &Omega}) ;
     }
-    else if (P.dumpkind==ExportType::NETCDFF)
+    if (P.dumpkind&ExportType::NETCDFF)
         printf("WARN: netcdf writing haven't been tested and therefore is not plugged in\n") ;
-    else if (P.dumpkind==ExportType::XML)
+    if (P.dumpkind&ExportType::XML)
     {
         P.xmlout->startTS(t);
         P.xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::ascii);
         P.xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::ascii);
         P.xmlout->stopTS();
     }
-    else if (P.dumpkind==ExportType::XMLbase64)
+    if (P.dumpkind&ExportType::XMLbase64)
     {
         P.xmlout->startTS(t);
         P.xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::base64);

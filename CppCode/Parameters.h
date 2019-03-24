@@ -13,7 +13,9 @@
 #include "Xml.h"
 
 using namespace std ;
-enum class ExportType {NONE, CSV, VTK, NETCDFF, XML, XMLbase64} ;
+enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
+inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
+inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 class Parameters {
 public :
     Parameters (int dd, int NN):
