@@ -74,8 +74,9 @@ void Tools::savecsv (char path[], cv2d & A)
  fprintf(out, "\n") ;
  for (uint i=0 ; i<A.size() ; i++)
  {
-  for (int j=0 ; j<dim ; j++)
+  for (int j=0 ; j<dim-1 ; j++)
     fprintf(out, "%.6g,", A[i][j]) ;
+  fprintf(out, "%.6g", A[i][dim]) ;
   fprintf(out, "\n") ;
  }
  fclose(out) ;
@@ -322,9 +323,11 @@ void Tools::matmult (v1d & r, cv1d &A, cv1d &B)
 v1d Tools::matvecmult (cv1d &A, cv1d &v)
 {
     v1d res (d, 0) ;
+    printf("I") ; fflush(stdout) ; 
     for (uint i=0 ; i<d; i++)
         for (uint k=0 ; k<d ; k++)
             res[i]+=A[i*d+k]*v[k] ;
+    printf("J") ; fflush(stdout) ; 
     return res ;
 }
 //----------------------------------------

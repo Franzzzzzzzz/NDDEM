@@ -25,9 +25,9 @@ vector<vector<float>> colors = {
     {0,1,1},
     {1,0,1}} ;
 //==================================================
-int main (int argc, char * argv[])
+//Args: d V1 V2 ... VN locationfile Afile
+int main (int argc, char * argv[]) 
 {
- 
  int d ;
  d = atoi(argv[1]) ;  
  Tools::initialise(d) ; 
@@ -35,9 +35,10 @@ int main (int argc, char * argv[])
  
  v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
  for (int i=0 ; i<d ; i++) View[i]=atof(argv[i+2]) ; 
- int Nlambda=8, Ntheta=8 ; 
+ int Nlambda=2, Ntheta=2 ; 
  v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
  vector<uint8_t> img (Nlambda*Ntheta*3) ; 
+ v1d sp (d,0),spturned (d,0) ; // Surface point (point on the syrface of the sphere)
  
  v2d X, A ; v1d R ; 
  csvread_XR (argv[argc-2], X, R, d) ;
@@ -50,23 +51,26 @@ int main (int argc, char * argv[])
  
  // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
  int nrotate = 0 ; 
- while (isnan(View[0]))
+ if (d>3) //All view dimensions are NaN if d==3
  {
-     rotate(View.begin(), View.begin()+1 , View.end()) ; 
-     nrotate++ ; 
+    while (isnan(View[0]))
+    {
+        rotate(View.begin(), View.begin()+1 , View.end()) ; 
+        nrotate++ ; 
+    }
+    if (nrotate==0)
+    {
+        auto b = find_if(View.begin(), View.end(), [](double d) { return std::isnan(d); } ) ; 
+        rotate(View.begin(), b+3, View.end()) ; 
+        nrotate = b-View.begin()+3 ; 
+    }
+    nrotate %= View.size() ; 
  }
- if (nrotate==0)
- {
-    auto b = find_if(View.begin(), View.end(), [](double d) { return std::isnan(d); } ) ; 
-    rotate(View.begin(), b+3, View.end()) ; 
-    nrotate = b-View.begin()+3 ; 
- }
- nrotate %= View.size() ; 
  
  for (int i=0 ; i<N ; i++)
  {
      // Check if we are in view
-     double rsqr = R[i]*R[i] ;
+     double rsqr = R[i]*R[i] ; printf("F") ; fflush(stdout) ; 
      rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ; 
      for (int j=0 ; j<d-3 ; j++)
          rsqr -= (View[j]-X[i][j])*(View[j]-X[i][j]) ; 
@@ -87,10 +91,9 @@ int main (int argc, char * argv[])
          {
              // Finalising the phi array (useless, but just because
              phi[d-2]=lambda ; 
-             phi[d-1]=theta ; 
-             
-             v1d sp (0,d) ; // Surface point (point on the syrface of the sphere)
-             sp = View-X[i] ; // All the dimensions except the last 3 are now correct
+             phi[d-1]=theta ;  
+             for (int dd=0 ; dd<d ; dd++) {printf("!"); fflush(stdout) ;sp[dd]=View[dd]-X[i][dd] ;} 
+             //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
              
              sp[d-3] = R[i] ;
              for (int j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ; 
@@ -101,15 +104,18 @@ int main (int argc, char * argv[])
              
              // Now sp should be right, let's check
              printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;  
-             
+             printf("A") ; fflush(stdout) ; 
              // Rotating the point vector back in dimensions, and then rotating in space according to the basis A
              rotate(sp.begin(), sp.begin()+(7-nrotate), sp.end()) ; 
-             sp = Tools::matvecmult(A[i], sp) ;
+             printf("C") ; fflush(stdout) ; 
+             spturned = Tools::matvecmult(A[i], sp) ;
+             printf("D") ; fflush(stdout) ; 
              Tools::hyperspherical_xtophi (sp, phi) ; 
-             phi2color (img.begin() + n*3, phi, d) ; 
-             n++ ;
+             printf("E %d", sp.size()) ; fflush(stdout) ; 
+             //phi2color (img.begin() + n*3, phi, d) ; 
+             n++ ;printf("B") ; fflush(stdout) ; 
          }
-     write_img(Ntheta, Nlambda, img.data(), i) ; 
+     //write_img(Ntheta, Nlambda, img.data(), i) ; 
  }
     
  return 0 ;    
