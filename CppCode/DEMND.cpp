@@ -24,7 +24,7 @@ void sig_handler (int p)
 
 
 int main (int argc, char *argv[])
-{
+{ 
  signal (SIGINT, sig_handler);   // Catch all signals ...
 
  if (argc<4) {printf("Usage: DEMND #dimensions #grains inputfile\n") ; std::exit(1) ; }
@@ -111,16 +111,14 @@ int main (int argc, char *argv[])
     Tools::skewmatsquare(tmpOO,Omega[i]) ;
     Tools::vScaledSum (tmpSUM , 1/P.I[i], tmpT, tmpOO) ;
     Tools::matmult(tmpterm2, tmpSUM, A[i]) ;
-
     for (int dd=0 ; dd<d *d ; dd++)
         A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;*/
-    // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics)
+    // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
     Tools::skewexpand(tmpO, Omega[i]) ;
     Tools::matmult(tmpterm1, tmpO, A[i]) ;
     for (int dd=0 ; dd<d*d ; dd++)
       A[i][dd] += tmpterm1[dd] * dt ;
-    if (i==30) printf("%g\n", A[i][0]*A[i][0]+A[i][3]*A[i][3]+A[i][6]*A[i][6]) ; 
-
+    Tools::orthonormalise(A[i]) ; 
 
     P.perform_PBC(X[i], PBCFlags[i]) ;
 
@@ -130,9 +128,7 @@ int main (int argc, char *argv[])
     for (int j=0 ; j<d ; j++, mask<<=1)
     {
      if (P.Boundaries[j][3] != 0) continue ;
-     //if      (X[i][j] < P.Boundaries[j][0] + 2*P.r[i]) { tmpghost[0]=i ; tmpghost[1]=j ; Ghosts.push_back(tmpghost) ; Ghosts_deltas.push_back( P.Boundaries[j][2]) ; }
-     //else if (X[i][j] > P.Boundaries[j][1] - 2*P.r[i]) { tmpghost[0]=i ; tmpghost[1]=j ; Ghosts.push_back(tmpghost) ; Ghosts_deltas.push_back(-P.Boundaries[j][2]) ; }
-     if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; } //Ghost_dir [i] |= mask*0 ;
+     if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; } 
      else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;
@@ -164,7 +160,6 @@ int main (int argc, char *argv[])
        {
            tmpcp.setinfo(CLp.default_action());
 
-
            for (int j=i+1 ; j<N ; j++) // Regular particles
            {
                sum=0 ;
@@ -188,8 +183,6 @@ int main (int argc, char *argv[])
                      CLp.insert(tmpcp) ;
                  }
                }
-
-
              }
 
            tmpcp.setinfo(CLw.default_action());
@@ -247,15 +240,8 @@ int main (int argc, char *argv[])
 
    Benchmark::stop_clock("Contacts");
 
-   // DEBUG
-   //for (auto i : CLp.v)
-  //  printf("%d %g %X %X %d %d\n", ti/P.tdump, i.contactlength, i.ghost, i.ghostdir, i.i, i.j) ;
-
    //-------------------------------------------------------------------------------
    // Force and torque computation
-   // DEBUG
-   //static FILE * outdebug=fopen("Debug.txt", "w") ;
-
    Benchmark::start_clock("Forces");
    Tools::setzero(F) ; Tools::setzero(Fcorr) ; Tools::setzero(TorqueCorr) ;
    Tools::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero

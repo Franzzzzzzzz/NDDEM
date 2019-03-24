@@ -315,7 +315,6 @@ void Parameters::init_locations (char *line, v2d & X)
       Frozen[0]=true ; bool bottomlayer=true ;
       for (int i=1 ; i<N ; i++)
       {
-        printf("%d \n",bottomlayer) ;
         X[i]=X[i-1] ;
         for (ddd=d-1 ; ddd>=0 ; ddd--)
         {

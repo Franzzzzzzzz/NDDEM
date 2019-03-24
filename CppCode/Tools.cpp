@@ -222,6 +222,9 @@ v1f & operator+= (v1f & a, cv1f b)  {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i
 v1d & operator/= (v1d & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b ; return a; }
 v1f & operator/= (v1f & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b ; return a; }
 //-----------------------------------
+//void Tools::vec2eigen (Eigen::MatrixXd & a, cv1d &b) {for (uint i=0 ; i<d*d ; i++) a(i/3,i%3) = b[i] ; }
+//void Tools::eigen2vec (v1d &b, const Eigen::MatrixXd & a) {for (uint i=0 ; i<d*d ; i++) b[i] = a(i/3,i%3);}
+
 v1d Tools::skewmatvecmult (cv1d & M, cv1d & v)
 {
  v1d res (d,0) ;
@@ -346,7 +349,30 @@ void Tools::unitvec (vector <double> & v, uint d, uint n)
 {
   for (uint i=0 ; i<d ; i++) v[i]=(i==n?1:0) ;
 }
-
+//-----------------------------------
+ void Tools::orthonormalise (v1d & A) //Gram-Schmidt process
+ {
+     static uint first = 0 ; // cycle through the base vector as first vector (to be impartial, random would probably be better but hey ...
+     
+     // Let's get the base vectors first
+     v2d base (d, v1d(d,0)) ; 
+     for (uint i=0 ; i<d ; i++)
+         for (uint j=0 ; j<d ; j++)
+            base[i][j] = A[j*d+(i+first)%d] ; 
+     
+     for (uint i=0 ; i<d ; i++)    
+     {
+         for (uint j=0 ; j<i ; j++) 
+             base[i] -= base[j] * (dot(base[i],base[j])) ; 
+         base[i] /= norm(base[i]) ; 
+     }
+     
+     for (uint i=first ; i<first+d ; i++)
+         for (uint j=0 ; j<d ; j++)
+             A[j*d+(i%d)] = base[i-first][j] ; 
+     
+     first++ ; if (first>=d) first=0 ; 
+ }
 
 //==================================
 double Tools::Volume (double R)

@@ -53,6 +53,7 @@ static double norm (const vector <double> & a) {double res=0 ; for (uint i=0 ; i
 static double normdiff (cv1d & a, cv1d & b) {double res=0 ; for (uint i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; }
 static double normsq (const vector <double> & a) {double res=0 ; for (uint i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; }
 static double normdiffsq (cv1d & a, cv1d & b) {double res=0 ; for (uint i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (res) ; }
+static void orthonormalise (v1d & A) ; // Gram-Shmidt process
 static double skewnorm (cv1d & a) {double res=0 ; for (uint i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; }
 static double skewnormsq (cv1d & a) {double res=0 ; for (uint i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (res) ; }
 static double dot (cv1d & a, cv1d & b) {double res=0; for (uint i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; }
