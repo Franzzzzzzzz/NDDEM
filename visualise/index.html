@@ -38,6 +38,21 @@
             // fname = "Samples/D7/";
             // inname = "in.test7adimD7";
 
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if ( urlParams.has('viewerType') ) {
+                viewerType = urlParams.get('viewerType');
+                console.log(viewerType);
+            };
+            if ( urlParams.has('fname') ) {
+                fname = urlParams.get('fname');
+                console.log(fname);
+            };
+            if ( urlParams.has('inname') ) {
+                inname = urlParams.get('inname');
+                console.log(inname);
+            };
+
         </script>
         <script src="js/nddem.js"></script>
 
