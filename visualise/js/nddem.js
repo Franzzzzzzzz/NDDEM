@@ -11,9 +11,12 @@ var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 0} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.1} // temporal properties
+if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
 var axeslength, fontsize; // axis properties
 var VR_scale = 5.; // mapping from DEM units to VR units
-
+var find_particle = window.find_particle === 'true'; // show just the first particle in a unique colour
+var rotations = window.rotations === 'true'; // show rotations via texture mapping
+console.log(rotations);
 init();
 
 function init() {
@@ -64,7 +67,7 @@ function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x808080 );
+    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     make_camera();
     // make_walls();
     make_axes();
@@ -87,11 +90,10 @@ function make_camera() {
     }
     else {
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
-        camera.position.set(0.5*world[0].max,
-                            1.*world[1].max,
-                            -2.*world[0].max
+        camera.position.set(0.25*world[0].max,
+                            -0.5*world[0].max,
+                            -0.5*world[0].max
                         );
-        camera.scale.set(0.5,0.5,0.5);
     }
 }
 function add_renderer() {
@@ -121,7 +123,7 @@ function add_gui() {
     }
     else {
         var gui = dat.GUIVR.create('MuDEM');
-        //dat.GUIVR.enableMouse( camera, renderer );
+        dat.GUIVR.enableMouse( camera, renderer );
         gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension') ;
         if (N > 3) {
             for (i=3;i<N;i++) {
@@ -155,7 +157,7 @@ function add_controllers() {
         // controller2.addEventListener( 'selectend', onSelectEnd );
         scene.add( controller2 );
         //
-        // controls = new THREE.TrackballControls( camera );
+        controls = new THREE.TrackballControls( camera, renderer.domElement );
         console.log("VR mode loaded");
 
         // var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
@@ -171,7 +173,7 @@ function add_controllers() {
         // raycaster = new THREE.Raycaster();
 
     } else if (window.viewerType == 'keyboard') {
-        controls = new THREE.TrackballControls( camera, renderer.domElement  );
+        controls = new THREE.TrackballControls( camera, renderer.domElement );
         aim_camera()
         // var gui = new dat.GUI();
         console.log('Keyboard mode loaded');
@@ -185,11 +187,11 @@ function add_controllers() {
 }
 function aim_camera() {
     controls.target0.set(
-        (world[0].min + world[0].max)/2.,
+        (world[0].min + world[0].max)/2./2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
         (world[1].min + world[1].max)/2.,
         (world[2].min + world[2].max)/2.,
     );
-    controls.up0.set( 1, 0, 0 ); // set z as up
+    controls.up0.set( 1, 0, 0 ); // set x as up
     controls.reset();
 }
 
@@ -264,9 +266,9 @@ function make_lights() {
     scene.add( light );
     // scene.add( light1 );
 
-    var helper = new THREE.DirectionalLightHelper( light, 5 );
+    // var helper = new THREE.DirectionalLightHelper( light, 5 );
     // var helper1 = new THREE.DirectionalLightHelper( light1, 5 );
-    scene.add( helper );
+    // scene.add( helper );
     // scene.add( helper1 );
 }
 
@@ -416,29 +418,36 @@ function make_initial_spheres_CSV() {
         complete: function(results) {
             particles = new THREE.Group();
             scene.add( particles );
-
             spheres = results.data;
             var numSpheres = spheres.length;
+
             var geometry = new THREE.SphereGeometry( 1, 32, 32 );
             var pointsGeometry = new THREE.SphereGeometry( 1, 6, 6 );
             var scale = 20.;
             for (var i = 0; i<numSpheres; i++) {
-                // if (i == 0) {
-                //     var material = new THREE.MeshStandardMaterial( {
-                //         color: 0xFF00FF,
-                //         roughness: 0.0,
-                //         metalness: 0.0
-                //     } );
-                // }
-                // else {
+                if ( find_particle ) {
+                    if (i == 0) {
+                        var color = 0xffffff;
+                        var material = new THREE.MeshStandardMaterial( { color: 0xFF00FF, roughness: 0.7, metalness: 0.0 } );
+                    }
+                    else {
+                        var material = new THREE.MeshStandardMaterial( { color: color, roughness: 0.7, metalness: 0.0 } );
+                    }
+                }
+                else {
                     var color = Math.random() * 0xffffff;
-                    var material = new THREE.MeshStandardMaterial( {
-                        // color: 0xffffff,
-                        color: color,
-                        roughness: 0.7,
-                        metalness: 0.0
-                    } );
-                // }
+                    if ( rotations ) {
+                        var texture = new THREE.TextureLoader().load("http://localhost:8000/Samples/tt.png");
+                        var material = new THREE.MeshBasicMaterial( { map: texture } );
+                    }
+                    else {
+                        var material = new THREE.MeshStandardMaterial( {
+                            color: color,
+                            roughness: 0.7,
+                            metalness: 0.0
+                        } );
+                    }
+                };
                 var object = new THREE.Mesh( geometry, material );
                 object.castShadow = true;
                 object.receiveShadow = true;
@@ -549,6 +558,13 @@ function update_spheres_CSV(t) {
                     z = r*Math.sin(theta);
                     object3.position.set(x,y,z);
                 };
+
+                if ( rotations ) {
+                    var texture = new THREE.TextureLoader().load("http://localhost:8000/Samples/tt.png", undefined, function() {
+                        object.material.map = texture;
+                        object.material.map.needsUpdate = true;
+                    });
+                }
             }
         }
     });
