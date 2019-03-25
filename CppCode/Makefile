@@ -1,5 +1,5 @@
-#CC=/opt/local/bin/g++-mp-6
-CC=g++
+CC=/opt/local/bin/g++-mp-6
+#CC=g++
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include
@@ -30,7 +30,7 @@ all:
 #	@echo 'Compilation without Matlab or Boost or Tiff support. Use "make advanced" to activate them.'
 
 texturing: 
-	$(CC) -g -Wall -O3 -I/opt/local/include -o Texturing Texturing.cpp Tools.cpp TinyPngOut.cpp 
+	@$(CC) -g -Wall -O3 -I/opt/local/include -o Texturing Texturing.cpp Tools.cpp TinyPngOut.cpp 
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(FLTO) $(OBJECTS) -o $@ $(LIBS)

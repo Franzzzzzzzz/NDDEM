@@ -70,13 +70,13 @@ void Tools::savecsv (char path[], cv2d & A)
  FILE *out ; int dim ;
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
  dim = A[0].size() ;
- for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
- fprintf(out, "\n") ;
+ for (int i=0 ; i<dim-1 ; i++) fprintf(out, "x%d,", i);
+ fprintf(out, "x%d\n", dim-1) ;
  for (uint i=0 ; i<A.size() ; i++)
  {
   for (int j=0 ; j<dim-1 ; j++)
     fprintf(out, "%.6g,", A[i][j]) ;
-  fprintf(out, "%.6g", A[i][dim]) ;
+  fprintf(out, "%.6g", A[i][dim-1]) ;
   fprintf(out, "\n") ;
  }
  fclose(out) ;
@@ -211,6 +211,7 @@ v1f operator* (v1f a, float b)  {for (uint i=0 ; i<a.size() ; i++) a[i]*=b    ; 
 v1d operator* (v1d a, cv1d b)    {for (uint i=0 ; i<a.size() ; i++) a[i]*=b[i] ; return a ; }
 v1d operator+ (v1d a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]+=b    ; return a ; }
 v1d operator+ (v1d a, cv1d b)    {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i] ; return a ; }
+v1f operator+ (v1f a, cv1f b)    {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i] ; return a ; }
 v1d operator- (v1d a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]-=b    ; return a ; }
 v1d operator- (v1d a, cv1d b)    {for (uint i=0 ; i<a.size() ; i++) a[i]-=b[i] ; return a ; }
 v1d operator- (v1d a)            {for (uint i=0 ; i<a.size() ; i++) a[i]=-a[i] ; return a ; }
@@ -320,15 +321,12 @@ void Tools::matmult (v1d & r, cv1d &A, cv1d &B)
                 r[i*d+j]+=A[i*d+k]*B[k*d+j] ;
 }
 //-------------------------------
-v1d Tools::matvecmult (cv1d &A, cv1d &v)
+void Tools::matvecmult (v1d & res, cv1d &A, cv1d &v)
 {
-    v1d res (d, 0) ;
-    printf("I") ; fflush(stdout) ; 
+    for (uint i=0 ; i<d ; i++) res[i] = 0.0;
     for (uint i=0 ; i<d; i++)
         for (uint k=0 ; k<d ; k++)
             res[i]+=A[i*d+k]*v[k] ;
-    printf("J") ; fflush(stdout) ; 
-    return res ;
 }
 //----------------------------------------
 v1d Tools::wedgeproduct (cv1d &a, cv1d &b)
@@ -356,25 +354,25 @@ void Tools::unitvec (vector <double> & v, uint d, uint n)
  void Tools::orthonormalise (v1d & A) //Gram-Schmidt process
  {
      static uint first = 0 ; // cycle through the base vector as first vector (to be impartial, random would probably be better but hey ...
-     
+
      // Let's get the base vectors first
-     v2d base (d, v1d(d,0)) ; 
+     v2d base (d, v1d(d,0)) ;
      for (uint i=0 ; i<d ; i++)
          for (uint j=0 ; j<d ; j++)
-            base[i][j] = A[j*d+(i+first)%d] ; 
-     
-     for (uint i=0 ; i<d ; i++)    
+            base[i][j] = A[j*d+(i+first)%d] ;
+
+     for (uint i=0 ; i<d ; i++)
      {
-         for (uint j=0 ; j<i ; j++) 
-             base[i] -= base[j] * (dot(base[i],base[j])) ; 
-         base[i] /= norm(base[i]) ; 
+         for (uint j=0 ; j<i ; j++)
+             base[i] -= base[j] * (dot(base[i],base[j])) ;
+         base[i] /= norm(base[i]) ;
      }
-     
+
      for (uint i=first ; i<first+d ; i++)
          for (uint j=0 ; j<d ; j++)
-             A[j*d+(i%d)] = base[i-first][j] ; 
-     
-     first++ ; if (first>=d) first=0 ; 
+             A[j*d+(i%d)] = base[i-first][j] ;
+
+     first++ ; if (first>=d) first=0 ;
  }
 
 //==================================
@@ -418,9 +416,10 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
     double r= sqrt(rsqr) ;
     for (uint j=0 ; j<d-1 ; j++)
     {
-       phi[j] = acos(x[j] /sqrt(rsqr)) ;
+       phi[j] = acos(x[j]/sqrt(rsqr)) ;
        rsqr -= x[j]*x[j] ;
     }
+    //printf("%g %g %g | %g | %g %g \n ", x[0], x[1], x[2], normsq(x), phi[0], phi[1]) ;
     if (x[d-1]<0) phi[d-2] = 2*M_PI - phi[d-2] ;
     return r ;
 }

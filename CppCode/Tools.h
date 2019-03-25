@@ -19,6 +19,7 @@ v1f operator* (v1f a, float b) ;
 v1d operator* (v1d a, cv1d b)   ;
 v1d operator+ (v1d a, double b) ;
 v1d operator+ (v1d a, cv1d b)   ;
+v1f operator+ (v1f a, cv1f b)   ;
 v1d operator- (v1d a, double b) ;
 v1d operator- (v1d a, cv1d b)   ;
 v1f operator- (v1f a, cv1f b)   ;
@@ -57,12 +58,16 @@ static void orthonormalise (v1d & A) ; // Gram-Shmidt process
 static double skewnorm (cv1d & a) {double res=0 ; for (uint i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; }
 static double skewnormsq (cv1d & a) {double res=0 ; for (uint i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (res) ; }
 static double dot (cv1d & a, cv1d & b) {double res=0; for (uint i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; }
+static v1f vsqrt (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=sqrt(a[i]) ; return b ; }
+static v1f vsq (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=a[i]*a[i] ; return b ; } 
+
+
 static v1d dbl2vec (double v) {v1d res (1,v) ; return res ; }
 static void setzero(v2d & a) {for (uint i=0 ; i<a.size() ; i++) for (uint j=0 ; j<a[0].size() ; j++) a[i][j]=0 ; }
 static void setzero(v1d & a) {for (uint i=0 ; i<a.size() ; i++) a[i]=0 ; }
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; }
 static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags) ;
-static void savecsv (char path[], cv2d & A) ; 
+static void savecsv (char path[], cv2d & A) ;
 static void savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data) ;
 
 static int write1D (char path[], v1d table) ;
@@ -86,7 +91,7 @@ static v1d  skewexpand     (cv1d &A) ;
 static void skewexpand     (v1d & r, cv1d &A) ;
 static v1d  matmult (cv1d &A, cv1d &B) ;
 static void matmult (v1d &r, cv1d &A, cv1d &B) ;
-static v1d  matvecmult (cv1d &A, cv1d &B) ;
+static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ;
 static v1d  wedgeproduct (cv1d &a, cv1d &b) ;
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; // Overloaded faster operation
 
