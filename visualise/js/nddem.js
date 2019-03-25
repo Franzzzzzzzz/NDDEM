@@ -12,7 +12,7 @@ var world = []; // properties that describe the domain
 var ref_dim = {'c': 0} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.1} // temporal properties
 var axeslength, fontsize; // axis properties
-
+var VR_scale = 5.; // mapping from DEM units to VR units
 
 init();
 
@@ -91,14 +91,13 @@ function make_camera() {
                             1.*world[1].max,
                             -2.*world[0].max
                         );
+        camera.scale.set(0.5,0.5,0.5);
     }
 }
 function add_renderer() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
     renderer.shadowMap.enabled = true;
     if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
@@ -180,6 +179,7 @@ function add_controllers() {
         controls = new THREE.TrackballControls( camera, renderer.domElement );
         aim_camera()
         effect = new THREE.AnaglyphEffect( renderer );
+        effect.setSize(window.innerWidth, window.innerHeight);
         console.log('Anaglyph mode loaded');
     };
 }
@@ -251,14 +251,23 @@ function make_lights() {
     scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
     var light = new THREE.DirectionalLight( 0xffffff );
-    light.position.set( 0, 6, 0 );
+    light.position.set( 2*world[0].max, -6, 0 );
+
+    // var light1 = new THREE.DirectionalLight( 0xffffff );
+    // light1.position.set( 0, 0, -12 );
     // light.castShadow = true;
-    light.shadow.camera.top = 2;
-    light.shadow.camera.bottom = - 2;
-    light.shadow.camera.right = 2;
-    light.shadow.camera.left = - 2;
-    light.shadow.mapSize.set( 4096, 4096 );
+    // light.shadow.camera.top = 2;
+    // light.shadow.camera.bottom = - 2;
+    // light.shadow.camera.right = 2;
+    // light.shadow.camera.left = - 2;
+    // light.shadow.mapSize.set( 4096, 4096 );
     scene.add( light );
+    // scene.add( light1 );
+
+    var helper = new THREE.DirectionalLightHelper( light, 5 );
+    // var helper1 = new THREE.DirectionalLightHelper( light1, 5 );
+    scene.add( helper );
+    // scene.add( helper1 );
 }
 
 function make_walls() {
@@ -411,6 +420,8 @@ function make_initial_spheres_CSV() {
             spheres = results.data;
             var numSpheres = spheres.length;
             var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+            var pointsGeometry = new THREE.SphereGeometry( 1, 6, 6 );
+            var scale = 20.;
             for (var i = 0; i<numSpheres; i++) {
                 // if (i == 0) {
                 //     var material = new THREE.MeshStandardMaterial( {
@@ -420,9 +431,10 @@ function make_initial_spheres_CSV() {
                 //     } );
                 // }
                 // else {
+                    var color = Math.random() * 0xffffff;
                     var material = new THREE.MeshStandardMaterial( {
                         // color: 0xffffff,
-                        color: Math.random() * 0xffffff,
+                        color: color,
                         roughness: 0.7,
                         metalness: 0.0
                     } );
@@ -432,8 +444,8 @@ function make_initial_spheres_CSV() {
                 object.receiveShadow = true;
                 particles.add( object );
                 if ( N > 3 ) {
-                    object2 = object.clone();
-                    var scale = 20.;
+                    pointsMaterial = new THREE.PointsMaterial( { color: color } );
+                    object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
                     object2.scale.set(R/scale,R/scale,R/scale);
                     object2.position.set(0.,0.,0.);
                     wristband.add(object2);
@@ -547,6 +559,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls.handleResize();
+    if (window.viewerType == 'anaglyph') { effect.setSize( window.innerWidth, window.innerHeight ); };
     render();
 };
 
