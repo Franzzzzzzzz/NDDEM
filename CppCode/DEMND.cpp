@@ -21,10 +21,10 @@ void sig_handler (int p)
     //printf("\n\n\n\n\n\n\n") ;
     std::exit(p) ;
 }
-
+void dispvector (v1d & a) {for (auto v: a) printf("%14g ", v); printf("") ; fflush(stdout) ; }
 
 int main (int argc, char *argv[])
-{ 
+{
  signal (SIGINT, sig_handler);   // Catch all signals ...
 
  if (argc<4) {printf("Usage: DEMND #dimensions #grains inputfile\n") ; std::exit(1) ; }
@@ -116,9 +116,16 @@ int main (int argc, char *argv[])
     // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
     Tools::skewexpand(tmpO, Omega[i]) ;
     Tools::matmult(tmpterm1, tmpO, A[i]) ;
+    /*if (ti==50000)
+    {
+      printf("\n\n\n") ;
+      dispvector(Omega[i]); printf("|") ; dispvector(tmpO) ; printf("|") ; dispvector(A[i]) ; printf("|"); dispvector(tmpterm1) ;  printf("\n") ;
+
+      printf("\n\n\n") ;
+    }*/
     for (int dd=0 ; dd<d*d ; dd++)
       A[i][dd] += tmpterm1[dd] * dt ;
-    Tools::orthonormalise(A[i]) ; 
+    Tools::orthonormalise(A[i]) ;
 
     P.perform_PBC(X[i], PBCFlags[i]) ;
 
@@ -128,7 +135,7 @@ int main (int argc, char *argv[])
     for (int j=0 ; j<d ; j++, mask<<=1)
     {
      if (P.Boundaries[j][3] != 0) continue ;
-     if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; } 
+     if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
      else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;

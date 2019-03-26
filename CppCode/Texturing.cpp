@@ -1,8 +1,8 @@
 #include "Tools.h"
 #include "TinyPngOut.hpp"
 
-#define Nlambda 8
-#define Ntheta 8
+#define Nlambda 16
+#define Ntheta 16
 
 using namespace std ;
 // needed for Tools
@@ -82,7 +82,13 @@ int main (int argc, char * argv[])
      rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
      for (int j=0 ; j<d-3 ; j++)
          rsqr -= (View[j]-X[i][j])*(View[j]-X[i][j]) ;
-     if (rsqr<=0) {fflush(stdout) ; continue ;}
+     if (rsqr<=0)
+     {
+       char path[500] ;
+       sprintf(path, "%s/Texture-%d.png", argv[argc-1], i) ;
+      experimental::filesystem::remove(path) ;
+       continue ;
+     }
 
      // We are in view, let's get to it let's get the first phi's (constants)
      for (int j=0 ; j<d-3 ; j++)
@@ -141,9 +147,10 @@ void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
           ctmp = colors[i]*(v*2) ;
         else
           ctmp = colors[i] + ((vector<float>(3,1.0) - colors[i])*((v-0.5)*2))  ;
-        cfinal += (Tools::vsq(ctmp)) ;
+        cfinal +=ctmp ;
+        //cfinal += (Tools::vsq(ctmp)) ;
     }
-    cfinal = Tools::vsqrt(cfinal) ;
+    //cfinal = Tools::vsqrt(cfinal) ;
     cfinal /= (d-1) ;
     for (int i=0 ; i<3 ; i++)
     {
@@ -158,7 +165,7 @@ void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
 int write_img (char path[], int w, int h, uint8_t * px, int idx)
 {
 	char ppath[500] ;
-    sprintf(ppath, "%s/Texture-%d.png", path, idx) ;
+  sprintf(ppath, "%s/Texture-%d.png", path, idx) ;
 	try {
 
 		std::ofstream out(ppath, std::ios::binary);

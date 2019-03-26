@@ -315,6 +315,7 @@ v1d Tools::matmult (cv1d &A, cv1d &B)
 //-------------------------------
 void Tools::matmult (v1d & r, cv1d &A, cv1d &B)
 {
+    setzero(r) ; 
     for (uint i=0 ; i<d; i++)
         for (uint j=0 ; j<d ; j++)
             for (uint k=0 ; k<d ; k++)
@@ -372,7 +373,7 @@ void Tools::unitvec (vector <double> & v, uint d, uint n)
          for (uint j=0 ; j<d ; j++)
              A[j*d+(i%d)] = base[i-first][j] ;
 
-     first++ ; if (first>=d) first=0 ;
+     //first++ ; if (first>=d) first=0 ;
  }
 
 //==================================
