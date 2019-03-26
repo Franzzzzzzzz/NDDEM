@@ -21,6 +21,7 @@ int csvread_A (char path[], v2d &result, int d) ;
 int csvread_XR (char path[], v2d & result, v1d &R, int d) ;
 
 void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
+void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 
 vector<vector<float>> colors = {
     {1,0,0},
@@ -86,7 +87,7 @@ int main (int argc, char * argv[])
      {
        char path[500] ;
        sprintf(path, "%s/Texture-%d.png", argv[argc-1], i) ;
-      experimental::filesystem::remove(path) ;
+       //experimental::filesystem::remove(path) ;
        continue ;
      }
 
@@ -136,26 +137,24 @@ int main (int argc, char * argv[])
 // =============================
 void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
 {
-    float v ; int vbyte ;
-    vector <float> ctmp (3,0) ;
+    int vbyte ;
+    vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
     phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
+    phi[d-2] /= 2 ; 
     for (int i=0 ; i<d-1 ; i++)
     {
-        v = phi[i] / M_PI ;
-        if (v<0.5)
-          ctmp = colors[i]*(v*2) ;
-        else
-          ctmp = colors[i] + ((vector<float>(3,1.0) - colors[i])*((v-0.5)*2))  ;
-        cfinal +=ctmp ;
-        //cfinal += (Tools::vsq(ctmp)) ;
+        ctmp += (colors[i] * sin(phi[i])) ;  
+        sum += colors[i] ; 
     }
-    //cfinal = Tools::vsqrt(cfinal) ;
-    cfinal /= (d-1) ;
+    ctmp /= sum ; 
+    for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
+    //ctmp = (colors[0]*sin(phi[0]) + colors[1]*sin(phi[1]/2)) * sin(phi[0]) ;
+    cfinal = ctmp ; 
     for (int i=0 ; i<3 ; i++)
     {
         vbyte = cfinal[i]*256 ;
-        vbyte=vbyte>256?256:vbyte ;
+        vbyte=vbyte>255?255:vbyte ;
         vbyte=vbyte<0?0:vbyte ;
         *(px+i) = vbyte ;
     }

@@ -1,16 +1,10 @@
-# CC=/opt/local/bin/g++-mp-6 # FG
-CC=g++-8 # BM
+#CC=/opt/local/bin/g++-mp-6 # FG
+#CC=g++-8 # BM
+CC=g++
 
 # Basic compilation
-#CFLAGS=-c -O3 -I./Headers -I/opt/local/include
-#LDFLAGS=-L./newmat10
-#LDFLAGS=-L/opt/local/lib
-#LIBS=-lm -lpthread
 
 # Compilation incluant le support matlab
-#CFLAGS=-c -O3 -m32 -DMATLAB -I./Headers -I/opt/local/include -I/home/franz/Logiciels/matlab2009/extern/include
-# -DUSETIFF and -ltiff to use tiff
-#LDFLAGS=-L/opt/local/lib -L/home/franz/Logiciels/matlab2009/bin/glnx86
 
 
 SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp

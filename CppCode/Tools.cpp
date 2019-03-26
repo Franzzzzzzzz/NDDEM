@@ -209,6 +209,7 @@ std::pair <double, double> Tools::two_max_element (cv1d & v)
 v1d operator* (v1d a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]*=b    ; return a ; }
 v1f operator* (v1f a, float b)  {for (uint i=0 ; i<a.size() ; i++) a[i]*=b    ; return a ; }
 v1d operator* (v1d a, cv1d b)    {for (uint i=0 ; i<a.size() ; i++) a[i]*=b[i] ; return a ; }
+v1f operator* (v1f a, cv1f b)    {for (uint i=0 ; i<a.size() ; i++) a[i]*=b[i] ; return a ; }
 v1d operator+ (v1d a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]+=b    ; return a ; }
 v1d operator+ (v1d a, cv1d b)    {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i] ; return a ; }
 v1f operator+ (v1f a, cv1f b)    {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i] ; return a ; }
@@ -219,8 +220,10 @@ v1f operator- (v1f a, cv1f b)    {for (uint i=0 ; i<a.size() ; i++) a[i]-=b[i] ;
 v1d operator/ (v1d a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b    ; return a ; }
 v1d & operator-= (v1d & a, cv1d b)  {for (uint i=0 ; i<a.size() ; i++) a[i]-=b[i] ; return a; }
 v1d & operator*= (v1d & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]*=b ; return a; }
+v1f & operator*= (v1f & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]*=b ; return a; }
 v1d & operator+= (v1d & a, cv1d b)  {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i] ; return a; }
 v1f & operator+= (v1f & a, cv1f b)  {for (uint i=0 ; i<a.size() ; i++) a[i]+=b[i] ; return a; }
+v1f & operator/= (v1f & a, cv1f b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b[i] ; return a; }
 v1d & operator/= (v1d & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b ; return a; }
 v1f & operator/= (v1f & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b ; return a; }
 //-----------------------------------
