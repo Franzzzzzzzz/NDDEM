@@ -20,8 +20,8 @@
         <script src="js/datguivr.js"></script>
         <script>
             // viewerType = "VR";
-            // viewerType = "anaglyph";
-            viewerType = "keyboard";
+            viewerType = "anaglyph";
+            // viewerType = "keyboard";
 
             // fname = "Samples/D3/";
             // inname = "in.test7adimD3";
@@ -29,30 +29,23 @@
             // fname = "Samples/D4/";
             // inname = "in.test7adimD4";
 
-            // fname = "Samples/D5/";
-            // inname = "in.test7adimD5";
+            fname = "Samples/D5/";
+            inname = "in.test7adimD5";
 
-            fname = "Samples/D6/";
-            inname = "in.test7adimD6";
+            // fname = "Samples/D6/";
+            // inname = "in.test7adimD6";
 
             // fname = "Samples/D7/";
             // inname = "in.test7adimD7";
 
 
             const urlParams = new URLSearchParams(window.location.search);
-            if ( urlParams.has('viewerType') ) {
-                viewerType = urlParams.get('viewerType');
-                console.log(viewerType);
-            };
-            if ( urlParams.has('fname') ) {
-                fname = urlParams.get('fname');
-                console.log(fname);
-            };
-            if ( urlParams.has('inname') ) {
-                inname = urlParams.get('inname');
-                console.log(inname);
-            };
-
+            if ( urlParams.has('viewerType') ) { viewerType = urlParams.get('viewerType'); };
+            if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
+            if ( urlParams.has('inname') ) { inname = urlParams.get('inname'); };
+            if ( urlParams.has('autoplay') ) { autoplay = urlParams.get('autoplay'); };
+            if ( urlParams.has('find_particle') ) { find_particle = urlParams.get('find_particle'); };
+            if ( urlParams.has('rotations') ) { rotations = urlParams.get('rotations'); };
         </script>
         <script src="js/nddem.js"></script>
 
