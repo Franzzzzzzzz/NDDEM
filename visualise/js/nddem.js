@@ -1,3 +1,5 @@
+// var THREE = require('three');
+
 var container; // main div element
 var camera, scene, controls, renderer; // UI elements
 var controller1, controller2; // VR controllers
@@ -10,20 +12,30 @@ var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 0} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.1} // temporal properties
+var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.5} // temporal properties
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
+if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) };
 var axeslength, fontsize; // axis properties
 var VR_scale = 5.; // mapping from DEM units to VR units
 var find_particle = window.find_particle === 'true'; // show just the first particle in a unique colour
 var rotations = window.rotations === 'true'; // show rotations via texture mapping
+// rotations = true;
 var catch_particle = window.catch_particle === 'true'; // enable ability to catch particles
-console.log(rotations);
+var quality, shadows;
+
+console.log(window.shadows)
+console.log(typeof window.shadows)
+if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
+else { shadows = true; };
+if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
+else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
+
 init();
 
 function init() {
     var request = new XMLHttpRequest();
-    // request.open('GET', "http://localhost:8000/" + window.fname + window.inname + "?_="+ (new Date).getTime(), true);
-    request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
+    request.open('GET', "http://localhost:8000/" + window.fname + window.inname + "?_="+ (new Date).getTime(), true);
+    // request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
@@ -94,7 +106,7 @@ function build_world() {
 function make_camera() {
     var aspect = window.innerWidth / window.innerHeight;
     if ( N == 2 ) {
-        zoom = 10.0;
+        zoom = 8.0;
         camera = new THREE.OrthographicCamera(-zoom*aspect,zoom*aspect,zoom,-zoom,-1000,1000);
         camera.position.set((world[0].min + world[0].max)/2./2.,(world[1].min + world[1].max)/2.,-1.0);
     }
@@ -110,7 +122,7 @@ function add_renderer() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.shadowMap.enabled = true;
+    if ( shadows ) { renderer.shadowMap.enabled = true; }
     if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
@@ -277,26 +289,18 @@ function make_axes() {
 }
 
 function make_lights() {
-    scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+    var background_light = new THREE.AmbientLight( 0x909090 );
+    scene.add( background_light );
 
     var light = new THREE.DirectionalLight( 0xffffff );
-    light.position.set( 2*world[0].max, -6, 0 );
+    light.position.set( world[0].max, -world[0].max, ( world[2].min + world[2].max)/2. );
+    light.lookAt(( world[2].min + world[2].max)/2.,( world[2].min + world[2].max)/2.,( world[2].min + world[2].max)/2.)
 
-    // var light1 = new THREE.DirectionalLight( 0xffffff );
-    // light1.position.set( 0, 0, -12 );
-    // light.castShadow = true;
-    // light.shadow.camera.top = 2;
-    // light.shadow.camera.bottom = - 2;
-    // light.shadow.camera.right = 2;
-    // light.shadow.camera.left = - 2;
-    // light.shadow.mapSize.set( 4096, 4096 );
+    if ( shadows ) {
+        light.castShadow = true;
+        light.shadow.mapSize.set( 4096, 4096 );
+    };
     scene.add( light );
-    // scene.add( light1 );
-
-    // var helper = new THREE.DirectionalLightHelper( light, 5 );
-    // var helper1 = new THREE.DirectionalLightHelper( light1, 5 );
-    // scene.add( helper );
-    // scene.add( helper1 );
 }
 
 function make_walls() {
@@ -346,7 +350,7 @@ function add_torus() {
     if (window.viewerType == "VR") { R = 0.1; }
     else { R = 0.5; }
     r = R/2.;
-    var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
+    var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
     var material = new THREE.MeshStandardMaterial( {
         color: 0xffffff,
         roughness: 0.7,
@@ -354,17 +358,19 @@ function add_torus() {
     } );
 
     wristband = new THREE.Mesh( geometry, material );
-    wristband.castShadow = true;
-    wristband.receiveShadow = true;
+    if ( shadows ) {
+        wristband.castShadow = true;
+        wristband.receiveShadow = true;
+    }
 
-    var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., 64, 32 );
+    var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality)*2, Math.pow(2,quality) );
     var material = new THREE.MeshStandardMaterial( {
         color: 0x000000,
         roughness: 0.7,
     } );
     wristband_phi = new THREE.Mesh( geometry, material );
 
-    var geometry = new THREE.TorusBufferGeometry( r, r/10., 64, 32 );
+    var geometry = new THREE.TorusBufferGeometry( r, r/10., Math.pow(2,quality)*2, Math.pow(2,quality) );
     wristband_theta = new THREE.Mesh( geometry, material );
     wristband_theta.rotation.y = Math.PI/2;
 
@@ -387,7 +393,7 @@ function add_torus() {
     }
 
     if ( N > 5 ) {
-        var geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
+        var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
         var material = new THREE.MeshStandardMaterial( {
             color: 0xffffff,
             roughness: 0.7,
@@ -395,17 +401,19 @@ function add_torus() {
         } );
 
         wristband1 = new THREE.Mesh( geometry, material );
-        wristband1.castShadow = true;
-        wristband1.receiveShadow = true;
+        if ( shadows ) {
+            wristband1.castShadow = true;
+            wristband1.receiveShadow = true;
+        }
 
-        var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., 64, 32 );
+        var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality)*2, Math.pow(2,quality) );
         var material = new THREE.MeshStandardMaterial( {
             color: 0x000000,
             roughness: 0.7,
         } );
         wristband1_phi = new THREE.Mesh( geometry, material );
 
-        var geometry = new THREE.TorusBufferGeometry( r, r/10., 64, 32 );
+        var geometry = new THREE.TorusBufferGeometry( r, r/10., Math.pow(2,quality)*2, Math.pow(2,quality) );
         wristband1_theta = new THREE.Mesh( geometry, material );
         wristband1_theta.rotation.y = Math.PI/2;
 
@@ -438,7 +446,23 @@ function load_hyperspheres_VTK() {
 };
 
 function make_initial_spheres_CSV() {
-    Papa.parse("http://localhost:8000/" + window.fname + "dump-00000.csv", {
+    if ( rotations ) {
+        var arr = new Array();
+        for ( i=0; i<N; i++ ) {
+            if ( i < 3 ) { arr.push('NaN') }
+            else { arr.push(world[i].cur) };
+        };
+        var request = new XMLHttpRequest();
+        request.open('POST', "http://localhost:8000/make_textures?" +
+                     "arr=" + JSON.stringify(arr) +
+                     "&N=" + N +
+                     "&t=" + "0" +
+                     "&fname=" + fname,
+                     true);
+        request.send(null);
+        // request.onreadystatechange = function () {}
+    };
+    Papa.parse("http://localhost:8000/" + window.fname + "dump-00000.csv" + "?_="+ (new Date).getTime(), {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -446,11 +470,10 @@ function make_initial_spheres_CSV() {
             particles = new THREE.Group();
             scene.add( particles );
             spheres = results.data;
-            var numSpheres = spheres.length;
-            var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-            var pointsGeometry = new THREE.SphereGeometry( 1, 6, 6 );
-            var scale = 20.;
-            for (var i = 0; i<numSpheres; i++) {
+            var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
+            var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
+            var scale = 20.; // size of particles on tori
+            for (var i = 0; i<spheres.length; i++) {
                 if ( N === 2 ) {
                     var color = Math.random() * 0xffffff;
                     var material = new THREE.PointsMaterial( {
@@ -479,8 +502,11 @@ function make_initial_spheres_CSV() {
                     };
                 }
                 var object = new THREE.Mesh( geometry, material );
-                object.castShadow = true;
-                object.receiveShadow = true;
+                object.rotation.z = Math.PI/2.;
+                if ( shadows ) {
+                    object.castShadow = true;
+                    object.receiveShadow = true;
+                }
                 particles.add( object );
                 if ( N > 3 ) {
                     pointsMaterial = new THREE.PointsMaterial( { color: color } );
@@ -499,17 +525,51 @@ function make_initial_spheres_CSV() {
 };
 
 function update_spheres_CSV(t) {
-    // Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime(), { // definitely no caching
-    Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv", {
+    if ( rotations ) {
+        var arr = new Array();
+        for ( var i=0; i<N; i++ ) {
+            if ( i < 3 ) { arr.push('NaN') }
+            else { arr.push(world[i].cur) };
+        };
+        var request = new XMLHttpRequest();
+        request.open('POST',
+                     "http://localhost:8000/make_textures?" +
+                     "arr=" + JSON.stringify(arr) +
+                     "&N=" + N +
+                     "&t=" + t + "0000" +
+                     "&fname=" + fname,
+                     true);
+        request.onload = function() {
+            var loader = new THREE.TextureLoader();
+            for ( ii = 0; ii < particles.children.length; ii++ ) {
+                loader.load("http://localhost:8000/" + window.fname +
+                            "Texture-" + ii + ".png" +
+                            "?_="+ (new Date).getTime(),
+                            function( texture ) {
+                                var myRe = /-[0-9]+.png/g
+                                var res=myRe.exec(texture.image.currentSrc)
+                                var myRe2 = /[0-9]+/
+                                var iii = myRe2.exec(res[0])[0]
+                                var o = particles.children[iii];
+                                o.material.map = texture;
+                                o.material.map.needsUpdate = true;
+                            });
+            }
+        }
+        request.send('');
+        // console.log(request);
+    };
+    Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime(), { // definitely no caching
+    // Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv", {
         download: true,
         dynamicTyping: true,
         header: true,
         cache: true,
         complete: function(results) {
             spheres = results.data;
-            var numSpheres = spheres.length;
-            for (i = 0; i<numSpheres; i++) {
+            for (i = 0; i<spheres.length; i++) {
                 var object = particles.children[i];
+                if ( N == 2 ) { spheres[i].x2 = 0; };
                 object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
                 if (N == 2) {
                     var R_draw = spheres[i].R;
@@ -588,13 +648,6 @@ function update_spheres_CSV(t) {
                     z = r*Math.sin(theta);
                     object3.position.set(x,y,z);
                 };
-
-                if ( rotations ) {
-                    var texture = new THREE.TextureLoader().load("http://localhost:8000/" + window.fname + "Texture-" + i + ".png", undefined, function() {
-                        object.material.map = texture;
-                        object.material.map.needsUpdate = true;
-                    });
-                }
             }
         }
     });

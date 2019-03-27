@@ -1,6 +1,6 @@
 #CC=/opt/local/bin/g++-mp-6 # FG
-#CC=g++-8 # BM
-CC=g++
+CC=g++-8 # BM
+# CC=g++
 
 # Basic compilation
 
