@@ -7,7 +7,7 @@ var controller1, controller2; // VR controllers
 var raycaster, intersected = []; // catching grains
 var tempMatrix = new THREE.Matrix4(); // catching grains
 
-var particles, wristband, wristband1, axesHelper; // groups of objects
+var particles, wristband, wristband1, axesHelper, axesLabels; // groups of objects
 var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
@@ -23,8 +23,6 @@ var rotations = window.rotations === 'true'; // show rotations via texture mappi
 var catch_particle = window.catch_particle === 'true'; // enable ability to catch particles
 var quality, shadows;
 
-console.log(window.shadows)
-console.log(typeof window.shadows)
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
 else { shadows = true; };
 if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
@@ -34,7 +32,7 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('GET', "http://localhost:8000/" + window.fname + window.inname + "?_="+ (new Date).getTime(), true);
+    request.open('POST', "http://localhost:8000/in?fname=" + window.fname + "&_="+ (new Date).getTime(), true);
     // request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
     request.send(null);
     request.onreadystatechange = function () {
@@ -69,7 +67,14 @@ function init() {
                         }
                     }
                 }
-                if (N == 2) { // just used for setting up cameras etc
+                if ( N == 1 ) { // just used for setting up cameras etc
+                    world.push({});
+                    world[1].min = 0.;
+                    world[1].max = 0.;
+                    world[1].cur = 0.5;
+                    world[1].prev = 0.5;
+                };
+                if ( N < 3 ) { // just used for setting up cameras etc
                     world.push({});
                     world[2].min = 0.;
                     world[2].max = 0.;
@@ -87,7 +92,8 @@ function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+    // scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+    scene.background = new THREE.Color( 0xFFFFFF ); // white
     make_camera();
     // make_walls();
     make_axes();
@@ -105,17 +111,27 @@ function build_world() {
 
 function make_camera() {
     var aspect = window.innerWidth / window.innerHeight;
-    if ( N == 2 ) {
+    if ( N < 3 ) {
         zoom = 8.0;
         camera = new THREE.OrthographicCamera(-zoom*aspect,zoom*aspect,zoom,-zoom,-1000,1000);
         camera.position.set((world[0].min + world[0].max)/2./2.,(world[1].min + world[1].max)/2.,-1.0);
     }
     else {
-        camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-        camera.position.set(0.25*world[0].max,
-                            -0.5*world[0].max,
-                            -0.5*world[0].max
-                        );
+        if ( window.viewerType == 'anaglyph' ) {
+            camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
+            camera.position.set(0.5*world[0].max/8.,
+                                   -world[0].max/8.,
+                                   -world[0].max/8.
+                            );
+            camera.focalLength = 3;
+        }
+        else {
+            camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
+            camera.position.set(0.25*world[0].max,
+                                -0.5*world[0].max,
+                                -0.5*world[0].max
+                            );
+        }
     }
 }
 function add_renderer() {
@@ -200,7 +216,7 @@ function add_controllers() {
         }
 
     } else if (window.viewerType == 'keyboard') {
-        if ( N == 2 ) {
+        if ( N < 3 ) {
             controls = new THREE.OrbitControls( camera, renderer.domElement );
             controls.target.set( (world[0].min + world[0].max)/2./2., (world[1].min + world[1].max)/2., 0 ); // view direction perpendicular to XY-plane. NOTE: VALUE OF 5 IS HARDCODED IN OTHER PLACES
             controls.enableRotate = false;
@@ -234,12 +250,60 @@ function aim_camera() {
 }
 
 function make_axes() {
-    if (typeof axesHelper == 'undefined') {
+    if (typeof axesLabels == 'undefined') {
         axeslength = 5 ; // length of axes vectors
         fontsize = 0.5; // font size
-        axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
+        thickness = 0.1; // line thickness
+        axesHelper = new THREE.Group();
+        axesLabels = new THREE.Group();
+        // axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
         // axesHelper.position.set(world[ref_dim.N_0])
         scene.add( axesHelper );
+        scene.add( axesLabels );
+
+        var arrow_body = new THREE.CylinderGeometry( thickness, thickness, axeslength, Math.pow(2,quality), Math.pow(2,quality) );
+        var arrow_head = new THREE.CylinderGeometry( 0., 2.*thickness, 4*thickness, Math.pow(2,quality), Math.pow(2,quality) );
+        var arrow_material_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+        var arrow_material_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+        var arrow_material_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
+        var arrow_x = new THREE.Mesh( arrow_body, arrow_material_x );
+        var arrow_y = new THREE.Mesh( arrow_body, arrow_material_y );
+        var arrow_z = new THREE.Mesh( arrow_body, arrow_material_z );
+        var arrow_head_x = new THREE.Mesh( arrow_head, arrow_material_x );
+        var arrow_head_y = new THREE.Mesh( arrow_head, arrow_material_y );
+        var arrow_head_z = new THREE.Mesh( arrow_head, arrow_material_z );
+
+        arrow_x.position.x = axeslength/2.;
+        arrow_x.rotation.z = -Math.PI/2.;
+        arrow_head_x.position.x = axeslength+thickness;
+        arrow_head_x.rotation.z = -Math.PI/2.;
+
+        arrow_y.position.y = axeslength/2.;
+        arrow_head_y.position.y = axeslength+thickness;
+
+        arrow_z.position.z = axeslength/2.;
+        arrow_z.rotation.x = -Math.PI/2.;
+        arrow_head_z.position.z = axeslength+thickness;
+        arrow_head_z.rotation.x = Math.PI/2.;
+
+        if ( N == 1 ) {
+            arrow_x.position.y = -1.5;
+            arrow_head_x.position.y = -1.5;
+        }
+
+        axesHelper.add( arrow_x );
+        axesHelper.add( arrow_head_x );
+
+        if ( N > 1 ) {
+            axesHelper.add( arrow_y );
+            axesHelper.add( arrow_head_y );
+        };
+        if ( N > 2 ) {
+            axesHelper.add( arrow_z );
+            axesHelper.add( arrow_head_z );
+        };
+
+
     }
 
     if (ref_dim.c != ref_dim.x) {
@@ -249,10 +313,10 @@ function make_axes() {
         if (ref_dim.c < N - 2) { ref_dim.z = ref_dim.c + 2; }
         else { ref_dim.z = ref_dim.c + 2 - N; }
 
-        if (axesHelper.children.length > 1 ) {
-            for( var i = axesHelper.children.length - 1; i >= 0; i--) {
-                obj = axesHelper.children[i];
-                axesHelper.remove(obj);
+        if (axesLabels.children.length > 0 ) {
+            for( var i = axesLabels.children.length - 1; i >= 0; i--) {
+                obj = axesLabels.children[i];
+                axesLabels.remove(obj);
             }
         }
         var loader = new THREE.FontLoader();
@@ -260,28 +324,37 @@ function make_axes() {
     		var textGeo_x = new THREE.TextBufferGeometry( "x" + ref_dim.x, { font: font, size: fontsize, height: fontsize/2., } );
     		var textMaterial_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
     		var mesh_x = new THREE.Mesh( textGeo_x, textMaterial_x );
-    		mesh_x.position.x = axeslength - 1.5*fontsize;
+    		mesh_x.position.x = axeslength;// - 1.5*fontsize;
+            mesh_x.position.y = -0.3;
+            mesh_x.position.z = fontsize/4.;
             mesh_x.rotation.z = Math.PI;
             mesh_x.rotation.y = Math.PI;
-            // mesh_x.position.y = -fontsize;
-    		axesHelper.add( mesh_x );
+            if ( N == 1 ) {
+                mesh_x.position.y = -1.8;
+            }
+    		axesLabels.add( mesh_x );
 
-            var textGeo_y = new THREE.TextGeometry( "x" + ref_dim.y, { font: font, size: fontsize, height: fontsize/2., } );
-    		var textMaterial_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-    		var mesh_y = new THREE.Mesh( textGeo_y, textMaterial_y );
-    		mesh_y.position.y = axeslength-fontsize*1.5;
-            mesh_y.rotation.z = -Math.PI/2.;
-            mesh_y.rotation.x = Math.PI;
-    		axesHelper.add( mesh_y );
-
+            if ( N > 1 ) {
+                var textGeo_y = new THREE.TextGeometry( "x" + ref_dim.y, { font: font, size: fontsize, height: fontsize/2., } );
+        		var textMaterial_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+        		var mesh_y = new THREE.Mesh( textGeo_y, textMaterial_y );
+                mesh_y.position.x = 0.3;
+                mesh_y.position.y = axeslength;//-fontsize*1.5;
+                mesh_y.position.z = fontsize/4.;
+                mesh_y.rotation.z = -Math.PI/2.;
+                mesh_y.rotation.x = Math.PI;
+        		axesLabels.add( mesh_y );
+            };
             if ( N > 2 ) {
                 var textGeo_z = new THREE.TextGeometry( "x" + ref_dim.z, { font: font, size: fontsize, height: fontsize/2., } );
         		var textMaterial_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
         		var mesh_z = new THREE.Mesh( textGeo_z, textMaterial_z );
-        		mesh_z.position.z = axeslength;//-fontsize;
+                mesh_z.position.x = 0.3;
+                mesh_z.position.y = fontsize/4.;
+                mesh_z.position.z = axeslength + 1.5*fontsize;
                 mesh_z.rotation.z = -Math.PI/2.;
                 mesh_z.rotation.x = Math.PI/2.;
-        		axesHelper.add( mesh_z );
+        		axesLabels.add( mesh_z );
             }
         });
 
@@ -296,19 +369,26 @@ function make_lights() {
     light.position.set( world[0].max, -world[0].max, ( world[2].min + world[2].max)/2. );
     light.lookAt(( world[2].min + world[2].max)/2.,( world[2].min + world[2].max)/2.,( world[2].min + world[2].max)/2.)
 
+    var light1 = new THREE.DirectionalLight( 0xffffff );
+    light1.position.set( world[0].max, world[0].max, ( world[2].min + world[2].max)/2. );
+    light1.lookAt(( world[2].min + world[2].max)/2.,( world[2].min + world[2].max)/2.,( world[2].min + world[2].max)/2.)
+
+
     if ( shadows ) {
         light.castShadow = true;
         light.shadow.mapSize.set( 4096, 4096 );
     };
+
     scene.add( light );
+    scene.add( light1 );
 }
 
 function make_walls() {
     var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-    var material = new THREE.MeshStandardMaterial( {
+    var material = new THREE.MeshPhongMaterial( {
         color: 0xeeeeee,
-        roughness: 1.0,
-        metalness: 0.0,
+        // roughness: 1.0,
+        // metalness: 0.0,
     } );
     material.transparent = true;
     material.opacity = 0.5;
@@ -351,10 +431,10 @@ function add_torus() {
     else { R = 0.5; }
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
-    var material = new THREE.MeshStandardMaterial( {
+    var material = new THREE.MeshPhongMaterial( {
         color: 0xffffff,
-        roughness: 0.7,
-        metalness: 0.5
+        // roughness: 0.7,
+        // metalness: 0.5
     } );
 
     wristband = new THREE.Mesh( geometry, material );
@@ -364,9 +444,9 @@ function add_torus() {
     }
 
     var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality)*2, Math.pow(2,quality) );
-    var material = new THREE.MeshStandardMaterial( {
+    var material = new THREE.MeshPhongMaterial( {
         color: 0x000000,
-        roughness: 0.7,
+        // roughness: 0.7,
     } );
     wristband_phi = new THREE.Mesh( geometry, material );
 
@@ -394,10 +474,10 @@ function add_torus() {
 
     if ( N > 5 ) {
         var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
-        var material = new THREE.MeshStandardMaterial( {
+        var material = new THREE.MeshPhongMaterial( {
             color: 0xffffff,
-            roughness: 0.7,
-            metalness: 0.5
+            // roughness: 0.7,
+            // metalness: 0.5
         } );
 
         wristband1 = new THREE.Mesh( geometry, material );
@@ -407,9 +487,9 @@ function add_torus() {
         }
 
         var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality)*2, Math.pow(2,quality) );
-        var material = new THREE.MeshStandardMaterial( {
+        var material = new THREE.MeshPhongMaterial( {
             color: 0x000000,
-            roughness: 0.7,
+            // roughness: 0.7,
         } );
         wristband1_phi = new THREE.Mesh( geometry, material );
 
@@ -470,7 +550,12 @@ function make_initial_spheres_CSV() {
             particles = new THREE.Group();
             scene.add( particles );
             spheres = results.data;
-            var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
+            if ( N == 1) {
+                var geometry = new THREE.CylinderGeometry( 1, 1, 2, Math.pow(2,quality), Math.pow(2,quality) );
+            }
+            else {
+                var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
+            }
             var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
             var scale = 20.; // size of particles on tori
             for (var i = 0; i<spheres.length; i++) {
@@ -483,8 +568,14 @@ function make_initial_spheres_CSV() {
                 else {
                     if ( find_particle ) {
                         if (i == 0) {
-                            var material = new THREE.MeshStandardMaterial( { color: 0xFF00FF, roughness: 0.7, metalness: 0.0 } ); }
-                        else { var material = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.7, metalness: 0.0 } ); }
+                            var material = new THREE.MeshPhongMaterial( { color: 0xFF00FF,
+                                                                             // roughness: 0.7,
+                                                                             // metalness: 0.0
+                                                                         } ); }
+                        else { var material = new THREE.MeshPhongMaterial( { color: 0xffffff,
+                                                                                // roughness: 0.7,
+                                                                                // metalness: 0.0
+                                                                            } ); }
                     }
                     else {
                         var color = Math.random() * 0xffffff;
@@ -493,10 +584,10 @@ function make_initial_spheres_CSV() {
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
-                            var material = new THREE.MeshStandardMaterial( {
+                            var material = new THREE.MeshPhongMaterial( {
                                 color: color,
-                                roughness: 0.7,
-                                metalness: 0.0
+                                // roughness: 0.2,
+                                // metalness: 0.5
                             } );
                         }
                     };
@@ -557,7 +648,6 @@ function update_spheres_CSV(t) {
             }
         }
         request.send('');
-        // console.log(request);
     };
     Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime(), { // definitely no caching
     // Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv", {
@@ -569,12 +659,10 @@ function update_spheres_CSV(t) {
             spheres = results.data;
             for (i = 0; i<spheres.length; i++) {
                 var object = particles.children[i];
-                if ( N == 2 ) { spheres[i].x2 = 0; };
+                if ( N == 1 ) { spheres[i].x1 = 0; };
+                if ( N < 3 ) { spheres[i].x2 = 0; };
                 object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
-                if (N == 2) {
-                    var R_draw = spheres[i].R;
-                             }
-                if (N == 3) {
+                if (N < 4) {
                     var R_draw = spheres[i].R;
                              }
                 else if (N == 4) {
@@ -654,7 +742,7 @@ function update_spheres_CSV(t) {
 };
 
 function onWindowResize() {
-    if ( N == 2) {
+    if ( N < 3 ) {
         var aspect = window.innerWidth / window.innerHeight;
         var zoom = 10.
         camera.left   = -zoom*aspect;
