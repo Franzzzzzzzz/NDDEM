@@ -1,8 +1,8 @@
 #include "Tools.h"
 #include "TinyPngOut.hpp"
 
-#define Nlambda 16
-#define Ntheta 16
+#define Nlambda 6
+#define Ntheta 6
 
 using namespace std ;
 // needed for Tools
@@ -140,6 +140,7 @@ void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
     int vbyte ;
     vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
+    //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ; 
     phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
     phi[d-2] /= 2 ; 
     for (int i=0 ; i<d-1 ; i++)
@@ -182,20 +183,22 @@ int csvread_A (char path[], v2d & result, int d)
 {
  FILE *in ; int n=0 ; double tmp ;
  in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
-
- fscanf(in,"%*[^\n]%*c") ; // Skipping header
+ int r ; 
+ 
+ r=fscanf(in,"%*[^\n]%*c") ; // Skipping header
 
  while (!feof(in))
  {
-     fscanf(in, "%lg%*c", &tmp) ;
+     r=fscanf(in, "%lg%*c", &tmp) ;
      if (feof(in)) break ;
 
      result.push_back(v1d (d*d,0)) ;
      result[n][0]=tmp ;
      for (int i=1 ; i<d*d ; i++)
-         fscanf(in, "%lg%*c", &result[n][i]) ;
+         r=fscanf(in, "%lg%*c", &result[n][i]) ;
 
      //dispvector(result[n]) ;
+     r=r ; 
      n++ ;
  }
 
@@ -207,22 +210,24 @@ int csvread_XR (char path[], v2d & result, v1d &R, int d)
 {
  FILE *in ; int n=0 ; double tmp ;
  in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
-
- fscanf(in,"%*[^\n]%*c") ; // Skipping header
+ int r ; 
+ 
+ r=fscanf(in,"%*[^\n]%*c") ; // Skipping header
 
  while (!feof(in))
  {
-     fscanf(in, "%lg%*c", &tmp) ;
+     r=fscanf(in, "%lg%*c", &tmp) ;
      if (feof(in)) break ;
 
      result.push_back(v1d (d,0)) ;
      R.push_back(0) ;
      result[n][0]=tmp ;
      for (int i=1 ; i<d ; i++)
-         fscanf(in, "%lg%*c", &result[n][i]) ;
-     fscanf(in, "%lg%*c", &R[n]) ;
+         r=fscanf(in, "%lg%*c", &result[n][i]) ;
+     r=fscanf(in, "%lg%*c", &R[n]) ;
      //printf("%g %g %g %g\n", result[n][0], result[n][1], result[n][2], R[n]) ;
-     fscanf(in, "%*s%*c") ;
+     r=fscanf(in, "%*s%*c") ;
+     r=r ; 
      n++ ;
  }
 

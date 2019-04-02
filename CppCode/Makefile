@@ -1,6 +1,6 @@
 #CC=/opt/local/bin/g++-mp-6 # FG
-CC=g++-8 # BM
-# CC=g++
+#CC=g++-8 # BM
+CC=g++
 
 # Basic compilation
 
@@ -10,12 +10,12 @@ CC=g++-8 # BM
 SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
-LDFLAGS=-L/usr/local/lib -Wall
+LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
 LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -DNETCDF -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs
+all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+=-lnetcdf -fopenmp -lstdc++fs
 all:
