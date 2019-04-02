@@ -12,7 +12,7 @@ CC=g++
 #LDFLAGS=-L/opt/local/lib -L/home/franz/Logiciels/matlab2009/bin/glnx86
 
 
-SOURCES=IO.cpp Coarsing.cpp zlib.cpp gzip.cpp
+SOURCES=IONDDEM.cpp Coarsing.cpp Xml.cpp zlib.cpp gzip.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=IO
 CFLAGS=-I/opt/local/include -DNETCDF

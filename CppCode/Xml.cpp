@@ -192,6 +192,22 @@ string XMLReader_base::getcontent()
     return res ;
 }
 //============================================================
+int XMLReader::read_boundaries (vector <double > & boundaries)
+{
+    auto results = gettagdata() ;
+    if (get<0>(results) != "boundaries") {printf("Wrong tag order, returning") ; return 1; }
+    boundaries = get<2>(results) ; 
+    return 0 ; 
+}
+//-------------------------------------------------------------
+int XMLReader::read_radius (vector <double > & radius)
+{
+    auto results = gettagdata() ;
+    if (get<0>(results) != "radius") {printf("Wrong tag order, returning") ; return 1; }
+    radius = get<2>(results) ; 
+    return 0 ; 
+}
+//-------------------------------------------------------------
 int XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>> & data)
 {
  ArrayType type ;
