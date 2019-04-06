@@ -21,7 +21,7 @@ void sig_handler (int p)
     //printf("\n\n\n\n\n\n\n") ;
     std::exit(p) ;
 }
-void dispvector (v1d & a) {for (auto v: a) printf("%14g ", v); printf("") ; fflush(stdout) ; }
+void dispvector (v1d & a) {for (auto v: a) printf("%14g ", v);fflush(stdout) ; }
 
 int main (int argc, char *argv[])
 {
@@ -335,33 +335,75 @@ int main (int argc, char *argv[])
    {
     if (P.dumpkind&ExportType::CSV)
     {
-        char path[500] ; sprintf(path, "%s/dump-%05d.csv", P.Directory.c_str(), ti) ;
-        Tools::savecsv(path, X, P.r, PBCFlags) ;
-    }
-    if (P.dumpkind&ExportType::CSVA)
-    {
+        if (P.dumplist & ExportData::POSITION) 
+        {
+            char path[500] ; sprintf(path, "%s/dump-%05d.csv", P.Directory.c_str(), ti) ;
+            Tools::savecsv(path, X, P.r, PBCFlags) ;
+        }
+        if (P.dumplist & ExportData::VELOCITY)
+        {
+        char path[500] ; sprintf(path, "%s/dumpV-%05d.csv", P.Directory.c_str(), ti) ;
+        Tools::savecsv(path, V) ;
+        }
+        if (P.dumplist & ExportData::OMEGA) 
+        {
+        char path[500] ; sprintf(path, "%s/dumpOmega-%05d.csv", P.Directory.c_str(), ti) ;
+        v1d OmegaMag(N,0) ; for (int p=0 ; p<N ; p++) OmegaMag[p]=Tools::skewnorm(Omega[p]) ; 
+        //Tools::savecsv(path, OmegaMag) ;
+        printf("Omega Mag not implemented yet\n");
+        }
+        if (P.dumplist & ExportData::OMEGAMAG) //TODO
+        {
+        char path[500] ; sprintf(path, "%s/dumpOmegaMag-%05d.csv", P.Directory.c_str(), ti) ;
+        Tools::savecsv(path, Omega) ;
+        }
+        if (P.dumplist & ExportData::ORIENTATION) 
+        {
         char path[500] ; sprintf(path, "%s/dumpA-%05d.csv", P.Directory.c_str(), ti) ;
         Tools::savecsv(path, A) ;
+        }
     }
+
     if (P.dumpkind&ExportType::VTK)
     {
         char path[500] ; sprintf(path, "%s/dump-%05d.vtk", P.Directory.c_str(), ti) ;
-        Tools::savevtk(path, P, X, {"", TensorType::NONE, &Omega}) ;
+        vector <TensorInfos> val;
+        if (P.dumplist & ExportData::VELOCITY) val.push_back({"Velocity", TensorType::VECTOR, &V}) ; 
+        if (P.dumplist & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ; 
+        if (P.dumplist & ExportData::OMEGAMAG)  printf("OmegaMag not implemented in VTK") ;
+        if (P.dumplist & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ; 
+        Tools::savevtk(path, P, X, val) ;
     }
     if (P.dumpkind&ExportType::NETCDFF)
         printf("WARN: netcdf writing haven't been tested and therefore is not plugged in\n") ;
     if (P.dumpkind&ExportType::XML)
     {
         P.xmlout->startTS(t);
-        P.xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::ascii);
-        P.xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::ascii);
+        if (P.dumplist & ExportData::POSITION) P.xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::ascii);
+        if (P.dumplist & ExportData::VELOCITY) P.xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::ascii);
+        if (P.dumplist & ExportData::OMEGA)    P.xmlout->writeArray("Omega", &Omega, ArrayType::particles, EncodingType::ascii);
+        if (P.dumplist & ExportData::OMEGAMAG) 
+        { 
+            v1d OmegaMag(N,0) ; for (int p=0 ; p<N ; p++) OmegaMag[p]=Tools::skewnorm(Omega[p]) ; 
+            //P.xmlout->writeArray("OmegaMag", &OmegaMag, ArrayType::particles, EncodingType::ascii); 
+            printf("Omega Mag not implemented yet\n");
+        }
+        if (P.dumplist & ExportData::ORIENTATION) P.xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::ascii); 
         P.xmlout->stopTS();
     }
     if (P.dumpkind&ExportType::XMLbase64)
     {
         P.xmlout->startTS(t);
-        P.xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::base64);
-        P.xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::base64);
+        if (P.dumplist & ExportData::POSITION) P.xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::base64);
+        if (P.dumplist & ExportData::VELOCITY) P.xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::base64);
+        if (P.dumplist & ExportData::OMEGA)    P.xmlout->writeArray("Omega", &Omega, ArrayType::particles, EncodingType::base64);
+        if (P.dumplist & ExportData::OMEGAMAG)
+        {
+            v1d OmegaMag(N,0) ; for (int p=0 ; p<N ; p++) OmegaMag[p]=Tools::skewnorm(Omega[p]) ; 
+            //P.xmlout->writeArray("OmegaMag", &OmegaMag, ArrayType::particles, EncodingType::base64);
+            printf("Omega Mag not implemented yet\n");
+        }
+        if (P.dumplist & ExportData::ORIENTATION) P.xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::base64); 
         P.xmlout->stopTS();
     }
     std::fill(PBCFlags.begin(), PBCFlags.end(), 0);

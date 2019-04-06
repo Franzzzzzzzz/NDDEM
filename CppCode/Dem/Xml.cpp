@@ -199,7 +199,7 @@ int XMLReader::read_boundaries (vector <vector <double>> & boundaries)
     boundaries.resize(2) ; 
     boundaries[0].resize(get<2>(results).size()/2) ; 
     boundaries[1].resize(get<2>(results).size()/2) ; 
-    for (int i=0 ; i<get<2>(results).size() ; i+=2)
+    for (unsigned int i=0 ; i<get<2>(results).size() ; i+=2)
     {
         boundaries[0][i/2] = get<2>(results)[i] ;
         boundaries[1][i/2] = get<2>(results)[i+1] ; 

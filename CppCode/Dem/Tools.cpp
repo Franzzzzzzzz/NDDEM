@@ -82,7 +82,7 @@ void Tools::savecsv (char path[], cv2d & A)
  fclose(out) ;
 }
 //=====================================
-void Tools::savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data)
+void Tools::savevtk (char path[], Parameters & P, cv2d & X, vector <TensorInfos> data)
 {
  FILE *out ; static bool warn = false ;
 
@@ -101,7 +101,7 @@ void Tools::savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data)
  fprintf(out, "VERTICES %ld %ld\n", X.size(), 2*X.size()) ;
  for (uint i=0 ; i<X.size() ; i++) fprintf(out, "1 %d\n", i) ;
 
- fprintf(out, "\nPOINT_DATA %ld", (*data.data).size()) ;
+ fprintf(out, "\nPOINT_DATA %ld", X.size()) ;
 
  for (uint j=3 ; j<X[0].size() ; j++)
  {
@@ -119,30 +119,33 @@ void Tools::savevtk (char path[], Parameters & P, cv2d & X, TensorInfos data)
    else fprintf(out, "%g ", sqrt(value)) ;
  }
 
- switch (data.order) {
-   case TensorType::SCALAR:  fprintf(out, "\nSCALARS %s double 1 \nLOOKUP_TABLE default \n", data.name.c_str()) ;//scalar
-            for (uint i=0 ; i<(*data.data).size() ; i++)
-              fprintf(out, "%g ", (*data.data)[i][0]) ;
+ for (auto v : data)
+ {
+ switch (v.order) {
+   case TensorType::SCALAR:  fprintf(out, "\nSCALARS %s double 1 \nLOOKUP_TABLE default \n", v.name.c_str()) ;//scalar
+            for (uint i=0 ; i<(*v.data).size() ; i++)
+              fprintf(out, "%g ", (*v.data)[i][0]) ;
             break ;
-   case TensorType::VECTOR:  fprintf(out, "\nVECTORS %s double \n", data.name.c_str()) ;//vector
-            for (auto i : (*data.data))
+   case TensorType::VECTOR:  fprintf(out, "\nVECTORS %s double \n", v.name.c_str()) ;//vector
+            for (auto i : (*v.data))
               fprintf(out, "%g %g %g\n", i[0], i[1], i[2]) ;
             break ;
-   case TensorType::TENSOR:  fprintf(out, "\nTENSORS %s double \n", data.name.c_str()) ;//tensor
-            for (auto i : (*data.data))
+   case TensorType::TENSOR:  fprintf(out, "\nTENSORS %s double \n", v.name.c_str()) ;//tensor
+            for (auto i : (*v.data))
               fprintf(out, "%g %g %g %g %g %g %g %g %g\n", i[0], i[1], i[2], i[d], i[d+1], i[d+2], i[2*d], i[2*d+1], i[2*d+2]) ;
             break ;
-   case TensorType::SYMTENSOR:  fprintf(out, "\nTENSORS %ssym double \n", data.name.c_str()) ;//tensor
-            for (auto i : (*data.data))
+   case TensorType::SYMTENSOR:  fprintf(out, "\nTENSORS %ssym double \n", v.name.c_str()) ;//tensor
+            for (auto i : (*v.data))
               fprintf(out, "%g %g %g %g %g %g %g %g %g\n", i[0], i[1], i[2], i[1], i[d], i[d+1], i[2], i[d+1], i[2*d-1]) ;
             break ;
-   case TensorType::SKEWTENSOR:  fprintf(out, "\nTENSORS %sskew double \n", data.name.c_str()) ;//tensor
-             for (v1d i : (*data.data))
+   case TensorType::SKEWTENSOR:  fprintf(out, "\nTENSORS %sskew double \n", v.name.c_str()) ;//tensor
+             for (v1d i : (*v.data))
                fprintf(out, "%g %g %g %g %g %g %g %g %g\n", 0.0, i[0], i[1], -i[0], 0.0, i[d-1], -i[1], -i[d-1], 0.0) ;
             break ;
    default: break ; /*fprintf(out, "\nPOINT_DATA %ld\nSCALARS %s double 1 \nLOOKUP_TABLE default \n",(*data.data).size(), data.name.c_str()) ;//scalar norm
               for (uint i=0 ; i<(*data.data).size() ; i++)
                  fprintf(out, "%g ", Tools::norm((*data.data)[i])) ;*/
+ }
  }
 
 

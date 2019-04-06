@@ -189,6 +189,22 @@ else if (!strcmp(line, "set"))
      else if (word=="XMLbase64") dumpkind |= ExportType::XMLbase64 ;
      else if (word=="CSVA") dumpkind |= ExportType::CSVA ;
  }
+ else if (!strcmp(line, "dumplist"))
+ {
+  int nlst ;
+  in >> nlst ; 
+  for (int n=0 ; n<nlst ; n++)
+  {
+      string word ; 
+      in >> word ; 
+      if (word=="Position") dumplist |= ExportData::POSITION ; 
+      else if (word =="Velocity") dumplist |= ExportData::VELOCITY ; 
+      else if (word =="Omega") dumplist |= ExportData::OMEGA ; 
+      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ; 
+      else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ; 
+      else printf("Unknown asked data %s\n", word.c_str()) ; 
+  }
+ }
  else if (!strcmp(line, "tinfo")) in>>tinfo ;
  else if (!strcmp(line, "dt")) in>>dt ;
  else printf("[Input] Unknown parameter to set\n") ;
