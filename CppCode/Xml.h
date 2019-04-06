@@ -70,7 +70,7 @@ public:
     XMLReader(string path): XMLReader_base(path) {tags=gettag() ; if (tags.first!="demnd") printf("ERR:unexpected first entry (should be demnd)\n") ;
         cout << "File date: "<< tags.second["date"]<< "\nInput file: " << tags.second["input"] <<"\nDimensions: "<< tags.second["dimensions"] <<"\n" ;
     };
-    int read_boundaries (vector <double> &boundaries) ; 
+    int read_boundaries (vector <vector <double>> &boundaries) ; 
     int read_radius (vector <double> &radius) ; 
     int read_nextts(vector<string> &names, vector<vector<vector<double>>> & data) ;
     int decodebase64f (istream &in, vector<float>& val) ;

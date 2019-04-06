@@ -192,11 +192,18 @@ string XMLReader_base::getcontent()
     return res ;
 }
 //============================================================
-int XMLReader::read_boundaries (vector <double > & boundaries)
+int XMLReader::read_boundaries (vector <vector <double>> & boundaries)
 {
     auto results = gettagdata() ;
     if (get<0>(results) != "boundaries") {printf("Wrong tag order, returning") ; return 1; }
-    boundaries = get<2>(results) ; 
+    boundaries.resize(2) ; 
+    boundaries[0].resize(get<2>(results).size()/2) ; 
+    boundaries[1].resize(get<2>(results).size()/2) ; 
+    for (int i=0 ; i<get<2>(results).size() ; i+=2)
+    {
+        boundaries[0][i/2] = get<2>(results)[i] ;
+        boundaries[1][i/2] = get<2>(results)[i+1] ; 
+    }
     return 0 ; 
 }
 //-------------------------------------------------------------

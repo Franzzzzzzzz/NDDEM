@@ -37,6 +37,7 @@ struct Field {
 /// Data structure handling point data and contact data
 struct Data {
 public:
+    Data () : mass(NULL), Imom(NULL), id1(NULL), id2(NULL) {}
 int N ;
 double * mass, *Imom ; // Scalars
 vector <double *> pos, vel, omega ; //Vectors
