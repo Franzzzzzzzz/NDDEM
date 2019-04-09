@@ -6,8 +6,8 @@ struct Param {
   int skipT=0 ; 
   int maxT = 100 ; 
   double rho=1 ; 
-  vector <string> flags = {"RHO", "VAVG"} ; 
-  vector <int> boxes= {5,5,5,5} ;
+  vector <string> flags = {"RHO"} ; 
+  vector <int> boxes= {5,5,5} ;
   vector <vector <double> > boundaries ;
   vector <double> radius ; 
   string save="" ; 
@@ -24,9 +24,12 @@ int main (int argc, char * argv[])
  struct Data D ; 
  // Extract path (last slash) for saving 
  
+ int res, t ;
  XMLReader XML(P.dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ; 
  XML.read_boundaries(P.boundaries) ; 
+ P.boundaries[1][0] = 5 ;
+ dispvector(P.boundaries) ;
  XML.read_radius (P.radius) ;
  D.N = P.radius.size() ; 
  
@@ -51,29 +54,32 @@ int main (int argc, char * argv[])
  vector <string> names ; vector<vector<vector<double>>> data ;
  for (int t=0 ; t<P.maxT ; t++)
  {
-  XML.read_nextts(names, data) ;   
+  res = XML.read_nextts(names, data) ;   
+  if (res!=0) break ; 
   C.cT++ ; 
   
   int delta=find(names.begin(), names.end(), "Position")-names.begin() ; 
   if (D.pos.size()==0) {D.pos.resize(d) ; for (auto & v:D.pos) {v=(double*) (malloc (sizeof(double)*D.N)) ; }}
   for (int j=0 ; j<D.N ; j++) for (int k=0 ;k<d ; k++) D.pos[k][j] = data[delta][j][k] ;
   
-  delta=find(names.begin(), names.end(), "Velocity")-names.begin() ; 
+  /*delta=find(names.begin(), names.end(), "Velocity")-names.begin() ; 
   if (delta!=(names.end()-names.begin()))
   {
     if (D.vel.size()==0) {D.vel.resize(d) ; for (auto & v:D.vel) {v=(double*) (malloc (sizeof(double)*D.N)) ; } }
     for (int j=0 ; j<D.N ; j++) for (int k=0 ;k<d ; k++) D.vel[k][j] = data[delta][j][k] ;
-  }
+  }*/
   
  printf("D"); fflush(stdout) ; 
   C.pass_1() ; 
-  C.compute_fluc_vel() ; 
-  C.compute_fluc_rot() ;
-  C.pass_2() ;
-  C.pass_3() ;
+  //C.compute_fluc_vel() ; 
+  //C.compute_fluc_rot() ;
+  //C.pass_2() ;
+  //C.pass_3() ;
+  
+ printf("%d ", t) ; 
  }
  
- 
+ printf("%d ", t) ; 
  
  
  

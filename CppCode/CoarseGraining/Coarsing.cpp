@@ -621,6 +621,92 @@ int Coarsing::write_vtk(string sout)
   fclose(out) ; 
   }
 }
+//-------------------------------------------------------
+int Coarsing ::write_NrrdIO (string path)
+{
+#ifdef NRRDIO
+    double * outdata ; 
+    int dimtime=d+2 ; 
+    
+    Nrrd *nval;
+    auto nio = nrrdIoStateNew();
+    nrrdIoStateEncodingSet(nio, nrrdEncodingAscii) ; //Change to nrrdEncodingRaw for binary encoding
+    nval = nrrdNew();
+    
+    // Header infos
+    vector <size_t> dimensions (3+d, 0) ; 
+    for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ; 
+    dimensions[dimtime] = Time ; 
+    
+    vector <int> nrrdkind (3+d, nrrdKindSpace) ; 
+    nrrdkind[0]=nrrdkind[1]= nrrdKindVector ; 
+    nrrdkind[dimtime]=nrrdKindTime ; 
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoKind, nrrdkind.data() );
+    
+    vector <double> nrrdmin(3+d,0), nrrdmax(3+d,0), nrrdspacing(3+d,0) ; 
+    for (int dd=0 ; dd<d ; dd++)
+    {
+        nrrdmin[dd+2]=box[0][dd] ; nrrdmax[dd+2]=box[1][dd] ; 
+        nrrdspacing[dd+2]=dx[dd] ; 
+    }
+    nrrdmin[0]=nrrdmin[1]=nrrdmax[0]=nrrdmax[1]=nrrdspacing[0]=nrrdspacing[1]=AIR_NAN ; 
+    nrrdmin[dimtime]=nrrdmax[dimtime]=nrrdspacing[dimtime] ; 
+    
+    char ** labels;
+    labels=(char **) malloc(sizeof(char *) * (d+3)) ; 
+    for (int dd=0 ; dd<d ; dd++)
+    {
+        labels[dd+2]=(char *) malloc(sizeof(char) * (1+d/10+1+1)) ; 
+        sprintf(labels[dd+2], "x%d", dd) ; 
+    }
+    labels[0]=(char *) malloc(sizeof(char) * (15)) ; sprintf(labels[0], "TensorialDim1") ; 
+    labels[1]=(char *) malloc(sizeof(char) * (15)) ; sprintf(labels[1], "TensorialDim2") ;
+    labels[dimtime]=(char *) malloc(sizeof(char) * (5 )) ; sprintf(labels[dimtime], "Time") ; 
+    
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoLabel, labels);
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMin, nrrdmin.data());
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMax, nrrdmax.data());
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoSpacing, nrrdspacing.data());
+    
+    for (int f=0 ; f<Fidx.size() ; f++)
+    {
+      if (Fidx[f]<0) continue ; 
+      
+      
+    // Data are goind fast to slow in NrrdIO ... so probably need some rewrite ...
+      switch (Ftype[f])
+      {
+        case 1: dimensions[0]=dimensions[1]=1 ;  //Scalar
+                outdata=(double *) malloc(sizeof(double) * 1 * Npt * Time) ; 
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++) 
+                        outdata[t*Npt+i]=CGP[i].fields[t][Fidx[f]] ; 
+              break ;
+        case 2: dimensions[0]=d ; dimensions[1]=1 ; // Vector
+                outdata=(double *) malloc(sizeof(double) * d * Npt * Time) ; 
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++) 
+                        for (int j=0 ; j<d ; j++)
+                            outdata[t*Npt*d + i*d +j]=CGP[i].fields[t][Fidx[f+j]] ; 
+              break ;
+        case 3: dimensions[0]=dimensions[1]=d ; //Tensor
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++) 
+                        for (int j=0 ; j<d*d ; j++)
+                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[i].fields[t][Fidx[f+j]] ; // j/d*d!=j because of integer division
+                outdata=(double *) malloc(sizeof(double) * d*d * Npt * Time) ; 
+              break ;
+        default: printf("ERR: this should never happen. \n") ; 
+      }
+      
+      nrrdWrap_nva(nval, outdata, nrrdTypeDouble, d+3, dimensions.data());
+      string fullpath ; 
+      fullpath = path + Fname[f] + ".nrrd" ; 
+      nrrdSave(fullpath.c_str(), nval, nio);
+      free(outdata) ; 
+    }
+#endif
+}
 
 
 //------------------------------------------

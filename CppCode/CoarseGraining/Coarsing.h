@@ -8,6 +8,10 @@
 #include <netcdf.h>
 #endif
 
+#ifdef NRRDIO
+#include "NrrdIO-1.11.0-src/NrrdIO.h"
+#endif
+
 using namespace std ; 
 
 //=========================================================
@@ -130,5 +134,6 @@ public :
     int mean_time() ;
     int write_vtk(string sout) ; 
     int write_netCDF (string sout) ;
+    int write_NrrdIO (string path) ; 
 } ; 
 

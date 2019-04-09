@@ -222,6 +222,7 @@ int XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>>
  int n=0 ;
  auto a=gettag() ;
  if (a.first != "timestep") {printf("ERR: not the right XML element (%s instead of timestep)\n", a.first.c_str()) ; return 1 ; }
+ printf("%s ", a.second["ts"].c_str()) ; 
  while (a.first !="/timestep")
  {
     a=gettag() ;

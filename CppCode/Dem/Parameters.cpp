@@ -69,7 +69,7 @@ void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
   }
 
   if ((dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
-    xmlout= new XMLWriter(Directory+".xml") ;
+    xmlout= new XMLWriter(Directory+"/"+Directory+".xml") ;
 }
 //-------------------------------------------------
 void Parameters::check_events(float time, v2d & X, v2d & V, v2d & Omega)
