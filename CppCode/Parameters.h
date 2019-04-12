@@ -33,7 +33,8 @@ public :
         Mu(0.5),        // Friction coefficient
         skin(1.0), skinsqr(1.0),      // Skin size (for verlet list optimisation)
         dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
-        Directory ("Output")
+        Directory ("Output"),
+        orientationtracking(true)
         {
          reset_ND(NN,dd) ;
         }
@@ -58,6 +59,7 @@ public :
     vector <bool> Frozen ;
     vector < vector <double> > Boundaries ;
     string Directory ;
+    bool orientationtracking ;
 
     map<float, string> events ;
 

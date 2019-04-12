@@ -177,6 +177,7 @@ else if (!strcmp(line, "set"))
  else if (!strcmp(line, "Mu")) in>>Mu ;
  else if (!strcmp(line, "T")) in>>T ;
  else if (!strcmp(line, "tdump")) in>>tdump ;
+ else if (!strcmp(line, "orientationtracking")) in >> orientationtracking ; 
  else if (!strcmp(line, "skin")) {in >> skin ; if (skin<r[0]) {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; } skinsqr=skin*skin ; }
  else if (!strcmp(line, "dumpkind"))
  {

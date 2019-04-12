@@ -1,7 +1,7 @@
 #include "DEMND.h"
 #include <signal.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 2
+#define OMP_NUM_THREADS 1
 
 uint Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
@@ -113,25 +113,23 @@ int main (int argc, char *argv[])
     Tools::matmult(tmpterm2, tmpSUM, A[i]) ;
     for (int dd=0 ; dd<d *d ; dd++)
         A[i][dd] += tmpterm1[dd]*dt + tmpterm2[dd] *dt*dt/2. ;*/
-    // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
-    Tools::skewexpand(tmpO, Omega[i]) ;
-    Tools::matmult(tmpterm1, tmpO, A[i]) ;
-    /*if (ti==50000)
-    {
-      printf("\n\n\n") ;
-      dispvector(Omega[i]); printf("|") ; dispvector(tmpO) ; printf("|") ; dispvector(A[i]) ; printf("|"); dispvector(tmpterm1) ;  printf("\n") ;
 
-      printf("\n\n\n") ;
-    }*/
-    for (int dd=0 ; dd<d*d ; dd++)
-      A[i][dd] += tmpterm1[dd] * dt ;
-    Tools::orthonormalise(A[i]) ;
+    // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
+    if (P.orientationtracking)
+    {
+      Tools::skewexpand(tmpO, Omega[i]) ;
+      Tools::matmult(tmpterm1, tmpO, A[i]) ;
+      for (int dd=0 ; dd<d*d ; dd++)
+        A[i][dd] += tmpterm1[dd] * dt ;
+      Tools::orthonormalise(A[i]) ;
+    }
 
     P.perform_PBC(X[i], PBCFlags[i]) ;
 
     // Find ghosts
     Ghost[i]=0 ; Ghost_dir[i]=0 ;
     u_int32_t mask=1 ;
+
     for (int j=0 ; j<d ; j++, mask<<=1)
     {
      if (P.Boundaries[j][3] != 0) continue ;
