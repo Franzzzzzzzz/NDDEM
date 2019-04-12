@@ -1,0 +1,16 @@
+NRRD0003
+# Complete NRRD file format specification at:
+# http://teem.sourceforge.net/nrrd/format.html
+type: float
+dimension: 4
+sizes: 2 3 4 1
+spacings: 0.10000000000000001 0.5 1 nan
+axis mins: 2.25 1 1.5 nan
+axis maxs: 1 2 3 nan
+kinds: space space space vector
+labels: "x" "y" "z" "nnn"
+encoding: ASCII
+
+0.1 0.2 0.30000001 0.40000001 0.5 0.60000002 0.69999999 0.80000001
+0.89999998 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2 2.0999999 2.2 2.3
+2.4000001

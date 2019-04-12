@@ -6,10 +6,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
 		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
+        <style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
 	</head>
 	<body>
 
 		<script src="node_modules/three/build/three.js"></script>
+        <script src="node_modules/three/examples/js/WebGL.js"></script>
 		<script src="node_modules/three/examples/js/vr/WebVR.js"></script>
         <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
         <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
@@ -20,32 +25,29 @@
         <script src="js/datguivr.js"></script>
         <script>
             // viewerType = "VR";
-            viewerType = "anaglyph";
-            // viewerType = "keyboard";
+            // viewerType = "anaglyph";
+            viewerType = "keyboard";
 
-            // fname = "Samples/D3/";
-            // inname = "in.test7adimD3";
 
+            // fname = "Samples/D1/";
+            // fname = "Samples/D2/";
+            fname = "Samples/D3/";
             // fname = "Samples/D4/";
-            // inname = "in.test7adimD4";
-
-            fname = "Samples/D5/";
-            inname = "in.test7adimD5";
-
+            // fname = "Samples/D5/";
             // fname = "Samples/D6/";
-            // inname = "in.test7adimD6";
-
             // fname = "Samples/D7/";
-            // inname = "in.test7adimD7";
-
+            quality = 5
 
             const urlParams = new URLSearchParams(window.location.search);
             if ( urlParams.has('viewerType') ) { viewerType = urlParams.get('viewerType'); };
             if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
-            if ( urlParams.has('inname') ) { inname = urlParams.get('inname'); };
             if ( urlParams.has('autoplay') ) { autoplay = urlParams.get('autoplay'); };
+            if ( urlParams.has('rate') ) { rate = urlParams.get('rate'); };
             if ( urlParams.has('find_particle') ) { find_particle = urlParams.get('find_particle'); };
             if ( urlParams.has('rotations') ) { rotations = urlParams.get('rotations'); };
+            if ( urlParams.has('catch_particle') ) { catch_particle = urlParams.get('catch_particle'); };
+            if ( urlParams.has('shadows') ) { shadows = urlParams.get('shadows'); };
+            if ( urlParams.has('quality') ) { quality = urlParams.get('quality'); };
         </script>
         <script src="js/nddem.js"></script>
 
