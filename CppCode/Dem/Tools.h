@@ -54,6 +54,7 @@ static int savetxt(char path[], const v2d & table, char header[]) ;
 static void unitvec (vector <double> & v, uint d, uint n) ;
 static v1d unitvec (int n) {v1d res (d,0) ; res[n]=1 ; return res ; }
 static double norm (const vector <double> & a) {double res=0 ; for (uint i=0 ; i<a.size() ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; }
+static   void norm (v1d & res, cv2d & a) {for (uint i=0 ; i<a.size() ; i++) res[i] = norm(a[i]) ; }
 static double normdiff (cv1d & a, cv1d & b) {double res=0 ; for (uint i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; }
 static double normsq (const vector <double> & a) {double res=0 ; for (uint i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; }
 static double normdiffsq (cv1d & a, cv1d & b) {double res=0 ; for (uint i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (res) ; }
@@ -62,14 +63,14 @@ static double skewnorm (cv1d & a) {double res=0 ; for (uint i=0 ; i<d*(d-1)/2 ; 
 static double skewnormsq (cv1d & a) {double res=0 ; for (uint i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (res) ; }
 static double dot (cv1d & a, cv1d & b) {double res=0; for (uint i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; }
 static v1f vsqrt (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=sqrt(a[i]) ; return b ; }
-static v1f vsq (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=a[i]*a[i] ; return b ; } 
+static v1f vsq (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=a[i]*a[i] ; return b ; }
 
 
 static v1d dbl2vec (double v) {v1d res (1,v) ; return res ; }
 static void setzero(v2d & a) {for (uint i=0 ; i<a.size() ; i++) for (uint j=0 ; j<a[0].size() ; j++) a[i][j]=0 ; }
 static void setzero(v1d & a) {for (uint i=0 ; i<a.size() ; i++) a[i]=0 ; }
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; }
-static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags) ;
+static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag) ;
 static void savecsv (char path[], cv2d & A) ;
 static void savevtk (char path[], Parameters & P, cv2d & X, vector <TensorInfos> data) ;
 

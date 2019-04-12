@@ -49,18 +49,18 @@ return 0 ;
 }
 
 //=====================================
-void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags)
+void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag)
 {
  FILE *out ; int dim ;
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
  dim = X[0].size() ;
  for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
- fprintf(out, "R,PBCFlags\n") ;
+ fprintf(out, "R,PBCFlags, Vmag, Omegamag\n") ;
  for (uint i=0 ; i<X.size() ; i++)
  {
   for (int j=0 ; j<dim ; j++)
     fprintf(out, "%.6g,", X[i][j]) ;
-  fprintf(out, "%g,%d\n", r[i],PBCFlags[i]) ;
+  fprintf(out, "%g,%d,%g,%g\n", r[i],PBCFlags[i], Vmag[i], OmegaMag[i]) ;
  }
  fclose(out) ;
 }
@@ -321,7 +321,7 @@ v1d Tools::matmult (cv1d &A, cv1d &B)
 //-------------------------------
 void Tools::matmult (v1d & r, cv1d &A, cv1d &B)
 {
-    setzero(r) ; 
+    setzero(r) ;
     for (uint i=0 ; i<d; i++)
         for (uint j=0 ; j<d ; j++)
             for (uint k=0 ; k<d ; k++)
@@ -424,7 +424,7 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
     for (uint j=0 ; j<d-1 ; j++)
     {
        phi[j] = acos(x[j]/sqrt(rsqr)) ;
-       if (isnan(phi[j])) phi[j]=acos(sgn(x[j])) ; 
+       if (isnan(phi[j])) phi[j]=acos(sgn(x[j])) ;
        rsqr -= x[j]*x[j] ;
     }
     //printf("%g %g %g | %g | %g %g \n ", x[0], x[1], x[2], normsq(x), phi[0], phi[1]) ;
