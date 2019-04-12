@@ -1,6 +1,6 @@
 #CC=/opt/local/bin/g++-mp-6 # FG
 #CC=g++-8 # BM
-CC=g++
+#CC=g++
 
 # Basic compilation
 
@@ -17,7 +17,7 @@ FLTO=
 
 all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs
 all: $(SOURCES) $(EXECUTABLE)
-all: LIBS+=-lnetcdf -fopenmp -lstdc++fs
+all: LIBS+= -fopenmp -lstdc++fs #-lnetcdf
 all:
 	@$(CC) -o xml2vtk xml2vtk.cpp Xml.cpp -lstdc++fs
 #info:#

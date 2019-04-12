@@ -1,3 +1,7 @@
+CC=/opt/local/bin/g++-mp-6 # FG
+#CC=g++-8 # BM
+#CC=g++
+
 dem       := Dem
 texturing := Texturing
 coarsening := CoarseGraining
@@ -12,7 +16,8 @@ clean :
 	rm bin/*
 
 $(results) $(alltarget):
-	$(MAKE) all --directory=$@
-	find $(alltarget) -type f -executable -exec cp {} bin \;
+	$(MAKE) all CC=$(CC) --directory=$@
+	#find $(alltarget) -type f -perm -u=x -exec cp {} bin \;
+	cp Dem/DEMND Texturing/Texturing CoarseGraining/IO ./bin
 
 $(results): $(alltarget)
