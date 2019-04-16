@@ -55,7 +55,7 @@ void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & 
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
  dim = X[0].size() ;
  for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
- fprintf(out, "R,PBCFlags, Vmag, Omegamag\n") ;
+ fprintf(out, "R,PBCFlags,Vmag,Omegamag\n") ;
  for (uint i=0 ; i<X.size() ; i++)
  {
   for (int j=0 ; j<dim ; j++)

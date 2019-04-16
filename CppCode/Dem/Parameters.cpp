@@ -68,8 +68,9 @@ void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
     interpret_command(in, X, V, Omega) ;
   }
 
-  if ((dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
-    xmlout= new XMLWriter(Directory+"/"+Directory+".xml") ;
+  for (auto v : dumps)
+    if (v.first==ExportType::XML || v.first==ExportType::XMLbase64)
+      xmlout= new XMLWriter(Directory+"/"+Directory+".xml") ;
 }
 //-------------------------------------------------
 void Parameters::check_events(float time, v2d & X, v2d & V, v2d & Omega)
@@ -177,9 +178,41 @@ else if (!strcmp(line, "set"))
  else if (!strcmp(line, "Mu")) in>>Mu ;
  else if (!strcmp(line, "T")) in>>T ;
  else if (!strcmp(line, "tdump")) in>>tdump ;
- else if (!strcmp(line, "orientationtracking")) in >> orientationtracking ; 
+ else if (!strcmp(line, "orientationtracking")) in >> orientationtracking ;
  else if (!strcmp(line, "skin")) {in >> skin ; if (skin<r[0]) {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; } skinsqr=skin*skin ; }
- else if (!strcmp(line, "dumpkind"))
+ else if (!strcmp(line, "dumps"))
+ {
+   string word ;
+   in>>word ;
+   ExportType dumpkind=ExportType::NONE ;
+   if (word=="CSV") dumpkind = ExportType::CSV ;
+   else if (word=="VTK") dumpkind = ExportType::VTK ;
+   else if (word=="NETCDFF") dumpkind = ExportType::NETCDFF ;
+   else if (word=="XML") dumpkind = ExportType::XML ;
+   else if (word=="XMLbase64") dumpkind = ExportType::XMLbase64 ;
+   else if (word=="CSVA") dumpkind = ExportType::CSVA ;
+
+   in>>word ;
+   if (word != "with") printf("ERR: expecting keyword 'with'\n") ;
+   int nbparam ;
+   ExportData dumplist = ExportData::NONE ;
+   in>>nbparam ;
+   for (int i=0 ; i<nbparam ; i++)
+   {
+     in>>word ;
+     if (word=="Position") dumplist |= ExportData::POSITION ;
+     else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
+     else if (word =="Omega") dumplist |= ExportData::OMEGA ;
+     else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
+     else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
+     else printf("Unknown asked data %s\n", word.c_str()) ;
+   }
+
+   dumps.push_back(make_pair(dumpkind,dumplist)) ;
+
+ }
+
+ /*else if (!strcmp(line, "dumpkind"))
  {
      string word ;
      in>>word ;
@@ -193,19 +226,19 @@ else if (!strcmp(line, "set"))
  else if (!strcmp(line, "dumplist"))
  {
   int nlst ;
-  in >> nlst ; 
+  in >> nlst ;
   for (int n=0 ; n<nlst ; n++)
   {
-      string word ; 
-      in >> word ; 
-      if (word=="Position") dumplist |= ExportData::POSITION ; 
-      else if (word =="Velocity") dumplist |= ExportData::VELOCITY ; 
-      else if (word =="Omega") dumplist |= ExportData::OMEGA ; 
-      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ; 
-      else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ; 
-      else printf("Unknown asked data %s\n", word.c_str()) ; 
+      string word ;
+      in >> word ;
+      if (word=="Position") dumplist |= ExportData::POSITION ;
+      else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
+      else if (word =="Omega") dumplist |= ExportData::OMEGA ;
+      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
+      else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
+      else printf("Unknown asked data %s\n", word.c_str()) ;
   }
- }
+}*/
  else if (!strcmp(line, "tinfo")) in>>tinfo ;
  else if (!strcmp(line, "dt")) in>>dt ;
  else printf("[Input] Unknown parameter to set\n") ;
@@ -422,17 +455,91 @@ void Parameters::xml_header ()
    xmlout->closebranch() ;
 }
 
-
-
-
 //-----------------------------------------
 void Parameters::quit_cleanly()
 {
-  if ((dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
-    xmlout->emergencyclose() ;
+  for (auto v : dumps)
+    if ((v.first == ExportType::XML) || (v.first == ExportType::XMLbase64))
+      xmlout->emergencyclose() ;
 }
 void Parameters::finalise()
 {
-  if ( (dumpkind&ExportType::XML) || (dumpkind&ExportType::XMLbase64))
-    xmlout->close() ;
+  for (auto v : dumps)
+    if ((v.first == ExportType::XML) || (v.first == ExportType::XMLbase64))
+      xmlout->close() ;
+}
+
+
+//========================================
+int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags)
+{
+  static bool xmlstarted=false ;
+
+  for (auto v : dumps)
+  {
+    if (v.first==ExportType::CSV)
+    {
+      char path[500] ; sprintf(path, "%s/dump-%05d.csv", Directory.c_str(), ti) ;
+      Tools::norm(Vmag, V) ; Tools::norm(OmegaMag, Omega) ;
+      Tools::savecsv(path, X, r, PBCFlags, Vmag, OmegaMag) ; //These are always written for CSV, independent of the dumplist
+      if (v.second & ExportData::ORIENTATION)
+      {
+        char path[500] ; sprintf(path, "%s/dumpA-%05d.csv", Directory.c_str(), ti) ;
+        Tools::savecsv(path, A) ;
+      }
+    }
+
+    if (v.first == ExportType::VTK)
+    {
+        char path[500] ; sprintf(path, "%s/dump-%05d.vtk", Directory.c_str(), ti) ;
+        vector <TensorInfos> val;
+        if (v.second & ExportData::VELOCITY) val.push_back({"Velocity", TensorType::VECTOR, &V}) ;
+        if (v.second & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ;
+        if (v.second & ExportData::OMEGAMAG)  printf("OmegaMag not implemented in VTK") ;
+        if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
+        Tools::savevtk(path, *this, X, val) ;
+    }
+
+    if (v.first == ExportType::NETCDFF)
+          printf("WARN: netcdf writing haven't been tested and therefore is not plugged in\n") ;
+
+    if (v.first == ExportType::XML)
+    {
+      if (xmlstarted==false)
+      {
+        char path[500] ; sprintf(path, "%s/dump.xml", Directory.c_str()) ;
+        xmlout->header(d, path) ;
+        xml_header() ;
+        xmlstarted=true ;
+      }
+      xmlout->startTS(t);
+      if (v.second & ExportData::POSITION) xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::ascii);
+      if (v.second & ExportData::VELOCITY) xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::ascii);
+      if (v.second & ExportData::OMEGA)    xmlout->writeArray("Omega", &Omega, ArrayType::particles, EncodingType::ascii);
+      if (v.second & ExportData::OMEGAMAG)
+          printf("Omega Mag not implemented yet\n");
+      if (v.second & ExportData::ORIENTATION) xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::ascii);
+      xmlout->stopTS();
+    }
+
+    if (v.first == ExportType::XMLbase64)
+    {
+      if (xmlstarted==false)
+      {
+        char path[500] ; sprintf(path, "%s/dump.xml", Directory.c_str()) ;
+        xmlout->header(d, path) ;
+        xml_header() ;
+        xmlstarted=true ;
+      }
+      xmlout->startTS(t);
+      if (v.second & ExportData::POSITION) xmlout->writeArray("Position", &X, ArrayType::particles, EncodingType::base64);
+      if (v.second & ExportData::VELOCITY) xmlout->writeArray("Velocity", &V, ArrayType::particles, EncodingType::base64);
+      if (v.second & ExportData::OMEGA)    xmlout->writeArray("Omega", &Omega, ArrayType::particles, EncodingType::base64);
+      if (v.second & ExportData::OMEGAMAG)
+          printf("Omega Mag not implemented yet\n");
+      if (v.second & ExportData::ORIENTATION) xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::base64);
+      xmlout->stopTS();
+    }
+  }
+return 0 ;
 }

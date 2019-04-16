@@ -14,7 +14,7 @@
 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
-enum class ExportData {POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16} ; 
+enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16} ;
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
@@ -35,8 +35,8 @@ public :
         Gammat(0),      //Tangential damping
         Mu(0.5),        // Friction coefficient
         skin(1.0), skinsqr(1.0),      // Skin size (for verlet list optimisation)
-        dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
-        dumplist(ExportData::POSITION),
+        //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
+        //dumplist(ExportData::POSITION),
         Directory ("Output")
         {
          reset_ND(NN,dd) ;
@@ -57,8 +57,9 @@ public :
     double T ;
     double dt, rho, Kn, Kt, Gamman, Gammat, Mu ;
     double skin, skinsqr ;
-    ExportType dumpkind ;
-    ExportData dumplist ; 
+    vector <std::pair<ExportType,ExportData>> dumps ;
+    //ExportType dumpkind ;
+    //ExportData dumplist ;
     vector <double> r, m, I, g ;
     vector <bool> Frozen ;
     vector < vector <double> > Boundaries ;
@@ -85,6 +86,7 @@ public :
     void quit_cleanly() ;
     void finalise();
     void xml_header () ;
+    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags) ;
 
 
 // For Xml Writing
