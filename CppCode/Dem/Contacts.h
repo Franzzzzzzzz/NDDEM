@@ -22,12 +22,12 @@ public:
     Parameters *ptrP ;
     vector < double > Torquei,Torquej, vrel ;
 
-    void particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
-                              cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact) ;
-    void particle_wall     ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
+    void particle_particle (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
+                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ;
+    void particle_wall     ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                                  int j, int orient, cp & Contact) ;
-    void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
-                              cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
+    void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
+                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
         static vector <double> loc (d, 0) ;
         loc=Xj ;

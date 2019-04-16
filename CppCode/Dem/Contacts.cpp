@@ -18,8 +18,8 @@ Contacts::Contacts (Parameters &P) : d(P.d), N(P.N), dt(P.dt), Kn(P.Kn), Kt(P.Kt
 
 //--------------------------------------------------------------------------------------
 //---------------------- particle particle contact ----------------------------
-void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
-                                     cv1d & Xj, cv1d & Vj, cv1d Omegaj, double rj, cp & Contact)
+void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri,
+                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, cp & Contact)
 {
   contactlength=Contact.contactlength ;
 
@@ -74,7 +74,7 @@ void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
 }
 
 //---------------------- particle wall contact ----------------------------
-void Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d Omegai, double ri,
+void Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                                  int j, int orient, cp & Contact)
 {
   contactlength=Contact.contactlength ;

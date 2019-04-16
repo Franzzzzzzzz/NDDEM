@@ -1,6 +1,6 @@
 # Incline plane flow
-#directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D3
-directory OutputTest
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D3
+#directory OutputTest
 dimensions 3 125
 
 #set adimensional

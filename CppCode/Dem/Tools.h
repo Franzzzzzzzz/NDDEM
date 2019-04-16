@@ -16,22 +16,22 @@
 
 v1d operator* (v1d a, double b) ;
 v1f operator* (v1f a, float b) ;
-v1d operator* (v1d a, cv1d b)   ;
-v1f operator* (v1f a, cv1f b)  ;
+v1d operator* (v1d a, cv1d &b)   ;
+v1f operator* (v1f a, cv1f &b)  ;
 v1d operator+ (v1d a, double b) ;
-v1d operator+ (v1d a, cv1d b)   ;
-v1f operator+ (v1f a, cv1f b)   ;
+v1d operator+ (v1d a, cv1d &b)   ;
+v1f operator+ (v1f a, cv1f &b)   ;
 v1d operator- (v1d a, double b) ;
-v1d operator- (v1d a, cv1d b)   ;
-v1f operator- (v1f a, cv1f b)   ;
+v1d operator- (v1d a, cv1d &b)   ;
+v1f operator- (v1f a, cv1f &b)   ;
 v1d operator- (v1d a)           ;
 v1d operator/ (v1d a, double b) ;
-v1d & operator-= (v1d & a, cv1d b) ;
+v1d & operator-= (v1d & a, cv1d &b) ;
 v1d & operator*= (v1d & a, double b);
 v1f & operator*= (v1f & a, double b);
-v1d & operator+= (v1d & a, cv1d b) ;
-v1f & operator+= (v1f & a, cv1f b) ;
-v1f & operator/= (v1f & a, cv1f b) ;
+v1d & operator+= (v1d & a, cv1d &b) ;
+v1f & operator+= (v1f & a, cv1f &b) ;
+v1f & operator/= (v1f & a, cv1f &b) ;
 v1d & operator/= (v1d & a, double b) ;
 v1f & operator/= (v1f & a, double b) ;
 
