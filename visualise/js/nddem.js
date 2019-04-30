@@ -18,22 +18,28 @@ if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) 
 var axeslength, fontsize; // axis properties
 var VR_scale = 5.; // mapping from DEM units to VR units
 var find_particle = window.find_particle === 'true'; // show just the first particle in a unique colour
-var rotations = window.rotations === 'true'; // show rotations via texture mapping
-// rotations = true;
-var catch_particle = window.catch_particle === 'true'; // enable ability to catch particles
+var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
+// var catch_particle = window.catch_particle === 'true'; // enable ability to catch particles
 var quality, shadows;
+var cache = true;
 
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
 else { shadows = true; };
 if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
 else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
 
+var lut = new THREE.Lut( "cooltowarm", 512 ); // options are rainbow, cooltowarm and blackbody
+
 init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('POST', "http://localhost:8000/in?fname=" + window.fname + "&_="+ (new Date).getTime(), true);
-    // request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
+    if ( cache ) {
+        request.open('POST', "http://localhost:8000/in?fname=" + window.fname, true);
+    }
+    else {
+        request.open('POST', "http://localhost:8000/in?fname=" + window.fname + "&_="+ (new Date).getTime(), true);
+    };
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
@@ -82,6 +88,7 @@ function init() {
                     world[2].prev = 0.5;
                 }
                 build_world();
+                remove_everything(); // only runs on postMessage receive
                 animate();
             }
         }
@@ -92,8 +99,8 @@ function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
     scene = new THREE.Scene();
-    // scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
-    scene.background = new THREE.Color( 0xFFFFFF ); // white
+    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+    // scene.background = new THREE.Color( 0xFFFFFF ); // white
     make_camera();
     // make_walls();
     make_axes();
@@ -190,7 +197,7 @@ function add_controllers() {
         scene.add( controller1 );
         scene.add( controller2 );
 
-        if ( catch_particle ) {
+        if ( view_mode === 'catch_particle' ) {
             controller1.addEventListener( 'selectstart', onSelectStart );
             controller1.addEventListener( 'selectend', onSelectEnd );
             controller2.addEventListener( 'selectstart', onSelectStart );
@@ -201,7 +208,7 @@ function add_controllers() {
         aim_camera()
         console.log("VR mode loaded");
 
-        if ( catch_particle ) {
+        if ( view_mode === 'catch_particle' ) {
             var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
             var line = new THREE.Line( geometry );
@@ -518,6 +525,37 @@ function add_torus() {
 
 }
 
+function remove_everything() {
+    window.addEventListener("message", receiveMessage, false);
+    function receiveMessage(event) {
+        // console.log(particles);
+        // console.log(wristband);
+        // console.log(wristband1);
+        // remove all particles
+        for (i = particles.children.length; i = 0; i--) {
+            var object = particles.children[i];
+            object.geometry.dispose();
+            object.material.dispose();
+            if ( view_mode === 'rotations' ) { object.texture.dispose(); }
+        }
+        if ( N > 3) {
+            for (i = wristband.children.length; i = 0; i--) {
+                var object = controller1.children[i];
+                object.geometry.dispose();
+                object.material.dispose();
+            }
+        };
+        if ( N > 5 ) {
+            for (i = wristband1.children.length; i = 0; i--) {
+                var object = controller1.children[i];
+                object.geometry.dispose();
+                object.material.dispose();
+            }
+        }
+        renderer.dispose();
+    }
+}
+
 function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
     loader.load("http://localhost:8000/visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
@@ -526,7 +564,7 @@ function load_hyperspheres_VTK() {
 };
 
 function make_initial_spheres_CSV() {
-    if ( rotations ) {
+    if ( view_mode === 'rotations' ) {
         var arr = new Array();
         for ( i=0; i<N; i++ ) {
             if ( i < 3 ) { arr.push('NaN') }
@@ -542,10 +580,17 @@ function make_initial_spheres_CSV() {
         request.send(null);
         // request.onreadystatechange = function () {}
     };
-    Papa.parse("http://localhost:8000/" + window.fname + "dump-00000.csv" + "?_="+ (new Date).getTime(), {
+    if ( cache ) {
+        var filename = "http://localhost:8000/" + window.fname + "dump-00000.csv";
+    }
+    else {
+        var filename = "http://localhost:8000/" + window.fname + "dump-00000.csv" + "?_="+ (new Date).getTime();
+    }
+    Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
         header: true,
+        cache: cache,
         complete: function(results) {
             particles = new THREE.Group();
             scene.add( particles );
@@ -579,7 +624,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         var color = Math.random() * 0xffffff;
-                        if ( rotations ) {
+                        if ( view_mode === 'rotations' ) {
                             var texture = new THREE.TextureLoader().load("http://localhost:8000/" + window.fname + "Texture-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
@@ -616,7 +661,7 @@ function make_initial_spheres_CSV() {
 };
 
 function update_spheres_CSV(t) {
-    if ( rotations ) {
+    if ( view_mode === 'rotations' ) {
         var arr = new Array();
         for ( var i=0; i<N; i++ ) {
             if ( i < 3 ) { arr.push('NaN') }
@@ -633,9 +678,13 @@ function update_spheres_CSV(t) {
         request.onload = function() {
             var loader = new THREE.TextureLoader();
             for ( ii = 0; ii < particles.children.length; ii++ ) {
-                loader.load("http://localhost:8000/" + window.fname +
-                            "Texture-" + ii + ".png" +
-                            "?_="+ (new Date).getTime(),
+                if ( cache ) {
+                    var filename = "http://localhost:8000/" + window.fname + "Texture-" + ii + ".png";
+                }
+                else {
+                    var filename = "http://localhost:8000/" + window.fname + "Texture-" + ii + ".png" + "?_="+ (new Date).getTime();
+                }
+                loader.load(filename,
                             function( texture ) {
                                 var myRe = /-[0-9]+.png/g
                                 var res=myRe.exec(texture.image.currentSrc)
@@ -649,12 +698,17 @@ function update_spheres_CSV(t) {
         }
         request.send('');
     };
-    Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime(), { // definitely no caching
-    // Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv", {
+    if ( cache ) {
+        var filename = "http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv";
+    }
+    else {
+        var filename = "http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime();
+    }
+    Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
         header: true,
-        cache: true,
+        cache: cache,
         complete: function(results) {
             spheres = results.data;
             for (i = 0; i<spheres.length; i++) {
@@ -697,6 +751,14 @@ function update_spheres_CSV(t) {
                 else {
                     object.visible = true;
                     object.scale.set(R_draw,R_draw,R_draw);
+                    if ( view_mode === 'velocity' ) {
+                        lut.setMax(1.); // TODO: MOVE TO GUI
+                        object.material.color = lut.getColor(spheres[i].Vmag);
+                    }
+                    else if ( view_mode === 'rotation_rate' ) {
+                        lut.setMax(1.); // TODO: MOVE TO GUI
+                        object.material.color = lut.getColor(spheres[i].Omegamag);
+                    }
                 }
 
                 if ( N == 4 ) {
@@ -856,7 +918,7 @@ function animate() {
 };
 
 function render() {
-    if ( catch_particle ) {
+    if ( view_mode === 'catch_particle' ) {
         cleanIntersected();
         intersectObjects( controller1 );
         intersectObjects( controller2 );
