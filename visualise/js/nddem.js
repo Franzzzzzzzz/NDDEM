@@ -18,16 +18,17 @@ if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) 
 var axeslength, fontsize; // axis properties
 var VR_scale = 5.; // mapping from DEM units to VR units
 var find_particle = window.find_particle === 'true'; // show just the first particle in a unique colour
-var rotations = window.rotations === 'true'; // show rotations via texture mapping
-// rotations = true;
-var catch_particle = window.catch_particle === 'true'; // enable ability to catch particles
+var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows;
+var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
 else { shadows = true; };
 if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
 else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
 
+var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
+var arrow_material;
 init();
 
 function init() {
@@ -41,7 +42,9 @@ function init() {
             if (type.indexOf("text") !== 1) {
                 lines = request.responseText.split('\n');
                 for (i=0;i<lines.length;i++) {
-                    l = lines[i].split(' ')
+                    console.log(lines[i])
+                    line = lines[i].replace(/ {1,}/g," "); // remove multiple spaces
+                    l = line.split(' ')
                     if (l[0] == 'dimensions') {
                         N = parseInt(l[1]);
                         for (j=0;j<N;j++) {
@@ -82,6 +85,7 @@ function init() {
                     world[2].prev = 0.5;
                 }
                 build_world();
+                remove_everything(); // only runs on postMessage receive
                 animate();
             }
         }
@@ -92,8 +96,8 @@ function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
     scene = new THREE.Scene();
-    // scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
-    scene.background = new THREE.Color( 0xFFFFFF ); // white
+    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+    // scene.background = new THREE.Color( 0xFFFFFF ); // white
     make_camera();
     // make_walls();
     make_axes();
@@ -157,6 +161,12 @@ function add_gui() {
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
         gui.add( time, 'rate').min(0).max(1.0).name('Autoplay rate') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
+        if ( view_mode === 'velocity' ) {
+            gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
+        }
+        if ( view_mode === 'rotation_rate' ) {
+            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
+        }
         gui.open();
     }
     else {
@@ -190,7 +200,7 @@ function add_controllers() {
         scene.add( controller1 );
         scene.add( controller2 );
 
-        if ( catch_particle ) {
+        if ( view_mode === 'catch_particle' ) {
             controller1.addEventListener( 'selectstart', onSelectStart );
             controller1.addEventListener( 'selectend', onSelectEnd );
             controller2.addEventListener( 'selectstart', onSelectStart );
@@ -201,7 +211,7 @@ function add_controllers() {
         aim_camera()
         console.log("VR mode loaded");
 
-        if ( catch_particle ) {
+        if ( view_mode === 'catch_particle' ) {
             var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
             var line = new THREE.Line( geometry );
@@ -257,21 +267,22 @@ function make_axes() {
         axesHelper = new THREE.Group();
         axesLabels = new THREE.Group();
         // axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
-        // axesHelper.position.set(world[ref_dim.N_0])
+        // axesHelper.position.set(0,-2,-2);
+        // axesLabels.position.set(0,-2,-2);
         scene.add( axesHelper );
         scene.add( axesLabels );
 
         var arrow_body = new THREE.CylinderGeometry( thickness, thickness, axeslength, Math.pow(2,quality), Math.pow(2,quality) );
         var arrow_head = new THREE.CylinderGeometry( 0., 2.*thickness, 4*thickness, Math.pow(2,quality), Math.pow(2,quality) );
-        var arrow_material_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
-        var arrow_material_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-        var arrow_material_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
-        var arrow_x = new THREE.Mesh( arrow_body, arrow_material_x );
-        var arrow_y = new THREE.Mesh( arrow_body, arrow_material_y );
-        var arrow_z = new THREE.Mesh( arrow_body, arrow_material_z );
-        var arrow_head_x = new THREE.Mesh( arrow_head, arrow_material_x );
-        var arrow_head_y = new THREE.Mesh( arrow_head, arrow_material_y );
-        var arrow_head_z = new THREE.Mesh( arrow_head, arrow_material_z );
+        arrow_material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+        // var arrow_material_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+        // var arrow_material_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
+        var arrow_x = new THREE.Mesh( arrow_body, arrow_material );
+        var arrow_y = new THREE.Mesh( arrow_body, arrow_material );
+        var arrow_z = new THREE.Mesh( arrow_body, arrow_material );
+        var arrow_head_x = new THREE.Mesh( arrow_head, arrow_material );
+        var arrow_head_y = new THREE.Mesh( arrow_head, arrow_material );
+        var arrow_head_z = new THREE.Mesh( arrow_head, arrow_material );
 
         arrow_x.position.x = axeslength/2.;
         arrow_x.rotation.z = -Math.PI/2.;
@@ -323,7 +334,7 @@ function make_axes() {
     	loader.load( 'http://localhost:8000/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
     		var textGeo_x = new THREE.TextBufferGeometry( "x" + ref_dim.x, { font: font, size: fontsize, height: fontsize/2., } );
     		var textMaterial_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
-    		var mesh_x = new THREE.Mesh( textGeo_x, textMaterial_x );
+    		var mesh_x = new THREE.Mesh( textGeo_x, arrow_material );
     		mesh_x.position.x = axeslength;// - 1.5*fontsize;
             mesh_x.position.y = -0.3;
             mesh_x.position.z = fontsize/4.;
@@ -337,7 +348,7 @@ function make_axes() {
             if ( N > 1 ) {
                 var textGeo_y = new THREE.TextGeometry( "x" + ref_dim.y, { font: font, size: fontsize, height: fontsize/2., } );
         		var textMaterial_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-        		var mesh_y = new THREE.Mesh( textGeo_y, textMaterial_y );
+        		var mesh_y = new THREE.Mesh( textGeo_y, arrow_material );
                 mesh_y.position.x = 0.3;
                 mesh_y.position.y = axeslength;//-fontsize*1.5;
                 mesh_y.position.z = fontsize/4.;
@@ -348,7 +359,7 @@ function make_axes() {
             if ( N > 2 ) {
                 var textGeo_z = new THREE.TextGeometry( "x" + ref_dim.z, { font: font, size: fontsize, height: fontsize/2., } );
         		var textMaterial_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
-        		var mesh_z = new THREE.Mesh( textGeo_z, textMaterial_z );
+        		var mesh_z = new THREE.Mesh( textGeo_z, arrow_material );
                 mesh_z.position.x = 0.3;
                 mesh_z.position.y = fontsize/4.;
                 mesh_z.position.z = axeslength + 1.5*fontsize;
@@ -518,6 +529,37 @@ function add_torus() {
 
 }
 
+function remove_everything() {
+    window.addEventListener("message", receiveMessage, false);
+    function receiveMessage(event) {
+        console.log(particles);
+        console.log(wristband);
+        console.log(wristband1);
+        // remove all particles
+        for (i = particles.children.length; i = 0; i--) {
+            var object = particles.children[i];
+            object.geometry.dispose();
+            object.material.dispose();
+            if ( view_mode === 'rotations' ) { object.texture.dispose(); }
+        }
+        if ( N > 3) {
+            for (i = wristband.children.length; i = 0; i--) {
+                var object = controller1.children[i];
+                object.geometry.dispose();
+                object.material.dispose();
+            }
+        };
+        if ( N > 5 ) {
+            for (i = wristband1.children.length; i = 0; i--) {
+                var object = controller1.children[i];
+                object.geometry.dispose();
+                object.material.dispose();
+            }
+        }
+        renderer.dispose();
+    }
+}
+
 function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
     loader.load("http://localhost:8000/visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
@@ -526,7 +568,7 @@ function load_hyperspheres_VTK() {
 };
 
 function make_initial_spheres_CSV() {
-    if ( rotations ) {
+    if ( view_mode === 'rotations' ) {
         var arr = new Array();
         for ( i=0; i<N; i++ ) {
             if ( i < 3 ) { arr.push('NaN') }
@@ -579,7 +621,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         var color = Math.random() * 0xffffff;
-                        if ( rotations ) {
+                        if ( view_mode === 'rotations' ) {
                             var texture = new THREE.TextureLoader().load("http://localhost:8000/" + window.fname + "Texture-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
@@ -593,6 +635,7 @@ function make_initial_spheres_CSV() {
                     };
                 }
                 var object = new THREE.Mesh( geometry, material );
+
                 object.rotation.z = Math.PI/2.;
                 if ( shadows ) {
                     object.castShadow = true;
@@ -616,7 +659,7 @@ function make_initial_spheres_CSV() {
 };
 
 function update_spheres_CSV(t) {
-    if ( rotations ) {
+    if ( view_mode === 'rotations' ) {
         var arr = new Array();
         for ( var i=0; i<N; i++ ) {
             if ( i < 3 ) { arr.push('NaN') }
@@ -690,14 +733,24 @@ function update_spheres_CSV(t) {
                                              Math.pow( (world[5].cur - spheres[i].x5), 2) -
                                              Math.pow( (world[6].cur - spheres[i].x6), 2)
                                          ); // FIXME - IS THIS RIGHT?
-                 }
+                 };
                 if (isNaN(R_draw)) {
                     object.visible = false;
                 }
                 else {
                     object.visible = true;
                     object.scale.set(R_draw,R_draw,R_draw);
-                }
+                    if ( view_mode === 'velocity' ) {
+                        lut.setMin(0);
+                        lut.setMax(velocity.vmax);
+                        object.material.color = lut.getColor(spheres[i].Vmag);
+                    }
+                    else if ( view_mode === 'rotation_rate' ) {
+                        lut.setMin(0);
+                        lut.setMax(velocity.omegamax);
+                        object.material.color = lut.getColor(spheres[i].Omegamag);
+                    }
+                };
 
                 if ( N == 4 ) {
                     var object2 = wristband.children[i];
@@ -856,7 +909,7 @@ function animate() {
 };
 
 function render() {
-    if ( catch_particle ) {
+    if ( view_mode === 'catch_particle' ) {
         cleanIntersected();
         intersectObjects( controller1 );
         intersectObjects( controller2 );
