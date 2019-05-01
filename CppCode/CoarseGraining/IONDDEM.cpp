@@ -70,7 +70,6 @@ int main (int argc, char * argv[])
     for (int j=0 ; j<C.data.N ; j++) for (int k=0 ;k<d ; k++) C.data.vel[k][j] = data[delta][j][k] ;
   }
 
-  printf("D"); fflush(stdout) ;
   C.pass_1() ;
   //C.compute_fluc_vel() ;
   //C.compute_fluc_rot() ;

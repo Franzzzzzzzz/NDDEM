@@ -1,7 +1,7 @@
 #include "DEMND.h"
 #include <signal.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 1
+#define OMP_NUM_THREADS 2
 
 uint Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
