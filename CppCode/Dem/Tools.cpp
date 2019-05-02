@@ -49,7 +49,7 @@ return 0 ;
 }
 
 //=====================================
-void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag)
+void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, cv1d & Z)
 {
  FILE *out ; int dim ;
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}

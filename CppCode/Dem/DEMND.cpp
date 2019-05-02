@@ -46,6 +46,7 @@ int main (int argc, char *argv[])
 
  std::vector < double > Vmag (N,0) ;
  std::vector < double > OmegaMag (N,0) ;
+ std::vector < double > Z (N,0) ; 
  std::vector < std::vector <double> > Fcorr (N, std::vector <double> (d, 0)) ;
  std::vector < std::vector <double> > TorqueCorr (N, std::vector <double> (d*(d-1)/2, 0)) ;
  std::vector < double > displacement (N, 0) ; double maxdisp[2] ;
@@ -329,7 +330,8 @@ int main (int argc, char *argv[])
    // Output something at some point I guess
    if (ti % P.tdump==0)
    {
-    P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags) ;
+    Tools::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ; 
+    P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
     std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
    }
  }

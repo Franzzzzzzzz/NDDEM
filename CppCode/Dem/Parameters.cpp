@@ -205,6 +205,7 @@ else if (!strcmp(line, "set"))
      else if (word =="Omega") dumplist |= ExportData::OMEGA ;
      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
      else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
+     else if (word =="Coordination") dumplist |= ExportData::COORDINATION ; 
      else printf("Unknown asked data %s\n", word.c_str()) ;
    }
 
@@ -471,7 +472,7 @@ void Parameters::finalise()
 
 
 //========================================
-int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags)
+int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags, v1d & Z)
 {
   static bool xmlstarted=false ;
 
@@ -481,7 +482,7 @@ int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &
     {
       char path[500] ; sprintf(path, "%s/dump-%05d.csv", Directory.c_str(), ti) ;
       Tools::norm(Vmag, V) ; Tools::norm(OmegaMag, Omega) ;
-      Tools::savecsv(path, X, r, PBCFlags, Vmag, OmegaMag) ; //These are always written for CSV, independent of the dumplist
+      Tools::savecsv(path, X, r, PBCFlags, Vmag, OmegaMag, Z) ; //These are always written for CSV, independent of the dumplist
       if (v.second & ExportData::ORIENTATION)
       {
         char path[500] ; sprintf(path, "%s/dumpA-%05d.csv", Directory.c_str(), ti) ;
@@ -495,8 +496,9 @@ int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &
         vector <TensorInfos> val;
         if (v.second & ExportData::VELOCITY) val.push_back({"Velocity", TensorType::VECTOR, &V}) ;
         if (v.second & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ;
-        if (v.second & ExportData::OMEGAMAG)  printf("OmegaMag not implemented in VTK") ;
+        if (v.second & ExportData::OMEGAMAG)  printf("OmegaMag not implemented in VTK\n") ;
         if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
+        if (v.second & ExportData::COORDINATION) printf("Coordination number not implemented in VTK\n") ; ;
         Tools::savevtk(path, *this, X, val) ;
     }
 
@@ -519,6 +521,7 @@ int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &
       if (v.second & ExportData::OMEGAMAG)
           printf("Omega Mag not implemented yet\n");
       if (v.second & ExportData::ORIENTATION) xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::ascii);
+      if (v.second & ExportData::COORDINATION) xmlout->writeArray("Coordination", &Z, ArrayType::particles, EncodingType::ascii);
       xmlout->stopTS();
     }
 
@@ -538,6 +541,7 @@ int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &
       if (v.second & ExportData::OMEGAMAG)
           printf("Omega Mag not implemented yet\n");
       if (v.second & ExportData::ORIENTATION) xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::base64);
+      if (v.second & ExportData::COORDINATION) xmlout->writeArray("Orientation", &Z, ArrayType::particles, EncodingType::base64);
       xmlout->stopTS();
     }
   }

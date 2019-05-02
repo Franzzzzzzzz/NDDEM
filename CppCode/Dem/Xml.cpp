@@ -93,6 +93,39 @@ void XMLWriter::writeArray(string name, vector<vector<double>>*x, ArrayType t, E
  }
  closebranch() ; closebranch() ;
 }
+//----------------------------------------------------------------------------
+void XMLWriter::writeArray(string name, vector<double>*x, ArrayType t, EncodingType te)
+{
+ if (t==ArrayType::particles) openbranch("particles") ; //fic << "  <particles>\n" ;
+ else if (t==ArrayType::contacts) openbranch("contacts") ; //fic << "  <contacts>\n" ;
+ else openbranch("unknown") ; //fic << "  <unknown>\n" ;
+ smallbranch("name", name) ; //fic << "   <name>" << name << "</name>\n" ;
+ if (te==EncodingType::ascii)      {smallbranch("encoding","ascii");}
+ else if (te==EncodingType::base64){smallbranch("encoding","base64");}
+
+ smallbranch("nrows", x->size()) ;
+ smallbranch("ncols", 1) ;
+ openbranch("data", {make_pair("length", to_string(x->size()))}) ;
+
+ int n=0 ;
+ if (te==EncodingType::ascii)
+ {
+   for (auto v:*x)
+   {
+    fic << v << " " ;
+    n++ ;
+    if (n%25==0) fic << endl << "    " ;
+   }
+ }
+ else if (te==EncodingType::base64)
+ {
+    printf("WARN: Encode base 64 not available for 1D array in XML writing ...\n") ; 
+   /*for (auto v:*x)
+     encodebase64f(fic, v) ;
+   encodebase64f_end(fic);*/
+ }
+ closebranch() ; closebranch() ;
+}
 //---------------------------------------------------------------
 void XMLWriter::close ()
 {

@@ -67,6 +67,14 @@ void ContactList::check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int
   }
 }
 
+//-----------------------------------
+void ContactList::coordinance (v1d &Z)
+{
+  for (auto & w : v)
+  {
+      Z[w.i]++ ; Z[w.j] ++ ; 
+  }
+}
 
 
 

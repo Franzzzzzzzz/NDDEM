@@ -29,6 +29,7 @@ public:
     void writeTs (double ts, tuple<string,vector<vector<double>>*, ArrayType> a);
     void startTS (double ts) ;
     void writeArray(string name, std::vector< std::vector< double > >* x, ArrayType t, EncodingType te=EncodingType::ascii) ;
+    void writeArray(string name, std::vector<double>* x, ArrayType t, EncodingType te=EncodingType::ascii) ;
     void stopTS () ;
     void close() ;
     void emergencyclose() ;
