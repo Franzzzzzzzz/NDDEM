@@ -1,0 +1,43 @@
+# Incline plane flow
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/SpinnerD3
+#directory OutputTest
+dimensions 3 3
+
+#set adimensional
+radius -1 0.45
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 PBC -2 2
+boundary 1 PBC -2 2
+boundary 2 PBC -2 2
+#boundary 3 PBC  0 3.4
+
+position 0 0 1 0
+position 1 1 1 0
+position 2 1 0 0
+position 4 -1 0 0
+position 5 -1 -1 0
+position 6 0 -1 0
+omega 0 1 0 0
+omega 1 0 1 0
+omega 2 0 0 1
+omega 3 -1 0 0
+omega 4 0 -1 0
+omega 5 0 0 -1
+
+gravity 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 50
+set dt 0.0001
+set dumps XML with 3 Position Velocity Omega
+set dumps CSV with 1 Orientation
+set tdump 10000
+EOF
