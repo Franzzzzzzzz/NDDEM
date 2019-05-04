@@ -60,6 +60,7 @@ int Parameters::init_inertia ()
 void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
 {
   ifstream in ;
+
   in.open(path) ;
   if (!in.is_open()) { printf("[Input] file cannot be open\n"); return ;}
 
@@ -71,6 +72,12 @@ void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
   for (auto v : dumps)
     if (v.first==ExportType::XML || v.first==ExportType::XMLbase64)
       xmlout= new XMLWriter(Directory+"/dump.xml") ;
+
+  in.close() ;
+  // Self copy :)
+  experimental::filesystem::path p (path) ;
+  experimental::filesystem::path pcp (Directory+"/") ; pcp/= p.filename() ;
+  copy_file(p,pcp,experimental::filesystem::copy_options::overwrite_existing);
 }
 //-------------------------------------------------
 void Parameters::check_events(float time, v2d & X, v2d & V, v2d & Omega)
@@ -205,7 +212,7 @@ else if (!strcmp(line, "set"))
      else if (word =="Omega") dumplist |= ExportData::OMEGA ;
      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
      else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
-     else if (word =="Coordination") dumplist |= ExportData::COORDINATION ; 
+     else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
      else printf("Unknown asked data %s\n", word.c_str()) ;
    }
 
@@ -492,13 +499,14 @@ int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &
 
     if (v.first == ExportType::VTK)
     {
+        v2d tmp ;
         char path[500] ; sprintf(path, "%s/dump-%05d.vtk", Directory.c_str(), ti) ;
         vector <TensorInfos> val;
         if (v.second & ExportData::VELOCITY) val.push_back({"Velocity", TensorType::VECTOR, &V}) ;
         if (v.second & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ;
         if (v.second & ExportData::OMEGAMAG)  printf("OmegaMag not implemented in VTK\n") ;
         if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
-        if (v.second & ExportData::COORDINATION) printf("Coordination number not implemented in VTK\n") ; ;
+        if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; val.push_back({"Coordination", TensorType::SCALAR, &tmp}) ;  }
         Tools::savevtk(path, *this, X, val) ;
     }
 

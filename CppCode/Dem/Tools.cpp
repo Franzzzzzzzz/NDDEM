@@ -123,8 +123,8 @@ void Tools::savevtk (char path[], Parameters & P, cv2d & X, vector <TensorInfos>
  {
  switch (v.order) {
    case TensorType::SCALAR:  fprintf(out, "\nSCALARS %s double 1 \nLOOKUP_TABLE default \n", v.name.c_str()) ;//scalar
-            for (uint i=0 ; i<(*v.data).size() ; i++)
-              fprintf(out, "%g ", (*v.data)[i][0]) ;
+            for (uint i=0 ; i<(*v.data)[0].size() ; i++)
+              fprintf(out, "%g ", (*v.data)[0][i]) ;
             break ;
    case TensorType::VECTOR:  fprintf(out, "\nVECTORS %s double \n", v.name.c_str()) ;//vector
             for (auto i : (*v.data))
