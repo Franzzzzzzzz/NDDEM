@@ -5,19 +5,20 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 				body {
-					color: #dddddd;
+					color: #e72564;
 					font-family:Montserrat;
 					font-size:26px;
 					text-align:center;
 
-					background-color: #e72564;
+					background-color: #111111;
 					margin: 0px;
 					overflow: hidden;
 				}
+                div.content{ width: 900px }
 		</style>
 	</head>
 	<body>
-	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<div id="container" class="content"><br /><br /><br /><br /><br />Loading...</div>
     <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/build/three.js"></script>
     <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/libs/ammo.js"></script> -->
     <script src="https://raw.githack.com/benjym/CIVL5999/master/ammo.js"></script>
@@ -60,17 +61,8 @@
         var ropes = [];
 		var ballRadius = 0.1;
 
-        // run();
-
-        // async function run() {
-        //     await sleep(1000);
-            init();
-    		animate();
-        // };
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        init();
+		animate();
 
 		function init() {
 			initGraphics();
