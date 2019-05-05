@@ -37,7 +37,7 @@
             // fname = "Samples/D5/";
             // fname = "Samples/D6/";
             // fname = "Samples/D7/";
-            quality = 4
+            quality = 5
 
             const urlParams = new URLSearchParams(window.location.search);
             if ( urlParams.has('viewerType') ) { viewerType = urlParams.get('viewerType'); };
@@ -48,6 +48,7 @@
             if ( urlParams.has('view_mode') ) { view_mode = urlParams.get('view_mode'); };
             if ( urlParams.has('shadows') ) { shadows = urlParams.get('shadows'); };
             if ( urlParams.has('quality') ) { quality = urlParams.get('quality'); };
+            if ( urlParams.has('zoom') ) { zoom = urlParams.get('zoom'); };
         </script>
         <script src="js/nddem.js"></script>
 
