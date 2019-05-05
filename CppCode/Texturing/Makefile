@@ -1,8 +1,8 @@
 ifndef $(CC)
 CC=/opt/local/bin/g++-mp-6 # FG
 endif
-#CC=g++-8 # BM
-CC=g++
+CC=g++-8 # BM
+#CC=g++
 
 # Basic compilation
 

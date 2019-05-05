@@ -1,7 +1,7 @@
 ifndef ${CC}
 CC=/opt/local/bin/g++-mp-6 # FG
 endif
-#CC=g++-8 # BM
+CC=g++-8 # BM
 #CC=g++
 
 dem       := Dem
@@ -11,7 +11,7 @@ alltarget := $(dem) $(texturing) $(coarsening)
 results := res
 
 .PHONY: all $(result) $(alltarget)
-all: $(alltarget) 
+all: $(alltarget)
 
 clean :
 	find * -name '*.o' -exec rm {} \;

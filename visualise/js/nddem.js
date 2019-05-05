@@ -17,7 +17,6 @@ if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 
 if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) };
 var axeslength, fontsize; // axis properties
 var VR_scale = 5.; // mapping from DEM units to VR units
-var find_particle = window.find_particle === 'true'; // show just the first particle in a unique colour
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
@@ -28,6 +27,8 @@ if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true
 else { shadows = true; };
 if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
 else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
+if ( typeof window.pinky !== 'undefined' ) { pinky = parseInt(window.pinky) }
+else { pinky = 100}; // which particle to catch
 
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material;
@@ -606,35 +607,25 @@ function make_initial_spheres_CSV() {
             var scale = 20.; // size of particles on tori
             for (var i = 0; i<spheres.length; i++) {
                 if ( N === 2 ) {
-                    var color = Math.random() * 0xffffff;
+                    var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
                     var material = new THREE.PointsMaterial( {
                         color: color,
                     } );
                 }
                 else {
-                    if ( find_particle ) {
-                        if (i == 0) {
-                            var material = new THREE.MeshPhongMaterial( { color: 0xFF00FF,
-                                                                             // roughness: 0.7,
-                                                                             // metalness: 0.0
-                                                                         } ); }
-                        else { var material = new THREE.MeshPhongMaterial( { color: 0xffffff,
-                                                                                // roughness: 0.7,
-                                                                                // metalness: 0.0
-                                                                            } ); }
+                    if ( view_mode === 'catch_particle' ) {
+                        if ( i == pinky ) { var color = 0xe72564; }
+                        else              { var color = 0xaaaaaa; }
+                        var material = new THREE.MeshPhongMaterial( { color: color } );
                     }
                     else {
-                        var color = Math.random() * 0xffffff;
                         if ( view_mode === 'rotations' ) {
                             var texture = new THREE.TextureLoader().load("http://localhost:8000/" + window.fname + "Texture-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
-                            var material = new THREE.MeshPhongMaterial( {
-                                color: color,
-                                // roughness: 0.2,
-                                // metalness: 0.5
-                            } );
+                            var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
+                            var material = new THREE.MeshPhongMaterial( { color: color } );
                         }
                     };
                 }
@@ -913,7 +904,7 @@ function animate() {
 };
 
 function render() {
-    if ( view_mode === 'catch_particle' ) {
+    if ( view_mode === 'catch_particle' && window.viewerType == "VR" ) {
         cleanIntersected();
         intersectObjects( controller1 );
         intersectObjects( controller2 );

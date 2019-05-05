@@ -10,13 +10,14 @@ const logRequestStart = (req, res, next) => {
     console.info(`${req.method} ${req.originalUrl}`)
     next()
 }
-server.use(logRequestStart)
+// server.use(logRequestStart)
 
 server.use('/', express.static(__dirname + '/')); // serve data files
 
 server.post('/in', function(req, res) { // serve infiles
     var fname = req.query.fname;
     glob(fname + "in.*", {}, (err, infile)=>{
+        console.log("Sending " + infile[0])
         res.sendFile( __dirname +  '/' + infile[0] );
     });
 });
@@ -28,7 +29,7 @@ server.post('/make_textures', function(req, res) { // generate textures
     var fname = req.query.fname;
     var text_arg = N + " " + arr.join(' ') + " " + t + " " + fname;
     console.log(text_arg);
-    exec('./CppCode/Texturing ' + text_arg, (err, stdout, stderr) => { res.send('Done making textures'); } );
+    exec('./CppCode/Texturing/Texturing ' + text_arg, (err, stdout, stderr) => { res.send('Done making textures'); } );
 });
 
 server.listen(8000); // run server
