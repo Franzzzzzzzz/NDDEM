@@ -56,8 +56,9 @@ int main (int argc, char * argv[])
 
  // Setting up the grid in latitude-longitude
  for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
- for (int i=0 ; i<Ntheta ; i++)  thetagrid[i] =2*M_PI/(2.*Ntheta )+2*M_PI/Ntheta *i ;
-
+ for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
+ thetagrid[Ntheta-1]=thetagrid[0];
+ 
  // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
  int nrotate = 0 ;
  if (d>3) //All view dimensions are NaN if d==3
@@ -140,6 +141,7 @@ void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
     int vbyte ;
     vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
+    //printf("%g %g\n", phi[0], phi[1]) ; 
     //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ; 
     phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
     phi[d-2] /= 2 ; 
