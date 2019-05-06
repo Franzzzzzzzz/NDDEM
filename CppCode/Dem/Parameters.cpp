@@ -9,7 +9,7 @@ int Parameters::set_boundaries()
         Boundaries[i][0]= 0 ;
         Boundaries[i][1]= 1 ;
         Boundaries[i][2]=Boundaries[i][1]-Boundaries[i][0] ; //Precomputed to increase speed
-        Boundaries[i][3]=0 ; // PBC by default
+        Boundaries[i][3]=static_cast<int>(WallType::PBC) ; // PBC by default
     }
     //np.savetxt('Boundaries.csv', Boundaries , delimiter=',', fmt='%.6g', header='Low,High,Size,Type', comments='')
     return 0 ;
@@ -19,9 +19,23 @@ void Parameters::perform_PBC (v1d & X, u_int32_t & PBCFlag)
 {
  for (uint j=0 ; j<d ; j++)
  {
-   if (Boundaries[j][3]!=0) continue ; // not a PBC
-   if      (X[j]<Boundaries[j][0]) {X[j] += Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
-   else if (X[j]>Boundaries[j][1]) {X[j] -= Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
+   if (Boundaries[j][3]==static_cast<int>(WallType::PBC)) //PBC
+   {
+    if      (X[j]<Boundaries[j][0]) {X[j] += Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
+    else if (X[j]>Boundaries[j][1]) {X[j] -= Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
+   }
+ }
+}
+//----------------------------------------------------
+void Parameters::perform_MOVINGWALL ()
+{
+ for (uint j=0 ; j<d ; j++)
+ {
+  if (Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))    
+  {
+    Boundaries[j][0] += Boundaries[j][4] * dt ; 
+    Boundaries[j][1] += Boundaries[j][5] * dt ; 
+  }
  }
 }
 //-----------------------------------------------------
@@ -115,11 +129,14 @@ if (!strcmp(line, "boundary"))
 {
   in>>id ;
   in>>line ;
-  if (!strcmp(line, "PBC")) Boundaries[id][3]=0 ;
-  else if (!strcmp(line, "WALL")) Boundaries[id][3]=1 ;
+  if (!strcmp(line, "PBC")) Boundaries[id][3]=static_cast<int>(WallType::PBC) ;
+  else if (!strcmp(line, "WALL")) Boundaries[id][3]=static_cast<int>(WallType::WALL) ;
+  else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
   else printf("[Input] Unknown boundary condition, unchanged.\n") ;
   in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
   Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
+  if (Boundaries[id][3]==static_cast<int>(WallType::MOVINGWALL))
+  {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ; }
  printf("[INFO] Changing BC.\n") ;
 }
 else if (!strcmp(line, "location"))
