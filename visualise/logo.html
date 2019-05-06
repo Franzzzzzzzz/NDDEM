@@ -169,14 +169,15 @@
 			var base_ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 20, 20 ), new THREE.MeshPhongMaterial( { color: 0xe72564 } ) );
 			base_ball.castShadow = true;
 			base_ball.receiveShadow = true;
-			var ballShape = new Ammo.btSphereShape( ballRadius );
-			ballShape.setMargin( 10000*margin );
 
             for ( n=0;n<numballs;n++ ) {
+                var ballShape = new Ammo.btSphereShape( ballRadius );
+    			// ballShape.setMargin( 10000*margin );
+
                 ball = base_ball.clone()
                 var x = ropeLength/3.*Math.random();
-                var y = ropeLength/3.*Math.random();
-                var z = ropeLength - Math.sqrt(Math.pow(x,2) + Math.pow(y,2)) //+ 0.01*(Math.random() - 0.5)
+                var z = ropeLength/3.*Math.random();
+                var y = - ropeLength + Math.sqrt(Math.pow(x,2) + Math.pow(z,2)) //+ 0.01*(Math.random() - 0.5)
                 pos.set( x,y,z );
                 quat.set( 0, 0, 0, 1 );
                 createRigidBody( ball, ballShape, ballMass, pos, quat );
@@ -338,18 +339,28 @@
 
         function updateSizes( t ) {
             // cycle gravity direction
-            var theta = Math.cos(t/2.)/2.;
-            physicsWorld.setGravity( new Ammo.btVector3( Math.sin(theta)*gravityConstant, Math.cos(theta)*gravityConstant, 0 ) );
-            physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( Math.sin(theta)*gravityConstant, Math.cos(theta)*gravityConstant, 0 ) );
+            const theta = Math.cos(t/2.)/2.;
+            const gravity = new Ammo.btVector3( Math.sin(theta)*gravityConstant, Math.cos(theta)*gravityConstant, 0 );
+            physicsWorld.setGravity( gravity );
+            physicsWorld.getWorldInfo().set_m_gravity( gravity );
+            // delete gravity;
 
             for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
                 var objThree = rigidBodies[ i ];
                 var objPhys = objThree.userData.physicsBody;
                 var scale = 1. + Math.sin(t/2. + objThree.phi)/2.;
 
-    			objPhys.setCollisionShape( new Ammo.btSphereShape( ballRadius*scale ) ); // WORKS FOR 20 SECONDS
+                // const shape = new Ammo.btSphereShape( ballRadius*scale );
+                var scale_vector = new Ammo.btVector3( scale , scale, scale );
+                // delete objPhys.getCollisionShape();
+                // objPhys.getCollisionShape.__destroy__ = true;
+                // console.log(objPhys.getCollisionShape());
+    			// objPhys.setCollisionShape( shape ); // WORKS FOR 20 SECONDS
+                objPhys.getCollisionShape().setLocalScaling(scale_vector); // WORKS FOR....
+                // console.log(objPhys.getCollisionShape().getLocalScaling());
                 objThree.scale.set( scale,scale,scale );
-
+                // delete shape;
+                // delete scale_vector;
 
                 // Ammo.castObject( objPhys, Ammo.btCollisionObject ).getCollisionShape().setLocalScaling(10.);
                 // Ammo.castObject( objPhys, Ammo.btCollisionObject ).getCollisionShape().setLocalScaling( 1000000. ); // REMOVES INTERACTIONS
