@@ -14,7 +14,7 @@ boundary 1 WALL 0 1
 boundary 2 WALL 0 1
 
 location 0 0.5 0.5 0.5
-velocity 0 0.293479 0.801017 0.351175
+velocity 0 0.47021483 0.31232756 0.82543898
 
 gravity 0 0 0
 set Kn 2e5
@@ -26,7 +26,7 @@ set Mu 0.5
 set T 50
 set dt 0.0001
 #set dumps XML with 3 Position Velocity Omega
-#set dumps CSV with 1 Orientation
-set dumps VTK with 0
+set dumps CSV with 1 Orientation
+#set dumps VTK with 0
 set tdump 10000
 EOF
