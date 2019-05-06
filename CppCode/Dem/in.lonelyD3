@@ -4,16 +4,16 @@ directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD3
 dimensions 3 1
 
 #set adimensional
-radius -1 0.25
+radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
 
-boundary 0 WALL 0 1
-boundary 1 WALL 0 1
-boundary 2 WALL 0 1
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
 
-location 0 0.5 0.5 0.5
+location 0 2.5 2.5 2.5
 velocity 0 0.47021483 0.31232756 0.82543898
 
 gravity 0 0 0

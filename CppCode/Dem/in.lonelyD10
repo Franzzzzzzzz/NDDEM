@@ -4,23 +4,23 @@ directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD10
 dimensions 10 1
 
 #set adimensional
-radius -1 0.25
+radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
 
-boundary 0 WALL 0 1
-boundary 1 WALL 0 1
-boundary 2 WALL 0 1
-boundary 3 WALL 0 1
-boundary 4 WALL 0 1
-boundary 5 WALL 0 1
-boundary 6 WALL 0 1
-boundary 7 WALL 0 1
-boundary 8 WALL 0 1
-boundary 9 WALL 0 1
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
+boundary 4 WALL 0 5
+boundary 5 WALL 0 5
+boundary 6 WALL 0 5
+boundary 7 WALL 0 5
+boundary 8 WALL 0 5
+boundary 9 WALL 0 5
 
-location 0 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+location 0 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5
 velocity 0 0.03062601 0.34067903 0.24343772 0.50037291 0.46338657 0.44310011 0.24865912 0.07589347 0.30025805 0.06748319
 
 

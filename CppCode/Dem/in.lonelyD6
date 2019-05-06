@@ -4,19 +4,19 @@ directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD6
 dimensions 6 1
 
 #set adimensional
-radius -1 0.25
+radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
 
-boundary 0 WALL 0 1
-boundary 1 WALL 0 1
-boundary 2 WALL 0 1
-boundary 3 WALL 0 1
-boundary 4 WALL 0 1
-boundary 5 WALL 0 1
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
+boundary 4 WALL 0 5
+boundary 5 WALL 0 5
 
-location 0 0.5 0.5 0.5 0.5 0.5 0.5
+location 0 2.5 2.5 2.5 2.5 2.5 2.5
 velocity 0 0.25364173 0.59848871 0.3346109 0.05681944 0.18595713 0.65399096
 
 gravity 0 0 0 0 0 0
