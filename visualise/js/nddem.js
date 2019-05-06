@@ -17,18 +17,22 @@ if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 
 if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) };
 var axeslength, fontsize; // axis properties
 var VR_scale = 5.; // mapping from DEM units to VR units
-var find_particle = window.find_particle === 'true'; // show just the first particle in a unique colour
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 
+if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
+else { var zoom = 20; } // default zoom level
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
 else { shadows = true; };
 if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
 else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
+if ( typeof window.pinky !== 'undefined' ) { pinky = parseInt(window.pinky) }
+else { pinky = 100}; // which particle to catch
 
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material;
+var cache = false;
 init();
 
 function init() {
@@ -42,7 +46,7 @@ function init() {
             if (type.indexOf("text") !== 1) {
                 lines = request.responseText.split('\n');
                 for (i=0;i<lines.length;i++) {
-                    console.log(lines[i])
+                    // console.log(lines[i])
                     line = lines[i].replace(/ {1,}/g," "); // remove multiple spaces
                     l = line.split(' ')
                     if (l[0] == 'dimensions') {
@@ -116,24 +120,24 @@ function build_world() {
 function make_camera() {
     var aspect = window.innerWidth / window.innerHeight;
     if ( N < 3 ) {
-        zoom = 8.0;
-        camera = new THREE.OrthographicCamera(-zoom*aspect,zoom*aspect,zoom,-zoom,-1000,1000);
+        // zoom = 8.0;
+        camera = new THREE.OrthographicCamera(-100.*aspect/zoom,100.*aspect/zoom,100./zoom,-100./zoom,-1000,1000);
         camera.position.set((world[0].min + world[0].max)/2./2.,(world[1].min + world[1].max)/2.,-1.0);
     }
     else {
         if ( window.viewerType == 'anaglyph' ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-            camera.position.set(0.5*world[0].max/8.,
-                                   -world[0].max/8.,
-                                   -world[0].max/8.
+            camera.position.set(0.5*world[0].max/zoom,
+                                   -world[0].max/zoom,
+                                   -world[0].max/zoom
                             );
             camera.focalLength = 3;
         }
         else {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-            camera.position.set(0.25*world[0].max,
-                                -0.5*world[0].max,
-                                -0.5*world[0].max
+            camera.position.set(0.25*world[0].max/zoom*10,
+                                -0.5*world[0].max/zoom*10,
+                                -0.5*world[0].max/zoom*10
                             );
         }
     }
@@ -142,6 +146,7 @@ function add_renderer() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    // renderer.setSize( container.offsetWidth, container.offsetHeight );
     if ( shadows ) { renderer.shadowMap.enabled = true; }
     if (window.viewerType == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
@@ -532,9 +537,9 @@ function add_torus() {
 function remove_everything() {
     window.addEventListener("message", receiveMessage, false);
     function receiveMessage(event) {
-        console.log(particles);
-        console.log(wristband);
-        console.log(wristband1);
+        // console.log(particles);
+        // console.log(wristband);
+        // console.log(wristband1);
         // remove all particles
         for (i = particles.children.length; i = 0; i--) {
             var object = particles.children[i];
@@ -602,35 +607,25 @@ function make_initial_spheres_CSV() {
             var scale = 20.; // size of particles on tori
             for (var i = 0; i<spheres.length; i++) {
                 if ( N === 2 ) {
-                    var color = Math.random() * 0xffffff;
+                    var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
                     var material = new THREE.PointsMaterial( {
                         color: color,
                     } );
                 }
                 else {
-                    if ( find_particle ) {
-                        if (i == 0) {
-                            var material = new THREE.MeshPhongMaterial( { color: 0xFF00FF,
-                                                                             // roughness: 0.7,
-                                                                             // metalness: 0.0
-                                                                         } ); }
-                        else { var material = new THREE.MeshPhongMaterial( { color: 0xffffff,
-                                                                                // roughness: 0.7,
-                                                                                // metalness: 0.0
-                                                                            } ); }
+                    if ( view_mode === 'catch_particle' ) {
+                        if ( i == pinky ) { var color = 0xe72564; }
+                        else              { var color = 0xaaaaaa; }
+                        var material = new THREE.MeshPhongMaterial( { color: color } );
                     }
                     else {
-                        var color = Math.random() * 0xffffff;
                         if ( view_mode === 'rotations' ) {
                             var texture = new THREE.TextureLoader().load("http://localhost:8000/" + window.fname + "Texture-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
-                            var material = new THREE.MeshPhongMaterial( {
-                                color: color,
-                                // roughness: 0.2,
-                                // metalness: 0.5
-                            } );
+                            var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
+                            var material = new THREE.MeshPhongMaterial( { color: color } );
                         }
                     };
                 }
@@ -697,7 +692,7 @@ function update_spheres_CSV(t) {
         download: true,
         dynamicTyping: true,
         header: true,
-        cache: true,
+        cache: cache,
         complete: function(results) {
             spheres = results.data;
             for (i = 0; i<spheres.length; i++) {
@@ -797,7 +792,7 @@ function update_spheres_CSV(t) {
 function onWindowResize() {
     if ( N < 3 ) {
         var aspect = window.innerWidth / window.innerHeight;
-        var zoom = 10.
+        // var zoom = 10.
         camera.left   = -zoom*aspect;
         camera.right  =  zoom*aspect;
         camera.bottom = -zoom;
@@ -909,7 +904,7 @@ function animate() {
 };
 
 function render() {
-    if ( view_mode === 'catch_particle' ) {
+    if ( view_mode === 'catch_particle' && window.viewerType == "VR" ) {
         cleanIntersected();
         intersectObjects( controller1 );
         intersectObjects( controller2 );
