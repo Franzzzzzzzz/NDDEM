@@ -504,7 +504,7 @@ int Parameters::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &
         vector <TensorInfos> val;
         if (v.second & ExportData::VELOCITY) val.push_back({"Velocity", TensorType::VECTOR, &V}) ;
         if (v.second & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ;
-        if (v.second & ExportData::OMEGAMAG)  printf("OmegaMag not implemented in VTK\n") ;
+        if (v.second & ExportData::OMEGAMAG)  {tmp.push_back(OmegaMag) ; val.push_back({"OmegaMag", TensorType::SCALAR, &tmp}) ;}
         if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
         if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; val.push_back({"Coordination", TensorType::SCALAR, &tmp}) ;  }
         Tools::savevtk(path, *this, X, val) ;
