@@ -25,9 +25,9 @@
         <script src="js/datguivr.js"></script>
         <script src="node_modules/three/examples/js/math/lut.js"></script>
         <script>
-            // viewerType = "VR";
-            // viewerType = "anaglyph";
-            viewerType = "keyboard";
+            // display_type = "VR";
+            // display_type = "anaglyph";
+            display_type = "keyboard";
 
 
             // fname = "Samples/D1/";
@@ -40,11 +40,11 @@
             quality = 5
 
             const urlParams = new URLSearchParams(window.location.search);
-            if ( urlParams.has('viewerType') ) { viewerType = urlParams.get('viewerType'); };
             if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
+            if ( urlParams.has('display_type') ) { display_type = urlParams.get('display_type'); };
+            if ( urlParams.has('view_mode') ) { view_mode = urlParams.get('view_mode'); };
             if ( urlParams.has('autoplay') ) { autoplay = urlParams.get('autoplay'); };
             if ( urlParams.has('rate') ) { rate = urlParams.get('rate'); };
-            if ( urlParams.has('view_mode') ) { view_mode = urlParams.get('view_mode'); };
             if ( urlParams.has('shadows') ) { shadows = urlParams.get('shadows'); };
             if ( urlParams.has('quality') ) { quality = urlParams.get('quality'); };
             if ( urlParams.has('zoom') ) { zoom = urlParams.get('zoom'); };

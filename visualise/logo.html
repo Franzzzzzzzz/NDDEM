@@ -14,22 +14,39 @@
 					margin: 0px;
 					overflow: hidden;
 				}
-                div.content{ width: 900px }
+                /* div.content{ width: 900px } */
 		</style>
 	</head>
 	<body>
 	<div id="container" class="content"><br /><br /><br /><br /><br />Loading...</div>
     <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/build/three.js"></script>
-    <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/libs/ammo.js"></script> -->
+    <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/libs/ammo.js"></script> DO NOT USE-->
     <script src="https://raw.githack.com/benjym/CIVL5999/master/ammo.js"></script>
     <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/WebGL.js"></script>
     <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js"></script>
 
-	<!-- <script src="node_modules/three/build/three.js"></script>
-	<script src="node_modules/three/examples/js/libs/ammo.js"></script>
-	<script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
-	<script src="node_modules/three/examples/js/WebGL.js"></script>
-    <script src="node_modules/three/examples/js/loaders/GLTFLoader.js"></script> -->
+	<!-- <script src="node_modules/three/build/three.js"></script> -->
+	<!-- <script src="node_modules/three/examples/js/libs/ammo.js"></script> -->
+	<!-- <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
+	<!-- <script src="node_modules/three/examples/js/WebGL.js"></script> -->
+    <!-- <script src="node_modules/three/examples/js/loaders/GLTFLoader.js"></script> -->
+
+    <script type="x-shader/x-vertex" id="vertexshader">
+		attribute float scale;
+		void main() {
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_PointSize = scale * ( 300.0 / - mvPosition.z );
+			gl_Position = projectionMatrix * mvPosition;
+		}
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentshader">
+		uniform vec3 color;
+		void main() {
+			if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
+			gl_FragColor = vec4( color, 1.0 );
+		}
+	</script>
 
 	<script>
 		if ( WEBGL.isWebGLAvailable() === false ) {
@@ -60,6 +77,8 @@
 		var armMovement = 0;
         var ropes = [];
 		var ballRadius = 0.1;
+        var earth;
+        var stars;
 
         init();
 		animate();
@@ -68,21 +87,23 @@
 			initGraphics();
 			initPhysics();
 			createObjects();
+            makeStars();
 		}
 
 		function initGraphics() {
 			container = document.getElementById( 'container' );
-			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 2000 );
 			scene = new THREE.Scene();
-            // var axesHelper = new THREE.AxesHelper( 5 );
+            // var axesHelper = new THREE.AxesHelper( 5 ); // X - red, Y - green, Z - blue
             // scene.add( axesHelper );
 			scene.background = new THREE.Color( 0x111111 ); // revealjs background
             // scene.background = new THREE.Color( 0xe72564 ); // pink background
 
-			camera.position.set( -3, -1, 3 );
+			camera.position.set( 0, -1, 3 );
             camera.rotation.z = 3.*Math.PI/4;
-            camera.up.set(-1,-1,0);
+            // camera.up.set(-1,-1,0);
             camera.lookAt(-0,-0,0);
+
 			// controls = new THREE.OrbitControls( camera );
 			// controls.target.set( 0, 0, 0 );
 			// controls.update();
@@ -97,16 +118,22 @@
 			var ambientLight = new THREE.AmbientLight( 0xaaaaaa );
 			scene.add( ambientLight );
 
-			var light = new THREE.DirectionalLight( 0xffffff, 1 );
-			light.position.set( - 10, 0, 5 );
+            var light = new THREE.DirectionalLight( 0xffffff, 1 );
+			light.position.set( - 10, 2, 50 );
 			light.castShadow = true;
 			light.shadow.mapSize.x = 2048;
 			light.shadow.mapSize.y = 2048;
-
             scene.add( light );
 
-            var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-            scene.add( light );
+            var light2 = new THREE.PointLight( 0xffffff, 1 );
+			light2.position.set( 0, 0.2, 0 );
+			light2.castShadow = true;
+			light2.shadow.mapSize.x = 2048;
+			light2.shadow.mapSize.y = 2048;
+            scene.add( light2 );
+
+            var light_ambient = new THREE.AmbientLight( 0x404040 ); // soft white light
+            scene.add( light_ambient );
 
 			container.innerHTML = "";
 
@@ -119,21 +146,45 @@
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
+            // new THREE.GLTFLoader()
+            //     // .setPath( 'http://localhost:8000/visualise/resources/' )
+            //     .load( 'https://rawcdn.githack.com/benjym/CIVL5999/9d29107b940c23142a4f1b7499d6c8d2d9a81bce/Earth.glb', // resource URL
+            // 	   function ( gltf ) {
+            //             var s = 0.000005;
+            //             earth = gltf.scene;
+            //             earth.scale.set(s,s,s);
+            //             earth.position.x = 0.5
+            //             earth.position.y = -0.4
+            //             earth.position.z = 2.2
+            //             earth.rotation.x = 0.1;
+            //             scene.add( earth );
+            // 	       },
+            //        undefined,
+            //        function (err) {console.log(err);});
+
             new THREE.GLTFLoader()
                 // .setPath( 'http://localhost:8000/visualise/resources/' )
-                .load( 'https://rawcdn.githack.com/benjym/CIVL5999/9d29107b940c23142a4f1b7499d6c8d2d9a81bce/Earth.glb', // resource URL
+                // .load( '1227 Earth.gltf',
+                .load( 'https://rawcdn.githack.com/benjym/CIVL5999/master/resources/1227%20Earth.gltf', // resource URL
             	   function ( gltf ) {
-                        var s = 0.000005;
-                        var model = gltf.scene;
-                        model.scale.set(s,s,s);
-                        model.position.x = 0.5
-                        model.position.y = -0.4
-                        model.position.z = 2.2
-                        model.rotation.x = 0.1;
-                        scene.add( model );
-            	       },
-                   undefined,
-                   function (err) {console.log(err);});
+                        var s = 0.025;
+                        mesh = gltf.scene;
+                        // earth.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -27., 0 ) );
+                        mesh.scale.set(s,s,s);
+                        mesh.position.y = - 27.*s; // 54 is original height
+
+                        earth = new THREE.Object3D();
+                        earth.add(mesh); // now located at origin
+
+                        earth.position.y = -0.56;
+                        earth.position.x = 0.37;
+                        // earth.position.y = - 1.18;
+                        // earth.rotation.y = -1.0;
+                        earth.rotation.z = 0.7;
+                        scene.add( earth );
+            	       }
+                   );
+
 
 		}
 
@@ -175,9 +226,9 @@
     			// ballShape.setMargin( 10000*margin );
 
                 ball = base_ball.clone()
-                var x = ropeLength/3.*Math.random();
+                var x = -ropeLength/3.*Math.random();
                 var z = ropeLength/3.*Math.random();
-                var y = - ropeLength + Math.sqrt(Math.pow(x,2) + Math.pow(z,2)) //+ 0.01*(Math.random() - 0.5)
+                var y =  ropeLength - Math.sqrt(Math.pow(x,2) + Math.pow(z,2)) //+ 0.01*(Math.random() - 0.5)
                 pos.set( x,y,z );
                 quat.set( 0, 0, 0, 1 );
                 createRigidBody( ball, ballShape, ballMass, pos, quat );
@@ -331,47 +382,70 @@
 
 			var deltaTime = clock.getDelta();
             updateSizes( clock.elapsedTime );
+            moveStars( clock.elapsedTime );
 			updatePhysics( deltaTime );
 
 			renderer.render( scene, camera );
 
 		}
 
+        function makeStars() {
+    		var numParticles = 10000;
+            var positions = new Float32Array( numParticles * 3 );
+			var scales = new Float32Array( numParticles );
+
+            for (var i = 0; i < numParticles; i++) {
+    			var starVertex = new THREE.Vector3();
+    			positions[ i*3 ] = ( Math.random() - 0.5 ) * 1000;
+    			positions[i*3+1] = ( Math.random() - 0.5 ) * 1000;
+    			positions[i*3+2] = - (Math.random()+0.2)/1.2 * 500;
+    			scales[i] = 2;
+    		}
+
+			geometry = new THREE.BufferGeometry();
+            geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) );
+
+            var material = new THREE.ShaderMaterial( {
+					uniforms: {
+						color: { value: new THREE.Color( 0xffffff ) },
+					},
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+				} );
+				//
+			stars = new THREE.Points( geometry, material );
+			scene.add( stars );
+	}
+
         function updateSizes( t ) {
+            if ( earth !== undefined ) {
+                // earth.rotation.x = clock.elapsedTime/10.;
+                earth.rotateOnAxis(  new THREE.Vector3(0, 1, 0), 0.002 ); // axis, angle
+            };
             // cycle gravity direction
             const theta = Math.cos(t/2.)/2.;
-            const gravity = new Ammo.btVector3( Math.sin(theta)*gravityConstant, Math.cos(theta)*gravityConstant, 0 );
+            const gravity = new Ammo.btVector3( (1-Math.sin(theta))*gravityConstant, -Math.cos(theta)*gravityConstant, 0 );
             physicsWorld.setGravity( gravity );
             physicsWorld.getWorldInfo().set_m_gravity( gravity );
-            // delete gravity;
+            delete gravity;
 
             for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
                 var objThree = rigidBodies[ i ];
                 var objPhys = objThree.userData.physicsBody;
                 var scale = 1. + Math.sin(t/2. + objThree.phi)/2.;
-
-                // const shape = new Ammo.btSphereShape( ballRadius*scale );
                 var scale_vector = new Ammo.btVector3( scale , scale, scale );
-                // delete objPhys.getCollisionShape();
-                // objPhys.getCollisionShape.__destroy__ = true;
-                // console.log(objPhys.getCollisionShape());
-    			// objPhys.setCollisionShape( shape ); // WORKS FOR 20 SECONDS
                 objPhys.getCollisionShape().setLocalScaling(scale_vector); // WORKS FOR....
-                // console.log(objPhys.getCollisionShape().getLocalScaling());
                 objThree.scale.set( scale,scale,scale );
-                // delete shape;
-                // delete scale_vector;
-
-                // Ammo.castObject( objPhys, Ammo.btCollisionObject ).getCollisionShape().setLocalScaling(10.);
-                // Ammo.castObject( objPhys, Ammo.btCollisionObject ).getCollisionShape().setLocalScaling( 1000000. ); // REMOVES INTERACTIONS
-                // objPhys.getCollisionShape().setMargin( 1000000000. ); // DOES NOTHING
-                // Ammo.btCollisionWorld.updateSingleAABB( objPhys ); // doesn't work
-
-
+                delete scale_vector;
 
             }
-            // physicsWorld.setForceUpdateAllAabbs(true);
-            physicsWorld.m_forceUpdateAllAabbs = true;
+        }
+
+        function moveStars( t ) {
+            // console.log(stars);
+            stars.position.x = t/1.;
+            stars.position.y = -t/1.;
         }
 
 		function updatePhysics( deltaTime ) {
@@ -411,7 +485,7 @@
 					var q = transformAux1.getRotation();
 					objThree.position.set( p.x(), p.y(), p.z() );
 					objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
-
+                    delete transformAux1;
 				}
 
 			}

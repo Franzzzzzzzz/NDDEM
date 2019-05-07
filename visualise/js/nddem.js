@@ -30,6 +30,9 @@ else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
 if ( typeof window.pinky !== 'undefined' ) { pinky = parseInt(window.pinky) }
 else { pinky = 100}; // which particle to catch
 
+var fname = window.fname;
+if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
+
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material;
 var cache = false;
@@ -37,8 +40,8 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('POST', "http://localhost:8000/in?fname=" + window.fname + "&_="+ (new Date).getTime(), true);
-    // request.open('GET', "http://localhost:8000/" + window.fname + window.inname, true);
+    request.open('POST', "http://localhost:8000/in?fname=" + fname + "&_="+ (new Date).getTime(), true);
+    // request.open('GET', "http://localhost:8000/" + fname + window.inname, true);
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
@@ -104,7 +107,7 @@ function build_world() {
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
     make_camera();
     // make_walls();
-    make_axes();
+    if ( !fname.includes('Spinner') ) { make_axes(); }
     make_lights();
     add_renderer();
     add_controllers();
@@ -120,25 +123,30 @@ function build_world() {
 function make_camera() {
     var aspect = window.innerWidth / window.innerHeight;
     if ( N < 3 ) {
-        // zoom = 8.0;
         camera = new THREE.OrthographicCamera(-100.*aspect/zoom,100.*aspect/zoom,100./zoom,-100./zoom,-1000,1000);
         camera.position.set((world[0].min + world[0].max)/2./2.,(world[1].min + world[1].max)/2.,-1.0);
     }
     else {
-        if ( window.viewerType == 'anaglyph' ) {
+        if ( fname.includes('Spinner') ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-            camera.position.set(0.5*world[0].max/zoom,
-                                   -world[0].max/zoom,
-                                   -world[0].max/zoom
-                            );
-            camera.focalLength = 3;
+            camera.position.set(0,0,-N);
         }
         else {
-            camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-            camera.position.set(0.25*world[0].max/zoom*10,
-                                -0.5*world[0].max/zoom*10,
-                                -0.5*world[0].max/zoom*10
-                            );
+            if ( window.display_type == 'anaglyph' ) {
+                camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
+                camera.position.set(0.5*world[0].max/zoom,
+                                       -world[0].max/zoom,
+                                       -world[0].max/zoom
+                                );
+                camera.focalLength = 3;
+            }
+            else {
+                camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
+                camera.position.set(0.5*world[0].max/zoom*5,
+                                       -world[0].max/zoom*5,
+                                       -world[0].max/zoom*5
+                                );
+            }
         }
     }
 }
@@ -148,19 +156,19 @@ function add_renderer() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     // renderer.setSize( container.offsetWidth, container.offsetHeight );
     if ( shadows ) { renderer.shadowMap.enabled = true; }
-    if (window.viewerType == "VR") { renderer.vr.enabled = true; };
+    if (window.display_type == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
-    if (window.viewerType == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
+    if (window.display_type == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
 }
 
 function add_gui() {
-    if ( window.viewerType == 'anaglyph' || window.viewerType == 'keyboard' ) {
+    if ( window.display_type == 'anaglyph' || window.display_type == 'keyboard' ) {
         var gui = new dat.GUI();
         gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
             for (i=3;i<N;i++) {
-                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
+                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('X'+i) ;
             }
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
@@ -199,7 +207,7 @@ function add_gui() {
 }
 
 function add_controllers() {
-    if (window.viewerType == "VR") {
+    if (window.display_type == "VR") {
         controller1 = renderer.vr.getController( 0 );
         controller2 = renderer.vr.getController( 1 );
         scene.add( controller1 );
@@ -223,14 +231,14 @@ function add_controllers() {
             line.name = 'line';
             line.scale.z = 5;
 
-            if (window.viewerType == "VR") {
+            if (window.display_type == "VR") {
                 controller1.add( line.clone() );
                 controller2.add( line.clone() );
                 };
             raycaster = new THREE.Raycaster();
         }
 
-    } else if (window.viewerType == 'keyboard') {
+    } else if (window.display_type == 'keyboard') {
         if ( N < 3 ) {
             controls = new THREE.OrbitControls( camera, renderer.domElement );
             controls.target.set( (world[0].min + world[0].max)/2./2., (world[1].min + world[1].max)/2., 0 ); // view direction perpendicular to XY-plane. NOTE: VALUE OF 5 IS HARDCODED IN OTHER PLACES
@@ -244,7 +252,7 @@ function add_controllers() {
 
         // var gui = new dat.GUI();
         console.log('Keyboard mode loaded');
-    } else if (window.viewerType == 'anaglyph') {
+    } else if (window.display_type == 'anaglyph') {
         controls = new THREE.TrackballControls( camera, renderer.domElement );
         aim_camera()
         effect = new THREE.AnaglyphEffect( renderer );
@@ -443,7 +451,7 @@ function make_walls() {
 }
 
 function add_torus() {
-    if (window.viewerType == "VR") { R = 0.1; }
+    if (window.display_type == "VR") { R = 0.1; }
     else { R = 0.5; }
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
@@ -471,7 +479,7 @@ function add_torus() {
     wristband_theta.rotation.y = Math.PI/2;
 
 
-    if (window.viewerType == "VR") {
+    if (window.display_type == "VR") {
         wristband.position.set(0.,0.,0.);
         wristband_phi.position.set(0.,0.,0.);
         wristband_theta.position.set(0.,R,0.);
@@ -514,7 +522,7 @@ function add_torus() {
         wristband1_theta.rotation.y = Math.PI/2;
 
 
-        if (window.viewerType == "VR") {
+        if (window.display_type == "VR") {
             wristband1.position.set(0.,0.,0.);
             wristband1_phi.position.set(0.,0.,0.);
             wristband1_theta.position.set(0.,R,0.);
@@ -589,7 +597,9 @@ function make_initial_spheres_CSV() {
         request.send(null);
         // request.onreadystatechange = function () {}
     };
-    Papa.parse("http://localhost:8000/" + window.fname + "dump-00000.csv" + "?_="+ (new Date).getTime(), {
+    if ( cache ) { var filename = "http://localhost:8000/" + fname + "dump-00000.csv" }
+    else { var filename = "http://localhost:8000/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
+    Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -620,7 +630,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            var texture = new THREE.TextureLoader().load("http://localhost:8000/" + window.fname + "Texture-0.png");
+                            var texture = new THREE.TextureLoader().load("http://localhost:8000/" + fname + "Texture-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
@@ -670,10 +680,10 @@ function update_spheres_CSV(t) {
                      true);
         request.onload = function() {
             var loader = new THREE.TextureLoader();
-            for ( ii = 0; ii < particles.children.length; ii++ ) {
-                loader.load("http://localhost:8000/" + window.fname +
-                            "Texture-" + ii + ".png" +
-                            "?_="+ (new Date).getTime(),
+            for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
+                if ( cache ) { var filename = "http://localhost:8000/" + fname + "Texture-" + ii + ".png" }
+                else { var filename = "http://localhost:8000/" + fname +  "Texture-" + ii + ".png" + "?_="+ (new Date).getTime() }
+                loader.load(filename,
                             function( texture ) {
                                 var myRe = /-[0-9]+.png/g
                                 var res=myRe.exec(texture.image.currentSrc)
@@ -687,8 +697,9 @@ function update_spheres_CSV(t) {
         }
         request.send('');
     };
-    Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime(), { // definitely no caching
-    // Papa.parse("http://localhost:8000/" + window.fname + "dump-"+t+"0000.csv", {
+    if ( cache ) { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv" }
+    else { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
+    Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
         header: true,
@@ -805,7 +816,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls.handleResize();
-    if (window.viewerType == 'anaglyph') { effect.setSize( window.innerWidth, window.innerHeight ); };
+    if (window.display_type == 'anaglyph') { effect.setSize( window.innerWidth, window.innerHeight ); };
     render();
 };
 
@@ -893,9 +904,9 @@ function animate() {
         }
     }
     if (time.play) { time.cur += time.rate; };
-    if (Math.floor(time.cur) != time.prev) {
+    if ( Math.floor(time.cur) != time.prev ) {
         update_spheres_CSV(Math.floor(time.cur));
-        time.prev = time.cur;
+        time.prev = Math.floor(time.cur);
     }
     if (time.cur > time.max) { time.cur -= time.max; }
     requestAnimationFrame( animate );
@@ -904,11 +915,11 @@ function animate() {
 };
 
 function render() {
-    if ( view_mode === 'catch_particle' && window.viewerType == "VR" ) {
+    if ( view_mode === 'catch_particle' && window.display_type == "VR" ) {
         cleanIntersected();
         intersectObjects( controller1 );
         intersectObjects( controller2 );
     }
-    if (window.viewerType == "anaglyph") { effect.render( scene, camera ); }
+    if (window.display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
 };
