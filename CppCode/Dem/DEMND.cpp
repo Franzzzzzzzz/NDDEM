@@ -123,20 +123,22 @@ int main (int argc, char *argv[])
       Tools::orthonormalise(A[i]) ;
     }
 
+    // Boundary conditions ...
     P.perform_PBC(X[i], PBCFlags[i]) ;
-
+    
     // Find ghosts
     Ghost[i]=0 ; Ghost_dir[i]=0 ;
     u_int32_t mask=1 ;
 
     for (int j=0 ; j<d ; j++, mask<<=1)
     {
-     if (P.Boundaries[j][3] != 0) continue ;
+     if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC)) continue ;
      if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
      else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;
    }
+   P.perform_MOVINGWALL() ; 
    Benchmark::stop_clock("Verlet 1st");
 
    //---------- Velocity Verlet step 2 : compute the forces and torques
@@ -192,7 +194,7 @@ int main (int argc, char *argv[])
            tmpcp.setinfo(CLw.default_action());
            for (int j=0 ; j<d ; j++) // Wall contacts
            {
-                if (P.Boundaries[j][3]!=1) continue ;
+                if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
 
                 tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
                 if (tmpcp.contactlength<P.skin)

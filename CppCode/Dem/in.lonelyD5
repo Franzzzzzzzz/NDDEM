@@ -4,18 +4,18 @@ directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD5
 dimensions 5 1
 
 #set adimensional
-radius -1 0.25
+radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
 
-boundary 0 WALL 0 1
-boundary 1 WALL 0 1
-boundary 2 WALL 0 1
-boundary 3 WALL 0 1
-boundary 4 WALL 0 1
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
+boundary 4 WALL 0 5
 
-location 0 0.5 0.5 0.5 0.5 0.5
+location 0 2.5 2.5 2.5 2.5 2.5
 velocity 0 0.56449912 0.2551427 0.00227766 0.53903389 0.570684
 
 gravity 0 0 0 0 0

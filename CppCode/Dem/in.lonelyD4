@@ -4,17 +4,17 @@ directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD4
 dimensions 4 1
 
 #set adimensional
-radius -1 0.25
+radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
 
-boundary 0 WALL 0 1
-boundary 1 WALL 0 1
-boundary 2 WALL 0 1
-boundary 3 WALL 0 1
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
 
-location 0 0.5 0.5 0.5 0.5
+location 0 2.5 2.5 2.5 2.5
 velocity 0 0.33036717 0.38848501 0.19905226 0.83684833
 
 gravity 0 0 0 0
