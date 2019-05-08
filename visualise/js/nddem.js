@@ -33,6 +33,7 @@ else { pinky = 100}; // which particle to catch
 var fname = window.fname;
 if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
 
+
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material;
 var cache = false;
@@ -60,6 +61,7 @@ function init() {
                             world[j].max = 1.;
                             world[j].cur = 0.5;
                             world[j].prev = 0.5;
+                            world[j].wall = false;
                         }
 
                     }
@@ -70,6 +72,7 @@ function init() {
                             world[l[1]].cur = (world[l[1]].min + world[l[1]].max)/2.;
                             world[l[1]].prev = world[l[1]].cur;
                         }
+                        if ( l[2] == 'WALL' ) { world[l[1]].wall = true; }
                     }
                     else if (l[0] == 'set') {
                         if (l[1] == 'T') {
@@ -106,7 +109,7 @@ function build_world() {
     scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
     make_camera();
-    // make_walls();
+    make_walls();
     if ( !fname.includes('Spinner') ) { make_axes(); }
     make_lights();
     add_renderer();
@@ -130,6 +133,10 @@ function make_camera() {
         if ( fname.includes('Spinner') ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
             camera.position.set(0,0,-N);
+        }
+        else if ( fname.includes('Lonely') ) {
+            camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
+            camera.position.set((world[0].min + world[0].max)/2.,(world[1].min + world[1].max)/2.,-world[0].max/zoom*25.);
         }
         else {
             if ( window.display_type == 'anaglyph' ) {
@@ -261,7 +268,14 @@ function add_controllers() {
     };
 }
 function aim_camera() {
-    if ( N > 2 ) {
+    if ( fname.includes('Lonely') ) {
+        controls.target0.set(
+            (world[0].min + world[0].max)/2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
+            (world[1].min + world[1].max)/2.,
+            (world[2].min + world[2].max)/2.,
+        );
+    }
+    else if ( N > 2 ) {
         controls.target0.set(
             (world[0].min + world[0].max)/2./2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
             (world[1].min + world[1].max)/2.,
@@ -409,43 +423,62 @@ function make_lights() {
 
 function make_walls() {
     var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-    var material = new THREE.MeshPhongMaterial( {
-        color: 0xeeeeee,
+    var material = new THREE.MeshStandardMaterial( {
+        color: 0xaaaaaa,
         // roughness: 1.0,
-        // metalness: 0.0,
+        // metalness: 1.0,
     } );
     material.transparent = true;
     material.opacity = 0.5;
-    material.side = THREE.DoubleSide;
+    // material.side = THREE.DoubleSide;
 
-    var floor = new THREE.Mesh( geometry, material );
-    floor.rotation.x = - Math.PI / 2;
-    floor.position.set(0.5,0,0.5)
-    scene.add( floor );
+    // for ( var i=0;i<N;i++ ) {
+        // if ( world[i].wall ) {
+                // do it nicely
+        // }
+    // }
 
-    var roof = new THREE.Mesh( geometry, material );
-    roof.rotation.x = - Math.PI / 2;
-    roof.position.set(0.5,1,0.5)
-    scene.add( roof );
+    if ( world[0].wall ) {
+        var floor = new THREE.Mesh( geometry, material );
+        floor.scale.set(world[1].max - world[1].min,world[2].max - world[2].min,1)
+        floor.rotation.y = + Math.PI / 2;
+        floor.position.set(world[0].min,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
+        scene.add( floor );
 
-    var left_wall = new THREE.Mesh( geometry, material );
-    left_wall.rotation.y = - Math.PI / 2;
-    left_wall.position.set(0.5,1,0.5)
-    scene.add( left_wall );
+        var roof = new THREE.Mesh( geometry, material );
+        roof.scale.set(world[1].max - world[1].min,world[2].max - world[2].min,1)
+        roof.rotation.y = - Math.PI / 2;
+        roof.position.set(world[0].max,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
+        scene.add( roof );
+    }
 
-    var right_wall = new THREE.Mesh( geometry, material );
-    right_wall.rotation.y = - Math.PI / 2;
-    right_wall.position.set(0.5,1,0.5)
-    scene.add( right_wall );
+    if ( world[1].wall ) {
+        var left_wall = new THREE.Mesh( geometry, material );
+        left_wall.scale.set(world[2].max - world[2].min,world[0].max - world[0].min,1)
+        left_wall.rotation.x = - Math.PI / 2;
+        left_wall.position.set((world[0].max - world[0].min)/2.,world[1].min,(world[2].max - world[2].min)/2.)
+        scene.add( left_wall );
+
+        var right_wall = new THREE.Mesh( geometry, material );
+        right_wall.scale.set(world[2].max - world[2].min,world[0].max - world[0].min,1)
+        right_wall.rotation.x = Math.PI / 2;
+        right_wall.position.set((world[0].max - world[0].min)/2.,world[1].max,(world[2].max - world[2].min)/2.)
+        scene.add( right_wall );
+    }
 
     if (N > 2) {
-        var front_wall = new THREE.Mesh( geometry, material );
-        front_wall.position.set(0.5,1,0.5)
-        scene.add( front_wall );
+        if ( world[2].wall ) {
+            var front_wall = new THREE.Mesh( geometry, material );
+            front_wall.scale.set(world[0].max - world[0].min,world[1].max - world[1].min,1)
+            front_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].min)
+            scene.add( front_wall );
 
-        var back_wall = new THREE.Mesh( geometry, material );
-        front_wall.position.set(0.5,1,0.5)
-        scene.add( back_wall );
+            var back_wall = new THREE.Mesh( geometry, material );
+            back_wall.scale.set(world[0].max - world[0].min,world[1].max - world[1].min,1)
+            back_wall.rotation.y = Math.PI;
+            back_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].max)
+            scene.add( back_wall );
+        }
     }
 
 }
@@ -545,6 +578,7 @@ function add_torus() {
 function remove_everything() {
     window.addEventListener("message", receiveMessage, false);
     function receiveMessage(event) {
+        console.log('Closing renderer')
         // console.log(particles);
         // console.log(wristband);
         // console.log(wristband1);
