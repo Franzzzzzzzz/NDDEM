@@ -1,8 +1,8 @@
 #include "../Dem/Tools.h"
 #include "TinyPngOut.hpp"
 
-#define Nlambda 6
-#define Ntheta 6
+#define Nlambda 8
+#define Ntheta 8
 
 using namespace std ;
 // needed for Tools
@@ -16,6 +16,7 @@ boost::random::mt19937 Tools::rng ;
 boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
 void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d) ;
+int write_colormap_vtk (int d) ;
 int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
 int csvread_A (char path[], v2d &result, int d) ;
 int csvread_XR (char path[], v2d & result, v1d &R, int d) ;
@@ -34,6 +35,9 @@ vector<vector<float>> colors = {
 //Args: d V1 V2 ... VN locationfile Afile
 int main (int argc, char * argv[])
 {
+ /* TEST
+ write_colormap_vtk(4) ;
+ exit(0) ; */
  int d ;
  d = atoi(argv[1]) ;
  Tools::initialise(d) ;
@@ -58,7 +62,7 @@ int main (int argc, char * argv[])
  for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
  for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
  thetagrid[Ntheta-1]=thetagrid[0];
- 
+
  // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
  int nrotate = 0 ;
  if (d>3) //All view dimensions are NaN if d==3
@@ -108,6 +112,7 @@ int main (int argc, char * argv[])
              // Finalising the phi array (useless, but just because
              phi[d-3]=lambda ;
              phi[d-2]=theta ;
+
              for (int dd=0 ; dd<d ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
              //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
 
@@ -125,6 +130,8 @@ int main (int argc, char * argv[])
 
              Tools::matvecmult(spturned, A[i], sp) ;
              Tools::hyperspherical_xtophi (spturned, phi) ;
+             printf("%g %g %g | %g %g %g | %g %g %g\n", sp[0], sp[1], sp[2], spturned[0], spturned[1],spturned[2], phi[0], phi[1], phi[2]) ;
+             //if (phi[1]==0) phi[1]=M_PI ;
              phi2color (img.begin() + n*3, phi, d) ;
              n++ ;
          }
@@ -136,29 +143,38 @@ int main (int argc, char * argv[])
 
 
 // =============================
+void rescale (v1f & c, cv1f sum)
+{
+  for (int i=0 ; i<c.size() ; i++)
+    if (sum[i]!=0)
+      c[i]/=sum[i] ;
+}
+//--------------------------------------------------------
 void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
 {
     int vbyte ;
     vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
-    //printf("%g %g\n", phi[0], phi[1]) ; 
-    //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ; 
-    phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
-    phi[d-2] /= 2 ; 
-    for (int i=0 ; i<d-1 ; i++)
+    //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ;
+    //phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
+    //phi[d-2] /= 2 ;
+    for (int i=0 ; i<d-2 ; i++)
     {
-        ctmp += (colors[i] * sin(phi[i])) ;  
-        sum += colors[i] ; 
+        ctmp += (colors[i] * sin(phi[i])) ;
+        sum += colors[i] ;
     }
-    ctmp /= sum ; 
-    for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
+    rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
+    //for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
+    ctmp *= sin(phi[d-2]/2.) ;
+    //printf("%g %g %g\n", ctmp[0], ctmp[1], ctmp[2]) ;
     //ctmp = (colors[0]*sin(phi[0]) + colors[1]*sin(phi[1]/2)) * sin(phi[0]) ;
-    cfinal = ctmp ; 
+    cfinal = ctmp ;
     for (int i=0 ; i<3 ; i++)
     {
-        vbyte = cfinal[i]*256 ;
-        vbyte=vbyte>255?255:vbyte ;
-        vbyte=vbyte<0?0:vbyte ;
+        cfinal[i] = round(cfinal[i]*256) ;
+        cfinal[i]=cfinal[i]>255?255:cfinal[i] ;
+        cfinal[i]=cfinal[i]<0?0:cfinal[i] ;
+        vbyte=cfinal[i] ;
         *(px+i) = vbyte ;
     }
     return ;
@@ -185,8 +201,8 @@ int csvread_A (char path[], v2d & result, int d)
 {
  FILE *in ; int n=0 ; double tmp ;
  in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
- int r ; 
- 
+ int r ;
+
  r=fscanf(in,"%*[^\n]%*c") ; // Skipping header
 
  while (!feof(in))
@@ -200,7 +216,7 @@ int csvread_A (char path[], v2d & result, int d)
          r=fscanf(in, "%lg%*c", &result[n][i]) ;
 
      //dispvector(result[n]) ;
-     r=r ; 
+     r=r ;
      n++ ;
  }
 
@@ -212,8 +228,8 @@ int csvread_XR (char path[], v2d & result, v1d &R, int d)
 {
  FILE *in ; int n=0 ; double tmp ;
  in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
- int r ; 
- 
+ int r ;
+
  r=fscanf(in,"%*[^\n]%*c") ; // Skipping header
 
  while (!feof(in))
@@ -229,10 +245,47 @@ int csvread_XR (char path[], v2d & result, v1d &R, int d)
      r=fscanf(in, "%lg%*c", &R[n]) ;
      //printf("%g %g %g %g\n", result[n][0], result[n][1], result[n][2], R[n]) ;
      r=fscanf(in, "%*s%*c") ;
-     r=r ; 
+     r=r ;
      n++ ;
  }
 
  fclose(in) ;
  return 0 ;
+}
+//--------------
+int write_colormap_vtk(int d)
+{
+int nvalues=10 ;
+int vvalues=5 ;
+vector<double> p(3), ptmp ;
+vector <uint8_t> a ;
+a.resize(3,0) ;
+
+if (d!=4) printf("ERROR: cannot export the colormap for d!=4 currently\n") ;
+
+FILE *vtkout ;
+vtkout=fopen("Colormap.vtk", "w") ;
+fprintf(vtkout,"# vtk DataFile Version 2.0\nTexture for ND DEM\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n\nPOINT_DATA %d\nCOLOR_SCALARS Color 3\n", nvalues, nvalues, nvalues, 0 +M_PI/2/nvalues, 0 + M_PI/2/nvalues, 0+M_PI/nvalues, M_PI/nvalues, M_PI/nvalues, 2*M_PI/nvalues, nvalues*nvalues*nvalues) ;
+
+p[2] = 0 + M_PI/nvalues ;
+printf("%g ", p[2]) ;
+for (int i=0 ; i<nvalues ; i++)
+{
+  p[1] = 0 +M_PI/2/nvalues ;
+  for (int j=0 ; j<nvalues ; j++)
+  {
+    p[0] = 0+M_PI/2/nvalues ;
+    for (int k=0 ; k<nvalues ; k++)
+    {
+      ptmp=p ;
+      phi2color(a.begin(), ptmp, d) ;
+      //printf("%g %g %g\n", p[0], p[1], p[2]) ;
+      fprintf(vtkout, "%g %g %g\n", a[0]/256., a[1]/256., a[2]/256.) ;
+      p[0] += M_PI/nvalues ;
+    }
+    p[1] += M_PI/nvalues ;
+  }
+  p[2] += 2*M_PI/nvalues ;
+}
+return 0 ;
 }

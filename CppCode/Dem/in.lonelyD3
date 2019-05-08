@@ -28,5 +28,5 @@ set dt 0.0001
 #set dumps XML with 3 Position Velocity Omega
 set dumps CSV with 1 Orientation
 #set dumps VTK with 0
-set tdump 10000
+set tdump 1000
 EOF

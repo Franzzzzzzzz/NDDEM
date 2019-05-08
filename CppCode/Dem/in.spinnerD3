@@ -13,18 +13,18 @@ boundary 0 PBC -2 2
 boundary 1 PBC -2 2
 boundary 2 PBC -2 2
 
-location 0 0 1 0
-location 1 1 1 0
-location 2 -1 0 0
-location 3 1 0 0
-location 4 -1 -1 0
-location 5 0 -1 0
-omega 0 1 0 0
-omega 1 0 1 0
-omega 2 0 0 1
-omega 3 1 0 0
-omega 4 0 1 0
-omega 5 0 0 1
+location 0 0 1 0 
+location 1 1 1 0 
+location 2 1 0 0 
+location 3 -1 0 0 
+location 4 -1 -1 0 
+location 5 0 -1 0 
+omega 0 1 0 0 
+omega 1 0 1 0 
+omega 2 0 0 1 
+omega 3 1 0 0 
+omega 4 0 1 0 
+omega 5 0 0 1 
 
 gravity 0 0 0
 set Kn 2e5

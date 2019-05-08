@@ -7,7 +7,7 @@ struct Param {
   int maxT = 100 ;
   double rho=1 ;
   vector <string> flags = {"RHO", "VAVG"} ;
-  vector <int> boxes= {5,3,5} ;
+  vector <int> boxes= {4,3,8} ;
   vector <vector <double> > boundaries ;
   vector <double> radius ;
   string save="" ;
@@ -80,6 +80,7 @@ int main (int argc, char * argv[])
  }
 
  C.write_vtk("Coarsed") ;
+ C.write_NrrdIO("Coarsed") ; 
 
 
 

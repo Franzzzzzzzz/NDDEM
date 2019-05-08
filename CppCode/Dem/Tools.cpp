@@ -424,7 +424,7 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
     for (uint j=0 ; j<d-1 ; j++)
     {
        phi[j] = acos(x[j]/sqrt(rsqr)) ;
-       if (isnan(phi[j])) phi[j]=acos(sgn(x[j])) ;
+       if (isnan(phi[j])) {phi[j]=acos(sgn(x[j])*x[j]) ;} //TODO Check that ................
        rsqr -= x[j]*x[j] ;
     }
     //printf("%g %g %g | %g | %g %g \n ", x[0], x[1], x[2], normsq(x), phi[0], phi[1]) ;

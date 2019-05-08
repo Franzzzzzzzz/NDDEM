@@ -624,10 +624,11 @@ int Coarsing::write_vtk(string sout)
 //-------------------------------------------------------
 int Coarsing ::write_NrrdIO (string path)
 {
+  printf("Hey") ;
 #ifdef NRRDIO
     double * outdata ;
     int dimtime=d+2 ;
-
+printf("YO") ; 
     Nrrd *nval;
     auto nio = nrrdIoStateNew();
     nrrdIoStateEncodingSet(nio, nrrdEncodingAscii) ; //Change to nrrdEncodingRaw for binary encoding
@@ -704,7 +705,11 @@ int Coarsing ::write_NrrdIO (string path)
       fullpath = path + Fname[f] + ".nrrd" ;
       nrrdSave(fullpath.c_str(), nval, nio);
       free(outdata) ;
+
+      printf("%s ", fullpath.c_str()) ;
     }
+
+printf("DONE") ;
 #endif
 }
 
