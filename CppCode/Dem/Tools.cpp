@@ -421,9 +421,21 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
 {
     double rsqr = normsq(x) ;
     double r= sqrt(rsqr) ;
-    for (uint j=0 ; j<d-1 ; j++)
+    uint j;
+    phi=vector<double>(d-1, 0) ; 
+    for (j=d-1 ; j>=0 && fabs(x[j])<1e-6 ; j--) ; 
+    uint lastnonzero=j ;     
+    for (j=0 ; j<d-1 ; j++)
     {
+       if (j==lastnonzero)
+       {
+           printf("!!") ; 
+           if (x[j]<0) phi[j]=M_PI ; 
+           else phi[j]=0 ;
+           return r ; 
+       }
        phi[j] = acos(x[j]/sqrt(rsqr)) ;
+       //printf("[%g %g]", x[j], sqrt(rsqr)) ; 
        if (isnan(phi[j])) {phi[j]=acos(sgn(x[j])*x[j]) ;} //TODO Check that ................
        rsqr -= x[j]*x[j] ;
     }

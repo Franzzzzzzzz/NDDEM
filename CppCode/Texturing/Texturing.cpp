@@ -1,8 +1,8 @@
 #include "../Dem/Tools.h"
 #include "TinyPngOut.hpp"
 
-#define Nlambda 8
-#define Ntheta 8
+#define Nlambda 32
+#define Ntheta 32
 
 using namespace std ;
 // needed for Tools
@@ -15,7 +15,7 @@ vector <FILE *> Tools::outs ;
 boost::random::mt19937 Tools::rng ;
 boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
-void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d) ;
+void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d) ;
 int write_colormap_vtk (int d) ;
 int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
 int csvread_A (char path[], v2d &result, int d) ;
@@ -25,8 +25,8 @@ void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflu
 void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 
 vector<vector<float>> colors = {
-    {1,0,0},
-    {0,1,0},
+    {1,1,0},
+    {0,1,1},
     {0,0,1},
     {1,1,0},
     {0,1,1},
@@ -42,7 +42,7 @@ int main (int argc, char * argv[])
  d = atoi(argv[1]) ;
  Tools::initialise(d) ;
  if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
- v1d phi (d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+ v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
 
  v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
  for (int i=0 ; i<d ; i++) View[i]=atof(argv[i+2]) ;
@@ -80,7 +80,7 @@ int main (int argc, char * argv[])
     }
     nrotate %= View.size() ;
  }
-
+ 
  for (int i=0 ; i<N ; i++)
  {
      // Check if we are in view
@@ -101,13 +101,13 @@ int main (int argc, char * argv[])
      {
        double cosine = (View[j]-X[i][j])/R[i] ;
        for (int k=0 ; k<j ; k++)
-         cosine= View[j] / sin(phi[k]) ;
+         cosine /= sin(phi[k]) ;
        phi[j] = acos(cosine) ;
      }
 
      int n=0 ;
-     for (auto lambda : lambdagrid)
-         for (auto theta : thetagrid)
+     for (auto theta : thetagrid)
+        for (auto lambda : lambdagrid)
          {
              // Finalising the phi array (useless, but just because
              phi[d-3]=lambda ;
@@ -127,12 +127,13 @@ int main (int argc, char * argv[])
              //printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;
              // Rotating the point vector back in dimensions, and then rotating in space according to the basis A
              rotate(sp.begin(), sp.begin()+((d-nrotate)%d), sp.end()) ;
-
              Tools::matvecmult(spturned, A[i], sp) ;
-             Tools::hyperspherical_xtophi (spturned, phi) ;
-             printf("%g %g %g | %g %g %g | %g %g %g\n", sp[0], sp[1], sp[2], spturned[0], spturned[1],spturned[2], phi[0], phi[1], phi[2]) ;
+             // and ... rotating back :)
+             rotate(spturned.begin(), spturned.begin()+nrotate, spturned.end()) ;
+             Tools::hyperspherical_xtophi (spturned, phinew) ;
+             printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
              //if (phi[1]==0) phi[1]=M_PI ;
-             phi2color (img.begin() + n*3, phi, d) ;
+             phi2color (img.begin() + n*3, phinew, d) ;
              n++ ;
          }
      write_img(argv[argc-1], Ntheta, Nlambda, img.data(), i) ;
@@ -150,7 +151,7 @@ void rescale (v1f & c, cv1f sum)
       c[i]/=sum[i] ;
 }
 //--------------------------------------------------------
-void phi2color (vector<uint8_t>::iterator px, v1d & phi, int d)
+void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
 {
     int vbyte ;
     vector <float> ctmp (3,0), sum(3,0) ;
