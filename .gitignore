@@ -1,3 +1,7 @@
 .DS_Store
 *.o
 node_modules/
+CppCode/Dem/DEMND
+CppCode/Dem/xml2vtk
+package-lock.json
+Samples

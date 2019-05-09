@@ -29,8 +29,8 @@ void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflu
 void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 
 vector<vector<float>> colors = {
-    {1,1,0},
-    {0,1,1},
+    {1,0,0},
+    {0,1,0},
     {0,0,1},
     {1,1,0},
     {0,1,1},
@@ -87,6 +87,8 @@ int main (int argc, char * argv[])
     nrotate %= View.size() ;
  }
 
+ FILE *log = fopen("Loging.log", "a") ;
+ fprintf(log, "%d ",N) ;
  for (int i=0 ; i<N ; i++)
  {
      // Check if we are in view
@@ -112,8 +114,8 @@ int main (int argc, char * argv[])
      }
 
      int n=0 ;
-     for (auto theta : thetagrid)
-        for (auto lambda : lambdagrid)
+     for (auto lambda : lambdagrid)
+        for (auto theta : thetagrid)
          {
              // Finalising the phi array (useless, but just because
              phi[d-3]=lambda ;
@@ -137,7 +139,7 @@ int main (int argc, char * argv[])
              // and ... rotating back :)
              rotate(spturned.begin(), spturned.begin()+nrotate, spturned.end()) ;
              Tools::hyperspherical_xtophi (spturned, phinew) ;
-             printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
+             //printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
              //if (phi[1]==0) phi[1]=M_PI ;
              phi2color (img.begin() + n*3, phinew, d) ;
              n++ ;
