@@ -333,10 +333,10 @@ THREE.NRRDLoader.prototype = {
 		volume.windowHigh = max;
 
 		// get the image dimensions
-		volume.dimensions = headerObject.sizes.slice(0,headerObject.sizes.length-1);
+		volume.dimensions = headerObject.sizes;
 		volume.time = headerObject.sizes[headerObject.sizes.length-1];
 
-        if ( headerObject.tt === 'RGB' ) { volume.RGB = true; }
+        if ( headerObject.type === 'unsigned char' ) { volume.RGB = true; }
         else { volume.RGB = false; }
 
         // console.log(volume.time);

@@ -132,7 +132,7 @@ function make_camera() {
     else {
         if ( fname.includes('Spinner') ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-            camera.position.set(0,0,-N);
+            camera.position.set(0,0,N);
         }
         else if ( fname.includes('Lonely') ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
@@ -282,7 +282,8 @@ function aim_camera() {
             (world[2].min + world[2].max)/2.,
         );
     }
-    controls.up0.set( 1, 0, 0 ); // set x as up
+    if ( fname.includes('Spinner') ) { controls.up0.set( 0, 1, 0 ); } // set x as up
+    else { controls.up0.set( 1, 0, 0 ); }
     controls.reset();
 }
 

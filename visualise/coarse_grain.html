@@ -43,10 +43,12 @@
             world,
             time,
             data,
+            rgb,
             nx,ny,nz;
 
-        // fname = "Samples/D3/CoarsedRHO.nrrd"
-        fname = "Samples/D3/CoarsedVAVG.nrrd"
+        fname = "Samples/D3/CoarsedRHO.nrrd"
+        // fname = "Samples/D3/CoarsedVAVG.nrrd"
+        // fname = "Samples/Colormap.nrrd"
 		init();
 		function init() {
 			scene = new THREE.Scene();
@@ -74,8 +76,8 @@
 			// Lighting is baked into the shader a.t.m.
 			// var dirLight = new THREE.DirectionalLight( 0xffffff );
 			// The gui for interaction
-			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'inferno' };
-            time = {'min':0,'max':1,'cur':20,'rate':0.5,'play':false,'c':0}; // c is which component to show
+			volconfig = { clim1: 0, clim2: 1, renderstyle: 'mip', isothreshold: 0.15, colormap: 'inferno' };
+            time = {'min':0,'max':1,'cur':0,'rate':0.5,'play':false,'c':0}; // c is which component to show
 			var gui = new dat.GUI();
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
@@ -87,14 +89,15 @@
                 // .load( "http://localhost:8000/visualise/resources/stent.nrrd", function ( volume ) {
                 .load( "http://localhost:8000/" + fname, function ( volume ) {
                 // Get correct slice of current data
+
                 time.max = volume.time;
-                time.nc = volume.dimensions[0]*volume.dimensions[1]; // number of components to visualise
+                time.nc = volume.dimensions[0]*volume.dimensions[1];
                 nx = volume.dimensions[2];
                 ny = volume.dimensions[3];
                 nz = volume.dimensions[4];
 
-                gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time').onChange( function() { updateUniforms() }) ;
-                var extra_dims = volume.dimensions.length - 5;
+                gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time').onChange( function() { updateUniforms() });
+                var extra_dims = volume.dimensions.length - 6;
 
                 world = [];
                 for ( var i=0;i<extra_dims;i++ ) {
@@ -104,27 +107,24 @@
                     world[i].cur = volume.dimensions[i+5]/2.;
                     gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i+3).onChange( function() { updateUniforms() });
                 }
-                if ( time.nc > 1 ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
+                if ( time.nc > 1 && !rgb ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
 
-                var start = 0;
-                var end   = nx*ny*nz;
+                var start = [0,0,0,0,0,0];
+                var end   = [0,0,nx,ny,nz,0];
                 data = volume.data;
+                // var display_data = data.slice(0,nx*ny*nz);
+                display_data = get_data(volume.data,start,end);
                 // console.log(volume.dimensions);
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the RedFormat and FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
-				texture = new THREE.DataTexture3D( data.slice(start,end), nx, ny, nz );
-                if ( volume.RGB ) {
-                    texture.format = THREE.RGBFormat;
-    				texture.type = THREE.UnsignedByteType;
-                }
-                else {
-    				texture.format = THREE.RedFormat;
-    				texture.type = THREE.FloatType;
-                }
-				texture.minFilter = texture.magFilter = THREE.LinearFilter;
+				texture = new THREE.DataTexture3D( display_data, nx, ny, nz );
+				texture.format = THREE.RedFormat;
+				texture.type = THREE.FloatType;
+                texture.minFilter = texture.magFilter = THREE.LinearFilter;
+
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
 				// Colormap textures
@@ -158,15 +158,14 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 		}
 		function updateUniforms() {
-            var start = (time.cur*time.c)*nx*ny*nz;
-            var end   = (time.cur*time.c+1)*nx*ny*nz;
-            texture.image.data = data.slice(start,end);
+            var start = [0,0,0,0,0,time.cur];
+            var end   = [0,0,nx,ny,nz,time.cur];
+            texture.image.data = get_data(data,start,end);
             texture.needsUpdate = true;
 			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
 			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
 			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
 			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
-            // material.needsUpdate = true;
 			render();
 		}
 		function onWindowResize() {
@@ -181,6 +180,22 @@
 		function render() {
 			renderer.render( scene, camera );
 		}
+        function get_data(data,start,end) {
+            length = nx*ny*nz;
+            output = new Float32Array(length);
+            n = [1,time.nc,time.nc*nx,time.nc*nx*ny,time.nc*nx*ny*nz];
+            for ( var i=0;i<nx;i++ ) {
+                for ( var j=0;j<ny;j++ ) {
+                    for ( var k=0;k<nz;k++ ) {
+                        shaped_pos = [time.c,i,j,k,time.cur]
+                        var linear_pos = 0;
+                        for (var l=0; l< n.length; l++) { linear_pos += n[l]*shaped_pos[l]; };
+                        output[k + j*nx + i*nx*ny] = data[linear_pos]
+                    }
+                }
+            }
+            return output;
+        }
 	</script>
 
 </body>
