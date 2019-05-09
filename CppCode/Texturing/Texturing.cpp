@@ -1,5 +1,8 @@
 #include "../Dem/Tools.h"
 #include "TinyPngOut.hpp"
+#ifdef NRRDIO
+#include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
+#endif
 
 #define Nlambda 32
 #define Ntheta 32
@@ -17,6 +20,7 @@ boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
 void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d) ;
 int write_colormap_vtk (int d) ;
+int write_NrrdIO (string path, int d) ;
 int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
 int csvread_A (char path[], v2d &result, int d) ;
 int csvread_XR (char path[], v2d & result, v1d &R, int d) ;
@@ -35,9 +39,11 @@ vector<vector<float>> colors = {
 //Args: d V1 V2 ... VN locationfile Afile
 int main (int argc, char * argv[])
 {
- /* TEST
- write_colormap_vtk(4) ;
- exit(0) ; */
+  //TEST
+ //write_colormap_vtk(4) ;
+ //write_NrrdIO("Colormap.nrrd", 4) ;
+ //exit(0) ;
+
  int d ;
  d = atoi(argv[1]) ;
  Tools::initialise(d) ;
@@ -80,7 +86,7 @@ int main (int argc, char * argv[])
     }
     nrotate %= View.size() ;
  }
- 
+
  for (int i=0 ; i<N ; i++)
  {
      // Check if we are in view
@@ -131,7 +137,7 @@ int main (int argc, char * argv[])
              // and ... rotating back :)
              rotate(spturned.begin(), spturned.begin()+nrotate, spturned.end()) ;
              Tools::hyperspherical_xtophi (spturned, phinew) ;
-             printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
+             //printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
              //if (phi[1]==0) phi[1]=M_PI ;
              phi2color (img.begin() + n*3, phinew, d) ;
              n++ ;
@@ -288,5 +294,89 @@ for (int i=0 ; i<nvalues ; i++)
   }
   p[2] += 2*M_PI/nvalues ;
 }
+return 0 ;
+}
+//-------------------------------------------
+int write_NrrdIO (string path, int d)
+{
+#ifdef NRRDIO
+    int npoints=16 ;
+    vector<double> p(d,0) ;
+
+    Nrrd *nval;
+    auto nio = nrrdIoStateNew();
+    nrrdIoStateEncodingSet(nio, nrrdEncodingAscii) ; //Change to nrrdEncodingRaw for binary encoding
+    nval = nrrdNew();
+
+    // Header infos
+    vector <size_t> dimensions (d, npoints) ;
+    dimensions[0] = 3 ;
+    dimensions[1]= npoints*2 ;
+
+    vector <int> nrrdkind (d, nrrdKindSpace) ;
+    nrrdkind[0]=nrrdKindVector ;
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoKind, nrrdkind.data() );
+
+    vector <double> nrrdmin(d,0+M_PI/npoints/2), nrrdmax(d,M_PI-M_PI/npoints/2), nrrdspacing(d,M_PI/npoints) ;
+    nrrdmin[0]=nrrdmax[0]=nrrdspacing[0]=AIR_NAN ;
+    //nrrdmin[d-1]=0+M_PI/npoints ; nrrdmax[d-1]=2*M_PI+M_PI/npoints ;
+
+    char ** labels;
+    labels=(char **) malloc(sizeof(char *) * (d+3)) ;
+    labels[0]=(char *) malloc(sizeof(char) * (4)) ;
+    sprintf(labels[0], "rgb") ;
+    for (int dd=1 ; dd<d ; dd++)
+    {
+        labels[dd]=(char *) malloc(sizeof(char) * (3+d/10+1+1)) ;
+        sprintf(labels[dd], "phi%d", dd) ;
+    }
+
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoLabel, labels);
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMin, nrrdmin.data());
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMax, nrrdmax.data());
+    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoSpacing, nrrdspacing.data());
+
+    int allpoint=pow(npoints,d-1)*2 ;
+    uint8_t * outdata, * pout ;
+    outdata=(uint8_t*) malloc(sizeof(uint8_t)*allpoint*3) ;
+
+  //---------------------------------------------------------------------
+    std::function <void(int,vector<double>)> lbdrecurse ;
+    pout=outdata ;
+    lbdrecurse = [&,d](int lvl, vector<double> p)
+    {
+      if (lvl<d-1)
+      {
+        p[lvl]=0+M_PI/npoints/2 ;
+        for (int i=0 ; i<npoints ; i++)
+        {
+          lbdrecurse(lvl+1, p) ;
+          p[lvl]+=M_PI/npoints ;
+        }
+      }
+      else
+      {
+        p[lvl]=0+M_PI/npoints/2 ;
+        for (int i=0 ; i<2*npoints ; i++)
+        {
+          auto ptmp=p ; vector <uint8_t> a(3,0) ;
+          phi2color(a.begin(), ptmp, d) ;
+          *pout=a[0] ; pout++ ;
+          *pout=a[1] ; pout++ ;
+          *pout=a[2] ; pout++ ;
+          p[lvl]+=M_PI/npoints ;
+        }
+      }
+    } ;
+    lbdrecurse(0,p) ;
+    //---------------------------------------------------------------------
+
+    nrrdWrap_nva(nval, outdata, nrrdTypeUChar, d, dimensions.data());
+    string fullpath ;
+    fullpath = path ;
+    nrrdSave(fullpath.c_str(), nval, nio);
+    free(outdata) ;
+    printf("%s ", fullpath.c_str()) ;
+#endif
 return 0 ;
 }

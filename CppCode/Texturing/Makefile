@@ -2,7 +2,7 @@ ifndef $(CC)
 CC=/opt/local/bin/g++-mp-6 # FG
 endif
 #CC=g++-8 # BM
-CC=g++
+#CC=g++
 
 # Basic compilation
 
@@ -12,14 +12,14 @@ CC=g++
 SOURCES=Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=Texturing
-LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
+LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall -L../CoarseGraining/NrrdIO-1.11.0-src/build
 LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs
+all: CFLAGS+=-g -O3 -I/usr/local/include -DNRRDIO -I/opt/local/include -Wall -fopenmp -lstdc++fs
 all: $(SOURCES) $(EXECUTABLE)
-all: LIBS+= -fopenmp -lstdc++fs #-lnetcdf
+all: LIBS+= -fopenmp -lstdc++fs -lNrrdIO #-lnetcdf
 all:
 
 #info:#
