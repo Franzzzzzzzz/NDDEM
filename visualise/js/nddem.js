@@ -11,7 +11,7 @@ var particles, wristband, wristband1, axesHelper, axesLabels; // groups of objec
 var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
-var ref_dim = {'c': 0} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
+var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.5} // temporal properties
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
 if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) };
@@ -114,7 +114,7 @@ function build_world() {
     make_lights();
     add_renderer();
     add_controllers();
-    if ( N > 3 ) { add_torus(); }
+    if ( N > 3 && !fname.includes('Spinner') ) { add_torus(); }
     // load_hyperspheres_VTK();
     make_initial_spheres_CSV();
     update_spheres_CSV(0);
@@ -172,10 +172,10 @@ function add_renderer() {
 function add_gui() {
     if ( window.display_type == 'anaglyph' || window.display_type == 'keyboard' ) {
         var gui = new dat.GUI();
-        gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
+        //gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
             for (i=3;i<N;i++) {
-                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('X'+i) ;
+                gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('x'+(i+1)) ;
             }
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
@@ -682,7 +682,7 @@ function make_initial_spheres_CSV() {
                     object.receiveShadow = true;
                 }
                 particles.add( object );
-                if ( N > 3 ) {
+                if ( N > 3 && !fname.includes('Spinner')) {
                     pointsMaterial = new THREE.PointsMaterial( { color: color } );
                     object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
                     object2.scale.set(R/scale,R/scale,R/scale);
@@ -793,7 +793,7 @@ function update_spheres_CSV(t) {
                     }
                 };
 
-                if ( N == 4 ) {
+                if ( N == 4 && !fname.includes('Spinner')) {
                     var object2 = wristband.children[i];
                     phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) + Math.PI/2.;
                     x = (R + r)*Math.cos(phi);
@@ -802,7 +802,7 @@ function update_spheres_CSV(t) {
                     object2.position.set(x,y,z);
                 };
 
-                if ( N > 4 ) {
+                if ( N > 4 && !fname.includes('Spinner') ) {
                     var object2 = wristband.children[i];
                     phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) + Math.PI/2.;
                     theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
@@ -812,7 +812,7 @@ function update_spheres_CSV(t) {
                     object2.position.set(x,y,z);
                 };
 
-                if ( N == 6 ) {
+                if ( N == 6 && !fname.includes('Spinner') ) {
                     var object3 = wristband1.children[i];
                     phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) + Math.PI/2.;
                     x = (R + r)*Math.cos(phi);
@@ -821,7 +821,7 @@ function update_spheres_CSV(t) {
                     object3.position.set(x,y,z);
                 };
 
-                if ( N == 7 ) {
+                if ( N == 7 && !fname.includes('Spinner') ) {
                     var object3 = wristband1.children[i];
                     phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) + Math.PI/2.;
                     theta = 2.*Math.PI*(world[6].cur - spheres[i].x6)/(world[6].max - world[6].min) ;
