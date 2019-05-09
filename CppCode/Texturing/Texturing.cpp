@@ -4,12 +4,13 @@
 #include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
 
-#define Nlambda 32
-#define Ntheta 32
+//#define Nlambda 32
+//#define Ntheta 32
 
 using namespace std ;
 // needed for Tools
 uint Tools::d=0 ;
+int Nlambda=32, Ntheta=32 ; 
 vector < vector <int> > Tools::MSigns ;
 vector < vector <int> > Tools::MIndexAS ;
 vector < double > Tools::Eye ;
@@ -35,6 +36,11 @@ vector<vector<float>> colors = {
     {1,1,0},
     {0,1,1},
     {1,0,1}} ;
+    
+vector<vector<vector<float>>> allcolors = {
+    {{1,0,1}},
+    {{1,1,0},{0,1,1}}};
+    
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
 int main (int argc, char * argv[])
@@ -44,14 +50,27 @@ int main (int argc, char * argv[])
  //write_NrrdIO("Colormap.nrrd", 4) ;
  //exit(0) ;
 
- int d ;
- d = atoi(argv[1]) ;
+ int nb=atoi(argv[1]) ;    
+ if (nb>0 && nb<16) 
+     Nlambda=Ntheta=(1<<nb);
+ else if (nb>=16)
+     Nlambda=Ntheta=nb ; 
+ else
+ {
+     colors=allcolors[1] ; 
+     write_colormap_vtk(4) ;
+     exit(0) ; 
+ }
+ 
+ uint d ;
+ d = atoi(argv[2]) ;
  Tools::initialise(d) ;
  if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
+ if (d-3<allcolors.size()) colors=allcolors[d-3] ;
  v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
 
  v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
- for (int i=0 ; i<d ; i++) View[i]=atof(argv[i+2]) ;
+ for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
  v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
  vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
  v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the syrface of the sphere)
@@ -94,7 +113,7 @@ int main (int argc, char * argv[])
      // Check if we are in view
      double rsqr = R[i]*R[i] ;
      rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
-     for (int j=0 ; j<d-3 ; j++)
+     for (uint j=0 ; j<d-3 ; j++)
          rsqr -= (View[j]-X[i][j])*(View[j]-X[i][j]) ;
      if (rsqr<=0)
      {
@@ -105,10 +124,10 @@ int main (int argc, char * argv[])
      }
 
      // We are in view, let's get to it let's get the first phi's (constants)
-     for (int j=0 ; j<d-3 ; j++)
+     for (uint j=0 ; j<d-3 ; j++)
      {
        double cosine = (View[j]-X[i][j])/R[i] ;
-       for (int k=0 ; k<j ; k++)
+       for (uint k=0 ; k<j ; k++)
          cosine /= sin(phi[k]) ;
        phi[j] = acos(cosine) ;
      }
@@ -121,11 +140,11 @@ int main (int argc, char * argv[])
              phi[d-3]=lambda ;
              phi[d-2]=theta ;
 
-             for (int dd=0 ; dd<d ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
+             for (uint dd=0 ; dd<d ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
              //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
 
              sp[d-3] = R[i] ;
-             for (int j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
+             for (uint j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
              sp[d-2]=sp[d-3] ; sp[d-1]=sp[d-3] ;
              sp[d-3] *= cos(phi[d-3]) ;
              sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
@@ -154,7 +173,7 @@ int main (int argc, char * argv[])
 // =============================
 void rescale (v1f & c, cv1f sum)
 {
-  for (int i=0 ; i<c.size() ; i++)
+  for (uint i=0 ; i<c.size() ; i++)
     if (sum[i]!=0)
       c[i]/=sum[i] ;
 }
@@ -265,7 +284,6 @@ int csvread_XR (char path[], v2d & result, v1d &R, int d)
 int write_colormap_vtk(int d)
 {
 int nvalues=10 ;
-int vvalues=5 ;
 vector<double> p(3), ptmp ;
 vector <uint8_t> a ;
 a.resize(3,0) ;
