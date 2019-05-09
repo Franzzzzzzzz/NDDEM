@@ -19,7 +19,7 @@
 	<script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
 
 	<script src="node_modules/three/examples/js/Volume.js"></script>
-	<script src="node_modules/three/examples/js/loaders/NRRDLoader.js"></script>
+	<script src="js/NRRDLoader.js"></script> <!-- CUSTOM VERSION -->
 	<script src="node_modules/three/examples/js/shaders/VolumeShader.js"></script>
 
 	<script src="node_modules/three/examples/js/WebGL.js"></script>
@@ -36,8 +36,17 @@
 			camera,
 			controls,
 			material,
+            texture,
 			volconfig,
-			cmtextures;
+			cmtextures,
+            fname,
+            world,
+            time,
+            data,
+            nx,ny,nz;
+
+        // fname = "Samples/D3/CoarsedRHO.nrrd"
+        fname = "Samples/D3/CoarsedVAVG.nrrd"
 		init();
 		function init() {
 			scene = new THREE.Scene();
@@ -49,51 +58,86 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 			// Create camera (The volume renderer does not work very well with perspective yet)
-			var h = 512; // frustum height
+			var h = 16; // frustum height
 			var aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
-			camera.position.set( 0, 0, 128 );
+			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 0.1, 1000 );
+			camera.position.set( 20, 20, 20 );
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
 			// Create controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.addEventListener( 'change', render );
-			controls.target.set( 64, 64, 128 );
+			// controls.target.set( 64, 64, 128 );
 			controls.minZoom = 0.5;
 			controls.maxZoom = 4;
 			controls.update();
-			// scene.add( new THREE.AxesHelper( 128 ) );
+			scene.add( new THREE.AxesHelper( 128 ) );
 			// Lighting is baked into the shader a.t.m.
 			// var dirLight = new THREE.DirectionalLight( 0xffffff );
 			// The gui for interaction
-			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis' };
+			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'inferno' };
+            time = {'min':0,'max':1,'cur':20,'rate':0.5,'play':false,'c':0}; // c is which component to show
 			var gui = new dat.GUI();
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
+			gui.add( volconfig, 'colormap', { inferno: 'inferno', viridis: 'viridis', gray: 'gray' } ).onChange( updateUniforms );
 			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 			// Load the data ...
-			new THREE.NRRDLoader().load( "http://localhost:8000/visualise/stent.nrrd", function ( volume ) {
+			new THREE.NRRDLoader()
+                // .load( "http://localhost:8000/visualise/resources/stent.nrrd", function ( volume ) {
+                .load( "http://localhost:8000/" + fname, function ( volume ) {
+                // Get correct slice of current data
+                time.max = volume.time;
+                time.nc = volume.dimensions[0]*volume.dimensions[1]; // number of components to visualise
+                nx = volume.dimensions[2];
+                ny = volume.dimensions[3];
+                nz = volume.dimensions[4];
+
+                gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time').onChange( function() { updateUniforms() }) ;
+                var extra_dims = volume.dimensions.length - 5;
+
+                world = [];
+                for ( var i=0;i<extra_dims;i++ ) {
+                    world.push({});
+                    world[i].min = 0;
+                    world[i].max = volume.dimensions[i+5];
+                    world[i].cur = volume.dimensions[i+5]/2.;
+                    gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i+3).onChange( function() { updateUniforms() });
+                }
+                if ( time.nc > 1 ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
+
+                var start = 0;
+                var end   = nx*ny*nz;
+                data = volume.data;
+                // console.log(volume.dimensions);
+
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the RedFormat and FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
-				var texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
-				texture.format = THREE.RedFormat;
-				texture.type = THREE.FloatType;
+				texture = new THREE.DataTexture3D( data.slice(start,end), nx, ny, nz );
+                if ( volume.RGB ) {
+                    texture.format = THREE.RGBFormat;
+    				texture.type = THREE.UnsignedByteType;
+                }
+                else {
+    				texture.format = THREE.RedFormat;
+    				texture.type = THREE.FloatType;
+                }
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
 				// Colormap textures
 				cmtextures = {
-					viridis: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/cm_viridis.png', render ),
-					gray: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/cm_gray.png', render )
+                    inferno: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_inferno.png', render ),
+                    viridis: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_viridis.png', render ),
+					gray: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_gray.png', render )
 				};
 				// Material
 				var shader = THREE.VolumeRenderShader1;
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 				uniforms[ "u_data" ].value = texture;
-				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
+				uniforms[ "u_size" ].value.set( nx, ny, nz );
 				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
 				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
 				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
@@ -105,8 +149,8 @@
 					side: THREE.BackSide // The volume shader uses the backface as its "reference point"
 				} );
 				// Mesh
-				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
-				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
+				var geometry = new THREE.BoxBufferGeometry( nx, ny, nz );
+				geometry.translate( nx / 2 - 0.5, ny / 2 - 0.5, nz / 2 - 0.5 );
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 				render();
@@ -114,10 +158,15 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 		}
 		function updateUniforms() {
+            var start = (time.cur*time.c)*nx*ny*nz;
+            var end   = (time.cur*time.c+1)*nx*ny*nz;
+            texture.image.data = data.slice(start,end);
+            texture.needsUpdate = true;
 			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
 			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
 			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
 			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
+            // material.needsUpdate = true;
 			render();
 		}
 		function onWindowResize() {
