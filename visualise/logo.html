@@ -19,17 +19,16 @@
 	</head>
 	<body>
 	<div id="container" class="content"><br /><br /><br /><br /><br />Loading...</div>
-    <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/build/three.js"></script>
-    <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/libs/ammo.js"></script> DO NOT USE-->
-    <script src="https://raw.githack.com/benjym/CIVL5999/master/ammo.js"></script>
-    <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/WebGL.js"></script>
-    <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/build/three.js"></script> -->
+    <!-- <script src="https://raw.githack.com/benjym/CIVL5999/master/ammo.js"></script> -->
+    <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/WebGL.js"></script> -->
+    <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js"></script> -->
 
-	<!-- <script src="node_modules/three/build/three.js"></script> -->
-	<!-- <script src="node_modules/three/examples/js/libs/ammo.js"></script> -->
+	<script src="node_modules/three/build/three.js"></script>
+	<script src="node_modules/three/examples/js/libs/ammo.js"></script>
 	<!-- <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
-	<!-- <script src="node_modules/three/examples/js/WebGL.js"></script> -->
-    <!-- <script src="node_modules/three/examples/js/loaders/GLTFLoader.js"></script> -->
+	<script src="node_modules/three/examples/js/WebGL.js"></script>
+    <script src="node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
 
     <script type="x-shader/x-vertex" id="vertexshader">
 		attribute float scale;
@@ -163,9 +162,9 @@
             //        function (err) {console.log(err);});
 
             new THREE.GLTFLoader()
-                // .setPath( 'http://localhost:8000/visualise/resources/' )
-                // .load( '1227 Earth.gltf',
-                .load( 'https://rawcdn.githack.com/benjym/CIVL5999/master/resources/1227%20Earth.gltf', // resource URL
+                .setPath( 'http://localhost:8000/visualise/resources/' )
+                .load( '1227 Earth.gltf',
+                // .load( 'https://rawcdn.githack.com/benjym/CIVL5999/master/resources/1227%20Earth.gltf', // resource URL
             	   function ( gltf ) {
                         var s = 0.025;
                         mesh = gltf.scene;
