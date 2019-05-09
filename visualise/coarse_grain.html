@@ -46,8 +46,8 @@
             rgb,
             nx,ny,nz;
 
-        fname = "Samples/D3/CoarsedRHO.nrrd"
-        // fname = "Samples/D3/CoarsedVAVG.nrrd"
+        //fname = "Samples/D3/CoarsedRHO.nrrd"
+         fname = "Samples/D3/CoarsedVAVG.nrrd"
         // fname = "Samples/Colormap.nrrd"
 		init();
 		function init() {
@@ -187,10 +187,10 @@
             for ( var i=0;i<nx;i++ ) {
                 for ( var j=0;j<ny;j++ ) {
                     for ( var k=0;k<nz;k++ ) {
-                        shaped_pos = [time.c,i,j,k,time.cur]
+                        shaped_pos = [1,time.c,i,j,k,time.cur]
                         var linear_pos = 0;
                         for (var l=0; l< n.length; l++) { linear_pos += n[l]*shaped_pos[l]; };
-                        output[k + j*nx + i*nx*ny] = data[linear_pos]
+                        output[i + j*nx + k*nx*ny] = data[linear_pos]
                     }
                 }
             }

@@ -3,7 +3,7 @@
 
 struct Param {
   string dump ;
-  int skipT=0 ;
+  int skipT=50 ;
   int maxT = 100 ;
   double rho=1 ;
   vector <string> flags = {"RHO", "VAVG"} ;
@@ -30,7 +30,7 @@ int main (int argc, char * argv[])
  XMLReader XML(P.dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
  XML.read_boundaries(P.boundaries) ;
- P.boundaries[1][0] = 5 ;
+ P.boundaries[1][0] = 20 ;
  dispvector(P.boundaries) ;
  XML.read_radius (P.radius) ;
  int N = P.radius.size() ;
@@ -43,7 +43,7 @@ int main (int argc, char * argv[])
      Imom.push_back(2/5. * mass[i] * P.radius[i] * P.radius[i]) ;
  }
 
- Coarsing C(d, P.boxes, P.boundaries, P.maxT) ;
+ Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
  C.cT=-1 ;
@@ -55,6 +55,8 @@ int main (int argc, char * argv[])
  for (int t=0 ; t<P.maxT ; t++)
  {
   res = XML.read_nextts(names, data) ;
+  if (t<P.skipT) continue ;
+
   if (res!=0) break ;
   C.cT++ ;
 
@@ -79,8 +81,9 @@ int main (int argc, char * argv[])
  printf("%d \n", t) ;
  }
 
+ C.mean_time() ;
  C.write_vtk("Coarsed") ;
- C.write_NrrdIO("Coarsed") ; 
+ C.write_NrrdIO("Coarsed") ;
 
 
 
