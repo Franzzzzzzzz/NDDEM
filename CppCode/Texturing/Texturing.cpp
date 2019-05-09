@@ -137,7 +137,7 @@ int main (int argc, char * argv[])
              // and ... rotating back :)
              rotate(spturned.begin(), spturned.begin()+nrotate, spturned.end()) ;
              Tools::hyperspherical_xtophi (spturned, phinew) ;
-             //printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
+             printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
              //if (phi[1]==0) phi[1]=M_PI ;
              phi2color (img.begin() + n*3, phinew, d) ;
              n++ ;
