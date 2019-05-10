@@ -138,7 +138,7 @@ function make_camera() {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
             camera.position.set(0,0,N);
         }
-        else if ( fname.includes('Lonely') ) {
+        else if ( fname.includes('Lonely') || fname.includes('Drops') ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
             camera.position.set((world[0].min + world[0].max)/2.,(world[1].min + world[1].max)/2.,-world[0].max/zoom*25.);
         }
@@ -189,7 +189,7 @@ function add_gui() {
             gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
         }
         if ( view_mode === 'rotation_rate' ) {
-            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
+            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(20).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
         }
         gui.open();
     }
@@ -272,7 +272,7 @@ function add_controllers() {
     };
 }
 function aim_camera() {
-    if ( fname.includes('Lonely') ) {
+    if ( fname.includes('Lonely') || fname.includes('Drops')) {
         controls.target0.set(
             (world[0].min + world[0].max)/2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
             (world[1].min + world[1].max)/2.,
@@ -445,13 +445,13 @@ function make_walls() {
 
     if ( world[0].wall ) {
         var floor = new THREE.Mesh( geometry, material );
-        floor.scale.set(world[1].max - world[1].min,world[2].max - world[2].min,1)
+        floor.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1)
         floor.rotation.y = + Math.PI / 2;
         floor.position.set(world[0].min,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
         scene.add( floor );
 
         var roof = new THREE.Mesh( geometry, material );
-        roof.scale.set(world[1].max - world[1].min,world[2].max - world[2].min,1)
+        roof.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1)
         roof.rotation.y = - Math.PI / 2;
         roof.position.set(world[0].max,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
         scene.add( roof );
@@ -647,7 +647,7 @@ function make_initial_spheres_CSV() {
             particles = new THREE.Group();
             scene.add( particles );
             spheres = results.data;
-            if ( N == 1) {
+            if ( N == 1 ) {
                 var geometry = new THREE.CylinderGeometry( 1, 1, 2, Math.pow(2,quality), Math.pow(2,quality) );
             }
             else {

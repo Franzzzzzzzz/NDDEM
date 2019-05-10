@@ -46,7 +46,9 @@
             rgb,
             nx,ny,nz;
 
+        const urlParams = new URLSearchParams(window.location.search);
         fname = "Samples/D3/CoarsedRHO.nrrd"
+        if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
          // fname = "Samples/D3/CoarsedVAVG.nrrd"
         // fname = "Samples/Colormap.nrrd"
 		init();
