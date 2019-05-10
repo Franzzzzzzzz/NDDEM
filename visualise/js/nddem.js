@@ -113,7 +113,8 @@ function build_world() {
     if ( !fname.includes('Spinner') ) { make_axes(); }
     make_lights();
     add_renderer();
-    add_controllers();
+    if ( !fname.includes('Submarine') ) { add_controllers(); }
+    // add_controllers();
     if ( N > 3 && !fname.includes('Spinner') ) { add_torus(); }
     // load_hyperspheres_VTK();
     make_initial_spheres_CSV();
@@ -626,7 +627,8 @@ function make_initial_spheres_CSV() {
         request.open('POST', "http://localhost:8000/make_textures?" +
                      "arr=" + JSON.stringify(arr) +
                      "&N=" + N +
-                     "&t=" + "0" +
+                     "&t=" + "00000" +
+                     "&quality=" + quality +
                      "&fname=" + fname,
                      true);
         request.send(null);
@@ -675,7 +677,7 @@ function make_initial_spheres_CSV() {
                     };
                 }
                 var object = new THREE.Mesh( geometry, material );
-
+                object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
                 object.rotation.z = Math.PI/2.;
                 if ( shadows ) {
                     object.castShadow = true;
@@ -694,6 +696,7 @@ function make_initial_spheres_CSV() {
                     }
                 }
             }
+            if ( fname.includes("Submarine") ) { camera.position.set(particles.children[pinky].position.x,particles.children[pinky].position.y,particles.children[pinky].position.z); console.log(camera.position) }
         }
     });
 };
@@ -711,6 +714,7 @@ function update_spheres_CSV(t) {
                      "arr=" + JSON.stringify(arr) +
                      "&N=" + N +
                      "&t=" + t + "0000" +
+                     "&quality=" + quality +
                      "&fname=" + fname,
                      true);
         request.onload = function() {
@@ -778,6 +782,7 @@ function update_spheres_CSV(t) {
                 if (isNaN(R_draw)) {
                     object.visible = false;
                 }
+                if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
                 else {
                     object.visible = true;
                     object.scale.set(R_draw,R_draw,R_draw);
@@ -850,7 +855,7 @@ function onWindowResize() {
 
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
-    controls.handleResize();
+    if ( controls !== undefined) { controls.handleResize(); }
     if (window.display_type == 'anaglyph') { effect.setSize( window.innerWidth, window.innerHeight ); };
     render();
 };
@@ -945,7 +950,7 @@ function animate() {
     }
     if (time.cur > time.max) { time.cur -= time.max; }
     requestAnimationFrame( animate );
-    if ( controls !== 'undefined' ) { controls.update(); }
+    if ( controls !== undefined ) { controls.update(); }
     renderer.setAnimationLoop( render );
 };
 

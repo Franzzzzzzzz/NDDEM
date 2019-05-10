@@ -25,9 +25,10 @@ server.post('/in', function(req, res) { // serve infiles
 server.post('/make_textures', function(req, res) { // generate textures
     var N = parseInt(req.query.N);
     var t = req.query.t;
+    var quality = req.query.quality;
     var arr = JSON.parse(req.query.arr);
     var fname = req.query.fname;
-    var text_arg = N + " " + arr.join(' ') + " " + t + " " + fname;
+    var text_arg = quality + " " + N + " " + arr.join(' ') + " " + t + " " + fname;
     console.log(text_arg);
     exec('./CppCode/Texturing/Texturing ' + text_arg, (err, stdout, stderr) => { res.send(stdout); } );
 });
