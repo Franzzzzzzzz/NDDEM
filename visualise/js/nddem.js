@@ -79,6 +79,9 @@ function init() {
                             time.max = parseInt(l[2]) - 1;
                         }
                     }
+                    else if (l[0] == 'freeze') {
+                        pinky = parseInt(l[1]);
+                    }
                 }
                 if ( N == 1 ) { // just used for setting up cameras etc
                     world.push({});
