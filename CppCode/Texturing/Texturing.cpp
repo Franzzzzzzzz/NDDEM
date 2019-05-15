@@ -1,5 +1,6 @@
 #include "../Dem/Tools.h"
 #include "TinyPngOut.hpp"
+#include <regex>
 #ifdef NRRDIO
 #include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
@@ -23,8 +24,8 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d) ;
 int write_colormap_vtk (int d) ;
 int write_NrrdIO (string path, int d) ;
 int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
-int csvread_A (char path[], v2d &result, int d) ;
-int csvread_XR (char path[], v2d & result, v1d &R, int d) ;
+int csvread_A (const char path[], v2d &result, int d) ;
+int csvread_XR (const char path[], v2d & result, v1d &R, int d) ;
 
 void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
@@ -40,7 +41,10 @@ vector<vector<float>> colors = {
 vector<vector<vector<float>>> allcolors = {
     {{1,0,1}},
     {{1,1,0},{0,1,1}}};
+    
+    
 
+    
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
 int main (int argc, char * argv[])
@@ -58,24 +62,49 @@ int main (int argc, char * argv[])
  for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
 
  // Check if already rendered
- spring Directory = argv[argc-1] ;
+ string Directory = argv[argc-1] ; 
+ {
+ string filepath = Directory + "/" + "Rendered.bin" ; 
  FILE *alreadyrendered ;
- alreadyrendered = fopen((Directory+"/"+"Rendered.bin").c_str(), "rb") ;
+ alreadyrendered = fopen(filepath.c_str(), "rb") ;
  if (alreadyrendered!=NULL)
  {
-   float tmp ; int i ;
+   double tmp ; uint i ;
    for (i=0 ; i<d ; i++)
    {
-     fread(&tmp, sizeof(float), 1, alreadyrendered) ;
+     int res=fread(&tmp, sizeof(double), 1, alreadyrendered) ; res=res ; 
+     printf("%f %f\n", tmp, View[i]) ;  fflush(stdout) ; 
+     if (isnan(tmp)) continue ; 
      if (tmp!=View[i]) break ;
    }
    fclose (alreadyrendered) ;
    if (i==d)
+   {
+    printf("Already rendered\n") ; 
     std::exit(0) ; // All rendered already
+   }
    else // Let's keep going, removing the Rendered.bin file
-     experimental::filesystem::remove(Directory+"/"+"Rendered.bin").c_str()) ;
+     experimental::filesystem::remove(filepath.c_str()) ;
  }
-
+ }
+ v1d ViewInit = View ; 
+ 
+ //Get all the relevent files in the Directory, sort them and identify the timesteps
+ experimental::filesystem::directory_iterator D(Directory) ; 
+ vector <string> tmpfilelst ;
+ vector <std::pair<int,string>> filelistloc, filelistA ; 
+ for (auto& p : experimental::filesystem::directory_iterator(Directory)) tmpfilelst.push_back(p.path().string()) ; 
+ regex exprloc{".*dump-([0-9]+).csv"};
+ regex exprA{".*dumpA-([0-9]+).csv"};
+ smatch what;
+ for (auto &a : tmpfilelst)
+ {
+     if (regex_match(a, what, exprloc)) filelistloc.push_back(make_pair(stoi(what[1].str()), a)) ; 
+     if (regex_match(a, what, exprA)) filelistA.push_back(make_pair(stoi(what[1].str()), a)) ; 
+ }
+ std::sort(filelistloc.begin(), filelistloc.end()) ; 
+ std::sort(filelistA.begin()  , filelistA.end()  ) ;  
+ 
  // Set Lambda and Theta grids
  int nb=atoi(argv[1]) ;
  if (nb>0 && nb<16)
@@ -97,22 +126,9 @@ int main (int argc, char * argv[])
  if (d-3<allcolors.size()) colors=allcolors[d-3] ;
  v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
 
- int Time = atoi(argv[argc-2]) ;
-// Need to get input file
- int t=Time ;
- do {
-
- } while(t!=Time);
- // Write "alreadyrendered"
-
- v2d X, A ; v1d R ;
- char path[5000] ;
- sprintf(path, "%s/dump-%s.csv", Directory, argv[argc-2]) ;
- csvread_XR (path, X, R, d) ;
- sprintf(path, "%s/dumpA-%s.csv", Directory, argv[argc-2]) ;
- csvread_A  (path, A, d) ;
- int N = X.size() ;
-
+ auto TimeFirst = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==atoi(argv[argc-2])) ; }) ; 
+ auto TimeCur = TimeFirst ;
+ 
  // Setting up the grid in latitude-longitude
  for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
  for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
@@ -135,6 +151,16 @@ int main (int argc, char * argv[])
     }
     nrotate %= View.size() ;
  }
+ 
+ do 
+ {
+ v2d X, A ; v1d R ;
+ //char path[5000] ;
+ //sprintf(path, "%s/dump-%s.csv", Directory, argv[argc-2]) ;
+ csvread_XR (TimeCur->second.c_str(), X, R, d) ;
+ //sprintf(path, "%s/dumpA-%s.csv", Directory, argv[argc-2]) ;
+ csvread_A  ((filelistA.begin() + (TimeCur-filelistloc.begin()))->second.c_str(), A, d) ;
+ int N = X.size() ;
 
  for (int i=0 ; i<N ; i++)
  {
@@ -145,8 +171,8 @@ int main (int argc, char * argv[])
          rsqr -= (View[j]-X[i][j])*(View[j]-X[i][j]) ;
      if (rsqr<=0)
      {
-       char path[500] ;
-       sprintf(path, "%s/Texture-%d.png", argv[argc-1], i) ;
+       char path[5000] ;
+       sprintf(path, "%s/Texture-%d-%d.png", Directory.c_str(), TimeCur->first, i) ;
        //experimental::filesystem::remove(path) ;
        continue ;
      }
@@ -191,9 +217,28 @@ int main (int argc, char * argv[])
              phi2color (img.begin() + n*3, phinew, d) ;
              n++ ;
          }
-     write_img(argv[argc-1], Ntheta, Nlambda, img.data(), i) ;
+         
+     char path[5000] ;
+     sprintf(path, "%s/Texture-%d-%d.png", Directory.c_str(), TimeCur->first, i) ;
+     write_img(path, Ntheta, Nlambda, img.data(), i) ;
  }
+ 
+ // Advance TimeCur
+ TimeCur ++ ;
+ if (TimeCur==filelistloc.end()) TimeCur=filelistloc.begin() ; 
+ //printf("%d\n", TimeCur->first); 
+ } while (TimeCur != TimeFirst) ; 
 
+ // Save the file
+ {
+ string filepath = Directory + "/" + "Rendered.bin" ; 
+ FILE *alreadyrendered ;
+ alreadyrendered = fopen(filepath.c_str(), "wb") ; 
+ for (int i=0 ; i<d ; i++)
+  {int res=fwrite(&(ViewInit[i]), sizeof(double), 1, alreadyrendered) ; printf("%d ", res) ; res=res ;}
+ fclose (alreadyrendered) ;
+ }
+ 
  return 0 ;
 }
 
@@ -238,11 +283,9 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
 //-------------------------------------------------------
 int write_img (char path[], int w, int h, uint8_t * px, int idx)
 {
-	char ppath[500] ;
-  sprintf(ppath, "%s/Texture-%d.png", path, idx) ;
 	try {
 
-		std::ofstream out(ppath, std::ios::binary);
+		std::ofstream out(path, std::ios::binary);
 		TinyPngOut pngout(static_cast<uint32_t>(w), static_cast<uint32_t>(h), out);
 		pngout.write(px, static_cast<size_t>(w * h));
 		return EXIT_SUCCESS;
@@ -253,7 +296,7 @@ int write_img (char path[], int w, int h, uint8_t * px, int idx)
 	}
 }
 //---------
-int csvread_A (char path[], v2d & result, int d)
+int csvread_A (const char path[], v2d & result, int d)
 {
  FILE *in ; int n=0 ; double tmp ;
  in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
@@ -280,7 +323,7 @@ int csvread_A (char path[], v2d & result, int d)
  return 0 ;
 }
 //-------
-int csvread_XR (char path[], v2d & result, v1d &R, int d)
+int csvread_XR (const char path[], v2d & result, v1d &R, int d)
 {
  FILE *in ; int n=0 ; double tmp ;
  in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
