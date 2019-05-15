@@ -10,7 +10,7 @@
 using namespace std ;
 // needed for Tools
 uint Tools::d=0 ;
-int Nlambda=32, Ntheta=32 ; 
+int Nlambda=32, Ntheta=32 ;
 vector < vector <int> > Tools::MSigns ;
 vector < vector <int> > Tools::MIndexAS ;
 vector < double > Tools::Eye ;
@@ -36,11 +36,11 @@ vector<vector<float>> colors = {
     {1,1,0},
     {0,1,1},
     {1,0,1}} ;
-    
+
 vector<vector<vector<float>>> allcolors = {
     {{1,0,1}},
     {{1,1,0},{0,1,1}}};
-    
+
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
 int main (int argc, char * argv[])
@@ -50,36 +50,66 @@ int main (int argc, char * argv[])
  //write_NrrdIO("Colormap.nrrd", 4) ;
  //exit(0) ;
 
- int nb=atoi(argv[1]) ;    
- if (nb>0 && nb<16) 
-     Nlambda=Ntheta=(1<<nb);
- else if (nb>=16)
-     Nlambda=Ntheta=nb ; 
- else
- {
-     colors=allcolors[1] ; 
-     write_colormap_vtk(4) ;
-     exit(0) ; 
- }
- 
+ // Get Number of dimensions and extract viewpoint
  uint d ;
  d = atoi(argv[2]) ;
  Tools::initialise(d) ;
- if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
- if (d-3<allcolors.size()) colors=allcolors[d-3] ;
- v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
-
  v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
  for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
+
+ // Check if already rendered
+ spring Directory = argv[argc-1] ;
+ FILE *alreadyrendered ;
+ alreadyrendered = fopen((Directory+"/"+"Rendered.bin").c_str(), "rb") ;
+ if (alreadyrendered!=NULL)
+ {
+   float tmp ; int i ;
+   for (i=0 ; i<d ; i++)
+   {
+     fread(&tmp, sizeof(float), 1, alreadyrendered) ;
+     if (tmp!=View[i]) break ;
+   }
+   fclose (alreadyrendered) ;
+   if (i==d)
+    std::exit(0) ; // All rendered already
+   else // Let's keep going, removing the Rendered.bin file
+     experimental::filesystem::remove(Directory+"/"+"Rendered.bin").c_str()) ;
+ }
+
+ // Set Lambda and Theta grids
+ int nb=atoi(argv[1]) ;
+ if (nb>0 && nb<16)
+     Nlambda=Ntheta=(1<<nb);
+ else if (nb>=16)
+     Nlambda=Ntheta=nb ;
+ else
+ {
+     colors=allcolors[1] ;
+     write_colormap_vtk(4) ;
+     exit(0) ;
+ }
  v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
  vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
  v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the syrface of the sphere)
 
+ // Color gradient initialisation
+ if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
+ if (d-3<allcolors.size()) colors=allcolors[d-3] ;
+ v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+
+ int Time = atoi(argv[argc-2]) ;
+// Need to get input file
+ int t=Time ;
+ do {
+
+ } while(t!=Time);
+ // Write "alreadyrendered"
+
  v2d X, A ; v1d R ;
  char path[5000] ;
- sprintf(path, "%s/dump-%s.csv", argv[argc-1], argv[argc-2]) ;
+ sprintf(path, "%s/dump-%s.csv", Directory, argv[argc-2]) ;
  csvread_XR (path, X, R, d) ;
- sprintf(path, "%s/dumpA-%s.csv", argv[argc-1], argv[argc-2]) ;
+ sprintf(path, "%s/dumpA-%s.csv", Directory, argv[argc-2]) ;
  csvread_A  (path, A, d) ;
  int N = X.size() ;
 
@@ -106,8 +136,6 @@ int main (int argc, char * argv[])
     nrotate %= View.size() ;
  }
 
- FILE *log = fopen("Loging.log", "a") ;
- fprintf(log, "%d ",N) ;
  for (int i=0 ; i<N ; i++)
  {
      // Check if we are in view
