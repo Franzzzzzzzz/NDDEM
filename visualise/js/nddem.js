@@ -108,6 +108,12 @@ function init() {
 function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
+
+    N_tag = document.createElement( 'div' );
+    N_tag.setAttribute("id", "N_tag");
+    N_tag.innerHTML = N + "D";
+    container.appendChild(N_tag);
+
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
@@ -188,7 +194,7 @@ function add_gui() {
             }
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-        gui.add( time, 'rate').min(0).max(1.0).name('Autoplay rate') ;
+        gui.add( time, 'rate').min(0).max(1.0).name('Rate') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         if ( view_mode === 'velocity' ) {
             gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
@@ -577,9 +583,12 @@ function add_torus() {
             controller2.add( wristband1_theta );
         }
         else {
-            wristband1.position.set(      5,-3*R,  0.5);
-            wristband1_phi.position.set(  5,-3*R,  0.5);
-            wristband1_theta.position.set(5,-3*R+R,0.5);
+            wristband.position.x -= 1.5
+            wristband_phi.position.x -= 1.5
+            wristband_theta.position.x -= 1.5
+            wristband1.position.set(      4,-3*R,  0.5);
+            wristband1_phi.position.set(  4,-3*R,  0.5);
+            wristband1_theta.position.set(4,-3*R+R,0.5);
             scene.add( wristband1 );
             scene.add( wristband1_phi );
             scene.add( wristband1_theta );
