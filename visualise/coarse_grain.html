@@ -21,6 +21,7 @@
 	<script src="node_modules/three/examples/js/Volume.js"></script>
 	<script src="js/NRRDLoader.js"></script> <!-- CUSTOM VERSION -->
 	<script src="node_modules/three/examples/js/shaders/VolumeShader.js"></script>
+    <script src="js/VolumeShaderRGB.js"></script>
 
 	<script src="node_modules/three/examples/js/WebGL.js"></script>
 	<script src="node_modules/three/examples/js/libs/gunzip.min.js"></script>
@@ -47,10 +48,12 @@
             nx,ny,nz;
 
         const urlParams = new URLSearchParams(window.location.search);
-        fname = "Samples/D3/CoarsedRHO.nrrd"
-        if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
-         // fname = "Samples/D3/CoarsedVAVG.nrrd"
+        // fname = "Samples/D3/CoarsedRHO.nrrd"
+         fname = "Samples/D3/CoarsedVAVG.nrrd"
         // fname = "Samples/Colormap.nrrd"
+        // fname = "Samples/Colormap_fake.nrrd"
+
+        if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
 		init();
 		function init() {
 			scene = new THREE.Scene();
@@ -64,15 +67,15 @@
 			// Create camera (The volume renderer does not work very well with perspective yet)
 			var h = 16; // frustum height
 			var aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 0.1, 1000 );
-            camera.position.set( 20, 20, 20 );
+			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 0., 1000 );
+            camera.position.set( 50, 50, 50 );
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
 			// Create controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.addEventListener( 'change', render );
 			// controls.target.set( 64, 64, 128 );
-			controls.minZoom = 0.5;
-			controls.maxZoom = 4;
+			controls.minZoom = 0.1;
+			controls.maxZoom = 10;
 			controls.update();
 			scene.add( new THREE.AxesHelper( 128 ) );
 			// Lighting is baked into the shader a.t.m.
@@ -93,12 +96,13 @@
                 // Get correct slice of current data
 
                 time.max = volume.time;
+                // time.max = 1;
                 time.nc = volume.dimensions[0]*volume.dimensions[1];
                 nx = volume.dimensions[2];
                 ny = volume.dimensions[3];
                 nz = volume.dimensions[4];
 
-                gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time').onChange( function() { updateUniforms() });
+                gui.add( time, 'cur').min(time.min).max(time.max-1).step(1).listen().name('Time').onChange( function() { updateUniforms() });
                 var extra_dims = volume.dimensions.length - 6;
 
                 world = [];
@@ -109,13 +113,15 @@
                     world[i].cur = volume.dimensions[i+5]/2.;
                     gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i+3).onChange( function() { updateUniforms() });
                 }
-                if ( time.nc > 1 && !rgb ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
+                if ( time.nc > 1 ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
 
                 var start = [0,0,0,0,0,0];
                 var end   = [0,0,nx,ny,nz,0];
                 data = volume.data;
+                rgb = volume.RGB;
                 // var display_data = data.slice(0,nx*ny*nz);
-                display_data = get_data(volume.data,start,end);
+                if ( volume.RGB ) { display_data = get_data_RGB(volume.data,start,end); }
+                else { display_data = get_data(volume.data,start,end); }
                 // console.log(volume.dimensions);
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
@@ -123,9 +129,11 @@
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
 				texture = new THREE.DataTexture3D( display_data, nx, ny, nz );
-				texture.format = THREE.RedFormat;
+				// if ( volume.RGB ) { texture.format = THREE.RGBAFormat; }
+                texture.format = THREE.RedFormat;
 				texture.type = THREE.FloatType;
-                texture.minFilter = texture.magFilter = THREE.LinearFilter;
+                // texture.minFilter = texture.magFilter = THREE.LinearFilter;
+                texture.minFilter = texture.magFilter = THREE.NearestFilter;
 
 				texture.unpackAlignment = 1;
 				texture.needsUpdate = true;
@@ -136,7 +144,9 @@
 					gray: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_gray.png', render )
 				};
 				// Material
-				var shader = THREE.VolumeRenderShader1;
+                if ( volume.RGB ) { var shader = THREE.VolumeRenderShaderRGB; }
+                else { var shader = THREE.VolumeRenderShader1; }
+
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 				uniforms[ "u_data" ].value = texture;
 				uniforms[ "u_size" ].value.set( nx, ny, nz );
@@ -162,7 +172,8 @@
 		function updateUniforms() {
             var start = [0,0,0,0,0,time.cur];
             var end   = [0,0,nx,ny,nz,time.cur];
-            texture.image.data = get_data(data,start,end);
+            if ( rgb ) { texture.image.data = get_data_RGB(data,start,end); }
+            else { texture.image.data = get_data(data,start,end); }
             texture.needsUpdate = true;
 			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
 			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
@@ -189,10 +200,31 @@
             for ( var i=0;i<nx;i++ ) {
                 for ( var j=0;j<ny;j++ ) {
                     for ( var k=0;k<nz;k++ ) {
-                        shaped_pos = [1,time.c,i,j,k,time.cur]
+                        shaped_pos = [time.c,i,j,k,time.cur]
                         var linear_pos = 0;
                         for (var l=0; l< n.length; l++) { linear_pos += n[l]*shaped_pos[l]; };
+                        // console.log(linear_pos > length*time.nc);
                         output[i + j*nx + k*nx*ny] = data[linear_pos]
+                        // output[k + j*nz + i*nz*ny] = data[linear_pos]
+                    }
+                }
+            }
+            return output;
+        }
+        function get_data_RGB(data,start,end) {
+            length = nx*ny*nz;
+            output = new Float32Array(length);
+            // console.log(data);
+            n = [1,3,3*nx,3*nx*ny,3*nx*ny*nz];
+            for ( var i=0;i<nx;i++ ) {
+                for ( var j=0;j<ny;j++ ) {
+                    for ( var k=0;k<nz;k++ ) {
+                        shaped_pos = [0,i,j,k,time.cur]
+                        var linear_pos = 0;
+                        for (var l=0; l< n.length; l++) { linear_pos += n[l]*shaped_pos[l]; };
+                        output[i + j*nx + k*nx*ny] = data[linear_pos]*256*256 + data[linear_pos+1]*256 + data[linear_pos+2]
+                        // console.log(data[linear_pos]) ;
+                        // output[k + j*nz + i*nz*ny] =data[linear_pos]*256*256 + data[linear_pos+1]*256 + data[linear_pos+2]
                     }
                 }
             }

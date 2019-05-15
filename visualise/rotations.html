@@ -26,11 +26,9 @@
         clock = new THREE.Clock();
         var scene = new THREE.Scene();
         scene.background = new THREE.Color( 0x111111 );
-		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-		camera.position.z = 4;
+		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 0.1, 1000 );
+		camera.position.z = 6;
         camera.position.x = 1.5;
-        // camera.rotation.y = Math.PI;
-        // camera.rotation.z = Math.PI;
 
 		var renderer = new THREE.WebGLRenderer();
         // var controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -57,8 +55,8 @@
                 var material = new THREE.MeshStandardMaterial( { map: texture } );
                 sphere = new THREE.Mesh( sphere_geometry, material );
                 rect = new THREE.Mesh( rect_geometry, material );
-                sphere.position.x = -1
-                rect.position.x = 3
+                sphere.position.x = 4
+                rect.position.x = 0
                 rect.scale.set(4,2,1);
                 rect.rotation.z = Math.PI;
                 sphere.rotation.z = Math.PI;
@@ -67,11 +65,6 @@
                 scene.add( sphere );
                 scene.add( rect );
             } );
-
-
-        // var sphere  = new THREE.Mesh( sphere_geometry, material );
-        // var rect  = new THREE.Mesh( rect_geometry, material );
-
 
         // var gui = new dat.GUI();
         // gui.add( slice, 'loc').min(-1).max(1).step(0.01).listen().name('Slice').onChange( function( val ) { update_spheres(val); }) ;

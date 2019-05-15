@@ -6,7 +6,7 @@
  * This is not the only approach, therefore it's marked 1.
  */
 
-THREE.VolumeRenderShader1 = {
+THREE.VolumeRenderShaderRGB = {
 	uniforms: {
         "u_size": { value: new THREE.Vector3( 1, 1, 1 ) },
         "u_renderstyle": { value: 0 },
@@ -115,10 +115,14 @@ THREE.VolumeRenderShader1 = {
         'const vec4 specular_color = vec4(1.0, 1.0, 1.0, 1.0);',
         'const float shininess = 40.0;',
 
+        // 'void gl_SamplerParameter[if]( )'
+
         'void cast_mip(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray);',
+        'void cast_mip2(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray);',
         'void cast_iso(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray);',
 
         'float sample1(vec3 texcoords);',
+        'float sample2(vec3 texcoords);',
         'vec4 apply_colormap(float val);',
         'vec4 add_lighting(float val, vec3 loc, vec3 step, vec3 view_ray);',
 
@@ -160,7 +164,8 @@ THREE.VolumeRenderShader1 = {
             //'return;',
 
             'if (u_renderstyle == 0)',
-                'cast_mip(start_loc, step, nsteps, view_ray);',
+                'cast_mip2(start_loc, step, nsteps, view_ray);',
+                // 'cast_mip(start_loc, step, nsteps, view_ray);',
             'else if (u_renderstyle == 1)',
                 'cast_iso(start_loc, step, nsteps, view_ray);',
 
@@ -171,16 +176,51 @@ THREE.VolumeRenderShader1 = {
 
         'float sample1(vec3 texcoords) {',
             '/* Sample float value from a 3D texture. Assumes intensity data. */',
-            'return texture(u_data, texcoords.xyz).r;',
+            'return texture(u_data, texcoords.xyz, 0.).r;',
+        '}',
+
+        'float sample2(vec3 texcoords) {',
+            '/* Sample float value from a 3D texture. Assumes intensity data. */',
+            'return texture(u_data, texcoords.xyz, 0.).r;',
         '}',
 
 
         'vec4 apply_colormap(float val) {',
-            'val = (val - u_clim[0]) / (u_clim[1] - u_clim[0]);',
-            'return(vec4(1.0,0,0,1)) ; ',
-            //'return texture2D(u_cmdata, vec2(val, 0.5));',
+            // 'val = (val - u_clim[0]) / (u_clim[1] - u_clim[0]);',
+            'int v= int(val) ; ',
+            'return(vec4(float(v/256/256)/256.,float((v-(v/256/256)*256*256)/256)/256.,float((v-(v/256)*256))/256.,0.5)) ; ',
+            //'return(vec4(float(v/256/256)/256.,float((v-(v/256/256)*256*256)/256)/256.,float(0)/256.,1)) ; ',
+            // 'return texture2D(u_cmdata, vec2(val, 0.5));',
         '}',
 
+
+        'void cast_mip2(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray) {',
+
+            // 'float max_val = -1e6;',
+            'int max_i = 100;',
+            // 'float r = 0.;',
+            // 'float g = 0.;',
+            // 'float b = 0.;',
+            'vec3 loc = start_loc;',
+            'vec4 accumulated_color = vec4(0.);',
+
+            // Enter the raycasting loop. In WebGL 1 the loop index cannot be compared with
+            // non-constant expression. So we use a hard-coded max, and an additional condition
+            // inside the loop.
+            'for (int iter=0; iter<MAX_STEPS; iter++) {',
+                'if (iter >= nsteps)',
+                    'break;',
+
+                'float val = sample2(loc);', // Sample from the 3D texture using linear interpolation
+                'vec4 col = apply_colormap(val);',
+                'accumulated_color.rgb += col.rgb*(col.a);', // transfer function
+                'accumulated_color.a += col.a;',
+
+                'loc += step;', // Advance location deeper into the volume
+            '}',
+
+            'gl_FragColor = accumulated_color/float(nsteps);',
+        '}',
 
         'void cast_mip(vec3 start_loc, vec3 step, int nsteps, vec3 view_ray) {',
 

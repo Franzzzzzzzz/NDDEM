@@ -16,7 +16,7 @@ var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.5}
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
 if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) };
 var axeslength, fontsize; // axis properties
-var VR_scale = 5.; // mapping from DEM units to VR units
+var vr_scale = 0.5; // mapping from DEM units to VR units
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
@@ -170,7 +170,12 @@ function add_renderer() {
     if (window.display_type == "VR") { renderer.vr.enabled = true; };
     container.appendChild( renderer.domElement );
 
-    if (window.display_type == "VR") { container.appendChild( WEBVR.createButton( renderer ) ); };
+    if (window.display_type == "VR") {
+        container.appendChild( WEBVR.createButton( renderer ) );
+        window.addEventListener('vrdisplayactivate', () => {
+                renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] );
+            }, false); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
+    };
 }
 
 function add_gui() {
@@ -211,6 +216,9 @@ function add_gui() {
         gui.scale.set(0.5,0.5,0.5);
         controller2.add( gui );
         var input1 = dat.GUIVR.addInputObject( controller1, renderer );
+        document.addEventListener( 'mousedown', function(){ input1.pressed( true ); } ); // TODO: CAN I SOMEHOW USE THIS TO FAKE THE .pressed() IF I CAN MANUALLY PIPE THE A REAL PRESS EVENT??
+        // see here: https://github.com/dataarts/dat.guiVR/wiki/Input-Support-(Vive-Controllers,-Mouse,-etc)
+
         //var input2 = dat.GUIVR.addInputObject( controller2 , renderer);
         scene.add( input1 );
         //scene.add( input2 );
@@ -526,9 +534,9 @@ function add_torus() {
         controller1.add( wristband_theta );
     }
     else {
-        wristband.position.set(      -3*R,0.5,  0.5);
-        wristband_phi.position.set(  -3*R,0.5,  0.5);
-        wristband_theta.position.set(-3*R,R+0.5,0.5);
+        wristband.position.set(      2.5,-3*R,  0.5);
+        wristband_phi.position.set(  2.5,-3*R,  0.5);
+        wristband_theta.position.set(2.5,-3*R+R,0.5);
         scene.add( wristband );
         scene.add( wristband_phi );
         scene.add( wristband_theta );
@@ -569,9 +577,9 @@ function add_torus() {
             controller2.add( wristband1_theta );
         }
         else {
-            wristband1.position.set(      -3*R,2.5,  0.5);
-            wristband1_phi.position.set(  -3*R,2.5,  0.5);
-            wristband1_theta.position.set(-3*R,R+2.5,0.5);
+            wristband1.position.set(      5,-3*R,  0.5);
+            wristband1_phi.position.set(  5,-3*R,  0.5);
+            wristband1_theta.position.set(5,-3*R+R,0.5);
             scene.add( wristband1 );
             scene.add( wristband1_phi );
             scene.add( wristband1_theta );
@@ -958,6 +966,7 @@ function animate() {
 };
 
 function render() {
+    if ( renderer.vr.isPresenting() ) { scene.scale.set( vr_scale, vr_scale, vr_scale ); }// TODO: SET VR SCALING TO LOOK GOOD
     if ( view_mode === 'catch_particle' && window.display_type == "VR" ) {
         cleanIntersected();
         intersectObjects( controller1 );

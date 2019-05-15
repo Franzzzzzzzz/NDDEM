@@ -323,7 +323,8 @@ THREE.NRRDLoader.prototype = {
 		// parse the (unzipped) data to a datastream of the correct type
 		//
 		volume.data = new headerObject.__array( _data );
-        volume.data = Float32Array.from(volume.data); // BENJY
+
+
 		// get the min and max intensities
 		var min_max = volume.computeMinMax();
 		var min = min_max[ 0 ];
@@ -334,10 +335,22 @@ THREE.NRRDLoader.prototype = {
 
 		// get the image dimensions
 		volume.dimensions = headerObject.sizes;
-		volume.time = headerObject.sizes[headerObject.sizes.length-1];
 
-        if ( headerObject.type === 'unsigned char' ) { volume.RGB = true; }
-        else { volume.RGB = false; }
+
+        if ( headerObject.type === 'unsigned char' ) {
+            volume.RGB = true;
+            volume.data = Uint8Array.from(volume.data);
+            volume.time = 1;
+        }
+        else {
+            volume.RGB = false;
+            volume.data = Float32Array.from(volume.data);
+            volume.time = headerObject.sizes[headerObject.sizes.length-1];
+    }
+
+        // console.log(volume.data);
+        // console.log(volume.time);
+        // console.log(volume.dimensions);
 
         // console.log(volume.time);
 		// // spacing
