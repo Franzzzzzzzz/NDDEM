@@ -23,6 +23,11 @@
             }
         };
 
+        var fname = "visualise/resources/earth2d.jpg";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
+
         clock = new THREE.Clock();
         var scene = new THREE.Scene();
         scene.background = new THREE.Color( 0x111111 );
@@ -46,7 +51,7 @@
         var rect;
 
         var loader = new THREE.TextureLoader()
-            .load( "http://localhost:8000/" + "visualise/resources/earth2d.jpg", function( texture ) {
+            .load( "http://localhost:8000/" + fname, function( texture ) {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 var sphere_geometry = new THREE.SphereGeometry( 1, 32, 32 );
