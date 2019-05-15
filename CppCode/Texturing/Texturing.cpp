@@ -234,7 +234,7 @@ int main (int argc, char * argv[])
  string filepath = Directory + "/" + "Rendered.bin" ; 
  FILE *alreadyrendered ;
  alreadyrendered = fopen(filepath.c_str(), "wb") ; 
- for (int i=0 ; i<d ; i++)
+ for (uint i=0 ; i<d ; i++)
   {int res=fwrite(&(ViewInit[i]), sizeof(double), 1, alreadyrendered) ; printf("%d ", res) ; res=res ;}
  fclose (alreadyrendered) ;
  }
@@ -261,7 +261,7 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
     //phi[d-2] /= 2 ;
     for (int i=0 ; i<d-2 ; i++)
     {
-        ctmp += (colors[i] * sin(phi[i])) ;
+        ctmp += (colors[i] * fabs(sin(3*phi[i]))) ;
         sum += colors[i] ;
     }
     rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
