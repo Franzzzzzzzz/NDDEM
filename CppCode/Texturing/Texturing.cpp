@@ -5,6 +5,7 @@
 #include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
 
+#define DeltaX 10
 //#define Nlambda 32
 //#define Ntheta 32
 
@@ -26,6 +27,7 @@ int write_NrrdIO (string path, int d) ;
 int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
 int csvread_A (const char path[], v2d &result, int d) ;
 int csvread_XR (const char path[], v2d & result, v1d &R, int d) ;
+int viewpermute (v1d & View, int d) ;
 
 void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
@@ -41,9 +43,6 @@ vector<vector<float>> colors = {
 vector<vector<vector<float>>> allcolors = {
     {{231./256., 37./256., 100./256.}}, // official NDDEM pink
     {{1,1,0},{0,1,1}}};
-
-
-
 
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
@@ -62,8 +61,8 @@ int main (int argc, char * argv[])
  for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
 
  // Check if already rendered
- string Directory = argv[argc-1] ;
- {
+ string Directory = argv[argc-2] ;
+ /*{
  string filepath = Directory + "/" + "Rendered.bin" ;
  FILE *alreadyrendered ;
  alreadyrendered = fopen(filepath.c_str(), "rb") ;
@@ -86,8 +85,8 @@ int main (int argc, char * argv[])
    else // Let's keep going, removing the Rendered.bin file
      experimental::filesystem::remove(filepath.c_str()) ;
  }
- }
- v1d ViewInit = View ;
+}*/
+ //v1d ViewInit = View ;
 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
  experimental::filesystem::directory_iterator D(Directory) ;
@@ -105,6 +104,18 @@ int main (int argc, char * argv[])
  std::sort(filelistloc.begin(), filelistloc.end()) ;
  std::sort(filelistA.begin()  , filelistA.end()  ) ;
 
+ // Let's read everything
+ vector <v2d> X, A ; v1d R ;
+ X.resize(filelistloc.size()) ;
+ A.resize(filelistloc.size()) ;
+ for (int i=0 ; i<filelistloc.size() ; i++)
+  {
+    R.clear() ;
+    csvread_XR (filelistloc[i].second.c_str(), X[i], R, d) ;
+  }
+ for (int i=0 ; i<filelistA.size() ; i++)   csvread_A  (filelistA[i].second.c_str(), A[i], d) ;
+ int N = X.size() ;
+
  // Set Lambda and Theta grids
  int nb=atoi(argv[1]) ;
  if (nb>0 && nb<16)
@@ -119,48 +130,90 @@ int main (int argc, char * argv[])
  }
  v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
  vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
- v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the syrface of the sphere)
+ v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
 
  // Color gradient initialisation
  if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
  if (d-3<allcolors.size()) colors=allcolors[d-3] ;
  v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
 
- auto TimeFirst = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==atoi(argv[argc-2])) ; }) ;
- auto TimeCur = TimeFirst ;
+ //auto TimeFirst = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==atoi(argv[argc-2])) ; }) ;
+ //auto TimeCur = TimeFirst ;
 
  // Setting up the grid in latitude-longitude
  for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
  for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
  thetagrid[Ntheta-1]=thetagrid[0];
 
- // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
- int nrotate = 0 ;
- if (d>3) //All view dimensions are NaN if d==3
+ FILE * piping ; char line[5000] ;
+ f=fopen("pipe", "r") ; if (f==NULL) {printf("ERR: a pipe is expected\n") ; exit(1) ; }
+
+ bool run = true ;
+ vector<int> ViewPoint, NewViewPoint(d+1,0) ;
+ while (run)
  {
-    while (isnan(View[0]))
-    {
-        rotate(View.begin(), View.begin()+1 , View.end()) ;
-        nrotate++ ;
-    }
-    if (nrotate==0)
-    {
-        auto b = find_if(View.begin(), View.end(), [](double d) { return std::isnan(d); } ) ;
-        rotate(View.begin(), b+3, View.end()) ;
-        nrotate = b-View.begin()+3 ;
-    }
-    nrotate %= View.size() ;
+   int l=-1,n ;
+   do {
+     l++ ;
+     n=fscanf(f, "%c", line+l) ;
+   } while (n>0) ;
+   line[l] = 0 ;
+   clearerr(f) ;
+
+   if (!strcmp(line, "stop")) run=false ;
+   else if (line[0]!=0) // Assume we got a new viewpoint
+   {
+     stringstream ss(line);
+     for (int i=0 ; i<d ; i++) {ss>>View[i] ; NewViewPoint[i] = isnan(View[i])?0:static_cast<int>(round(View[i]*10)) ; }
+     ss>>TimeCur ; NewViewPoint[d]= TimeCur ;
+
+     if (ViewPoint.size()==0)
+     {
+       
+       NewViewPoint=ViewPoint ;
+     }
+     else
+     {
+
+
+     }
+
+   }
+   else {usleep(10000) ; } // A little sleep :)
+
  }
+
+ // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
+ int nrotate = viewpermute (View, d) ;
+
+
+ while (true)
+ {
+   if (newlocation)
+   {
+     compare newlocation with old one
+     kill threads which are on different dimensions
+     remove files on dimensions that are different
+
+     spawn new threads on required dimensions
+   }
+
+
+
+
+ }
+
+
+
+
+
+
+
+
 
  do
  {
- v2d X, A ; v1d R ;
- //char path[5000] ;
- //sprintf(path, "%s/dump-%s.csv", Directory, argv[argc-2]) ;
- csvread_XR (TimeCur->second.c_str(), X, R, d) ;
- //sprintf(path, "%s/dumpA-%s.csv", Directory, argv[argc-2]) ;
- csvread_A  ((filelistA.begin() + (TimeCur-filelistloc.begin()))->second.c_str(), A, d) ;
- int N = X.size() ;
+
 
  for (int i=0 ; i<N ; i++)
  {
@@ -470,4 +523,26 @@ int write_NrrdIO (string path, int d)
     printf("%s ", fullpath.c_str()) ;
 #endif
 return 0 ;
+}
+
+//=================================================
+int viewpermute (v1d & View, int d)
+{
+if (d>3) //All view dimensions are NaN if d==3
+{
+   while (isnan(View[0]))
+   {
+       rotate(View.begin(), View.begin()+1 , View.end()) ;
+       nrotate++ ;
+   }
+   if (nrotate==0)
+   {
+       auto b = find_if(View.begin(), View.end(), [](double d) { return std::isnan(d); } ) ;
+       rotate(View.begin(), b+3, View.end()) ;
+       nrotate = b-View.begin()+3 ;
+   }
+   nrotate %= View.size() ;
+return nrotate ;
+}
+else return 0 ;
 }
