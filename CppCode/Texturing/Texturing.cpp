@@ -39,7 +39,7 @@ vector<vector<float>> colors = {
     {1,0,1}} ;
 
 vector<vector<vector<float>>> allcolors = {
-    {{1,0,1}},
+    {{231./256., 37./256., 100./256.}}, // official NDDEM pink
     {{1,1,0},{0,1,1}}};
 
 
@@ -247,7 +247,7 @@ int main (int argc, char * argv[])
 void rescale (v1f & c, cv1f sum)
 {
   for (uint i=0 ; i<c.size() ; i++)
-    if (sum[i]!=0)
+    if (sum[i]>=1)
       c[i]/=sum[i] ;
 }
 //--------------------------------------------------------
@@ -266,7 +266,7 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
     }
     rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
     //for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
-    ctmp *= sin(phi[d-2]/2.) ;
+    ctmp *= fabs(sin(6*phi[d-2]/2.)) ;
     //printf("%g %g %g\n", ctmp[0], ctmp[1], ctmp[2]) ;
     //ctmp = (colors[0]*sin(phi[0]) + colors[1]*sin(phi[1]/2)) * sin(phi[0]) ;
     cfinal = ctmp ;
