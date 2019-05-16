@@ -36,7 +36,8 @@ if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
 
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material;
-var cache = false;
+if ( typeof window.cache !== 'undefined' ) { cache = window.cache == 'true' }
+else { cache = false; };
 init();
 
 function init() {
@@ -743,27 +744,29 @@ function load_textures(t) {
 }
 
 function update_spheres_CSV(t,changed_higher_dim_view) {
-    if ( view_mode === 'rotations' && changed_higher_dim_view ) {
-        var arr = new Array();
-        for ( var i=0; i<N; i++ ) {
-            if ( i < 3 ) { arr.push('NaN') }
-            else { arr.push(world[i].cur) };
-        };
-        var request = new XMLHttpRequest();
-        request.open('POST',
-                     "http://localhost:8000/make_textures?" +
-                     "arr=" + JSON.stringify(arr) +
-                     "&N=" + N +
-                     "&t=" + t + "0000" +
-                     "&quality=" + quality +
-                     "&fname=" + fname,
-                     true);
-        request.onload = function() {
-            load_textures(t);
+    if ( view_mode === 'rotations' ) {
+        if  ( changed_higher_dim_view ) {
+            var arr = new Array();
+            for ( var i=0; i<N; i++ ) {
+                if ( i < 3 ) { arr.push('NaN') }
+                else { arr.push(world[i].cur) };
+            };
+            var request = new XMLHttpRequest();
+            request.open('POST',
+                         "http://localhost:8000/make_textures?" +
+                         "arr=" + JSON.stringify(arr) +
+                         "&N=" + N +
+                         "&t=" + t + "0000" +
+                         "&quality=" + quality +
+                         "&fname=" + fname,
+                         true);
+            request.onload = function() {
+                load_textures(t);
+            }
+            request.send('');
         }
-        request.send('');
+        else { load_textures(t); }
     }
-    else { load_textures(t); };
 
     if ( cache ) { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv" }
     else { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
