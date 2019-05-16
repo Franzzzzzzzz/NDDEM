@@ -36,7 +36,7 @@ if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
 
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material;
-var cache = false;
+var cache = true;
 init();
 
 function init() {
@@ -127,7 +127,7 @@ function build_world() {
     if ( N > 3 && !fname.includes('Spinner') ) { add_torus(); }
     // load_hyperspheres_VTK();
     make_initial_spheres_CSV();
-    update_spheres_CSV(0);
+    update_spheres_CSV(0,false);
     add_gui();
     window.addEventListener( 'resize', onWindowResize, false );
 
@@ -197,10 +197,10 @@ function add_gui() {
         gui.add( time, 'rate').min(0).max(1.0).name('Rate') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         if ( view_mode === 'velocity' ) {
-            gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
+            gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur),false); });
         }
         if ( view_mode === 'rotation_rate' ) {
-            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(20).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur)); });
+            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(20).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur),false); });
         }
         gui.open();
     }
@@ -687,7 +687,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            var texture = new THREE.TextureLoader().load("http://localhost:8000/" + fname + "Texture-0.png");
+                            var texture = new THREE.TextureLoader().load("http://localhost:8000/" + fname + "Texture-00000-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
@@ -721,8 +721,28 @@ function make_initial_spheres_CSV() {
     });
 };
 
-function update_spheres_CSV(t) {
-    if ( view_mode === 'rotations' ) {
+function load_textures(t) {
+    if ( particles !== undefined) {
+        var loader = new THREE.TextureLoader();
+        for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
+            if ( cache ) { var filename = "http://localhost:8000/" + fname + "Texture-" + t + "0000-" + ii + ".png" }
+            else { var filename = "http://localhost:8000/" + fname +  "Texture-" + t + "0000-" + ii + ".png" + "?_="+ (new Date).getTime() }
+            loader.load(filename,
+                        function( texture ) {
+                            var myRe = /-[0-9]+.png/g
+                            var res=myRe.exec(texture.image.currentSrc)
+                            var myRe2 = /[0-9]+/
+                            var iii = myRe2.exec(res[0])[0]
+                            var o = particles.children[iii];
+                            o.material.map = texture;
+                            o.material.map.needsUpdate = true;
+                        });
+        }
+    }
+}
+
+function update_spheres_CSV(t,changed_higher_dim_view) {
+    if ( view_mode === 'rotations' && changed_higher_dim_view ) {
         var arr = new Array();
         for ( var i=0; i<N; i++ ) {
             if ( i < 3 ) { arr.push('NaN') }
@@ -738,24 +758,12 @@ function update_spheres_CSV(t) {
                      "&fname=" + fname,
                      true);
         request.onload = function() {
-            var loader = new THREE.TextureLoader();
-            for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
-                if ( cache ) { var filename = "http://localhost:8000/" + fname + "Texture-" + ii + ".png" }
-                else { var filename = "http://localhost:8000/" + fname +  "Texture-" + ii + ".png" + "?_="+ (new Date).getTime() }
-                loader.load(filename,
-                            function( texture ) {
-                                var myRe = /-[0-9]+.png/g
-                                var res=myRe.exec(texture.image.currentSrc)
-                                var myRe2 = /[0-9]+/
-                                var iii = myRe2.exec(res[0])[0]
-                                var o = particles.children[iii];
-                                o.material.map = texture;
-                                o.material.map.needsUpdate = true;
-                            });
-            }
+            load_textures(t);
         }
         request.send('');
-    };
+    }
+    else { load_textures(t); };
+
     if ( cache ) { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv" }
     else { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
@@ -958,14 +966,14 @@ function animate() {
     if (N > 3) {
         for (i=3;i<N;i++) {
             if (world[i].cur != world[i].prev) {
-                update_spheres_CSV(Math.floor(time.cur));
+                update_spheres_CSV(Math.floor(time.cur),true);
                 world[i].prev = world[i].cur;
             }
         }
     }
     if (time.play) { time.cur += time.rate; };
     if ( Math.floor(time.cur) != time.prev ) {
-        update_spheres_CSV(Math.floor(time.cur));
+        update_spheres_CSV(Math.floor(time.cur),false);
         time.prev = Math.floor(time.cur);
     }
     if (time.cur > time.max) { time.cur -= time.max; }

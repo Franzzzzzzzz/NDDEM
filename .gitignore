@@ -3,5 +3,6 @@
 node_modules/
 CppCode/Dem/DEMND
 CppCode/Dem/xml2vtk
+CppCode/Texturing/Texturing
 package-lock.json
 Samples
