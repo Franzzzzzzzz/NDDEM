@@ -1,11 +1,12 @@
 #include "../Dem/Tools.h"
 #include "TinyPngOut.hpp"
 #include <regex>
+#include <limits>
 #ifdef NRRDIO
 #include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
 
-#define DeltaX 10
+#define DeltaX 0.1
 //#define Nlambda 32
 //#define Ntheta 32
 
@@ -28,10 +29,14 @@ int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
 int csvread_A (const char path[], v2d &result, int d) ;
 int csvread_XR (const char path[], v2d & result, v1d &R, int d) ;
 int viewpermute (v1d & View, int d) ;
+void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A) ; 
+void filepathname (char * path, int time, cv1d View) ;
+void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A) ;
 
 void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 
+// Some helpful globals (sorry ...)
 vector<vector<float>> colors = {
     {1,0,0},
     {0,1,0},
@@ -44,6 +49,10 @@ vector<vector<vector<float>>> allcolors = {
     {{231./256., 37./256., 100./256.}}, // official NDDEM pink
     {{1,1,0},{0,1,1}}};
 
+v1d lambdagrid, thetagrid ; 
+string DirectorySave ; 
+uint d ; int N ; 
+
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
 int main (int argc, char * argv[])
@@ -54,40 +63,14 @@ int main (int argc, char * argv[])
  //exit(0) ;
 
  // Get Number of dimensions and extract viewpoint
- uint d ;
  d = atoi(argv[2]) ;
  Tools::initialise(d) ;
  v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
  for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
 
- // Check if already rendered
  string Directory = argv[argc-2] ;
- /*{
- string filepath = Directory + "/" + "Rendered.bin" ;
- FILE *alreadyrendered ;
- alreadyrendered = fopen(filepath.c_str(), "rb") ;
- if (alreadyrendered!=NULL)
- {
-   double tmp ; uint i ;
-   for (i=0 ; i<d ; i++)
-   {
-     int res=fread(&tmp, sizeof(double), 1, alreadyrendered) ; res=res ;
-     printf("%f %f\n", tmp, View[i]) ;  fflush(stdout) ;
-     if (isnan(tmp)) continue ;
-     if (tmp!=View[i]) break ;
-   }
-   fclose (alreadyrendered) ;
-   if (i==d)
-   {
-    printf("Already rendered\n") ;
-    std::exit(0) ; // All rendered already
-   }
-   else // Let's keep going, removing the Rendered.bin file
-     experimental::filesystem::remove(filepath.c_str()) ;
- }
-}*/
- //v1d ViewInit = View ;
-
+ DirectorySave = argv[argc-1] ; 
+ 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
  experimental::filesystem::directory_iterator D(Directory) ;
  vector <string> tmpfilelst ;
@@ -108,14 +91,20 @@ int main (int argc, char * argv[])
  vector <v2d> X, A ; v1d R ;
  X.resize(filelistloc.size()) ;
  A.resize(filelistloc.size()) ;
- for (int i=0 ; i<filelistloc.size() ; i++)
+ for (uint i=0 ; i<filelistloc.size() ; i++)
   {
     R.clear() ;
     csvread_XR (filelistloc[i].second.c_str(), X[i], R, d) ;
   }
- for (int i=0 ; i<filelistA.size() ; i++)   csvread_A  (filelistA[i].second.c_str(), A[i], d) ;
- int N = X.size() ;
-
+ for (uint i=0 ; i<filelistA.size() ; i++)   csvread_A  (filelistA[i].second.c_str(), A[i], d) ;
+ N = X[0].size() ;
+ int nrotate=d-3 ; // Rotate all the coordinates already 
+ for (auto v : X)
+ {
+    for (int i=0 ; i<N ; i++)
+        rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
+ }
+ 
  // Set Lambda and Theta grids
  int nb=atoi(argv[1]) ;
  if (nb>0 && nb<16)
@@ -128,14 +117,13 @@ int main (int argc, char * argv[])
      write_colormap_vtk(4) ;
      exit(0) ;
  }
- v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
- vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
- v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
+ lambdagrid.resize(Nlambda,0) ; 
+ thetagrid.resize(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
 
  // Color gradient initialisation
  if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
  if (d-3<allcolors.size()) colors=allcolors[d-3] ;
- v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+
 
  //auto TimeFirst = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==atoi(argv[argc-2])) ; }) ;
  //auto TimeCur = TimeFirst ;
@@ -146,86 +134,84 @@ int main (int argc, char * argv[])
  thetagrid[Ntheta-1]=thetagrid[0];
 
  FILE * piping ; char line[5000] ;
- f=fopen("pipe", "r") ; if (f==NULL) {printf("ERR: a pipe is expected\n") ; exit(1) ; }
+ piping=fopen("pipe", "r") ; if (piping==NULL) {printf("ERR: a pipe is expected\n") ; exit(1) ; }
 
  bool run = true ;
- vector<int> ViewPoint, NewViewPoint(d+1,0) ;
+ vector<int> ViewPoint(d-3+1, INT_MIN), NewViewPoint(d-3+1,0) ;
+ vector <vector<string>> FileList (d-3+1) ; 
+ int TimeCur ; 
  while (run)
  {
    int l=-1,n ;
    do {
      l++ ;
-     n=fscanf(f, "%c", line+l) ;
+     n=fscanf(piping, "%c", line+l) ;
    } while (n>0) ;
    line[l] = 0 ;
-   clearerr(f) ;
+   clearerr(piping) ;
 
    if (!strcmp(line, "stop")) run=false ;
    else if (line[0]!=0) // Assume we got a new viewpoint
    {
      stringstream ss(line);
-     for (int i=0 ; i<d ; i++) {ss>>View[i] ; NewViewPoint[i] = isnan(View[i])?0:static_cast<int>(round(View[i]*10)) ; }
-     ss>>TimeCur ; NewViewPoint[d]= TimeCur ;
-
-     if (ViewPoint.size()==0)
+     for (uint i=0 ; i<d ; i++) {ss>>View[i] ; }
+     for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = isnan(View[i+3])?0:static_cast<int>(round(View[i+3]/DeltaX));}
+     ss>>TimeCur ; NewViewPoint[d-3]= TimeCur ;
+      
+     int nrotate = viewpermute (View, d) ;
+     int TimeCurInt = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==TimeCur);})-filelistloc.begin() ; 
+    
+     // Alright, lets start the threads 
+     for (uint i=0 ; i<d-3 ; i++)
      {
-       
-       NewViewPoint=ViewPoint ;
+         if (NewViewPoint[i]!=ViewPoint[i])
+         {
+          // Kill previous thread if exist
+          // Restart the thread
+             
+             spaceloop(FileList[i], View, nrotate, i, TimeCur, X[TimeCurInt], R, A[TimeCurInt]) ; 
+         }
      }
-     else
+     if (NewViewPoint[d-3]!=ViewPoint[d-3])
      {
-
-
+          // Kill previous thread if exist
+          // Restart the thread         
      }
-
    }
    else {usleep(10000) ; } // A little sleep :)
-
  }
 
- // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
- int nrotate = viewpermute (View, d) ;
+ return 0 ;
+}
+//===========================================================
+void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A)
+{
+//auto ViewO=View ; 
+// Let's not put the loop just yet ...
+FileList.clear() ; 
+Render(FileList,View, nrotate, time, X, R, A) ; 
+
+    
+}
 
 
- while (true)
- {
-   if (newlocation)
-   {
-     compare newlocation with old one
-     kill threads which are on different dimensions
-     remove files on dimensions that are different
-
-     spawn new threads on required dimensions
-   }
-
-
-
-
- }
-
-
-
-
-
-
-
-
-
- do
- {
-
-
+//-----------------------------------------------------
+void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A)
+{
+v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
+v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
  for (int i=0 ; i<N ; i++)
  {
      // Check if we are in view
      double rsqr = R[i]*R[i] ;
-     rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
+     //rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
      for (uint j=0 ; j<d-3 ; j++)
          rsqr -= (View[j]-X[i][j])*(View[j]-X[i][j]) ;
      if (rsqr<=0)
      {
-       char path[5000] ;
-       sprintf(path, "%s/Texture-%d-%d.png", Directory.c_str(), TimeCur->first, i) ;
+       //char path[5000] ;
+       //sprintf(path, "%s/Texture-%d-%d.png", Directory.c_str(), TimeCur->first, i) ;
        //experimental::filesystem::remove(path) ;
        continue ;
      }
@@ -272,29 +258,20 @@ int main (int argc, char * argv[])
          }
 
      char path[5000] ;
-     sprintf(path, "%s/Texture-%05d-%d.png", Directory.c_str(), TimeCur->first, i) ;
+     filepathname(path, time, View) ; 
      write_img(path, Ntheta, Nlambda, img.data(), i) ;
+     filerendered.push_back(path); 
  }
-
- // Advance TimeCur
- TimeCur ++ ;
- if (TimeCur==filelistloc.end()) TimeCur=filelistloc.begin() ;
- //printf("%d\n", TimeCur->first);
- } while (TimeCur != TimeFirst) ;
-
- // Save the file
- {
- string filepath = Directory + "/" + "Rendered.bin" ;
- FILE *alreadyrendered ;
- alreadyrendered = fopen(filepath.c_str(), "wb") ;
- for (uint i=0 ; i<d ; i++)
-  {int res=fwrite(&(ViewInit[i]), sizeof(double), 1, alreadyrendered) ; printf("%d ", res) ; res=res ;}
- fclose (alreadyrendered) ;
- }
-
- return 0 ;
 }
 
+//------------------------
+void filepathname (char * path, int time, cv1d View)
+{
+    sprintf (path, "%s/Texture-%05d", DirectorySave.c_str(), time) ; 
+    for (uint i=0 ; i<d-3 ; i++)
+        sprintf(path, "%s-%.1f", path, View[i]) ; 
+    strcat(path, ".png") ; 
+}
 
 // =============================
 void rescale (v1f & c, cv1f sum)
@@ -530,6 +507,7 @@ int viewpermute (v1d & View, int d)
 {
 if (d>3) //All view dimensions are NaN if d==3
 {
+   int nrotate=0 ; 
    while (isnan(View[0]))
    {
        rotate(View.begin(), View.begin()+1 , View.end()) ;
