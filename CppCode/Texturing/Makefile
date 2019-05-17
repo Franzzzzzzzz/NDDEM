@@ -1,8 +1,10 @@
-ifndef $(CC)
+HOST=$(shell hostname)
+
+ifeq "$(HOST)" "guillard"
 CC=/opt/local/bin/g++-mp-6 # FG
 endif
 #CC=g++-8 # BM
-CC=g++
+#CC=g++
 
 # Basic compilation
 
@@ -17,7 +19,7 @@ LIBS=-lm
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs #-DNRRDIO 
+all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs #-DNRRDIO
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+= -fopenmp -lstdc++fs -lNrrdIO #-lnetcdf
 all:

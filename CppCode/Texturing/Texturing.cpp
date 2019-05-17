@@ -29,18 +29,18 @@ int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
 int csvread_A (const char path[], v2d &result, int d) ;
 int csvread_XR (const char path[], v2d & result, v1d &R, int d) ;
 int viewpermute (v1d & View, int d) ;
-void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A) ; 
-void filepathname (char * path, int time, cv1d View) ;
+void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A) ;
+void filepathname (char * path, int n, int time, cv1d View) ;
 void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A) ;
 
-void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
-void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
+void dispvector (const v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
+void dispvector (const v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 
 // Some helpful globals (sorry ...)
 vector<vector<float>> colors = {
-    {1,0,0},
-    {0,1,0},
-    {0,0,1},
+    {1,1,0},
+    {0,1,1},
+    {1,0,1},
     {1,1,0},
     {0,1,1},
     {1,0,1}} ;
@@ -49,9 +49,9 @@ vector<vector<vector<float>>> allcolors = {
     {{231./256., 37./256., 100./256.}}, // official NDDEM pink
     {{1,1,0},{0,1,1}}};
 
-v1d lambdagrid, thetagrid ; 
-string DirectorySave ; 
-uint d ; int N ; 
+v1d lambdagrid, thetagrid ;
+string DirectorySave ;
+uint d ; int N ;
 
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
@@ -66,11 +66,11 @@ int main (int argc, char * argv[])
  d = atoi(argv[2]) ;
  Tools::initialise(d) ;
  v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
- for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
+ //for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
 
  string Directory = argv[argc-2] ;
- DirectorySave = argv[argc-1] ; 
- 
+ DirectorySave = argv[argc-1] ;
+
  //Get all the relevent files in the Directory, sort them and identify the timesteps
  experimental::filesystem::directory_iterator D(Directory) ;
  vector <string> tmpfilelst ;
@@ -98,13 +98,13 @@ int main (int argc, char * argv[])
   }
  for (uint i=0 ; i<filelistA.size() ; i++)   csvread_A  (filelistA[i].second.c_str(), A[i], d) ;
  N = X[0].size() ;
- int nrotate=d-3 ; // Rotate all the coordinates already 
- for (auto v : X)
+ int nrotate=3 ; // Rotate all the coordinates already
+ for (auto & v : X)
  {
     for (int i=0 ; i<N ; i++)
-        rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
+        rotate(v[i].begin(), v[i].begin()+nrotate, v[i].end()) ;
  }
- 
+
  // Set Lambda and Theta grids
  int nb=atoi(argv[1]) ;
  if (nb>0 && nb<16)
@@ -117,12 +117,12 @@ int main (int argc, char * argv[])
      write_colormap_vtk(4) ;
      exit(0) ;
  }
- lambdagrid.resize(Nlambda,0) ; 
+ lambdagrid.resize(Nlambda,0) ;
  thetagrid.resize(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
 
  // Color gradient initialisation
  if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
- if (d-3<allcolors.size()) colors=allcolors[d-3] ;
+ //if (d-3<allcolors.size()) colors=allcolors[d-3] ;
 
 
  //auto TimeFirst = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==atoi(argv[argc-2])) ; }) ;
@@ -138,8 +138,9 @@ int main (int argc, char * argv[])
 
  bool run = true ;
  vector<int> ViewPoint(d-3+1, INT_MIN), NewViewPoint(d-3+1,0) ;
- vector <vector<string>> FileList (d-3+1) ; 
- int TimeCur ; 
+ vector <vector<string>> FileList (d-3+1) ;
+ int TimeCur ;
+ printf("Texturing Waiting") ; fflush(stdout) ;
  while (run)
  {
    int l=-1,n ;
@@ -147,35 +148,51 @@ int main (int argc, char * argv[])
      l++ ;
      n=fscanf(piping, "%c", line+l) ;
    } while (n>0) ;
-   line[l] = 0 ;
+   if (l>0) line[l-1] = 0 ;
+   else line[0] = 0 ;
    clearerr(piping) ;
 
+   if (line[0]!=0) {printf("Text received: %s\n", line) ; fflush(stdout) ;}
+
    if (!strcmp(line, "stop")) run=false ;
+   else if (!strcmp(line, "pass")) {} // Just pass
    else if (line[0]!=0) // Assume we got a new viewpoint
    {
-     stringstream ss(line);
-     for (uint i=0 ; i<d ; i++) {ss>>View[i] ; }
-     for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = isnan(View[i+3])?0:static_cast<int>(round(View[i+3]/DeltaX));}
-     ss>>TimeCur ; NewViewPoint[d-3]= TimeCur ;
-      
+     char * pch;
+     pch = strtok (line," ");
+     for (uint i=0 ; i<d ; i++)
+     {
+       View[i] = atof(pch) ;
+       pch = strtok (NULL, " ");
+     }
+     TimeCur=atoi(pch) ;
+
      int nrotate = viewpermute (View, d) ;
-     int TimeCurInt = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==TimeCur);})-filelistloc.begin() ; 
-    
-     // Alright, lets start the threads 
+     printf("[%d]", nrotate) ; fflush(stdout) ;
+     for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = isnan(View[i+3])?0:static_cast<int>(round(View[i+3]/DeltaX));}
+     NewViewPoint[d-3]= TimeCur ;
+
+     int TimeCurInt = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==TimeCur);})-filelistloc.begin() ;
+
+     for (auto v:View) printf("%f ", v) ; printf("|") ;
+     for (auto v: NewViewPoint) printf("%d ", v) ;
+     printf("|%d\n", TimeCur) ; fflush(stdout) ;
+
+     // Alright, lets start the threads
      for (uint i=0 ; i<d-3 ; i++)
      {
          if (NewViewPoint[i]!=ViewPoint[i])
          {
           // Kill previous thread if exist
           // Restart the thread
-             
-             spaceloop(FileList[i], View, nrotate, i, TimeCur, X[TimeCurInt], R, A[TimeCurInt]) ; 
+
+             spaceloop(FileList[i], View, nrotate, i, TimeCur, X[TimeCurInt], R, A[TimeCurInt]) ;
          }
      }
      if (NewViewPoint[d-3]!=ViewPoint[d-3])
      {
           // Kill previous thread if exist
-          // Restart the thread         
+          // Restart the thread
      }
    }
    else {usleep(10000) ; } // A little sleep :)
@@ -186,12 +203,12 @@ int main (int argc, char * argv[])
 //===========================================================
 void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A)
 {
-//auto ViewO=View ; 
+//auto ViewO=View ;
 // Let's not put the loop just yet ...
-FileList.clear() ; 
-Render(FileList,View, nrotate, time, X, R, A) ; 
+FileList.clear() ;
+Render(FileList,View, nrotate, time, X, R, A) ;
 
-    
+
 }
 
 
@@ -233,7 +250,7 @@ vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
              phi[d-3]=lambda ;
              phi[d-2]=theta ;
 
-             for (uint dd=0 ; dd<d ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
+             for (uint dd=0 ; dd<d-3 ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
              //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
 
              sp[d-3] = R[i] ;
@@ -242,7 +259,7 @@ vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
              sp[d-3] *= cos(phi[d-3]) ;
              sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
              sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
-
+             //dispvector(sp) ;
              // Now sp should be right, let's check
              //printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;
              // Rotating the point vector back in dimensions, and then rotating in space according to the basis A
@@ -258,19 +275,19 @@ vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
          }
 
      char path[5000] ;
-     filepathname(path, time, View) ; 
+     filepathname(path, i, time, View) ;
      write_img(path, Ntheta, Nlambda, img.data(), i) ;
-     filerendered.push_back(path); 
+     filerendered.push_back(path);
  }
 }
 
 //------------------------
-void filepathname (char * path, int time, cv1d View)
+void filepathname (char * path, int n, int time, cv1d View)
 {
-    sprintf (path, "%s/Texture-%05d", DirectorySave.c_str(), time) ; 
+    sprintf (path, "%s/Texture-%d-%05d", DirectorySave.c_str(), n, time) ;
     for (uint i=0 ; i<d-3 ; i++)
-        sprintf(path, "%s-%.1f", path, View[i]) ; 
-    strcat(path, ".png") ; 
+        sprintf(path, "%s-%.1f", path, View[i]) ;
+    strcat(path, ".png") ;
 }
 
 // =============================
@@ -291,12 +308,15 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
     //phi[d-2] /= 2 ;
     for (int i=0 ; i<d-2 ; i++)
     {
-        ctmp += (colors[i] * fabs(sin(3*phi[i]))) ;
+        ctmp += (colors[i] * fabs(sin(phi[i]))) ;
         sum += colors[i] ;
     }
+    ctmp += (colors[d-2] * fabs(sin(phi[d-2]/2.))) ;
+    sum += colors[d-2] ;
     rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
     //for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
-    ctmp *= fabs(sin(6*phi[d-2]/2.)) ;
+    for (int i=0 ; i<d-2 ; i++)
+      ctmp *= fabs(sin(phi[i])) ;
     //printf("%g %g %g\n", ctmp[0], ctmp[1], ctmp[2]) ;
     //ctmp = (colors[0]*sin(phi[0]) + colors[1]*sin(phi[1]/2)) * sin(phi[0]) ;
     cfinal = ctmp ;
@@ -507,7 +527,7 @@ int viewpermute (v1d & View, int d)
 {
 if (d>3) //All view dimensions are NaN if d==3
 {
-   int nrotate=0 ; 
+   int nrotate=0 ;
    while (isnan(View[0]))
    {
        rotate(View.begin(), View.begin()+1 , View.end()) ;
