@@ -15,7 +15,7 @@ SOURCES=Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=Texturing
 LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall -L../CoarseGraining/NrrdIO-1.11.0-src/build
-LIBS=-lm
+LIBS=-lm -lpthread
 FLTO=-flto
 FLTO=
 

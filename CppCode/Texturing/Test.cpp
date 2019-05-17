@@ -9,7 +9,7 @@
 
 using namespace std ;
 
-void foo (double t)
+void foo (double t, double a)
 {
   for (int i=0 ; i<t ; i++)
   {
@@ -27,41 +27,22 @@ int main (int argc, char * argv[])
 {
 FILE * f ;char letter ;
 char line[5000] ;
-f=fopen("pipe", "r") ;
-vector <double> test(6,0) ;
+//f=fopen("pipe", "r") ;
+vector <double> test(12,0) ;
 std::thread first ;
 
-
-while(1)
-{
-  int n ; int i ;
-  i=-1 ;
-  do
-  {
-    i++ ;
-    n=fscanf(f, "%c", line+i) ;
-  } while (n>0) ;
-  line[i]=0 ;
-clearerr(f) ;
-
-stringstream ss(line);
-if (line[0]!=0)
-{
-  for (int i=0 ; i<6 ; i++)
-    ss>>test[i] ;
-  first = std::thread (foo, test[5]);
-  auto id = first.native_handle() ;
-  printf("%d|%g %g %g %g %g %g\n",n, test[0], test[1], test[2], test[3], test[4], test[5]) ; fflush(stdout) ;
-  usleep(10000000) ;
-  pthread_cancel(id);
+printf("Hello") ; fflush(stdout) ;
+if (first.joinable())
   first.join() ;
-  usleep(1000000) ;
-}
+printf("Here") ; fflush(stdout) ;
+test[5]=0 ;
+first = std::thread (foo, test[5], test[2]);
 usleep(1000000) ;
-printf(".")  ;fflush(stdout) ; 
+if (first.joinable())
+{
+printf("BOO") ; fflush(stdout) ;
+first.join() ;
 }
-
-fclose(f);
 
 
 

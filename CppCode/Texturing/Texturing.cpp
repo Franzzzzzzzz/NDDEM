@@ -2,6 +2,7 @@
 #include "TinyPngOut.hpp"
 #include <regex>
 #include <limits>
+#include <thread>
 #ifdef NRRDIO
 #include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
@@ -30,6 +31,7 @@ int csvread_A (const char path[], v2d &result, int d) ;
 int csvread_XR (const char path[], v2d & result, v1d &R, int d) ;
 int viewpermute (v1d & View, int d) ;
 void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A) ;
+void timeloop (vector<string> & FileList, v1d View, int nrotate, const vector <int> & timelst, uint timeidx, cv3d & X, cv1d & R, cv3d & A) ;
 void filepathname (char * path, int n, int time, cv1d View) ;
 void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A) ;
 
@@ -52,6 +54,7 @@ vector<vector<vector<float>>> allcolors = {
 v1d lambdagrid, thetagrid ;
 string DirectorySave ;
 uint d ; int N ;
+v2d Boundaries ;
 
 //==================================================
 //Args: d V1 V2 ... VN locationfile Afile
@@ -86,6 +89,8 @@ int main (int argc, char * argv[])
  }
  std::sort(filelistloc.begin(), filelistloc.end()) ;
  std::sort(filelistA.begin()  , filelistA.end()  ) ;
+ vector <int> timelst ;
+ for (uint i=0 ; i<filelistloc.size() ; i++) timelst.push_back(filelistloc[i].first) ;
 
  // Let's read everything
  vector <v2d> X, A ; v1d R ;
@@ -96,7 +101,7 @@ int main (int argc, char * argv[])
     R.clear() ;
     csvread_XR (filelistloc[i].second.c_str(), X[i], R, d) ;
   }
- for (uint i=0 ; i<filelistA.size() ; i++)   csvread_A  (filelistA[i].second.c_str(), A[i], d) ;
+ for (uint i=0 ; i<filelistA.size() ; i++) csvread_A(filelistA[i].second.c_str(), A[i], d) ;
  N = X[0].size() ;
  int nrotate=3 ; // Rotate all the coordinates already
  for (auto & v : X)
@@ -104,6 +109,22 @@ int main (int argc, char * argv[])
     for (int i=0 ; i<N ; i++)
         rotate(v[i].begin(), v[i].begin()+nrotate, v[i].end()) ;
  }
+ Boundaries.resize(2) ;
+ Boundaries[0].resize(d-3, INT_MAX) ;
+ Boundaries[1].resize(d-3, INT_MIN) ;
+ for (auto &v : X)
+  for (auto &w : v)
+  {
+    for (uint i=0 ; i<d-3 ; i++)
+    {
+      if (w[i]<Boundaries[0][i]) Boundaries[0][i] = w[i] ;
+      if (w[i]>Boundaries[1][i]) Boundaries[1][i] = w[i] ;
+    }
+  }
+ auto tmpbound = max_element(R.begin(), R.end()) ;
+ for (uint i=0 ; i<d-3 ; i++) {Boundaries[0][i] -= (*tmpbound) ;  Boundaries[1][i] += (*tmpbound) ; }
+ dispvector(Boundaries[0]) ;
+ dispvector(Boundaries[1]) ;
 
  // Set Lambda and Theta grids
  int nb=atoi(argv[1]) ;
@@ -139,8 +160,9 @@ int main (int argc, char * argv[])
  bool run = true ;
  vector<int> ViewPoint(d-3+1, INT_MIN), NewViewPoint(d-3+1,0) ;
  vector <vector<string>> FileList (d-3+1) ;
+ vector <std::thread> Threads (d-3+1) ;
  int TimeCur ;
- printf("Texturing Waiting") ; fflush(stdout) ;
+ bool firstrun = true ;
  while (run)
  {
    int l=-1,n ;
@@ -154,7 +176,22 @@ int main (int argc, char * argv[])
 
    if (line[0]!=0) {printf("Text received: %s\n", line) ; fflush(stdout) ;}
 
-   if (!strcmp(line, "stop")) run=false ;
+   if (!strcmp(line, "stop"))
+   {
+     for (auto &w : FileList)
+        for (auto & v : w)
+          experimental::filesystem::remove(v.c_str()) ;
+     for (auto & v : Threads)
+     {
+       if (v.joinable())
+       {
+         auto ThreadID = v.native_handle() ;
+         pthread_cancel(ThreadID);
+         v.join() ;
+       }
+     }
+     run=false ;
+   }
    else if (!strcmp(line, "pass")) {} // Just pass
    else if (line[0]!=0) // Assume we got a new viewpoint
    {
@@ -169,31 +206,54 @@ int main (int argc, char * argv[])
 
      int nrotate = viewpermute (View, d) ;
      printf("[%d]", nrotate) ; fflush(stdout) ;
-     for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = isnan(View[i+3])?0:static_cast<int>(round(View[i+3]/DeltaX));}
+     for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
      NewViewPoint[d-3]= TimeCur ;
 
-     int TimeCurInt = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==TimeCur);})-filelistloc.begin() ;
+     uint TimeCurInt = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==TimeCur);})-filelistloc.begin() ;
 
-     for (auto v:View) printf("%f ", v) ; printf("|") ;
-     for (auto v: NewViewPoint) printf("%d ", v) ;
-     printf("|%d\n", TimeCur) ; fflush(stdout) ;
-
+     printf("%d %d | %d %d\n", ViewPoint[0], ViewPoint[1], NewViewPoint[0], NewViewPoint[1]) ;
      // Alright, lets start the threads
      for (uint i=0 ; i<d-3 ; i++)
      {
-         if (NewViewPoint[i]!=ViewPoint[i])
-         {
-          // Kill previous thread if exist
-          // Restart the thread
-
-             spaceloop(FileList[i], View, nrotate, i, TimeCur, X[TimeCurInt], R, A[TimeCurInt]) ;
-         }
+       for (uint j=0 ; j<d-3+1 ; j++)
+       {
+        if (j==i) continue ;
+        if (NewViewPoint[j] != ViewPoint[j])
+          {
+            if (Threads[i].joinable())
+            {
+              auto ThreadID = Threads[i].native_handle() ;
+              pthread_cancel(ThreadID);
+              Threads[i].join() ;
+            }
+            Threads[i] = std::thread(spaceloop, std::ref(FileList[i]), View, nrotate, i, TimeCur, std::ref(X[TimeCurInt]), std::ref(R), std::ref(A[TimeCurInt])) ;
+          }
+       }
      }
-     if (NewViewPoint[d-3]!=ViewPoint[d-3])
+     for (uint j=0 ; j<d-3 ; j++)
      {
-          // Kill previous thread if exist
-          // Restart the thread
+       if (NewViewPoint[j] != ViewPoint[j])
+       {
+         if (Threads[d-3].joinable())
+         {
+           auto ThreadID = Threads[d-3].native_handle() ;
+           pthread_cancel(ThreadID) ;
+           Threads[d-3].join() ;
+         }
+         Threads[d-3] = std::thread(timeloop, std::ref(FileList[d-3]), View, nrotate, std::ref(timelst), TimeCurInt, std::ref(X), std::ref(R), std::ref(A)) ;
+       }
      }
+
+     if (d==3) // Special case for d=3, run anyway
+     {
+       if (firstrun)
+       {
+         Threads[d-3] = std::thread(timeloop, std::ref(FileList[d-3]), View, nrotate, std::ref(timelst), TimeCurInt, std::ref(X), std::ref(R), std::ref(A)) ;
+         firstrun=false ;
+       }
+     }
+
+     ViewPoint=NewViewPoint ;
    }
    else {usleep(10000) ; } // A little sleep :)
  }
@@ -203,14 +263,36 @@ int main (int argc, char * argv[])
 //===========================================================
 void spaceloop (vector<string> & FileList, v1d View, int nrotate, int dim, int time, cv2d & X, cv1d & R, cv2d & A)
 {
-//auto ViewO=View ;
-// Let's not put the loop just yet ...
+for (auto & v : FileList) experimental::filesystem::remove(v.c_str()) ;
+
 FileList.clear() ;
-Render(FileList,View, nrotate, time, X, R, A) ;
 
+auto Viewdec = View ;
+while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
+{
+  Viewdec[dim] -= DeltaX ;
+  View[dim] += DeltaX ;
 
+  printf("s") ; fflush(stdout) ;
+
+  if (Viewdec[dim]>Boundaries[0][dim]) Render(FileList,Viewdec, nrotate, time, X, R, A) ;
+  if (View[dim]<Boundaries[1][dim]) Render(FileList,View, nrotate, time, X, R, A) ;
 }
+}
+//-----------------------------------------------------
+void timeloop (vector<string> & FileList, v1d View, int nrotate, const vector <int> & timelst, uint timeidx, cv3d & X, cv1d & R, cv3d & A)
+{
+for (auto & v : FileList) experimental::filesystem::remove(v.c_str()) ;
 
+FileList.clear() ;
+uint timeidxinit=timeidx ;
+do {
+printf("%d ",timeidx) ; fflush(stdout) ;
+Render(FileList,View, nrotate, timelst[timeidx], X[timeidx], R, A[timeidx]) ;
+timeidx++ ;
+if (timeidx>=X.size()) timeidx=0 ;
+} while (timeidx != timeidxinit) ;
+}
 
 //-----------------------------------------------------
 void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A)
