@@ -646,12 +646,13 @@ function make_initial_spheres_CSV() {
             else { arr.push(world[i].cur) };
         };
         var request = new XMLHttpRequest();
+        var f = fname.substring(fname.indexOf('/')+1) // split at first / and send just after that
         request.open('POST', "http://localhost:8000/make_textures?" +
                      "arr=" + JSON.stringify(arr) +
                      "&N=" + N +
                      "&t=" + "00000" +
                      "&quality=" + quality +
-                     "&fname=" + fname,
+                     "&fname=" + f,
                      true);
         request.send(null);
         // request.onreadystatechange = function () {}
@@ -689,7 +690,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            var texture = new THREE.TextureLoader().load("http://localhost:8000/" + fname + "Texture-00000-0.png");
+                            var texture = new THREE.TextureLoader().load("http://localhost:8000/Textures/" + fname + "Texture-00000-0.png");
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
@@ -727,8 +728,8 @@ function load_textures(t) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
         for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
-            if ( cache ) { var filename = "http://localhost:8000/" + fname + "Texture-" + t + "0000-" + ii + ".png" }
-            else { var filename = "http://localhost:8000/" + fname +  "Texture-" + t + "0000-" + ii + ".png" + "?_="+ (new Date).getTime() }
+            if ( cache ) { var filename = "http://localhost:8000/Textures/" + fname + "Texture-" + t + "0000-" + ii + ".png" }
+            else { var filename = "http://localhost:8000/Textures/" + fname +  "Texture-" + t + "0000-" + ii + ".png" + "?_="+ (new Date).getTime() }
             loader.load(filename,
                         function( texture ) {
                             var myRe = /-[0-9]+.png/g
@@ -752,13 +753,14 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                 else { arr.push(world[i].cur) };
             };
             var request = new XMLHttpRequest();
+            var f = fname.substring(fname.indexOf('/')+1) // split at first / and send just after that
             request.open('POST',
                          "http://localhost:8000/make_textures?" +
                          "arr=" + JSON.stringify(arr) +
                          "&N=" + N +
                          "&t=" + t + "0000" +
                          "&quality=" + quality +
-                         "&fname=" + fname,
+                         "&fname=" + f,
                          true);
             request.onload = function() {
                 load_textures(t);

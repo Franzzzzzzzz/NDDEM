@@ -43,6 +43,8 @@ vector<vector<vector<float>>> allcolors = {
     {{1,1,0},{0,1,1}}};
 
 
+string sample_directory = "Samples/";
+string texture_directory = "Textures/";
 
 
 //==================================================
@@ -64,7 +66,7 @@ int main (int argc, char * argv[])
  // Check if already rendered
  string Directory = argv[argc-1] ;
  {
- string filepath = Directory + "/" + "Rendered.bin" ;
+ string filepath = texture_directory + Directory + "/" + "Rendered.bin" ; // BENJY
  FILE *alreadyrendered ;
  alreadyrendered = fopen(filepath.c_str(), "rb") ;
  if (alreadyrendered!=NULL)
@@ -88,12 +90,11 @@ int main (int argc, char * argv[])
  }
  }
  v1d ViewInit = View ;
-
  //Get all the relevent files in the Directory, sort them and identify the timesteps
- experimental::filesystem::directory_iterator D(Directory) ;
+ experimental::filesystem::directory_iterator D(sample_directory + Directory) ;
  vector <string> tmpfilelst ;
  vector <std::pair<int,string>> filelistloc, filelistA ;
- for (auto& p : experimental::filesystem::directory_iterator(Directory)) tmpfilelst.push_back(p.path().string()) ;
+ for (auto& p : experimental::filesystem::directory_iterator(sample_directory + Directory)) tmpfilelst.push_back(p.path().string()) ;
  regex exprloc{".*dump-([0-9]+).csv"};
  regex exprA{".*dumpA-([0-9]+).csv"};
  smatch what;
@@ -172,7 +173,7 @@ int main (int argc, char * argv[])
      if (rsqr<=0)
      {
        char path[5000] ;
-       sprintf(path, "%s/Texture-%d-%d.png", Directory.c_str(), TimeCur->first, i) ;
+       sprintf(path, "%s/%s/Texture-%d-%d.png", texture_directory.c_str(), Directory.c_str(), TimeCur->first, i) ; // BENJY
        //experimental::filesystem::remove(path) ;
        continue ;
      }
@@ -219,7 +220,7 @@ int main (int argc, char * argv[])
          }
 
      char path[5000] ;
-     sprintf(path, "%s/Texture-%05d-%d.png", Directory.c_str(), TimeCur->first, i) ;
+     sprintf(path, "%s/%s/Texture-%05d-%d.png", texture_directory.c_str(), Directory.c_str(), TimeCur->first, i) ; // BENJY
      write_img(path, Ntheta, Nlambda, img.data(), i) ;
  }
 
@@ -231,7 +232,7 @@ int main (int argc, char * argv[])
 
  // Save the file
  {
- string filepath = Directory + "/" + "Rendered.bin" ;
+ string filepath = texture_directory + Directory + "/" + "Rendered.bin" ; // BENJY
  FILE *alreadyrendered ;
  alreadyrendered = fopen(filepath.c_str(), "wb") ;
  for (uint i=0 ; i<d ; i++)

@@ -30,7 +30,7 @@ server.post('/make_textures', function(req, res) { // generate textures
     var fname = req.query.fname;
     var text_arg = quality + " " + N + " " + arr.join(' ') + " " + t + " " + fname;
     console.log(text_arg);
-    exec('./CppCode/Texturing/Texturing ' + text_arg, (err, stdout, stderr) => { res.send(stdout); console.log('Done with ' + text_arg) } );
+    exec('./CppCode/bin/Texturing ' + text_arg, (err, stdout, stderr) => { res.send(stdout); console.log('Done with ' + text_arg) } );
 });
 
 server.listen(8000); // run server
