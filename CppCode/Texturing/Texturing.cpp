@@ -20,6 +20,7 @@ vector <FILE *> Tools::outs ;
 boost::random::mt19937 Tools::rng ;
 boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
+
 void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d) ;
 int write_colormap_vtk (int d) ;
 int write_NrrdIO (string path, int d) ;
@@ -66,6 +67,10 @@ int main (int argc, char * argv[])
  // Check if already rendered
  string Directory = argv[argc-1] ;
  {
+ // Make the texturing folder if it does not already exist
+ // string path(texture_directory + Directory);
+ experimental::filesystem::create_directory(texture_directory + Directory);
+
  string filepath = texture_directory + Directory + "/" + "Rendered.bin" ; // BENJY
  FILE *alreadyrendered ;
  alreadyrendered = fopen(filepath.c_str(), "rb") ;

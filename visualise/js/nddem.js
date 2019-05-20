@@ -42,7 +42,7 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('POST', "http://localhost:8000/in?fname=" + fname + "&_="+ (new Date).getTime(), true);
+    request.open('POST', "http://localhost:8000/in?fname=Samples/" + fname + "&_="+ (new Date).getTime(), true);
     // request.open('GET', "http://localhost:8000/" + fname + window.inname, true);
     request.send(null);
     request.onreadystatechange = function () {
@@ -646,19 +646,18 @@ function make_initial_spheres_CSV() {
             else { arr.push(world[i].cur) };
         };
         var request = new XMLHttpRequest();
-        var f = fname.substring(fname.indexOf('/')+1) // split at first / and send just after that
         request.open('POST', "http://localhost:8000/make_textures?" +
                      "arr=" + JSON.stringify(arr) +
                      "&N=" + N +
                      "&t=" + "00000" +
                      "&quality=" + quality +
-                     "&fname=" + f,
+                     "&fname=" + fname,
                      true);
         request.send(null);
         // request.onreadystatechange = function () {}
     };
-    if ( cache ) { var filename = "http://localhost:8000/" + fname + "dump-00000.csv" }
-    else { var filename = "http://localhost:8000/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
+    if ( cache ) { var filename = "http://localhost:8000/Samples/" + fname + "dump-00000.csv" }
+    else { var filename = "http://localhost:8000/Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
@@ -753,14 +752,13 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                 else { arr.push(world[i].cur) };
             };
             var request = new XMLHttpRequest();
-            var f = fname.substring(fname.indexOf('/')+1) // split at first / and send just after that
             request.open('POST',
                          "http://localhost:8000/make_textures?" +
                          "arr=" + JSON.stringify(arr) +
                          "&N=" + N +
                          "&t=" + t + "0000" +
                          "&quality=" + quality +
-                         "&fname=" + f,
+                         "&fname=" + fname,
                          true);
             request.onload = function() {
                 load_textures(t);
@@ -770,8 +768,8 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
         else { load_textures(t); }
     }
 
-    if ( cache ) { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv" }
-    else { var filename = "http://localhost:8000/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
+    if ( cache ) { var filename = "http://localhost:8000/Samples/" + fname + "dump-"+t+"0000.csv" }
+    else { var filename = "http://localhost:8000/Samples/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
