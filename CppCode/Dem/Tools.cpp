@@ -429,7 +429,6 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
     {
        if (j==lastnonzero)
        {
-           printf("!!") ; 
            if (x[j]<0) phi[j]=M_PI ; 
            else phi[j]=0 ;
            return r ; 
