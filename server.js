@@ -14,13 +14,13 @@ const logRequestStart = (req, res, next) => {
 
 server.use('/', express.static(__dirname + '/')); // serve data files
 
-server.post('/in', function(req, res) { // serve infiles
-    var fname = req.query.fname;
-    glob(fname + "in.*", {}, (err, infile)=>{
-        console.log("Sending " + infile[0])
-        res.sendFile( __dirname +  '/' + infile[0] );
-    });
-});
+// server.post('/in', function(req, res) { // serve infiles
+//     var fname = req.query.fname;
+//     glob(fname + "in.*", {}, (err, infile)=>{
+//         console.log("Sending " + infile[0])
+//         res.sendFile( __dirname +  '/' + infile[0] );
+//     });
+// });
 
 server.post('/make_textures', function(req, res) { // generate textures
     var N = parseInt(req.query.N);

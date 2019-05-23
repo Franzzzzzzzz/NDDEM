@@ -42,8 +42,8 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    request.open('POST', "http://localhost:8000/in?fname=Samples/" + fname + "&_="+ (new Date).getTime(), true);
-    // request.open('GET', "http://localhost:8000/" + fname + window.inname, true);
+    request.open('GET', "http://localhost:8000/Samples/" + fname + "in?_="+ (new Date).getTime(), true);
+    // request.open('GET', "http://localhost:8000/Samples/" + fname + "in", true);
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {

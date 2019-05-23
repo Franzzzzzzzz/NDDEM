@@ -68,8 +68,9 @@ int main (int argc, char * argv[])
  string Directory = argv[argc-1] ;
  {
  // Make the texturing folder if it does not already exist
- // string path(texture_directory + Directory);
- experimental::filesystem::create_directory(texture_directory + Directory);
+ if ( !experimental::filesystem::exists(texture_directory + Directory) ) {
+   experimental::filesystem::create_directory(texture_directory + Directory);
+ }
 
  string filepath = texture_directory + Directory + "/" + "Rendered.bin" ; // BENJY
  FILE *alreadyrendered ;
