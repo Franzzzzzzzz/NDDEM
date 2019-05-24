@@ -13,9 +13,9 @@ endif
 # Compilation incluant le support matlab
 
 
-SOURCES=Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp
+SOURCES=Server.cpp io.cpp Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=Texturing
+EXECUTABLE=TexturingServer
 LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall -L../CoarseGraining/NrrdIO-1.11.0-src/build
 LIBS=-lm -lpthread
 FLTO=-flto
