@@ -2,17 +2,6 @@
 
 using namespace std ;
 
-
-
-
-
-void filepathname (char * path, int n, int time, cv1d View)
-{
-    sprintf (path, "%s/Texture-%d-%05d", DirectorySave.c_str(), n, time) ;
-    for (uint i=0 ; i<d-3 ; i++)
-        sprintf(path, "%s-%.1f", path, View[i]) ;
-    strcat(path, ".png") ;
-}
 //----------------------
 int write_img (char path[], int w, int h, uint8_t * px, int idx)
 {
@@ -85,7 +74,7 @@ int csvread_XR (const char path[], v2d & result, v1d &R, int d)
  return 0 ;
 }
 //--------------
-int write_colormap_vtk(int d)
+int write_colormap_vtk(int d, vector<vector<float>> & colors)
 {
 int nvalues=10 ;
 vector<double> p(3), ptmp ;
@@ -109,7 +98,7 @@ for (int i=0 ; i<nvalues ; i++)
     for (int k=0 ; k<nvalues ; k++)
     {
       ptmp=p ;
-      phi2color(a.begin(), ptmp, d) ;
+      phi2color(a.begin(), ptmp, d, colors) ;
       //printf("%g %g %g\n", p[0], p[1], p[2]) ;
       fprintf(vtkout, "%g %g %g\n", a[0]/256., a[1]/256., a[2]/256.) ;
       p[0] += M_PI/nvalues ;
@@ -121,7 +110,7 @@ for (int i=0 ; i<nvalues ; i++)
 return 0 ;
 }
 //-------------------------------------------
-int write_NrrdIO (string path, int d)
+int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
 {
 #ifdef NRRDIO
     int npoints=16 ;
