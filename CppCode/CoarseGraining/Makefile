@@ -1,7 +1,13 @@
-#CC=g++
-ifndef ${CC}
+HOST=$(shell hostname)
+
+ifeq "$(HOST)" "guillard"
 CC=/opt/local/bin/g++-mp-6 # FG
+else ifeq "$(HOST)" "franz-pavilion"
+CC=g++
+else
+CC=g++
 endif
+
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include
@@ -18,7 +24,7 @@ endif
 SOURCES=IONDDEM.cpp Coarsing.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=IO
-CFLAGS=-I/opt/local/include -DNETCDF -DNRRDIO
+CFLAGS=-I/opt/local/include -DNETCDF #-DNRRDIO
 LDFLAGS=-L/opt/local/lib -L./NrrdIO-1.11.0-src/build
 LIBS=-lz -lm -lnetcdf -lNrrdIO
 

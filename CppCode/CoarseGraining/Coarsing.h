@@ -56,6 +56,10 @@ vector <double *> pospq, lpq, fpq, mpq, mqp ;
 int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data structure
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
 } ; 
+
+//------------------------------------------------------
+#include "WindowLibrary.h"
+
 //=========================================================
 /// Main Coarse graining class
 class Coarsing 
@@ -68,7 +72,7 @@ public :
         for (int i=0 ; i<d ; i++) 
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
         
-        w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
+        double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ; 
         //for (int i=0 ; i<d ; i++) 
@@ -76,18 +80,20 @@ public :
         grid_generate() ; 
         grid_neighbour() ; 
         set_field_struct() ; 
+        Window = new LibLucy3D( &data, w, d) ; 
     }
     
     int d ; ///< Number of dimensions
     int Npt; ///<Number of coarse graining points
     int Time; ///<Total timesteps
     int cT ; ///< Current timestep
-    double w , cutoff ; ///< CG width, and cutoff 
+    double cutoff ; ///< CG width, and cutoff 
     vector <class CGPoint> CGP ; ///< List of Coarse Graining points
     vector <int> npt; ///< Number of points per dimension
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; 
     v2d box ; 
+    LibBase * Window ; 
     
     // Fields variable and function
     unsigned int flags ; ///< Flags deciding which fields to coarse-grain
@@ -113,11 +119,11 @@ public :
     v1d interpolate_rot_nearest (int id) ;
     
     // Windowing functions
-    double window(double r) {Lucy(r) ; } 
-    double window_int (v1d r1, v1d lpq, v1d x) {printf("Numerical integration of wpqf not implemented\n") ; } ///< Numerical integration: not implemented
-    double window_int(double r1, double r2) {return window_avg(r1, r2) ; } ///< Overload to avoid integration ...
-    double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }  
-    double Lucy (double r) {static double cst=105./(16*M_PI*w*w*w) ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
+    //double window(double r) {Lucy(r) ; } 
+    //double window_int (v1d r1, v1d lpq, v1d x) {printf("Numerical integration of wpqf not implemented\n") ; } ///< Numerical integration: not implemented
+    //double window_int(double r1, double r2) {return window_avg(r1, r2) ; } ///< Overload to avoid integration ...
+    //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }  
+    //double Lucy (double r) {static double cst=105./(16*M_PI*w*w*w) ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
     double normdiff (v1d a, v1d b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; } ;     
     // Coarse graining functions
     int pass_1 () ; ///< Coarse-grain anything based on particles (not contacts) which does not need fluctuating quantities
@@ -127,7 +133,6 @@ public :
     // Data handling functions
     int compute_fluc_vel () ; 
     int compute_fluc_rot () ; 
-    double distance (int id, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-data.pos[i][id])*(loc[i]-data.pos[i][id]) ; return sqrt(res) ; } ///< function for mixed particle id / vector informations. 
     struct Data data ; 
     
     // Time and output handling

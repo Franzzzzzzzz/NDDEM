@@ -306,7 +306,7 @@ for (i=0 ; i<data.N ; i++)
 
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
-     wp=window(distance(i,CGP[*j].location)) ;
+     wp=Window->window(Window->distance(i,CGP[*j].location)) ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
      if (wp>0) CGP[*j].natom ++ ;
@@ -373,7 +373,7 @@ for (i=0 ; i<data.N ; i++)
 
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
-     wp=window(distance(i,CGP[*j].location)) ;
+     wp=Window->window(Window->distance(i,CGP[*j].location)) ;
 
      if (doeKT)
          CGP[*j].fields[cT][eKTid] += wp * data.mass[i] * velfluc ;
@@ -428,10 +428,10 @@ for (i=0 ; i<data.Ncf ; i++)
  //printf("%d ", i) ;
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
-  rp=distance(p, CGP[*j].location) ;
-  rq=distance(q, CGP[*j].location) ;
-  wpqs = window_avg (rp, rq) ;
-  wpqf = window_int (rp, rq) ;
+  rp=Window->distance(p, CGP[*j].location) ;
+  rq=Window->distance(q, CGP[*j].location) ;
+  wpqs = Window->window_avg (rp, rq) ;
+  wpqf = Window->window_int (rp, rq) ;
   //printf("%g %g %g", rp, rq, wpqf) ;
   if (dozT)
   {
