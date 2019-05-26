@@ -3,7 +3,7 @@
 using namespace std ;
 
 //----------------------
-int write_img (char path[], int w, int h, uint8_t * px, int idx)
+int write_img (char path[], int w, int h, uint8_t * px)
 {
 	try {
 

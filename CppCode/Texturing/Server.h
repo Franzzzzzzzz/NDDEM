@@ -112,7 +112,7 @@ template <typename uint64_t, typename... Args>
 std::pair<std::string, std::string> make_range_header(uint64_t value,
                                                       Args... args);
 
-typedef std::multimap<std::string, std::string> Params;
+typedef std::map<std::string, std::string> Params;
 typedef std::smatch Match;
 typedef std::function<bool(uint64_t current, uint64_t total)> Progress;
 

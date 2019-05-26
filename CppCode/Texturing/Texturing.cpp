@@ -4,9 +4,6 @@
 #include <regex>
 #include <limits>
 
-
-
-#define DeltaX 0.1
 //#define Nlambda 32
 //#define Ntheta 32
 
@@ -14,6 +11,7 @@ using namespace std ;
 
 void dispvector (const v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 void dispvector (const v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
+void dispvector (const vector<int> & a) {for (auto v: a) printf("%d ", v); printf("\n") ; fflush(stdout) ; }
 
 void runthread_timeloop (Texturing * T, v1d View, uint tsint, int nrotate) 
 {T->timeloop(View, tsint,nrotate) ; }
@@ -21,7 +19,7 @@ void runthread_spaceloop (Texturing * T, v1d View, uint tsint, int nrotate, int 
 {T->spaceloop(View, tsint,nrotate, dim) ; }
 
 //==================================================
-int Texturing::initialise (map <string,string> & args)
+int Texturing::initialise (map <string,string> args)
 {
  d = atoi(args["ND"].c_str()) ; 
  Tools::initialise(d) ;
@@ -80,10 +78,13 @@ int Texturing::initialise (map <string,string> & args)
  for (uint i=0 ; i<d-3 ; i++) {Boundaries[0][i] -= (*tmpbound) ;  Boundaries[1][i] += (*tmpbound) ; }
  
  // Color gradient initialisation
- if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
- if (d-3<allcolors.size()) colors=allcolors[d-3] ;
+ if (static_cast<uint>(d-1)>allcolorslist.size()) printf("ERR: not enough color gradients!!\n") ;
+ //if (d-3<allcolors.size()) colors=allcolors[d-3] ; //TODO
+ //else 
+     colors=allcolorslist ; 
 
  ViewPoint.resize(d-3+1, INT_MIN) ; 
+ FileList.resize(d-3+1) ; 
  Threads.resize(d-3+1) ; 
  justloaded=true ; 
  return 0 ; 
@@ -93,8 +94,33 @@ int Texturing::initialise (map <string,string> & args)
 //==================================================
 int Texturing::clean()
 {
+colors.clear() ;
+lambdagrid.clear() ; 
+thetagrid.clear() ;
+
+Boundaries.clear() ;
+TsName.clear() ; 
+R.clear() ; 
+View.clear() ; 
+ViewPoint.clear() ; 
+
+vector <std::thread> Threads;
+
+for (auto & Thr : Threads)
+if (Thr.joinable())
+{
+  auto ThrID = Thr.native_handle() ;
+  pthread_cancel(ThrID);
+  Thr.join() ;
+}    
+    
 Tools::clear() ;
 vector<Timestep>().swap(Ts) ; 
+Boundaries.clear() ; 
+ViewPoint.clear() ; 
+for (auto & u : FileList)
+    for (auto & v: u)
+        experimental::filesystem::remove(v.c_str()) ;
 return 0 ;
 }
 //=================================================
@@ -105,7 +131,7 @@ int Texturing::MasterRender(map <string,string> args)
  View[0]=View[1]=View[2]=NAN ; 
  for (uint dd=3 ; dd<d ; dd++)
  {
-   sprintf(dimstr, "x%d", dd) ; 
+   sprintf(dimstr, "x%d", dd+1) ; 
    View[dd]=atof(args[dimstr].c_str()) ; 
  }
  vector <int> NewViewPoint(d-3+1,0) ;
@@ -133,6 +159,7 @@ int Texturing::MasterRender(map <string,string> args)
          pthread_cancel(ThreadID);
          Threads[i].join() ;
        }
+    dispvector(NewViewPoint) ; 
     Threads[i] = std::thread(runthread_spaceloop, this, View, NewViewPoint[d-3], nrotate, i) ;
     break ; 
     }
@@ -148,6 +175,7 @@ int Texturing::MasterRender(map <string,string> args)
        pthread_cancel(ThreadID) ;
        Threads[d-3].join() ;
      }
+   dispvector(NewViewPoint) ; 
    Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
    }
  }
@@ -164,8 +192,8 @@ return 0 ;
 //===========================================================
 void Texturing::spaceloop (v1d View, uint tsint, int nrotate, int dim)
 {
+//printf("S") ; fflush(stdout) ; 
 for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
-
 FileList[dim].clear() ;
 
 auto Viewdec = View ;
@@ -174,7 +202,7 @@ while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
   Viewdec[dim] -= DeltaX ;
   View[dim] += DeltaX ;
 
-  printf("s") ; fflush(stdout) ;
+  //printf("s") ; fflush(stdout) ;
 
   if (Viewdec[dim]>Boundaries[0][dim]) Render(FileList[dim], Viewdec, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
   if (View[dim]<Boundaries[1][dim])    Render(FileList[dim], View,    nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
@@ -200,9 +228,21 @@ void Texturing::Render (vector <string> & filerendered, cv1d & View, int nrotate
 {
 v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
 v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
-vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
- for (int i=0 ; i<N ; i++)
- {
+vector<uint8_t> img ; int stride ;  
+int imgx0=0 ; 
+if (singlefiles)  
+{
+    img.resize(Nlambda*Ntheta*3,0) ;
+    stride=Ntheta ; 
+}
+else 
+{
+    img.resize( Ntheta * FilePerLine * (N/FilePerLine+1)* Nlambda*3,0) ; 
+    stride = Nlambda * FilePerLine ; 
+}
+
+for (int i=0 ; i<N ; i++)
+{
      // Check if we are in view
      double rsqr = R[i]*R[i] ;
      //rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
@@ -225,17 +265,16 @@ vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
        phi[j] = acos(cosine) ;
      }
 
-     int n=0 ;
-     for (auto lambda : lambdagrid)
-        for (auto theta : thetagrid)
+     
+     for (int j = 0 ; j<Nlambda ; j++)
+         for (int k=0 ; k<Ntheta ; k++)
          {
              // Finalising the phi array (useless, but just because
-             phi[d-3]=lambda ;
-             phi[d-2]=theta ;
+             phi[d-3]=lambdagrid[j] ;
+             phi[d-2]=thetagrid[k] ;
 
              for (uint dd=0 ; dd<d-3 ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
              //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
-
              sp[d-3] = R[i] ;
              for (uint j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
              sp[d-2]=sp[d-3] ; sp[d-1]=sp[d-3] ;
@@ -253,15 +292,30 @@ vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
              Tools::hyperspherical_xtophi (spturned, phinew) ;
              //printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
              //if (phi[1]==0) phi[1]=M_PI ;
-             phi2color (img.begin() + n*3, phinew, d, colors) ;
-             n++ ;
+             phi2color (img.begin() + imgx0 * 3 + k*3 + j*stride*3, phinew, d, colors) ;
          }
+    
+     if (singlefiles)
+     {
+        char path[5000] ;
+        filepathname(path, i, time, View) ;
+        write_img(path, Ntheta, Nlambda, img.data()) ;
+        filerendered.push_back(path);
+     }
+     else 
+     {
+         imgx0 += Ntheta ;
+         if (imgx0 >= Ntheta * FilePerLine) imgx0 = 0 + i/FilePerLine * (Ntheta*Nlambda*FilePerLine) ;
+     }
+}
 
-     char path[5000] ;
-     filepathname(path, i, time, View) ;
-     write_img(path, Ntheta, Nlambda, img.data(), i) ;
-     filerendered.push_back(path);
- }
+if (!singlefiles)
+{
+ char path[5000] ; 
+ filepathname(path, time, View) ;
+ write_img(path, Ntheta*FilePerLine, Nlambda * (N/FilePerLine +1), img.data()) ;
+ filerendered.push_back(path);
+}
 return ; 
 }
 //--------------------------------------------------------
@@ -317,7 +371,13 @@ void Texturing::filepathname (char * path, int n, int time, cv1d &View)
         sprintf(path, "%s-%.1f", path, View[i]) ;
     strcat(path, ".png") ;
 }
-
+void Texturing::filepathname (char * path, int time, cv1d &View)
+{
+    sprintf (path, "%s/TextureTile-%05d", DirectorySave.c_str(), time) ;
+    for (uint i=0 ; i<d-3 ; i++)
+        sprintf(path, "%s-%.1f", path, View[i]) ;
+    strcat(path, ".png") ;
+}
 
 // =============================
 void rescale (v1f & c, cv1f sum)
@@ -330,7 +390,7 @@ void rescale (v1f & c, cv1f sum)
 //--------------------------------------------------------
 void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<float>> & colors)
 {
-    int vbyte ;
+    int vbyte ;  
     vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
     //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ;
