@@ -90,7 +90,7 @@ void Parameters::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
   in.close() ;
   // Self copy :)
   experimental::filesystem::path p (path) ;
-  experimental::filesystem::path pcp (Directory+"/") ; pcp/= p.filename() ;
+  experimental::filesystem::path pcp (Directory+"/in") ;// pcp/= p.filename() ;
   copy_file(p,pcp,experimental::filesystem::copy_options::overwrite_existing);
 }
 //-------------------------------------------------
@@ -216,6 +216,7 @@ else if (!strcmp(line, "set"))
    else if (word=="XMLbase64") dumpkind = ExportType::XMLbase64 ;
    else if (word=="CSVA") dumpkind = ExportType::CSVA ;
    else if (word=="WALLFORCE") {wallforcecompute = true ; goto LABEL_leave ;} //Jumps at the end of the section
+   else {printf("Unknown dump type\n") ; }
        
    { // New section so g++ doesn't complains about the goto ...
    in>>word ;

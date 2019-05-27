@@ -341,7 +341,8 @@ int main (int argc, char *argv[])
     
     if (P.wallforcecompute)
     {
-     char path[5000] ; sprintf(path, "%s/LogWallForce.txt", P.Directory.c_str()) ; 
+     char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ; 
+     Tools::setzero(WallForce) ; 
      if (P.wallforcecompute)
      {
        for (int i=0 ; i<MP.P ; i++)
