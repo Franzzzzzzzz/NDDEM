@@ -215,7 +215,9 @@ else if (!strcmp(line, "set"))
    else if (word=="XML") dumpkind = ExportType::XML ;
    else if (word=="XMLbase64") dumpkind = ExportType::XMLbase64 ;
    else if (word=="CSVA") dumpkind = ExportType::CSVA ;
-
+   else if (word=="WALLFORCE") {wallforcecompute = true ; goto LABEL_leave ;} //Jumps at the end of the section
+       
+   { // New section so g++ doesn't complains about the goto ...
    in>>word ;
    if (word != "with") printf("ERR: expecting keyword 'with'\n") ;
    int nbparam ;
@@ -234,7 +236,8 @@ else if (!strcmp(line, "set"))
    }
 
    dumps.push_back(make_pair(dumpkind,dumplist)) ;
-
+   }
+   LABEL_leave: ; // Goto label (I know, not beautiful, but makes sense here really)
  }
 
  /*else if (!strcmp(line, "dumpkind"))

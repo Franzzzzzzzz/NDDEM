@@ -60,6 +60,22 @@ void Multiproc::delaying (int ID, int j, Action & act)
     //delayedj[ID].push_back(j) ;
   }
 }
+void Multiproc::delayingwall (int ID, int j, Action & act)
+{
+  delayedwall_size[ID]++ ;
+  if (delayedwall_size[ID] < delayedwallj[ID].size())
+  {
+    delayedwall[ID][delayedwall_size[ID]-1]=act ;
+    delayedwallj[ID][delayedwall_size[ID]-1]=j ;
+  }
+  else
+  {
+    delayedwall[ID].resize(delayedwall_size[ID]+100, act) ;
+    delayedwallj[ID].resize(delayedwall_size[ID]+100, j) ;
+    //delayed[ID].push_back(act) ;
+    //delayedj[ID].push_back(j) ;
+  }
+}
 //---------------------------------------------
 void Multiproc::delayed_clean()
 {
@@ -68,3 +84,11 @@ void Multiproc::delayed_clean()
     val=0 ;
   }
 }
+void Multiproc::delayedwall_clean()
+{
+  for (auto & val : delayedwall_size)
+  {
+    val=0 ;
+  }
+}
+

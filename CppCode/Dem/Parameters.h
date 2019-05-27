@@ -39,7 +39,8 @@ public :
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
-        orientationtracking(true)
+        orientationtracking(true),
+        wallforcecompute(false)
         {
          reset_ND(NN,dd) ;
         }
@@ -67,6 +68,7 @@ public :
     vector < vector <double> > Boundaries ;
     string Directory ;
     bool orientationtracking ;
+    bool wallforcecompute ;
 
     map<float, string> events ;
 

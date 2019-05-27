@@ -25,11 +25,16 @@ public:
     delayed.resize(P) ;
     delayedj.resize(P) ;
     delayed_size.resize(P,0) ;
+    delayedwall.resize(P) ;
+    delayedwallj.resize(P) ;
+    delayedwall_size.resize(P,0) ;
     }
   void disp_share();
   bool ismine (int ID, int j) {if (j>=share[ID] && j<share[ID+1]) return true ; return false ; }
   void delaying (int ID, int j, Action & act) ;
   void delayed_clean() ; 
+  void delayingwall (int ID, int j, Action & act) ;
+  void delayedwall_clean() ; 
 
   vector <ContactList> CLp ;
   vector <ContactList> CLw ;
@@ -40,6 +45,10 @@ public:
   vector <vector <Action> > delayed ;
   vector <vector <int> > delayedj ;
   vector <uint> delayed_size ;
+  
+  vector <vector <Action> > delayedwall ; 
+  vector <vector <int> > delayedwallj ; 
+  vector <uint> delayedwall_size ; 
 
   int P ;
 

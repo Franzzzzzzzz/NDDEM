@@ -52,6 +52,7 @@ int main (int argc, char *argv[])
  std::vector < double > displacement (N, 0) ; double maxdisp[2] ;
 
  std::vector <u_int32_t> PBCFlags (N, 0) ;
+ std::vector < std::vector <double> > WallForce (2*d, std::vector <double> (d,0)) ; 
 
  vector <u_int32_t> Ghost (N, 0) ;
  vector <u_int32_t> Ghost_dir (N, 0) ;
@@ -149,7 +150,7 @@ int main (int argc, char *argv[])
    bool recompute = true ;
    // Should we recompute the neighbor list?
    //auto res=Tools::two_max_element(displacement) ;
-   if (maxdisp[0]+maxdisp[1] > 0.7*(P.skin-P.r[0]*2)) {recompute=true ; std::fill(displacement.begin(), displacement.end(), 0);}
+   //if (maxdisp[0]+maxdisp[1] > 0.7*(P.skin-P.r[0]*2)) {recompute=true ; std::fill(displacement.begin(), displacement.end(), 0);}
    //else recompute=false ;
 
    if (recompute)
@@ -295,6 +296,8 @@ int main (int argc, char *argv[])
 
       Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
       Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+      
+      if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ; 
      }
    }
 
@@ -335,7 +338,21 @@ int main (int argc, char *argv[])
     Tools::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ; 
     P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
     std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
+    
+    if (P.wallforcecompute)
+    {
+     char path[5000] ; sprintf(path, "%s/LogWallForce.txt", P.Directory.c_str()) ; 
+     if (P.wallforcecompute)
+     {
+       for (int i=0 ; i<MP.P ; i++)
+           for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+               Tools::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ; 
+     }
+     Tools::savetxt(path, WallForce, (const char*)("Force on the various walls")) ; 
+    }
    }
+   
+   if (P.wallforcecompute) MP.delayedwall_clean() ; 
  }
 
 //Tools::write1D ("Res.txt", TmpRes) ;
