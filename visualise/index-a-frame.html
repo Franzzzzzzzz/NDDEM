@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
+		<!-- <meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0="> -->
         <style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
@@ -24,30 +24,25 @@
         <script src="js/a-frame/infile.js"></script>
         <script src="js/a-frame/x-button-listener.js"></script>
         <!-- <script src="http://localhost:8000/visualise/js/aframe.min.js"></script> -->
-        <!-- <script src="node_modules/three/build/three.js"></script>
-        <script src="node_modules/three/examples/js/WebGL.js"></script>
-        <script src="node_modules/three/examples/js/vr/WebVR.js"></script>
-        <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
-        <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
-        <script src="node_modules/three/examples/js/effects/AnaglyphEffect.js"></script>
-        <script src="node_modules/three/examples/js/loaders/VTKLoader.js"></script> -->
         <script src="node_modules/papaparse/papaparse.js"></script>
-        <!-- <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
-        <script src="js/datguivr.js"></script>
-        <script src="node_modules/three/examples/js/math/lut.js"></script> -->
+        <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+
 	</head>
 	<body>
         <a-scene>
+            <!-- <a-entity environment="preset: forest; dressingAmount: 500" rotation="0 0 -90"></a-entity> -->
+            <a-entity environment="preset: default;" rotation="0 0 -90"></a-entity>
             <a-entity id="rig" position="0 2 5" rotation="0 0 -90" scale="2 2 2">
                 <a-camera id="camera"></a-camera>
             </a-entity>
-
-            <a-entity hand-controls="hand: left" x-button-listener></a-entity>
-            <a-entity hand-controls="hand: right"></a-entity>
-
-            <!-- <a-box position="0 0 0" rotation="0 0 0" color="#4CC3D9"></a-box> -->
             <a-entity infile="fname: D4/"></a-entity>
             <a-entity particles="view_mode: default;"></a-entity>
+
+            <a-entity hand-controls="left" x-button-listener></a-entity>
+            <a-entity hand-controls="right"></a-entity>
+
+            <!-- <a-box position="0 0 0" rotation="0 0 0" color="#4CC3D9"></a-box> -->
+
         </a-scene>
         <!-- <script>
             // display_type = "VR";
