@@ -18,7 +18,11 @@
             }
 		</style>
         <script src="https://aframe.io/releases/0.9.1/aframe.min.js"></script>
+        <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.min.js"></script>
+<script src="https://unpkg.com/super-hands@3.0.0/dist/super-hands.min.js"></script>
         <script src="js/a-frame/particles.js"></script>
+        <script src="js/a-frame/infile.js"></script>
+        <script src="js/a-frame/x-button-listener.js"></script>
         <!-- <script src="http://localhost:8000/visualise/js/aframe.min.js"></script> -->
         <!-- <script src="node_modules/three/build/three.js"></script>
         <script src="node_modules/three/examples/js/WebGL.js"></script>
@@ -34,8 +38,16 @@
 	</head>
 	<body>
         <a-scene>
-            <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-            <a-entity particles="view_mode: default; fname: D4/"></a-entity>
+            <a-entity id="rig" position="0 2 5" rotation="0 0 -90" scale="2 2 2">
+                <a-camera id="camera"></a-camera>
+            </a-entity>
+
+            <a-entity hand-controls="hand: left" x-button-listener></a-entity>
+            <a-entity hand-controls="hand: right"></a-entity>
+
+            <!-- <a-box position="0 0 0" rotation="0 0 0" color="#4CC3D9"></a-box> -->
+            <a-entity infile="fname: D4/"></a-entity>
+            <a-entity particles="view_mode: default;"></a-entity>
         </a-scene>
         <!-- <script>
             // display_type = "VR";

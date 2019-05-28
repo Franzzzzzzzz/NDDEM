@@ -8,7 +8,7 @@ AFRAME.registerComponent('particles', {
         shadows: {type: 'boolean', default: false},
         time: {type: 'number', default: 0},
         prev: {type: 'number', default: 0},
-        rate: {type: 'number', default: 0.5},
+        rate: {type: 'number', default: 0.1},
         tmax: {type: 'number', default: 100},
   },
     init: function () {
