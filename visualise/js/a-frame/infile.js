@@ -1,6 +1,6 @@
 AFRAME.registerComponent('infile', {
   schema: {
-    N: {type: 'number', default: 99},
+    N: {type: 'number', default: -1},
     world: {type: 'array', default: []},
     tmax: {type: 'number', default: 99},
     pinky: {type: 'number', default: 0},
@@ -28,7 +28,7 @@ AFRAME.registerComponent('infile', {
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
-            data = document.querySelector("a-entity[infile]").components.infile.data;
+            var data = document.querySelector("a-entity[infile]").components.infile.data;
             var type = request.getResponseHeader('Content-Type');
             if (type.indexOf("text") !== 1) {
                 lines = request.responseText.split('\n');
@@ -36,8 +36,8 @@ AFRAME.registerComponent('infile', {
                     line = lines[i].replace(/ {1,}/g," "); // remove multiple spaces
                     l = line.split(' ')
                     if (l[0] == 'dimensions') {
-                        N = parseInt(l[1]);
-                        for (j=0;j<N;j++) {
+                        data.N = parseInt(l[1]);
+                        for (j=0;j<data.N;j++) {
                             data.world.push({});
                             data.world[j].min = 0.;
                             data.world[j].max = 1.;
@@ -64,14 +64,14 @@ AFRAME.registerComponent('infile', {
                         data.pinky = parseInt(l[1]);
                     }
                 }
-                if ( N == 1 ) { // just used for setting up cameras etc
+                if ( data.N == 1 ) { // just used for setting up cameras etc
                     data.world.push({});
                     data.world[1].min = 0.;
                     data.world[1].max = 0.;
                     data.world[1].cur = 0.5;
                     data.world[1].prev = 0.5;
                 };
-                if ( N < 3 ) { // just used for setting up cameras etc
+                if ( data.N < 3 ) { // just used for setting up cameras etc
                     data.world.push({});
                     data.world[2].min = 0.;
                     data.world[2].max = 0.;

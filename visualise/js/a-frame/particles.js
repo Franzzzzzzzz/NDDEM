@@ -1,7 +1,6 @@
 AFRAME.registerComponent('particles', {
     schema: {
         view_mode: {type: 'string', default: 'default'},
-        fname: {type: 'string', default: 'D3/'},
         cache: {type: 'boolean', default: false},
         N: {type: 'number', default: 3},
         quality: {type: 'number', default: 5},
@@ -10,9 +9,13 @@ AFRAME.registerComponent('particles', {
         prev: {type: 'number', default: 0},
         rate: {type: 'number', default: 0.1},
         tmax: {type: 'number', default: 100},
+        paused: {type: 'number', default: 1},
   },
-    init: function () {
+    update: function () {
         data = this.data;
+        data.fname = document.querySelector("a-entity[infile]").components.infile.data.fname;
+        data.N = document.querySelector("a-entity[infile]").components.infile.data.N;
+        data.world = document.querySelector("a-entity[infile]").components.infile.data.world;
         el = this.el;
         if ( data.view_mode === 'rotations' ) {
             var arr = new Array();
@@ -31,7 +34,6 @@ AFRAME.registerComponent('particles', {
             request.send(null);
             // request.onreadystatechange = function () {}
         };
-
         if ( this.data.cache ) { var filename = "http://localhost:8000/Samples/" + this.data.fname + "dump-00000.csv" }
         else { var filename = "http://localhost:8000/Samples/" + this.data.fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
         Papa.parse(filename, {
@@ -83,17 +85,17 @@ AFRAME.registerComponent('particles', {
                         object.receiveShadow = true;
                     }
                     this.particles.add( object );
-                    if ( data.N > 3 && !data.fname.includes('Spinner')) {
-                        pointsMaterial = new THREE.PointsMaterial( { color: color } );
-                        object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
-                        object2.scale.set(R/scale,R/scale,R/scale);
-                        object2.position.set(0.,0.,0.);
-                        wristband.add(object2);
-                        if ( data.N > 5 ) {
-                            object3 = object2.clone();
-                            wristband1.add(object3);
-                        }
-                    }
+                    // if ( data.N > 3 && !data.fname.includes('Spinner')) {
+                    //     pointsMaterial = new THREE.PointsMaterial( { color: color } );
+                    //     object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
+                    //     object2.scale.set(R/scale,R/scale,R/scale);
+                    //     object2.position.set(0.,0.,0.);
+                    //     wristband.add(object2);
+                    //     if ( data.N > 5 ) {
+                    //         object3 = object2.clone();
+                    //         wristband1.add(object3);
+                    //     }
+                    // }
                 }
                 if ( data.fname.includes("Submarine") ) { camera.position.set(particles.children[pinky].position.x,particles.children[pinky].position.y,particles.children[pinky].position.z); console.log(camera.position) }
 
@@ -103,8 +105,11 @@ AFRAME.registerComponent('particles', {
 
     tick: function(t, changed_higher_dim_view) {
         data = this.data;
-        el = this.el;
-        data.time += data.rate;
+        data.fname = document.querySelector("a-entity[infile]").components.infile.data.fname;
+        data.N = document.querySelector("a-entity[infile]").components.infile.data.N;
+        world = document.querySelector("a-entity[infile]").components.infile.data.world;
+        // el = this.el;
+        data.time += data.rate*data.paused;
         if ( Math.floor(data.time) !== data.prev) {
             data.prev = Math.floor(data.time);
             if (data.time > data.tmax) { data.time -= data.tmax; }
@@ -159,14 +164,14 @@ AFRAME.registerComponent('particles', {
                              var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
                                                      Math.pow( (world[3].cur - spheres[i].x3), 2) -
                                                      Math.pow( (world[4].cur - spheres[i].x4), 2)
-                                                 ); // FIXME - IS THIS RIGHT?
+                                                 );
                          }
                          else if (data.N == 6) {
                              var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
                                                      Math.pow( (world[3].cur - spheres[i].x3), 2) -
                                                      Math.pow( (world[4].cur - spheres[i].x4), 2) -
                                                      Math.pow( (world[5].cur - spheres[i].x5), 2)
-                                                 ); // FIXME - IS THIS RIGHT?
+                                                 );
                          }
                          else if (data.N == 7) {
                              var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
@@ -174,7 +179,7 @@ AFRAME.registerComponent('particles', {
                                                      Math.pow( (world[4].cur - spheres[i].x4), 2) -
                                                      Math.pow( (world[5].cur - spheres[i].x5), 2) -
                                                      Math.pow( (world[6].cur - spheres[i].x6), 2)
-                                                 ); // FIXME - IS THIS RIGHT?
+                                                 );
                          };
                         if (isNaN(R_draw)) {
                             object.visible = false;
@@ -195,15 +200,15 @@ AFRAME.registerComponent('particles', {
                             }
                         };
 
-                        if ( data.N == 4 && !data.fname.includes('Spinner')) {
-                            var object2 = wristband.children[i];
-                            phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) + Math.PI/2.;
-                            x = (R + r)*Math.cos(phi);
-                            y = (R + r)*Math.sin(phi);
-                            z = 0.;
-                            object2.position.set(x,y,z);
-                        };
-
+                        // if ( data.N == 4 && !data.fname.includes('Spinner')) {
+                        //     var object2 = wristband.children[i];
+                        //     phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) + Math.PI/2.;
+                        //     x = (R + r)*Math.cos(phi);
+                        //     y = (R + r)*Math.sin(phi);
+                        //     z = 0.;
+                        //     object2.position.set(x,y,z);
+                        // };
+                        // console.log(data.N);
                         if ( data.N > 4 && !data.fname.includes('Spinner') ) {
                             var object2 = wristband.children[i];
                             phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) + Math.PI/2.;
