@@ -19,7 +19,7 @@
 		</style>
         <script src="https://aframe.io/releases/0.9.1/aframe.min.js"></script>
         <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.min.js"></script>
-<script src="https://unpkg.com/super-hands@3.0.0/dist/super-hands.min.js"></script>
+		<script src="https://unpkg.com/super-hands@3.0.0/dist/super-hands.min.js"></script>
         <script src="js/a-frame/particles.js"></script>
         <script src="js/a-frame/infile.js"></script>
         <script src="js/a-frame/x-button-listener.js"></script>
@@ -34,12 +34,16 @@
             <a-entity environment="preset: default;" rotation="0 0 -90"></a-entity>
             <a-entity id="rig" position="0 2 5" rotation="0 0 -90" scale="3 3 3">
                 <a-camera id="camera"></a-camera>
+				<!-- <a-entity oculus-touch-controls="hand: left" x-button-listener></a-entity> -->
+				<!-- <a-entity oculus-touch-controls="hand: right" x-button-listener ></a-entity> -->
+				<a-entity hand-controls="left" x-button-listener></a-entity>
+				<a-entity hand-controls="right" x-button-listener ></a-entity>
             </a-entity>
             <a-entity infile="fname: D4/"></a-entity>
             <a-entity particles="view_mode: default;"></a-entity>
 
-            <a-entity hand-controls="left" x-button-listener></a-entity>
-            <a-entity hand-controls="right"></a-entity>
+
+
 
             <!-- <a-box position="0 0 0" rotation="0 0 0" color="#4CC3D9"></a-box> -->
 
