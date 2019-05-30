@@ -50,7 +50,7 @@ AFRAME.registerComponent('infile', {
                         if (l[2] == 'WALL' || l[2] == 'PBC') {
                             data.world[l[1]].min = parseFloat(l[3]);
                             data.world[l[1]].max = parseFloat(l[4]);
-                            data.world[l[1]].cur = (data.world[l[1]].min + data.world[l[1]].max)/2.;
+                            data.world[l[1]].cur = 3.*(data.world[l[1]].min + data.world[l[1]].max)/4.;
                             data.world[l[1]].prev = data.world[l[1]].cur;
                         }
                         if ( l[2] == 'WALL' ) { data.world[l[1]].wall = true; }
