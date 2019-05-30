@@ -21,6 +21,7 @@
         <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
 		<!-- <script src="https://unpkg.com/super-hands@3.0.0/dist/super-hands.min.js"></script> -->
         <script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+
         <script src="node_modules/papaparse/papaparse.js"></script>
         <script src="js/a-frame/particles.js"></script>
         <script src="js/a-frame/infile.js"></script>
@@ -35,16 +36,20 @@
 	<body>
         <!-- <a-scene auto-enter-vr> -->
         <a-scene>
+            <a-assets>
+                <a-asset-item id="oculuslefthand" src="https://cdn.aframe.io/controllers/oculus-hands/v2/leftHand.json"></a-asset-item>
+                <a-asset-item id="oculusrighthand" src="https://cdn.aframe.io/controllers/oculus-hands/v2/rightHand.json"></a-asset-item>
+</a-assets>
 			<a-entity id="infile" infile="fname: D5/"></a-entity>
             <a-entity environment="preset: forest; dressingAmount: 500" rotation="0 0 -90"></a-entity>
             <!-- <a-entity environment="preset: default;" rotation="0 0 -90"></a-entity> -->
 
             <a-entity id="rig" position="0 2 5" rotation="0 0 -90" scale="3 3 3">
                 <a-camera id="camera"></a-camera>
-				<a-entity id="leftHand" hand-controls="left" rotate-d4>
+				<a-entity id="leftHand" hand-controls="left" model="oculuslefthand" rotate-d4>
                     <a-entity id="leftTorus" torus="hand: left" position="0 0 0.2" rotation="0 0 -90"></a-entity>
                 </a-entity>
-				<a-entity id="rightHand" hand-controls="right" pause-on-gripdown rotators-D6-D7>
+				<a-entity id="rightHand" hand-controls="right" model="#oculusrighthand" pause-on-gripdown rotators-D6-D7>
                     <a-entity id="rightTorus" torus="hand: right" position="0 0 0.2" rotation="0 0 90"></a-entity>
                 </a-entity>
             </a-entity>
