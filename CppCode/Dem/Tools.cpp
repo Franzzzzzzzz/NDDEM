@@ -20,6 +20,15 @@ void Tools::initialise (int dd)
   for (uint de=0 ; de<d ; de++) Eye[de*d+de]=1 ; //initial orientation matrix
 }
 //===================================
+void Tools::clear()
+{
+    MSigns.clear() ;
+    MIndexAS.clear() ; 
+    MASIndex.clear() ; 
+    Eye.clear() ; 
+}
+
+//===================================
 int Tools::savetxt(char path[], const v2d & table, char header[])
 {
  FILE * out ;
@@ -429,7 +438,6 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
     {
        if (j==lastnonzero)
        {
-           printf("!!") ; 
            if (x[j]<0) phi[j]=M_PI ; 
            else phi[j]=0 ;
            return r ; 

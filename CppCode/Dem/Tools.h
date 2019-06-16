@@ -48,6 +48,7 @@ class Tools
 {
 public:
 static void initialise (int dd) ;
+static void clear() ; 
 static bool check_initialised (uint dd) {return (dd==d) ; }
 
 static int savetxt(char path[], const v2d & table, char header[]) ;

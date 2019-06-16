@@ -1,0 +1,40 @@
+# Incline plane flow
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/DropsD4
+#directory OutputTest
+dimensions 4 9
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
+
+location 0 2.5 2.5 2.5 2.5
+location 1 2.5 2 2.5 2.5
+location 2 2.5 2.5 2 2.5
+location 3 2 2.5 2.5 2.5
+location 4 2.5 2.5 2.5 2
+location 5 2.5 2 2 2.5
+location 6 2 2.5 2 2.5
+location 7 2 2.5 2.5 2
+location 8 2.5 2 2.5 2
+
+gravity -1 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+set T 50
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+set dumps CSV with 1 Orientation
+set dumps VTK with 1 OmegaMag
+set tdump 1000
+EOF

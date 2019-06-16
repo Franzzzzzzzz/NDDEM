@@ -1,101 +1,34 @@
-#include "../Dem/Tools.h"
-#include "TinyPngOut.hpp"
+//#include "../Dem/Tools.h"
+#include "Texturing.h"
+
 #include <regex>
-#ifdef NRRDIO
-#include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
-#endif
+#include <limits>
 
 //#define Nlambda 32
 //#define Ntheta 32
 
 using namespace std ;
-// needed for Tools
-uint Tools::d=0 ;
-int Nlambda=32, Ntheta=32 ;
-vector < vector <int> > Tools::MSigns ;
-vector < vector <int> > Tools::MIndexAS ;
-vector < double > Tools::Eye ;
-vector < pair <int,int> > Tools::MASIndex ;
-vector <FILE *> Tools::outs ;
-boost::random::mt19937 Tools::rng ;
-boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 
+void dispvector (const v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
+void dispvector (const v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
+void dispvector (const vector<int> & a) {for (auto v: a) printf("%d ", v); printf("\n") ; fflush(stdout) ; }
 
-void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d) ;
-int write_colormap_vtk (int d) ;
-int write_NrrdIO (string path, int d) ;
-int write_img (char path[], int w, int h, uint8_t * px, int idx) ;
-int csvread_A (const char path[], v2d &result, int d) ;
-int csvread_XR (const char path[], v2d & result, v1d &R, int d) ;
-
-void dispvector (v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
-void dispvector (v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
-
-vector<vector<float>> colors = {
-    {1,0,0},
-    {0,1,0},
-    {0,0,1},
-    {1,1,0},
-    {0,1,1},
-    {1,0,1}} ;
-
-vector<vector<vector<float>>> allcolors = {
-    {{231./256., 37./256., 100./256.}}, // official NDDEM pink
-    {{1,1,0},{0,1,1}}};
-
-
-string sample_directory = "Samples/";
-string texture_directory = "Textures/";
-
+void runthread_timeloop (Texturing * T, v1d View, uint tsint, int nrotate) 
+{T->timeloop(View, tsint,nrotate) ; }
+void runthread_spaceloop (Texturing * T, v1d View, uint tsint, int nrotate, int dim) 
+{T->spaceloop(View, tsint,nrotate, dim) ; }
 
 //==================================================
-//Args: d V1 V2 ... VN locationfile Afile
-int main (int argc, char * argv[])
+int Texturing::initialise (map <string,string> args)
 {
-  //TEST
- //write_colormap_vtk(4) ;
- //write_NrrdIO("Colormap.nrrd", 4) ;
- //exit(0) ;
-
- // Get Number of dimensions and extract viewpoint
- uint d ;
- d = atoi(argv[2]) ;
+ d = atoi(args["ND"].c_str()) ; 
  Tools::initialise(d) ;
- v1d View(d,0) ; // Use NaN for the 3D coordinates (careful, should always follow each others
- for (uint i=0 ; i<d ; i++) View[i]=atof(argv[i+3]) ;
+ size(d,0) ;
+ string Directory=args["path"] ; 
+ DirectorySave= args["texturepath"] ; 
+ 
+ set_grid (atoi(args["resolution"].c_str())) ; 
 
- // Check if already rendered
- string Directory = argv[argc-1] ;
- {
- // Make the texturing folder if it does not already exist
- if ( !experimental::filesystem::exists(texture_directory + Directory) ) {
-   experimental::filesystem::create_directory(texture_directory + Directory);
- }
-
- string filepath = texture_directory + Directory + "/" + "Rendered.bin" ; // BENJY
- FILE *alreadyrendered ;
- alreadyrendered = fopen(filepath.c_str(), "rb") ;
- if (alreadyrendered!=NULL)
- {
-   double tmp ; uint i ;
-   for (i=0 ; i<d ; i++)
-   {
-     int res=fread(&tmp, sizeof(double), 1, alreadyrendered) ; res=res ;
-     printf("%f %f\n", tmp, View[i]) ;  fflush(stdout) ;
-     if (isnan(tmp)) continue ;
-     if (tmp!=View[i]) break ;
-   }
-   fclose (alreadyrendered) ;
-   if (i==d)
-   {
-    printf("Already rendered\n") ;
-    std::exit(0) ; // All rendered already
-   }
-   else // Let's keep going, removing the Rendered.bin file
-     experimental::filesystem::remove(filepath.c_str()) ;
- }
- }
- v1d ViewInit = View ;
  //Get all the relevent files in the Directory, sort them and identify the timesteps
  experimental::filesystem::directory_iterator D(sample_directory + Directory) ;
  vector <string> tmpfilelst ;
@@ -111,75 +44,214 @@ int main (int argc, char * argv[])
  }
  std::sort(filelistloc.begin(), filelistloc.end()) ;
  std::sort(filelistA.begin()  , filelistA.end()  ) ;
+ TsName.resize(filelistloc.size(), 0) ; 
+ for (uint i=0 ; i<filelistloc.size() ; i++) TsName[i]=filelistloc[i].first ;
 
- // Set Lambda and Theta grids
- int nb=atoi(argv[1]) ;
- if (nb>0 && nb<16)
-     Nlambda=Ntheta=(1<<nb);
- else if (nb>=16)
-     Nlambda=Ntheta=nb ;
- else
+ // Let's read everything
+ Ts.resize(filelistloc.size()) ;
+ for (uint i=0 ; i<filelistloc.size() ; i++)
+  {
+    R.clear() ;
+    csvread_XR (filelistloc[i].second.c_str(), Ts[i].X, R, d) ;
+  }
+ for (uint i=0 ; i<filelistA.size() ; i++) csvread_A(filelistA[i].second.c_str(), Ts[i].A, d) ;
+ N = Ts[0].X.size() ;
+ int nrotate=3 ; // Rotate all the coordinates already
+ for (auto & v : Ts)
  {
-     colors=allcolors[1] ;
-     write_colormap_vtk(4) ;
-     exit(0) ;
+    for (int i=0 ; i<N ; i++)
+        rotate(v.X[i].begin(), v.X[i].begin()+nrotate, v.X[i].end()) ;
  }
- v1d lambdagrid(Nlambda,0), thetagrid(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
- vector<uint8_t> img (Nlambda*Ntheta*3,0) ;
- v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the syrface of the sphere)
-
+ Boundaries.resize(2) ;
+ Boundaries[0].resize(d-3, INT_MAX) ;
+ Boundaries[1].resize(d-3, INT_MIN) ;
+ for (auto &v : Ts)
+  for (auto &w : v.X)
+  {
+    for (uint i=0 ; i<d-3 ; i++)
+    {
+      if (w[i]<Boundaries[0][i]) Boundaries[0][i] = w[i] ;
+      if (w[i]>Boundaries[1][i]) Boundaries[1][i] = w[i] ;
+    }
+  }
+ auto tmpbound = max_element(R.begin(), R.end()) ;
+ for (uint i=0 ; i<d-3 ; i++) {Boundaries[0][i] -= (*tmpbound) ;  Boundaries[1][i] += (*tmpbound) ; }
+ 
  // Color gradient initialisation
- if (static_cast<uint>(d-1)>colors.size()) printf("ERR: not enough color gradients!!\n") ;
- if (d-3<allcolors.size()) colors=allcolors[d-3] ;
- v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+ if (static_cast<uint>(d-1)>allcolorslist.size()) printf("ERR: not enough color gradients!!\n") ;
+ //if (d-3<allcolors.size()) colors=allcolors[d-3] ; //TODO
+ //else 
+     colors=allcolorslist ; 
 
- auto TimeFirst = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==atoi(argv[argc-2])) ; }) ;
- auto TimeCur = TimeFirst ;
+ ViewPoint.resize(d-3+1, INT_MIN) ; 
+ FileList.resize(d-3+1) ; 
+ Threads.resize(d-3+1) ; 
+ justloaded=true ; 
+ return 0 ; 
+} 
 
- // Setting up the grid in latitude-longitude
- for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
- for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
- thetagrid[Ntheta-1]=thetagrid[0];
 
- // Let's simplify our life and rotate the view so that the 3 last coordinates are the NaN's
- int nrotate = 0 ;
- if (d>3) //All view dimensions are NaN if d==3
+//==================================================
+int Texturing::clean()
+{
+colors.clear() ;
+lambdagrid.clear() ; 
+thetagrid.clear() ;
+
+Boundaries.clear() ;
+TsName.clear() ; 
+R.clear() ; 
+View.clear() ; 
+ViewPoint.clear() ; 
+
+vector <std::thread> Threads;
+
+for (auto & Thr : Threads)
+if (Thr.joinable())
+{
+  auto ThrID = Thr.native_handle() ;
+  pthread_cancel(ThrID);
+  Thr.join() ;
+}    
+    
+Tools::clear() ;
+vector<Timestep>().swap(Ts) ; 
+Boundaries.clear() ; 
+ViewPoint.clear() ; 
+for (auto & u : FileList)
+    for (auto & v: u)
+        experimental::filesystem::remove(v.c_str()) ;
+return 0 ;
+}
+//=================================================
+int Texturing::MasterRender(map <string,string> args)
+{
+ int Time=atoi(args["ts"].c_str()) ;
+ char dimstr[10] ; 
+ View[0]=View[1]=View[2]=NAN ; 
+ for (uint dd=3 ; dd<d ; dd++)
  {
-    while (isnan(View[0]))
-    {
-        rotate(View.begin(), View.begin()+1 , View.end()) ;
-        nrotate++ ;
+   sprintf(dimstr, "x%d", dd+1) ; 
+   View[dd]=atof(args[dimstr].c_str()) ; 
+ }
+ vector <int> NewViewPoint(d-3+1,0) ;
+    
+ int nrotate = viewpermute (View, d) ;
+ if (nrotate != 3) printf("WHAT? No the first 3D should be NaNs ...") ; 
+ for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
+    
+ auto tmp  = find(TsName.begin(), TsName.end(), Time) ;
+ if (tmp == TsName.end()) {printf("WARN: not found timestep\n") ; return -1 ; }
+ NewViewPoint[d-3] = tmp-TsName.begin() ; 
+
+ //printf("%d %d | %d %d\n", ViewPoint[0], ViewPoint[1], NewViewPoint[0], NewViewPoint[1]) ;
+ // Alright, lets start the threads
+ for (uint i=0 ; i<d-3 ; i++)
+ {
+   for (uint j=0 ; j<d-3+1 ; j++)
+   {
+     if (j==i) continue ;
+     if (NewViewPoint[j] != ViewPoint[j])
+     {
+       if (Threads[i].joinable())
+       {
+         auto ThreadID = Threads[i].native_handle() ;
+         pthread_cancel(ThreadID);
+         Threads[i].join() ;
+       }
+    dispvector(NewViewPoint) ; 
+    Threads[i] = std::thread(runthread_spaceloop, this, View, NewViewPoint[d-3], nrotate, i) ;
+    break ; 
     }
-    if (nrotate==0)
-    {
-        auto b = find_if(View.begin(), View.end(), [](double d) { return std::isnan(d); } ) ;
-        rotate(View.begin(), b+3, View.end()) ;
-        nrotate = b-View.begin()+3 ;
-    }
-    nrotate %= View.size() ;
+  }
+ }
+ for (uint j=0 ; j<d-3 ; j++)
+ {
+   if (NewViewPoint[j] != ViewPoint[j])
+   {
+     if (Threads[d-3].joinable())
+     {
+       auto ThreadID = Threads[d-3].native_handle() ;
+       pthread_cancel(ThreadID) ;
+       Threads[d-3].join() ;
+     }
+   dispvector(NewViewPoint) ; 
+   Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
+   }
  }
 
- do
+ if (d==3 && justloaded)
  {
- v2d X, A ; v1d R ;
- //char path[5000] ;
- //sprintf(path, "%s/dump-%s.csv", Directory, argv[argc-2]) ;
- csvread_XR (TimeCur->second.c_str(), X, R, d) ;
- //sprintf(path, "%s/dumpA-%s.csv", Directory, argv[argc-2]) ;
- csvread_A  ((filelistA.begin() + (TimeCur-filelistloc.begin()))->second.c_str(), A, d) ;
- int N = X.size() ;
+   Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
+   justloaded=false ;
+ }
+ViewPoint=NewViewPoint ;
+return 0 ; 
+}
 
- for (int i=0 ; i<N ; i++)
- {
+//===========================================================
+void Texturing::spaceloop (v1d View, uint tsint, int nrotate, int dim)
+{
+//printf("S") ; fflush(stdout) ; 
+for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
+FileList[dim].clear() ;
+
+auto Viewdec = View ;
+while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
+{
+  Viewdec[dim] -= DeltaX ;
+  View[dim] += DeltaX ;
+
+  //printf("s") ; fflush(stdout) ;
+
+  if (Viewdec[dim]>Boundaries[0][dim]) Render(FileList[dim], Viewdec, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+  if (View[dim]<Boundaries[1][dim])    Render(FileList[dim], View,    nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+}
+}
+//-----------------------------------------------------
+void Texturing::timeloop (v1d View, uint tsint, int nrotate)
+{
+int dim=FileList.size()-1 ; 
+for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
+
+FileList[dim].clear() ;
+uint timeidxinit=tsint ;
+do {
+Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+tsint++ ;
+if (tsint>=Ts.size()) tsint=0 ;
+} while (tsint != timeidxinit) ;
+}
+
+//-----------------------------------------------------
+void Texturing::Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A)
+{
+v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
+v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+vector<uint8_t> img ; int stride ;  
+int imgx0=0 ; 
+if (singlefiles)  
+{
+    img.resize(Nlambda*Ntheta*3,0) ;
+    stride=Ntheta ; 
+}
+else 
+{
+    img.resize( Ntheta * FilePerLine * (N/FilePerLine+1)* Nlambda*3,0) ; 
+    stride = Nlambda * FilePerLine ; 
+}
+
+for (int i=0 ; i<N ; i++)
+{
      // Check if we are in view
      double rsqr = R[i]*R[i] ;
-     rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
+     //rotate(X[i].begin(), X[i].begin()+nrotate, X[i].end()) ;
      for (uint j=0 ; j<d-3 ; j++)
          rsqr -= (View[j]-X[i][j])*(View[j]-X[i][j]) ;
      if (rsqr<=0)
      {
-       char path[5000] ;
-       sprintf(path, "%s/%s/Texture-%d-%d.png", texture_directory.c_str(), Directory.c_str(), TimeCur->first, i) ; // BENJY
+       //char path[5000] ;
+       //sprintf(path, "%s/Texture-%d-%d.png", Directory.c_str(), TimeCur->first, i) ;
        //experimental::filesystem::remove(path) ;
        continue ;
      }
@@ -193,24 +265,23 @@ int main (int argc, char * argv[])
        phi[j] = acos(cosine) ;
      }
 
-     int n=0 ;
-     for (auto lambda : lambdagrid)
-        for (auto theta : thetagrid)
+     
+     for (int j = 0 ; j<Nlambda ; j++)
+         for (int k=0 ; k<Ntheta ; k++)
          {
              // Finalising the phi array (useless, but just because
-             phi[d-3]=lambda ;
-             phi[d-2]=theta ;
+             phi[d-3]=lambdagrid[j] ;
+             phi[d-2]=thetagrid[k] ;
 
-             for (uint dd=0 ; dd<d ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
+             for (uint dd=0 ; dd<d-3 ; dd++) {sp[dd]=View[dd]-X[i][dd] ;}
              //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
-
              sp[d-3] = R[i] ;
              for (uint j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
              sp[d-2]=sp[d-3] ; sp[d-1]=sp[d-3] ;
              sp[d-3] *= cos(phi[d-3]) ;
              sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
              sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
-
+             //dispvector(sp) ;
              // Now sp should be right, let's check
              //printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;
              // Rotating the point vector back in dimensions, and then rotating in space according to the basis A
@@ -221,34 +292,92 @@ int main (int argc, char * argv[])
              Tools::hyperspherical_xtophi (spturned, phinew) ;
              //printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
              //if (phi[1]==0) phi[1]=M_PI ;
-             phi2color (img.begin() + n*3, phinew, d) ;
-             n++ ;
+             phi2color (img.begin() + imgx0 * 3 + k*3 + j*stride*3, phinew, d, colors) ;
          }
-
-     char path[5000] ;
-     sprintf(path, "%s/%s/Texture-%05d-%d.png", texture_directory.c_str(), Directory.c_str(), TimeCur->first, i) ; // BENJY
-     write_img(path, Ntheta, Nlambda, img.data(), i) ;
- }
-
- // Advance TimeCur
- TimeCur ++ ;
- if (TimeCur==filelistloc.end()) TimeCur=filelistloc.begin() ;
- //printf("%d\n", TimeCur->first);
- } while (TimeCur != TimeFirst) ;
-
- // Save the file
- {
- string filepath = texture_directory + Directory + "/" + "Rendered.bin" ; // BENJY
- FILE *alreadyrendered ;
- alreadyrendered = fopen(filepath.c_str(), "wb") ;
- for (uint i=0 ; i<d ; i++)
-  {int res=fwrite(&(ViewInit[i]), sizeof(double), 1, alreadyrendered) ; printf("%d ", res) ; res=res ;}
- fclose (alreadyrendered) ;
- }
-
- return 0 ;
+    
+     if (singlefiles)
+     {
+        char path[5000] ;
+        filepathname(path, i, time, View) ;
+        write_img(path, Ntheta, Nlambda, img.data()) ;
+        filerendered.push_back(path);
+     }
+     else 
+     {
+         imgx0 += Ntheta ;
+         if (imgx0 >= Ntheta * FilePerLine) imgx0 = 0 + i/FilePerLine * (Ntheta*Nlambda*FilePerLine) ;
+     }
 }
 
+if (!singlefiles)
+{
+ char path[5000] ; 
+ filepathname(path, time, View) ;
+ write_img(path, Ntheta*FilePerLine, Nlambda * (N/FilePerLine +1), img.data()) ;
+ filerendered.push_back(path);
+}
+return ; 
+}
+//--------------------------------------------------------
+int Texturing::set_grid(int nb)
+{
+  // Set Lambda and Theta grids
+  if (nb>0 && nb<16)
+      Nlambda=Ntheta=(1<<nb);
+  else if (nb>=16)
+      Nlambda=Ntheta=nb ;
+  else
+  {
+      colors=allcolors[1] ;
+      write_colormap_vtk(4, colors) ;
+      exit(0) ;
+  }
+  lambdagrid.resize(Nlambda,0) ;
+  thetagrid.resize(Ntheta,0) ; //lambda:latitude (0:pi), theta: longitude (0:2pi)
+
+  // Setting up the grid in latitude-longitude
+  for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
+  for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
+  thetagrid[Ntheta-1]=thetagrid[0];
+  return 0 ; 
+}
+//=================================================
+int Texturing::viewpermute (v1d & View, int d)
+{
+if (d>3) //All view dimensions are NaN if d==3
+{
+   int nrotate=0 ;
+   while (isnan(View[0]))
+   {
+       rotate(View.begin(), View.begin()+1 , View.end()) ;
+       nrotate++ ;
+   }
+   if (nrotate==0)
+   {
+       auto b = find_if(View.begin(), View.end(), [](double d) { return std::isnan(d); } ) ;
+       rotate(View.begin(), b+3, View.end()) ;
+       nrotate = b-View.begin()+3 ;
+   }
+   nrotate %= View.size() ;
+return nrotate ;
+}
+else return 0 ;
+}
+//====================================================
+void Texturing::filepathname (char * path, int n, int time, cv1d &View)
+{
+    sprintf (path, "%s/Texture-%d-%05d", DirectorySave.c_str(), n, time) ;
+    for (uint i=0 ; i<d-3 ; i++)
+        sprintf(path, "%s-%.1f", path, View[i]) ;
+    strcat(path, ".png") ;
+}
+void Texturing::filepathname (char * path, int time, cv1d &View)
+{
+    sprintf (path, "%s/TextureTile-%05d", DirectorySave.c_str(), time) ;
+    for (uint i=0 ; i<d-3 ; i++)
+        sprintf(path, "%s-%.1f", path, View[i]) ;
+    strcat(path, ".png") ;
+}
 
 // =============================
 void rescale (v1f & c, cv1f sum)
@@ -257,10 +386,11 @@ void rescale (v1f & c, cv1f sum)
     if (sum[i]>=1)
       c[i]/=sum[i] ;
 }
+
 //--------------------------------------------------------
-void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
+void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<float>> & colors)
 {
-    int vbyte ;
+    int vbyte ;  
     vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
     //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ;
@@ -268,12 +398,15 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
     //phi[d-2] /= 2 ;
     for (int i=0 ; i<d-2 ; i++)
     {
-        ctmp += (colors[i] * fabs(sin(3*phi[i]))) ;
+        ctmp += (colors[i] * fabs(sin(phi[i]))) ;
         sum += colors[i] ;
     }
+    ctmp += (colors[d-2] * fabs(sin(phi[d-2]/2.))) ;
+    sum += colors[d-2] ;
     rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
     //for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
-    ctmp *= fabs(sin(6*phi[d-2]/2.)) ;
+    for (int i=0 ; i<d-2 ; i++)
+      ctmp *= fabs(sin(phi[i])) ;
     //printf("%g %g %g\n", ctmp[0], ctmp[1], ctmp[2]) ;
     //ctmp = (colors[0]*sin(phi[0]) + colors[1]*sin(phi[1]/2)) * sin(phi[0]) ;
     cfinal = ctmp ;
@@ -287,194 +420,111 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d)
     }
     return ;
 }
-//-------------------------------------------------------
-int write_img (char path[], int w, int h, uint8_t * px, int idx)
+
+/*int render (int argc, char * argv[])
 {
-	try {
+ //FILE * piping ; char line[5000] ;
+ //piping=fopen("pipe", "r") ; if (piping==NULL) {printf("ERR: a pipe is expected\n") ; exit(1) ; }
 
-		std::ofstream out(path, std::ios::binary);
-		TinyPngOut pngout(static_cast<uint32_t>(w), static_cast<uint32_t>(h), out);
-		pngout.write(px, static_cast<size_t>(w * h));
-		return EXIT_SUCCESS;
-
-	} catch (const char *msg) {
-		std::cerr << msg << std::endl;
-		return EXIT_FAILURE;
-	}
-}
-//---------
-int csvread_A (const char path[], v2d & result, int d)
-{
- FILE *in ; int n=0 ; double tmp ;
- in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
- int r ;
-
- r=fscanf(in,"%*[^\n]%*c") ; // Skipping header
-
- while (!feof(in))
+ bool run = true ;
+ vector <vector<string>> FileList (d-3+1) ;
+ vector <std::thread> Threads (d-3+1) ;
+ int TimeCur ;
+ bool firstrun = true ;
+ while (run)
  {
-     r=fscanf(in, "%lg%*c", &tmp) ;
-     if (feof(in)) break ;
+   int l=-1,n ;
+   do {
+     l++ ;
+     n=fscanf(piping, "%c", line+l) ;
+   } while (n>0) ;
+   if (l>0) line[l-1] = 0 ;
+   else line[0] = 0 ;
+   clearerr(piping) ;
 
-     result.push_back(v1d (d*d,0)) ;
-     result[n][0]=tmp ;
-     for (int i=1 ; i<d*d ; i++)
-         r=fscanf(in, "%lg%*c", &result[n][i]) ;
+   if (line[0]!=0) {printf("Text received: %s\n", line) ; fflush(stdout) ;}
 
-     //dispvector(result[n]) ;
-     r=r ;
-     n++ ;
+   if (!strcmp(line, "stop"))
+   {
+     for (auto &w : FileList)
+        for (auto & v : w)
+          experimental::filesystem::remove(v.c_str()) ;
+     for (auto & v : Threads)
+     {
+       if (v.joinable())
+       {
+         auto ThreadID = v.native_handle() ;
+         pthread_cancel(ThreadID);
+         v.join() ;
+       }
+     }
+     run=false ;
+   }
+   else if (!strcmp(line, "pass")) {} // Just pass
+   else if (line[0]!=0) // Assume we got a new viewpoint
+   {
+     char * pch;
+     pch = strtok (line," ");
+     for (uint i=0 ; i<d ; i++)
+     {
+       View[i] = atof(pch) ;
+       pch = strtok (NULL, " ");
+     }
+     TimeCur=atoi(pch) ;
+
+     int nrotate = viewpermute (View, d) ;
+     printf("[%d]", nrotate) ; fflush(stdout) ;
+     for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
+     NewViewPoint[d-3]= TimeCur ;
+
+     uint TimeCurInt = find_if(filelistloc.begin(), filelistloc.end(), [=](std::pair<int,string>a){return (a.first==TimeCur);})-filelistloc.begin() ;
+
+     printf("%d %d | %d %d\n", ViewPoint[0], ViewPoint[1], NewViewPoint[0], NewViewPoint[1]) ;
+     // Alright, lets start the threads
+     for (uint i=0 ; i<d-3 ; i++)
+     {
+       for (uint j=0 ; j<d-3+1 ; j++)
+       {
+        if (j==i) continue ;
+        if (NewViewPoint[j] != ViewPoint[j])
+          {
+            if (Threads[i].joinable())
+            {
+              auto ThreadID = Threads[i].native_handle() ;
+              pthread_cancel(ThreadID);
+              Threads[i].join() ;
+            }
+            Threads[i] = std::thread(spaceloop, std::ref(FileList[i]), View, nrotate, i, TimeCur, std::ref(X[TimeCurInt]), std::ref(R), std::ref(A[TimeCurInt])) ;
+          }
+       }
+     }
+     for (uint j=0 ; j<d-3 ; j++)
+     {
+       if (NewViewPoint[j] != ViewPoint[j])
+       {
+         if (Threads[d-3].joinable())
+         {
+           auto ThreadID = Threads[d-3].native_handle() ;
+           pthread_cancel(ThreadID) ;
+           Threads[d-3].join() ;
+         }
+         Threads[d-3] = std::thread(timeloop, std::ref(FileList[d-3]), View, nrotate, std::ref(timelst), TimeCurInt, std::ref(X), std::ref(R), std::ref(A)) ;
+       }
+     }
+
+     if (d==3) // Special case for d=3, run anyway
+     {
+       if (firstrun)
+       {
+         Threads[d-3] = std::thread(timeloop, std::ref(FileList[d-3]), View, nrotate, std::ref(timelst), TimeCurInt, std::ref(X), std::ref(R), std::ref(A)) ;
+         firstrun=false ;
+       }
+     }
+
+     ViewPoint=NewViewPoint ;
+   }
+   else {usleep(10000) ; } // A little sleep :)
  }
 
- fclose(in) ;
  return 0 ;
-}
-//-------
-int csvread_XR (const char path[], v2d & result, v1d &R, int d)
-{
- FILE *in ; int n=0 ; double tmp ;
- in=fopen(path, "r") ; if (in==NULL) {printf("Cannot open input file %s\n", path) ; return 1 ; }
- int r ;
-
- r=fscanf(in,"%*[^\n]%*c") ; // Skipping header
-
- while (!feof(in))
- {
-     r=fscanf(in, "%lg%*c", &tmp) ;
-     if (feof(in)) break ;
-
-     result.push_back(v1d (d,0)) ;
-     R.push_back(0) ;
-     result[n][0]=tmp ;
-     for (int i=1 ; i<d ; i++)
-         r=fscanf(in, "%lg%*c", &result[n][i]) ;
-     r=fscanf(in, "%lg%*c", &R[n]) ;
-     //printf("%g %g %g %g\n", result[n][0], result[n][1], result[n][2], R[n]) ;
-     r=fscanf(in, "%*s%*c") ;
-     r=r ;
-     n++ ;
- }
-
- fclose(in) ;
- return 0 ;
-}
-//--------------
-int write_colormap_vtk(int d)
-{
-int nvalues=10 ;
-vector<double> p(3), ptmp ;
-vector <uint8_t> a ;
-a.resize(3,0) ;
-
-if (d!=4) printf("ERROR: cannot export the colormap for d!=4 currently\n") ;
-
-FILE *vtkout ;
-vtkout=fopen("Colormap.vtk", "w") ;
-fprintf(vtkout,"# vtk DataFile Version 2.0\nTexture for ND DEM\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n\nPOINT_DATA %d\nCOLOR_SCALARS Color 3\n", nvalues, nvalues, nvalues, 0 +M_PI/2/nvalues, 0 + M_PI/2/nvalues, 0+M_PI/nvalues, M_PI/nvalues, M_PI/nvalues, 2*M_PI/nvalues, nvalues*nvalues*nvalues) ;
-
-p[2] = 0 + M_PI/nvalues ;
-printf("%g ", p[2]) ;
-for (int i=0 ; i<nvalues ; i++)
-{
-  p[1] = 0 +M_PI/2/nvalues ;
-  for (int j=0 ; j<nvalues ; j++)
-  {
-    p[0] = 0+M_PI/2/nvalues ;
-    for (int k=0 ; k<nvalues ; k++)
-    {
-      ptmp=p ;
-      phi2color(a.begin(), ptmp, d) ;
-      //printf("%g %g %g\n", p[0], p[1], p[2]) ;
-      fprintf(vtkout, "%g %g %g\n", a[0]/256., a[1]/256., a[2]/256.) ;
-      p[0] += M_PI/nvalues ;
-    }
-    p[1] += M_PI/nvalues ;
-  }
-  p[2] += 2*M_PI/nvalues ;
-}
-return 0 ;
-}
-//-------------------------------------------
-int write_NrrdIO (string path, int d)
-{
-#ifdef NRRDIO
-    int npoints=16 ;
-    vector<double> p(d,0) ;
-
-    Nrrd *nval;
-    auto nio = nrrdIoStateNew();
-    nrrdIoStateEncodingSet(nio, nrrdEncodingAscii) ; //Change to nrrdEncodingRaw for binary encoding
-    nval = nrrdNew();
-
-    // Header infos
-    vector <size_t> dimensions (d, npoints) ;
-    dimensions[0] = 3 ;
-    dimensions[1]= npoints*2 ;
-
-    vector <int> nrrdkind (d, nrrdKindSpace) ;
-    nrrdkind[0]=nrrdKindVector ;
-    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoKind, nrrdkind.data() );
-
-    vector <double> nrrdmin(d,0+M_PI/npoints/2), nrrdmax(d,M_PI-M_PI/npoints/2), nrrdspacing(d,M_PI/npoints) ;
-    nrrdmin[0]=nrrdmax[0]=nrrdspacing[0]=AIR_NAN ;
-    //nrrdmin[d-1]=0+M_PI/npoints ; nrrdmax[d-1]=2*M_PI+M_PI/npoints ;
-
-    char ** labels;
-    labels=(char **) malloc(sizeof(char *) * (d+3)) ;
-    labels[0]=(char *) malloc(sizeof(char) * (4)) ;
-    sprintf(labels[0], "rgb") ;
-    for (int dd=1 ; dd<d ; dd++)
-    {
-        labels[dd]=(char *) malloc(sizeof(char) * (3+d/10+1+1)) ;
-        sprintf(labels[dd], "phi%d", dd) ;
-    }
-
-    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoLabel, labels);
-    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMin, nrrdmin.data());
-    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMax, nrrdmax.data());
-    nrrdAxisInfoSet_nva(nval, nrrdAxisInfoSpacing, nrrdspacing.data());
-
-    int allpoint=pow(npoints,d-1)*2 ;
-    uint8_t * outdata, * pout ;
-    outdata=(uint8_t*) malloc(sizeof(uint8_t)*allpoint*3) ;
-
-  //---------------------------------------------------------------------
-    std::function <void(int,vector<double>)> lbdrecurse ;
-    pout=outdata ;
-    lbdrecurse = [&,d](int lvl, vector<double> p)
-    {
-      if (lvl<d-1)
-      {
-        p[lvl]=0+M_PI/npoints/2 ;
-        for (int i=0 ; i<npoints ; i++)
-        {
-          lbdrecurse(lvl+1, p) ;
-          p[lvl]+=M_PI/npoints ;
-        }
-      }
-      else
-      {
-        p[lvl]=0+M_PI/npoints/2 ;
-        for (int i=0 ; i<2*npoints ; i++)
-        {
-          auto ptmp=p ; vector <uint8_t> a(3,0) ;
-          phi2color(a.begin(), ptmp, d) ;
-          *pout=a[0] ; pout++ ;
-          *pout=a[1] ; pout++ ;
-          *pout=a[2] ; pout++ ;
-          p[lvl]+=M_PI/npoints ;
-        }
-      }
-    } ;
-    lbdrecurse(0,p) ;
-    //---------------------------------------------------------------------
-
-    nrrdWrap_nva(nval, outdata, nrrdTypeUChar, d, dimensions.data());
-    string fullpath ;
-    fullpath = path ;
-    nrrdSave(fullpath.c_str(), nval, nio);
-    free(outdata) ;
-    printf("%s ", fullpath.c_str()) ;
-#endif
-return 0 ;
-}
+}*/

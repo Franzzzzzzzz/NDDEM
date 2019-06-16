@@ -1,5 +1,9 @@
-ifndef $(CC)
+HOST=$(shell hostname)
+
+ifeq "$(HOST)" "guillard"
 CC=/opt/local/bin/g++-mp-6 # FG
+else ifeq "$(HOST)" "franz-pavilion"
+CC=g++
 endif
 #CC=g++-8 # BM
 #CC=g++
@@ -9,15 +13,15 @@ endif
 # Compilation incluant le support matlab
 
 
-SOURCES=Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp
+SOURCES=Server.cpp io.cpp Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=Texturing
+EXECUTABLE=TexturingServer
 LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall -L../CoarseGraining/NrrdIO-1.11.0-src/build
-LIBS=-lm
+LIBS=-lm -lpthread
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs #-DNRRDIO 
+all: CFLAGS+=-g -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs#-DNRRDIO
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+= -fopenmp -lstdc++fs -lNrrdIO #-lnetcdf
 all:
