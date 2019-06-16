@@ -32,6 +32,7 @@ public :
       {{1,1,0},{0,1,1}}};
 
   v1d lambdagrid, thetagrid ;
+  string BasePath ; 
   string DirectorySave ;
   uint d ; int N ;
   v2d Boundaries ;
@@ -45,7 +46,7 @@ public :
   bool justloaded ; 
   vector<vector<string>> FileList ; 
   vector <std::thread> Threads;
-  const bool singlefiles = false ; 
+  const bool singlefiles = true ; 
 
   // function
   int initialise (map <string,string> args) ; 

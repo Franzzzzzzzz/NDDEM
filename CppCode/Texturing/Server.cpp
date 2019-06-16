@@ -21,7 +21,8 @@ int main(void)
     Server svr;
     Texturing Texture ; 
     
-    svr.set_base_dir("../../");
+    Texture.BasePath = "../../Samples/" ;
+    svr.set_base_dir("../..");
     printf("Starting\n") ; fflush(stdout) ; 
     /*svr.Get("/hi", [](const Request& req, Response& res) {
         res.set_content("Hello World!", "text/plain");
@@ -35,16 +36,16 @@ int main(void)
         Texture.clean() ; 
         Texture.initialise(req.params) ; 
         
-        printf("%d %d %d Data loaded\n", Texture.N, Texture.Ts.size(), Texture.R.size()) ; fflush(stdout) ; 
+        printf("%d %lu %lu Data loaded\n", Texture.N, Texture.Ts.size(), Texture.R.size()) ; fflush(stdout) ; 
         
-        //res.set_content(numbers, "text/plain");
+        res.set_content("Done", "text/plain");
     });
     
     svr.Get(R"(/render)", [&](const Request& req, Response& res) {
         printf("Rendering data") ; fflush(stdout) ; 
         Texture.MasterRender(req.params) ;
         printf("Rendered!") ; fflush(stdout) ; 
-        //res.set_content(numbers, "text/plain");
+        res.set_content("Done", "text/plain");
     });
     
     svr.Get(R"(/forcerender)", [&](const Request& req, Response& res) {
@@ -52,7 +53,7 @@ int main(void)
         Texture.ViewPoint = vector<int> (Texture.d-3+1, INT_MIN) ; 
         Texture.MasterRender(req.params) ;
         printf("Rendered!\n") ; fflush(stdout) ; 
-        //res.set_content(numbers, "text/plain");
+        res.set_content("Done", "text/plain");
     });
     
 

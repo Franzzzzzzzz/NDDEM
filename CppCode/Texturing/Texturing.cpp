@@ -23,17 +23,16 @@ int Texturing::initialise (map <string,string> args)
 {
  d = atoi(args["ND"].c_str()) ; 
  Tools::initialise(d) ;
- size(d,0) ;
  string Directory=args["path"] ; 
  DirectorySave= args["texturepath"] ; 
  
  set_grid (atoi(args["resolution"].c_str())) ; 
 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
- experimental::filesystem::directory_iterator D(sample_directory + Directory) ;
+ experimental::filesystem::directory_iterator D(BasePath + Directory) ;
  vector <string> tmpfilelst ;
  vector <std::pair<int,string>> filelistloc, filelistA ;
- for (auto& p : experimental::filesystem::directory_iterator(sample_directory + Directory)) tmpfilelst.push_back(p.path().string()) ;
+ for (auto& p : experimental::filesystem::directory_iterator(BasePath+Directory)) tmpfilelst.push_back(p.path().string()) ;
  regex exprloc{".*dump-([0-9]+).csv"};
  regex exprA{".*dumpA-([0-9]+).csv"};
  smatch what;
@@ -83,6 +82,7 @@ int Texturing::initialise (map <string,string> args)
  //else 
      colors=allcolorslist ; 
 
+ View.resize(d, 0) ; 
  ViewPoint.resize(d-3+1, INT_MIN) ; 
  FileList.resize(d-3+1) ; 
  Threads.resize(d-3+1) ; 
@@ -135,7 +135,6 @@ int Texturing::MasterRender(map <string,string> args)
    View[dd]=atof(args[dimstr].c_str()) ; 
  }
  vector <int> NewViewPoint(d-3+1,0) ;
-    
  int nrotate = viewpermute (View, d) ;
  if (nrotate != 3) printf("WHAT? No the first 3D should be NaNs ...") ; 
  for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
