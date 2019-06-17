@@ -13,20 +13,20 @@ void dispvector (const v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") 
 void dispvector (const v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
 void dispvector (const vector<int> & a) {for (auto v: a) printf("%d ", v); printf("\n") ; fflush(stdout) ; }
 
-void runthread_timeloop (Texturing * T, v1d View, uint tsint, int nrotate) 
+void runthread_timeloop (Texturing * T, v1d View, uint tsint, int nrotate)
 {T->timeloop(View, tsint,nrotate) ; }
-void runthread_spaceloop (Texturing * T, v1d View, uint tsint, int nrotate, int dim) 
+void runthread_spaceloop (Texturing * T, v1d View, uint tsint, int nrotate, int dim)
 {T->spaceloop(View, tsint,nrotate, dim) ; }
 
 //==================================================
 int Texturing::initialise (map <string,string> args)
 {
- d = atoi(args["ND"].c_str()) ; 
+ d = atoi(args["ND"].c_str()) ;
  Tools::initialise(d) ;
- string Directory=args["path"] ; 
- DirectorySave= args["texturepath"] ; 
- 
- set_grid (atoi(args["resolution"].c_str())) ; 
+ string Directory=args["path"] ;
+ DirectorySave= args["texturepath"] ;
+
+ set_grid (atoi(args["resolution"].c_str())) ;
 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
  experimental::filesystem::directory_iterator D(BasePath + Directory) ;
@@ -43,7 +43,7 @@ int Texturing::initialise (map <string,string> args)
  }
  std::sort(filelistloc.begin(), filelistloc.end()) ;
  std::sort(filelistA.begin()  , filelistA.end()  ) ;
- TsName.resize(filelistloc.size(), 0) ; 
+ TsName.resize(filelistloc.size(), 0) ;
  for (uint i=0 ; i<filelistloc.size() ; i++) TsName[i]=filelistloc[i].first ;
 
  // Let's read everything
@@ -75,34 +75,36 @@ int Texturing::initialise (map <string,string> args)
   }
  auto tmpbound = max_element(R.begin(), R.end()) ;
  for (uint i=0 ; i<d-3 ; i++) {Boundaries[0][i] -= (*tmpbound) ;  Boundaries[1][i] += (*tmpbound) ; }
- 
+
  // Color gradient initialisation
  if (static_cast<uint>(d-1)>allcolorslist.size()) printf("ERR: not enough color gradients!!\n") ;
  //if (d-3<allcolors.size()) colors=allcolors[d-3] ; //TODO
- //else 
-     colors=allcolorslist ; 
+ //else
+     colors=allcolorslist ;
 
- View.resize(d, 0) ; 
- ViewPoint.resize(d-3+1, INT_MIN) ; 
- FileList.resize(d-3+1) ; 
- Threads.resize(d-3+1) ; 
- justloaded=true ; 
- return 0 ; 
-} 
-
+ View.resize(d, 0) ;
+ RenderedAlready.resize(2*(d-3+1), 0) ;
+ ViewPoint.resize(d-3+1, INT_MIN) ;
+ NewViewPoint.resize(d-3+1, 0) ;
+ FileList.resize(d-3+1) ;
+ Threads.resize(d-3+1) ;
+ justloaded=true ;
+ return 0 ;
+}
 
 //==================================================
 int Texturing::clean()
 {
 colors.clear() ;
-lambdagrid.clear() ; 
+lambdagrid.clear() ;
 thetagrid.clear() ;
 
 Boundaries.clear() ;
-TsName.clear() ; 
-R.clear() ; 
-View.clear() ; 
-ViewPoint.clear() ; 
+TsName.clear() ;
+R.clear() ;
+View.clear() ;
+ViewPoint.clear() ;
+NewViewPoint.clear() ;
 
 vector <std::thread> Threads;
 
@@ -112,39 +114,61 @@ if (Thr.joinable())
   auto ThrID = Thr.native_handle() ;
   pthread_cancel(ThrID);
   Thr.join() ;
-}    
-    
+}
+
 Tools::clear() ;
-vector<Timestep>().swap(Ts) ; 
-Boundaries.clear() ; 
-ViewPoint.clear() ; 
+vector<Timestep>().swap(Ts) ;
+Boundaries.clear() ;
+ViewPoint.clear() ;
 for (auto & u : FileList)
     for (auto & v: u)
         experimental::filesystem::remove(v.c_str()) ;
 return 0 ;
 }
 //=================================================
-int Texturing::MasterRender(map <string,string> args)
+int Texturing::SetNewViewPoint (map <string,string>  args)
 {
- int Time=atoi(args["ts"].c_str()) ;
- char dimstr[10] ; 
- View[0]=View[1]=View[2]=NAN ; 
- for (uint dd=3 ; dd<d ; dd++)
- {
-   sprintf(dimstr, "x%d", dd+1) ; 
-   View[dd]=atof(args[dimstr].c_str()) ; 
- }
- vector <int> NewViewPoint(d-3+1,0) ;
- int nrotate = viewpermute (View, d) ;
- if (nrotate != 3) printf("WHAT? No the first 3D should be NaNs ...") ; 
- for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
-    
- auto tmp  = find(TsName.begin(), TsName.end(), Time) ;
- if (tmp == TsName.end()) {printf("WARN: not found timestep\n") ; return -1 ; }
- NewViewPoint[d-3] = tmp-TsName.begin() ; 
+  int Time=atoi(args["ts"].c_str()) ;
+  char dimstr[10] ;
+  View[0]=View[1]=View[2]=NAN ;
+  for (uint dd=3 ; dd<d ; dd++)
+  {
+    sprintf(dimstr, "x%d", dd+1) ;
+    View[dd]=atof(args[dimstr].c_str()) ;
+  }
+  nrotate = viewpermute (View, d) ;
+  if (nrotate != 3) printf("WHAT? No the first 3D should be NaNs ...") ;
+  for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
 
+  auto tmp  = find(TsName.begin(), TsName.end(), Time) ;
+  if (tmp == TsName.end()) {printf("WARN: not found timestep\n") ; return -1 ; }
+  NewViewPoint[d-3] = tmp-TsName.begin() ;
+
+  return 0 ;
+}
+//=====================================================
+bool Texturing::isrendered ()
+{
+  for (uint i=0 ; i<d-3 ; i++)
+    if (NewViewPoint[i]<RenderedAlready[i*2] || NewViewPoint[i]>RenderedAlready[i*2+1])
+      return false ;
+
+  int t ;
+  if (NewViewPoint[d-3]<RenderedAlready[(d-3)*2]) t = NewViewPoint[d-3] +Ts.size() ;
+  else t= NewViewPoint[d-3] ;
+
+  if (t>=RenderedAlready[(d-3)*2]+RenderedAlready[(d-3)*2+1]) return false ;
+
+  return true ;
+}
+
+
+//=====================================================
+int Texturing::MasterRender()
+{
  //printf("%d %d | %d %d\n", ViewPoint[0], ViewPoint[1], NewViewPoint[0], NewViewPoint[1]) ;
  // Alright, lets start the threads
+ //hereandnow(View, NewViewPoint[d-3], nrotate) ;
  for (uint i=0 ; i<d-3 ; i++)
  {
    for (uint j=0 ; j<d-3+1 ; j++)
@@ -158,9 +182,9 @@ int Texturing::MasterRender(map <string,string> args)
          pthread_cancel(ThreadID);
          Threads[i].join() ;
        }
-    dispvector(NewViewPoint) ; 
+    dispvector(NewViewPoint) ;
     Threads[i] = std::thread(runthread_spaceloop, this, View, NewViewPoint[d-3], nrotate, i) ;
-    break ; 
+    break ;
     }
   }
  }
@@ -174,7 +198,7 @@ int Texturing::MasterRender(map <string,string> args)
        pthread_cancel(ThreadID) ;
        Threads[d-3].join() ;
      }
-   dispvector(NewViewPoint) ; 
+   dispvector(NewViewPoint) ;
    Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
    }
  }
@@ -185,13 +209,13 @@ int Texturing::MasterRender(map <string,string> args)
    justloaded=false ;
  }
 ViewPoint=NewViewPoint ;
-return 0 ; 
+return 0 ;
 }
 
 //===========================================================
 void Texturing::spaceloop (v1d View, uint tsint, int nrotate, int dim)
 {
-//printf("S") ; fflush(stdout) ; 
+//printf("S") ; fflush(stdout) ;
 for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
 FileList[dim].clear() ;
 
@@ -204,40 +228,55 @@ while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
   //printf("s") ; fflush(stdout) ;
 
   if (Viewdec[dim]>Boundaries[0][dim]) Render(FileList[dim], Viewdec, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+  RenderedAlready[2*dim] = Viewdec[dim] / DeltaX ;
   if (View[dim]<Boundaries[1][dim])    Render(FileList[dim], View,    nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+  RenderedAlready[2*dim+1] = View[dim] / DeltaX ;
 }
 }
 //-----------------------------------------------------
 void Texturing::timeloop (v1d View, uint tsint, int nrotate)
 {
-int dim=FileList.size()-1 ; 
+int dim=FileList.size()-1 ;
 for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
 
 FileList[dim].clear() ;
 uint timeidxinit=tsint ;
+//if (tsint>=Ts.size()) tsint=0 ;
+RenderedAlready[2*(d-3)] = tsint ;
+RenderedAlready[2*(d-3)+1] = 0;
 do {
 Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
 tsint++ ;
+RenderedAlready[2*(d-3)+1] ++ ;
 if (tsint>=Ts.size()) tsint=0 ;
 } while (tsint != timeidxinit) ;
 }
+//-----------------------------------------------------
+void Texturing::hereandnow (v1d View, uint tsint, int nrotate)
+{
+int dim=FileList.size()-1 ;
+for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
 
+FileList[dim].clear() ;
+//uint timeidxinit=tsint ;
+Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+}
 //-----------------------------------------------------
 void Texturing::Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A)
 {
 v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
 v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
-vector<uint8_t> img ; int stride ;  
-int imgx0=0 ; 
-if (singlefiles)  
+vector<uint8_t> img ; int stride ;
+int imgx0=0 ;
+if (singlefiles)
 {
     img.resize(Nlambda*Ntheta*3,0) ;
-    stride=Ntheta ; 
+    stride=Ntheta ;
 }
-else 
+else
 {
-    img.resize( Ntheta * FilePerLine * (N/FilePerLine+1)* Nlambda*3,0) ; 
-    stride = Nlambda * FilePerLine ; 
+    img.resize( Ntheta * FilePerLine * (N/FilePerLine+1)* Nlambda*3,0) ;
+    stride = Nlambda * FilePerLine ;
 }
 
 for (int i=0 ; i<N ; i++)
@@ -264,7 +303,7 @@ for (int i=0 ; i<N ; i++)
        phi[j] = acos(cosine) ;
      }
 
-     
+
      for (int j = 0 ; j<Nlambda ; j++)
          for (int k=0 ; k<Ntheta ; k++)
          {
@@ -293,7 +332,7 @@ for (int i=0 ; i<N ; i++)
              //if (phi[1]==0) phi[1]=M_PI ;
              phi2color (img.begin() + imgx0 * 3 + k*3 + j*stride*3, phinew, d, colors) ;
          }
-    
+
      if (singlefiles)
      {
         char path[5000] ;
@@ -301,7 +340,7 @@ for (int i=0 ; i<N ; i++)
         write_img(path, Ntheta, Nlambda, img.data()) ;
         filerendered.push_back(path);
      }
-     else 
+     else
      {
          imgx0 += Ntheta ;
          if (imgx0 >= Ntheta * FilePerLine) imgx0 = 0 + i/FilePerLine * (Ntheta*Nlambda*FilePerLine) ;
@@ -310,12 +349,12 @@ for (int i=0 ; i<N ; i++)
 
 if (!singlefiles)
 {
- char path[5000] ; 
+ char path[5000] ;
  filepathname(path, time, View) ;
  write_img(path, Ntheta*FilePerLine, Nlambda * (N/FilePerLine +1), img.data()) ;
  filerendered.push_back(path);
 }
-return ; 
+return ;
 }
 //--------------------------------------------------------
 int Texturing::set_grid(int nb)
@@ -338,7 +377,7 @@ int Texturing::set_grid(int nb)
   for (int i=0 ; i<Nlambda ; i++) lambdagrid[i]=  M_PI/(2.*Nlambda)+  M_PI/Nlambda*i ;
   for (int i=0 ; i<Ntheta-1 ; i++)  thetagrid[i] =2*M_PI/(2.*(Ntheta-1) )+2*M_PI/(Ntheta-1) *i ;
   thetagrid[Ntheta-1]=thetagrid[0];
-  return 0 ; 
+  return 0 ;
 }
 //=================================================
 int Texturing::viewpermute (v1d & View, int d)
@@ -389,7 +428,7 @@ void rescale (v1f & c, cv1f sum)
 //--------------------------------------------------------
 void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<float>> & colors)
 {
-    int vbyte ;  
+    int vbyte ;
     vector <float> ctmp (3,0), sum(3,0) ;
     vector <float> cfinal(3,0) ;
     //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ;

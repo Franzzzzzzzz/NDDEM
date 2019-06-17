@@ -127,8 +127,9 @@ function build_world() {
     // add_controllers();
     if ( N > 3 && !fname.includes('Spinner') ) { add_torus(); }
     // load_hyperspheres_VTK();
-    make_initial_spheres_CSV();
-    update_spheres_CSV(0,false);
+    if ( view_mode === 'rotations' ) { make_initial_sphere_texturing(); }
+    else { make_initial_spheres_CSV(); update_spheres_CSV(0,false);}
+    //update_spheres_CSV(0,false);
     add_gui();
     window.addEventListener( 'resize', onWindowResize, false );
 
@@ -638,31 +639,37 @@ function remove_everything() {
     } );
 };*/ // FG: Removed as I don't think we use that anymore
 
-function make_initial_spheres_CSV() {
-    if ( view_mode === 'rotations' ) {
-        var commandstring = "" ;
-        for ( i=3 ; i<N ; i++)
-        {
-            commandstring = commandstring + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
-            if (i<N-1) commandstring += "&" ;
-        };
-        var request = new XMLHttpRequest();
-        /*request.open('POST', "http://localhost:54321/make_textures?" +
-                     "arr=" + JSON.stringify(arr) +
-                     "&N=" + N +
-                     "&t=" + "00000" +
-                     "&quality=" + quality +
-                     "&fname=" + fname,
-                     true);*/
-        request.open('GET', 'http://localhost:54321/load?ND=' + N + '&path='+ fname + '&texturepath=Tmp&resolution=' + quality, false) ; 
-        request.send(null);
-        
-        // Let's do the first rendering as well
-        request.open('GET', 'http://localhost:54321/render?ts=00000&' + commandstring, true) ; 
-        request.send(null);
-        
-        // request.onreadystatechange = function () {}
+function make_initial_sphere_texturing() {
+    var commandstring = "" ;
+    for ( i=3 ; i<N ; i++)
+    {
+        commandstring = commandstring + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
+        if (i<N-1) commandstring += "&" ;
     };
+    request = new XMLHttpRequest();
+    /*request.open('POST', "http://localhost:54321/make_textures?" +
+                 "arr=" + JSON.stringify(arr) +
+                 "&N=" + N +
+                 "&t=" + "00000" +
+                 "&quality=" + quality +
+                 "&fname=" + fname,
+                 true);*/
+    request.open('GET', 'http://localhost:54321/load?ND=' + N + '&path='+ fname + '&texturepath=Tmp&resolution=' + quality, true)
+    request.send(null)
+
+    request.onload = function() {
+        request.open('GET', 'http://localhost:54321/render?ts=00000&' + commandstring, true) ;
+        request.send(null)
+        request.onload = function() { make_initial_spheres_CSV(); update_spheres_CSV(0,false);}
+    }
+    // Let's do the first rendering as well
+    //request.open('GET', 'http://localhost:54321/render?ts=00000&' + commandstring, true) ;
+    //request.send(null);
+
+    // request.onreadystatechange = function () {}
+};
+
+function make_initial_spheres_CSV() {
     if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-00000.csv" }
     else { var filename = "http://localhost:54321/Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
     Papa.parse(filename, {
@@ -733,16 +740,17 @@ function make_initial_spheres_CSV() {
 function load_textures(t, Viewpoint) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
-        console.log(Viewpoint)
         for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
             if ( cache ) { var filename = "http://localhost:54321/Textures/" + "Texture-" + ii + "-" + Viewpoint+".png" }
             else { var filename = "http://localhost:54321/Textures/" + "Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
             loader.load(filename,
                         function( texture ) { //TODO not sure why not working ... ...
-                            var myRe = /-[0-9]+.png/g
-                            var res=myRe.exec(texture.image.currentSrc)
-                            var myRe2 = /[0-9]+/
-                            var iii = myRe2.exec(res[0])[0]
+                            //var myRe = /-[0-9]+.png/g
+                            //var res=myRe.exec(texture.image.currentSrc)
+                            //var myRe2 = /[0-9]+/
+                            //var iii = myRe2.exec(texture.image.currentSrc)[0]
+                            var iii = texture.image.currentSrc.split('-')[1]
+                            console.log(texture.image.currentSrc); console.log(iii);
                             var o = particles.children[iii];
                             o.material.map = texture;
                             o.material.map.needsUpdate = true;
@@ -751,36 +759,38 @@ function load_textures(t, Viewpoint) {
     }
 }
 
+function update_spheres_texturing (t) {
+      if  ( true ) { //TODO Do something better ...
+          var commandstring = "" ; var Viewpoint = t+"0000" ;
+
+          for ( i=3 ; i<N ; i++)
+          {
+              commandstring = commandstring + "&" + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
+              Viewpoint = Viewpoint + "-" + world[i].cur.toFixed(1) ;
+          }
+          var request = new XMLHttpRequest();
+          /*request.open('POST',
+                       "http://localhost:54321/make_textures?" +
+                       "arr=" + JSON.stringify(arr) +
+                       "&N=" + N +
+                       "&t=" + t + "0000" +
+                       "&quality=" + quality +
+                       "&fname=" + fname,
+                       true);*/
+          request.open('GET', 'http://localhost:54321/render?ts='+t+'0000' + commandstring, true) ;
+
+          request.onload = function() {
+              load_textures(t, Viewpoint);
+          }
+          request.send('');
+      }
+      else {
+          load_textures(t, Viewpoint);
+      }
+}
+
 function update_spheres_CSV(t,changed_higher_dim_view) {
-    if ( view_mode === 'rotations' ) {
-        if  ( true ) {
-            var commandstring = "" ; var Viewpoint = t+"0000" ; 
-            
-            for ( i=3 ; i<N ; i++)
-            {
-                commandstring = commandstring + "&" + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
-                Viewpoint = Viewpoint + "-" + world[i].cur.toFixed(1) ;
-            }
-            var request = new XMLHttpRequest();
-            /*request.open('POST',
-                         "http://localhost:54321/make_textures?" +
-                         "arr=" + JSON.stringify(arr) +
-                         "&N=" + N +
-                         "&t=" + t + "0000" +
-                         "&quality=" + quality +
-                         "&fname=" + fname,
-                         true);*/
-            request.open('GET', 'http://localhost:54321/render?ts='+t+'0000' + commandstring, true) ; 
-            
-            request.onload = function() {
-                load_textures(t, Viewpoint);
-            }
-            request.send('');
-        }
-        else {
-            load_textures(t, Viewpoint);
-        }
-    }
+
     if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+t+"0000.csv" }
     else { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
@@ -984,6 +994,7 @@ function animate() {
         for (iii=3;iii<N;iii++) {
             if (world[iii].cur != world[iii].prev) {
                 update_spheres_CSV(Math.floor(time.cur),true);
+                if (view_mode === 'rotations') {update_spheres_texturing(Math.floor(time.cur),) ;}
                 world[iii].prev = world[iii].cur;
             }
         }
@@ -991,6 +1002,7 @@ function animate() {
     if (time.play) { time.cur += time.rate; };
     if ( Math.floor(time.cur) != time.prev ) {
         update_spheres_CSV(Math.floor(time.cur),false);
+        if (view_mode === 'rotations') {update_spheres_texturing(Math.floor(time.cur),) ;}
         time.prev = Math.floor(time.cur);
     }
     if (time.cur > time.max) { time.cur -= time.max; }

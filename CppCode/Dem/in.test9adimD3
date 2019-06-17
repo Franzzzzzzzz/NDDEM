@@ -1,5 +1,5 @@
-# Incline plane flow
-directory OutputAdim
+# Uniaxial compaction
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/UniaxialD3
 dimensions 3 125
 
 #set adimensional
@@ -27,7 +27,8 @@ set skin 1.5
 
 set T 150
 set dt 0.0001
-set dumps VTK with 1 Omega
+#set dumps VTK with 1 Omega
+set dumps CSV with 1 Orientation
 set dumps WALLFORCE
 set tdump 10000
 event 50 boundary 0 MOVINGWALL 0 10 0. -0.1
