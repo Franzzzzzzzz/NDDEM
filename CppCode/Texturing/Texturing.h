@@ -43,6 +43,8 @@ public :
   v1d View ;
   vector <int> ViewPoint, NewViewPoint ;
   vector <int> RenderedAlready ;
+  bool runfast ; 
+  bool singlerendered ; 
 
   bool justloaded ;
   int nrotate ;

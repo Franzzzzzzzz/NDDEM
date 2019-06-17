@@ -654,7 +654,7 @@ function make_initial_sphere_texturing() {
                  "&quality=" + quality +
                  "&fname=" + fname,
                  true);*/
-    request.open('GET', 'http://localhost:54321/load?ND=' + N + '&path='+ fname + '&texturepath=Tmp&resolution=' + quality, true)
+    request.open('GET', 'http://localhost:54321/load?ND=' + N + '&path='+ fname + '&texturepath=../../Textures&resolution=' + quality, true)
     request.send(null)
 
     request.onload = function() {
@@ -768,6 +768,7 @@ function update_spheres_texturing (t) {
               commandstring = commandstring + "&" + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
               Viewpoint = Viewpoint + "-" + world[i].cur.toFixed(1) ;
           }
+          
           var request = new XMLHttpRequest();
           /*request.open('POST',
                        "http://localhost:54321/make_textures?" +
@@ -777,7 +778,9 @@ function update_spheres_texturing (t) {
                        "&quality=" + quality +
                        "&fname=" + fname,
                        true);*/
-          request.open('GET', 'http://localhost:54321/render?ts='+t+'0000' + commandstring, true) ;
+          var runvalue = 0 ; 
+          if (time.play) runvalue = 1 ; 
+          request.open('GET', 'http://localhost:54321/render?ts='+t+'0000' + commandstring + '&running=' + runvalue, true) ;
 
           request.onload = function() {
               load_textures(t, Viewpoint);

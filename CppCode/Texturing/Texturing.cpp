@@ -25,7 +25,6 @@ int Texturing::initialise (map <string,string> args)
  Tools::initialise(d) ;
  string Directory=args["path"] ;
  DirectorySave= args["texturepath"] ;
-
  set_grid (atoi(args["resolution"].c_str())) ;
 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
@@ -89,6 +88,7 @@ int Texturing::initialise (map <string,string> args)
  FileList.resize(d-3+1) ;
  Threads.resize(d-3+1) ;
  justloaded=true ;
+ singlerendered=false ;
  return 0 ;
 }
 
@@ -106,23 +106,26 @@ View.clear() ;
 ViewPoint.clear() ;
 NewViewPoint.clear() ;
 
-vector <std::thread> Threads;
-
 for (auto & Thr : Threads)
-if (Thr.joinable())
-{
-  auto ThrID = Thr.native_handle() ;
-  pthread_cancel(ThrID);
-  Thr.join() ;
-}
+    if (Thr.joinable())
+    {
+        auto ThrID = Thr.native_handle() ;
+        pthread_cancel(ThrID);
+        Thr.join() ;
+    }
 
+Threads.clear();
 Tools::clear() ;
 vector<Timestep>().swap(Ts) ;
 Boundaries.clear() ;
 ViewPoint.clear() ;
+NewViewPoint.clear() ; 
+View.clear() ; 
+RenderedAlready.clear() ; 
 for (auto & u : FileList)
     for (auto & v: u)
         experimental::filesystem::remove(v.c_str()) ;
+
 return 0 ;
 }
 //=================================================
@@ -144,11 +147,15 @@ int Texturing::SetNewViewPoint (map <string,string>  args)
   if (tmp == TsName.end()) {printf("WARN: not found timestep\n") ; return -1 ; }
   NewViewPoint[d-3] = tmp-TsName.begin() ;
 
+  if (atoi(args["running"].c_str())==1) runfast=true ; 
+  else runfast=false ; 
   return 0 ;
 }
 //=====================================================
 bool Texturing::isrendered ()
 {
+  if (singlerendered) {singlerendered=false ; return true ; }
+    
   for (uint i=0 ; i<d-3 ; i++)
     if (NewViewPoint[i]<RenderedAlready[i*2] || NewViewPoint[i]>RenderedAlready[i*2+1])
       return false ;
@@ -168,45 +175,49 @@ int Texturing::MasterRender()
 {
  //printf("%d %d | %d %d\n", ViewPoint[0], ViewPoint[1], NewViewPoint[0], NewViewPoint[1]) ;
  // Alright, lets start the threads
- //hereandnow(View, NewViewPoint[d-3], nrotate) ;
- for (uint i=0 ; i<d-3 ; i++)
+    
+ if (! isrendered() && runfast) {dispvector(RenderedAlready) ; hereandnow(View, NewViewPoint[d-3], nrotate) ; singlerendered=true ; }
+ if (! runfast)
  {
-   for (uint j=0 ; j<d-3+1 ; j++)
-   {
-     if (j==i) continue ;
-     if (NewViewPoint[j] != ViewPoint[j])
-     {
-       if (Threads[i].joinable())
-       {
-         auto ThreadID = Threads[i].native_handle() ;
-         pthread_cancel(ThreadID);
-         Threads[i].join() ;
-       }
-    dispvector(NewViewPoint) ;
-    Threads[i] = std::thread(runthread_spaceloop, this, View, NewViewPoint[d-3], nrotate, i) ;
-    break ;
+    for (uint i=0 ; i<d-3 ; i++)
+    {
+        for (uint j=0 ; j<d-3+1 ; j++)
+        {
+            if (j==i) continue ;
+            if (NewViewPoint[j] != ViewPoint[j])
+            {
+            if (Threads[i].joinable())
+            {
+                auto ThreadID = Threads[i].native_handle() ;
+                pthread_cancel(ThreadID);
+                Threads[i].join() ;
+            }
+            dispvector(NewViewPoint) ;
+            Threads[i] = std::thread(runthread_spaceloop, this, View, NewViewPoint[d-3], nrotate, i) ;
+            break ;
+            }
+        }
     }
-  }
- }
- for (uint j=0 ; j<d-3 ; j++)
- {
-   if (NewViewPoint[j] != ViewPoint[j])
-   {
-     if (Threads[d-3].joinable())
-     {
-       auto ThreadID = Threads[d-3].native_handle() ;
-       pthread_cancel(ThreadID) ;
-       Threads[d-3].join() ;
-     }
-   dispvector(NewViewPoint) ;
-   Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
-   }
- }
+    for (uint j=0 ; j<d-3 ; j++)
+    {
+    if (NewViewPoint[j] != ViewPoint[j])
+        {
+            if (Threads[d-3].joinable())
+            {
+            auto ThreadID = Threads[d-3].native_handle() ;
+            pthread_cancel(ThreadID) ;
+            Threads[d-3].join() ;
+            }
+        dispvector(NewViewPoint) ;
+        Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
+        }
+    }
 
- if (d==3 && justloaded)
- {
-   Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
-   justloaded=false ;
+    if (d==3 && justloaded)
+    {
+        Threads[d-3] = std::thread(runthread_timeloop, this, View, NewViewPoint[d-3], nrotate) ;
+        justloaded=false ;
+    }
  }
 ViewPoint=NewViewPoint ;
 return 0 ;
@@ -232,6 +243,7 @@ while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
   if (View[dim]<Boundaries[1][dim])    Render(FileList[dim], View,    nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
   RenderedAlready[2*dim+1] = View[dim] / DeltaX ;
 }
+printf("Spaceloop is done") ; fflush(stdout) ;
 }
 //-----------------------------------------------------
 void Texturing::timeloop (v1d View, uint tsint, int nrotate)
@@ -250,6 +262,7 @@ tsint++ ;
 RenderedAlready[2*(d-3)+1] ++ ;
 if (tsint>=Ts.size()) tsint=0 ;
 } while (tsint != timeidxinit) ;
+printf("Timeloop is done") ; fflush(stdout) ;
 }
 //-----------------------------------------------------
 void Texturing::hereandnow (v1d View, uint tsint, int nrotate)

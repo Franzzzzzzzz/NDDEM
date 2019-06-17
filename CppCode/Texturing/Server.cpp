@@ -15,6 +15,7 @@ boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 map<string,string> parse_url (string & url) ;
 void runthread_MasterRender (Texturing * T) {T->MasterRender() ; }
 std::thread MasterRenderThread ;
+std::mutex LockRender ; 
 
 int main(void)
 {
@@ -35,6 +36,7 @@ int main(void)
 
     svr.Get(R"(/load)", [&](const Request& req, Response& res) {
         printf("Loading data") ; fflush(stdout) ;
+        if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
         Texture.clean() ;
         Texture.initialise(req.params) ;
 
@@ -44,15 +46,24 @@ int main(void)
     });
 
     svr.Get(R"(/render)", [&](const Request& req, Response& res) {
-        printf("Rendering data") ; fflush(stdout) ;
-        Texture.SetNewViewPoint(req.params) ;
-        if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
-        MasterRenderThread = std::thread(runthread_MasterRender, &Texture) ;
+        if (!LockRender.try_lock()) 
+        {
+            res.status=429 ;
+            printf("B") ; fflush(stdout) ; 
+        }
+        else
+        {
+            printf("S") ; 
+            Texture.SetNewViewPoint(req.params) ;
+            if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+            MasterRenderThread = std::thread(runthread_MasterRender, &Texture) ;
 
-        while (!Texture.isrendered()) ;
+            while (!Texture.isrendered()) ;
 
-        printf("Rendered!") ; fflush(stdout) ;
-        res.set_content("Done", "text/plain");
+            printf("R") ; fflush(stdout) ; 
+            res.set_content("Done", "text/plain");
+            LockRender.unlock() ; 
+        }
     });
 
     svr.Get(R"(/forcerender)", [&](const Request& req, Response& res) {
