@@ -140,7 +140,7 @@ int Texturing::SetNewViewPoint (map <string,string>  args)
     View[dd]=atof(args[dimstr].c_str()) ;
   }
   nrotate = viewpermute (View, d) ;
-  if (nrotate != 3) printf("WHAT? No the first 3D should be NaNs ...") ;
+  if (nrotate != 3 && d>3) printf("WHAT? No the first 3D should be NaNs ...") ;
   for (uint i=0 ; i<d-3 ; i++) {NewViewPoint[i] = static_cast<int>(round(View[i]/DeltaX));}
 
   auto tmp  = find(TsName.begin(), TsName.end(), Time) ;
@@ -243,6 +243,8 @@ while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
   if (View[dim]<Boundaries[1][dim])    Render(FileList[dim], View,    nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
   RenderedAlready[2*dim+1] = View[dim] / DeltaX ;
 }
+RenderedAlready[2*dim] = INT_MIN ; 
+RenderedAlready[2*dim+1] = INT_MAX ; 
 printf("Spaceloop is done") ; fflush(stdout) ;
 }
 //-----------------------------------------------------
@@ -341,7 +343,14 @@ for (int i=0 ; i<N ; i++)
              // and ... rotating back :)
              rotate(spturned.begin(), spturned.begin()+nrotate, spturned.end()) ;
              Tools::hyperspherical_xtophi (spturned, phinew) ;
-             //printf("%g %g %g | %g %g %g \n", phi[0], phi[1], phi[2], phinew[0], phinew[1], phinew[2]) ;
+             /*if (i==9)
+             {
+                 printf("=======================\n") ; 
+                 dispvector(sp) ; 
+                 dispvector(A[i]) ;
+                 dispvector(spturned) ;
+                 //printf("%g %g %g %g| %g %g %g %g\n", phi[0], phi[1], phi[2], phi[3], phinew[0], phinew[1], phinew[2], phinew[3]) ;
+             }*/
              //if (phi[1]==0) phi[1]=M_PI ;
              phi2color (img.begin() + imgx0 * 3 + k*3 + j*stride*3, phinew, d, colors) ;
          }
@@ -449,10 +458,10 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<f
     //phi[d-2] /= 2 ;
     for (int i=0 ; i<d-2 ; i++)
     {
-        ctmp += (colors[i] * fabs(sin(phi[i]))) ;
+        ctmp += (colors[i] * fabs(sin(3*phi[i]))) ;
         sum += colors[i] ;
     }
-    ctmp += (colors[d-2] * fabs(sin(phi[d-2]/2.))) ;
+    ctmp += (colors[d-2] * fabs(sin(2*phi[d-2]/2.))) ;
     sum += colors[d-2] ;
     rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
     //for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;
