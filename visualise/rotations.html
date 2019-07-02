@@ -51,7 +51,7 @@
         var rect;
 
         var loader = new THREE.TextureLoader()
-            .load( "http://localhost:8000/" + fname, function( texture ) {
+            .load( "http://localhost:54321/" + fname, function( texture ) {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 var sphere_geometry = new THREE.SphereGeometry( 1, 32, 32 );
