@@ -42,7 +42,7 @@ init();
 
 function init() {
     var request = new XMLHttpRequest();
-    //request.open('GET', "http://localhost:8000/Samples/" + fname + "in?_="+ (new Date).getTime(), true);
+    //request.open('GET', "http://localhost:54321/Samples/" + fname + "in?_="+ (new Date).getTime(), true);
     request.open('GET', "http://localhost:54321/Samples/" + fname + "in", true);
     request.send(null);
     request.onreadystatechange = function () {
@@ -634,7 +634,7 @@ function remove_everything() {
 
 /*function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
-    loader.load("http://localhost:8000/visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
+    loader.load("http://localhost:54321/visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
         console.log(geometry);
     } );
 };*/ // FG: Removed as I don't think we use that anymore
@@ -768,7 +768,7 @@ function update_spheres_texturing (t) {
               commandstring = commandstring + "&" + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
               Viewpoint = Viewpoint + "-" + world[i].cur.toFixed(1) ;
           }
-          
+
           var request = new XMLHttpRequest();
           /*request.open('POST',
                        "http://localhost:54321/make_textures?" +
@@ -778,8 +778,8 @@ function update_spheres_texturing (t) {
                        "&quality=" + quality +
                        "&fname=" + fname,
                        true);*/
-          var runvalue = 0 ; 
-          if (time.play) runvalue = 1 ; 
+          var runvalue = 0 ;
+          if (time.play) runvalue = 1 ;
           request.open('GET', 'http://localhost:54321/render?ts='+t+'0000' + commandstring + '&running=' + runvalue, true) ;
 
           request.onload = function() {

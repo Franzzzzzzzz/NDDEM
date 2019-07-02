@@ -33,4 +33,4 @@ server.post('/make_textures', function(req, res) { // generate textures
     exec('./CppCode/bin/Texturing ' + text_arg, (err, stdout, stderr) => { res.send(stdout); console.log('Done with ' + text_arg) } );
 });
 
-server.listen(8000); // run server
+server.listen(54321); // run server
