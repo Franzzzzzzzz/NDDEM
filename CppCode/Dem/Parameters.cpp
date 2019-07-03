@@ -31,10 +31,10 @@ void Parameters::perform_MOVINGWALL ()
 {
  for (uint j=0 ; j<d ; j++)
  {
-  if (Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))    
+  if (Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
   {
-    Boundaries[j][0] += Boundaries[j][4] * dt ; 
-    Boundaries[j][1] += Boundaries[j][5] * dt ; 
+    Boundaries[j][0] += Boundaries[j][4] * dt ;
+    Boundaries[j][1] += Boundaries[j][5] * dt ;
   }
  }
 }
@@ -217,7 +217,7 @@ else if (!strcmp(line, "set"))
    else if (word=="CSVA") dumpkind = ExportType::CSVA ;
    else if (word=="WALLFORCE") {wallforcecompute = true ; goto LABEL_leave ;} //Jumps at the end of the section
    else {printf("Unknown dump type\n") ; }
-       
+
    { // New section so g++ doesn't complains about the goto ...
    in>>word ;
    if (word != "with") printf("ERR: expecting keyword 'with'\n") ;
@@ -351,8 +351,10 @@ void Parameters::init_locations (char *line, v2d & X)
         {
          for(uint dd=0 ; dd < d ; dd++)
          {
+           if (Boundaries[dd][3]==0)
              X[i][dd] = rand()*Boundaries[dd][2] + Boundaries[dd][0] ;
-
+           else
+             X[i][dd] = rand()*(Boundaries[dd][2]-2*r[i]) + Boundaries[dd][0] + r[i] ; 
          }
         }
 

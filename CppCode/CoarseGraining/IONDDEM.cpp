@@ -44,6 +44,7 @@ int main (int argc, char * argv[])
  }
 
  Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
+ C.setWindow("LibRectND") ; 
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
  C.cT=-1 ;

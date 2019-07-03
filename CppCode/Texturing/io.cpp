@@ -76,6 +76,7 @@ int csvread_XR (const char path[], v2d & result, v1d &R, int d)
 //--------------
 int write_colormap_vtk(int d, vector<vector<float>> & colors)
 {
+
 int nvalues=10 ;
 vector<double> p(3), ptmp ;
 vector <uint8_t> a ;
@@ -107,6 +108,8 @@ for (int i=0 ; i<nvalues ; i++)
   }
   p[2] += 2*M_PI/nvalues ;
 }
+
+fclose(vtkout) ; 
 return 0 ;
 }
 //-------------------------------------------

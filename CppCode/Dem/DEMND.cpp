@@ -1,7 +1,7 @@
 #include "DEMND.h"
 #include <signal.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 4
+#define OMP_NUM_THREADS 2
 
 uint Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
@@ -46,13 +46,13 @@ int main (int argc, char *argv[])
 
  std::vector < double > Vmag (N,0) ;
  std::vector < double > OmegaMag (N,0) ;
- std::vector < double > Z (N,0) ; 
+ std::vector < double > Z (N,0) ;
  std::vector < std::vector <double> > Fcorr (N, std::vector <double> (d, 0)) ;
  std::vector < std::vector <double> > TorqueCorr (N, std::vector <double> (d*(d-1)/2, 0)) ;
  std::vector < double > displacement (N, 0) ; double maxdisp[2] ;
 
  std::vector <u_int32_t> PBCFlags (N, 0) ;
- std::vector < std::vector <double> > WallForce (2*d, std::vector <double> (d,0)) ; 
+ std::vector < std::vector <double> > WallForce (2*d, std::vector <double> (d,0)) ;
 
  vector <u_int32_t> Ghost (N, 0) ;
  vector <u_int32_t> Ghost_dir (N, 0) ;
@@ -126,7 +126,7 @@ int main (int argc, char *argv[])
 
     // Boundary conditions ...
     P.perform_PBC(X[i], PBCFlags[i]) ;
-    
+
     // Find ghosts
     Ghost[i]=0 ; Ghost_dir[i]=0 ;
     u_int32_t mask=1 ;
@@ -139,7 +139,7 @@ int main (int argc, char *argv[])
     }
     //Nghosts=Ghosts.size() ;
    }
-   P.perform_MOVINGWALL() ; 
+   P.perform_MOVINGWALL() ;
    Benchmark::stop_clock("Verlet 1st");
 
    //---------- Velocity Verlet step 2 : compute the forces and torques
@@ -296,8 +296,8 @@ int main (int argc, char *argv[])
 
       Tools::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
       Tools::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
-      
-      if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ; 
+
+      if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
      }
    }
 
@@ -335,25 +335,25 @@ int main (int argc, char *argv[])
    // Output something at some point I guess
    if (ti % P.tdump==0)
    {
-    Tools::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ; 
+    Tools::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ;
     P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
     std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
-    
+
     if (P.wallforcecompute)
     {
-     char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ; 
-     Tools::setzero(WallForce) ; 
+     char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+     Tools::setzero(WallForce) ;
      if (P.wallforcecompute)
      {
        for (int i=0 ; i<MP.P ; i++)
            for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
-               Tools::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ; 
+               Tools::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
      }
-     Tools::savetxt(path, WallForce, (const char*)("Force on the various walls")) ; 
+     Tools::savetxt(path, WallForce, (const char*)("Force on the various walls")) ;
     }
    }
-   
-   if (P.wallforcecompute) MP.delayedwall_clean() ; 
+
+   if (P.wallforcecompute) MP.delayedwall_clean() ;
  }
 
 //Tools::write1D ("Res.txt", TmpRes) ;

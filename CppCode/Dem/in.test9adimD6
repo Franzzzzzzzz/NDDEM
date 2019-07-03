@@ -1,6 +1,6 @@
 # Incline plane flow
-directory OutputAdimD4
-dimensions 4 500
+directory OutputAdimD6
+dimensions 6 10000
 
 #set adimensional
 radius -1 0.5
@@ -12,25 +12,27 @@ boundary 0 WALL 0 20
 boundary 1 PBC  0 4
 boundary 2 PBC  0 4
 boundary 3 PBC  0 4
-#boundary 3 PBC 0 3.4
+boundary 4 PBC  0 4
+boundary 5 PBC  0 4
+#boundary3 PBC 0 3.4
 
 #auto location roughinclineplane2
 auto location randomdrop
 
-gravity -1 0 0 0
+gravity -1 0 0 0 0 0
 set Kn 2e5
 set Kt 8e4
 set GammaN 75
 set GammaT 75
 set Mu 0.5
-set skin 1.5
+set skin 1
 
 
 set T 150
 set dt 0.0001
 set dumps VTK with 1 Omega
 set dumps WALLFORCE
-set tdump 10000
+set tdump 100
 event 50 boundary 0 MOVINGWALL 0 10 0. -0.1
 #event 10 boundary 2 MOVINGWALL 0 5 0.02 -0.02
 #event 10 boundary 1 MOVINGWALL 0 5 0.02 -0.02

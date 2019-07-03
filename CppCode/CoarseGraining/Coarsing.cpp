@@ -813,7 +813,18 @@ printf("Coarsing not compile with netCDF support. Use the macro -DNETCDF at the 
 return 1 ;
 #endif
 }
+//==================================
+int Coarsing::setWindow (string windowname)
+{
+  double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
+  cutoff=2.5*w ; //TODO
+  printf("Window and cutoff: %g %g \n", w, cutoff) ;
 
+  if (windowname=="LibRectND")
+    Window=new LibRectND (&data, w, d) ;
+  else
+    printf("Unknown window, check Coarsing::setWindow") ;
+}
 
 
 

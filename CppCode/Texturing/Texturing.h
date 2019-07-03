@@ -43,8 +43,8 @@ public :
   v1d View ;
   vector <int> ViewPoint, NewViewPoint ;
   vector <int> RenderedAlready ;
-  bool runfast ; 
-  bool singlerendered ; 
+  bool runfast ;
+  bool singlerendered ;
 
   bool justloaded ;
   int nrotate ;
@@ -67,5 +67,8 @@ public :
   void rescale (v1f & c, cv1f sum) ;
   void filepathname (char * path, int n, int time, cv1d & View);
   void filepathname (char * path, int time, cv1d & View);
+
+  int write_vtkmap (map <string,string> args) ;
+  int write_colormap_vtk_base () ;
 
 } ;

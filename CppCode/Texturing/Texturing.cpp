@@ -119,9 +119,9 @@ Tools::clear() ;
 vector<Timestep>().swap(Ts) ;
 Boundaries.clear() ;
 ViewPoint.clear() ;
-NewViewPoint.clear() ; 
-View.clear() ; 
-RenderedAlready.clear() ; 
+NewViewPoint.clear() ;
+View.clear() ;
+RenderedAlready.clear() ;
 for (auto & u : FileList)
     for (auto & v: u)
         experimental::filesystem::remove(v.c_str()) ;
@@ -147,15 +147,15 @@ int Texturing::SetNewViewPoint (map <string,string>  args)
   if (tmp == TsName.end()) {printf("WARN: not found timestep\n") ; return -1 ; }
   NewViewPoint[d-3] = tmp-TsName.begin() ;
 
-  if (atoi(args["running"].c_str())==1) runfast=true ; 
-  else runfast=false ; 
+  if (atoi(args["running"].c_str())==1) runfast=true ;
+  else runfast=false ;
   return 0 ;
 }
 //=====================================================
 bool Texturing::isrendered ()
 {
   if (singlerendered) {singlerendered=false ; return true ; }
-    
+
   for (uint i=0 ; i<d-3 ; i++)
     if (NewViewPoint[i]<RenderedAlready[i*2] || NewViewPoint[i]>RenderedAlready[i*2+1])
       return false ;
@@ -175,7 +175,7 @@ int Texturing::MasterRender()
 {
  //printf("%d %d | %d %d\n", ViewPoint[0], ViewPoint[1], NewViewPoint[0], NewViewPoint[1]) ;
  // Alright, lets start the threads
-    
+
  if (! isrendered() && runfast) {dispvector(RenderedAlready) ; hereandnow(View, NewViewPoint[d-3], nrotate) ; singlerendered=true ; }
  if (! runfast)
  {
@@ -243,8 +243,8 @@ while (Viewdec[dim]>Boundaries[0][dim] || View[dim]<Boundaries[1][dim])
   if (View[dim]<Boundaries[1][dim])    Render(FileList[dim], View,    nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
   RenderedAlready[2*dim+1] = View[dim] / DeltaX ;
 }
-RenderedAlready[2*dim] = INT_MIN ; 
-RenderedAlready[2*dim+1] = INT_MAX ; 
+RenderedAlready[2*dim] = INT_MIN ;
+RenderedAlready[2*dim+1] = INT_MAX ;
 printf("Spaceloop is done") ; fflush(stdout) ;
 }
 //-----------------------------------------------------
@@ -345,8 +345,8 @@ for (int i=0 ; i<N ; i++)
              Tools::hyperspherical_xtophi (spturned, phinew) ;
              /*if (i==9)
              {
-                 printf("=======================\n") ; 
-                 dispvector(sp) ; 
+                 printf("=======================\n") ;
+                 dispvector(sp) ;
                  dispvector(A[i]) ;
                  dispvector(spturned) ;
                  //printf("%g %g %g %g| %g %g %g %g\n", phi[0], phi[1], phi[2], phi[3], phinew[0], phinew[1], phinew[2], phinew[3]) ;
@@ -456,6 +456,7 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<f
     //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ;
     //phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
     //phi[d-2] /= 2 ;
+    //dispvector(colors[0]) ; 
     for (int i=0 ; i<d-2 ; i++)
     {
         ctmp += (colors[i] * fabs(sin(3*phi[i]))) ;
@@ -480,6 +481,97 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<f
     }
     return ;
 }
+
+//================================================
+int Texturing::write_colormap_vtk_base (){
+  write_colormap_vtk(d, colors) ;
+  return 0 ;
+}
+///----------------------------------------------------------
+int Texturing::write_vtkmap (map <string,string> args)
+{
+  v1d View ; int nrotate=3 ;
+  View.push_back(atof(args["x4"].c_str())) ;
+  int time = atoi(args["ts"].c_str()) ;
+  int idx = atoi(args["N"].c_str()) ;
+
+	v1d sp (d,0) ; v1d spturned (d,0) ; // Surface point (point on the surface of the sphere)
+	v1d phi (d-1,0), phinew(d-1,0) ; // Angles of the hyperspherical coordinates. All angles between 0 and pi, except the last one between 0 and 2pi
+	vector<uint8_t> img ;
+
+	img.resize(3*Nlambda*(Ntheta-1),0) ;
+
+	FILE *vtkout ;
+  char path[5000] ;
+  sprintf(path,"Colormap-Surface-%d-%d.vtk", idx, time) ;
+	vtkout=fopen(path, "w") ;
+	fprintf(vtkout,"# vtk DataFile Version 2.0\nTexture surface for ND DEM\nASCII\nDATASET UNSTRUCTURED_GRID\nPOINTS %d float\n", Nlambda*(Ntheta-1)) ;
+
+   // Check if we are in view
+   double rsqr = R[idx]*R[idx] ;
+   for (uint j=0 ; j<d-3 ; j++)
+       rsqr -= (View[j]-Ts[time].X[idx][j])*(View[j]-Ts[time].X[idx][j]) ;
+   if (rsqr<=0)
+       return -1 ;
+
+   // We are in view, let's get to it let's get the first phi's (constants)
+   for (uint j=0 ; j<d-3 ; j++)
+   {
+     double cosine = (View[j]-Ts[time].X[idx][j])/R[idx] ;
+     for (uint k=0 ; k<j ; k++)
+       cosine /= sin(phi[k]) ;
+     phi[j] = acos(cosine) ;
+   }
+
+   for (int j = 0 ; j<Nlambda ; j++)
+       for (int k=0 ; k<Ntheta-1 ; k++)
+	         {
+
+	             // Finalising the phi array (useless, but just because
+	             phi[d-3]=lambdagrid[j] ;
+	             phi[d-2]=thetagrid[k] ;
+
+	             for (uint dd=0 ; dd<d-3 ; dd++) {sp[dd]=View[dd]-Ts[time].X[idx][dd] ;}
+	             //sp = View-X[i] ; // All the dimensions except the last 3 are now correct
+	             sp[d-3] = R[idx] ;
+	             for (uint j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
+	             sp[d-2]=sp[d-3] ; sp[d-1]=sp[d-3] ;
+	             sp[d-3] *= cos(phi[d-3]) ;
+	             sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
+	             sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
+	             //dispvector(sp) ;
+	             // Now sp should be right, let's check
+	             //printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;
+	             // Rotating the point vector back in dimensions, and then rotating in space according to the basis A
+	             rotate(sp.begin(), sp.begin()+((d-nrotate)%d), sp.end()) ;
+	             Tools::matvecmult(spturned, Ts[time].A[idx], sp) ;
+	             // and ... rotating back :)
+	             rotate(spturned.begin(), spturned.begin()+nrotate, spturned.end()) ;
+	             Tools::hyperspherical_xtophi (spturned, phinew) ;
+
+							 fprintf(vtkout, "%g %g %g\n", phinew[0], phinew[1], phinew[2]) ;
+
+	             phi2color (img.begin()+j*(Ntheta-1)*3+k*3, phinew, d, colors) ;
+	         }
+
+  fprintf(vtkout, "\nCELLS %d %d\n", (Nlambda-1)*(Ntheta-2), (Nlambda-1)*(Ntheta-2)*5 ) ;
+  for (int i=0 ; i<Nlambda-1 ; i++)
+    for (int j=0 ; j<Ntheta-2 ; j++)
+      fprintf(vtkout, "4 %d %d %d %d\n", i*(Ntheta-1)+j, i*(Ntheta-1)+j+1, (i+1)*(Ntheta-1)+j+1, (i+1)*(Ntheta-1)+j) ;
+
+   fprintf(vtkout, "\nCELL_TYPES %d\n", (Nlambda-1)*(Ntheta-2)) ;
+   for (int i=0 ; i<(Nlambda-1)*(Ntheta-2) ; i++) fprintf(vtkout, "9 ") ;
+   fprintf(vtkout, "\n") ;
+
+  fprintf(vtkout, "\nPOINT_DATA %d\nCOLOR_SCALARS Color 3\n", Nlambda*(Ntheta-1)) ;
+  for (int j = 0 ; j<Nlambda ; j++)
+      for (int k=0 ; k<Ntheta-1 ; k++)
+		 	    fprintf(vtkout, "%g %g %g\n", img[j*(Ntheta-1)*3+k*3]/256., img[j*(Ntheta-1)*3+k*3+1]/256., img[j*(Ntheta-1)*3+k*3+2]/256.) ;
+  fclose(vtkout) ;
+
+  return 0 ;
+}
+
 
 /*int render (int argc, char * argv[])
 {

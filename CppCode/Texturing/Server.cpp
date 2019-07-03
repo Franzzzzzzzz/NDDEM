@@ -15,7 +15,7 @@ boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;
 map<string,string> parse_url (string & url) ;
 void runthread_MasterRender (Texturing * T) {T->MasterRender() ; }
 std::thread MasterRenderThread ;
-std::mutex LockRender ; 
+std::mutex LockRender ;
 
 int main(void)
 {
@@ -46,23 +46,23 @@ int main(void)
     });
 
     svr.Get(R"(/render)", [&](const Request& req, Response& res) {
-        if (!LockRender.try_lock()) 
+        if (!LockRender.try_lock())
         {
             res.status=429 ;
-            printf("B") ; fflush(stdout) ; 
+            printf("B") ; fflush(stdout) ;
         }
         else
         {
-            printf("S") ; 
+            printf("S") ;
             Texture.SetNewViewPoint(req.params) ;
             if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
             MasterRenderThread = std::thread(runthread_MasterRender, &Texture) ;
 
             while (!Texture.isrendered()) ;
 
-            printf("R") ; fflush(stdout) ; 
+            printf("R") ; fflush(stdout) ;
             res.set_content("Done", "text/plain");
-            LockRender.unlock() ; 
+            LockRender.unlock() ;
         }
     });
 
@@ -72,6 +72,14 @@ int main(void)
         //Texture.MasterRender(req.params) ;
         printf("Rendered!\n") ; fflush(stdout) ;
         res.set_content("Done", "text/plain");
+    });
+
+    svr.Get(R"(/vtkcolormap)", [&](const Request& req, Response& res) {
+        Texture.write_colormap_vtk_base() ;
+    });
+
+    svr.Get(R"(/vtkmap)", [&](const Request& req, Response& res) {
+        Texture.write_vtkmap(req.params) ;
     });
 
 
