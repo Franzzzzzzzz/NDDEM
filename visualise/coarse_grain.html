@@ -49,8 +49,8 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         // fname = "Samples/D3/CoarsedRHO.nrrd"
-         fname = "Samples/D3/CoarsedVAVG.nrrd"
-        // fname = "Samples/Colormap.nrrd"
+         // fname = "Samples/D3/CoarsedVAVG.nrrd"
+        fname = "Samples/Colormap.nrrd"
         // fname = "Samples/Colormap_fake.nrrd"
 
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
@@ -95,8 +95,8 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 			// Load the data ...
 			new THREE.NRRDLoader()
-                // .load( "http://localhost:8000/visualise/resources/stent.nrrd", function ( volume ) {
-                .load( "http://localhost:8000/" + fname, function ( volume ) {
+                // .load( "http://localhost:54321/visualise/resources/stent.nrrd", function ( volume ) {
+                .load( "http://localhost:54321/" + fname, function ( volume ) {
                 // Get correct slice of current data
 
                 time.max = volume.time;
@@ -143,9 +143,9 @@
 				texture.needsUpdate = true;
 				// Colormap textures
 				cmtextures = {
-                    inferno: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_inferno.png', render ),
-                    viridis: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_viridis.png', render ),
-					gray: new THREE.TextureLoader().load( 'http://localhost:8000/visualise/resources/cm_gray.png', render )
+                    inferno: new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/cm_inferno.png', render ),
+                    viridis: new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/cm_viridis.png', render ),
+					gray: new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/cm_gray.png', render )
 				};
 				// Material
                 if ( volume.RGB ) { var shader = THREE.VolumeRenderShaderRGB; }
