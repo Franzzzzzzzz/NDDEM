@@ -20,6 +20,7 @@ var vr_scale = 0.5; // mapping from DEM units to VR units
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
+var roof;
 
 if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
 else { var zoom = 20; } // default zoom level
@@ -467,10 +468,16 @@ function make_walls() {
         floor.position.set(world[0].min,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
         scene.add( floor );
 
-        var roof = new THREE.Mesh( geometry, material );
+        roof = new THREE.Mesh( geometry, material );
         roof.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1)
         roof.rotation.y = - Math.PI / 2;
         roof.position.set(world[0].max,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
+        if ( fname.includes('Uniaxial') ) {
+            roof.material.side = THREE.DoubleSide;
+            roof.material.opacity = 0.9;
+            floor.material.side = THREE.DoubleSide;
+            floor.material.opacity = 0.9;
+        }
         scene.add( roof );
     }
 
@@ -993,6 +1000,9 @@ function cleanIntersected() {
 //
 
 function animate() {
+    if ( fname.includes('Uniaxial') ) {
+        roof.position.x = world[0].max - 5. - time.cur/10.;
+    }
     if (N > 3) {
         for (iii=3;iii<N;iii++) {
             if (world[iii].cur != world[iii].prev) {
