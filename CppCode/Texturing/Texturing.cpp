@@ -456,13 +456,13 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<f
     //if (isnan(phi[0])||isnan(phi[1]) || isnan(phi[2])) dispvector(phi) ;
     //phi[d-2] = phi[d-2]>M_PI?2*M_PI-phi[d-2]:phi[d-2] ;
     //phi[d-2] /= 2 ;
-    //dispvector(colors[0]) ; 
+    //dispvector(colors[0]) ;
     for (int i=0 ; i<d-2 ; i++)
     {
         ctmp += (colors[i] * fabs(sin(3*phi[i]))) ;
         sum += colors[i] ;
     }
-    ctmp += (colors[d-2] * fabs(sin(2*phi[d-2]/2.))) ;
+    ctmp += (colors[d-2] * fabs(sin(4*phi[d-2]/2.))) ;
     sum += colors[d-2] ;
     rescale(ctmp,sum) ; //printf("%g %g %g\n", sum[0], sum[1], sum[2]);
     //for (int i=0 ; i<d-2 ; i++) ctmp *= sin(phi[i]) ;

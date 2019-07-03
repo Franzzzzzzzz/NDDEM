@@ -680,20 +680,20 @@ int Coarsing ::write_NrrdIO (string path)
                 outdata=(double *) malloc(sizeof(double) * 1 * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
-                        outdata[t*Npt+i]=CGP[i].fields[t][Fidx[f]] ;
+                        outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
               break ;
         case 2: dimensions[0]=d ; dimensions[1]=1 ; // Vector
                 outdata=(double *) malloc(sizeof(double) * d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d ; j++)
-                            outdata[t*Npt*d + i*d +j]=CGP[i].fields[t][Fidx[f+j]] ;
+                            outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
               break ;
         case 3: dimensions[0]=dimensions[1]=d ; //Tensor
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d*d ; j++)
-                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[i].fields[t][Fidx[f+j]] ; // j/d*d!=j because of integer division
+                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
                 outdata=(double *) malloc(sizeof(double) * d*d * Npt * Time) ;
               break ;
         default: printf("ERR: this should never happen. \n") ;
@@ -707,6 +707,8 @@ int Coarsing ::write_NrrdIO (string path)
 
       printf("%s ", fullpath.c_str()) ;
     }
+#elif
+  printf("ERR: Not compiled with NRRD support.\n") ;
 #endif
 }
 
@@ -827,6 +829,17 @@ int Coarsing::setWindow (string windowname)
 }
 
 
+int Coarsing::idx_FastFirst2SlowFirst (int n)
+{
+  // Get an Integer in [0, Ncpt] going 1st dimension fast, convert in idx list, then back to an integer between 0 & Ncpt, but with first dimension slow
+  vector <int> idx (d,0) ;
+  for (int i=0 ; i<d ; i++,n/npt[i])
+    idx[i]=n%npt[i] ;
+  int res=0 ;
+  for (int i=0; i<d ; i++)
+    res += idx[i]*nptcum[i] ;
+  return res ;
+}
 
 //-----------------------------------------------
 CGPoint * Coarsing::reverseloop (string type)

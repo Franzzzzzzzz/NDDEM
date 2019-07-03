@@ -119,6 +119,8 @@ public :
     v1d interpolate_vel_nearest (int id) ;
     v1d interpolate_rot_nearest (int id) ;
 
+    int idx_FastFirst2SlowFirst (int n) ; 
+
     // Windowing functions
     //double window(double r) {Lucy(r) ; }
     //double window_int (v1d r1, v1d lpq, v1d x) {printf("Numerical integration of wpqf not implemented\n") ; } ///< Numerical integration: not implemented

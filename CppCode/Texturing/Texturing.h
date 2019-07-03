@@ -20,9 +20,9 @@ public :
   int Nlambda=32, Ntheta=32 ;
   vector<vector<float>> colors ;
   const vector<vector<float>> allcolorslist = {
-      {1,1,0},
-      {0,1,1},
-      {1,0,1},
+      {1,0,0},
+      {0,1,0},
+      {0,0,1},
       {1,1,0},
       {0,1,1},
       {1,0,1}} ;

@@ -7,7 +7,7 @@ struct Param {
   int maxT = 100 ;
   double rho=1 ;
   vector <string> flags = {"RHO", "VAVG"} ;
-  vector <int> boxes= {4,3,8} ;
+  vector <int> boxes= {15,4,3,3} ;
   vector <vector <double> > boundaries ;
   vector <double> radius ;
   string save="" ;
@@ -30,7 +30,7 @@ int main (int argc, char * argv[])
  XMLReader XML(P.dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
  XML.read_boundaries(P.boundaries) ;
- P.boundaries[1][0] = 20 ;
+ P.boundaries[1][0] = 10 ;
  dispvector(P.boundaries) ;
  XML.read_radius (P.radius) ;
  int N = P.radius.size() ;
@@ -44,7 +44,7 @@ int main (int argc, char * argv[])
  }
 
  Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
- C.setWindow("LibRectND") ; 
+ C.setWindow("LibRectND") ;
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
  C.cT=-1 ;
@@ -83,7 +83,7 @@ int main (int argc, char * argv[])
  }
 
  C.mean_time() ;
- C.write_vtk("Coarsed") ;
+ //C.write_vtk("Coarsed") ;
  C.write_NrrdIO("Coarsed") ;
 
 
