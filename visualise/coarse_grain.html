@@ -17,6 +17,7 @@
 	<script src="node_modules/three/build/three.js"></script>
 
 	<script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
+    <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
 
 	<script src="node_modules/three/examples/js/Volume.js"></script>
 	<script src="js/NRRDLoader.js"></script> <!-- CUSTOM VERSION -->
@@ -45,13 +46,16 @@
             time,
             data,
             rgb,
+            gui,
             nx,ny,nz;
 
         const urlParams = new URLSearchParams(window.location.search);
         // fname = "Samples/D3/CoarsedRHO.nrrd"
          // fname = "Samples/D3/CoarsedVAVG.nrrd"
-        fname = "Samples/Colormap.nrrd"
+        // fname = "Samples/Colormap.nrrd"
         // fname = "Samples/Colormap_fake.nrrd"
+        fname = "CppCode/CoarseGraining/CoarsedVAVG.nrrd"
+        // fname = "CppCode/CoarseGraining/CoarsedRHO.nrrd"
 
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
 		init();
@@ -84,20 +88,16 @@
 			scene.add( new THREE.AxesHelper( 128 ) );
 			// Lighting is baked into the shader a.t.m.
 			// var dirLight = new THREE.DirectionalLight( 0xffffff );
-			// The gui for interaction
-			volconfig = { clim1: 0, clim2: 1, renderstyle: 'mip', isothreshold: 0.15, colormap: 'inferno' };
-            time = {'min':0,'max':1,'cur':0,'rate':0.5,'play':false,'c':0}; // c is which component to show
-			var gui = new dat.GUI();
-			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'colormap', { inferno: 'inferno', viridis: 'viridis', gray: 'gray' } ).onChange( updateUniforms );
-			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
-			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
+
 			// Load the data ...
 			new THREE.NRRDLoader()
                 // .load( "http://localhost:54321/visualise/resources/stent.nrrd", function ( volume ) {
                 .load( "http://localhost:54321/" + fname, function ( volume ) {
                 // Get correct slice of current data
+
+
+                // The gui for interaction
+                time = {'min':0,'max':1,'cur':0,'rate':0.5,'play':false,'c':0}; // c is which component to show
 
                 time.max = volume.time;
                 // time.max = 1;
@@ -106,8 +106,19 @@
                 ny = volume.dimensions[3];
                 nz = volume.dimensions[4];
 
+                volconfig = { clim1: volume.windowLow, clim2: volume.windowHigh, renderstyle: 'mip', isothreshold: 0.15, colormap: 'inferno' };
+
+
+    			gui = new dat.GUI();
+    			var cmin = gui.add( volconfig, 'clim1', volume.windowLow, volume.windowHigh, 0.01 ).onChange( updateUniforms );
+    			var cmax = gui.add( volconfig, 'clim2', volume.windowLow, volume.windowHigh, 0.01 ).onChange( updateUniforms );
+    			gui.add( volconfig, 'colormap', { inferno: 'inferno', viridis: 'viridis', gray: 'gray' } ).onChange( updateUniforms );
+    			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
+    			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
+
                 gui.add( time, 'cur').min(time.min).max(time.max-1).step(1).listen().name('Time').onChange( function() { updateUniforms() });
                 var extra_dims = volume.dimensions.length - 6;
+
 
                 world = [];
                 for ( var i=0;i<extra_dims;i++ ) {
@@ -126,7 +137,6 @@
                 // var display_data = data.slice(0,nx*ny*nz);
                 if ( volume.RGB ) { display_data = get_data_RGB(volume.data,start,end); }
                 else { display_data = get_data(volume.data,start,end); }
-                // console.log(volume.dimensions);
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the RedFormat and FloatType.

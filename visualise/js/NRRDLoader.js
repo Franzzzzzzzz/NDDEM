@@ -346,6 +346,7 @@ THREE.NRRDLoader.prototype = {
             volume.RGB = false;
             volume.data = Float32Array.from(volume.data);
             volume.time = headerObject.sizes[headerObject.sizes.length-1];
+            console.log(volume)
     }
 
         // console.log(volume.data);
