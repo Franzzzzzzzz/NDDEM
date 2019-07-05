@@ -309,6 +309,7 @@ for (i=0 ; i<data.N ; i++)
      wp=Window->window(Window->distance(i,CGP[*j].location)) ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
+     CGP[*j].phi += wp ;
      if (wp>0) CGP[*j].natom ++ ;
      if (dorho)
        CGP[*j].fields[cT][rhoid] += wp * data.mass[i] ;
@@ -589,6 +590,13 @@ int Coarsing::write_vtk(string sout)
     if (out==NULL) {printf("ERR: Cannot open file to write to.") ; return 1 ; }
     fprintf(out, "# vtk DataFile Version 2.0\nSome data\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n", npt[0], npt[1], npt[2], CGP[0].location[0], CGP[0].location[1], CGP[0].location[2], dx[0], dx[1], dx[2]) ;
     fprintf(out, "POINT_DATA %d\n", Npt) ;
+
+    fprintf(out,"SCALARS count float \nLOOKUP_TABLE default \n") ;
+    for (int k=0 ; k<npt[2] ; k++)
+     for (int j=0 ; j<npt[1] ; j++)
+      for (int i=0 ; i<npt[0] ; i++)
+       fprintf(out, "%g ", CGP[i*npt[1]*npt[2]+j*npt[2]+k].phi) ;
+
     for (int f=0 ; f<Fidx.size() ; f++)
     {
       if (Fidx[f]<0) continue ;
@@ -824,6 +832,8 @@ int Coarsing::setWindow (string windowname)
 
   if (windowname=="LibRectND")
     Window=new LibRectND (&data, w, d) ;
+  else if (windowname=="LibLucy3D")
+    Window = new LibLucy3D (&data,w,d) ;
   else
     printf("Unknown window, check Coarsing::setWindow") ;
 }

@@ -5,9 +5,9 @@ struct Param {
   string dump ;
   int skipT=50 ;
   int maxT = 100 ;
-  double rho=1 ;
+  double rho=1.9098593171027443 ;
   vector <string> flags = {"RHO", "VAVG"} ;
-  vector <int> boxes= {15,4,3,3} ;
+  vector <int> boxes= {15,5,5} ;
   vector <vector <double> > boundaries ;
   vector <double> radius ;
   string save="" ;
@@ -19,13 +19,18 @@ void dispvector (v1d &u) {for (auto v:u) printf("%g ", v) ; printf("\n") ; fflus
 //===================================================
 int main (int argc, char * argv[])
 {
- P.dump = argv[1] ;
+ /*if (argc > 2)
+ {
+   P.dump = argv[2] ;
+   P.selfset(argv[1]) ;
+ }
+ else*/
+   P.dump=argv[1] ;
 
  P.maxT=100 ;
 
  //struct Data D ;
  // Extract path (last slash) for saving
- printf("A") ; fflush(stdout);
  int res, t ;
  XMLReader XML(P.dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
@@ -40,11 +45,12 @@ int main (int argc, char * argv[])
  for (int i=0 ; i<N ; i++)
  {
      mass.push_back(4/3. * M_PI * P.radius[i] * P.radius[i] * P.radius[i] * P.rho) ;
+     printf("%g ", mass[i]) ;
      Imom.push_back(2/5. * mass[i] * P.radius[i] * P.radius[i]) ;
  }
 
  Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
- C.setWindow("LibRectND") ;
+ C.setWindow("LibLucy3D") ;
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
  C.cT=-1 ;
@@ -82,8 +88,8 @@ int main (int argc, char * argv[])
  printf("%d \n", t) ;
  }
 
- C.mean_time() ;
- //C.write_vtk("Coarsed") ;
+ //C.mean_time() ;
+ C.write_vtk("Coarsed") ;
  C.write_NrrdIO("Coarsed") ;
 
 

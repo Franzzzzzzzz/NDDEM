@@ -19,13 +19,14 @@ using namespace std ;
 class CGPoint
 {
 public :
-    CGPoint(int dd, v1d loc): natom(0) {d=dd ; location=loc ; }
+    CGPoint(int dd, v1d loc): natom(0), phi(0) {d=dd ; location=loc ; }
 
     v2d fields ;    ///< 1st dimension is time, second are fields
     v1d location ;  ///< Location of the coarse graining point
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
     double natom ;
+    double phi ;
 
 private :
     int d ;
@@ -72,7 +73,7 @@ public :
         for (int i=0 ; i<d ; i++)
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
 
-        double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
+        double w= (*std::min_element(dx.begin(),dx.end())) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
         //for (int i=0 ; i<d ; i++)
@@ -119,7 +120,7 @@ public :
     v1d interpolate_vel_nearest (int id) ;
     v1d interpolate_rot_nearest (int id) ;
 
-    int idx_FastFirst2SlowFirst (int n) ; 
+    int idx_FastFirst2SlowFirst (int n) ;
 
     // Windowing functions
     //double window(double r) {Lucy(r) ; }

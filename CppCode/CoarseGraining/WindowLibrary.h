@@ -32,8 +32,25 @@ public:
 class LibRectND : public LibBase {
 public:
   LibRectND(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) ; return a ;}}
+  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) ; return 1/a ;}}
 };
+
+
+class LibLucyND : public LibBase {
+public:
+  MCintegrate (int N ) {
+    boost::random::mt19937 rng;
+    boost::random::uniform_01 val ;
+    vector<double> pos (d) ; 
+    for (int i=0 ; i<N ; i++)
+    {
+      for (int dd=0 ; dd<d ; dd++)
+
+    }
+  }
+
+
+}
 
 class LibLucy1DPBC : public LibBase {
 public:
