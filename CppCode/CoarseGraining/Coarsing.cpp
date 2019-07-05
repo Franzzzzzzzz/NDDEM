@@ -715,7 +715,7 @@ int Coarsing ::write_NrrdIO (string path)
 
       printf("%s ", fullpath.c_str()) ;
     }
-#elif
+#else
   printf("ERR: Not compiled with NRRD support.\n") ;
 #endif
 }
@@ -826,7 +826,7 @@ return 1 ;
 //==================================
 int Coarsing::setWindow (string windowname)
 {
-  double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
+  double w= (*std::min_element(dx.begin(),dx.end())*1) ; // w automatically set
   cutoff=2.5*w ; //TODO
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
 
@@ -834,6 +834,8 @@ int Coarsing::setWindow (string windowname)
     Window=new LibRectND (&data, w, d) ;
   else if (windowname=="LibLucy3D")
     Window = new LibLucy3D (&data,w,d) ;
+  else if (windowname=="LibLucyND")
+    Window = new LibLucyND (&data,w,d) ;
   else
     printf("Unknown window, check Coarsing::setWindow") ;
 }

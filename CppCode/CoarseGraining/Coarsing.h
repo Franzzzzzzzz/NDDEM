@@ -73,7 +73,7 @@ public :
         for (int i=0 ; i<d ; i++)
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
 
-        double w= (*std::min_element(dx.begin(),dx.end())) ; // w automatically set
+        double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
         //for (int i=0 ; i<d ; i++)

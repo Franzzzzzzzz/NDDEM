@@ -1,5 +1,5 @@
 #include "IONDDEM.h"
-
+#include <boost/math/special_functions/factorials.hpp>
 
 struct Param {
   string dump ;
@@ -16,6 +16,9 @@ struct Param {
 void dispvector (v2d &u) {for (auto v:u) {for (auto w:v) printf("%g ", w) ; printf("\n") ; } fflush(stdout) ; }
 void dispvector (v1d &u) {for (auto v:u) printf("%g ", v) ; printf("\n") ; fflush(stdout) ;}
 
+double Volume (int d , double R) ; 
+double InertiaMomentum (int d, double R, double rho) ;
+
 //===================================================
 int main (int argc, char * argv[])
 {
@@ -25,7 +28,7 @@ int main (int argc, char * argv[])
    P.selfset(argv[1]) ;
  }
  else*/
-   P.dump=argv[1] ;
+ P.dump=argv[1] ;
 
  P.maxT=100 ;
 
@@ -44,13 +47,13 @@ int main (int argc, char * argv[])
 
  for (int i=0 ; i<N ; i++)
  {
-     mass.push_back(4/3. * M_PI * P.radius[i] * P.radius[i] * P.radius[i] * P.rho) ;
+     mass.push_back(Volume(d,P.radius[i]) * P.rho) ;
      printf("%g ", mass[i]) ;
-     Imom.push_back(2/5. * mass[i] * P.radius[i] * P.radius[i]) ;
+     Imom.push_back(InertiaMomentum(d,P.radius[i],P.rho)) ; 
  }
 
  Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
- C.setWindow("LibLucy3D") ;
+ C.setWindow("LibLucyND") ;
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
  C.cT=-1 ;
@@ -109,4 +112,38 @@ vector <double *> pospq, lpq, fpq, mpq, mqp ;
 
 
 
+}
+//==============================================
+double Volume (int d, double R)
+{
+  if (d%2==0)
+    return (pow(boost::math::double_constants::pi,d/2)*pow(R,d)/( boost::math::factorial<double>(d/2) )) ;
+  else
+  {
+   int k=(d-1)/2 ;
+   return(2* boost::math::factorial<double>(k) * pow(4*boost::math::double_constants::pi, k) *pow(R,d) / (boost::math::factorial<double>(d))) ;
+  }
+}
+#define MAXDEFDIM 30
+//----------------------------------------
+double InertiaMomentum (int d , double R, double rho)
+{
+ if (d>MAXDEFDIM)
+ {
+  printf("[WARN] Inertia InertiaMomentum not guaranteed for dimension > %d\n", MAXDEFDIM) ;
+ }
+
+ double res ;
+ if (d%2==0)
+ {
+   uint k=d/2 ;
+   res=pow(boost::math::double_constants::pi,k)*pow(R, d+2) / boost::math::factorial<double>(k+1) ;
+   return (res*rho) ;
+ }
+ else
+ {
+   uint k=(d-1)/2 ;
+   res=pow(2,k+2) * pow(boost::math::double_constants::pi, k) * pow(R, d+2) / boost::math::double_factorial<double> (d+2) ;
+   return (res*rho) ;
+ }
 }
