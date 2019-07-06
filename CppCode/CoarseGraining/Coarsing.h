@@ -56,6 +56,7 @@ vector <double *> pospq, lpq, fpq, mpq, mqp ;
 // Some useful functions
 int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data structure
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
+int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta) ; 
 } ;
 
 //------------------------------------------------------
@@ -112,6 +113,7 @@ public :
     int grid_neighbour() ;
     int grid_setfields() ;
     v1d grid_getfields() ;
+    v2d get_bounds() ;
     CGPoint * reverseloop (string type) ; //< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ;
     int find_closest_pq (int id) ;

@@ -22,6 +22,35 @@ double InertiaMomentum (int d, double R, double rho) ;
 //===================================================
 int main (int argc, char * argv[])
 {
+ // TEST
+    Data D ;
+    int ddd=4 ; double v[]={0.1,0.2,0.3,0.4} ;  double zero = 0 ;
+    D.pos.resize(ddd, v) ; 
+    D.vel.resize(ddd, &zero) ; 
+    D.omega.resize(ddd, &zero) ; 
+    //D.pos[0]=(double *)malloc(ddd*sizeof(double)) ; 
+    //D.vel[0]=(double *)malloc(ddd*sizeof(double)) ; 
+    //D.omega[0]=(double *)malloc(ddd*sizeof(double)) ; 
+    
+    //double u=0.1 ; 
+    D.N=1 ; 
+    //for (int j=0 ; j<ddd ; j++) {D.pos[0][j]=u ; u+=0.05 ; }
+    D.pos[1]=v+1 ; 
+    D.pos[2]=v+2 ; 
+    D.pos[3]=v+3 ;
+    
+    v2d bounds = {{0,0,0.2,0},{0.5,0.2,1,0.6}} ; 
+    v1d Delta = {0.1,0.1,0.1,0.1} ; 
+    int pbc=0b1111 ; 
+    D.periodic_atoms ( ddd,  bounds,  pbc,  Delta) ;
+    
+    
+    
+    
+    
+std::exit(0) ; 
+    
+    
  /*if (argc > 2)
  {
    P.dump = argv[2] ;
