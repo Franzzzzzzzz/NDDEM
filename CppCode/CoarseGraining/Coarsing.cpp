@@ -577,10 +577,11 @@ int Data::compute_lpq (int d)
  return 0 ;
 }
 //---------------------------------------------------
-int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta)
+int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude)
 {
     v2d newpos, newvel, newomega ; 
     v1d newmass, newImom ; 
+    int newN=0 ; 
     
     auto isinside = [&bounds,d](v1d loc){for(int j=0 ; j<d ; j++) if (loc[j]<bounds[0][j] || loc[j]>bounds[1][j]) return false ; return true ; } ; 
     auto push_back = [=](v2d v, double * a) {v.push_back(v1d(d,0)) ; for (int i=0 ; i<d ; i++) (*(v.end()-1))[i]=*(a+i) ; } ;
@@ -593,13 +594,19 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta)
      {
          if (isinside(location) && nmodif>0)
          {
-             for (auto v:location) printf("%g ", v) ; printf("\n"); 
+            newN++ ; 
+            newpos.push_back(location) ;
+            newvel.resize(newN) ; newvel[newN-1].resize(d,0) ; 
+            for (int i=0 ; i<d ; i++) newvel[newN-1][i] = vel[i][idx] ; 
+            if (omegainclude) 
+            {
+                newomega.resize(newN) ; newomega[newN-1].resize((d*(d-1))/2, 0) ;
+                for (int i=0 ; i<(d*(d-1))/2 ; i++) newomega[newN-1][i] = omega[i][idx] ; 
+            }
+            newmass.push_back(mass[idx]) ; 
+            newImom.push_back(Imom[idx]) ; 
+            //for (auto v:location) printf("%g ", v) ; printf("\n"); fflush(stdout) ; 
          }
-         /*newpos.push_back(location) ;
-         push_back(newvel, vel[idx]) ; 
-         push_back(newomega, omega[idx]) ; 
-         newmass.push_back(mass[idx]) ; 
-         newImom.push_back(Imom[idx]) ; */
     }
      else
      {
@@ -639,8 +646,28 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta)
     {
        for (int j=0 ; j<d ; j++) locbase[j]=pos[j][i] ;
        lbd(i, 0, locbase, pbc, 0) ;
-       
     }
+    
+    mass=(double*)realloc(mass, (N+newN)*sizeof(double)) ; 
+    Imom=(double*)realloc(Imom, (N+newN)*sizeof(double)) ; 
+    for (auto & v: pos) v = (double *) realloc(v, (N+newN)*sizeof(double)) ;
+    for (auto & v: vel) v = (double *) realloc(v, (N+newN)*sizeof(double)) ; 
+    if (omegainclude) for (auto & v: omega) v = (double *) realloc(v, (N+newN)*sizeof(double)) ;
+    
+    for (int i=0 ; i<newN ; i++)
+    {
+     mass[N+i]=newmass[i] ;
+     Imom[N+i]=newmass[i] ; 
+     for (int j=0 ; j<d ; j++) pos[j][N+i]=newpos[i][j] ;
+     for (int j=0 ; j<d ; j++) vel[j][N+i]=newvel[i][j] ; 
+     if (omegainclude) 
+         for (int j=0 ; j<(d*(d-1))/2 ; j++) 
+             omega[j][N+1] = newomega[j][N+1] ;   
+    }
+    
+    printf("Periodic effect: old N = %d, added = %d\n", N, newN) ; 
+    Nnonper=N ; 
+    N += newN ; 
     
 }
 

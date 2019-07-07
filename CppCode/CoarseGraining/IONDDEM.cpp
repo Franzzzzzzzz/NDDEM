@@ -9,6 +9,8 @@ struct Param {
   vector <string> flags = {"RHO", "VAVG"} ;
   vector <int> boxes= {15,5,5} ;
   vector <vector <double> > boundaries ;
+  int pbc = 0b110 ; 
+  vector<double> Delta = {20, 5, 3.4} ; 
   vector <double> radius ;
   string save="" ;
 } P;
@@ -22,35 +24,6 @@ double InertiaMomentum (int d, double R, double rho) ;
 //===================================================
 int main (int argc, char * argv[])
 {
- // TEST
-    Data D ;
-    int ddd=4 ; double v[]={0.1,0.2,0.3,0.4} ;  double zero = 0 ;
-    D.pos.resize(ddd, v) ; 
-    D.vel.resize(ddd, &zero) ; 
-    D.omega.resize(ddd, &zero) ; 
-    //D.pos[0]=(double *)malloc(ddd*sizeof(double)) ; 
-    //D.vel[0]=(double *)malloc(ddd*sizeof(double)) ; 
-    //D.omega[0]=(double *)malloc(ddd*sizeof(double)) ; 
-    
-    //double u=0.1 ; 
-    D.N=1 ; 
-    //for (int j=0 ; j<ddd ; j++) {D.pos[0][j]=u ; u+=0.05 ; }
-    D.pos[1]=v+1 ; 
-    D.pos[2]=v+2 ; 
-    D.pos[3]=v+3 ;
-    
-    v2d bounds = {{0,0,0.2,0},{0.5,0.2,1,0.6}} ; 
-    v1d Delta = {0.1,0.1,0.1,0.1} ; 
-    int pbc=0b1111 ; 
-    D.periodic_atoms ( ddd,  bounds,  pbc,  Delta) ;
-    
-    
-    
-    
-    
-std::exit(0) ; 
-    
-    
  /*if (argc > 2)
  {
    P.dump = argv[2] ;
@@ -85,6 +58,7 @@ std::exit(0) ;
  C.setWindow("LibLucyND") ;
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
+ auto Bounds = C.get_bounds() ; 
  C.cT=-1 ;
  C.data.N=P.radius.size() ;
  C.data.mass = mass.data() ;
@@ -110,8 +84,10 @@ std::exit(0) ;
     if (C.data.vel.size()==0) {C.data.vel.resize(d) ; for (auto & v:C.data.vel) {v=(double*) (malloc (sizeof(double)*C.data.N)) ; } }
     for (int j=0 ; j<C.data.N ; j++) for (int k=0 ;k<d ; k++) C.data.vel[k][j] = data[delta][j][k] ;
   }
-
-  C.pass_1() ;
+  
+  //C.data.periodic_atoms (d, Bounds, P.pbc, P.Delta, false) ;
+  C.pass_1() ; 
+  //C.data.clean_periodic_atoms() ; 
   //C.compute_fluc_vel() ;
   //C.compute_fluc_rot() ;
   //C.pass_2() ;

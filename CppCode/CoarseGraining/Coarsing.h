@@ -54,9 +54,11 @@ double * id1, *id2 ;
 vector <double *> pospq, lpq, fpq, mpq, mqp ;
 
 // Some useful functions
+int Nnonper=-1 ; 
 int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data structure
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
-int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta) ; 
+int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ; 
+int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; }
 } ;
 
 //------------------------------------------------------
