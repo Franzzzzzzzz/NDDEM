@@ -32,13 +32,29 @@ public:
 class LibRectND : public LibBase {
 public:
   LibRectND(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) ; return a ;}}
+  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) ; return 1/a ;}}
 };
 
-class LibLucy1DPBC : public LibBase {
+
+class LibLucyND : public LibBase {
+public:
+  LibLucyND(struct Data * D, double ww, double dd) 
+    { 
+        data=D; w=ww ; d=dd ; 
+        double Vol=pow(M_PI,d/2.)/(tgamma(d/2.+1)) ; // N-ball volume
+        scale = Vol * d * (-3./(d+4) + 8./(d+3) - 6./(d+2) + 1./d) ; 
+        scale = 1/scale ; 
+        printf("Lucy function scaling : %f \n", scale) ;  
+    }
+  double scale ; 
+  double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (scale*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
+  double window(double r) {return (Lucy(r)) ;}
+} ; 
+
+/*class LibLucy1DPBC : public LibBase {
 public:
     double scale ; // integral over all the non lucy dimensions
     double Lucy (double r) {static double cst=2*w/5. ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
     double windows (double r) {return (Lucy(r)*scale) ; }
     double distance (int id, v1d loc) {return(fabs(loc[0]-data->pos[0][id])) ;}
-};
+};*/

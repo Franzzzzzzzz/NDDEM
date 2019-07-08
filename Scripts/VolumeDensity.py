@@ -1,4 +1,4 @@
-#!python
+#!/anaconda/bin/python
 
 import math
 import sys

@@ -24,8 +24,8 @@ endif
 SOURCES=IONDDEM.cpp Coarsing.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=IO
-CFLAGS=-I/opt/local/include -DNETCDF -DNRRDIO
-LDFLAGS=-L/opt/local/lib -L./NrrdIO-1.11.0-src/build
+CFLAGS=-g -I/opt/local/include -DNETCDF -DNRRDIO
+LDFLAGS=-g -L/opt/local/lib -L./NrrdIO-1.11.0-src/build
 LIBS=-lz -lm -lnetcdf -lNrrdIO
 
 all: $(SOURCES) $(EXECUTABLE)

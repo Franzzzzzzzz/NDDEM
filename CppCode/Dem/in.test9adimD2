@@ -1,6 +1,6 @@
 # Uniaxial compaction
 directory /Users/FGuillard/Dropbox/DEM_ND/Samples/UniaxialD2
-dimensions 2 32
+dimensions 2 128
 
 #set adimensional
 radius -1 0.5
@@ -9,7 +9,7 @@ auto rho
 auto inertia
 
 boundary 0 WALL 0 20
-boundary 1 PBC  0 4
+boundary 1 PBC  0 16
 #boundary 2 PBC  0 4
 #boundary 3 PBC 0 3.4
 

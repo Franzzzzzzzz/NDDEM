@@ -19,13 +19,14 @@ using namespace std ;
 class CGPoint
 {
 public :
-    CGPoint(int dd, v1d loc): natom(0) {d=dd ; location=loc ; }
+    CGPoint(int dd, v1d loc): natom(0), phi(0) {d=dd ; location=loc ; }
 
     v2d fields ;    ///< 1st dimension is time, second are fields
     v1d location ;  ///< Location of the coarse graining point
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
     double natom ;
+    double phi ;
 
 private :
     int d ;
@@ -53,8 +54,11 @@ double * id1, *id2 ;
 vector <double *> pospq, lpq, fpq, mpq, mqp ;
 
 // Some useful functions
+int Nnonper=-1 ;
 int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data structure
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
+int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ;
+int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; }
 } ;
 
 //------------------------------------------------------
@@ -107,10 +111,12 @@ public :
     // Grid functions
     int set_field_struct() ; //< Set the FIELDS structure, with all the different CG properties that can be computed.
     int setWindow (string windowname) ;
+    int setWindow (string windowname, double w) ;
     int grid_generate() ;
     int grid_neighbour() ;
     int grid_setfields() ;
     v1d grid_getfields() ;
+    v2d get_bounds() ;
     CGPoint * reverseloop (string type) ; //< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ;
     int find_closest_pq (int id) ;
@@ -119,7 +125,7 @@ public :
     v1d interpolate_vel_nearest (int id) ;
     v1d interpolate_rot_nearest (int id) ;
 
-    int idx_FastFirst2SlowFirst (int n) ; 
+    int idx_FastFirst2SlowFirst (int n) ;
 
     // Windowing functions
     //double window(double r) {Lucy(r) ; }
