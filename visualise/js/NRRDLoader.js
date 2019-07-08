@@ -335,7 +335,7 @@ THREE.NRRDLoader.prototype = {
 
 		// get the image dimensions
 		volume.dimensions = headerObject.sizes;
-
+        console.log(headerObject);
 
         if ( headerObject.type === 'unsigned char' ) {
             volume.RGB = true;
@@ -345,7 +345,7 @@ THREE.NRRDLoader.prototype = {
         else {
             volume.RGB = false;
             volume.data = Float32Array.from(volume.data);
-            volume.time = headerObject.sizes[headerObject.sizes.length-1];
+            volume.time = headerObject.sizes[headerObject.sizes.length-1]; // last is time
             console.log(volume)
     }
 
