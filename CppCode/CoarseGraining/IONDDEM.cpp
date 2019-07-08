@@ -22,7 +22,7 @@ struct Param P2 {
   100,                                // maxT
   1.2732395447351628,                 // rho
   {"RHO", "VAVG"},                    // flags
-  {15,1},                             // boxes #
+  {25,1},                             // boxes #
   {{}},                               // Boundaries
   0b10,                               // PBC (fisrt dimension is LSD)
   {20, 5},                            // Deltas (used for pbcs)
@@ -36,7 +36,7 @@ struct Param P3 {
   100,                                // maxT
   1.9098593171027443,                 // rho
   {"RHO", "VAVG"},                    // flags
-  {15,1,1},                           // boxes #
+  {25,1,1},                           // boxes #
   {{}},                               // Boundaries
   0b110,                              // PBC (fisrt dimension is LSD)
   {20, 5, 3.4},                       // Deltas (used for pbcs)
@@ -50,7 +50,7 @@ struct Param P4 {
   100,                                // maxT
   3.242277876554809,                  // rho
   {"RHO", "VAVG"},                    // flags
-  {15,1,1,1},                           // boxes #
+  {25,1,1,1},                           // boxes #
   {{}},                               // Boundaries
   0b1110,                              // PBC (fisrt dimension is LSD)
   {20, 5, 3.4, 3.4},                       // Deltas (used for pbcs)
@@ -64,7 +64,7 @@ struct Param P5 {
   100,                                // maxT
   6.079271018540266,                  // rho
   {"RHO", "VAVG"},                    // flags
-  {15,1,1,1,1},                           // boxes #
+  {25,1,1,1,1},                           // boxes #
   {{}},                               // Boundaries
   0b11110,                              // PBC (fisrt dimension is LSD)
   {20, 5, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
@@ -88,7 +88,7 @@ int main (int argc, char * argv[])
  }
  else*/
 
- auto P=P5 ;
+ auto P=P2 ;
 
  //P.dump=argv[1] ;
 
