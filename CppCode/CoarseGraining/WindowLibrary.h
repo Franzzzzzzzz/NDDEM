@@ -43,7 +43,8 @@ public:
         data=D; w=ww ; d=dd ; 
         double Vol=pow(M_PI,d/2.)/(tgamma(d/2.+1)) ; // N-ball volume
         scale = Vol * d * (-3./(d+4) + 8./(d+3) - 6./(d+2) + 1./d) ; 
-        scale = 1/scale ; 
+        scale = 1/scale ;
+        scale = scale / (pow(w, d)) ; 
         printf("Lucy function scaling : %f \n", scale) ;  
     }
   double scale ; 

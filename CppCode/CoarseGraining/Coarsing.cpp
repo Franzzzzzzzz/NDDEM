@@ -959,7 +959,7 @@ int Coarsing::idx_FastFirst2SlowFirst (int n)
   // Get an Integer in [0, Ncpt] going 1st dimension fast, convert in idx list, then back to an integer between 0 & Ncpt, but with first dimension slow
   vector <int> idx (d,0) ;
   //printf("[%d] ", n) ;
-  for (int i=0 ; i<d ; i++,n/=npt[i])
+  for (int i=0 ; i<d ; n/=npt[i],i++)
     idx[i]=n%npt[i] ;
   int res=0 ;
   for (int i=0; i<d ; i++)
