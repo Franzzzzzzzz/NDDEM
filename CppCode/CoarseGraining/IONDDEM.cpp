@@ -19,7 +19,7 @@ struct Param {
 struct Param P2 {
   "/Users/FGuillard/Dropbox/DEM_ND/Samples/D2/dump.xml",                                 // dump
   50,                                 // skipT
-  100,                                // maxT
+  450,                                // maxT
   1.2732395447351628,                 // rho
   {"RHO", "VAVG"},                    // flags
   {25,1},                             // boxes #
@@ -33,7 +33,7 @@ struct Param P2 {
 struct Param P3 {
   "/Users/FGuillard/Dropbox/DEM_ND/Samples/D3/dump.xml",                                 // dump
   50,                                 // skipT
-  100,                                // maxT
+  450,                                // maxT
   1.9098593171027443,                 // rho
   {"RHO", "VAVG"},                    // flags
   {25,1,1},                           // boxes #
@@ -47,7 +47,7 @@ struct Param P3 {
 struct Param P4 {
   "/Users/FGuillard/Dropbox/DEM_ND/Samples/D4/dump.xml",                                 // dump
   50,                                 // skipT
-  100,                                // maxT
+  450,                                // maxT
   3.242277876554809,                  // rho
   {"RHO", "VAVG"},                    // flags
   {25,1,1,1},                           // boxes #
@@ -61,7 +61,7 @@ struct Param P4 {
 struct Param P5 {
   "/Users/FGuillard/Dropbox/DEM_ND/Samples/D5/dump.xml",                                 // dump
   50,                                 // skipT
-  100,                                // maxT
+  450,                                // maxT
   6.079271018540266,                  // rho
   {"RHO", "VAVG"},                    // flags
   {25,1,1,1,1},                           // boxes #
@@ -70,6 +70,34 @@ struct Param P5 {
   {20, 5, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
   {},                                 // radii
   "CoarseD5"                          // save location
+};
+
+struct Param P6 {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D6/dump.xml",                                 // dump
+  50,                                 // skipT
+  230,                                // maxT
+  12.384589222348605,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {25,1,1,1,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b111110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD6"                          // save location
+};
+
+struct Param PTest {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D4/dump.xml",                                 // dump
+  50,                                 // skipT
+  450,                                // maxT
+  3.242277876554809,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {25,3,4,5},                           // boxes #
+  {{}},                               // Boundaries
+  0b1110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD4Test"                          // save location
 };
 
 void dispvector (v2d &u) {for (auto v:u) {for (auto w:v) printf("%g ", w) ; printf("\n") ; } fflush(stdout) ; }
