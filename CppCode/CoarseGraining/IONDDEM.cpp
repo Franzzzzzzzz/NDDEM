@@ -3,22 +3,79 @@
 
 struct Param {
   string dump ;
-  int skipT=50 ;
-  int maxT = 100 ;
-  double rho=1.9098593171027443 ;
-  vector <string> flags = {"RHO", "VAVG"} ;
-  vector <int> boxes= {15,5,5} ;
+  int skipT ;
+  int maxT ;
+  double rho ;
+  vector <string> flags ;
+  vector <int> boxes ;
   vector <vector <double> > boundaries ;
-  int pbc = 0b110 ; 
-  vector<double> Delta = {20, 5, 3.4} ; 
+  int pbc ;
+  vector<double> Delta ;
   vector <double> radius ;
-  string save="" ;
-} P;
+  string save;
+} ;
+
+// Struct init
+struct Param P2 {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D2/dump.xml",                                 // dump
+  50,                                 // skipT
+  100,                                // maxT
+  1.2732395447351628,                 // rho
+  {"RHO", "VAVG"},                    // flags
+  {15,1},                             // boxes #
+  {{}},                               // Boundaries
+  0b10,                               // PBC (fisrt dimension is LSD)
+  {20, 5},                            // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD2"                          // save location
+};
+
+struct Param P3 {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D3/dump.xml",                                 // dump
+  50,                                 // skipT
+  100,                                // maxT
+  1.9098593171027443,                 // rho
+  {"RHO", "VAVG"},                    // flags
+  {15,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD3"                          // save location
+};
+
+struct Param P4 {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D4/dump.xml",                                 // dump
+  50,                                 // skipT
+  100,                                // maxT
+  3.242277876554809,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {15,1,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b1110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD4"                          // save location
+};
+
+struct Param P5 {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D5/dump.xml",                                 // dump
+  50,                                 // skipT
+  100,                                // maxT
+  6.079271018540266,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {15,1,1,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b11110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD5"                          // save location
+};
 
 void dispvector (v2d &u) {for (auto v:u) {for (auto w:v) printf("%g ", w) ; printf("\n") ; } fflush(stdout) ; }
 void dispvector (v1d &u) {for (auto v:u) printf("%g ", v) ; printf("\n") ; fflush(stdout) ;}
 
-double Volume (int d , double R) ; 
+double Volume (int d , double R) ;
 double InertiaMomentum (int d, double R, double rho) ;
 
 //===================================================
@@ -30,9 +87,10 @@ int main (int argc, char * argv[])
    P.selfset(argv[1]) ;
  }
  else*/
- P.dump=argv[1] ;
 
- P.maxT=100 ;
+ auto P=P5 ;
+
+ //P.dump=argv[1] ;
 
  //struct Data D ;
  // Extract path (last slash) for saving
@@ -50,15 +108,14 @@ int main (int argc, char * argv[])
  for (int i=0 ; i<N ; i++)
  {
      mass.push_back(Volume(d,P.radius[i]) * P.rho) ;
-     printf("%g ", mass[i]) ;
-     Imom.push_back(InertiaMomentum(d,P.radius[i],P.rho)) ; 
+     Imom.push_back(InertiaMomentum(d,P.radius[i],P.rho)) ;
  }
 
  Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
- C.setWindow("LibLucyND") ;
+ C.setWindow("LibLucyND", 1.5) ;
  C.set_flags(P.flags) ;
  C.grid_setfields() ;
- auto Bounds = C.get_bounds() ; 
+ auto Bounds = C.get_bounds() ;
  C.cT=-1 ;
  C.data.N=P.radius.size() ;
  C.data.mass = mass.data() ;
@@ -84,22 +141,23 @@ int main (int argc, char * argv[])
     if (C.data.vel.size()==0) {C.data.vel.resize(d) ; for (auto & v:C.data.vel) {v=(double*) (malloc (sizeof(double)*C.data.N)) ; } }
     for (int j=0 ; j<C.data.N ; j++) for (int k=0 ;k<d ; k++) C.data.vel[k][j] = data[delta][j][k] ;
   }
-  
-  //C.data.periodic_atoms (d, Bounds, P.pbc, P.Delta, false) ;
-  C.pass_1() ; 
-  //C.data.clean_periodic_atoms() ; 
+
+  C.data.periodic_atoms (d, Bounds, P.pbc, P.Delta, false) ;
+  C.pass_1() ;
+  C.data.clean_periodic_atoms() ;
   //C.compute_fluc_vel() ;
   //C.compute_fluc_rot() ;
   //C.pass_2() ;
   //C.pass_3() ;
 
- printf("%d \n", t) ;
+ printf("%d \n", t) ; fflush(stdout) ;
  }
 
- //C.mean_time() ;
- C.write_vtk("Coarsed") ;
- C.write_NrrdIO("Coarsed") ;
+ C.mean_time() ;
+ //C.write_vtk("Coarsed") ;
+ C.write_NrrdIO(P.save.c_str()) ;
 
+printf("\nA deallocation error may appear at the end. I am not quite sure where that come from (apparently the realloc in periodic_atoms leaves some stuff behind). Hopefully should not affect anything since it is the final deallocaiton as the program exits. \n") ; fflush(stdout) ;
 
 
 
@@ -141,13 +199,13 @@ double InertiaMomentum (int d , double R, double rho)
  double res ;
  if (d%2==0)
  {
-   uint k=d/2 ;
+   unsigned int k=d/2 ;
    res=pow(boost::math::double_constants::pi,k)*pow(R, d+2) / boost::math::factorial<double>(k+1) ;
    return (res*rho) ;
  }
  else
  {
-   uint k=(d-1)/2 ;
+   unsigned int k=(d-1)/2 ;
    res=pow(2,k+2) * pow(boost::math::double_constants::pi, k) * pow(R, d+2) / boost::math::double_factorial<double> (d+2) ;
    return (res*rho) ;
  }

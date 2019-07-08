@@ -194,19 +194,19 @@ return res ;
 v2d Coarsing::get_bounds ()
 {
  v2d res (2, v1d (d)) ; // vector 2xd, min & max reach of the CG points
- 
+
  for (auto & v : res[0]) v=+std::numeric_limits<double>::infinity() ;
- for (auto & v : res[1]) v=-std::numeric_limits<double>::infinity() ; 
- 
+ for (auto & v : res[1]) v=-std::numeric_limits<double>::infinity() ;
+
  for (auto & v : CGP)
      for (int i=0 ; i<d ; i++)
      {
          if (v.location[i]<res[0][i]) res[0][i]= v.location[i] ;
-         if (v.location[i]>res[1][i]) res[1][i]= v.location[i] ; 
+         if (v.location[i]>res[1][i]) res[1][i]= v.location[i] ;
      }
- for (auto & v : res[0]) v -= cutoff ; 
+ for (auto & v : res[0]) v -= cutoff ;
  for (auto & v : res[1]) v += cutoff ;
- return res ;  
+ return res ;
 }
 //----------------------------------------
 int Coarsing::find_closest(int id)
@@ -579,96 +579,96 @@ int Data::compute_lpq (int d)
 //---------------------------------------------------
 int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude)
 {
-    v2d newpos, newvel, newomega ; 
-    v1d newmass, newImom ; 
-    int newN=0 ; 
-    
-    auto isinside = [&bounds,d](v1d loc){for(int j=0 ; j<d ; j++) if (loc[j]<bounds[0][j] || loc[j]>bounds[1][j]) return false ; return true ; } ; 
+    v2d newpos, newvel, newomega ;
+    v1d newmass, newImom ;
+    int newN=0 ;
+
+    auto isinside = [&bounds,d](v1d loc){for(int j=0 ; j<d ; j++) if (loc[j]<bounds[0][j] || loc[j]>bounds[1][j]) return false ; return true ; } ;
     auto push_back = [=](v2d v, double * a) {v.push_back(v1d(d,0)) ; for (int i=0 ; i<d ; i++) (*(v.end()-1))[i]=*(a+i) ; } ;
-    
-    std::function <void(int,int,v1d,int,int)> lbd ; 
-    lbd = [&](int idx, int dim, v1d location, int pbc, int nmodif) 
+
+    std::function <void(int,int,v1d,int,int)> lbd ;
+    lbd = [&](int idx, int dim, v1d location, int pbc, int nmodif)
     {
      //printf("%d %d-> ", dim, pbc) ; for (auto v:location) printf("%g ", v) ; printf("\n"); fflush(stdout) ;
      if (pbc==0) // No more pbc, needs to test that final location, and eventually add it
      {
          if (isinside(location) && nmodif>0)
          {
-            newN++ ; 
+            newN++ ;
             newpos.push_back(location) ;
-            newvel.resize(newN) ; newvel[newN-1].resize(d,0) ; 
-            for (int i=0 ; i<d ; i++) newvel[newN-1][i] = vel[i][idx] ; 
-            if (omegainclude) 
+            newvel.resize(newN) ; newvel[newN-1].resize(d,0) ;
+            for (int i=0 ; i<d ; i++) newvel[newN-1][i] = vel[i][idx] ;
+            if (omegainclude)
             {
                 newomega.resize(newN) ; newomega[newN-1].resize((d*(d-1))/2, 0) ;
-                for (int i=0 ; i<(d*(d-1))/2 ; i++) newomega[newN-1][i] = omega[i][idx] ; 
+                for (int i=0 ; i<(d*(d-1))/2 ; i++) newomega[newN-1][i] = omega[i][idx] ;
             }
-            newmass.push_back(mass[idx]) ; 
-            newImom.push_back(Imom[idx]) ; 
-            //for (auto v:location) printf("%g ", v) ; printf("\n"); fflush(stdout) ; 
+            newmass.push_back(mass[idx]) ;
+            newImom.push_back(Imom[idx]) ;
+            //for (auto v:location) printf("%g ", v) ; printf("\n"); fflush(stdout) ;
          }
     }
      else
      {
         if (pbc&1)
         {
-            bool keepgoing=true ; 
-            v1d locorig=location ; 
+            bool keepgoing=true ;
+            v1d locorig=location ;
             lbd(idx, dim+1, location, pbc>>1, nmodif) ; // No modif on that dimension, falling down to lower dimensions
             while (keepgoing) // Images upwards thought the pbc
             {
-                location[dim] += Delta[dim] ; 
+                location[dim] += Delta[dim] ;
                 if (isinside(location))
                     lbd(idx, dim+1, location, pbc>>1, nmodif+1) ;
                 else
-                    keepgoing=false ; 
+                    keepgoing=false ;
             }
-            keepgoing=true ; 
+            keepgoing=true ;
             location=locorig ;
             while (keepgoing) // Images downwards through the pbc
             {
-                location[dim] -= Delta[dim] ; 
+                location[dim] -= Delta[dim] ;
                 if (isinside(location))
                     lbd(idx, dim+1, location, pbc>>1, nmodif+1) ;
                 else
-                    keepgoing=false ; 
+                    keepgoing=false ;
             }
-            
+
         }
         else // Not a pbc, falling down through dims
-            lbd(idx, dim+1, location, pbc>>1, nmodif) ; 
-            
+            lbd(idx, dim+1, location, pbc>>1, nmodif) ;
+
      }
     } ; // end of lambda function
-    
-    v1d locbase(d,0) ; 
+
+    v1d locbase(d,0) ;
     for (int i=0 ; i<N ; i++)
     {
        for (int j=0 ; j<d ; j++) locbase[j]=pos[j][i] ;
        lbd(i, 0, locbase, pbc, 0) ;
     }
-    
-    mass=(double*)realloc(mass, (N+newN)*sizeof(double)) ; 
-    Imom=(double*)realloc(Imom, (N+newN)*sizeof(double)) ; 
+
+    mass=(double*)realloc(mass, (N+newN)*sizeof(double)) ;
+    Imom=(double*)realloc(Imom, (N+newN)*sizeof(double)) ;
     for (auto & v: pos) v = (double *) realloc(v, (N+newN)*sizeof(double)) ;
-    for (auto & v: vel) v = (double *) realloc(v, (N+newN)*sizeof(double)) ; 
+    for (auto & v: vel) v = (double *) realloc(v, (N+newN)*sizeof(double)) ;
     if (omegainclude) for (auto & v: omega) v = (double *) realloc(v, (N+newN)*sizeof(double)) ;
-    
+
     for (int i=0 ; i<newN ; i++)
     {
      mass[N+i]=newmass[i] ;
-     Imom[N+i]=newmass[i] ; 
+     Imom[N+i]=newmass[i] ;
      for (int j=0 ; j<d ; j++) pos[j][N+i]=newpos[i][j] ;
-     for (int j=0 ; j<d ; j++) vel[j][N+i]=newvel[i][j] ; 
-     if (omegainclude) 
-         for (int j=0 ; j<(d*(d-1))/2 ; j++) 
-             omega[j][N+1] = newomega[j][N+1] ;   
+     for (int j=0 ; j<d ; j++) vel[j][N+i]=newvel[i][j] ;
+     if (omegainclude)
+         for (int j=0 ; j<(d*(d-1))/2 ; j++)
+             omega[j][N+1] = newomega[j][N+1] ;
     }
-    
-    printf("Periodic effect: old N = %d, added = %d\n", N, newN) ; 
-    Nnonper=N ; 
-    N += newN ; 
-    
+
+    printf("Periodic effect: old N = %d, added = %d\n", N, newN) ;
+    Nnonper=N ;
+    N += newN ;
+
 }
 
 //====================================================
@@ -936,8 +936,10 @@ return 1 ;
 }
 //==================================
 int Coarsing::setWindow (string windowname)
+{ double w= (*std::min_element(dx.begin(),dx.end())*1) ; // w automatically set
+  setWindow(windowname, w) ; }
+int Coarsing::setWindow (string windowname, double w)
 {
-  double w= (*std::min_element(dx.begin(),dx.end())*1) ; // w automatically set
   cutoff=2.5*w ; //TODO
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
 
