@@ -27,8 +27,8 @@
                 sphere.scale.set(R_draw,R_draw,R_draw);
             };
 
-            phi   = 2.*Math.PI*(slice.D4)/(2) + Math.PI/2.;
-            theta = 2.*Math.PI*(slice.D5)/(2) ;
+            phi   = 2.*Math.PI*(slice.D4)/(6) + Math.PI/2.;
+            theta = 2.*Math.PI*(slice.D5)/(6) ;
             x = (R + r*Math.cos(theta))*Math.cos(phi);
             y = (R + r*Math.cos(theta))*Math.sin(phi);
             z = r*Math.sin(theta);
@@ -99,8 +99,8 @@
         update_spheres();
 
         var gui = new dat.GUI();
-        gui.add( slice, 'D4').min(-1).max(1).step(0.01).listen().name('D4').onChange( function( val ) { update_spheres(); }) ;
-        gui.add( slice, 'D5').min(-1).max(1).step(0.01).listen().name('D5').onChange( function( val ) { update_spheres(); }) ;
+        gui.add( slice, 'D4').min(-3).max(3).step(0.01).listen().name('D4').onChange( function( val ) { update_spheres(); }) ;
+        gui.add( slice, 'D5').min(-3).max(3).step(0.01).listen().name('D5').onChange( function( val ) { update_spheres(); }) ;
         gui.open();
 
 		var animate = function () {
