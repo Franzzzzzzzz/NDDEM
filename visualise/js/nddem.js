@@ -17,7 +17,7 @@ var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 1.8; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
-var quality, shadows;
+var quality, shadows, timestep;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 var roof;
 var redraw_left = false; // force redrawing of particles
@@ -67,7 +67,6 @@ function init() {
                             world[j].prev = 0.5;
                             world[j].wall = false;
                         }
-
                     }
                     else if (l[0] == 'boundary') {
                         if (l[2] == 'WALL' || l[2] == 'PBC') {
@@ -79,13 +78,10 @@ function init() {
                         if ( l[2] == 'WALL' ) { world[l[1]].wall = true; }
                     }
                     else if (l[0] == 'set') {
-                        if (l[1] == 'T') {
-                            time.max = parseInt(l[2]) - 1;
-                        }
+                        if (l[1] == 'T') { time.max = parseInt(l[2]) - 1; }
+                        else if (l[1] === 'tdump') { timestep = parseInt(l[2]) }
                     }
-                    else if (l[0] == 'freeze') {
-                        pinky = parseInt(l[1]);
-                    }
+                    else if (l[0] == 'freeze') { pinky = parseInt(l[1]); }
                 }
                 if ( N == 1 ) { // just used for setting up cameras etc
                     world.push({});
@@ -974,7 +970,7 @@ function load_textures(t, Viewpoint) {
 
 function update_spheres_texturing (t) {
       if  ( true ) { //TODO Do something better ...
-          var commandstring = "" ; var Viewpoint = t+"0000" ;
+          var commandstring = "" ; var Viewpoint = String(t*timestep).padStart(5,'0')  ;
 
           for ( i=3 ; i<N ; i++)
           {
@@ -993,7 +989,7 @@ function update_spheres_texturing (t) {
                        true);*/
           var runvalue = 0 ;
           if (time.play) runvalue = 1 ;
-          request.open('GET', 'http://localhost:54321/render?ts='+t+'0000' + commandstring + '&running=' + runvalue, true) ;
+          request.open('GET', 'http://localhost:54321/render?ts='+String(t*timestep).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
 
           request.onload = function() {
               load_textures(t, Viewpoint);
@@ -1007,8 +1003,8 @@ function update_spheres_texturing (t) {
 
 function update_spheres_CSV(t,changed_higher_dim_view) {
 
-    if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+t+"0000.csv" }
-    else { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+t+"0000.csv"+"?_="+ (new Date).getTime() }
+    if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*timestep).padStart(5,'0') +".csv" }
+    else { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*timestep).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
