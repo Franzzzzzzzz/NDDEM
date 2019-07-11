@@ -759,6 +759,7 @@ function add_torus() {
     }
     else {
         wristband1.position.set(      2.5,-3*R,  0.5);
+        wristband1.rotation.set(0.,0.,Math.PI);
         wristband1_phi.position.set(  2.5,-3*R,  0.5);
         wristband1_theta.position.set(2.5,-3*R+R,0.5);
         scene.add( wristband1 );
@@ -806,6 +807,7 @@ function add_torus() {
             wristband1_phi.position.x -= 1.5
             wristband1_theta.position.x -= 1.5
             wristband2.position.set(      4,-3*R,  0.5);
+            wristband2.rotation.set(0.,0.,Math.PI);
             wristband2_phi.position.set(  4,-3*R,  0.5);
             wristband2_theta.position.set(4,-3*R+R,0.5);
             scene.add( wristband2 );
