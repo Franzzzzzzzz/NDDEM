@@ -17,7 +17,7 @@ struct Param {
 
 // Struct init
 struct Param P2 {
-  "/home/franz/Dropbox/DEM_ND/Samples/D2/dump.xml",                                 // dump
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D2/dump.xml",                                 // dump
   50,                                 // skipT
   450,                                // maxT
   1.2732395447351628,                 // rho
@@ -31,7 +31,7 @@ struct Param P2 {
 };
 
 struct Param P3 {
-  "/home/franz/Dropbox/DEM_ND/Samples/D3/dump.xml",                                 // dump
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D3/dump.xml",                                 // dump
   50,                                 // skipT
   450,                                // maxT
   1.9098593171027443,                 // rho
@@ -45,7 +45,7 @@ struct Param P3 {
 };
 
 struct Param P4 {
-  "/home/franz/Dropbox/DEM_ND/Samples/D4/dump.xml",                                 // dump
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D4/dump.xml",                                 // dump
   50,                                 // skipT
   450,                                // maxT
   3.242277876554809,                  // rho
@@ -59,7 +59,7 @@ struct Param P4 {
 };
 
 struct Param P5 {
-  "/home/franz/Dropbox/DEM_ND/Samples/D5/dump.xml",                                 // dump
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D5/dump.xml",                                 // dump
   50,                                 // skipT
   450,                                // maxT
   6.079271018540266,                  // rho
@@ -73,7 +73,7 @@ struct Param P5 {
 };
 
 struct Param P6 {
-  "/home/franz/Dropbox/DEM_ND/Samples/D6/dump.xml",                                 // dump
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D6/dump.xml",                                 // dump
   50,                                 // skipT
   230,                                // maxT
   12.384589222348605,                  // rho
@@ -116,7 +116,7 @@ int main (int argc, char * argv[])
  }
  else*/
 
- auto P=P6 ;
+ auto P=P3 ;
 
  //P.dump=argv[1] ;
 
@@ -182,7 +182,7 @@ int main (int argc, char * argv[])
  }
 
  C.mean_time() ;
- //C.write_vtk("Coarsed") ;
+ C.write_vtk("Coarsed") ;
  C.write_NrrdIO(P.save.c_str()) ;
 
 printf("\nA deallocation error may appear at the end. I am not quite sure where that come from (apparently the realloc in periodic_atoms leaves some stuff behind). Hopefully should not affect anything since it is the final deallocaiton as the program exits. \n") ; fflush(stdout) ;
