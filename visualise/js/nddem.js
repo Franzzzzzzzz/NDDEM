@@ -23,7 +23,7 @@ var roof;
 var redraw_left = false; // force redrawing of particles
 var redraw_right = false;
 var left_hand, right_hand;
-
+var hard_mode;
 if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
 else { var zoom = 20; } // default zoom level
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
@@ -41,6 +41,9 @@ var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm 
 var arrow_material;
 if ( typeof window.cache !== 'undefined' ) { cache = window.cache == 'true' }
 else { cache = false; };
+if ( typeof window.hard_mode !== 'undefined' ) { hard_mode = window.hard_mode == 'true'; }
+else { hard_mode = false; }
+console.log(hard_mode);
 init();
 
 function init() {
@@ -138,7 +141,7 @@ function build_world() {
     add_renderer();
     if ( !fname.includes('Submarine') ) { add_controllers(); }
     // add_controllers();
-    if ( N > 3 && !fname.includes('Spinner') ) { add_torus(); }
+    if ( N > 3 && !fname.includes('Spinner') && !hard_mode) { add_torus(); }
     // load_hyperspheres_VTK();
     if ( view_mode === 'rotations' ) { make_initial_sphere_texturing(); }
     else { make_initial_spheres_CSV(); update_spheres_CSV(0,false);}
@@ -938,7 +941,7 @@ function make_initial_spheres_CSV() {
                     object.receiveShadow = true;
                 }
                 particles.add( object );
-                if ( N > 3 && !fname.includes('Spinner')) {
+                if ( N > 3 && !fname.includes('Spinner') && !hard_mode) {
                     pointsMaterial = new THREE.PointsMaterial( { color: color } );
                     object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
                     if ( fname.includes('Lonely') ) { object2.scale.set(2.*R/scale,2.*R/scale,2.*R/scale); }
@@ -1104,7 +1107,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                     object2.position.set(x,y,z);
                 };
 
-                if ( N > 4 && !fname.includes('Spinner') ) {
+                if ( N > 4 && !fname.includes('Spinner') && !hard_mode ) {
                     var object2 = wristband1.children[i];
                     phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) - Math.PI/2.;
                     theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
