@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>MuDEM</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="node_modules/three/build/three.js"></script>
+        <script src="node_modules/three/examples/js/WebGL.js"></script>
+        <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
+        <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
+        <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <script>
+
+        function update_spheres() {
+            var R_draw = Math.sqrt( 1 -
+                                    Math.pow( slice.D4, 2) -
+                                    Math.pow( slice.D5, 2));
+            if ( R_draw == 0 ) { sphere.visible = false; }
+            else {
+                sphere.visible = true;
+                sphere.scale.set(R_draw,R_draw,R_draw);
+            };
+
+            phi   = 2.*Math.PI*(slice.D4)/(6) + Math.PI/2.;
+            theta = 2.*Math.PI*(slice.D5)/(6) ;
+            x = (R + r*Math.cos(theta))*Math.cos(phi);
+            y = (R + r*Math.cos(theta))*Math.sin(phi);
+            z = r*Math.sin(theta);
+            point.position.set(x,y,z);
+            // wall.position.x = x;
+        };
+        var controls;
+        var slice = {'D4':0, 'D5':0};
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0x111111 );
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+		camera.position.z = 4;
+        camera.position.x = 1.5;
+
+
+		var renderer = new THREE.WebGLRenderer();
+        // var controls = new THREE.TrackballControls( camera, renderer.domElement );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+        var background_light = new THREE.AmbientLight( 0x555555 );
+        scene.add( background_light );
+        var light = new THREE.PointLight(0xa0a0a0);
+        light.position.z = 8
+        light.position.x = 5
+        scene.add( light );
+
+        var sphere_geometry = new THREE.SphereGeometry( 1, 32, 32 );
+        var sphere_material = new THREE.MeshPhongMaterial( { color: 0xe72564 } );
+        var sphere  = new THREE.Mesh( sphere_geometry, sphere_material );;
+        sphere.position.x = -1
+        scene.add( sphere );
+
+
+        R = 1;
+        r = R/2.;
+        var torus_geometry = new THREE.TorusBufferGeometry( R, r, 64, 32 );
+        var torus_material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+
+        torus = new THREE.Mesh( torus_geometry, torus_material );
+        torus.castShadow = true;
+        torus.receiveShadow = true;
+
+        var phi_geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., 64, 32 );
+        var phi_material = new THREE.MeshPhongMaterial( {
+            color: 0x000000,
+            // roughness: 0.7,
+        } );
+        torus_phi = new THREE.Mesh( phi_geometry, phi_material );
+
+        var theta_geometry = new THREE.TorusBufferGeometry( r, r/10., 64, 32 );
+        torus_theta = new THREE.Mesh( theta_geometry, phi_material );
+        torus_theta.rotation.y = Math.PI/2;
+
+        torus.position.set(3.,0.,0.);
+        torus_phi.position.set(0.,0.,0.);
+        torus_theta.position.set(0.,R,0.);
+        scene.add( torus );
+        torus.add( torus_phi );
+        torus.add( torus_theta );
+        torus.rotation.set(Math.PI/2.,Math.PI/4.,0.);
+
+        var pointGeometry = new THREE.SphereGeometry( 1, 16, 16 );
+        var pointMaterial = new THREE.MeshPhongMaterial( { color: 0xe72564 } );
+        var point = new THREE.Mesh( pointGeometry, pointMaterial );
+        point.scale.set(1./10.,1./10.,1./10.);
+        torus.add( point );
+        update_spheres();
+
+        var gui = new dat.GUI();
+        gui.add( slice, 'D4').min(-3).max(3).step(0.01).listen().name('D4').onChange( function( val ) { update_spheres(); }) ;
+        gui.add( slice, 'D5').min(-3).max(3).step(0.01).listen().name('D5').onChange( function( val ) { update_spheres(); }) ;
+        gui.open();
+
+		var animate = function () {
+            if ( controls !== undefined) { controls.update(); }
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
+            // torus.rotation.y = torus.rotation.y + 0.01;
+
+		};
+        window.addEventListener( 'resize', onWindowResize, false );
+		animate();
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            if ( controls !== undefined) { controls.handleResize(); }
+        };
+        </script>
+
+	</body>
+</html>
