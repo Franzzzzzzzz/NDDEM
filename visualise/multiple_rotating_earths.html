@@ -38,7 +38,7 @@
             }
         };
 
-        var fname = "visualise/resources/earth2d.jpg";
+        var fname = "visualise/resources/earthmap.jpg";
 
         const urlParams = new URLSearchParams(window.location.search);
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
@@ -58,7 +58,7 @@
 
         var background_light = new THREE.AmbientLight( 0xffffff );
         scene.add( background_light );
-        var light = new THREE.DirectionalLight(0x505050);
+        var light = new THREE.DirectionalLight(0xaaaaaa);
         light.position.x = -2
         light.position.z = 2
         scene.add( light );
