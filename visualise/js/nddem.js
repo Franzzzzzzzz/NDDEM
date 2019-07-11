@@ -1248,7 +1248,7 @@ function animate() {
             }
         }
     }
-    if (time.play) { time.cur += time.rate; };
+    if (time.play) { time.cur += time.rate*timestep/10000.; };
     //if ( Math.floor(time.cur) != time.prev ) {
     if ( ( Math.floor(time.cur) !== time.prev ) ){//|| redraw ){
         update_spheres_CSV(Math.floor(time.cur),false);
