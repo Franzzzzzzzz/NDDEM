@@ -19,7 +19,7 @@ var human_height = 1.8; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows, timestep;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
-var roof;
+var roof, bg;
 var redraw_left = false; // force redrawing of particles
 var redraw_right = false;
 var left_hand, right_hand;
@@ -43,7 +43,7 @@ if ( typeof window.cache !== 'undefined' ) { cache = window.cache == 'true' }
 else { cache = false; };
 if ( typeof window.hard_mode !== 'undefined' ) { hard_mode = window.hard_mode == 'true'; }
 else { hard_mode = false; }
-console.log(hard_mode);
+
 init();
 
 function init() {
@@ -120,17 +120,19 @@ function build_world() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
+    var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+	// invert the geometry on the x-axis so that all of the faces point inward
+	geometry.scale( - 1, 1, 1 );
+	var texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/eso0932a.jpg' );
+	var material = new THREE.MeshBasicMaterial( { map: texture } );
+	bg = new THREE.Mesh( geometry, material );
+    scene.add(bg);
+
     if ( window.display_type === 'VR' ) {
-        //scene.rotation.z = Math.PI/2.; // right way up, facing away from the computer
-        // scene.position.x = -2; // middle of scene
-        // scene.position.z = -2; // middle of scene
-        // scene.position.y = -2; // go up vertically a bit
+        bg.rotation.z = Math.PI/2; // TODO: CHECK THIS!
+
         controller1 = new THREE.Object3D;
         controller2 = new THREE.Object3D;
-
-        // controller1.position.y = -2;
-        // controller1.position.z = -2;
-        // controller1.rotation.z = -Math.PI/2.;
     }
 
 
