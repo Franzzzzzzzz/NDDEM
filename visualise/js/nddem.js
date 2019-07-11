@@ -194,7 +194,7 @@ function build_world() {
                     controller1.getWorldQuaternion(left_hand.previous_direction);
                     left_hand.previous_torus_rotation_z = wristband1.rotation.z;
                 }
-                if ( N > 4 ) { left_hand.previous_torus_rotation_y = world[4].cur; }
+                if ( N > 4 ) { left_hand.previous_torus_rotation_x = (world[4].cur - world[4].min)/(world[4].max - world[4].min)*2*Math.PI; }
             }
             else {
                 if ( N > 5 ) {
@@ -202,7 +202,7 @@ function build_world() {
                     controller2.getWorldQuaternion(right_hand.previous_direction);
                     right_hand.previous_torus_rotation_z = wristband2.rotation.z;
                 }
-                if ( N > 6 ) { right_hand.previous_torus_rotation_y = world[6].cur; }
+                if ( N > 6 ) { right_hand.previous_torus_rotation_x = (world[6].cur - world[6].min)/(world[6].max - world[6].min)*2*Math.PI; }
             }
     		//guiInputHelper.pressed( true )
     	})
@@ -240,12 +240,17 @@ function update_higher_dims_left() {
         world[3].cur = left_hand.new_orientation*(world[3].max - world[3].min)/Math.PI/2.;
         wristband1.rotation.z = left_hand.new_orientation;
     }
-    // move in D4 by rotations in y
+    // move in D5 by rotations in y
     if ( N > 4 ) {
-        left_hand.new_orientation = left_hand.previous_torus_rotation_y + 2.*left_hand.diff_angle.y*(world[4].max - world[4].min)/Math.PI;
-        if      ( left_hand.new_orientation < world[4].min )  { left_hand.new_orientation += (world[4].max - world[4].min); }
-        else if ( left_hand.new_orientation > world[4].max )  { left_hand.new_orientation -= (world[4].max - world[4].min); }
-        world[4].cur = left_hand.new_orientation;
+        // left_hand.new_orientation = left_hand.previous_torus_rotation_y + 2.*left_hand.diff_angle.y*(world[4].max - world[4].min)/Math.PI;
+        // if      ( left_hand.new_orientation < world[4].min )  { left_hand.new_orientation += (world[4].max - world[4].min); }
+        // else if ( left_hand.new_orientation > world[4].max )  { left_hand.new_orientation -= (world[4].max - world[4].min); }
+        // world[4].cur = left_hand.new_orientation;
+        left_hand.new_orientation = left_hand.previous_torus_rotation_x + 2.*left_hand.diff_angle.x; // double rotation in reality
+        if      ( left_hand.new_orientation < 0.         )  { left_hand.new_orientation +=  2.*Math.PI; }
+        else if ( left_hand.new_orientation > 2.*Math.PI )  { left_hand.new_orientation -=  2.*Math.PI; }
+        world[4].cur = left_hand.new_orientation*(world[4].max - world[4].min)/Math.PI/2.;
+
     }
 }
 
@@ -255,19 +260,19 @@ function update_higher_dims_right() {
     right_hand.diff_angle.setFromQuaternion(right_hand.diff);// + Math.PI;// between 0 and 2 Pi
 
     // move in D4 by rotations in z
-    if ( N > 3 ) {
+    if ( N > 5 ) {
         right_hand.new_orientation = right_hand.previous_torus_rotation_z + right_hand.diff_angle.z;
         if      ( right_hand.new_orientation < 0.         )  { right_hand.new_orientation += 2.*Math.PI; }
         else if ( right_hand.new_orientation > 2.*Math.PI )  { right_hand.new_orientation -= 2.*Math.PI; }
         world[5].cur = right_hand.new_orientation*(world[5].max - world[5].min)/Math.PI/2.;
         wristband2.rotation.z = right_hand.new_orientation;
     }
-    // move in D4 by rotations in z
-    if ( N > 4 ) {
-        right_hand.new_orientation = right_hand.previous_torus_rotation_y + 2.*right_hand.diff_angle.y*(world[6].max - world[6].min)/Math.PI;
-        if      ( right_hand.new_orientation < world[6].min )  { right_hand.new_orientation += (world[6].max - world[6].min); }
-        else if ( right_hand.new_orientation > world[6].max )  { right_hand.new_orientation -= (world[6].max - world[6].min); }
-        world[6].cur = right_hand.new_orientation;
+    // move in D4 by rotations in y
+    if ( N > 6 ) {
+        right_hand.new_orientation = right_hand.previous_torus_rotation_x + 2.*right_hand.diff_angle.x;
+        if      ( right_hand.new_orientation < 0.         )  { right_hand.new_orientation +=  2.*Math.PI; }
+        else if ( right_hand.new_orientation > 2.*Math.PI )  { right_hand.new_orientation -=  2.*Math.PI; }
+        world[6].cur = right_hand.new_orientation*(world[6].max - world[6].min)/Math.PI/2.;
     }
 }
 
@@ -718,7 +723,7 @@ function add_torus() {
     if (window.display_type == "VR") { R = 0.1; }
     else { R = 0.5; }
     r = R/2.;
-    var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
+    var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     var material = new THREE.MeshPhongMaterial( {
         color: 0xffffff,
         // roughness: 0.7,
@@ -731,20 +736,21 @@ function add_torus() {
         wristband1.receiveShadow = true;
     }
 
-    var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality)*2, Math.pow(2,quality) );
+    var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     var material = new THREE.MeshPhongMaterial( {
         color: 0x000000,
         // roughness: 0.7,
     } );
     wristband1_phi = new THREE.Mesh( geometry, material );
 
-    var geometry = new THREE.TorusBufferGeometry( r, r/10., Math.pow(2,quality)*2, Math.pow(2,quality) );
+    var geometry = new THREE.TorusBufferGeometry( r, r/10., Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     wristband1_theta = new THREE.Mesh( geometry, material );
     wristband1_theta.rotation.y = Math.PI/2;
 
 
     if (window.display_type == "VR") {
         wristband1.position.set(0.,0.,0.1);
+        wristband1.rotation.set(0.,0.,Math.PI);
         wristband1_phi.position.set(0.,0.,0.1);
         wristband1_theta.position.set(0.,R,0.1);
         controller1.add( wristband1 );
@@ -788,6 +794,7 @@ function add_torus() {
 
         if (window.display_type == "VR") {
             wristband2.position.set(0.,0.,0.1);
+            wristband2.rotation.set(0.,0.,Math.PI);
             wristband2_phi.position.set(0.,0.,0.1);
             wristband2_theta.position.set(0.,R,0.1);
             controller2.add( wristband2 );
@@ -932,7 +939,8 @@ function make_initial_spheres_CSV() {
                 if ( N > 3 && !fname.includes('Spinner')) {
                     pointsMaterial = new THREE.PointsMaterial( { color: color } );
                     object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
-                    object2.scale.set(R/scale,R/scale,R/scale);
+                    if ( fname.includes('Lonely') ) { object2.scale.set(2.*R/scale,2.*R/scale,2.*R/scale); }
+                    else { object2.scale.set(R/scale,R/scale,R/scale); }
                     object2.position.set(0.,0.,0.);
                     wristband1.add(object2);
                     if ( N > 5 ) {
@@ -1023,6 +1031,8 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
                                             Math.pow( (world[3].cur - spheres[i].x3), 2)
                                           );
+
+                    //if ( (world[3].cur >  world[3].max-spheres[i].R ) // NOTE: IMPLEMENT THIS!!
                              }
                  else if (N == 5) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
@@ -1043,6 +1053,17 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[4].cur - spheres[i].x4), 2) -
                                              Math.pow( (world[5].cur - spheres[i].x5), 2) -
                                              Math.pow( (world[6].cur - spheres[i].x6), 2)
+                                         ); // FIXME - IS THIS RIGHT?
+                                     }
+                 else if (N == 10) {
+                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
+                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
+                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
+                                             Math.pow( (world[5].cur - spheres[i].x5), 2) -
+                                             Math.pow( (world[6].cur - spheres[i].x6), 2) -
+                                             Math.pow( (world[7].cur - spheres[i].x7), 2) -
+                                             Math.pow( (world[8].cur - spheres[i].x8), 2) -
+                                             Math.pow( (world[9].cur - spheres[i].x9), 2)
                                          ); // FIXME - IS THIS RIGHT?
                  };
                 if (isNaN(R_draw)) {
@@ -1074,7 +1095,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
 
                 if ( N == 4 && !fname.includes('Spinner')) {
                     var object2 = wristband1.children[i];
-                    phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) + Math.PI/2.;
+                    phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) - Math.PI/2.;
                     x = (R + r)*Math.cos(phi);
                     y = (R + r)*Math.sin(phi);
                     z = 0.;
@@ -1083,7 +1104,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
 
                 if ( N > 4 && !fname.includes('Spinner') ) {
                     var object2 = wristband1.children[i];
-                    phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) + Math.PI/2.;
+                    phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) - Math.PI/2.;
                     theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
@@ -1093,16 +1114,16 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
 
                 if ( N == 6 && !fname.includes('Spinner') ) {
                     var object3 = wristband2.children[i];
-                    phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) + Math.PI/2.;
+                    phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) - Math.PI/2.;
                     x = (R + r)*Math.cos(phi);
                     y = (R + r)*Math.sin(phi);
                     z = 0.;
                     object3.position.set(x,y,z);
                 };
 
-                if ( N == 7 && !fname.includes('Spinner') ) {
+                if ( N >= 7 && !fname.includes('Spinner') ) {
                     var object3 = wristband2.children[i];
-                    phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) + Math.PI/2.;
+                    phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) - Math.PI/2.;
                     theta = 2.*Math.PI*(world[6].cur - spheres[i].x6)/(world[6].max - world[6].min) ;
                     x = (R + r*Math.cos(theta))*Math.cos(phi);
                     y = (R + r*Math.cos(theta))*Math.sin(phi);
