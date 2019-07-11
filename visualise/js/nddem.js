@@ -120,16 +120,15 @@ function build_world() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
-    var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
-	// invert the geometry on the x-axis so that all of the faces point inward
-	geometry.scale( - 1, 1, 1 );
-	var texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/eso0932a.jpg' );
-	var material = new THREE.MeshBasicMaterial( { map: texture } );
-	bg = new THREE.Mesh( geometry, material );
-    scene.add(bg);
-
     if ( window.display_type === 'VR' ) {
+        var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+        // invert the geometry on the x-axis so that all of the faces point inward
+        geometry.scale( - 1, 1, 1 );
+        var texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/eso0932a.jpg' );
+        var material = new THREE.MeshBasicMaterial( { map: texture } );
+        bg = new THREE.Mesh( geometry, material );
         bg.rotation.z = Math.PI/2; // TODO: CHECK THIS!
+        scene.add(bg);
 
         controller1 = new THREE.Object3D;
         controller2 = new THREE.Object3D;
