@@ -77,7 +77,7 @@ int csvread_XR (const char path[], v2d & result, v1d &R, int d)
 int write_colormap_vtk(int d, vector<vector<float>> & colors)
 {
 
-int nvalues=20 ;
+int nvalues=40 ;
 vector<double> p(3), ptmp ;
 vector <uint8_t> a ;
 a.resize(3,0) ;
@@ -117,7 +117,7 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
 {
 #ifdef NRRDIO
     int npoints=16 ;
-    vector<double> p(d,0) ;
+    vector<double> p(d-1,0) ;
 
     Nrrd *nval;
     auto nio = nrrdIoStateNew();
@@ -127,7 +127,7 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
     // Header infos
     vector <size_t> dimensions (d, npoints) ;
     dimensions[0] = 3 ;
-    dimensions[1]= npoints*2 ;
+    dimensions[d-1]= npoints*2 ;
 
     vector <int> nrrdkind (d, nrrdKindSpace) ;
     nrrdkind[0]=nrrdKindVector ;
@@ -135,7 +135,7 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
 
     vector <double> nrrdmin(d,0+M_PI/npoints/2), nrrdmax(d,M_PI-M_PI/npoints/2), nrrdspacing(d,M_PI/npoints) ;
     nrrdmin[0]=nrrdmax[0]=nrrdspacing[0]=AIR_NAN ;
-    //nrrdmin[d-1]=0+M_PI/npoints ; nrrdmax[d-1]=2*M_PI+M_PI/npoints ;
+    nrrdmin[d-1]=0+M_PI/npoints ; nrrdmax[d-1]=2*M_PI+M_PI/npoints ;
 
     char ** labels;
     labels=(char **) malloc(sizeof(char *) * (d+3)) ;
@@ -153,15 +153,14 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
     nrrdAxisInfoSet_nva(nval, nrrdAxisInfoSpacing, nrrdspacing.data());
 
     int allpoint=pow(npoints,d-1)*2 ;
-    uint8_t * outdata, * pout ;
-    outdata=(uint8_t*) malloc(sizeof(uint8_t)*allpoint*3) ;
-
+    unsigned char * outdata, * pout ;
+    outdata=(unsigned char*) malloc(sizeof(unsigned char)*allpoint*3) ;
   //---------------------------------------------------------------------
     std::function <void(int,vector<double>)> lbdrecurse ;
     pout=outdata ;
     lbdrecurse = [&,d](int lvl, vector<double> p)
     {
-      if (lvl<d-1)
+      if (lvl<d-2)
       {
         p[lvl]=0+M_PI/npoints/2 ;
         for (int i=0 ; i<npoints ; i++)
@@ -172,21 +171,21 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
       }
       else
       {
-        p[lvl]=0+M_PI/npoints/2 ;
+        p[lvl]=0+M_PI/npoints ;
         for (int i=0 ; i<2*npoints ; i++)
         {
           auto ptmp=p ; vector <uint8_t> a(3,0) ;
-          phi2color(a.begin(), ptmp, d) ;
+          phi2color(a.begin(), ptmp, d, colors) ;
           *pout=a[0] ; pout++ ;
           *pout=a[1] ; pout++ ;
           *pout=a[2] ; pout++ ;
-          p[lvl]+=M_PI/npoints ;
+					//printf("%d %d %d | %d %d %d #", a[0], a[1], a[2], *(pout-3), *(pout-2), *(pout-1)) ;
+					p[lvl]+=M_PI/npoints ;
         }
       }
     } ;
     lbdrecurse(0,p) ;
     //---------------------------------------------------------------------
-
     nrrdWrap_nva(nval, outdata, nrrdTypeUChar, d, dimensions.data());
     string fullpath ;
     fullpath = path ;

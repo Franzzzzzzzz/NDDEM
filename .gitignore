@@ -7,3 +7,4 @@ CppCode/Texturing/Texturing
 package-lock.json
 Samples
 Textures
+CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/*

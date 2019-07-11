@@ -78,6 +78,11 @@ int main(void)
         Texture.write_colormap_vtk_base() ;
     });
 
+    svr.Get(R"(/nrrdcolormap)", [&](const Request& req, Response& res) {
+        Texture.write_colormap_nrrd_base (req.params) ;
+        printf("NRRD colormap done\n") ; 
+    });
+
     svr.Get(R"(/vtkmap)", [&](const Request& req, Response& res) {
         Texture.write_vtkmap(req.params) ;
     });

@@ -487,6 +487,10 @@ int Texturing::write_colormap_vtk_base (){
   write_colormap_vtk(d, colors) ;
   return 0 ;
 }
+int Texturing::write_colormap_nrrd_base (map <string,string> args){
+  write_NrrdIO(args["path"], d, colors) ;
+  return 0 ;
+}
 ///----------------------------------------------------------
 int Texturing::write_vtkmap (map <string,string> args)
 {

@@ -19,11 +19,11 @@ var human_height = 1.8; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows, timestep;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
-var roof;
+var roof, bg;
 var redraw_left = false; // force redrawing of particles
 var redraw_right = false;
 var left_hand, right_hand;
-
+var hard_mode;
 if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
 else { var zoom = 20; } // default zoom level
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
@@ -41,6 +41,9 @@ var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm 
 var arrow_material;
 if ( typeof window.cache !== 'undefined' ) { cache = window.cache == 'true' }
 else { cache = false; };
+if ( typeof window.hard_mode !== 'undefined' ) { hard_mode = window.hard_mode == 'true'; }
+else { hard_mode = false; }
+
 init();
 
 function init() {
@@ -118,16 +121,17 @@ function build_world() {
     scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
     if ( window.display_type === 'VR' ) {
-        //scene.rotation.z = Math.PI/2.; // right way up, facing away from the computer
-        // scene.position.x = -2; // middle of scene
-        // scene.position.z = -2; // middle of scene
-        // scene.position.y = -2; // go up vertically a bit
+        var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+        // invert the geometry on the x-axis so that all of the faces point inward
+        geometry.scale( - 1, 1, 1 );
+        var texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/eso0932a.jpg' );
+        var material = new THREE.MeshBasicMaterial( { map: texture } );
+        bg = new THREE.Mesh( geometry, material );
+        bg.rotation.z = Math.PI/2; // TODO: CHECK THIS!
+        scene.add(bg);
+
         controller1 = new THREE.Object3D;
         controller2 = new THREE.Object3D;
-
-        // controller1.position.y = -2;
-        // controller1.position.z = -2;
-        // controller1.rotation.z = -Math.PI/2.;
     }
 
 
@@ -138,7 +142,7 @@ function build_world() {
     add_renderer();
     if ( !fname.includes('Submarine') ) { add_controllers(); }
     // add_controllers();
-    if ( N > 3 && !fname.includes('Spinner') ) { add_torus(); }
+    if ( N > 3 && !fname.includes('Spinner') && !hard_mode) { add_torus(); }
     // load_hyperspheres_VTK();
     if ( view_mode === 'rotations' ) { make_initial_sphere_texturing(); }
     else { make_initial_spheres_CSV(); update_spheres_CSV(0,false);}
@@ -759,6 +763,7 @@ function add_torus() {
     }
     else {
         wristband1.position.set(      2.5,-3*R,  0.5);
+        wristband1.rotation.set(0.,0.,Math.PI);
         wristband1_phi.position.set(  2.5,-3*R,  0.5);
         wristband1_theta.position.set(2.5,-3*R+R,0.5);
         scene.add( wristband1 );
@@ -806,6 +811,7 @@ function add_torus() {
             wristband1_phi.position.x -= 1.5
             wristband1_theta.position.x -= 1.5
             wristband2.position.set(      4,-3*R,  0.5);
+            wristband2.rotation.set(0.,0.,Math.PI);
             wristband2_phi.position.set(  4,-3*R,  0.5);
             wristband2_theta.position.set(4,-3*R+R,0.5);
             scene.add( wristband2 );
@@ -936,7 +942,7 @@ function make_initial_spheres_CSV() {
                     object.receiveShadow = true;
                 }
                 particles.add( object );
-                if ( N > 3 && !fname.includes('Spinner')) {
+                if ( N > 3 && !fname.includes('Spinner') && !hard_mode) {
                     pointsMaterial = new THREE.PointsMaterial( { color: color } );
                     object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
                     if ( fname.includes('Lonely') ) { object2.scale.set(2.*R/scale,2.*R/scale,2.*R/scale); }
@@ -1102,7 +1108,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                     object2.position.set(x,y,z);
                 };
 
-                if ( N > 4 && !fname.includes('Spinner') ) {
+                if ( N > 4 && !fname.includes('Spinner') && !hard_mode ) {
                     var object2 = wristband1.children[i];
                     phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) - Math.PI/2.;
                     theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
@@ -1243,7 +1249,7 @@ function animate() {
             }
         }
     }
-    if (time.play) { time.cur += time.rate; };
+    if (time.play) { time.cur += time.rate*timestep/10000.; };
     //if ( Math.floor(time.cur) != time.prev ) {
     if ( ( Math.floor(time.cur) !== time.prev ) ){//|| redraw ){
         update_spheres_CSV(Math.floor(time.cur),false);

@@ -70,5 +70,6 @@ public :
 
   int write_vtkmap (map <string,string> args) ;
   int write_colormap_vtk_base () ;
+  int write_colormap_nrrd_base (map <string,string> args) ; 
 
 } ;

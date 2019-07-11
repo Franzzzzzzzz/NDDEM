@@ -4,6 +4,8 @@ ifeq "$(HOST)" "guillard"
 CC=/opt/local/bin/g++-mp-6 # FG
 else ifeq "$(HOST)" "franz-pavilion"
 CC=g++
+else
+CC=g++
 endif
 #CC=g++-8 # BM
 #CC=g++
@@ -21,7 +23,7 @@ LIBS=-lm -lpthread
 FLTO=-flto
 FLTO=
 
-all: CFLAGS+=-g -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs#-DNRRDIO
+all: CFLAGS+=-g -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs -DNRRDIO
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+= -fopenmp -lstdc++fs -lNrrdIO #-lnetcdf
 all:
