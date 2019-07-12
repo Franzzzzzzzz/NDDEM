@@ -1,4 +1,4 @@
-The system is: Darwin - 18.6.0 - x86_64
+The system is: Darwin - 18.2.0 - x86_64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc 
 Build flags: 
@@ -10,7 +10,7 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is AppleClang, found in "/Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/3.14.5/CompilerIdC/a.out"
+The C compiler identification is AppleClang, found in "/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/3.13.1/CompilerIdC/a.out"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ 
@@ -23,109 +23,67 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
 
-The CXX compiler identification is AppleClang, found in "/Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/3.14.5/CompilerIdCXX/a.out"
+The CXX compiler identification is AppleClang, found in "/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/3.13.1/CompilerIdCXX/a.out"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_d0bcc/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_d0bcc.dir/build.make CMakeFiles/cmTC_d0bcc.dir/build
-Building C object CMakeFiles/cmTC_d0bcc.dir/testCCompiler.c.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_d0bcc.dir/testCCompiler.c.o   -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_d0bcc
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d0bcc.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_d0bcc.dir/testCCompiler.c.o  -o cmTC_d0bcc 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_ee665/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_ee665.dir/build.make CMakeFiles/cmTC_ee665.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ee665.dir/testCCompiler.c.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_ee665.dir/testCCompiler.c.o   -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_ee665
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ee665.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_ee665.dir/testCCompiler.c.o  -o cmTC_ee665 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_3399d/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_3399d.dir/build.make CMakeFiles/cmTC_3399d.dir/build
-Building C object CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -v -Wl,-v -o CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o   -c /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCCompilerABI.c
-Apple LLVM version 10.0.1 (clang-1001.0.46.4)
-Target: x86_64-apple-darwin18.6.0
+Run Build Command:"/opt/local/bin/gmake" "cmTC_946d1/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_946d1.dir/build.make CMakeFiles/cmTC_946d1.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.13/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_946d1
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_946d1.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o  -o cmTC_946d1 
+Apple LLVM version 10.0.0 (clang-1000.11.45.5)
+Target: x86_64-apple-darwin18.2.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5
-clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx10.14.0 -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mthread-model posix -mdisable-fp-elim -fno-strict-return -masm-verbose -munwind-tables -target-sdk-version=10.14 -target-cpu penryn -dwarf-column-info -debugger-tuning=lldb -target-linker-version 450.3 -v -coverage-notes-file /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.gcno -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wno-atomic-implicit-seq-cst -Wno-framework-include-private-from-public -Wno-atimport-in-framework-header -Wno-quoted-include-in-framework-header -fdebug-compilation-dir /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 1 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fobjc-runtime=macosx-10.14.0 -fmax-type-align=16 -fdiagnostics-show-option -o CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o -x c /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCCompilerABI.c
-clang -cc1 version 10.0.1 (clang-1001.0.46.4) default target x86_64-apple-darwin18.6.0
-ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/local/include"
-ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/Library/Frameworks"
-#include "..." search starts here:
-#include <...> search starts here:
- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include
- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
- /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include
- /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks (framework directory)
-End of search list.
-Linking C executable cmTC_3399d
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3399d.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o  -o cmTC_3399d 
-Apple LLVM version 10.0.1 (clang-1001.0.46.4)
-Target: x86_64-apple-darwin18.6.0
-Thread model: posix
-InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5
- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_3399d -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a
-@(#)PROGRAM:ld  PROJECT:ld64-450.3
-BUILD 18:45:16 Apr  4 2019
-configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+Found CUDA installation: /usr/local/cuda, version 7.5
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_946d1 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a
+@(#)PROGRAM:ld  PROJECT:ld64-409.12
+BUILD 17:47:51 Sep 25 2018
+configured to support archs: armv6 armv7 armv7s arm64 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em arm64e arm64_32
 Library search paths:
 	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib
 Framework search paths:
 	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/
-
-
-Parsed C implicit include dir info from above output: rv=done
-  found start of include info
-  found start of implicit include info
-    add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include]
-    add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-    add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
-  end of search list found
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include]
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
-  implicit include dirs: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):/usr/bin/make cmTC_3399d/fast ]
-  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_3399d.dir/build.make CMakeFiles/cmTC_3399d.dir/build]
-  ignore line: [Building C object CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -v -Wl,-v -o CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o   -c /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCCompilerABI.c]
-  ignore line: [Apple LLVM version 10.0.1 (clang-1001.0.46.4)]
-  ignore line: [Target: x86_64-apple-darwin18.6.0]
+  ignore line: [Run Build Command:"/opt/local/bin/gmake" "cmTC_946d1/fast"]
+  ignore line: [/opt/local/bin/gmake -f CMakeFiles/cmTC_946d1.dir/build.make CMakeFiles/cmTC_946d1.dir/build]
+  ignore line: [gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o   -c /opt/local/share/cmake-3.13/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_946d1]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_946d1.dir/link.txt --verbose=1]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o  -o cmTC_946d1 ]
+  ignore line: [Apple LLVM version 10.0.0 (clang-1000.11.45.5)]
+  ignore line: [Target: x86_64-apple-darwin18.2.0]
   ignore line: [Thread model: posix]
   ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-  ignore line: [Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5]
-  ignore line: [clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]]
-  ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx10.14.0 -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mthread-model posix -mdisable-fp-elim -fno-strict-return -masm-verbose -munwind-tables -target-sdk-version=10.14 -target-cpu penryn -dwarf-column-info -debugger-tuning=lldb -target-linker-version 450.3 -v -coverage-notes-file /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.gcno -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wno-atomic-implicit-seq-cst -Wno-framework-include-private-from-public -Wno-atimport-in-framework-header -Wno-quoted-include-in-framework-header -fdebug-compilation-dir /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 1 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fobjc-runtime=macosx-10.14.0 -fmax-type-align=16 -fdiagnostics-show-option -o CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o -x c /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCCompilerABI.c]
-  ignore line: [clang -cc1 version 10.0.1 (clang-1001.0.46.4) default target x86_64-apple-darwin18.6.0]
-  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/local/include"]
-  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/Library/Frameworks"]
-  ignore line: [#include "..." search starts here:]
-  ignore line: [#include <...> search starts here:]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks (framework directory)]
-  ignore line: [End of search list.]
-  ignore line: [Linking C executable cmTC_3399d]
-  ignore line: [/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3399d.dir/link.txt --verbose=1]
-  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o  -o cmTC_3399d ]
-  ignore line: [Apple LLVM version 10.0.1 (clang-1001.0.46.4)]
-  ignore line: [Target: x86_64-apple-darwin18.6.0]
-  ignore line: [Thread model: posix]
-  ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-  ignore line: [Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5]
-  link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_3399d -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a]
+  ignore line: [Found CUDA installation: /usr/local/cuda, version 7.5]
+  link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_946d1 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a]
     arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
     arg [-demangle] ==> ignore
     arg [-lto_library] ==> ignore, skip following value
@@ -138,17 +96,17 @@ Parsed C implicit link information from above output:
     arg [-syslibroot] ==> ignore
     arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_3399d] ==> ignore
+    arg [cmTC_946d1] ==> ignore
     arg [-search_paths_first] ==> ignore
     arg [-headerpad_max_install_names] ==> ignore
     arg [-v] ==> ignore
-    arg [CMakeFiles/cmTC_3399d.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_946d1.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lSystem] ==> lib [System]
-    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a]
+    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a]
   Library search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib]
   Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/]
   remove lib [System]
-  remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a]
+  remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a]
   collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib]
   collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks]
   implicit libs: []
@@ -159,15 +117,17 @@ Parsed C implicit link information from above output:
 
 
 Detecting C [-std=c11] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_965f0/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_965f0.dir/build.make CMakeFiles/cmTC_965f0.dir/build
-Building C object CMakeFiles/cmTC_965f0.dir/feature_tests.c.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c11 -o CMakeFiles/cmTC_965f0.dir/feature_tests.c.o   -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_965f0
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_965f0.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_965f0.dir/feature_tests.c.o  -o cmTC_965f0 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_a2118/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_a2118.dir/build.make CMakeFiles/cmTC_a2118.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a2118.dir/feature_tests.c.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c11 -o CMakeFiles/cmTC_a2118.dir/feature_tests.c.o   -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_a2118
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a2118.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_a2118.dir/feature_tests.c.o  -o cmTC_a2118 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -177,15 +137,17 @@ Linking C executable cmTC_965f0
 
 
 Detecting C [-std=c99] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_15e49/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_15e49.dir/build.make CMakeFiles/cmTC_15e49.dir/build
-Building C object CMakeFiles/cmTC_15e49.dir/feature_tests.c.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c99 -o CMakeFiles/cmTC_15e49.dir/feature_tests.c.o   -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_15e49
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_15e49.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_15e49.dir/feature_tests.c.o  -o cmTC_15e49 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_c7550/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_c7550.dir/build.make CMakeFiles/cmTC_c7550.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c7550.dir/feature_tests.c.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c99 -o CMakeFiles/cmTC_c7550.dir/feature_tests.c.o   -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_c7550
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c7550.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_c7550.dir/feature_tests.c.o  -o cmTC_c7550 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -195,15 +157,17 @@ Linking C executable cmTC_15e49
 
 
 Detecting C [-std=c90] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_c1805/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_c1805.dir/build.make CMakeFiles/cmTC_c1805.dir/build
-Building C object CMakeFiles/cmTC_c1805.dir/feature_tests.c.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c90 -o CMakeFiles/cmTC_c1805.dir/feature_tests.c.o   -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_c1805
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c1805.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_c1805.dir/feature_tests.c.o  -o cmTC_c1805 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_fd041/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_fd041.dir/build.make CMakeFiles/cmTC_fd041.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fd041.dir/feature_tests.c.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c90 -o CMakeFiles/cmTC_fd041.dir/feature_tests.c.o   -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_fd041
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fd041.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_fd041.dir/feature_tests.c.o  -o cmTC_fd041 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -211,112 +175,64 @@ Linking C executable cmTC_c1805
     Feature record: C_FEATURE:0c_static_assert
     Feature record: C_FEATURE:0c_variadic_macros
 Determining if the CXX compiler works passed with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_e61d5/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_e61d5.dir/build.make CMakeFiles/cmTC_e61d5.dir/build
-Building CXX object CMakeFiles/cmTC_e61d5.dir/testCXXCompiler.cxx.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_e61d5.dir/testCXXCompiler.cxx.o -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_e61d5
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e61d5.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_e61d5.dir/testCXXCompiler.cxx.o  -o cmTC_e61d5 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_d915f/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_d915f.dir/build.make CMakeFiles/cmTC_d915f.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d915f.dir/testCXXCompiler.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_d915f.dir/testCXXCompiler.cxx.o -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_d915f
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d915f.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_d915f.dir/testCXXCompiler.cxx.o  -o cmTC_d915f 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_6fe68/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_6fe68.dir/build.make CMakeFiles/cmTC_6fe68.dir/build
-Building CXX object CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -v -Wl,-v -o CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCXXCompilerABI.cpp
-Apple LLVM version 10.0.1 (clang-1001.0.46.4)
-Target: x86_64-apple-darwin18.6.0
+Run Build Command:"/opt/local/bin/gmake" "cmTC_ef3dd/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_ef3dd.dir/build.make CMakeFiles/cmTC_ef3dd.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_ef3dd
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ef3dd.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_ef3dd 
+Apple LLVM version 10.0.0 (clang-1000.11.45.5)
+Target: x86_64-apple-darwin18.2.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5
-clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx10.14.0 -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mthread-model posix -mdisable-fp-elim -fno-strict-return -masm-verbose -munwind-tables -target-sdk-version=10.14 -target-cpu penryn -dwarf-column-info -debugger-tuning=lldb -target-linker-version 450.3 -v -coverage-notes-file /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.gcno -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -stdlib=libc++ -Wno-atomic-implicit-seq-cst -Wno-framework-include-private-from-public -Wno-atimport-in-framework-header -Wno-quoted-include-in-framework-header -fdeprecated-macro -fdebug-compilation-dir /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 1 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fobjc-runtime=macosx-10.14.0 -fcxx-exceptions -fexceptions -fmax-type-align=16 -fdiagnostics-show-option -o CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCXXCompilerABI.cpp
-clang -cc1 version 10.0.1 (clang-1001.0.46.4) default target x86_64-apple-darwin18.6.0
-ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include/c++/v1"
-ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/local/include"
-ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/Library/Frameworks"
-#include "..." search starts here:
-#include <...> search starts here:
- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include
- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
- /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include
- /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks (framework directory)
-End of search list.
-Linking CXX executable cmTC_6fe68
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6fe68.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_6fe68 
-Apple LLVM version 10.0.1 (clang-1001.0.46.4)
-Target: x86_64-apple-darwin18.6.0
-Thread model: posix
-InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5
- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_6fe68 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a
-@(#)PROGRAM:ld  PROJECT:ld64-450.3
-BUILD 18:45:16 Apr  4 2019
-configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+Found CUDA installation: /usr/local/cuda, version 7.5
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_ef3dd -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a
+@(#)PROGRAM:ld  PROJECT:ld64-409.12
+BUILD 17:47:51 Sep 25 2018
+configured to support archs: armv6 armv7 armv7s arm64 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em arm64e arm64_32
 Library search paths:
 	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib
 Framework search paths:
 	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/
-
-
-Parsed CXX implicit include dir info from above output: rv=done
-  found start of include info
-  found start of implicit include info
-    add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1]
-    add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include]
-    add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-    add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
-  end of search list found
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1]
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include]
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-  collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
-  implicit include dirs: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
 Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):/usr/bin/make cmTC_6fe68/fast ]
-  ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_6fe68.dir/build.make CMakeFiles/cmTC_6fe68.dir/build]
-  ignore line: [Building CXX object CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -v -Wl,-v -o CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o -c /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Apple LLVM version 10.0.1 (clang-1001.0.46.4)]
-  ignore line: [Target: x86_64-apple-darwin18.6.0]
+  ignore line: [Run Build Command:"/opt/local/bin/gmake" "cmTC_ef3dd/fast"]
+  ignore line: [/opt/local/bin/gmake -f CMakeFiles/cmTC_ef3dd.dir/build.make CMakeFiles/cmTC_ef3dd.dir/build]
+  ignore line: [gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -o CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o -c /opt/local/share/cmake-3.13/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_ef3dd]
+  ignore line: [/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ef3dd.dir/link.txt --verbose=1]
+  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_ef3dd ]
+  ignore line: [Apple LLVM version 10.0.0 (clang-1000.11.45.5)]
+  ignore line: [Target: x86_64-apple-darwin18.2.0]
   ignore line: [Thread model: posix]
   ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-  ignore line: [Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5]
-  ignore line: [clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]]
-  ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx10.14.0 -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mthread-model posix -mdisable-fp-elim -fno-strict-return -masm-verbose -munwind-tables -target-sdk-version=10.14 -target-cpu penryn -dwarf-column-info -debugger-tuning=lldb -target-linker-version 450.3 -v -coverage-notes-file /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.gcno -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -stdlib=libc++ -Wno-atomic-implicit-seq-cst -Wno-framework-include-private-from-public -Wno-atimport-in-framework-header -Wno-quoted-include-in-framework-header -fdeprecated-macro -fdebug-compilation-dir /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 1 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fobjc-runtime=macosx-10.14.0 -fcxx-exceptions -fexceptions -fmax-type-align=16 -fdiagnostics-show-option -o CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/local/Cellar/cmake/3.14.5/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [clang -cc1 version 10.0.1 (clang-1001.0.46.4) default target x86_64-apple-darwin18.6.0]
-  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include/c++/v1"]
-  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/local/include"]
-  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/Library/Frameworks"]
-  ignore line: [#include "..." search starts here:]
-  ignore line: [#include <...> search starts here:]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/include]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/include]
-  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks (framework directory)]
-  ignore line: [End of search list.]
-  ignore line: [Linking CXX executable cmTC_6fe68]
-  ignore line: [/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6fe68.dir/link.txt --verbose=1]
-  ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_6fe68 ]
-  ignore line: [Apple LLVM version 10.0.1 (clang-1001.0.46.4)]
-  ignore line: [Target: x86_64-apple-darwin18.6.0]
-  ignore line: [Thread model: posix]
-  ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-  ignore line: [Found CUDA installation: /Developer/NVIDIA/CUDA-7.5, version 7.5]
-  link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_6fe68 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a]
+  ignore line: [Found CUDA installation: /usr/local/cuda, version 7.5]
+  link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -macosx_version_min 10.14.0 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -o cmTC_ef3dd -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a]
     arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
     arg [-demangle] ==> ignore
     arg [-lto_library] ==> ignore, skip following value
@@ -329,18 +245,18 @@ Parsed CXX implicit link information from above output:
     arg [-syslibroot] ==> ignore
     arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_6fe68] ==> ignore
+    arg [cmTC_ef3dd] ==> ignore
     arg [-search_paths_first] ==> ignore
     arg [-headerpad_max_install_names] ==> ignore
     arg [-v] ==> ignore
-    arg [CMakeFiles/cmTC_6fe68.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_ef3dd.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lc++] ==> lib [c++]
     arg [-lSystem] ==> lib [System]
-    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a]
+    arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a]
   Library search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib]
   Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/]
   remove lib [System]
-  remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.1/lib/darwin/libclang_rt.osx.a]
+  remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/lib/darwin/libclang_rt.osx.a]
   collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/usr/lib]
   collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks/] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks]
   implicit libs: [c++]
@@ -351,15 +267,17 @@ Parsed CXX implicit link information from above output:
 
 
 Detecting CXX [-std=c++1z] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_a34d8/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_a34d8.dir/build.make CMakeFiles/cmTC_a34d8.dir/build
-Building CXX object CMakeFiles/cmTC_a34d8.dir/feature_tests.cxx.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++1z -o CMakeFiles/cmTC_a34d8.dir/feature_tests.cxx.o -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_a34d8
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a34d8.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_a34d8.dir/feature_tests.cxx.o  -o cmTC_a34d8 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_24546/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_24546.dir/build.make CMakeFiles/cmTC_24546.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_24546.dir/feature_tests.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++1z -o CMakeFiles/cmTC_24546.dir/feature_tests.cxx.o -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_24546
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_24546.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_24546.dir/feature_tests.cxx.o  -o cmTC_24546 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -422,15 +340,17 @@ Linking CXX executable cmTC_a34d8
 
 
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_6a63e/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_6a63e.dir/build.make CMakeFiles/cmTC_6a63e.dir/build
-Building CXX object CMakeFiles/cmTC_6a63e.dir/feature_tests.cxx.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++14 -o CMakeFiles/cmTC_6a63e.dir/feature_tests.cxx.o -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_6a63e
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6a63e.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_6a63e.dir/feature_tests.cxx.o  -o cmTC_6a63e 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_c13a9/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_c13a9.dir/build.make CMakeFiles/cmTC_c13a9.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_c13a9.dir/feature_tests.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++14 -o CMakeFiles/cmTC_c13a9.dir/feature_tests.cxx.o -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_c13a9
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c13a9.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_c13a9.dir/feature_tests.cxx.o  -o cmTC_c13a9 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -493,15 +413,17 @@ Linking CXX executable cmTC_6a63e
 
 
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_b70a7/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_b70a7.dir/build.make CMakeFiles/cmTC_b70a7.dir/build
-Building CXX object CMakeFiles/cmTC_b70a7.dir/feature_tests.cxx.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++11 -o CMakeFiles/cmTC_b70a7.dir/feature_tests.cxx.o -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_b70a7
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b70a7.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_b70a7.dir/feature_tests.cxx.o  -o cmTC_b70a7 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_2d6ec/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_2d6ec.dir/build.make CMakeFiles/cmTC_2d6ec.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_2d6ec.dir/feature_tests.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++11 -o CMakeFiles/cmTC_2d6ec.dir/feature_tests.cxx.o -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_2d6ec
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2d6ec.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_2d6ec.dir/feature_tests.cxx.o  -o cmTC_2d6ec 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
@@ -564,15 +486,17 @@ Linking CXX executable cmTC_b70a7
 
 
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
-Change Dir: /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
+Change Dir: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_e67c8/fast 
-/Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_e67c8.dir/build.make CMakeFiles/cmTC_e67c8.dir/build
-Building CXX object CMakeFiles/cmTC_e67c8.dir/feature_tests.cxx.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++98 -o CMakeFiles/cmTC_e67c8.dir/feature_tests.cxx.o -c /Users/benjymarks/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_e67c8
-/usr/local/Cellar/cmake/3.14.5/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e67c8.dir/link.txt --verbose=1
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_e67c8.dir/feature_tests.cxx.o  -o cmTC_e67c8 
+Run Build Command:"/opt/local/bin/gmake" "cmTC_e3e07/fast"
+/opt/local/bin/gmake -f CMakeFiles/cmTC_e3e07.dir/build.make CMakeFiles/cmTC_e3e07.dir/build
+gmake[1]: Entering directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_e3e07.dir/feature_tests.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk   -std=c++98 -o CMakeFiles/cmTC_e3e07.dir/feature_tests.cxx.o -c /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_e3e07
+/opt/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e3e07.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_e3e07.dir/feature_tests.cxx.o  -o cmTC_e3e07 
+gmake[1]: Leaving directory '/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers

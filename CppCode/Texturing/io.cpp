@@ -116,7 +116,7 @@ return 0 ;
 int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
 {
 #ifdef NRRDIO
-    int npoints=16 ;
+    int npoints=32 ;
     vector<double> p(d-1,0) ;
 
     Nrrd *nval;
@@ -125,9 +125,10 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
     nval = nrrdNew();
 
     // Header infos
-    vector <size_t> dimensions (d, npoints) ;
+    vector <size_t> dimensions (d+1, npoints) ;
     dimensions[0] = 3 ;
-    dimensions[d-1]= npoints*2 ;
+		dimensions[1] = 1 ;
+		dimensions[2]= npoints*2 ;
 
     vector <int> nrrdkind (d, nrrdKindSpace) ;
     nrrdkind[0]=nrrdKindVector ;
@@ -186,7 +187,7 @@ int write_NrrdIO (string path, int d, vector<vector<float>> & colors)
     } ;
     lbdrecurse(0,p) ;
     //---------------------------------------------------------------------
-    nrrdWrap_nva(nval, outdata, nrrdTypeUChar, d, dimensions.data());
+    nrrdWrap_nva(nval, outdata, nrrdTypeUChar, d+1, dimensions.data());
     string fullpath ;
     fullpath = path ;
     nrrdSave(fullpath.c_str(), nval, nio);

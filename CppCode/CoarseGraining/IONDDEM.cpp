@@ -58,6 +58,20 @@ struct Param P4 {
   "CoarseD4"                          // save location
 };
 
+struct Param P4T {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D4Thick/dump.xml",                                 // dump
+  50,                                 // skipT
+  450,                                // maxT
+  3.242277876554809,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {25,1,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b1110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD4Thick"                          // save location
+};
+
 struct Param P5 {
   "/Users/FGuillard/Dropbox/DEM_ND/Samples/D5/dump.xml",                                 // dump
   50,                                 // skipT
@@ -70,6 +84,20 @@ struct Param P5 {
   {20, 5, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
   {},                                 // radii
   "CoarseD5"                          // save location
+};
+
+struct Param P5T {
+  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D5Thick/dump.xml",                                 // dump
+  50,                                 // skipT
+  450,                                // maxT
+  6.079271018540266,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {25,1,1,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b11110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseD5Thick"                          // save location
 };
 
 struct Param P6 {
@@ -86,18 +114,20 @@ struct Param P6 {
   "CoarseD6"                          // save location
 };
 
-struct Param PTest {
-  "/Users/FGuillard/Dropbox/DEM_ND/Samples/D4/dump.xml",                                 // dump
+struct Param P6T {} ;
+
+struct Param P3Channel {
+  "../Dem/OutputChannelD3/dump.xml",                                 // dump
   50,                                 // skipT
   450,                                // maxT
-  3.242277876554809,                  // rho
+  1.9098593171027443,                  // rho
   {"RHO", "VAVG"},                    // flags
-  {25,3,4,5},                           // boxes #
+  {25,5,5},                           // boxes #
   {{}},                               // Boundaries
-  0b1110,                              // PBC (fisrt dimension is LSD)
-  {20, 5, 3.4, 3.4},                       // Deltas (used for pbcs)
+  0b010,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.5},                       // Deltas (used for pbcs)
   {},                                 // radii
-  "CoarseD4Test"                          // save location
+  "CoarseD3Channel"                          // save location
 };
 
 void dispvector (v2d &u) {for (auto v:u) {for (auto w:v) printf("%g ", w) ; printf("\n") ; } fflush(stdout) ; }
@@ -109,51 +139,57 @@ double InertiaMomentum (int d, double R, double rho) ;
 //===================================================
 int main (int argc, char * argv[])
 {
- /*if (argc > 2)
+  struct Param * P  ;
+ if (argc >= 2)
  {
-   P.dump = argv[2] ;
-   P.selfset(argv[1]) ;
+         if (!strcmp("D2", argv[1])) P = &P2 ;
+    else if (!strcmp("D3", argv[1])) P = &P3 ;
+    else if (!strcmp("D4", argv[1])) P = &P4 ;
+    else if (!strcmp("D5", argv[1])) P = &P5 ;
+    else if (!strcmp("D6", argv[1])) P = &P6 ;
+    else if (!strcmp("D4Thick", argv[1])) P = &P4T ;
+    else if (!strcmp("D5Thick", argv[1])) P = &P5T ;
+    else if (!strcmp("D6Thick", argv[1])) P = &P6T;
  }
- else*/
-
- auto P=P3 ;
+ else
+    P= &P3Channel ;
 
  //P.dump=argv[1] ;
 
  //struct Data D ;
  // Extract path (last slash) for saving
  int res, t ;
- XMLReader XML(P.dump) ;
+ XMLReader XML(P->dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
- XML.read_boundaries(P.boundaries) ;
- P.boundaries[1][0] = 10 ;
- dispvector(P.boundaries) ;
- XML.read_radius (P.radius) ;
- int N = P.radius.size() ;
+ XML.read_boundaries(P->boundaries) ;
+ P->boundaries[1][0] = 10 ;
+ dispvector(P->boundaries) ;
+ XML.read_radius (P->radius) ;
+ int N = P->radius.size() ;
 
  vector <double> mass, Imom ;
 
  for (int i=0 ; i<N ; i++)
  {
-     mass.push_back(Volume(d,P.radius[i]) * P.rho) ;
-     Imom.push_back(InertiaMomentum(d,P.radius[i],P.rho)) ;
+     mass.push_back(Volume(d,P->radius[i]) * P->rho) ;
+     Imom.push_back(InertiaMomentum(d,P->radius[i],P->rho)) ;
  }
 
- Coarsing C(d, P.boxes, P.boundaries, P.maxT-P.skipT) ;
+ Coarsing C(d, P->boxes, P->boundaries, P->maxT-P->skipT) ;
  C.setWindow("LibLucyND", 1.5) ;
- C.set_flags(P.flags) ;
+ C.set_flags(P->flags) ;
  C.grid_setfields() ;
  auto Bounds = C.get_bounds() ;
  C.cT=-1 ;
- C.data.N=P.radius.size() ;
+ C.data.N=P->radius.size() ;
  C.data.mass = mass.data() ;
  C.data.Imom = Imom.data() ;
 
  vector <string> names ; vector<vector<vector<double>>> data ;
- for (int t=0 ; t<P.maxT ; t++)
+ for (int t=0 ; t<P->maxT ; t++)
  {
   res = XML.read_nextts(names, data) ;
-  if (t<P.skipT) continue ;
+  if (t<P->skipT) continue ;
 
   if (res!=0) break ;
   C.cT++ ;
@@ -170,7 +206,7 @@ int main (int argc, char * argv[])
     for (int j=0 ; j<C.data.N ; j++) for (int k=0 ;k<d ; k++) C.data.vel[k][j] = data[delta][j][k] ;
   }
 
-  C.data.periodic_atoms (d, Bounds, P.pbc, P.Delta, false) ;
+  C.data.periodic_atoms (d, Bounds, P->pbc, P->Delta, false) ;
   C.pass_1() ;
   C.data.clean_periodic_atoms() ;
   //C.compute_fluc_vel() ;
@@ -183,7 +219,7 @@ int main (int argc, char * argv[])
 
  C.mean_time() ;
  C.write_vtk("Coarsed") ;
- C.write_NrrdIO(P.save.c_str()) ;
+ C.write_NrrdIO(P->save.c_str()) ;
 
 printf("\nA deallocation error may appear at the end. I am not quite sure where that come from (apparently the realloc in periodic_atoms leaves some stuff behind). Hopefully should not affect anything since it is the final deallocaiton as the program exits. \n") ; fflush(stdout) ;
 
