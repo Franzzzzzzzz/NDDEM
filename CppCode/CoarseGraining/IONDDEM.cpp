@@ -122,7 +122,7 @@ struct Param P3Channel {
   450,                                // maxT
   1.9098593171027443,                  // rho
   {"RHO", "VAVG"},                    // flags
-  {25,5,5},                           // boxes #
+  {25,5,4},                           // boxes #
   {{}},                               // Boundaries
   0b010,                              // PBC (fisrt dimension is LSD)
   {20, 5, 3.5},                       // Deltas (used for pbcs)
@@ -176,7 +176,7 @@ int main (int argc, char * argv[])
  }
 
  Coarsing C(d, P->boxes, P->boundaries, P->maxT-P->skipT) ;
- C.setWindow("LibLucyND", 1.5) ;
+ C.setWindow("LibLucyND", 0.5) ;
  C.set_flags(P->flags) ;
  C.grid_setfields() ;
  auto Bounds = C.get_bounds() ;
