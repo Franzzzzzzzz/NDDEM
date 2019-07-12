@@ -106,20 +106,29 @@
                 ny = volume.dimensions[3];
                 nz = volume.dimensions[4];
 
-                volconfig = { clim1: volume.windowLow, clim2: volume.windowHigh, renderstyle: 'mip', isothreshold: 0.15, colormap: 'inferno' };
+                volconfig = { clim1: volume.windowLow, clim2: volume.windowHigh, renderstyle: 'normal', isothreshold: 0.15, colormap: 'inferno' };
 
-    			gui = new dat.GUI();
-    			var cmin = gui.add( volconfig, 'clim1', volume.windowLow, volume.windowHigh, 0.01 ).onChange( updateUniforms );
-    			var cmax = gui.add( volconfig, 'clim2', volume.windowLow, volume.windowHigh, 0.01 ).onChange( updateUniforms );
-    			gui.add( volconfig, 'colormap', { inferno: 'inferno', viridis: 'viridis', gray: 'gray' } ).onChange( updateUniforms );
-    			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
-    			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
+                var start = [0,0,0,0,0,0];
+                var end   = [0,0,nx,ny,nz,0];
+                data = volume.data;
+                rgb = volume.RGB;
 
-                gui.add( time, 'cur').min(time.min).max(time.max-1).step(1).listen().name('Time').onChange( function() { updateUniforms() });
-                extra_dims = volume.dimensions.length - 6;
+                gui = new dat.GUI();
+                // if ( rgb ) { gui.close(); }
+    			if ( !rgb ) {
+                    var cmin = gui.add( volconfig, 'clim1', volume.windowLow, volume.windowHigh, 0.01 ).onChange( updateUniforms );
+        			var cmax = gui.add( volconfig, 'clim2', volume.windowLow, volume.windowHigh, 0.01 ).onChange( updateUniforms );
+                    gui.add( volconfig, 'colormap', { inferno: 'inferno', viridis: 'viridis', gray: 'gray' } ).onChange( updateUniforms ); }
+    			gui.add( volconfig, 'renderstyle', { normal: 'normal', iso: 'iso' } ).onChange( updateUniforms );
+                if ( !rgb ) {
+        			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
+                    gui.add( time, 'cur').min(time.min).max(time.max-1).step(1).listen().name('Time').onChange( function() { updateUniforms() });
+                }
+
+                if ( rgb ) { extra_dims = volume.dimensions.length - 5; }
+                else { extra_dims = volume.dimensions.length - 6; }
                 console.log('Found ', extra_dims, ' extra dimensions');
 
-                nx_array = volume.dimensions.slice(2,-1);
 
                 world = [];
                 for ( var i=0;i<extra_dims;i++ ) {
@@ -127,14 +136,14 @@
                     world[i].min = 0;
                     world[i].max = volume.dimensions[i+5]-1;
                     world[i].cur = Math.floor(volume.dimensions[i+5]/2);
-                    gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(1).name('X'+i+3).onChange( function() { updateUniforms() }); // TODO: correct scale rather than grid point number
+                    gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(1).name('x'+String(i+4)).onChange( function() { updateUniforms() }); // TODO: correct scale rather than grid point number
                 }
-                if ( time.nc > 1 ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
+                if ( time.nc > 1 && !rgb ) { gui.add( time, 'c').min(0).max(time.nc-1).step(1).name('component').onChange( function() { updateUniforms() }); }
 
-                var start = [0,0,0,0,0,0];
-                var end   = [0,0,nx,ny,nz,0];
-                data = volume.data;
-                rgb = volume.RGB;
+
+
+                if ( volume.RGB ) { nx_array = volume.dimensions.slice(2); }
+                else { nx_array = volume.dimensions.slice(2,-1); }
 
                 if ( volume.RGB ) { display_data = get_data_RGB(volume.data,start,end); }
                 else if (extra_dims === 1) { display_data = get_data_ND(volume.data,start,end); }
@@ -167,7 +176,7 @@
 				uniforms[ "u_data" ].value = texture;
 				uniforms[ "u_size" ].value.set( nx, ny, nz );
 				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'normal' ? 0 : 1; // 0: MIP, 1: ISO
 				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
 				uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 				material = new THREE.ShaderMaterial( {
@@ -193,7 +202,7 @@
             else { texture.image.data = get_data(data,start,end); }
             texture.needsUpdate = true;
 			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'normal' ? 0 : 1; // 0: MIP, 1: ISO
 			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
 			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 			render();
@@ -269,13 +278,21 @@
         }
 
         function get_data_RGB(data,start,end) {
-            length = nx*ny*nz;
+            length = nx_array.reduce( (a,b) => a * b ); // multiply all components of array
             output = new Float32Array(length);
-            n = [1,3,3*nx,3*nx*ny,3*nx*ny*nz];
-            for ( var i=0;i<nx;i++ ) {
-                for ( var j=0;j<ny;j++ ) {
-                    for ( var k=0;k<nz;k++ ) {
-                        shaped_pos = [0,i,j,k,time.cur]
+
+            n = [1,3];
+            for ( var m=0;m<nx_array.length;m++ ) {
+                n.push(3*nx_array.slice(0,m+1).reduce( (a,b) => a * b ))
+            };
+
+            for ( var i=0;i<nx_array[0];i++ ) {
+                for ( var j=0;j<nx_array[1];j++ ) {
+                    for ( var k=0;k<nx_array[2];k++ ) {
+                        shaped_pos = [0,i,j,k];
+                        for ( var m=0;m<extra_dims;m++ ) { shaped_pos.push(world[m].cur); }
+                        shaped_pos.push(time.cur);
+
                         var linear_pos = 0;
                         for (var l=0; l< n.length; l++) { linear_pos += n[l]*shaped_pos[l]; };
                         output[i + j*nx + k*nx*ny] = data[linear_pos]*256*256 + data[linear_pos+1]*256 + data[linear_pos+2]
@@ -284,6 +301,23 @@
             }
             return output;
         }
+
+        // function get_data_RGB(data,start,end) { // JUST IN 3D
+        //     length = nx*ny*nz;
+        //     output = new Float32Array(length);
+        //     n = [1,3,3*nx,3*nx*ny,3*nx*ny*nz];
+        //     for ( var i=0;i<nx;i++ ) {
+        //         for ( var j=0;j<ny;j++ ) {
+        //             for ( var k=0;k<nz;k++ ) {
+        //                 shaped_pos = [0,i,j,k,time.cur]
+        //                 var linear_pos = 0;
+        //                 for (var l=0; l< n.length; l++) { linear_pos += n[l]*shaped_pos[l]; };
+        //                 output[i + j*nx + k*nx*ny] = data[linear_pos]*256*256 + data[linear_pos+1]*256 + data[linear_pos+2]
+        //             }
+        //         }
+        //     }
+        //     return output;
+        // }
 	</script>
 
 </body>
