@@ -925,7 +925,9 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            var texture = new THREE.TextureLoader().load("http://localhost:54321/Textures/Texture-"+i+"-00000-0.0.png"); //TODO
+                            texture_path = "http://localhost:54321/Textures/Texture-"+i+"-00000"
+                            for ( var i=3;i<N;i++) { texture_path += "-0.0"; }
+                            var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
                         }
                         else {
