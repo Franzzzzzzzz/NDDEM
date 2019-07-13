@@ -79,6 +79,8 @@
         var earth;
         var stars;
 
+        var screenshot = true;
+
         init();
 		animate();
 
@@ -107,7 +109,11 @@
 			// controls.target.set( 0, 0, 0 );
 			// controls.update();
 
-			renderer = new THREE.WebGLRenderer();
+            if ( screenshot ) {
+                renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } ); // for screenshots
+            }
+            else { renderer = new THREE.WebGLRenderer(); }
+
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
@@ -181,6 +187,11 @@
                         // earth.rotation.y = -1.0;
                         earth.rotation.z = 0.7;
                         scene.add( earth );
+
+                        if ( screenshot ) {
+                            setTimeout(function(){ window.open( renderer.domElement.toDataURL( 'image/png' ), 'screenshot' ); }, 2000); // take screenshot after 3s
+                        }
+
             	       }
                    );
 

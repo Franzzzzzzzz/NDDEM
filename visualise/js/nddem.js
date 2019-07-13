@@ -295,7 +295,6 @@ function add_vive_models() {
             // Pause label
             var font_loader = new THREE.FontLoader();
             font_loader.load( 'http://localhost:54321/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
-                console.log('making pause');
                 var fontsize = 0.005;
                 var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
                 var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
@@ -319,8 +318,6 @@ function add_vive_models() {
                 move_label.position.z = 0.045;
                 if ( N > 3 ) { controller1.add(move_label); }
                 if ( N > 5 ) { controller2.add(move_label); }
-
-                console.log('Added vive models to both controllers');
             });
 		} );
 
@@ -1235,7 +1232,18 @@ function cleanIntersected() {
     }
 };
 
+function check_if_won() {
+    if ( spheres[pinky].visible = true ) {
+        if ( controller1.position.distanceTo(particles.children[pinky].position) < spheres[pinky].R ||
+             controller2.position.distanceTo(particles.children[pinky].position) < spheres[pinky].R ) {
+                 alert('You win!');
+             }
+
+    }
+}
+
 function animate() {
+    if ( view_mode === 'catch_particle' ) { check_if_won(); }
     THREE.VRController.update();
     if ( redraw_left ) { update_higher_dims_left(); }
     if ( redraw_right ) { update_higher_dims_right(); }
