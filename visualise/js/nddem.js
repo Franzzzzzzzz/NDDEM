@@ -851,7 +851,10 @@ function remove_everything() {
                 object.material.dispose();
             }
         }
+        renderer.vr.enabled = false;
         renderer.dispose();
+        scene.dispose();
+
     }
 }
 
