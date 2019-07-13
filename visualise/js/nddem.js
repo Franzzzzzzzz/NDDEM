@@ -10,14 +10,14 @@ var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'rate': 0.5} // temporal properties
+var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 0.5, 'save_rate': 1000} // temporal properties
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
-if ( typeof window.rate !== 'undefined' ) { time.rate = parseFloat(window.rate) };
+if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) };
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 1.8; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
-var quality, shadows, timestep;
+var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 var roof, bg;
 var redraw_left = false; // force redrawing of particles
@@ -82,7 +82,7 @@ function init() {
                     }
                     else if (l[0] == 'set') {
                         if (l[1] == 'T') { time.max = parseInt(l[2]) - 1; }
-                        else if (l[1] === 'tdump') { timestep = parseInt(l[2]) }
+                        else if (l[1] === 'tdump') { time.save_rate = parseInt(l[2]) }
                     }
                     else if (l[0] == 'freeze') { pinky = parseInt(l[1]); }
                 }
@@ -385,7 +385,7 @@ function add_gui() {
             }
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-        gui.add( time, 'rate').min(0).max(1.0).name('Rate') ;
+        gui.add( time, 'play_rate').min(0).max(1.0).name('Rate') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         if ( view_mode === 'velocity' ) {
             gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur),false); });
@@ -983,7 +983,7 @@ function load_textures(t, Viewpoint) {
 
 function update_spheres_texturing (t) {
       if  ( true ) { //TODO Do something better ...
-          var commandstring = "" ; var Viewpoint = String(t*timestep).padStart(5,'0')  ;
+          var commandstring = "" ; var Viewpoint = String(t*time.save_rate).padStart(5,'0')  ;
 
           for ( i=3 ; i<N ; i++)
           {
@@ -1002,7 +1002,7 @@ function update_spheres_texturing (t) {
                        true);*/
           var runvalue = 0 ;
           if (time.play) runvalue = 1 ;
-          request.open('GET', 'http://localhost:54321/render?ts='+String(t*timestep).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
+          request.open('GET', 'http://localhost:54321/render?ts='+String(t*time.save_rate).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
 
           request.onload = function() {
               load_textures(t, Viewpoint);
@@ -1016,8 +1016,8 @@ function update_spheres_texturing (t) {
 
 function update_spheres_CSV(t,changed_higher_dim_view) {
 
-    if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*timestep).padStart(5,'0') +".csv" }
-    else { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*timestep).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
+    if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
+    else { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
@@ -1259,7 +1259,7 @@ function animate() {
             }
         }
     }
-    if (time.play) { time.cur += time.rate*timestep/10000.; };
+    if (time.play) { time.cur += time.play_rate*time.save_rate/10000.; };
     //if ( Math.floor(time.cur) != time.prev ) {
     if ( ( Math.floor(time.cur) !== time.prev ) ){//|| redraw ){
         update_spheres_CSV(Math.floor(time.cur),false);
