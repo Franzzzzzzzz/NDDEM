@@ -193,6 +193,7 @@ function build_world() {
 
     	controller.addEventListener( 'primary press began', function( event ){
             if ( controller.gamepad.hand === 'left' ) {
+                wristband1.material.emissive = new THREE.Color(0.5,0.5,0.5);
                 if ( N > 3 ) {
                     redraw_left = true;
                     controller1.getWorldQuaternion(left_hand.previous_direction);
@@ -201,6 +202,7 @@ function build_world() {
                 if ( N > 4 ) { left_hand.previous_torus_rotation_x = (world[4].cur - world[4].min)/(world[4].max - world[4].min)*2*Math.PI; }
             }
             else {
+                wristband2.material.emissive = new THREE.Color(0.5,0.5,0.5);
                 if ( N > 5 ) {
                     redraw_right = true;
                     controller2.getWorldQuaternion(right_hand.previous_direction);
@@ -213,9 +215,11 @@ function build_world() {
     	controller.addEventListener( 'primary press ended', function( event ){
             if ( controller.gamepad.hand === 'left' ) {
                 redraw_left = false;
+                wristband1.material.emissive = new THREE.Color(0.,0.,0.);
             }
             else {
                 redraw_right = false;
+                wristband2.material.emissive = new THREE.Color(0.,0.,0.);
             }
     		//guiInputHelper.pressed( false )
     	})
@@ -1243,6 +1247,7 @@ function check_if_won() {
 }
 
 function animate() {
+    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/time.max*2.*Math.PI; } // rotate the background over time
     if ( view_mode === 'catch_particle' ) { check_if_won(); }
     THREE.VRController.update();
     if ( redraw_left ) { update_higher_dims_left(); }
