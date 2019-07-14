@@ -290,15 +290,16 @@ function add_renderer() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     // renderer.setSize( container.offsetWidth, container.offsetHeight );
     if ( shadows ) { renderer.shadowMap.enabled = true; }
-    if (window.display_type == "VR") { renderer.vr.enabled = true; };
-    container.appendChild( renderer.domElement );
-
     if (window.display_type == "VR") {
+        renderer.vr.enabled = true;
         container.appendChild( WEBVR.createButton( renderer ) );
-        window.addEventListener('vrdisplayactivate', () => {
-                renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] );
-            }); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
+        // window.addEventListener('vrdisplayactivate', () => {
+        //     console.log('FIRED');
+        //     renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] );
+        // }, false); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
     };
+
+    container.appendChild( renderer.domElement );
 }
 
 function add_gui() {
@@ -431,7 +432,10 @@ function add_controllers() {
                 time.play = !time.play;
                 //guiInputHelper.pressed( true )
             })
-
+            controller.addEventListener( 'menu press began', function( event ){
+                window.location.replace('http://localhost:54321/visualise/vr-menu.html')
+                //guiInputHelper.pressed( true )
+            })
         	controller.addEventListener( 'disconnected', function( event ){
         		controller.parent.remove( controller )
         	})

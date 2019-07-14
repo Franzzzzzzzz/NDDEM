@@ -31,6 +31,7 @@ var WEBVR = {
 			button.onclick = function () {
 
 				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
+                // console.log(device)
 
 			};
 
@@ -156,15 +157,17 @@ var WEBVR = {
 			stylizeElement( button );
 
 			window.addEventListener( 'vrdisplayconnect', function ( event ) {
-
+console.log('d');
 				showEnterVR( event.display );
                 ///////// BENJY: AUTO GO INTO VR MODE
                 event.display.isPresenting ? event.display.exitPresent() : event.display.requestPresent( [ { source: renderer.domElement } ] );
+                 //device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
+                //event.display.requestPresent( [ { source: renderer.domElement } ] );
 
 			}, false );
 
 			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
-
+console.log('a');
 				showVRNotFound();
 
 			}, false );
@@ -176,7 +179,7 @@ var WEBVR = {
 			}, false );
 
 			window.addEventListener( 'vrdisplayactivate', function ( event ) {
-
+                console.log('c');
 				event.display.requestPresent( [ { source: renderer.domElement } ] );
 
 			}, false );

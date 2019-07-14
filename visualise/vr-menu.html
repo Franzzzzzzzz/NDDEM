@@ -35,12 +35,12 @@
 		container = document.createElement( 'div' );
 		document.body.appendChild( container );
 		scene = new THREE.Scene();
-	    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+	    scene.background = new THREE.Color( 0x888888 ); // revealjs background colour
 
 		var intersected = [];
 		var tempMatrix = new THREE.Matrix4(); // catching grains
-		var particles = new THREE.Group();
-
+		var buttons = new THREE.Group();
+		add_buttons();
 		add_controllers();
 
 		camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
@@ -59,9 +59,9 @@
 		    container.appendChild( renderer.domElement );
 
 	        container.appendChild( WEBVR.createButton( renderer ) );
-	        window.addEventListener('vrdisplayactivate', () => {
-	                renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] );
-	            }); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
+	        // window.addEventListener('vrdisplayactivate', () => {
+	        //         renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] , false);
+	        //     }); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
     	};
 
 		function add_controllers() {
@@ -76,7 +76,8 @@
 					var controller = object.children[ 0 ];
 					controller.material.map = loader.load( 'onepointfive_texture.png' );
 					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-
+					controller1.add( controller.clone() );
+					controller2.add( controller.clone() );
 				} );
 
 			var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
@@ -112,16 +113,54 @@
 			   	 //  Check out the THREE.VRController.supported{} object to see
 			   	 //  all the named buttons we’ve already mapped for you!
 
-			   	 controller.addEventListener( 'primary press began', function( event ){
-			   		 if ( controller.gamepad.hand === 'left' ) {
-
-			   		 }
-			   		 else {
-
-			   		 }
-			   		 //guiInputHelper.pressed( true )
-			   	 })
+			   	 controller.addEventListener( 'primary press began', onSelectStart );
+				 // controller.addEventListener( 'primary press began', onSelectEnd );
 		    });
+		}
+		function add_buttons() {
+			fontsize = 0.25;
+			vert_offset = 2.*fontsize;
+			horiz_offset = 2.5;
+			back = 2.0;
+			vert_initial_value = 2;
+			horiz_initial_value = -4;
+			var loader = new THREE.FontLoader();
+			loader.load( 'http://localhost:54321/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+				Lonely_Ds = [3,4,5,6,7,8,9,10,30];
+				Inclined_Ds = [3,4,5,6];
+				Uniaxial_Ds = [3,4,5,6];
+				Catch_Ds = [3,4,5,6];
+
+				names = ['Lonely','Inclined','Uniaxial','Catch'];
+				fnames = ['Lonely','','Uniaxial',''];
+				Ds = [Lonely_Ds,Inclined_Ds,Uniaxial_Ds,Catch_Ds];
+				extra_strings = ['','','','&view_mode=catch_particle']
+				var mat = new THREE.MeshPhongMaterial( { color: 0x333333 } );
+				var geom = new THREE.BoxGeometry( 0.9*horiz_offset,0.8*vert_offset, 0.1 );
+				var button_bg = new THREE.Mesh( geom, mat );
+				button_bg.position.x = 0.4*horiz_offset;
+				button_bg.position.y = 0.4*vert_offset;
+				button_bg.position.z = -0.1;
+
+				for ( var i=0;i<Ds.length;i++ ) {
+					for ( var j=0;j<Ds[i].length;j++ ) {
+						var mat = new THREE.MeshPhongMaterial( { color: 0xe72564 } );
+						var geom = new THREE.TextBufferGeometry( names[i] + " D" + String(Ds[i][j]), { font: font, size: fontsize, height: fontsize/5., } );
+			    		var button = new THREE.Mesh( geom, mat );
+
+						button.add(button_bg.clone());
+
+						button.rotation.y = -Math.PI/2.;
+						button.position.y = vert_initial_value - vert_offset*j;
+						button.position.x = back;
+						button.position.z = horiz_initial_value + horiz_offset*i;
+						button.url = 'http://localhost:54321/visualise/index.html?display_type=VR&fname='+fnames[i]+'D'+String(Ds[i][j])+extra_strings[i];
+						buttons.add(button);
+					}
+				}
+
+			});
+			scene.add(buttons);
 		}
 
 		function make_lights() {
@@ -136,11 +175,13 @@
 		        var intersection = intersections[ 0 ];
 		        tempMatrix.getInverse( controller.matrixWorld );
 		        var object = intersection.object;
-		        object.matrix.premultiply( tempMatrix );
-		        object.matrix.decompose( object.position, object.quaternion, object.scale );
-		        object.material.emissive.b = 1;
-		        controller.add( object );
-		        controller.userData.selected = object;
+				window.location.href = object.url; // simulate mouse click
+				//window.location.replace(object.url); // simulate HTTP redirect
+		        // object.matrix.premultiply( tempMatrix );
+		        // object.matrix.decompose( object.position, object.quaternion, object.scale );
+		        // object.material.emissive.b = 1;
+		        // controller.add( object );
+		        // controller.userData.selected = object;
 		    }
 		}
 
@@ -150,8 +191,8 @@
 		        var object = controller.userData.selected;
 		        object.matrix.premultiply( controller.matrixWorld );
 		        object.matrix.decompose( object.position, object.quaternion, object.scale );
-		        object.material.emissive.b = 0;
-		        particles.add( object );
+		        // object.material.emissive.b = 0;
+		        //buttons.add( object );
 		        controller.userData.selected = undefined;
 		    }
 		};
@@ -163,7 +204,7 @@
 		    raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
 		    raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
-		    return raycaster.intersectObjects( particles.children );
+		    return raycaster.intersectObjects( buttons.children );
 
 		}
 
@@ -181,6 +222,7 @@
 		        var intersection = intersections[ 0 ];
 
 		        var object = intersection.object;
+				console.log(object);
 		        object.material.emissive.r = 1;
 		        intersected.push( object );
 
