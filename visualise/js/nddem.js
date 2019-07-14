@@ -16,6 +16,7 @@ if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.r
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 1.8; // height of the human in m
+// var human_height = 0.; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
@@ -392,7 +393,7 @@ function add_controllers() {
                 console.log('Added right hand'); }
         	scene.add( controller )
         	controller.standingMatrix = renderer.vr.getStandingMatrix()
-        	//controller.head = window.camera
+        	controller.head = window.camera
 
         	//  Allow this controller to interact with DAT GUI.
         	//var guiInputHelper = dat.GUIVR.addInputObject( controller )
@@ -678,6 +679,18 @@ function make_lights() {
 }
 
 function make_walls() {
+    if ( display_type === 'VR' ) {
+        var base_plain_geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+        var base_plain_material = new THREE.MeshStandardMaterial( {
+            color: 0x000000,
+        } );
+        var base_plain = new THREE.Mesh( base_plain_geometry, base_plain_material );
+        base_plain.rotation.x = -Math.PI/2;
+        base_plain.scale.set(10,10,10);
+        base_plain.position.y = -0.1 - human_height;
+        scene.add(base_plain);
+    }
+
     var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
     var material = new THREE.MeshStandardMaterial( {
         color: 0xaaaaaa,
@@ -696,15 +709,32 @@ function make_walls() {
 
     if ( world[0].wall ) {
         var floor = new THREE.Mesh( geometry, material );
-        floor.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1)
-        floor.rotation.y = + Math.PI / 2;
-        floor.position.set(world[0].min,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
+        if ( window.display_type === 'VR' ) {
+            floor.scale.set((world[2].max - world[2].min)*vr_scale,(world[1].max - world[1].min)*vr_scale,1);
+            floor.rotation.x = + Math.PI / 2;
+            floor.position.set((world[1].max - world[1].min)/2.*vr_scale,world[0].min*vr_scale-human_height,(world[2].max - world[2].min)*vr_scale/2.);
+            floor.material.side = THREE.DoubleSide;
+        }
+        else {
+            floor.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1);
+            floor.rotation.y = + Math.PI / 2;
+            floor.position.set(world[0].min,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.);
+        }
         scene.add( floor );
 
         roof = new THREE.Mesh( geometry, material );
-        roof.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1)
-        roof.rotation.y = - Math.PI / 2;
-        roof.position.set(world[0].max,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.)
+        if ( window.display_type === 'VR' ) {
+            roof.scale.set((world[2].max - world[2].min)*vr_scale,(world[1].max - world[1].min)*vr_scale,1);
+            roof.rotation.x = - Math.PI / 2;
+            roof.position.set((world[1].max - world[1].min)/2.*vr_scale,world[0].max*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
+            roof.material.side = THREE.DoubleSide;
+        }
+        else {
+            roof.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1);
+            roof.rotation.y = - Math.PI / 2;
+            roof.position.set(world[0].max,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.);
+        }
+
         if ( fname.includes('Uniaxial') ) {
             roof.material.side = THREE.DoubleSide;
             roof.material.opacity = 0.9;
@@ -716,29 +746,60 @@ function make_walls() {
 
     if ( world[1].wall ) {
         var left_wall = new THREE.Mesh( geometry, material );
-        left_wall.scale.set(world[2].max - world[2].min,world[0].max - world[0].min,1)
-        left_wall.rotation.x = - Math.PI / 2;
-        left_wall.position.set((world[0].max - world[0].min)/2.,world[1].min,(world[2].max - world[2].min)/2.)
+        if ( display_type === 'VR' ) {
+            left_wall.scale.set((world[2].max - world[2].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+            left_wall.rotation.y = - Math.PI / 2;
+            left_wall.position.set(world[1].min*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
+            left_wall.material.side = THREE.DoubleSide;
+        }
+        else {
+            left_wall.scale.set(world[2].max - world[2].min,world[0].max - world[0].min,1);
+            left_wall.rotation.x = - Math.PI / 2;
+            left_wall.position.set((world[0].max - world[0].min)/2.,world[1].min,(world[2].max - world[2].min)/2.);
+        }
         scene.add( left_wall );
 
         var right_wall = new THREE.Mesh( geometry, material );
-        right_wall.scale.set(world[2].max - world[2].min,world[0].max - world[0].min,1)
-        right_wall.rotation.x = Math.PI / 2;
-        right_wall.position.set((world[0].max - world[0].min)/2.,world[1].max,(world[2].max - world[2].min)/2.)
+        if ( display_type === 'VR' ) {
+            right_wall.scale.set((world[2].max - world[2].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+            right_wall.rotation.y = Math.PI / 2;
+            right_wall.position.set(world[1].max*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
+            right_wall.material.side = THREE.DoubleSide;
+        }
+        else {
+            right_wall.scale.set(world[2].max - world[2].min,world[0].max - world[0].min,1);
+            right_wall.rotation.x = Math.PI / 2;
+            right_wall.position.set((world[0].max - world[0].min)/2.,world[1].max,(world[2].max - world[2].min)/2.);
+        }
         scene.add( right_wall );
     }
 
     if (N > 2) {
         if ( world[2].wall ) {
             var front_wall = new THREE.Mesh( geometry, material );
-            front_wall.scale.set(world[0].max - world[0].min,world[1].max - world[1].min,1)
-            front_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].min)
+            if ( display_type === 'VR' ) {
+                front_wall.scale.set((world[1].max - world[1].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+                front_wall.position.set((world[1].max - world[1].min)/2.*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,world[2].min*vr_scale);
+                front_wall.material.side = THREE.DoubleSide;
+            }
+            else {
+                front_wall.scale.set(world[0].max - world[0].min,world[1].max - world[1].min,1);
+                front_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].min);
+            }
             scene.add( front_wall );
 
             var back_wall = new THREE.Mesh( geometry, material );
-            back_wall.scale.set(world[0].max - world[0].min,world[1].max - world[1].min,1)
-            back_wall.rotation.y = Math.PI;
-            back_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].max)
+            if ( display_type === 'VR' ) {
+                back_wall.scale.set((world[1].max - world[1].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+                back_wall.rotation.x = Math.PI;
+                back_wall.position.set((world[1].max - world[1].min)/2.*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,world[2].max*vr_scale);
+                back_wall.material.side = THREE.DoubleSide;
+            }
+            else {
+                back_wall.scale.set(world[0].max - world[0].min,world[1].max - world[1].min,1);
+                back_wall.rotation.y = Math.PI;
+                back_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].max);
+            }
             scene.add( back_wall );
         }
     }
@@ -1285,13 +1346,14 @@ function check_if_won() {
 }
 
 function animate() {
-    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/time.max*2.*Math.PI/2.; } // rotate the background over time
+    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/time.max*2.*Math.PI/4.; } // rotate the background over time
     if ( view_mode === 'catch_particle' ) { check_if_won(); }
     THREE.VRController.update();
     if ( redraw_left ) { update_higher_dims_left(); }
     if ( redraw_right ) { update_higher_dims_right(); }
     if ( fname.includes('Uniaxial') ) {
-        roof.position.x = world[0].max - 5. - time.cur/10.;
+        if ( display_type === 'VR' ) { roof.position.y = (world[0].max - 5. - time.cur/10.)*vr_scale - human_height; }
+        else { roof.position.x = world[0].max - 5. - time.cur/10.; }
     }
     if (N > 3) {
         for (iii=3;iii<N;iii++) {
