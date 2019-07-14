@@ -24,6 +24,9 @@ var redraw_left = false; // force redrawing of particles
 var redraw_right = false;
 var left_hand, right_hand;
 var hard_mode;
+var winning = false; // did you win the game?
+var winning_texture;
+
 if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
 else { var zoom = 20; } // default zoom level
 if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
@@ -125,6 +128,7 @@ function build_world() {
         // invert the geometry on the x-axis so that all of the faces point inward
         geometry.scale( - 1, 1, 1 );
         var texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/eso0932a.jpg' );
+        winning_texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/winning.png' );
         var material = new THREE.MeshBasicMaterial( { map: texture } );
         bg = new THREE.Mesh( geometry, material );
         bg.rotation.z = Math.PI/2; // TODO: CHECK THIS!
@@ -150,89 +154,6 @@ function build_world() {
     add_gui();
     window.addEventListener( 'resize', onWindowResize, false );
     if ( window.display_type === 'VR' ) { add_vive_models(); }
-
-    window.addEventListener( 'vr controller connected', function( event ){
-    	//  Here it is, your VR controller instance.
-    	//  It’s really a THREE.Object3D so you can just add it to your scene:
-    	var controller = event.detail
-        if ( controller.gamepad.hand === 'left' ) {
-            controller.add(controller1);
-            left_hand = new THREE.Object3D;
-            left_hand.previous_torus_rotation_z = 0.;
-            left_hand.previous_torus_rotation_y = 0.;
-            left_hand.new_orientation = 0.;
-            left_hand.previous_direction = new THREE.Quaternion();
-            left_hand.current_direction  = new THREE.Quaternion();
-            left_hand.diff               = new THREE.Quaternion();
-            left_hand.diff_angle = new THREE.Euler();
-            console.log('Added left hand'); }
-        else if ( controller.gamepad.hand === 'right' ) {
-            controller.add(controller2);
-            right_hand = new THREE.Object3D;
-            right_hand.previous_torus_rotation_z = 0.;
-            right_hand.previous_torus_rotation_y = 0.;
-            right_hand.new_orientation = 0.;
-            right_hand.previous_direction = new THREE.Quaternion();
-            right_hand.current_direction  = new THREE.Quaternion();
-            right_hand.diff               = new THREE.Quaternion();
-            right_hand.diff_angle = new THREE.Euler();
-            console.log('Added right hand'); }
-    	scene.add( controller )
-    	controller.standingMatrix = renderer.vr.getStandingMatrix()
-    	controller.head = window.camera
-
-    	//  Allow this controller to interact with DAT GUI.
-    	//var guiInputHelper = dat.GUIVR.addInputObject( controller )
-    	//scene.add( guiInputHelper )
-    	//  Button events. How easy is this?!
-    	//  We’ll just use the “primary” button -- whatever that might be ;)
-    	//  Check out the THREE.VRController.supported{} object to see
-    	//  all the named buttons we’ve already mapped for you!
-
-
-
-    	controller.addEventListener( 'primary press began', function( event ){
-            if ( controller.gamepad.hand === 'left' ) {
-                wristband1.material.emissive = new THREE.Color(0.5,0.5,0.5);
-                if ( N > 3 ) {
-                    redraw_left = true;
-                    controller1.getWorldQuaternion(left_hand.previous_direction);
-                    left_hand.previous_torus_rotation_z = wristband1.rotation.z;
-                }
-                if ( N > 4 ) { left_hand.previous_torus_rotation_x = (world[4].cur - world[4].min)/(world[4].max - world[4].min)*2*Math.PI; }
-            }
-            else {
-                wristband2.material.emissive = new THREE.Color(0.5,0.5,0.5);
-                if ( N > 5 ) {
-                    redraw_right = true;
-                    controller2.getWorldQuaternion(right_hand.previous_direction);
-                    right_hand.previous_torus_rotation_z = wristband2.rotation.z;
-                }
-                if ( N > 6 ) { right_hand.previous_torus_rotation_x = (world[6].cur - world[6].min)/(world[6].max - world[6].min)*2*Math.PI; }
-            }
-    		//guiInputHelper.pressed( true )
-    	})
-    	controller.addEventListener( 'primary press ended', function( event ){
-            if ( controller.gamepad.hand === 'left' ) {
-                redraw_left = false;
-                wristband1.material.emissive = new THREE.Color(0.,0.,0.);
-            }
-            else {
-                redraw_right = false;
-                wristband2.material.emissive = new THREE.Color(0.,0.,0.);
-            }
-    		//guiInputHelper.pressed( false )
-    	})
-        controller.addEventListener( 'thumbpad press began', function( event ){
-            time.play = !time.play;
-            //guiInputHelper.pressed( true )
-        })
-
-    	controller.addEventListener( 'disconnected', function( event ){
-    		controller.parent.remove( controller )
-    	})
-    })
-
 }
 
 function update_higher_dims_left() {
@@ -312,16 +233,18 @@ function add_vive_models() {
                 controller1.add( controller.clone() );
                 controller2.add( controller.clone() );
 
-                // Move label
-                geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
-                var move_label = new THREE.Mesh( geometry, textMaterial );
-                move_label.rotation.x = -Math.PI/2.;
-                move_label.rotation.y = Math.PI;
-                move_label.position.y = -0.03 -fontsize;
-                move_label.position.x = 0.01;
-                move_label.position.z = 0.045;
-                if ( N > 3 ) { controller1.add(move_label); }
-                if ( N > 5 ) { controller2.add(move_label); }
+                if ( !hard_mode ) {
+                    // Move label
+                    geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
+                    var move_label = new THREE.Mesh( geometry, textMaterial );
+                    move_label.rotation.x = -Math.PI/2.;
+                    move_label.rotation.y = Math.PI;
+                    move_label.position.y = -0.03 -fontsize;
+                    move_label.position.x = 0.01;
+                    move_label.position.z = 0.045;
+                    if ( N > 3 ) { controller1.add(move_label); }
+                    if ( N > 5 ) { controller2.add(move_label); }
+                }
             });
 		} );
 
@@ -427,7 +350,92 @@ function add_gui() {
 }
 
 function add_controllers() {
-    if (window.display_type == "VR") {
+    if ( window.display_type == "VR" ) {
+        window.addEventListener( 'vr controller connected', function( event ){
+        	//  Here it is, your VR controller instance.
+        	//  It’s really a THREE.Object3D so you can just add it to your scene:
+        	var controller = event.detail
+            //console.log(controller)
+            if ( controller.gamepad.hand === 'left' ) {
+                controller.name = 'vive_left_hand';
+                controller.add(controller1);
+                left_hand = new THREE.Object3D;
+                left_hand.previous_torus_rotation_z = 0.;
+                left_hand.previous_torus_rotation_y = 0.;
+                left_hand.new_orientation = 0.;
+                left_hand.previous_direction = new THREE.Quaternion();
+                left_hand.current_direction  = new THREE.Quaternion();
+                left_hand.diff               = new THREE.Quaternion();
+                left_hand.diff_angle = new THREE.Euler();
+                console.log('Added left hand'); }
+            else if ( controller.gamepad.hand === 'right' ) {
+                controller.add(controller2);
+                controller.name = 'vive_right_hand';
+                right_hand = new THREE.Object3D;
+                right_hand.previous_torus_rotation_z = 0.;
+                right_hand.previous_torus_rotation_y = 0.;
+                right_hand.new_orientation = 0.;
+                right_hand.previous_direction = new THREE.Quaternion();
+                right_hand.current_direction  = new THREE.Quaternion();
+                right_hand.diff               = new THREE.Quaternion();
+                right_hand.diff_angle = new THREE.Euler();
+                console.log('Added right hand'); }
+        	scene.add( controller )
+        	controller.standingMatrix = renderer.vr.getStandingMatrix()
+        	//controller.head = window.camera
+
+        	//  Allow this controller to interact with DAT GUI.
+        	//var guiInputHelper = dat.GUIVR.addInputObject( controller )
+        	//scene.add( guiInputHelper )
+        	//  Button events. How easy is this?!
+        	//  We’ll just use the “primary” button -- whatever that might be ;)
+        	//  Check out the THREE.VRController.supported{} object to see
+        	//  all the named buttons we’ve already mapped for you!
+
+
+            if ( !hard_mode ) {
+            	controller.addEventListener( 'primary press began', function( event ){
+                    if ( controller.gamepad.hand === 'left' ) {
+                        if ( N > 3 ) {
+                            wristband1.material.emissive = new THREE.Color(0.5,0.5,0.5);
+                            redraw_left = true;
+                            controller1.getWorldQuaternion(left_hand.previous_direction);
+                            left_hand.previous_torus_rotation_z = wristband1.rotation.z;
+                        }
+                        if ( N > 4 ) { left_hand.previous_torus_rotation_x = (world[4].cur - world[4].min)/(world[4].max - world[4].min)*2*Math.PI; }
+                    }
+                    else {
+                        if ( N > 5 ) {
+                            wristband2.material.emissive = new THREE.Color(0.5,0.5,0.5);
+                            redraw_right = true;
+                            controller2.getWorldQuaternion(right_hand.previous_direction);
+                            right_hand.previous_torus_rotation_z = wristband2.rotation.z;
+                        }
+                        if ( N > 6 ) { right_hand.previous_torus_rotation_x = (world[6].cur - world[6].min)/(world[6].max - world[6].min)*2*Math.PI; }
+                    }
+            		//guiInputHelper.pressed( true )
+            	})
+            	controller.addEventListener( 'primary press ended', function( event ){
+                    if ( controller.gamepad.hand === 'left' ) {
+                        redraw_left = false;
+                        if ( N > 3 ) { wristband1.material.emissive = new THREE.Color(0.,0.,0.); }
+                    }
+                    else {
+                        redraw_right = false;
+                        if ( N > 5 ) { wristband2.material.emissive = new THREE.Color(0.,0.,0.); }
+                    }
+            		//guiInputHelper.pressed( false )
+            	})
+            }
+            controller.addEventListener( 'thumbpad press began', function( event ){
+                time.play = !time.play;
+                //guiInputHelper.pressed( true )
+            })
+
+        	controller.addEventListener( 'disconnected', function( event ){
+        		controller.parent.remove( controller )
+        	})
+        })
         // built in THREEjs
         //controller1 = renderer.vr.getController( 0 ); // JUST HAS ONE BUTTON MAPPED! - SEE WebVRManager
         //controller2 = renderer.vr.getController( 1 );
@@ -457,19 +465,19 @@ function add_controllers() {
         aim_camera()
         console.log("VR mode loaded");
 
-        if ( view_mode === 'catch_particle' ) {
-            var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
-
-            var line = new THREE.Line( geometry );
-            line.name = 'line';
-            line.scale.z = 5;
-
-            if (window.display_type == "VR") {
-                controller1.add( line.clone() );
-                controller2.add( line.clone() );
-                };
-            raycaster = new THREE.Raycaster();
-        }
+        // if ( view_mode === 'catch_particle' ) {
+        //     var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+        //
+        //     var line = new THREE.Line( geometry );
+        //     line.name = 'line';
+        //     line.scale.z = 5;
+        //
+        //     if (window.display_type == "VR") {
+        //         controller1.add( line.clone() );
+        //         controller2.add( line.clone() );
+        //         };
+        //     raycaster = new THREE.Raycaster();
+        // }
 
     } else if (window.display_type == 'keyboard') {
         if ( N < 3 ) {
@@ -1078,70 +1086,70 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[9].cur - spheres[i].x9), 2)
                                          ); // FIXME - IS THIS RIGHT?
                  };
-                if (isNaN(R_draw)) {
-                    object.visible = false;
-                }
-                if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
+                if (isNaN(R_draw)) { object.visible = false; }
                 else {
-                    if ( window.display_type === 'VR') {
-                        R_draw = R_draw*vr_scale;
-                        object.position.set(spheres[i].x1*vr_scale,spheres[i].x0*vr_scale - human_height,spheres[i].x2*vr_scale);
-                    }
+                    if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
                     else {
-                        object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
+                        if ( window.display_type === 'VR') {
+                            R_draw = R_draw*vr_scale;
+                            object.position.set(spheres[i].x1*vr_scale,spheres[i].x0*vr_scale - human_height,spheres[i].x2*vr_scale);
+                        }
+                        else {
+                            object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
+                        }
+                        object.scale.set(R_draw,R_draw,R_draw);
+                        object.visible = true;
+                        if ( view_mode === 'velocity' ) {
+                            lut.setMin(0);
+                            lut.setMax(velocity.vmax);
+                            object.material.color = lut.getColor(spheres[i].Vmag);
+                        }
+                        else if ( view_mode === 'rotation_rate' ) {
+                            lut.setMin(0);
+                            lut.setMax(velocity.omegamax);
+                            object.material.color = lut.getColor(spheres[i].Omegamag);
+                        }
                     }
-                    object.scale.set(R_draw,R_draw,R_draw);
-                    object.visible = true;
-
-                    if ( view_mode === 'velocity' ) {
-                        lut.setMin(0);
-                        lut.setMax(velocity.vmax);
-                        object.material.color = lut.getColor(spheres[i].Vmag);
-                    }
-                    else if ( view_mode === 'rotation_rate' ) {
-                        lut.setMin(0);
-                        lut.setMax(velocity.omegamax);
-                        object.material.color = lut.getColor(spheres[i].Omegamag);
-                    }
                 };
+                if ( !hard_mode ) {
+                    if ( N == 4 && !fname.includes('Spinner')) {
+                        var object2 = wristband1.children[i];
+                        phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) - Math.PI/2.;
+                        x = (R + r)*Math.cos(phi);
+                        y = (R + r)*Math.sin(phi);
+                        z = 0.;
+                        object2.position.set(x,y,z);
+                    };
 
-                if ( N == 4 && !fname.includes('Spinner')) {
-                    var object2 = wristband1.children[i];
-                    phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) - Math.PI/2.;
-                    x = (R + r)*Math.cos(phi);
-                    y = (R + r)*Math.sin(phi);
-                    z = 0.;
-                    object2.position.set(x,y,z);
-                };
+                    if ( N > 4 && !fname.includes('Spinner') && !hard_mode ) {
+                        var object2 = wristband1.children[i];
+                        phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) - Math.PI/2.;
+                        theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
+                        x = (R + r*Math.cos(theta))*Math.cos(phi);
+                        y = (R + r*Math.cos(theta))*Math.sin(phi);
+                        z = r*Math.sin(theta);
+                        object2.position.set(x,y,z);
+                    };
 
-                if ( N > 4 && !fname.includes('Spinner') && !hard_mode ) {
-                    var object2 = wristband1.children[i];
-                    phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) - Math.PI/2.;
-                    theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
-                    x = (R + r*Math.cos(theta))*Math.cos(phi);
-                    y = (R + r*Math.cos(theta))*Math.sin(phi);
-                    z = r*Math.sin(theta);
-                    object2.position.set(x,y,z);
-                };
+                    if ( N == 6 && !fname.includes('Spinner') ) {
+                        var object3 = wristband2.children[i];
+                        phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) - Math.PI/2.;
+                        x = (R + r)*Math.cos(phi);
+                        y = (R + r)*Math.sin(phi);
+                        z = 0.;
+                        object3.position.set(x,y,z);
+                    };
 
-                if ( N == 6 && !fname.includes('Spinner') ) {
-                    var object3 = wristband2.children[i];
-                    phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) - Math.PI/2.;
-                    x = (R + r)*Math.cos(phi);
-                    y = (R + r)*Math.sin(phi);
-                    z = 0.;
-                    object3.position.set(x,y,z);
-                };
-
-                if ( N >= 7 && !fname.includes('Spinner') ) {
-                    var object3 = wristband2.children[i];
-                    phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) - Math.PI/2.;
-                    theta = 2.*Math.PI*(world[6].cur - spheres[i].x6)/(world[6].max - world[6].min) ;
-                    x = (R + r*Math.cos(theta))*Math.cos(phi);
-                    y = (R + r*Math.cos(theta))*Math.sin(phi);
-                    z = r*Math.sin(theta);
-                    object3.position.set(x,y,z);
-                };
+                    if ( N >= 7 && !fname.includes('Spinner') ) {
+                        var object3 = wristband2.children[i];
+                        phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) - Math.PI/2.;
+                        theta = 2.*Math.PI*(world[6].cur - spheres[i].x6)/(world[6].max - world[6].min) ;
+                        x = (R + r*Math.cos(theta))*Math.cos(phi);
+                        y = (R + r*Math.cos(theta))*Math.sin(phi);
+                        z = r*Math.sin(theta);
+                        object3.position.set(x,y,z);
+                    };
+                }
             }
         }
     });
@@ -1201,7 +1209,8 @@ function getIntersections( controller ) {
     raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
     raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
-    return raycaster.intersectObjects( particles.children );
+    if ( particles !== undefined ) { return raycaster.intersectObjects( particles.children ); }
+    else { return []; }
 
 }
 
@@ -1240,17 +1249,30 @@ function cleanIntersected() {
 };
 
 function check_if_won() {
-    if ( spheres[pinky].visible = true ) {
-        if ( controller1.position.distanceTo(particles.children[pinky].position) < spheres[pinky].R ||
-             controller2.position.distanceTo(particles.children[pinky].position) < spheres[pinky].R ) {
-                 alert('You win!');
+    if ( particles !== undefined ) {
+        if ( particles.children[pinky].visible === true ) {
+            var loc_left = new THREE.Vector3;
+            var loc_right = new THREE.Vector3;
+            if ( scene.getObjectByName('vive_left_hand') && scene.getObjectByName('vive_right_hand') ) {
+                scene.getObjectByName('vive_left_hand').getWorldPosition(loc_left);
+                scene.getObjectByName('vive_right_hand').getWorldPosition(loc_right);
+                //console.log(controller1.position.distanceTo(particles.children[pinky].position));
+                //console.log(controller2.position.distanceTo(particles.children[pinky].position));
+                if ( loc_left.distanceTo(particles.children[pinky].position) < particles.children[pinky].scale.x ||
+                     loc_right.distanceTo(particles.children[pinky].position) < particles.children[pinky].scale.x ) {
+                         winning = true;
+                         bg.material.map = winning_texture;
+                         bg.rotation.x = 0.
+                         bg.rotation.y = 0.
+                         bg.rotation.z = 0.
+                 }
              }
-
-    }
+         }
+     }
 }
 
 function animate() {
-    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/time.max*2.*Math.PI; } // rotate the background over time
+    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/time.max*2.*Math.PI/2.; } // rotate the background over time
     if ( view_mode === 'catch_particle' ) { check_if_won(); }
     THREE.VRController.update();
     if ( redraw_left ) { update_higher_dims_left(); }
@@ -1281,15 +1303,15 @@ function animate() {
 };
 
 function render() {
-    if ( renderer.vr.isPresenting() ) {
-        //scene.scale.set( vr_scale, vr_scale, vr_scale );
-        //scene.rotation.z = -Math.PI/2.;
-    }// TODO: SET VR SCALING TO LOOK GOOD
-    if ( view_mode === 'catch_particle' && window.display_type == "VR" ) {
-        cleanIntersected();
-        intersectObjects( controller1 );
-        intersectObjects( controller2 );
-    }
+    // if ( renderer.vr.isPresenting() ) {
+    //     //scene.scale.set( vr_scale, vr_scale, vr_scale );
+    //     //scene.rotation.z = -Math.PI/2.;
+    // }// TODO: SET VR SCALING TO LOOK GOOD
+    // if ( view_mode === 'catch_particle' && window.display_type == "VR" ) {
+    //     cleanIntersected();
+    //     intersectObjects( controller1 );
+    //     intersectObjects( controller2 );
+    // }
     if (window.display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
 };
