@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>NDDEM</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
+        <style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+            #N_tag {
+                color: white;
+                padding: 24px;
+                font: 48px Montserrat;
+                font-weight: bold;
+                position:absolute;
+            }
+		</style>
+	</head>
+	<body>
+		<script src="node_modules/three/build/three.js"></script>
+        <script src="node_modules/three/examples/js/WebGL.js"></script>
+		<script src="node_modules/three/examples/js/vr/WebVR.js"></script>
+        <script src="node_modules/three/examples/js/effects/AnaglyphEffect.js"></script>
+        <script src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
+		<script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
+		<script src="node_modules/three/examples/js/vr/ViveController.js"></script>
+		<script src="js/VRController.js"></script>
+        <script src="node_modules/papaparse/papaparse.js"></script>
+        <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <!-- <script src="js/datguivr.js"></script> -->
+        <script src="node_modules/three/examples/js/math/Lut.js"></script>
+        <script>
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		scene = new THREE.Scene();
+	    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+
+		var intersected = [];
+		var tempMatrix = new THREE.Matrix4(); // catching grains
+		var particles = new THREE.Group();
+
+		add_controllers();
+
+		camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
+		camera.position.set(5,5,5);
+		make_lights();
+		add_renderer();
+		window.addEventListener( 'resize', onWindowResize, false );
+		animate();
+
+		function add_renderer() {
+		    renderer = new THREE.WebGLRenderer( { antialias: true } );
+		    renderer.setPixelRatio( window.devicePixelRatio );
+		    renderer.setSize( window.innerWidth, window.innerHeight );
+		    // renderer.setSize( container.offsetWidth, container.offsetHeight );
+		    renderer.vr.enabled = true;
+		    container.appendChild( renderer.domElement );
+
+	        container.appendChild( WEBVR.createButton( renderer ) );
+	        window.addEventListener('vrdisplayactivate', () => {
+	                renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] );
+	            }); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
+    	};
+
+		function add_controllers() {
+			controller1 = new THREE.Object3D;
+			controller2 = new THREE.Object3D;
+
+		    var loader = new THREE.OBJLoader();
+				loader.setPath( 'http://localhost:54321/visualise/resources/vive/' );
+				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+					var loader = new THREE.TextureLoader();
+					loader.setPath( 'http://localhost:54321/visualise/resources/vive/' );
+					var controller = object.children[ 0 ];
+					controller.material.map = loader.load( 'onepointfive_texture.png' );
+					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+
+				} );
+
+			var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+
+			var line = new THREE.Line( geometry );
+			line.name = 'line';
+			line.scale.z = 5;
+
+			controller1.add( line.clone() );
+			controller2.add( line.clone() );
+
+			raycaster = new THREE.Raycaster();
+
+			window.addEventListener( 'vr controller connected', function( event ){
+			   	 //  Here it is, your VR controller instance.
+			   	 //  It’s really a THREE.Object3D so you can just add it to your scene:
+			   	 var controller = event.detail
+			   	 if ( controller.gamepad.hand === 'left' ) {
+			   		 controller.add(controller1);
+			   	 }
+			   	 else if ( controller.gamepad.hand === 'right' ) {
+			   		 controller.add(controller2);
+			   	 }
+			   	 scene.add( controller )
+			   	 controller.standingMatrix = renderer.vr.getStandingMatrix()
+			   	 controller.head = window.camera
+
+			   	 //  Allow this controller to interact with DAT GUI.
+			   	 //var guiInputHelper = dat.GUIVR.addInputObject( controller )
+			   	 //scene.add( guiInputHelper )
+			   	 //  Button events. How easy is this?!
+			   	 //  We’ll just use the “primary” button -- whatever that might be ;)
+			   	 //  Check out the THREE.VRController.supported{} object to see
+			   	 //  all the named buttons we’ve already mapped for you!
+
+			   	 controller.addEventListener( 'primary press began', function( event ){
+			   		 if ( controller.gamepad.hand === 'left' ) {
+
+			   		 }
+			   		 else {
+
+			   		 }
+			   		 //guiInputHelper.pressed( true )
+			   	 })
+		    });
+		}
+
+		function make_lights() {
+		    var background_light = new THREE.AmbientLight( 0xFFFFFF );
+		    scene.add( background_light );
+		}
+
+		function onSelectStart( event ) {
+		    var controller = event.target;
+		    var intersections = getIntersections( controller );
+		    if ( intersections.length > 0 ) {
+		        var intersection = intersections[ 0 ];
+		        tempMatrix.getInverse( controller.matrixWorld );
+		        var object = intersection.object;
+		        object.matrix.premultiply( tempMatrix );
+		        object.matrix.decompose( object.position, object.quaternion, object.scale );
+		        object.material.emissive.b = 1;
+		        controller.add( object );
+		        controller.userData.selected = object;
+		    }
+		}
+
+		function onSelectEnd( event ) {
+		    var controller = event.target;
+		    if ( controller.userData.selected !== undefined ) {
+		        var object = controller.userData.selected;
+		        object.matrix.premultiply( controller.matrixWorld );
+		        object.matrix.decompose( object.position, object.quaternion, object.scale );
+		        object.material.emissive.b = 0;
+		        particles.add( object );
+		        controller.userData.selected = undefined;
+		    }
+		};
+
+		function getIntersections( controller ) {
+
+		    tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+		    raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+		    raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+
+		    return raycaster.intersectObjects( particles.children );
+
+		}
+
+		function intersectObjects( controller ) {
+
+		    // Do not highlight when already selected
+
+		    if ( controller.userData.selected !== undefined ) return;
+
+		    var line = controller.getObjectByName( 'line' );
+		    var intersections = getIntersections( controller );
+
+		    if ( intersections.length > 0 ) {
+
+		        var intersection = intersections[ 0 ];
+
+		        var object = intersection.object;
+		        object.material.emissive.r = 1;
+		        intersected.push( object );
+
+		        line.scale.z = intersection.distance;
+
+		    } else {
+
+		        line.scale.z = 5;
+
+		    }
+
+		}
+
+		function cleanIntersected() {
+		    while ( intersected.length ) {
+		        var object = intersected.pop();
+		        object.material.emissive.r = 0;
+		    }
+		};
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+		    camera.updateProjectionMatrix();
+		    renderer.setSize( window.innerWidth, window.innerHeight );
+		    render();
+		};
+
+		function animate() {
+		    THREE.VRController.update();
+		    requestAnimationFrame( animate );
+		    renderer.setAnimationLoop( render );
+		};
+
+		function render() {
+	        cleanIntersected();
+	        intersectObjects( controller1 );
+	        intersectObjects( controller2 );
+ 			renderer.render( scene, camera );
+		};
+
+        </script>
+	</body>
+</html>
