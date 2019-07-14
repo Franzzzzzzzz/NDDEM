@@ -230,6 +230,15 @@ function add_vive_models() {
                 pause_label.position.z = 0.05;
                 controller.add(pause_label);
 
+                var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
+                var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                var menu_label = new THREE.Mesh( geometry, textMaterial );
+                menu_label.rotation.x = -Math.PI/2.;
+                menu_label.position.y = 2*fontsize;
+                menu_label.position.x = -0.008;
+                menu_label.position.z = 0.023;
+                controller.add(menu_label);
+
                 controller1.add( controller.clone() );
                 controller2.add( controller.clone() );
 
