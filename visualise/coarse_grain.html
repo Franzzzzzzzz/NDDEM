@@ -72,10 +72,11 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 			// Create camera (The volume renderer does not work very well with perspective yet)
-			var h = 32; // frustum height
+			var h = 4; // frustrum height
 			var aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 0., 1000 );
-            camera.position.set( 50, 50, 50 );
+			// camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 0., 100 );
+            camera = new THREE.OrthographicCamera( );
+            camera.position.set( 200, 200, 200 );
 
             controls = new THREE.TrackballControls( camera, renderer.domElement );
 			// controls.rotateSpeed = 1.0;
@@ -189,6 +190,8 @@
 				var geometry = new THREE.BoxBufferGeometry( nx, ny, nz );
 				geometry.translate( nx / 2 - 0.5, ny / 2 - 0.5, nz / 2 - 0.5 );
 				var mesh = new THREE.Mesh( geometry, material );
+                nx_max = Math.max(nx, ny, nz);
+                mesh.scale.set(1./nx_max,1./nx_max,1./nx_max);
 				scene.add( mesh );
 				render();
 			} );

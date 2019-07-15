@@ -10,7 +10,7 @@ var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
-var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 1.0, 'save_rate': 1000} // temporal properties
+var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000} // temporal properties
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
 if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // seconds/second
 var axeslength, fontsize; // axis properties
@@ -128,7 +128,7 @@ function build_world() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
     // scene.background = new THREE.Color( 0xFFFFFF ); // white
-    if ( window.display_type === 'VR' ) {
+    if ( display_type === 'VR' ) {
         var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
         // invert the geometry on the x-axis so that all of the faces point inward
         geometry.scale( - 1, 1, 1 );
@@ -158,7 +158,7 @@ function build_world() {
     //update_spheres_CSV(0,false);
     add_gui();
     window.addEventListener( 'resize', onWindowResize, false );
-    if ( window.display_type === 'VR' ) { add_vive_models(); }
+    if ( display_type === 'VR' ) { add_vive_models(); }
 }
 
 function update_higher_dims_left() {
@@ -277,10 +277,10 @@ function make_camera() {
         }
         else if ( fname.includes('Lonely') || fname.includes('Drops') ) {
             camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
-            camera.position.set((world[0].min + world[0].max)/2.,(world[1].min + world[1].max)/2.,-world[0].max/zoom*25.);
+            camera.position.set((world[0].min + world[0].max)/2.,(world[1].min + world[1].max)/2.,-world[0].max/zoom*10.);
         }
         else {
-            if ( window.display_type == 'anaglyph' ) {
+            if ( display_type == 'anaglyph' ) {
                 camera = new THREE.PerspectiveCamera(70, aspect, 0.1, 1000 ); // fov, aspect, near, far
                 camera.position.set(0.5*world[0].max/zoom,
                                        -world[0].max/zoom,
@@ -304,7 +304,7 @@ function add_renderer() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     // renderer.setSize( container.offsetWidth, container.offsetHeight );
     if ( shadows ) { renderer.shadowMap.enabled = true; }
-    if (window.display_type == "VR") {
+    if (display_type == "VR") {
         renderer.vr.enabled = true;
         container.appendChild( WEBVR.createButton( renderer ) );
         // window.addEventListener('vrdisplayactivate', () => {
@@ -317,7 +317,7 @@ function add_renderer() {
 }
 
 function add_gui() {
-    if ( window.display_type == 'anaglyph' || window.display_type == 'keyboard' ) {
+    if ( display_type == 'anaglyph' || display_type == 'keyboard' ) {
         var gui = new dat.GUI();
         //gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
@@ -365,7 +365,7 @@ function add_gui() {
 }
 
 function add_controllers() {
-    if ( window.display_type == "VR" ) {
+    if ( display_type == "VR" ) {
         window.addEventListener( 'vr controller connected', function( event ){
         	//  Here it is, your VR controller instance.
         	//  It’s really a THREE.Object3D so you can just add it to your scene:
@@ -490,14 +490,14 @@ function add_controllers() {
         //     line.name = 'line';
         //     line.scale.z = 5;
         //
-        //     if (window.display_type == "VR") {
+        //     if (display_type == "VR") {
         //         controller1.add( line.clone() );
         //         controller2.add( line.clone() );
         //         };
         //     raycaster = new THREE.Raycaster();
         // }
 
-    } else if (window.display_type == 'keyboard') {
+    } else if (display_type == 'keyboard') {
         if ( N < 3 ) {
             controls = new THREE.OrbitControls( camera, renderer.domElement );
             controls.target.set( (world[0].min + world[0].max)/2./2., (world[1].min + world[1].max)/2., 0 ); // view direction perpendicular to XY-plane. NOTE: VALUE OF 5 IS HARDCODED IN OTHER PLACES
@@ -511,7 +511,7 @@ function add_controllers() {
 
         // var gui = new dat.GUI();
         console.log('Keyboard mode loaded');
-    } else if (window.display_type == 'anaglyph') {
+    } else if (display_type == 'anaglyph') {
         controls = new THREE.TrackballControls( camera, renderer.domElement );
         aim_camera()
         effect = new THREE.AnaglyphEffect( renderer );
@@ -547,7 +547,7 @@ function make_axes() {
         axesHelper = new THREE.Group();
         axesLabels = new THREE.Group();
         // axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
-        if ( window.display_type === 'VR' ) {
+        if ( display_type === 'VR' ) {
             axesHelper.position.set(0,-human_height,0);
             axesLabels.position.set(0,-human_height,0);
             axesHelper.scale.set(vr_scale,vr_scale,vr_scale);
@@ -713,7 +713,7 @@ function make_walls() {
 
     if ( world[0].wall ) {
         var floor = new THREE.Mesh( geometry, material );
-        if ( window.display_type === 'VR' ) {
+        if ( display_type === 'VR' ) {
             floor.scale.set((world[2].max - world[2].min)*vr_scale,(world[1].max - world[1].min)*vr_scale,1);
             floor.rotation.x = + Math.PI / 2;
             floor.position.set((world[1].max - world[1].min)/2.*vr_scale,world[0].min*vr_scale-human_height,(world[2].max - world[2].min)*vr_scale/2.);
@@ -727,7 +727,7 @@ function make_walls() {
         scene.add( floor );
 
         roof = new THREE.Mesh( geometry, material );
-        if ( window.display_type === 'VR' ) {
+        if ( display_type === 'VR' ) {
             roof.scale.set((world[2].max - world[2].min)*vr_scale,(world[1].max - world[1].min)*vr_scale,1);
             roof.rotation.x = - Math.PI / 2;
             roof.position.set((world[1].max - world[1].min)/2.*vr_scale,world[0].max*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
@@ -811,7 +811,7 @@ function make_walls() {
 }
 
 function add_torus() {
-    if (window.display_type == "VR") { R = 0.1; }
+    if (display_type == "VR") { R = 0.1; }
     else { R = 0.5; }
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
@@ -839,7 +839,7 @@ function add_torus() {
     wristband1_theta.rotation.y = Math.PI/2;
 
 
-    if (window.display_type == "VR") {
+    if (display_type == "VR") {
         wristband1.position.set(0.,0.,0.1);
         wristband1.rotation.set(0.,0.,Math.PI);
         wristband1_phi.position.set(0.,0.,0.1);
@@ -884,7 +884,7 @@ function add_torus() {
         wristband2_theta.rotation.y = Math.PI/2;
 
 
-        if (window.display_type == "VR") {
+        if (display_type == "VR") {
             wristband2.position.set(0.,0.,0.1);
             wristband2.rotation.set(0.,0.,Math.PI);
             wristband2_phi.position.set(0.,0.,0.1);
@@ -912,7 +912,7 @@ function add_torus() {
 function remove_everything() {
     window.addEventListener("message", receiveMessage, false);
     function receiveMessage(event) {
-        console.log('Closing renderer')
+        console.log('Closing renderer. Current number of programs:' + renderer.info.programs.length );
         // console.log(particles);
         // console.log(wristband);
         // console.log(wristband1);
@@ -937,10 +937,11 @@ function remove_everything() {
                 object.material.dispose();
             }
         }
+        if ( display_type === 'anaglyph' ) { effect.dispose(); }
         renderer.vr.enabled = false;
         renderer.dispose();
         scene.dispose();
-
+        console.log('Killed everything. Remaining programs:' + renderer.info.programs.length );
     }
 }
 
@@ -1168,7 +1169,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                 else {
                     if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
                     else {
-                        if ( window.display_type === 'VR') {
+                        if ( display_type === 'VR') {
                             R_draw = R_draw*vr_scale;
                             object.position.set(spheres[i].x1*vr_scale,spheres[i].x0*vr_scale - human_height,spheres[i].x2*vr_scale);
                         }
@@ -1249,7 +1250,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
     if ( controls !== undefined) { controls.handleResize(); }
-    if (window.display_type == 'anaglyph') { effect.setSize( window.innerWidth, window.innerHeight ); };
+    if (display_type == 'anaglyph') { effect.setSize( window.innerWidth, window.innerHeight ); };
     render();
 };
 
@@ -1369,10 +1370,8 @@ function animate() {
         }
     }
     delta = clock.getDelta();
-    if (time.play) {
-        time.cur += delta*time.play_rate; // current time is in 'seconds'
-        time.frame = Math.floor(time.cur*time.frames_per_second);
-    };
+    if (time.play) { time.cur += delta*time.play_rate; }; // current time is in 'seconds'
+    time.frame = Math.floor(time.cur*time.frames_per_second);
     if ( time.frame !== time.prev_frame ) {
         update_spheres_CSV(time.frame,false);
         if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
@@ -1389,11 +1388,11 @@ function render() {
     //     //scene.scale.set( vr_scale, vr_scale, vr_scale );
     //     //scene.rotation.z = -Math.PI/2.;
     // }// TODO: SET VR SCALING TO LOOK GOOD
-    // if ( view_mode === 'catch_particle' && window.display_type == "VR" ) {
+    // if ( view_mode === 'catch_particle' && display_type == "VR" ) {
     //     cleanIntersected();
     //     intersectObjects( controller1 );
     //     intersectObjects( controller2 );
     // }
-    if (window.display_type == "anaglyph") { effect.render( scene, camera ); }
+    if (display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
 };

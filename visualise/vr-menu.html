@@ -44,7 +44,8 @@
 		add_controllers();
 
 		camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
-		camera.position.set(5,5,5);
+		// camera.position.set(5,5,2);
+        // camera.rotation.z = Math.PI/2.;
 		make_lights();
 		add_renderer();
 		window.addEventListener( 'resize', onWindowResize, false );
@@ -57,11 +58,7 @@
 		    // renderer.setSize( container.offsetWidth, container.offsetHeight );
 		    renderer.vr.enabled = true;
 		    container.appendChild( renderer.domElement );
-
 	        container.appendChild( WEBVR.createButton( renderer ) );
-	        // window.addEventListener('vrdisplayactivate', () => {
-	        //         renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] , false);
-	        //     }); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
     	};
 
 		function add_controllers() {
@@ -81,7 +78,6 @@
 				} );
 
 			var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
-
 			var line = new THREE.Line( geometry );
 			line.name = 'line';
 			line.scale.z = 5;
@@ -131,10 +127,10 @@
 				Uniaxial_Ds = [3,4,5,6];
 				Catch_Ds = [3,4,5,6];
 
-				names = ['Lonely','Inclined','Uniaxial','Catch'];
-				fnames = ['Lonely','','Uniaxial',''];
-				Ds = [Lonely_Ds,Inclined_Ds,Uniaxial_Ds,Catch_Ds];
-				extra_strings = ['','','','&view_mode=catch_particle']
+				names = ['Lonely','Inclined','Uniaxial','Catch','Catch (Harder)'];
+				fnames = ['Lonely','','Uniaxial','',''];
+				Ds = [Lonely_Ds,Inclined_Ds,Uniaxial_Ds,Catch_Ds,Catch_Ds];
+				extra_strings = ['','','','&view_mode=catch_particle','&view_mode=catch_particle&hard_mode=true']
 				var mat = new THREE.MeshPhongMaterial( { color: 0x333333 } );
 				var geom = new THREE.BoxGeometry( 0.9*horiz_offset,0.8*vert_offset, 0.1 );
 				var button_bg = new THREE.Mesh( geom, mat );
