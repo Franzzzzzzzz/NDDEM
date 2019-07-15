@@ -10,9 +10,9 @@ var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
-var time = {'cur': 0, 'prev': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 0.5, 'save_rate': 1000} // temporal properties
+var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 1.0, 'save_rate': 1000} // temporal properties
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
-if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) };
+if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // seconds/second
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 1.8; // height of the human in m
@@ -27,6 +27,7 @@ var left_hand, right_hand;
 var hard_mode;
 var winning = false; // did you win the game?
 var winning_texture;
+var clock = new THREE.Clock;
 
 if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
 else { var zoom = 20; } // default zoom level
@@ -87,6 +88,7 @@ function init() {
                     else if (l[0] == 'set') {
                         if (l[1] == 'T') { time.max = parseInt(l[2]) - 1; }
                         else if (l[1] === 'tdump') { time.save_rate = parseInt(l[2]) }
+                        else if (l[1] === 'dt') { time.dt_dem = parseFloat(l[2]) }
                     }
                     else if (l[0] == 'freeze') { pinky = parseInt(l[1]); }
                 }
@@ -104,6 +106,8 @@ function init() {
                     world[2].cur = 0.5;
                     world[2].prev = 0.5;
                 }
+                time.frames_per_second = 1./(time.save_rate*time.dt_dem); // time between DEM frames in seconds
+                time.nt = time.max*time.frames_per_second; // total number of saved frames
                 build_world();
                 remove_everything(); // only runs on postMessage receive
                 animate();
@@ -323,13 +327,13 @@ function add_gui() {
             }
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-        gui.add( time, 'play_rate').min(0).max(1.0).name('Rate') ;
+        gui.add( time, 'play_rate').min(0).max(10.0).name('Rate') ;
         gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         if ( view_mode === 'velocity' ) {
-            gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur),false); });
+            gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
         }
         if ( view_mode === 'rotation_rate' ) {
-            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(20).listen().onChange ( function() { update_spheres_CSV(Math.floor(time.cur),false); });
+            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(20).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
         }
         gui.open();
     }
@@ -1358,19 +1362,22 @@ function animate() {
     if (N > 3) {
         for (iii=3;iii<N;iii++) {
             if (world[iii].cur != world[iii].prev) {
-                update_spheres_CSV(Math.floor(time.cur),true);
-                if (view_mode === 'rotations') {update_spheres_texturing(Math.floor(time.cur),) ;}
+                update_spheres_CSV(time.frame,true);
+                if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
                 world[iii].prev = world[iii].cur;
             }
         }
     }
-    if (time.play) { time.cur += time.play_rate*time.save_rate/10000.; };
-    //if ( Math.floor(time.cur) != time.prev ) {
-    if ( ( Math.floor(time.cur) !== time.prev ) ){//|| redraw ){
-        update_spheres_CSV(Math.floor(time.cur),false);
-        if (view_mode === 'rotations') {update_spheres_texturing(Math.floor(time.cur),) ;}
-        time.prev = Math.floor(time.cur);
-    }
+    delta = clock.getDelta();
+    if (time.play) {
+        time.cur += delta*time.play_rate; // current time is in 'seconds'
+        time.frame = Math.floor(time.cur*time.frames_per_second);
+    };
+    if ( time.frame !== time.prev_frame ) {
+        update_spheres_CSV(time.frame,false);
+        if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
+        time.prev_frame = time.frame;
+    };
     if (time.cur > time.max) { time.cur -= time.max; }
     requestAnimationFrame( animate );
     if ( controls !== undefined ) { controls.update(); }
