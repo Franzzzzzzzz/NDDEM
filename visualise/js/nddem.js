@@ -412,7 +412,7 @@ function add_controllers() {
             	controller.addEventListener( 'primary press began', function( event ){
                     if ( controller.gamepad.hand === 'left' ) {
                         if ( N > 3 ) {
-                            wristband1.material.emissive = new THREE.Color(0.5,0.5,0.5);
+                            wristband1.material.emissive = 0xe72564;
                             redraw_left = true;
                             controller1.getWorldQuaternion(left_hand.previous_direction);
                             left_hand.previous_torus_rotation_z = wristband1.rotation.z;
@@ -421,7 +421,7 @@ function add_controllers() {
                     }
                     else {
                         if ( N > 5 ) {
-                            wristband2.material.emissive = new THREE.Color(0.5,0.5,0.5);
+                            wristband2.material.emissive = 0xe72564;
                             redraw_right = true;
                             controller2.getWorldQuaternion(right_hand.previous_direction);
                             right_hand.previous_torus_rotation_z = wristband2.rotation.z;
