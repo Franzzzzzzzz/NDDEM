@@ -3,8 +3,8 @@
 var container; // main div element
 var camera, scene, controls, renderer; // UI elements
 var controller1, controller2; // VR controllers
-var raycaster, intersected = []; // catching grains
-var tempMatrix = new THREE.Matrix4(); // catching grains
+// var raycaster, intersected = []; // catching grains
+// var tempMatrix = new THREE.Matrix4(); // catching grains
 var particles, wristband1, wristband2, axesHelper, axesLabels; // groups of objects
 var R,r; // parameters of torus
 var N; // number of dimensions
@@ -12,42 +12,37 @@ var world = []; // properties that describe the domain
 var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000} // temporal properties
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
-if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // seconds/second
+if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // DEM time units/second
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 1.8; // height of the human in m
 // var human_height = 0.; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
-var quality, shadows;
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
-var roof, bg;
-var redraw_left = false; // force redrawing of particles
-var redraw_right = false;
-var left_hand, right_hand;
-var hard_mode;
+var roof; // top boundary
+var bg; // background mesh with texture attached
+var redraw_left = false; // force redrawing of particles from movement in left hand
+var redraw_right = false; // force redrawing of particles from movement in right hand
+var left_hand, right_hand; // store parameters for movement in higher dims via hand controls
 var winning = false; // did you win the game?
-var winning_texture;
-var clock = new THREE.Clock;
-
+var winning_texture; // texture to hold 'WINNING' sign for catch_particle mode
+var clock = new THREE.Clock; // global clock
 if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
 else { var zoom = 20; } // default zoom level
-if ( typeof window.shadows !== 'undefined' ) { shadows = window.shadows == 'true' }
-else { shadows = true; };
-if ( typeof window.quality !== 'undefined' ) { quality = parseInt(window.quality) }
-else { quality = 5}; // quality flag - 5 is default, 8 is ridiculous
-if ( typeof window.pinky !== 'undefined' ) { pinky = parseInt(window.pinky) }
-else { pinky = 100}; // which particle to catch
-
-var fname = window.fname;
+if ( typeof window.shadows !== 'undefined' ) { var shadows = window.shadows == 'true' }
+else { var shadows = true; };
+if ( typeof window.quality !== 'undefined' ) { var quality = parseInt(window.quality) }
+else { var quality = 5}; // quality flag - 5 is default, 8 is ridiculous
+if ( typeof window.pinky !== 'undefined' ) { var pinky = parseInt(window.pinky) }
+else { var pinky = 100}; // which particle to catch in catch_particle mode
+var fname = window.fname; // which folder to load data from
 if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
-
-
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
-var arrow_material;
-if ( typeof window.cache !== 'undefined' ) { cache = window.cache == 'true' }
-else { cache = false; };
-if ( typeof window.hard_mode !== 'undefined' ) { hard_mode = window.hard_mode == 'true'; }
-else { hard_mode = false; }
+var arrow_material; // material used for arrows to show dimensions
+if ( typeof window.cache !== 'undefined' ) { var cache = window.cache == 'true' } // should we use cached data or not
+else { var cache = false; };
+if ( typeof window.hard_mode !== 'undefined' ) { var hard_mode = window.hard_mode == 'true'; } // optional flag to not show wristbands if in catch_particle mode
+else { var hard_mode = false; }
 
 init();
 
