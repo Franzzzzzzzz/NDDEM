@@ -522,7 +522,7 @@ function add_controllers() {
 function aim_camera() {
     if ( fname.includes('Lonely') || fname.includes('Drops')) {
         controls.target0.set(
-            (world[0].min + world[0].max)/2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
+            (world[0].min + world[0].max)/2.,
             (world[1].min + world[1].max)/2.,
             (world[2].min + world[2].max)/2.,
         );
@@ -923,7 +923,7 @@ function remove_everything() {
             object.material.dispose();
             if ( view_mode === 'rotations' ) { object.texture.dispose(); }
         }
-        if ( N > 3) {
+        if ( N > 3 ) {
             for (i = wristband1.children.length; i = 0; i--) {
                 var object = controller1.children[i];
                 object.geometry.dispose();
@@ -1137,14 +1137,14 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
                                              Math.pow( (world[3].cur - spheres[i].x3), 2) -
                                              Math.pow( (world[4].cur - spheres[i].x4), 2)
-                                         ); // FIXME - IS THIS RIGHT?
+                                         );
                  }
                  else if (N == 6) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
                                              Math.pow( (world[3].cur - spheres[i].x3), 2) -
                                              Math.pow( (world[4].cur - spheres[i].x4), 2) -
                                              Math.pow( (world[5].cur - spheres[i].x5), 2)
-                                         ); // FIXME - IS THIS RIGHT?
+                                         );
                  }
                  else if (N == 7) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
@@ -1152,7 +1152,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[4].cur - spheres[i].x4), 2) -
                                              Math.pow( (world[5].cur - spheres[i].x5), 2) -
                                              Math.pow( (world[6].cur - spheres[i].x6), 2)
-                                         ); // FIXME - IS THIS RIGHT?
+                                         );
                                      }
                  else if (N == 10) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
@@ -1163,7 +1163,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[7].cur - spheres[i].x7), 2) -
                                              Math.pow( (world[8].cur - spheres[i].x8), 2) -
                                              Math.pow( (world[9].cur - spheres[i].x9), 2)
-                                         ); // FIXME - IS THIS RIGHT?
+                                         );
                  };
                 if (isNaN(R_draw)) { object.visible = false; }
                 else {
@@ -1254,78 +1254,78 @@ function onWindowResize() {
     render();
 };
 
-function onSelectStart( event ) {
-    var controller = event.target;
-    var intersections = getIntersections( controller );
-    if ( intersections.length > 0 ) {
-        var intersection = intersections[ 0 ];
-        tempMatrix.getInverse( controller.matrixWorld );
-        var object = intersection.object;
-        object.matrix.premultiply( tempMatrix );
-        object.matrix.decompose( object.position, object.quaternion, object.scale );
-        object.material.emissive.b = 1;
-        controller.add( object );
-        controller.userData.selected = object;
-    }
-}
+// function onSelectStart( event ) {
+//     var controller = event.target;
+//     var intersections = getIntersections( controller );
+//     if ( intersections.length > 0 ) {
+//         var intersection = intersections[ 0 ];
+//         tempMatrix.getInverse( controller.matrixWorld );
+//         var object = intersection.object;
+//         object.matrix.premultiply( tempMatrix );
+//         object.matrix.decompose( object.position, object.quaternion, object.scale );
+//         object.material.emissive.b = 1;
+//         controller.add( object );
+//         controller.userData.selected = object;
+//     }
+// }
 
-function onSelectEnd( event ) {
-    var controller = event.target;
-    if ( controller.userData.selected !== undefined ) {
-        var object = controller.userData.selected;
-        object.matrix.premultiply( controller.matrixWorld );
-        object.matrix.decompose( object.position, object.quaternion, object.scale );
-        object.material.emissive.b = 0;
-        particles.add( object );
-        controller.userData.selected = undefined;
-    }
-};
-
-function getIntersections( controller ) {
-
-    tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-    raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-    raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
-
-    if ( particles !== undefined ) { return raycaster.intersectObjects( particles.children ); }
-    else { return []; }
-
-}
-
-function intersectObjects( controller ) {
-
-    // Do not highlight when already selected
-
-    if ( controller.userData.selected !== undefined ) return;
-
-    var line = controller.getObjectByName( 'line' );
-    var intersections = getIntersections( controller );
-
-    if ( intersections.length > 0 ) {
-
-        var intersection = intersections[ 0 ];
-
-        var object = intersection.object;
-        object.material.emissive.r = 1;
-        intersected.push( object );
-
-        line.scale.z = intersection.distance;
-
-    } else {
-
-        line.scale.z = 5;
-
-    }
-
-}
-
-function cleanIntersected() {
-    while ( intersected.length ) {
-        var object = intersected.pop();
-        object.material.emissive.r = 0;
-    }
-};
+// function onSelectEnd( event ) {
+//     var controller = event.target;
+//     if ( controller.userData.selected !== undefined ) {
+//         var object = controller.userData.selected;
+//         object.matrix.premultiply( controller.matrixWorld );
+//         object.matrix.decompose( object.position, object.quaternion, object.scale );
+//         object.material.emissive.b = 0;
+//         particles.add( object );
+//         controller.userData.selected = undefined;
+//     }
+// };
+//
+// function getIntersections( controller ) {
+//
+//     tempMatrix.identity().extractRotation( controller.matrixWorld );
+//
+//     raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+//     raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+//
+//     if ( particles !== undefined ) { return raycaster.intersectObjects( particles.children ); }
+//     else { return []; }
+//
+// }
+//
+// function intersectObjects( controller ) {
+//
+//     // Do not highlight when already selected
+//
+//     if ( controller.userData.selected !== undefined ) return;
+//
+//     var line = controller.getObjectByName( 'line' );
+//     var intersections = getIntersections( controller );
+//
+//     if ( intersections.length > 0 ) {
+//
+//         var intersection = intersections[ 0 ];
+//
+//         var object = intersection.object;
+//         object.material.emissive.r = 1;
+//         intersected.push( object );
+//
+//         line.scale.z = intersection.distance;
+//
+//     } else {
+//
+//         line.scale.z = 5;
+//
+//     }
+//
+// }
+//
+// function cleanIntersected() {
+//     while ( intersected.length ) {
+//         var object = intersected.pop();
+//         object.material.emissive.r = 0;
+//     }
+// };
 
 function check_if_won() {
     if ( particles !== undefined ) {
