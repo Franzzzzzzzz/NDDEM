@@ -163,22 +163,17 @@ function update_higher_dims_left() {
 
     // move in D4 by rotations in z
     if ( N > 3 ) {
-        left_hand.new_orientation = left_hand.previous_torus_rotation_z + left_hand.diff_angle.z;
-        if      ( left_hand.new_orientation < 0.         )  { left_hand.new_orientation += 2.*Math.PI; }
-        else if ( left_hand.new_orientation > 2.*Math.PI )  { left_hand.new_orientation -= 2.*Math.PI; }
-        world[3].cur = left_hand.new_orientation*(world[3].max - world[3].min)/Math.PI/2.;
-        wristband1.rotation.z = left_hand.new_orientation;
+        var new_orientation = left_hand.previous_torus_rotation_z + left_hand.diff_angle.z;
+        if      ( new_orientation < 0.         )  { new_orientation += 2.*Math.PI; }
+        else if ( new_orientation > 2.*Math.PI )  { new_orientation -= 2.*Math.PI; }
+        world[3].cur = new_orientation*(world[3].max - world[3].min)/Math.PI/2.;
     }
     // move in D5 by rotations in y
     if ( N > 4 ) {
-        // left_hand.new_orientation = left_hand.previous_torus_rotation_y + 2.*left_hand.diff_angle.y*(world[4].max - world[4].min)/Math.PI;
-        // if      ( left_hand.new_orientation < world[4].min )  { left_hand.new_orientation += (world[4].max - world[4].min); }
-        // else if ( left_hand.new_orientation > world[4].max )  { left_hand.new_orientation -= (world[4].max - world[4].min); }
-        // world[4].cur = left_hand.new_orientation;
-        left_hand.new_orientation = left_hand.previous_torus_rotation_x + 2.*left_hand.diff_angle.x; // double rotation in reality
-        if      ( left_hand.new_orientation < 0.         )  { left_hand.new_orientation +=  2.*Math.PI; }
-        else if ( left_hand.new_orientation > 2.*Math.PI )  { left_hand.new_orientation -=  2.*Math.PI; }
-        world[4].cur = left_hand.new_orientation*(world[4].max - world[4].min)/Math.PI/2.;
+        var new_orientation = left_hand.previous_torus_rotation_x + 2.*left_hand.diff_angle.x; // double rotation in reality
+        if      ( new_orientation < 0.         )  { new_orientation +=  2.*Math.PI; }
+        else if ( new_orientation > 2.*Math.PI )  { new_orientation -=  2.*Math.PI; }
+        world[4].cur = new_orientation*(world[4].max - world[4].min)/Math.PI/2.;
 
     }
 }
@@ -190,18 +185,17 @@ function update_higher_dims_right() {
 
     // move in D4 by rotations in z
     if ( N > 5 ) {
-        right_hand.new_orientation = right_hand.previous_torus_rotation_z + right_hand.diff_angle.z;
-        if      ( right_hand.new_orientation < 0.         )  { right_hand.new_orientation += 2.*Math.PI; }
-        else if ( right_hand.new_orientation > 2.*Math.PI )  { right_hand.new_orientation -= 2.*Math.PI; }
-        world[5].cur = right_hand.new_orientation*(world[5].max - world[5].min)/Math.PI/2.;
-        wristband2.rotation.z = right_hand.new_orientation;
+        var new_orientation = right_hand.previous_torus_rotation_z + right_hand.diff_angle.z;
+        if      ( new_orientation < 0.         )  { new_orientation += 2.*Math.PI; }
+        else if ( new_orientation > 2.*Math.PI )  { new_orientation -= 2.*Math.PI; }
+        world[5].cur = new_orientation*(world[5].max - world[5].min)/Math.PI/2.;
     }
     // move in D4 by rotations in y
     if ( N > 6 ) {
-        right_hand.new_orientation = right_hand.previous_torus_rotation_x + 2.*right_hand.diff_angle.x;
-        if      ( right_hand.new_orientation < 0.         )  { right_hand.new_orientation +=  2.*Math.PI; }
-        else if ( right_hand.new_orientation > 2.*Math.PI )  { right_hand.new_orientation -=  2.*Math.PI; }
-        world[6].cur = right_hand.new_orientation*(world[6].max - world[6].min)/Math.PI/2.;
+        new_orientation = right_hand.previous_torus_rotation_x + 2.*right_hand.diff_angle.x;
+        if      ( new_orientation < 0.         )  { new_orientation +=  2.*Math.PI; }
+        else if ( new_orientation > 2.*Math.PI )  { new_orientation -=  2.*Math.PI; }
+        world[6].cur = new_orientation*(world[6].max - world[6].min)/Math.PI/2.;
     }
 }
 
@@ -407,21 +401,22 @@ function add_controllers() {
             	controller.addEventListener( 'primary press began', function( event ){
                     if ( controller.gamepad.hand === 'left' ) {
                         if ( N > 3 ) {
-                            wristband1.material.emissive = 0xe72564;
+                            wristband1.material.emissive = new THREE.Color( 0xe72564 );
                             redraw_left = true;
                             controller1.getWorldQuaternion(left_hand.previous_direction);
-                            left_hand.previous_torus_rotation_z = wristband1.rotation.z;
+                            //left_hand.previous_torus_rotation_z = wristband1.rotation.z;
+                            left_hand.previous_torus_rotation_z = world[3].cur/(world[3].max - world[3].min)*Math.PI*2.;
                         }
-                        if ( N > 4 ) { left_hand.previous_torus_rotation_x = (world[4].cur - world[4].min)/(world[4].max - world[4].min)*2*Math.PI; }
+                        if ( N > 4 ) { left_hand.previous_torus_rotation_x = world[4].cur/(world[4].max - world[4].min)*2*Math.PI; }
                     }
                     else {
                         if ( N > 5 ) {
-                            wristband2.material.emissive = 0xe72564;
+                            wristband2.material.emissive = new THREE.Color( 0xe72564 );
                             redraw_right = true;
                             controller2.getWorldQuaternion(right_hand.previous_direction);
-                            right_hand.previous_torus_rotation_z = wristband2.rotation.z;
+                            right_hand.previous_torus_rotation_z =  world[5].cur/(world[5].max - world[5].min)*Math.PI*2.;
                         }
-                        if ( N > 6 ) { right_hand.previous_torus_rotation_x = (world[6].cur - world[6].min)/(world[6].max - world[6].min)*2*Math.PI; }
+                        if ( N > 6 ) { right_hand.previous_torus_rotation_x = world[6].cur/(world[6].max - world[6].min)*2*Math.PI; }
                     }
             		//guiInputHelper.pressed( true )
             	})
@@ -811,7 +806,7 @@ function add_torus() {
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     var material = new THREE.MeshPhongMaterial( {
-        color: 0xffffff,
+        color: 0xcccccc,
         // roughness: 0.7,
         // metalness: 0.5
     } );
@@ -1346,7 +1341,6 @@ function check_if_won() {
 }
 
 function animate() {
-    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/time.max*2.*Math.PI/4.; } // rotate the background over time
     if ( view_mode === 'catch_particle' ) { check_if_won(); }
     THREE.VRController.update();
     if ( redraw_left ) { update_higher_dims_left(); }
@@ -1367,6 +1361,7 @@ function animate() {
     delta = clock.getDelta();
     if (time.play) { time.cur += delta*time.play_rate; }; // current time is in 'seconds'
     time.frame = Math.floor(time.cur*time.frames_per_second);
+    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/50.; } // rotate the background over time
     if ( time.frame !== time.prev_frame ) {
         update_spheres_CSV(time.frame,false);
         if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
