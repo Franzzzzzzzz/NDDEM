@@ -15,7 +15,7 @@ if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 
 if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // DEM time units/second
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
-var human_height = 1.8; // height of the human in m
+var human_height = 1.2; // height of the human in m
 // var human_height = 0.; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
@@ -806,7 +806,7 @@ function add_torus() {
     r = R/2.;
     var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     var material = new THREE.MeshPhongMaterial( {
-        color: 0xcccccc,
+        color: 0xaaaaaa,
         // roughness: 0.7,
         // metalness: 0.5
     } );
@@ -851,7 +851,7 @@ function add_torus() {
     if ( N > 5 ) {
         var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality)*2, Math.pow(2,quality) );
         var material = new THREE.MeshPhongMaterial( {
-            color: 0xffffff,
+            color: 0xaaaaaa,
             // roughness: 0.7,
             // metalness: 0.5
         } );
