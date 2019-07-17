@@ -999,7 +999,7 @@ function make_initial_spheres_CSV() {
                     } );
                 }
                 else {
-                    if ( view_mode === 'catch_particle' ) {
+                    if ( view_mode === 'catch_particle' || fname.includes('Lonely') ) {
                         if ( i == pinky ) { var color = 0xe72564; }
                         else              { var color = 0xaaaaaa; }
                         var material = new THREE.MeshPhongMaterial( { color: color } );
