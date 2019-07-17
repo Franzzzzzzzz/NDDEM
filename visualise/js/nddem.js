@@ -44,12 +44,14 @@ else { var cache = false; };
 if ( typeof window.hard_mode !== 'undefined' ) { var hard_mode = window.hard_mode == 'true'; } // optional flag to not show wristbands if in catch_particle mode
 else { var hard_mode = false; }
 
+var root_dir = 'http://localhost:54321/';
+if ( window.location.hostname === 'www.benjymarks.com' ) { root_dir = 'http://www.benjymarks.com/nddem/'}
 init();
 
 function init() {
     var request = new XMLHttpRequest();
-    //request.open('GET', "http://localhost:54321/Samples/" + fname + "in?_="+ (new Date).getTime(), true);
-    request.open('GET', "http://localhost:54321/Samples/" + fname + "in", true);
+    //request.open('GET', root_dir + "Samples/" + fname + "in?_="+ (new Date).getTime(), true);
+    request.open('GET', root_dir + "Samples/" + fname + "in", true);
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
@@ -127,8 +129,8 @@ function build_world() {
         var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
         // invert the geometry on the x-axis so that all of the faces point inward
         geometry.scale( - 1, 1, 1 );
-        var texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/eso0932a.jpg' );
-        winning_texture = new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/winning.png' );
+        var texture = new THREE.TextureLoader().load( root_dir + 'visualise/resources/eso0932a.jpg' );
+        winning_texture = new THREE.TextureLoader().load( root_dir + 'visualise/resources/winning.png' );
         var material = new THREE.MeshBasicMaterial( { map: texture } );
         bg = new THREE.Mesh( geometry, material );
         bg.rotation.z = Math.PI/2; // TODO: CHECK THIS!
@@ -201,10 +203,10 @@ function update_higher_dims_right() {
 
 function add_vive_models() {
     var loader = new THREE.OBJLoader();
-		loader.setPath( 'http://localhost:54321/visualise/resources/vive/' );
+		loader.setPath( root_dir + 'visualise/resources/vive/' );
 		loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 			var loader = new THREE.TextureLoader();
-			loader.setPath( 'http://localhost:54321/visualise/resources/vive/' );
+			loader.setPath( root_dir + 'visualise/resources/vive/' );
 			var controller = object.children[ 0 ];
 			controller.material.map = loader.load( 'onepointfive_texture.png' );
 			controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
@@ -213,7 +215,7 @@ function add_vive_models() {
 
             // Pause label
             var font_loader = new THREE.FontLoader();
-            font_loader.load( 'http://localhost:54321/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+            font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
                 var fontsize = 0.005;
                 var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
                 var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
@@ -437,7 +439,7 @@ function add_controllers() {
                 //guiInputHelper.pressed( true )
             })
             controller.addEventListener( 'menu press began', function( event ){
-                window.location.replace('http://localhost:54321/visualise/vr-menu.html')
+                window.location.replace(root_dir + 'visualise/vr-menu.html')
                 //guiInputHelper.pressed( true )
             })
         	controller.addEventListener( 'disconnected', function( event ){
@@ -609,7 +611,7 @@ function make_axes() {
             }
         }
         var loader = new THREE.FontLoader();
-    	loader.load( 'http://localhost:54321/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+    	loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
     		var textGeo_x = new THREE.TextBufferGeometry( "x" + ref_dim.x, { font: font, size: fontsize, height: fontsize/5., } );
     		var textMaterial_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
     		var mesh_x = new THREE.Mesh( textGeo_x, arrow_material );
@@ -937,7 +939,7 @@ function remove_everything() {
 
 /*function load_hyperspheres_VTK() {
     var loader = new THREE.VTKLoader();
-    loader.load("http://localhost:54321/visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
+    loader.load(root_dir + "visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
         console.log(geometry);
     } );
 };*/ // FG: Removed as I don't think we use that anymore
@@ -950,31 +952,31 @@ function make_initial_sphere_texturing() {
         if (i<N-1) commandstring += "&" ;
     };
     request = new XMLHttpRequest();
-    /*request.open('POST', "http://localhost:54321/make_textures?" +
+    /*request.open('POST', root_dir + "make_textures?" +
                  "arr=" + JSON.stringify(arr) +
                  "&N=" + N +
                  "&t=" + "00000" +
                  "&quality=" + quality +
                  "&fname=" + fname,
                  true);*/
-    request.open('GET', 'http://localhost:54321/load?ND=' + N + '&path='+ fname + '&texturepath=../../Textures&resolution=' + quality, true)
+    request.open('GET', root_dir + 'load?ND=' + N + '&path='+ fname + '&texturepath=../../Textures&resolution=' + quality, true)
     request.send(null)
 
     request.onload = function() {
-        request.open('GET', 'http://localhost:54321/render?ts=00000&' + commandstring, true) ;
+        request.open('GET', root_dir + 'render?ts=00000&' + commandstring, true) ;
         request.send(null)
         request.onload = function() { make_initial_spheres_CSV(); update_spheres_CSV(0,false);}
     }
     // Let's do the first rendering as well
-    //request.open('GET', 'http://localhost:54321/render?ts=00000&' + commandstring, true) ;
+    //request.open('GET', root_dir + 'render?ts=00000&' + commandstring, true) ;
     //request.send(null);
 
     // request.onreadystatechange = function () {}
 };
 
 function make_initial_spheres_CSV() {
-    if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-00000.csv" }
-    else { var filename = "http://localhost:54321/Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
+    if ( cache ) { var filename = root_dir + "Samples/" + fname + "dump-00000.csv" }
+    else { var filename = root_dir + "Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
@@ -1006,7 +1008,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            texture_path = "http://localhost:54321/Textures/Texture-"+i+"-00000"
+                            texture_path = root_dir + "Textures/Texture-"+i+"-00000"
                             for ( var iiii=3;iiii<N;iiii++) { texture_path += "-0.0"; }
                             var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -1047,8 +1049,8 @@ function load_textures(t, Viewpoint) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
         for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
-            if ( cache ) { var filename = "http://localhost:54321/Textures/" + "Texture-" + ii + "-" + Viewpoint+".png" }
-            else { var filename = "http://localhost:54321/Textures/" + "Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
+            if ( cache ) { var filename = root_dir + "Textures/" + "Texture-" + ii + "-" + Viewpoint+".png" }
+            else { var filename = root_dir + "Textures/" + "Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
             loader.load(filename,
                         function( texture ) { //TODO not sure why not working ... ...
                             //var myRe = /-[0-9]+.png/g
@@ -1077,7 +1079,7 @@ function update_spheres_texturing (t) {
 
           var request = new XMLHttpRequest();
           /*request.open('POST',
-                       "http://localhost:54321/make_textures?" +
+                       root_dir + "make_textures?" +
                        "arr=" + JSON.stringify(arr) +
                        "&N=" + N +
                        "&t=" + t + "0000" +
@@ -1086,7 +1088,7 @@ function update_spheres_texturing (t) {
                        true);*/
           var runvalue = 0 ;
           if (time.play) runvalue = 1 ;
-          request.open('GET', 'http://localhost:54321/render?ts='+String(t*time.save_rate).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
+          request.open('GET', root_dir + 'render?ts='+String(t*time.save_rate).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
 
           request.onload = function() {
               load_textures(t, Viewpoint);
@@ -1099,9 +1101,8 @@ function update_spheres_texturing (t) {
 }
 
 function update_spheres_CSV(t,changed_higher_dim_view) {
-
-    if ( cache ) { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
-    else { var filename = "http://localhost:54321/Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
+    if ( cache ) { var filename = root_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
+    else { var filename = root_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
