@@ -45,18 +45,19 @@ if ( typeof window.hard_mode !== 'undefined' ) { var hard_mode = window.hard_mod
 else { var hard_mode = false; }
 
 var root_dir = 'http://localhost:54321/';
-if ( window.location.hostname === 'www.benjymarks.com' ) { root_dir = 'http://www.benjymarks.com/nddem/'}
-init();
+if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'; }
+// init();
 
-function init() {
+// function init() {
+let promise = new Promise( function(resolve, reject) {
     var request = new XMLHttpRequest();
-    //request.open('GET', root_dir + "Samples/" + fname + "in?_="+ (new Date).getTime(), true);
-    request.open('GET', root_dir + "Samples/" + fname + "in", true);
+    if ( cache ) { request.open('GET', root_dir + "Samples/" + fname + "in", true); }
+    else { request.open('GET', root_dir + "Samples/" + fname + "in?_="+ (new Date).getTime(), true); }
     request.send(null);
     request.onreadystatechange = function () {
-        if (request.readyState === 4 && request.status === 200) {
-            var type = request.getResponseHeader('Content-Type');
-            if (type.indexOf("text") !== 1) {
+        if (request.readyState === 4 && ( request.status === 200 || request.status === 304 ) ) { // fully loaded and ( fresh or cached )
+            // var type = request.getResponseHeader('Content-Type');
+            // if (type.indexOf("text") !== 1) {
                 lines = request.responseText.split('\n');
                 for (i=0;i<lines.length;i++) {
                     // console.log(lines[i])
@@ -105,13 +106,24 @@ function init() {
                 }
                 time.frames_per_second = 1./(time.save_rate*time.dt_dem); // time between DEM frames in seconds
                 time.nt = time.max*time.frames_per_second; // total number of saved frames
-                build_world();
-                remove_everything(); // only runs on postMessage receive
-                animate();
-            }
+                // build_world();
+                // remove_everything(); // only runs on postMessage receive
+                // animate();
+                resolve('Loaded infile');
+            // }
         }
     }
-}
+// }
+});
+
+promise.then(
+    function(result) { build_world();
+                       remove_everything(); // only runs on postMessage receive
+                       animate(); },
+    function(error) { }
+);
+
+
 
 function build_world() {
     container = document.createElement( 'div' );
