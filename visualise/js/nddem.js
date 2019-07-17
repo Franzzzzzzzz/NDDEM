@@ -145,7 +145,7 @@ function build_world() {
         winning_texture = new THREE.TextureLoader().load( root_dir + 'visualise/resources/winning.png' );
         var material = new THREE.MeshBasicMaterial( { map: texture } );
         bg = new THREE.Mesh( geometry, material );
-        bg.rotation.z = Math.PI/2; // TODO: CHECK THIS!
+        bg.rotation.z = Math.PI/2;
         scene.add(bg);
 
         controller1 = new THREE.Object3D;
@@ -305,15 +305,10 @@ function add_renderer() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
-    // renderer.setSize( container.offsetWidth, container.offsetHeight );
     if ( shadows ) { renderer.shadowMap.enabled = true; }
     if (display_type == "VR") {
         renderer.vr.enabled = true;
         container.appendChild( WEBVR.createButton( renderer ) );
-        // window.addEventListener('vrdisplayactivate', () => {
-        //     console.log('FIRED');
-        //     renderer.vr.getDevice().requestPresent( [ { source: renderer.domElement } ] );
-        // }, false); // TODO - TOTALLY UNTESTED BUT SHOULD DROP YOU INTO VR AUTOMATICALLY. FROM HERE: https://github.com/mrdoob/three.js/issues/13105#issuecomment-373246458
     };
 
     container.appendChild( renderer.domElement );
@@ -358,9 +353,6 @@ function add_gui() {
     //     gui.scale.set(0.5,0.5,0.5);
     //     controller2.add( gui );
     //     var input1 = dat.GUIVR.addInputObject( controller1, renderer );
-    //     document.addEventListener( 'mousedown', function(){ input1.pressed( true ); } ); // TODO: CAN I SOMEHOW USE THIS TO FAKE THE .pressed() IF I CAN MANUALLY PIPE THE A REAL PRESS EVENT??
-    //     // see here: https://github.com/dataarts/dat.guiVR/wiki/Input-Support-(Vive-Controllers,-Mouse,-etc)
-    //
     //     //var input2 = dat.GUIVR.addInputObject( controller2 , renderer);
     //     scene.add( input1 );
     //     //scene.add( input2 );
@@ -1387,15 +1379,6 @@ function animate() {
 };
 
 function render() {
-    // if ( renderer.vr.isPresenting() ) {
-    //     //scene.scale.set( vr_scale, vr_scale, vr_scale );
-    //     //scene.rotation.z = -Math.PI/2.;
-    // }// TODO: SET VR SCALING TO LOOK GOOD
-    // if ( view_mode === 'catch_particle' && display_type == "VR" ) {
-    //     cleanIntersected();
-    //     intersectObjects( controller1 );
-    //     intersectObjects( controller2 );
-    // }
     if (display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
 };
