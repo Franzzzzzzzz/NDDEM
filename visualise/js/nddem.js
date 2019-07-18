@@ -45,7 +45,10 @@ if ( typeof window.hard_mode !== 'undefined' ) { var hard_mode = window.hard_mod
 else { var hard_mode = false; }
 
 var root_dir = 'http://localhost:54321/';
-if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'; }
+if ( window.location.hostname.includes('benjymarks') ) {
+    root_dir = 'http://www.benjymarks.com/nddem/';
+    cache = true;
+}
 // init();
 
 // function init() {
