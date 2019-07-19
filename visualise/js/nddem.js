@@ -18,7 +18,7 @@ var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 1.2; // height of the human in m
 // var human_height = 0.; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
-var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
+var velocity = {'vmax': 1, 'omegamax': 100} // default GUI options
 var roof; // top boundary
 var bg; // background mesh with texture attached
 var redraw_left = false; // force redrawing of particles from movement in left hand
@@ -334,7 +334,7 @@ function add_gui() {
             gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
         }
         if ( view_mode === 'rotation_rate' ) {
-            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(20).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(100).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
         }
         gui.open();
     }
