@@ -188,7 +188,7 @@ THREE.VolumeRenderShaderRGB = {
         'vec4 apply_colormap(float val) {',
             // 'val = (val - u_clim[0]) / (u_clim[1] - u_clim[0]);',
             'int v= int(val) ; ',
-            'return(vec4(float(v/256/256)/256.,float((v-(v/256/256)*256*256)/256)/256.,float((v-(v/256)*256))/256.,0.5)) ; ',
+            'return(vec4(float(v/256/256)/256.,float((v-(v/256/256)*256*256)/256)/256.,float((v-(v/256)*256))/256.,1.5)) ; ',
             //'return(vec4(float(v/256/256)/256.,float((v-(v/256/256)*256*256)/256)/256.,float(0)/256.,1)) ; ',
             // 'return texture2D(u_cmdata, vec2(val, 0.5));',
         '}',
