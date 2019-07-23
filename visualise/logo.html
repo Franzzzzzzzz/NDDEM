@@ -73,8 +73,6 @@
 		var rigidBodies = [];
 		var margin = 0.01;
 		var rope;
-
-		var armMovement = 0;
         var ropes = [];
 		var ballRadius = 0.1;
         var earth;
@@ -403,16 +401,16 @@
 		}
 
         function makeStars() {
-    		var numParticles = 10000;
+    		var numParticles = 1000000; // added 00 to last longer for talk
             var positions = new Float32Array( numParticles * 3 );
 			var scales = new Float32Array( numParticles );
 
             for (var i = 0; i < numParticles; i++) {
     			var starVertex = new THREE.Vector3();
-    			positions[ i*3 ] = ( Math.random() - 0.5 ) * 1000;
-    			positions[i*3+1] = ( Math.random() - 0.5 ) * 1000;
+    			positions[ i*3 ] = ( Math.random() - 0.5 ) * 10000; // multiplied by 10 for talk
+    			positions[i*3+1] = ( Math.random() - 0.5 ) * 10000; // multiplied by 10 for talk
     			positions[i*3+2] = - (Math.random()+0.2)/1.2 * 500;
-    			scales[i] = 3;//2;
+    			scales[i] = 2; //3 for poster
     		}
 
 			geometry = new THREE.BufferGeometry();

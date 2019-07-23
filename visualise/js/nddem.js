@@ -15,7 +15,9 @@ if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 
 if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // DEM time units/second
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
-var human_height = 1.2; // height of the human in m
+var human_height = 0.; // height of the human in m
+var x_offset = 0.; // NOT USED
+var y_offset = 0.; // NOT USED
 // var human_height = 0.; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
 var velocity = {'vmax': 1, 'omegamax': 100} // default GUI options
@@ -122,7 +124,12 @@ let promise = new Promise( function(resolve, reject) {
 promise.then(
     function(result) { build_world();
                        remove_everything(); // only runs on postMessage receive
-                       animate(); },
+                       animate();
+                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 300); // for safety
+                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 1000); // for safety
+                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 2000); // for safety
+                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 5000); // for safety
+                     },
     function(error) { }
 );
 
@@ -1152,6 +1159,15 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[6].cur - spheres[i].x6), 2)
                                          );
                                      }
+                 else if (N == 8) {
+                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
+                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
+                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
+                                             Math.pow( (world[5].cur - spheres[i].x5), 2) -
+                                             Math.pow( (world[6].cur - spheres[i].x6), 2) -
+                                             Math.pow( (world[7].cur - spheres[i].x7), 2)
+                                         );
+                                     }
                  else if (N == 10) {
                      var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
                                              Math.pow( (world[3].cur - spheres[i].x3), 2) -
@@ -1161,6 +1177,16 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[7].cur - spheres[i].x7), 2) -
                                              Math.pow( (world[8].cur - spheres[i].x8), 2) -
                                              Math.pow( (world[9].cur - spheres[i].x9), 2)
+                                         );
+                 }
+                 else if (N == 30) {
+                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) - Math.pow( (world[3].cur - spheres[i].x3), 2) - Math.pow( (world[4].cur - spheres[i].x4), 2) - Math.pow( (world[5].cur - spheres[i].x5), 2) -
+                                             Math.pow( (world[6].cur - spheres[i].x6), 2)   - Math.pow( (world[7].cur - spheres[i].x7), 2)   - Math.pow( (world[8].cur - spheres[i].x8), 2)   - Math.pow( (world[9].cur - spheres[i].x9), 2) -
+                                             Math.pow( (world[10].cur - spheres[i].x10), 2) - Math.pow( (world[11].cur - spheres[i].x11), 2) - Math.pow( (world[12].cur - spheres[i].x12), 2) - Math.pow( (world[13].cur - spheres[i].x13), 2) -
+                                             Math.pow( (world[14].cur - spheres[i].x14), 2) - Math.pow( (world[15].cur - spheres[i].x15), 2) - Math.pow( (world[16].cur - spheres[i].x16), 2) - Math.pow( (world[17].cur - spheres[i].x17), 2) -
+                                             Math.pow( (world[18].cur - spheres[i].x18), 2) - Math.pow( (world[19].cur - spheres[i].x19), 2) - Math.pow( (world[20].cur - spheres[i].x20), 2) - Math.pow( (world[21].cur - spheres[i].x21), 2) -
+                                             Math.pow( (world[22].cur - spheres[i].x22), 2) - Math.pow( (world[23].cur - spheres[i].x23), 2) - Math.pow( (world[24].cur - spheres[i].x24), 2) - Math.pow( (world[25].cur - spheres[i].x25), 2) -
+                                             Math.pow( (world[26].cur - spheres[i].x26), 2) - Math.pow( (world[27].cur - spheres[i].x27), 2) - Math.pow( (world[28].cur - spheres[i].x28), 2) - Math.pow( (world[29].cur - spheres[i].x29), 2)
                                          );
                  };
                 if (isNaN(R_draw)) { object.visible = false; }
@@ -1369,7 +1395,7 @@ function animate() {
     delta = clock.getDelta();
     if (time.play) { time.cur += delta*time.play_rate; }; // current time is in 'seconds'
     time.frame = Math.floor(time.cur*time.frames_per_second);
-    if ( display_type === 'VR' ) { bg.rotation.x = time.cur/50.; } // rotate the background over time
+    //if ( display_type === 'VR' ) { bg.rotation.x = time.cur/100.; } // rotate the background over time
     if ( time.frame !== time.prev_frame ) {
         update_spheres_CSV(time.frame,false);
         if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}

@@ -40,6 +40,7 @@
 		var intersected = [];
 		var tempMatrix = new THREE.Matrix4(); // catching grains
 		var buttons = new THREE.Group();
+        var button_bgs = new THREE.Group();
 		add_buttons();
 		add_controllers();
 
@@ -116,27 +117,22 @@
 		function add_buttons() {
 			fontsize = 0.25;
 			vert_offset = 2.*fontsize;
-			horiz_offset = 2.5;
-			back = 5.0;
+			horiz_offset = 3.5;
+			back = 8.0;
 			vert_initial_value = 2;
-			horiz_initial_value = -4;
+			horiz_initial_value = -8;
 			var loader = new THREE.FontLoader();
 			loader.load( 'http://localhost:54321/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
 				Lonely_Ds = [3,4,5,6,7,8,9,10,30];
-				Inclined_Ds = [3,4,5,6];
-				Uniaxial_Ds = [3,4,5,6];
-				Catch_Ds = [3,4,5,6];
+				Inclined_Ds = [3,4,5];//,6];
+				Uniaxial_Ds = [3,4,5];//,6];
+				Catch_Ds = [3,4,5];//,6];
 
 				names = ['Lonely','Inclined','Uniaxial','Catch','Catch (Harder)'];
 				fnames = ['Lonely','','Uniaxial','',''];
 				Ds = [Lonely_Ds,Inclined_Ds,Uniaxial_Ds,Catch_Ds,Catch_Ds];
 				extra_strings = ['','','','&view_mode=catch_particle','&view_mode=catch_particle&hard_mode=true']
-				var mat = new THREE.MeshPhongMaterial( { color: 0x333333 } );
-				var geom = new THREE.BoxGeometry( 0.9*horiz_offset,0.8*vert_offset, 0.1 );
-				var button_bg = new THREE.Mesh( geom, mat );
-				button_bg.position.x = 0.4*horiz_offset;
-				button_bg.position.y = 0.4*vert_offset;
-				button_bg.position.z = -0.1;
+
 
 				for ( var i=0;i<Ds.length;i++ ) {
 					for ( var j=0;j<Ds[i].length;j++ ) {
@@ -144,19 +140,30 @@
 						var geom = new THREE.TextBufferGeometry( names[i] + " D" + String(Ds[i][j]), { font: font, size: fontsize, height: fontsize/5., } );
 			    		var button = new THREE.Mesh( geom, mat );
 
-						button.add(button_bg.clone());
+                        var url = 'http://localhost:54321/visualise/index.html?display_type=VR&fname='+fnames[i]+'D'+String(Ds[i][j])+extra_strings[i];
 
 						button.rotation.y = -Math.PI/2.;
 						button.position.y = vert_initial_value - vert_offset*j;
 						button.position.x = back;
 						button.position.z = horiz_initial_value + horiz_offset*i;
-						button.url = 'http://localhost:54321/visualise/index.html?display_type=VR&fname='+fnames[i]+'D'+String(Ds[i][j])+extra_strings[i];
+						button.url = url;
+
+                        var mat = new THREE.MeshPhongMaterial( { color: 0x333333 } );
+        				var geom = new THREE.BoxGeometry( 0.9*horiz_offset,0.8*vert_offset, 0.1 );
+        				var bg_current = new THREE.Mesh( geom, mat );
+                        bg_current.url = url;
+                        bg_current.rotation.y = -Math.PI/2.;
+						bg_current.position.y = vert_initial_value - vert_offset*j + 0.3*vert_offset;
+						bg_current.position.x = back + 0.01;
+						bg_current.position.z = horiz_initial_value + horiz_offset*i +  0.4*horiz_offset;;
+                        button_bgs.add(bg_current);
 						buttons.add(button);
 					}
 				}
 
 			});
 			scene.add(buttons);
+            scene.add(button_bgs);
 		}
 
 		function make_lights() {
@@ -200,7 +207,7 @@
 		    raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
 		    raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
-		    return raycaster.intersectObjects( buttons.children );
+		    return raycaster.intersectObjects( button_bgs.children );
 
 		}
 
@@ -219,7 +226,7 @@
 
 		        var object = intersection.object;
 				console.log(object);
-		        object.material.emissive.r = 1;
+		        object.material.emissive = new THREE.Color( 0x222222 );
 		        intersected.push( object );
 
 		        line.scale.z = intersection.distance;
@@ -235,7 +242,7 @@
 		function cleanIntersected() {
 		    while ( intersected.length ) {
 		        var object = intersected.pop();
-		        object.material.emissive.r = 0;
+		        object.material.emissive = new THREE.Color ( 0x000000 );
 		    }
 		};
 
