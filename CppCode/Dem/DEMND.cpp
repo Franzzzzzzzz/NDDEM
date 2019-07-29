@@ -156,7 +156,7 @@ int main (int argc, char *argv[])
    if (recompute)
    {
      //printf("RECOMPUTE\n");
-     #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared (stdout)
+     #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
      {
        int ID = omp_get_thread_num();
        ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ;
@@ -218,7 +218,7 @@ int main (int argc, char *argv[])
    }
    else // Do not recompute the full contact list, but still compute the contact length and all.
    {
-     #pragma omp parallel default(none) shared(MP) shared(P)  shared(d) shared(X) shared(Ghost) shared(Ghost_dir) shared(stdout)
+     #pragma omp parallel default(none) shared(MP) shared(P)  shared(d) shared(X) shared(Ghost) shared(Ghost_dir) //shared(stdout)
      {
        int ID = omp_get_thread_num();
        double sum=0 ;
@@ -255,7 +255,7 @@ int main (int argc, char *argv[])
    Tools::setzero(Torque);
 
    //Particle - particle contacts
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout)
+   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
    {
      int ID = omp_get_thread_num();
      ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ; Contacts & C =MP.C[ID] ;

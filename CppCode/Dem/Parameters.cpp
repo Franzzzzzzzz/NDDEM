@@ -241,33 +241,6 @@ else if (!strcmp(line, "set"))
    LABEL_leave: ; // Goto label (I know, not beautiful, but makes sense here really)
  }
 
- /*else if (!strcmp(line, "dumpkind"))
- {
-     string word ;
-     in>>word ;
-     if (word=="CSV") dumpkind |= ExportType::CSV ;
-     else if (word=="VTK") dumpkind |= ExportType::VTK ;
-     else if (word=="NETCDFF") dumpkind |= ExportType::NETCDFF ;
-     else if (word=="XML") dumpkind |= ExportType::XML ;
-     else if (word=="XMLbase64") dumpkind |= ExportType::XMLbase64 ;
-     else if (word=="CSVA") dumpkind |= ExportType::CSVA ;
- }
- else if (!strcmp(line, "dumplist"))
- {
-  int nlst ;
-  in >> nlst ;
-  for (int n=0 ; n<nlst ; n++)
-  {
-      string word ;
-      in >> word ;
-      if (word=="Position") dumplist |= ExportData::POSITION ;
-      else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
-      else if (word =="Omega") dumplist |= ExportData::OMEGA ;
-      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
-      else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
-      else printf("Unknown asked data %s\n", word.c_str()) ;
-  }
-}*/
  else if (!strcmp(line, "tinfo")) in>>tinfo ;
  else if (!strcmp(line, "dt")) in>>dt ;
  else printf("[Input] Unknown parameter to set\n") ;
@@ -354,7 +327,7 @@ void Parameters::init_locations (char *line, v2d & X)
            if (Boundaries[dd][3]==0)
              X[i][dd] = rand()*Boundaries[dd][2] + Boundaries[dd][0] ;
            else
-             X[i][dd] = rand()*(Boundaries[dd][2]-2*r[i]) + Boundaries[dd][0] + r[i] ; 
+             X[i][dd] = rand()*(Boundaries[dd][2]-2*r[i]) + Boundaries[dd][0] + r[i] ;
          }
         }
 
@@ -429,8 +402,29 @@ void Parameters::init_locations (char *line, v2d & X)
         }
       }
     }
+    else if (!strcmp(line, "quasicrystal"))
+    {
+        auto m = *(std::max_element(r.begin(), r.end())) ; // largest radius
+        printf("%g\n", m) ;
+        uint dd ;
+        // X is an array of particle locations
+        for (dd=0 ; dd<d ; dd++) { X[0][dd]=Boundaries[dd][0]+m ; } // d is number of dimensions, dd is its index
+        for (int i=1 ; i<N ; i++) // number of particles
+        {
+            X[i]=X[i-1] ; // get previous particle location
+            for (dd=0 ; dd<d ; dd++) // iterate over dimensions
+            {
+                X[i][dd] += 2*m ; // add a diameter
+                if (X[i][dd]>Boundaries[dd][1]-m) // if too close to 'right'
+                    X[i][dd] = Boundaries[dd][0]+m ; // bring back to 'left'
+                else
+                    break ;
+            }
+            if (dd==d) {printf("WARN: cannot affect all particles on the square lattice, not enough space in the simulation box\n") ; break ; }
+        }
+    }
     else
-        printf("ERR: no other initalisation location than square implemented\n") ;
+        printf("ERR: undefined initial location function.\n") ;
 }
 
 //======================================
