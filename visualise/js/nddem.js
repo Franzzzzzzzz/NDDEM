@@ -184,7 +184,6 @@ function build_world() {
     add_gui();
     window.addEventListener( 'resize', onWindowResize, false );
     //if ( display_type === 'VR' ) { add_vive_models(); }
-    if ( display_type === 'VR' ) { add_oculus_models(); }
 }
 
 function update_higher_dims_left() {
@@ -230,73 +229,20 @@ function update_higher_dims_right() {
     }
 }
 
-function add_oculus_models() {
-    // new THREE.MTLLoader()
-        // .setPath( root_dir + 'visualise/resources/oculus/' )
-        // .load( 'oculus-touch-controller-right.mtl', function ( materials ) {
-            // materials.preload();
-            new THREE.OBJLoader()
-    		      // .setMaterials( materials )
-                  .setPath( root_dir + 'visualise/resources/oculus/' )
-    		      .load( 'oculus-touch-controller-right.obj', function ( object ) {
-                      var controller = object.children[ 0 ];
-	                  controller.castShadow = true;
-			          controller.receiveShadow = true;
+// add_left_oculus_model(1);
+// add_right_oculus_model(1);
 
-                        // Pause label
-                        var font_loader = new THREE.FontLoader();
-                        font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
-                            var fontsize = 0.005;
-                            var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
-                            var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-                            var pause_label = new THREE.Mesh( geometry, textMaterial );
-                            pause_label.rotation.x = -Math.PI/2.;
-                            pause_label.position.y = fontsize;
-                            pause_label.position.x = -0.01;
-                            pause_label.position.z = 0.05;
-                            controller.add(pause_label);
-
-                            var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
-                            var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-                            var menu_label = new THREE.Mesh( geometry, textMaterial );
-                            menu_label.rotation.x = -Math.PI/2.;
-                            menu_label.position.y = 2*fontsize;
-                            menu_label.position.x = -0.008;
-                            menu_label.position.z = 0.023;
-                            controller.add(menu_label);
-
-                            controller1.add( controller.clone() );
-                            controller2.add( controller.clone() );
-
-                            if ( !hard_mode ) {
-                                // Move label
-                                geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
-                                var move_label = new THREE.Mesh( geometry, textMaterial );
-                                move_label.rotation.x = -Math.PI/2.;
-                                move_label.rotation.y = Math.PI;
-                                move_label.position.y = -0.03 -fontsize;
-                                move_label.position.x = 0.01;
-                                move_label.position.z = 0.045;
-                                if ( N > 3 ) { controller1.add(move_label); }
-                                if ( N > 5 ) { controller2.add(move_label); }
-                            }
-                });
-            });
-		// } );
-
-}
-
-function add_vive_models() {
-    var loader = new THREE.OBJLoader();
-		loader.setPath( root_dir + 'visualise/resources/vive/' );
-		loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
-			var loader = new THREE.TextureLoader();
-			loader.setPath( root_dir + 'visualise/resources/vive/' );
-			var controller = object.children[ 0 ];
-			controller.material.map = loader.load( 'onepointfive_texture.png' );
-			controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-			controller.castShadow = true;
-			controller.receiveShadow = true;
+function add_left_oculus_model(controller) {
+    new THREE.MTLLoader()
+    .setPath( root_dir + 'visualise/resources/oculus/' )
+    .load( 'oculus-touch-controller-left.mtl', function ( materials ) {
+        materials.preload();
+        new THREE.OBJLoader()
+        .setMaterials( materials )
+        .setPath( root_dir + 'visualise/resources/oculus/' )
+        .load( 'oculus-touch-controller-left.obj', function ( object ) {
+            object.castShadow = true;
+            object.receiveShadow = true;
 
             // Pause label
             var font_loader = new THREE.FontLoader();
@@ -305,39 +251,194 @@ function add_vive_models() {
                 var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
                 var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
                 var pause_label = new THREE.Mesh( geometry, textMaterial );
-                pause_label.rotation.x = -Math.PI/2.;
+                pause_label.rotation.x = -3.*Math.PI/4.;
                 pause_label.position.y = fontsize;
-                pause_label.position.x = -0.01;
-                pause_label.position.z = 0.05;
-                controller.add(pause_label);
+                pause_label.position.x = 0.05;
+                pause_label.position.z = 0.052;
+                object.add(pause_label);
+
+                var geometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.04, 16, 16 );
+                var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+                var pause_line = new THREE.Mesh( geometry, material );
+                pause_line.rotation.x = -3.*Math.PI/4.;
+                pause_line.position.y = fontsize;
+                pause_line.position.x = 0.03;
+                pause_line.position.z = 0.052;
+                pause_line.rotation.z = Math.PI/2.;
+                object.add(pause_line);
 
                 var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
                 var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
                 var menu_label = new THREE.Mesh( geometry, textMaterial );
-                menu_label.rotation.x = -Math.PI/2.;
-                menu_label.position.y = 2*fontsize;
-                menu_label.position.x = -0.008;
-                menu_label.position.z = 0.023;
-                controller.add(menu_label);
+                menu_label.rotation.x = -3*Math.PI/4.;
+                menu_label.position.y = -0.03;
+                menu_label.position.x = 0.005;
+                menu_label.position.z = 0.02;
+                object.add(menu_label);
 
-                controller1.add( controller.clone() );
-                controller2.add( controller.clone() );
+                var geometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.025, 16, 16 );
+                var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+                var menu_line = new THREE.Mesh( geometry, material );
+                menu_line.rotation.x = -3.*Math.PI/4.;
+                menu_line.position.y = -0.02;
+                menu_line.position.x = 0.015;
+                menu_line.position.z = 0.03;
+                object.add(menu_line);
+
+                controller.add( object );
+                // object.position.y = -3
+                // object.position.x = 3
+                // object.position.z = -3
+                // object.scale.set(20,20,20);
+                // object.rotation.z = Math.PI;
+                // scene.add( object );
 
                 if ( !hard_mode ) {
                     // Move label
                     geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
                     var move_label = new THREE.Mesh( geometry, textMaterial );
-                    move_label.rotation.x = -Math.PI/2.;
+                    move_label.rotation.x = -1.*Math.PI/4.;
                     move_label.rotation.y = Math.PI;
-                    move_label.position.y = -0.03 -fontsize;
-                    move_label.position.x = 0.01;
+                    move_label.position.y = -0.035 -fontsize;
+                    move_label.position.x = 0.018;
                     move_label.position.z = 0.045;
-                    if ( N > 3 ) { controller1.add(move_label); }
-                    if ( N > 5 ) { controller2.add(move_label); }
+                    if ( N > 3 ) { object.add(move_label); }
+                    // object.add(move_label);
                 }
             });
-		} );
+        });
+    } );
+}
 
+function add_right_oculus_model(controller) {
+    new THREE.MTLLoader()
+    .setPath( root_dir + 'visualise/resources/oculus/' )
+    .load( 'oculus-touch-controller-right.mtl', function ( materials ) {
+        materials.preload();
+        new THREE.OBJLoader()
+        .setMaterials( materials )
+        .setPath( root_dir + 'visualise/resources/oculus/' )
+        .load( 'oculus-touch-controller-right.obj', function ( object ) {
+            object.castShadow = true;
+            object.receiveShadow = true;
+
+            // Pause label
+            var font_loader = new THREE.FontLoader();
+            font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+                var fontsize = 0.005;
+                var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
+                var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                var pause_label = new THREE.Mesh( geometry, textMaterial );
+                pause_label.rotation.x = -3.*Math.PI/4.;
+                pause_label.position.y = fontsize;
+                pause_label.position.x = 0.03;
+                pause_label.position.z = 0.052;
+                object.add(pause_label);
+
+                var geometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.04, 16, 16 );
+                var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+                var pause_line = new THREE.Mesh( geometry, material );
+                pause_line.rotation.x = -3.*Math.PI/4.;
+                pause_line.position.y = fontsize;
+                pause_line.position.x = 0.01;
+                pause_line.position.z = 0.052;
+                pause_line.rotation.z = Math.PI/2.;
+                object.add(pause_line);
+
+                var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
+                var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                var menu_label = new THREE.Mesh( geometry, textMaterial );
+                menu_label.rotation.x = -3*Math.PI/4.;
+                menu_label.position.y = -0.03;
+                menu_label.position.x = -0.03;
+                menu_label.position.z = 0.02;
+                object.add(menu_label);
+
+                var geometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.025, 16, 16 );
+                var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+                var menu_line = new THREE.Mesh( geometry, material );
+                menu_line.rotation.x = -3.*Math.PI/4.;
+                menu_line.position.y = -0.02;
+                menu_line.position.x = -0.02;
+                menu_line.position.z = 0.03;
+                object.add(menu_line);
+
+                controller.add( object );
+                // object.position.y = -3
+                // object.position.x = 3
+                // object.position.z = -3
+                // object.scale.set(20,20,20);
+                // // object.rotation.z = Math.PI;
+                // scene.add( object );
+
+                if ( !hard_mode ) {
+                    // Move label
+                    geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
+                    var move_label = new THREE.Mesh( geometry, textMaterial );
+                    move_label.rotation.x = -1.*Math.PI/4.;
+                    move_label.rotation.y = Math.PI;
+                    move_label.position.y = -0.035 -fontsize;
+                    move_label.position.x = 0.0;
+                    move_label.position.z = 0.045;
+                    if ( N > 5 ) { object.add(move_label); }
+                    // object.add(move_label);
+                }
+            });
+        });
+    } );
+}
+
+    function add_vive_models() {
+        var loader = new THREE.OBJLoader();
+    		loader.setPath( root_dir + 'visualise/resources/vive/' );
+    		loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+    			var loader = new THREE.TextureLoader();
+    			loader.setPath( root_dir + 'visualise/resources/vive/' );
+    			var controller = object.children[ 0 ];
+    			controller.material.map = loader.load( 'onepointfive_texture.png' );
+    			controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+    			controller.castShadow = true;
+    			controller.receiveShadow = true;
+
+                // Pause label
+                var font_loader = new THREE.FontLoader();
+                font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+                    var fontsize = 0.005;
+                    var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
+                    var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                    var pause_label = new THREE.Mesh( geometry, textMaterial );
+                    pause_label.rotation.x = -Math.PI/2.;
+                    pause_label.position.y = fontsize;
+                    pause_label.position.x = -0.01;
+                    pause_label.position.z = 0.05;
+                    controller.add(pause_label);
+
+                    var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
+                    var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                    var menu_label = new THREE.Mesh( geometry, textMaterial );
+                    menu_label.rotation.x = -Math.PI/2.;
+                    menu_label.position.y = 2*fontsize;
+                    menu_label.position.x = -0.008;
+                    menu_label.position.z = 0.023;
+                    controller.add(menu_label);
+
+                    controller1.add( controller.clone() );
+                    controller2.add( controller.clone() );
+
+                    if ( !hard_mode ) {
+                        // Move label
+                        geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
+                        var move_label = new THREE.Mesh( geometry, textMaterial );
+                        move_label.rotation.x = -Math.PI/2.;
+                        move_label.rotation.y = Math.PI;
+                        move_label.position.y = -0.03 -fontsize;
+                        move_label.position.x = 0.01;
+                        move_label.position.z = 0.045;
+                        if ( N > 3 ) { controller1.add(move_label); }
+                        if ( N > 5 ) { controller2.add(move_label); }
+                        }
+                    });
+              });
 }
 
 function make_camera() {
@@ -445,6 +546,7 @@ function add_controllers() {
         	var controller = event.detail
             //console.log(controller)
             if ( controller.gamepad.hand === 'left' ) {
+                if ( controller.gamepad.id === 'Oculus Touch (Left)') { add_left_oculus_model(controller); }
                 controller.name = 'vive_left_hand';
                 controller.add(controller1);
                 left_hand = new THREE.Object3D;
@@ -457,6 +559,7 @@ function add_controllers() {
                 left_hand.diff_angle = new THREE.Euler();
                 console.log('Added left hand'); }
             else if ( controller.gamepad.hand === 'right' ) {
+                if ( controller.gamepad.id === 'Oculus Touch (Right)') { add_right_oculus_model(controller); }
                 controller.add(controller2);
                 controller.name = 'vive_right_hand';
                 right_hand = new THREE.Object3D;
