@@ -35,6 +35,13 @@
         <script>
 		container = document.createElement( 'div' );
 		document.body.appendChild( container );
+
+		var root_dir = 'http://localhost:54321/';
+		if ( window.location.hostname.includes('benjymarks') ) {
+		    root_dir = 'http://www.benjymarks.com/nddem/';
+		    cache = true;
+		}
+
 		scene = new THREE.Scene();
 	    scene.background = new THREE.Color( 0xdddddd ); // revealjs background colour
 
@@ -42,6 +49,7 @@
 		var tempMatrix = new THREE.Matrix4(); // catching grains
 		var buttons = new THREE.Group();
         var button_bgs = new THREE.Group();
+		vive = false;
 		add_buttons();
 		add_controllers();
 
@@ -63,21 +71,88 @@
 	        container.appendChild( WEBVR.createButton( renderer ) );
     	};
 
+
+		function add_left_oculus_model(controller) {
+		    new THREE.MTLLoader()
+		    .setPath( root_dir + 'visualise/resources/oculus/' )
+		    .load( 'oculus-touch-controller-left.mtl', function ( materials ) {
+		        materials.preload();
+		        new THREE.OBJLoader()
+		        .setMaterials( materials )
+		        .setPath( root_dir + 'visualise/resources/oculus/' )
+		        .load( 'oculus-touch-controller-left.obj', function ( object ) {
+		            object.castShadow = true;
+		            object.receiveShadow = true;
+					console.log(object)
+		            // Pause label
+		            var font_loader = new THREE.FontLoader();
+		            font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+		                var fontsize = 0.005;
+		                controller.add( object );
+	                    var geometry = new THREE.TextBufferGeometry( "Pick", { font: font, size: fontsize, height: fontsize/5. } );
+						var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+	                    var move_label = new THREE.Mesh( geometry, material );
+	                    move_label.rotation.x = -1.*Math.PI/4.;
+	                    move_label.rotation.y = Math.PI;
+	                    move_label.position.y = -0.035 -fontsize;
+	                    move_label.position.x = 0.018;
+	                    move_label.position.z = 0.045;
+						object.add(move_label);
+		            });
+		        });
+		    } );
+		}
+
+		function add_right_oculus_model(controller) {
+		    new THREE.MTLLoader()
+		    .setPath( root_dir + 'visualise/resources/oculus/' )
+		    .load( 'oculus-touch-controller-right.mtl', function ( materials ) {
+		        materials.preload();
+		        new THREE.OBJLoader()
+		        .setMaterials( materials )
+		        .setPath( root_dir + 'visualise/resources/oculus/' )
+		        .load( 'oculus-touch-controller-right.obj', function ( object ) {
+		            object.castShadow = true;
+		            object.receiveShadow = true;
+
+		            // Pause label
+		            var font_loader = new THREE.FontLoader();
+		            font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+		                var fontsize = 0.005;
+						controller.add( object );
+		                // scene.add( object );
+
+	                    var geometry = new THREE.TextBufferGeometry( "Pick", { font: font, size: fontsize, height: fontsize/5. } );
+						var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+	                    var move_label = new THREE.Mesh( geometry, material );
+	                    move_label.rotation.x = -1.*Math.PI/4.;
+	                    move_label.rotation.y = Math.PI;
+	                    move_label.position.y = -0.035 -fontsize;
+	                    move_label.position.x = 0.0;
+	                    move_label.position.z = 0.045;
+	                    object.add(move_label);
+		            });
+		        });
+		    } );
+		}
+
 		function add_controllers() {
 			controller1 = new THREE.Object3D;
 			controller2 = new THREE.Object3D;
 
-		    var loader = new THREE.OBJLoader();
-				loader.setPath( 'visualise/resources/vive/' );
-				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
-					var loader = new THREE.TextureLoader();
+			if ( vive ) {
+			    var loader = new THREE.OBJLoader();
 					loader.setPath( 'visualise/resources/vive/' );
-					var controller = object.children[ 0 ];
-					controller.material.map = loader.load( 'onepointfive_texture.png' );
-					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-					controller1.add( controller.clone() );
-					controller2.add( controller.clone() );
-				} );
+					loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+						var loader = new THREE.TextureLoader();
+						loader.setPath( 'visualise/resources/vive/' );
+						var controller = object.children[ 0 ];
+						controller.material.map = loader.load( 'onepointfive_texture.png' );
+						controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+						controller1.add( controller.clone() );
+						controller2.add( controller.clone() );
+					} );
+				}
 
 			var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 			var line = new THREE.Line( geometry );
@@ -95,21 +170,15 @@
 			   	 var controller = event.detail
 			   	 if ( controller.gamepad.hand === 'left' ) {
 			   		 controller.add(controller1);
+					 if ( controller.gamepad.id === 'Oculus Touch (Left)') { add_left_oculus_model(controller); }
 			   	 }
 			   	 else if ( controller.gamepad.hand === 'right' ) {
 			   		 controller.add(controller2);
+					 if ( controller.gamepad.id === 'Oculus Touch (Right)') { add_right_oculus_model(controller); }
 			   	 }
 			   	 scene.add( controller )
 			   	 controller.standingMatrix = renderer.vr.getStandingMatrix()
 			   	 controller.head = window.camera
-
-			   	 //  Allow this controller to interact with DAT GUI.
-			   	 //var guiInputHelper = dat.GUIVR.addInputObject( controller )
-			   	 //scene.add( guiInputHelper )
-			   	 //  Button events. How easy is this?!
-			   	 //  We’ll just use the “primary” button -- whatever that might be ;)
-			   	 //  Check out the THREE.VRController.supported{} object to see
-			   	 //  all the named buttons we’ve already mapped for you!
 
 			   	 controller.addEventListener( 'primary press began', onSelectStart );
 				 // controller.addEventListener( 'primary press began', onSelectEnd );
@@ -226,7 +295,6 @@
 		        var intersection = intersections[ 0 ];
 
 		        var object = intersection.object;
-				console.log(object);
 		        object.material.emissive = new THREE.Color( 0x222222 );
 		        intersected.push( object );
 

@@ -257,12 +257,12 @@ function add_left_oculus_model(controller) {
                 pause_label.position.z = 0.052;
                 object.add(pause_label);
 
-                var geometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.04, 16, 16 );
+                var geometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.03, 16, 16 );
                 var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
                 var pause_line = new THREE.Mesh( geometry, material );
                 pause_line.rotation.x = -3.*Math.PI/4.;
                 pause_line.position.y = fontsize;
-                pause_line.position.x = 0.03;
+                pause_line.position.x = 0.034;
                 pause_line.position.z = 0.052;
                 pause_line.rotation.z = Math.PI/2.;
                 object.add(pause_line);
@@ -272,7 +272,7 @@ function add_left_oculus_model(controller) {
                 var menu_label = new THREE.Mesh( geometry, textMaterial );
                 menu_label.rotation.x = -3*Math.PI/4.;
                 menu_label.position.y = -0.03;
-                menu_label.position.x = 0.005;
+                menu_label.position.x = 0.007;
                 menu_label.position.z = 0.02;
                 object.add(menu_label);
 
@@ -281,7 +281,7 @@ function add_left_oculus_model(controller) {
                 var menu_line = new THREE.Mesh( geometry, material );
                 menu_line.rotation.x = -3.*Math.PI/4.;
                 menu_line.position.y = -0.02;
-                menu_line.position.x = 0.015;
+                menu_line.position.x = 0.017;
                 menu_line.position.z = 0.03;
                 object.add(menu_line);
 
@@ -632,6 +632,9 @@ function add_controllers() {
                 window.location.replace(root_dir + 'visualise/vr-menu.html')
             })
             controller.addEventListener( 'B press began', function( event ){ // oculus
+                window.location.replace(root_dir + 'visualise/vr-menu.html')
+            })
+            controller.addEventListener( 'Y press began', function( event ){ // oculus
                 window.location.replace(root_dir + 'visualise/vr-menu.html')
             })
         	controller.addEventListener( 'disconnected', function( event ){
@@ -1033,10 +1036,10 @@ function add_torus() {
 
 
     if (display_type == "VR") {
-        wristband1.position.set(0.,0.,0.1);
+        wristband1.position.set(0.,0.,0.2);
         wristband1.rotation.set(0.,0.,Math.PI);
-        wristband1_phi.position.set(0.,0.,0.1);
-        wristband1_theta.position.set(0.,R,0.1);
+        wristband1_phi.position.set(0.,0.,0.2);
+        wristband1_theta.position.set(0.,R,0.2);
         controller1.add( wristband1 );
         controller1.add( wristband1_phi );
         controller1.add( wristband1_theta );
@@ -1078,10 +1081,10 @@ function add_torus() {
 
 
         if (display_type == "VR") {
-            wristband2.position.set(0.,0.,0.1);
+            wristband2.position.set(0.,0.,0.2);
             wristband2.rotation.set(0.,0.,Math.PI);
-            wristband2_phi.position.set(0.,0.,0.1);
-            wristband2_theta.position.set(0.,R,0.1);
+            wristband2_phi.position.set(0.,0.,0.2);
+            wristband2_theta.position.set(0.,R,0.2);
             controller2.add( wristband2 );
             controller2.add( wristband2_phi );
             controller2.add( wristband2_theta );
