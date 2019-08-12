@@ -25,6 +25,7 @@
         <script src="node_modules/three/examples/js/effects/AnaglyphEffect.js"></script>
         <script src="node_modules/three/examples/js/loaders/VTKLoader.js"></script>
 		<script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
+		<script src="node_modules/three/examples/js/loaders/MTLLoader.js"></script>
 		<script src="node_modules/three/examples/js/vr/ViveController.js"></script>
 		<script src="js/VRController.js"></script>
         <script src="node_modules/papaparse/papaparse.js"></script>
@@ -67,10 +68,10 @@
 			controller2 = new THREE.Object3D;
 
 		    var loader = new THREE.OBJLoader();
-				loader.setPath( 'http://localhost:54321/visualise/resources/vive/' );
+				loader.setPath( 'visualise/resources/vive/' );
 				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 					var loader = new THREE.TextureLoader();
-					loader.setPath( 'http://localhost:54321/visualise/resources/vive/' );
+					loader.setPath( 'visualise/resources/vive/' );
 					var controller = object.children[ 0 ];
 					controller.material.map = loader.load( 'onepointfive_texture.png' );
 					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );

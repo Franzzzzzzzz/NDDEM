@@ -183,7 +183,8 @@ function build_world() {
     //update_spheres_CSV(0,false);
     add_gui();
     window.addEventListener( 'resize', onWindowResize, false );
-    if ( display_type === 'VR' ) { add_vive_models(); }
+    //if ( display_type === 'VR' ) { add_vive_models(); }
+    if ( display_type === 'VR' ) { add_oculus_models(); }
 }
 
 function update_higher_dims_left() {
@@ -227,6 +228,62 @@ function update_higher_dims_right() {
         else if ( new_orientation > 2.*Math.PI )  { new_orientation -=  2.*Math.PI; }
         world[6].cur = new_orientation*(world[6].max - world[6].min)/Math.PI/2.;
     }
+}
+
+function add_oculus_models() {
+    // new THREE.MTLLoader()
+        // .setPath( root_dir + 'visualise/resources/oculus/' )
+        // .load( 'oculus-touch-controller-right.mtl', function ( materials ) {
+            // materials.preload();
+            new THREE.OBJLoader()
+    		      // .setMaterials( materials )
+                  .setPath( root_dir + 'visualise/resources/oculus/' )
+    		      .load( 'oculus-touch-controller-right.obj', function ( object ) {
+                      var controller = object.children[ 0 ];
+	                  controller.castShadow = true;
+			          controller.receiveShadow = true;
+
+                        // Pause label
+                        var font_loader = new THREE.FontLoader();
+                        font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+                            var fontsize = 0.005;
+                            var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
+                            var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                            var pause_label = new THREE.Mesh( geometry, textMaterial );
+                            pause_label.rotation.x = -Math.PI/2.;
+                            pause_label.position.y = fontsize;
+                            pause_label.position.x = -0.01;
+                            pause_label.position.z = 0.05;
+                            controller.add(pause_label);
+
+                            var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
+                            var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+                            var menu_label = new THREE.Mesh( geometry, textMaterial );
+                            menu_label.rotation.x = -Math.PI/2.;
+                            menu_label.position.y = 2*fontsize;
+                            menu_label.position.x = -0.008;
+                            menu_label.position.z = 0.023;
+                            controller.add(menu_label);
+
+                            controller1.add( controller.clone() );
+                            controller2.add( controller.clone() );
+
+                            if ( !hard_mode ) {
+                                // Move label
+                                geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
+                                var move_label = new THREE.Mesh( geometry, textMaterial );
+                                move_label.rotation.x = -Math.PI/2.;
+                                move_label.rotation.y = Math.PI;
+                                move_label.position.y = -0.03 -fontsize;
+                                move_label.position.x = 0.01;
+                                move_label.position.z = 0.045;
+                                if ( N > 3 ) { controller1.add(move_label); }
+                                if ( N > 5 ) { controller2.add(move_label); }
+                            }
+                });
+            });
+		// } );
+
 }
 
 function add_vive_models() {
@@ -459,13 +516,20 @@ function add_controllers() {
             		//guiInputHelper.pressed( false )
             	})
             }
-            controller.addEventListener( 'thumbpad press began', function( event ){
+            controller.addEventListener( 'thumbpad press began', function( event ){ // vive
                 time.play = !time.play;
-                //guiInputHelper.pressed( true )
             })
-            controller.addEventListener( 'menu press began', function( event ){
+            controller.addEventListener( 'A press began', function( event ){ // oculus
+                time.play = !time.play;
+            })
+            controller.addEventListener( 'X press began', function( event ){ // oculus
+                time.play = !time.play;
+            })
+            controller.addEventListener( 'menu press began', function( event ){ // vive
                 window.location.replace(root_dir + 'visualise/vr-menu.html')
-                //guiInputHelper.pressed( true )
+            })
+            controller.addEventListener( 'B press began', function( event ){ // oculus
+                window.location.replace(root_dir + 'visualise/vr-menu.html')
             })
         	controller.addEventListener( 'disconnected', function( event ){
         		controller.parent.remove( controller )
