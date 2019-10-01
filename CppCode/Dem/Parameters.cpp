@@ -199,7 +199,7 @@ else if (!strcmp(line, "gravityangle"))
   x[0] = -intensity * cos(angle / 180. * M_PI) ;
   x[1] = intensity * sin(angle / 180. * M_PI) ;
   g=x ;
-  for (auto v: g) printf("%g ", v) ;
+  //for (auto v: g) printf("%g ", v) ;
   printf("[INFO] Changing gravity angle in degree between x0 and x1.\n") ;
 }
 else if (!strcmp(line, "set"))
