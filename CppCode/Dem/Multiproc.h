@@ -19,8 +19,8 @@ public:
     share[share.size()-1]=NN ;
     split(N,P) ;
     disp_share() ;
-    CLp.resize(P) ;
-    CLw.resize(P) ;
+    CLp.resize(P,ContactList(Param.d)) ;
+    CLw.resize(P,ContactList(Param.d)) ;
     C.resize(P, Contacts(Param)) ;
     delayed.resize(P) ;
     delayedj.resize(P) ;

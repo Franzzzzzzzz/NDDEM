@@ -31,6 +31,7 @@ public:
      tspr=c.tspr ;
      contactlength=c.contactlength ;
      infos=c.infos ;
+     return *this ; 
  }
  Action & getinfo () {return *infos ; }
  //void setinfo (Action & a) {if (!infos) infos = new Action ; *infos=a ; }
@@ -49,12 +50,16 @@ public:
 class ContactList
 {
 public:
+ ContactList (int d) : deltamap(vector<double>(d,0)),masking(vector<u_int32_t>(d,0)),pbcdim(vector<int>(d,0)) {}
  void reset() {it = v.begin() ;}
  int insert(const cp& a) ;
  void finalise () { while (it!=v.end()) it=v.erase(it) ; }
  list <cp> v ;
  Action * default_action () {return (&def) ; }
  int cid=0 ;
+ vector <double> deltamap ; 
+ vector <u_int32_t> masking ; 
+ vector <int> pbcdim ; 
 
  void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
  void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2,           cp & contact) ; 

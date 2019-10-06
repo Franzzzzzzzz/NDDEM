@@ -26,9 +26,6 @@ int ContactList::insert(const cp &a)
 //------------------------------
 void ContactList::check_ghost (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp)
 {
-    static vector<double> deltamap (P.d,0) ; 
-    static vector<int> masking (P.d,0) ; 
-    static vector<int> pbcdim (P.d,0) ; 
     double sum ; 
     
     double Delta ; 
