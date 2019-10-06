@@ -1,7 +1,7 @@
 #include "DEMND.h"
 #include <signal.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 2
+#define OMP_NUM_THREADS 1
 
 uint Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
@@ -179,7 +179,7 @@ int main (int argc, char *argv[])
                      CLp.insert(tmpcp) ;
                  }
                  tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                 CLp.check_ghost(Ghost[j], 0, sum, 0, P, X[i], X[j], P.skinsqr, tmpcp) ;
+                 CLp.check_ghost(Ghost[j], sum, P, X[i], X[j], P.skinsqr, tmpcp) ;
                }
                else
                {
@@ -218,7 +218,7 @@ int main (int argc, char *argv[])
    }
    else // Do not recompute the full contact list, but still compute the contact length and all.
    {
-     #pragma omp parallel default(none) shared(MP) shared(P)  shared(d) shared(X) shared(Ghost) shared(Ghost_dir) //shared(stdout)
+     /*#pragma omp parallel default(none) shared(MP) shared(P)  shared(d) shared(X) shared(Ghost) shared(Ghost_dir) //shared(stdout)
      {
        int ID = omp_get_thread_num();
        double sum=0 ;
@@ -242,7 +242,8 @@ int main (int argc, char *argv[])
          int w = it->j / 2, wdir=it->j % 2 ;
          it->contactlength=fabs(X[it->i][w]-P.Boundaries[w][wdir]) ;
        }
-     }
+     }*/
+     printf("NOT IMPLEMENTED\n") ; 
    }
 
    Benchmark::stop_clock("Contacts");

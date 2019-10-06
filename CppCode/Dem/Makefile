@@ -27,8 +27,11 @@ LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
 LIBS=-lm
 FLTO=-flto
 FLTO=
+CCFLAGS=-Wall -Wextra # -march=native
+#-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2
 
-all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs
+
+all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include $(CCFLAGS) -fopenmp -lstdc++fs
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+= -fopenmp -lstdc++fs #-lnetcdf
 all:
