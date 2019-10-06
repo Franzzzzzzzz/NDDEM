@@ -5,19 +5,19 @@ void Tools::initialise (int dd)
 {
  d=dd ;
  Tools::MSigns.resize(d, vector <int> (d, 0)) ;
- for (uint i=0 ; i<d ; i++) for (uint j=0 ; j<d ; j++) MSigns[i][j]=(i<j)*(1)+(i>j)*(-1) ;
+ for (int i=0 ; i<d ; i++) for (int j=0 ; j<d ; j++) MSigns[i][j]=(i<j)*(1)+(i>j)*(-1) ;
 
  MIndexAS.resize(d, vector < int > (d,0)) ;
  int n=0 ;
- for (uint i=0 ; i<d ; i++)
-      for (uint j=i+1 ; j<d ; j++,n++)
+ for (int i=0 ; i<d ; i++)
+      for (int j=i+1 ; j<d ; j++,n++)
       {
           MIndexAS[i][j]=n ; MIndexAS[j][i]=n ;
           MASIndex.push_back(make_pair(i, j)) ;
       }
 
   Eye.clear() ; Eye.resize(d*d,0) ;
-  for (uint de=0 ; de<d ; de++) Eye[de*d+de]=1 ; //initial orientation matrix
+  for (int de=0 ; de<d ; de++) Eye[de*d+de]=1 ; //initial orientation matrix
 }
 //===================================
 void Tools::clear()
@@ -29,7 +29,7 @@ void Tools::clear()
 }
 
 //===================================
-int Tools::savetxt(char path[], const v2d & table, char header[])
+int Tools::savetxt(char path[], const v2d & table, char const header[])
 {
  FILE * out ;
  out = fopen(path, "w") ; if (out==NULL) {printf("ERR: cannot write in file %s\n", path) ; return 1 ; }
@@ -60,7 +60,7 @@ return 0 ;
 //=====================================
 void Tools::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, cv1d & Z)
 {
- FILE *out ; int dim ;
+ FILE *out ; int dim ; 
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
  dim = X[0].size() ;
  for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
@@ -95,7 +95,7 @@ void Tools::savevtk (char path[], Parameters & P, cv2d & X, vector <TensorInfos>
 {
  FILE *out ; static bool warn = false ;
 
- vector <float> projectioncenter  ; for (uint i=3 ; i<d ; i++) projectioncenter.push_back((P.Boundaries[i][1]+P.Boundaries[i][0])/2) ;
+ vector <float> projectioncenter  ; for (int i=3 ; i<d ; i++) projectioncenter.push_back((P.Boundaries[i][1]+P.Boundaries[i][0])/2) ;
 
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
 
@@ -123,7 +123,7 @@ void Tools::savevtk (char path[], Parameters & P, cv2d & X, vector <TensorInfos>
  for (int i=0 ; i<P.N ; i++)
  {
    float value = P.r[i]*P.r[i] ;
-   for (uint j=3 ; j<d ; j++) value-=(X[i][j]-projectioncenter[j-3])*(X[i][j]-projectioncenter[j-3]) ;
+   for (int j=3 ; j<d ; j++) value-=(X[i][j]-projectioncenter[j-3])*(X[i][j]-projectioncenter[j-3]) ;
    if (value<0) fprintf(out, "%g ", 0.0) ;
    else fprintf(out, "%g ", sqrt(value)) ;
  }
@@ -245,9 +245,9 @@ v1f & operator/= (v1f & a, double b)  {for (uint i=0 ; i<a.size() ; i++) a[i]/=b
 v1d Tools::skewmatvecmult (cv1d & M, cv1d & v)
 {
  v1d res (d,0) ;
- for (uint i=0 ; i<d ; i++)
+ for (int i=0 ; i<d ; i++)
  {
-     for (uint j=0 ; j<d ; j++)
+     for (int j=0 ; j<d ; j++)
      {
          if (j==i) continue ;
          res[i]+= MSigns[i][j]*M[MIndexAS[i][j]]*v[j] ;
@@ -258,9 +258,9 @@ v1d Tools::skewmatvecmult (cv1d & M, cv1d & v)
 //------------------------------------
 void Tools::skewmatvecmult (v1d & r, cv1d & M, cv1d & v)
 {
- for (uint i=0 ; i<d ; i++)
+ for (int i=0 ; i<d ; i++)
  {
-     for (uint j=0 ; j<d ; j++)
+     for (int j=0 ; j<d ; j++)
      {
          if (j==i) continue ;
          r[i]+= MSigns[i][j]*M[MIndexAS[i][j]]*v[j] ;
@@ -271,15 +271,15 @@ void Tools::skewmatvecmult (v1d & r, cv1d & M, cv1d & v)
 v1d Tools::skewmatsquare(cv1d & A)
 {
     v1d res (d*d, 0) ;
-    for (uint i=0 ; i<d ; i++)
-        for (uint j=i ; j<d ; j++)
+    for (int i=0 ; i<d ; i++)
+        for (int j=i ; j<d ; j++)
         {
-         for (uint k=0 ; k<d ; k++)
+         for (int k=0 ; k<d ; k++)
              res[i*d+j]+=A[MIndexAS[i][k]]*A[MIndexAS[k][j]]*MSigns[i][k]*MSigns[k][j] ;
         }
 
-    for (uint i=1 ; i<d ; i++)
-        for (uint j=0 ; j<i ; j++)
+    for (int i=1 ; i<d ; i++)
+        for (int j=0 ; j<i ; j++)
             res[i*d+j]=res[j*d+i] ;
 
     return res ;
@@ -287,15 +287,15 @@ v1d Tools::skewmatsquare(cv1d & A)
 //-------------------------------------
 void Tools::skewmatsquare(v1d & r, cv1d & A)
 {
-    for (uint i=0 ; i<d ; i++)
-        for (uint j=i ; j<d ; j++)
+    for (int i=0 ; i<d ; i++)
+        for (int j=i ; j<d ; j++)
         {
-         for (uint k=0 ; k<d ; k++)
+         for (int k=0 ; k<d ; k++)
              r[i*d+j]+=A[MIndexAS[i][k]]*A[MIndexAS[k][j]]*MSigns[i][k]*MSigns[k][j] ;
         }
 
-    for (uint i=1 ; i<d ; i++)
-        for (uint j=0 ; j<i ; j++)
+    for (int i=1 ; i<d ; i++)
+        for (int j=0 ; j<i ; j++)
             r[i*d+j]=r[j*d+i] ;
 
 }
@@ -303,7 +303,7 @@ void Tools::skewmatsquare(v1d & r, cv1d & A)
 v1d Tools::skewexpand(cv1d & A)
 {
     v1d res (d*d, 0) ;
-    for (uint i=0 ; i<d*d; i++)
+    for (int i=0 ; i<d*d; i++)
     {
         res[i]=A[MIndexAS[i/d][i%d]]*MSigns[i/d][i%d] ;
     }
@@ -312,7 +312,7 @@ v1d Tools::skewexpand(cv1d & A)
 //-------------------------------
 void Tools::skewexpand(v1d & r, cv1d & A)
 {
-    for (uint i=0 ; i<d*d; i++)
+    for (int i=0 ; i<d*d; i++)
     {
         r[i]=A[MIndexAS[i/d][i%d]]*MSigns[i/d][i%d] ;
     }
@@ -321,9 +321,9 @@ void Tools::skewexpand(v1d & r, cv1d & A)
 v1d Tools::matmult (cv1d &A, cv1d &B)
 {
     v1d res (d*d, 0) ;
-    for (uint i=0 ; i<d; i++)
-        for (uint j=0 ; j<d ; j++)
-            for (uint k=0 ; k<d ; k++)
+    for (int i=0 ; i<d; i++)
+        for (int j=0 ; j<d ; j++)
+            for (int k=0 ; k<d ; k++)
                 res[i*d+j]+=A[i*d+k]*B[k*d+j] ;
     return res ;
 }
@@ -331,17 +331,17 @@ v1d Tools::matmult (cv1d &A, cv1d &B)
 void Tools::matmult (v1d & r, cv1d &A, cv1d &B)
 {
     setzero(r) ;
-    for (uint i=0 ; i<d; i++)
-        for (uint j=0 ; j<d ; j++)
-            for (uint k=0 ; k<d ; k++)
+    for (int i=0 ; i<d; i++)
+        for (int j=0 ; j<d ; j++)
+            for (int k=0 ; k<d ; k++)
                 r[i*d+j]+=A[i*d+k]*B[k*d+j] ;
 }
 //-------------------------------
 void Tools::matvecmult (v1d & res, cv1d &A, cv1d &v)
 {
-    for (uint i=0 ; i<d ; i++) res[i] = 0.0;
-    for (uint i=0 ; i<d; i++)
-        for (uint k=0 ; k<d ; k++)
+    for (int i=0 ; i<d ; i++) res[i] = 0.0;
+    for (int i=0 ; i<d; i++)
+        for (int k=0 ; k<d ; k++)
             res[i]+=A[i*d+k]*v[k] ;
 }
 //----------------------------------------
@@ -362,30 +362,30 @@ void Tools::wedgeproduct (v1d &res, cv1d &a, cv1d &b)
       res[k]=a[iter->first]*b[iter->second]-a[iter->second]*b[iter->first] ;
 }
 //-----------------------------------
-void Tools::unitvec (vector <double> & v, uint d, uint n)
+void Tools::unitvec (vector <double> & v, int d, int n)
 {
-  for (uint i=0 ; i<d ; i++) v[i]=(i==n?1:0) ;
+  for (int i=0 ; i<d ; i++) v[i]=(i==n?1:0) ;
 }
 //-----------------------------------
  void Tools::orthonormalise (v1d & A) //Gram-Schmidt process
  {
-     static uint first = 0 ; // cycle through the base vector as first vector (to be impartial, random would probably be better but hey ...
+     static int first = 0 ; // cycle through the base vector as first vector (to be impartial, random would probably be better but hey ...
 
      // Let's get the base vectors first
      v2d base (d, v1d(d,0)) ;
-     for (uint i=0 ; i<d ; i++)
-         for (uint j=0 ; j<d ; j++)
+     for (int i=0 ; i<d ; i++)
+         for (int j=0 ; j<d ; j++)
             base[i][j] = A[j*d+(i+first)%d] ;
 
-     for (uint i=0 ; i<d ; i++)
+     for (int i=0 ; i<d ; i++)
      {
-         for (uint j=0 ; j<i ; j++)
+         for (int j=0 ; j<i ; j++)
              base[i] -= base[j] * (dot(base[i],base[j])) ;
          base[i] /= norm(base[i]) ;
      }
 
-     for (uint i=first ; i<first+d ; i++)
-         for (uint j=0 ; j<d ; j++)
+     for (int i=first ; i<first+d ; i++)
+         for (int j=0 ; j<d ; j++)
              A[j*d+(i%d)] = base[i-first][j] ;
 
      //first++ ; if (first>=d) first=0 ;
@@ -430,10 +430,10 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
 {
     double rsqr = normsq(x) ;
     double r= sqrt(rsqr) ;
-    uint j;
+    int j;
     phi=vector<double>(d-1, 0) ; 
     for (j=d-1 ; j>=0 && fabs(x[j])<1e-6 ; j--) ; 
-    uint lastnonzero=j ;     
+    int lastnonzero=j ;     
     for (j=0 ; j<d-1 ; j++)
     {
        if (j==lastnonzero)
@@ -455,10 +455,10 @@ double Tools::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVE
 void Tools::hyperspherical_phitox (double r, cv1d &phi, v1d &x) // WARNING NOT EXTENSIVELY TESTED
 {
     x = v1d (d,r) ;
-    for (uint i=0 ; i<d-1 ; i++)
+    for (int i=0 ; i<d-1 ; i++)
     {
         x[i] *= cos(phi[i]) ;
-        for (uint j=i+1 ; j<d ; j++)
+        for (int j=i+1 ; j<d ; j++)
             x[j] *= sin(phi[i]) ;
     }
     x[d-1] *= sin(phi[d-2]) ;

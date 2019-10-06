@@ -4,7 +4,7 @@
 
 int Parameters::set_boundaries()
 {
-    for (uint i=0 ; i<d ; i++)
+    for (int i=0 ; i<d ; i++)
     {
         Boundaries[i][0]= 0 ;
         Boundaries[i][1]= 1 ;
@@ -17,7 +17,7 @@ int Parameters::set_boundaries()
 //----------------------------------------------------
 void Parameters::perform_PBC (v1d & X, u_int32_t & PBCFlag)
 {
- for (uint j=0 ; j<d ; j++)
+ for (int j=0 ; j<d ; j++)
  {
    if (Boundaries[j][3]==static_cast<int>(WallType::PBC)) //PBC
    {
@@ -29,7 +29,7 @@ void Parameters::perform_PBC (v1d & X, u_int32_t & PBCFlag)
 //----------------------------------------------------
 void Parameters::perform_MOVINGWALL ()
 {
- for (uint j=0 ; j<d ; j++)
+ for (int j=0 ; j<d ; j++)
  {
   if (Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
   {
@@ -142,26 +142,26 @@ if (!strcmp(line, "boundary"))
 else if (!strcmp(line, "location"))
 {
   in>>id ;
-  for (uint i=0 ; i<d ; i++) {in >> x[i] ; printf("%g ", x[i]) ; }
+  for (int i=0 ; i<d ; i++) {in >> x[i] ; printf("%g ", x[i]) ; }
   X[id]=x ;
   printf("[INFO] Changing particle location.\n") ;
 }
 else if (!strcmp(line, "dimensions"))
 {
-  int nn; uint dd ; in>>dd ; in>>nn ;
+  int nn; int dd ; in>>dd ; in>>nn ;
   if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }
 }
 else if (!strcmp(line, "velocity"))
 {
   in>>id ;
-  for (uint i=0 ; i<d ; i++) in >> x[i] ;
+  for (int i=0 ; i<d ; i++) in >> x[i] ;
   V[id]=x ;
   printf("[INFO] Changing particle velocity.\n") ;
 }
 else if (!strcmp(line, "omega"))
 {
   in>>id ;
-  for (uint i=0 ; i<d*(d-1)/2 ; i++) in >> omeg[i] ;
+  for (int i=0 ; i<d*(d-1)/2 ; i++) in >> omeg[i] ;
   Omega[id]=omeg ;
   printf("[INFO] Changing particle angular velocity.\n") ;
 }
@@ -187,7 +187,7 @@ else if (!strcmp(line, "mass"))
 }
 else if (!strcmp(line, "gravity"))
 {
-  for (uint i=0 ; i<d ; i++) in >> x[i] ;
+  for (int i=0 ; i<d ; i++) in >> x[i] ;
   g=x ;
   printf("[INFO] Changing gravity.\n") ;
 }
@@ -300,7 +300,7 @@ void Parameters::remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omeg
     Frozen.erase(Frozen.begin()+idx) ;
     N-- ;
 }
-void Parameters::add_particle (v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld)
+void Parameters::add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/)
 {
     printf("add_particle NOT IMPLEMENTED YET\n") ;
 }
@@ -310,7 +310,7 @@ void Parameters::init_locations (char *line, v2d & X)
     {
         auto m = *(std::max_element(r.begin(), r.end())) ;
         printf("%g\n", m) ;
-        uint dd ;
+        int dd ;
         for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
         for (int i=1 ; i<N ; i++)
         {
@@ -333,7 +333,7 @@ void Parameters::init_locations (char *line, v2d & X)
 
         for (int i=0 ; i<N ; i++)
         {
-         for(uint dd=0 ; dd < d ; dd++)
+         for(int dd=0 ; dd < d ; dd++)
          {
            if (Boundaries[dd][3]==0)
              X[i][dd] = rand()*Boundaries[dd][2] + Boundaries[dd][0] ;
@@ -350,12 +350,12 @@ void Parameters::init_locations (char *line, v2d & X)
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ;
-      for (uint dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m+delta ;
+      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m+delta ;
       Frozen[0]=true ;
       for (int i=1 ; i<N ; i++)
       {
         X[i]=X[i-1] ;
-        for (uint dd=d-1 ; dd>=0 ; dd--)
+        for (int dd=d-1 ; dd>=0 ; dd--)
         {
           X[i][dd] += 2*m+2*delta ;
           if (X[i][dd]>Boundaries[dd][1]-m-delta)
@@ -365,7 +365,7 @@ void Parameters::init_locations (char *line, v2d & X)
         }
         if (X[i][0]==Boundaries[0][0]+m+delta) Frozen[i]=true ;
         // randomize the previous grain
-        for (uint dd=0 ; dd<d ; dd++)
+        for (int dd=0 ; dd<d ; dd++)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
       }
     }
@@ -376,7 +376,7 @@ void Parameters::init_locations (char *line, v2d & X)
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ; int ddd ;
-      for (uint dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
+      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
       Frozen[0]=true ; bool bottomlayer=true ;
       for (int i=1 ; i<N ; i++)
       {
@@ -408,7 +408,7 @@ void Parameters::init_locations (char *line, v2d & X)
         }
         else
         {
-          for (uint dd=0 ; dd<d ; dd++)
+          for (int dd=0 ; dd<d ; dd++)
             X[i-1][dd] += (rand()-0.5)*2*delta ;
         }
       }
@@ -417,7 +417,7 @@ void Parameters::init_locations (char *line, v2d & X)
     {
         auto m = *(std::max_element(r.begin(), r.end())) ; // largest radius
         printf("%g\n", m) ;
-        uint dd ;
+        int dd ;
         // X is an array of particle locations
         for (dd=0 ; dd<d ; dd++) { X[0][dd]=Boundaries[dd][0]+m ; } // d is number of dimensions, dd is its index
         for (int i=1 ; i<N ; i++) // number of particles
@@ -483,7 +483,7 @@ if (first) first=false ;
 void Parameters::xml_header ()
 {
    xmlout->openbranch("boundaries", {make_pair("length", to_string(d*2))}) ;
-   for (uint i=0 ; i<d ; i++) xmlout->fic << Boundaries[i][0] << " " << Boundaries[i][1] << " " ;
+   for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[i][0] << " " << Boundaries[i][1] << " " ;
    xmlout->closebranch() ;
 
    xmlout->openbranch("radius", {make_pair("length", to_string(N))}) ;

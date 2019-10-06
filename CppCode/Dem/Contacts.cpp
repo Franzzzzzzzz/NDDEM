@@ -74,8 +74,8 @@ void Contacts::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri
 }
 
 //---------------------- particle wall contact ----------------------------
-void Contacts::particle_wall ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                                 int j, int orient, cp & Contact)
+void Contacts::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
+                               int j, int orient, cp & Contact)
 {
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;

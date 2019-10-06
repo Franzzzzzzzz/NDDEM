@@ -3,7 +3,7 @@
 #include "Benchmark.h"
 #define OMP_NUM_THREADS 1
 
-uint Tools::d=0 ;
+int Tools::d=0 ;
 vector < vector <int> > Tools::MSigns ;
 vector < vector <int> > Tools::MIndexAS ;
 vector < double > Tools::Eye ;
@@ -32,7 +32,7 @@ int main (int argc, char *argv[])
  Parameters P(dd,NN) ; ptrP=&P ;
  Tools::initialise(P.d) ;
  if (!Tools::check_initialised(P.d)) printf("ERR: Something terribly wrong happened\n") ;
- assert(P.d<(sizeof(int)*8-1)) ;
+ assert(P.d<(static_cast<int>(sizeof(int))*8-1)) ;
  // Array initialisations
  int N=P.N ; int d=P.d ;
  std::vector < std::vector <double> > X (N, std::vector <double> (d, 0)) ;
@@ -291,7 +291,7 @@ int main (int argc, char *argv[])
 
      for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
      {
-      C.particle_wall(X[it->i],V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
+      C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
       //Tools::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
       //Torque[it->i] += Act.Torquei ;
 
@@ -350,7 +350,7 @@ int main (int argc, char *argv[])
            for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
                Tools::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
      }
-     Tools::savetxt(path, WallForce, (const char*)("Force on the various walls")) ;
+     Tools::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
     }
    }
 

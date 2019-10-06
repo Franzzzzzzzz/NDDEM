@@ -56,7 +56,7 @@ public :
      Boundaries.resize(d, vector <double> (4,0.0)) ; // Boundary type in [:,3]: 0=regular pbc, 1=wall}
     }
 
-    uint d ; int N, tdump, tinfo ;
+    int d ; int N, tdump, tinfo ;
     double T ;
     double dt, rho, Kn, Kt, Gamman, Gammat, Mu ;
     double skin, skinsqr ;
@@ -84,7 +84,7 @@ public :
     void check_events(float time, v2d & X, v2d & V, v2d & Omega) ;
     void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ;
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ;
-    void add_particle (v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ;
+    void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; // Not implemented
     void init_locations (char *line, v2d & X) ;
 
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ;
