@@ -23,78 +23,30 @@ int ContactList::insert(const cp &a)
     return (cid++) ;
 }
 
-//------------------------------
-void ContactList::check_ghost (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp)
+//-----------------------------------Fastest version so far ...
+void ContactList::check_ghost (bitdim gst, const Parameters & P, cv1d &X1, cv1d &X2, cp & tmpcp, 
+                                 int startd, double partialsum, bitdim mask)
 {
-    double sum ; 
-    
-    double Delta ; 
-    
-    auto lbd = [&](double s, int m){
-        //printf("\n {%X %X}\n\n", gstold, mask) ; fflush(stdout)  ; 
-        //tmpcp.i=i ; tmpcp.j=j ; //must be set up before calling
-        tmpcp.contactlength=sqrt(s) ;
-        tmpcp.ghost=m ;
-        //tmpcp.ghostdir must be set up before calling
-        insert(tmpcp) ;
-        //printf("CONTACT\n") ;
-    } ;
-    
-    if (gst==0) return ; 
-    
-    int n=0 ; 
-    for (int dd=0 ; gst ; gst>>=1, dd++ )
+    double sum=partialsum ;  
+    for (int dd=startd ; sum<P.skinsqr && dd<P.d ; dd++, gst>>=1)
     {
-     if (gst & 1) 
-     {
-      pbcdim[n] = dd ; 
-      Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
-      deltamap[n]= Delta * (2*(X2[dd]-X1[dd]) + Delta) ;
-      masking[n] = 1<<dd ; 
-      n++ ; 
-     }
-    }
-    
-    if (n==1) // Only 1 pbc, can be fast
-    {
-        sum = partialsum + deltamap[0] ;
-        if (sum<R) lbd (sum, masking[0]) ; 
-        return ; 
-    }
-    
-    if (n==2) // Again, small enough to do everything manually, probably
-    {
-        sum = partialsum + deltamap[0] ;
-        if (sum<R) lbd (sum, masking[0]) ; 
-        
-        sum = sum + deltamap[1] ;
-        if (sum<R) lbd (sum, masking[0] | masking[1]) ; 
-        
-        sum=partialsum + deltamap[1] ;
-        if (sum<R) lbd (sum, masking[1]) ; 
-        
-        return ; 
-    }
-    
-    // Fallback case
-    {
-      int recur = 1<<n ; 
-      for (int i=1 ; i<recur ; i++)
-      {
-        sum=partialsum ; 
-        for (int j=0 ; j<n ; j++)
-           if ((1<<j) & i)
-             sum += deltamap[j] ; 
-        if (sum<R) 
+        sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ; 
+        if (gst & 1)
         {
-            u_int32_t mask=0 ; 
-            for (int j=0 ; j<n ; j++) {mask += ((i>>j)&1) * masking[j] ; }
-            lbd (sum, mask) ;
+            double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
+            double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
+            if (sumspawn<P.skinsqr)
+                check_ghost (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ; 
         }
-      }        
+        partialsum = sum ; 
+    } 
+    if (sum<P.skinsqr)
+    {
+        tmpcp.contactlength=sqrt(sum) ;
+        tmpcp.ghost=mask ; 
+        insert(tmpcp) ;
     }
-
-} 
+}
 
 //----------------------------------------
 void ContactList::check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, cp & contact)
@@ -215,3 +167,77 @@ int sparsevector::find_next_insertion (vector <cp> &v, cp &a)
     check_ghost(gst-1, n, partialsum, mask|(1<<n), P, X1, X2, R, tmpcp ) ; // Recursing after changing partial sum -> looking for ghosts of ghosts...
   }
 }*/
+
+//------------------------------ A good version but the one above is faster
+/*void ContactList::check_ghost (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp)
+{
+    double sum ; 
+    
+    double Delta ; 
+    
+    auto lbd = [&](double s, int m){
+        //printf("\n {%X %X}\n\n", gstold, mask) ; fflush(stdout)  ; 
+        //tmpcp.i=i ; tmpcp.j=j ; //must be set up before calling
+        tmpcp.contactlength=sqrt(s) ;
+        tmpcp.ghost=m ;
+        //tmpcp.ghostdir must be set up before calling
+        printf("2|%d %d %d \n", tmpcp.i, tmpcp.j, m) ;
+        insert(tmpcp) ;
+        //printf("CONTACT\n") ;
+    } ;
+    
+    if (gst==0) return ; 
+    
+    int n=0 ; 
+    for (int dd=0 ; gst ; gst>>=1, dd++ )
+    {
+     if (gst & 1) 
+     {
+      pbcdim[n] = dd ; 
+      Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
+      deltamap[n]= Delta * (2*(X2[dd]-X1[dd]) + Delta) ;
+      masking[n] = 1<<dd ; 
+      n++ ; 
+     }
+    }
+    
+    if (n==1) // Only 1 pbc, can be fast
+    {
+        sum = partialsum + deltamap[0] ;
+        if (sum<R) lbd (sum, masking[0]) ; 
+        return ; 
+    }
+    
+    if (n==2) // Again, small enough to do everything manually, probably
+    {
+        sum = partialsum + deltamap[0] ;
+        if (sum<R) lbd (sum, masking[0]) ; 
+        
+        sum = sum + deltamap[1] ;
+        if (sum<R) lbd (sum, masking[0] | masking[1]) ; 
+        
+        sum=partialsum + deltamap[1] ;
+        if (sum<R) lbd (sum, masking[1]) ; 
+        
+        return ; 
+    }
+    
+    // Fallback case
+    {
+      int recur = 1<<n ; 
+      for (int i=1 ; i<recur ; i++)
+      {
+        sum=partialsum ; 
+        for (int j=0 ; j<n ; j++)
+           if ((1<<j) & i)
+             sum += deltamap[j] ; 
+        if (sum<R) 
+        {
+            u_int32_t mask=0 ; 
+            for (int j=0 ; j<n ; j++) {mask += ((i>>j)&1) * masking[j] ; }
+            lbd (sum, mask) ;
+        }
+      }        
+    }
+
+} */

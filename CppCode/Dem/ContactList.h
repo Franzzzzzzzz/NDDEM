@@ -61,9 +61,10 @@ public:
  vector <u_int32_t> masking ; 
  vector <int> pbcdim ; 
 
- void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
- void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2,           cp & contact) ; 
-
+ //void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
+ void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, cp & contact) ; 
+ void check_ghost (bitdim gst, const Parameters & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+                   int startd=0, double partialsum=0, bitdim mask=0) ; 
  void coordinance (v1d &Z) ; 
 
 private:

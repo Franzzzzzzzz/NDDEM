@@ -1,5 +1,6 @@
 #include "DEMND.h"
 #include <signal.h>
+#include <gperftools/profiler.h>
 #include "Benchmark.h"
 #define OMP_NUM_THREADS 1
 
@@ -75,7 +76,9 @@ int main (int argc, char *argv[])
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
  double dt=P.dt ;
+ FILE *logfile = fopen("Logfile", "w") ; 
 
+//ProfilerStart("Profiling") ; 
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
    //bool isdumptime = (ti % P.tdump==0) ;
@@ -85,6 +88,7 @@ int main (int argc, char *argv[])
      tnow = clock();
      printf("\r%10g | %5.2g%% | %d iterations in %10gs | %5d | finish in %10gs",t, t/P.T*100, P.tinfo,
             double(tnow - tprevious) / CLOCKS_PER_SEC, ti, ((P.T-t)/(P.tinfo*dt))*(double(tnow - tprevious) / CLOCKS_PER_SEC)) ;
+     fprintf(logfile, "%d %10g %d %d\n", ti, double(tnow - tprevious) / CLOCKS_PER_SEC, MP.CLp[0].v.size(), MP.CLw[0].v.size()) ; 
      fflush(stdout) ;
      tprevious=tnow ;
    }
@@ -152,11 +156,11 @@ int main (int argc, char *argv[])
    //auto res=Tools::two_max_element(displacement) ;
    //if (maxdisp[0]+maxdisp[1] > 0.7*(P.skin-P.r[0]*2)) {recompute=true ; std::fill(displacement.begin(), displacement.end(), 0);}
    //else recompute=false ;
-
    if (recompute)
    {
      //printf("RECOMPUTE\n");
-     #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
+       fflush(stdout) ; 
+     #pragma omp parallel default(none) shared(MP) shared(P) shared(d) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(t) //shared (stdout)
      {
        int ID = omp_get_thread_num();
        ContactList & CLp = MP.CLp[ID] ; ContactList & CLw = MP.CLw[ID] ;
@@ -169,20 +173,15 @@ int main (int argc, char *argv[])
 
            for (int j=i+1 ; j<N ; j++) // Regular particles
            {
-               sum=0 ;
+               //sum=0 ; 
                if (Ghost[j])
-               {
-                 for (int k=0 ; k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-                 if (sum<P.skinsqr)
-                 {
-                     tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-                     CLp.insert(tmpcp) ;
-                 }
+               { 
                  tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                 CLp.check_ghost(Ghost[j], sum, P, X[i], X[j], P.skinsqr, tmpcp) ;
+                 CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp, 0, 0, 0) ; 
                }
                else
                {
+                 sum=0 ; 
                  for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
                  if (sum<P.skinsqr)
                  {
@@ -245,7 +244,6 @@ int main (int argc, char *argv[])
      }*/
      printf("NOT IMPLEMENTED\n") ; 
    }
-
    Benchmark::stop_clock("Contacts");
 
    //-------------------------------------------------------------------------------
@@ -357,10 +355,12 @@ int main (int argc, char *argv[])
    if (P.wallforcecompute) MP.delayedwall_clean() ;
  }
 
+//ProfilerStop() ;
 //Tools::write1D ("Res.txt", TmpRes) ;
 //Tools::writeinline_close() ;
 Benchmark::write_all();
 P.finalise() ;
 printf("This is the end ...\n") ;
+fclose(logfile) ; 
 return 0 ;
 }
