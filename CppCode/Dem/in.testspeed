@@ -1,5 +1,5 @@
 # Incline plane flow
-directory Output
+directory OutputTemp
 dimensions 4 425
 
 #set adimensional

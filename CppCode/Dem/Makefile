@@ -27,7 +27,7 @@ LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
 LIBS=-lm -lprofiler
 FLTO=-flto
 FLTO=
-CCFLAGS=-Wall -Wextra # -march=native
+CCFLAGS=-Wall -Wextra #-std=c++17 # -march=native
 #-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2
 
 
