@@ -25,7 +25,7 @@ set Mu 0.5
 
 set T 10
 set dt 0.0001
-#set dumps XML with 4 Position Velocity Omega Coordination
+set dumps XML with 4 Position Velocity Omega Coordination
 #set dumps CSV with 1 Orientation
 set dumps VTK with 0
 set tdump 10000

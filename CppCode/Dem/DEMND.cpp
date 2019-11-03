@@ -4,49 +4,23 @@
 #include "Benchmark.h"
 #define OMP_NUM_THREADS 1
 
-// template <> vector < vector <int> > Tools<1>::MSigns ;
-// template <> vector < vector <int> > Tools<2>::MSigns ;
-// template <> vector < vector <int> > Tools<3>::MSigns ;
-// template <> vector < vector <int> > Tools<4>::MSigns ;
-// template <> vector < vector <int> > Tools<1>::MIndexAS ;
-// template <> vector < vector <int> > Tools<2>::MIndexAS ;
-// template <> vector < vector <int> > Tools<3>::MIndexAS ;
-// template <> vector < vector <int> > Tools<4>::MIndexAS ;
-// template <> vector < double > Tools<1>::Eye ;
-// template <> vector < double > Tools<2>::Eye ;
-// template <> vector < double > Tools<3>::Eye ;
-// template <> vector < double > Tools<4>::Eye ;
-// template <> vector < pair <int,int> > Tools<1>::MASIndex ;
-// template <> vector < pair <int,int> > Tools<2>::MASIndex ;
-// template <> vector < pair <int,int> > Tools<3>::MASIndex ;
-// template <> vector < pair <int,int> > Tools<4>::MASIndex ;
-// template <> vector <FILE *> Tools<1>::outs ;
-// template <> vector <FILE *> Tools<2>::outs ;
-// template <> vector <FILE *> Tools<3>::outs ;
-// template <> vector <FILE *> Tools<4>::outs ;
-// template <> boost::random::mt19937 Tools<1>::rng ;
-// template <> boost::random::mt19937 Tools<2>::rng ;
-// template <> boost::random::mt19937 Tools<3>::rng ;
-// template <> boost::random::mt19937 Tools<4>::rng ;
-// template <> boost::random::uniform_01<boost::mt19937> Tools<1>::rand(rng) ;
-// template <> boost::random::uniform_01<boost::mt19937> Tools<2>::rand(rng) ;
-// template <> boost::random::uniform_01<boost::mt19937> Tools<3>::rand(rng) ;
-// template <> boost::random::uniform_01<boost::mt19937> Tools<4>::rand(rng) ;
-
-/*Parameters * ptrP ; //Only for the signal handler ...
+vector <std::pair<ExportType,ExportData>> * toclean ; 
+XMLWriter * xmlout ;
 void sig_handler (int p)
 {
     Benchmark::write_all() ;
-    ptrP->quit_cleanly() ;
+    for (auto v : *toclean)
+        if ((v.first == ExportType::XML) || (v.first == ExportType::XMLbase64))
+            xmlout->emergencyclose() ;
     //printf("\n\n\n\n\n\n\n") ;
     std::exit(p) ;
-}*/ //TODO
+}
 
 template <int d>
 int templatedmain (char * argv[]) 
 {
  int NN=atoi(argv[2]) ;
- Parameters<d> P(NN) ; //ptrP=&P ;
+ Parameters<d> P(NN) ; 
  Tools<d>::initialise() ;
  if (!Tools<d>::check_initialised(d)) printf("ERR: Something terribly wrong happened\n") ;
  assert(d<(static_cast<int>(sizeof(int))*8-1)) ; //TODO
@@ -82,6 +56,8 @@ int templatedmain (char * argv[])
  //P.init_particles(X, A) ;
  if (strcmp(argv[3], "default"))
      P.load_datafile (argv[3], X, V, Omega) ;
+ toclean = &(P.dumps) ; 
+ xmlout = P.xmlout ; 
 
  displacement[0]=P.skinsqr*2 ;
  //Contacts C(P) ; //Initialize the Contact class object
@@ -385,7 +361,7 @@ return 0 ;
 //===================================================
 int main (int argc, char *argv[])
 {
- //signal (SIGINT, sig_handler);   // Catch all signals ... //TODO
+ signal (SIGINT, sig_handler);   // Catch all signals ...
 
  if (argc<4) {printf("Usage: DEMND #dimensions #grains inputfile\n") ; std::exit(1) ; }
  int dd=atoi(argv[1]) ;
@@ -396,27 +372,27 @@ int main (int argc, char *argv[])
      case  2: templatedmain<2> (argv) ; break ; 
      case  3: templatedmain<3> (argv) ; break ; 
      case  4: templatedmain<4> (argv) ; break ; 
-     case  5: templatedmain<5> (argv) ; break ; 
-     case  6: templatedmain<6> (argv) ; break ; 
-     case  7: templatedmain<7> (argv) ; break ; 
-     case  8: templatedmain<8> (argv) ; break ; 
-     case  9: templatedmain<9> (argv) ; break ; 
-     case 10: templatedmain<10> (argv) ; break ; 
-     case 11: templatedmain<11> (argv) ; break ; 
-     case 12: templatedmain<12> (argv) ; break ; 
-     case 13: templatedmain<13> (argv) ; break ; 
-     case 14: templatedmain<14> (argv) ; break ; 
-     case 15: templatedmain<15> (argv) ; break ; 
-     case 16: templatedmain<16> (argv) ; break ; 
-     case 17: templatedmain<17> (argv) ; break ; 
-     case 18: templatedmain<18> (argv) ; break ; 
-     case 19: templatedmain<19> (argv) ; break ; 
-     case 20: templatedmain<20> (argv) ; break ; 
-     case 21: templatedmain<21> (argv) ; break ; 
-     case 22: templatedmain<22> (argv) ; break ; 
-     case 23: templatedmain<23> (argv) ; break ; 
-     case 24: templatedmain<24> (argv) ; break ; 
-     case 25: templatedmain<25> (argv) ; break ; 
+//      case  5: templatedmain<5> (argv) ; break ; 
+//      case  6: templatedmain<6> (argv) ; break ; 
+//      case  7: templatedmain<7> (argv) ; break ; 
+//      case  8: templatedmain<8> (argv) ; break ; 
+//      case  9: templatedmain<9> (argv) ; break ; 
+//      case 10: templatedmain<10> (argv) ; break ; 
+//      case 11: templatedmain<11> (argv) ; break ; 
+//      case 12: templatedmain<12> (argv) ; break ; 
+//      case 13: templatedmain<13> (argv) ; break ; 
+//      case 14: templatedmain<14> (argv) ; break ; 
+//      case 15: templatedmain<15> (argv) ; break ; 
+//      case 16: templatedmain<16> (argv) ; break ; 
+//      case 17: templatedmain<17> (argv) ; break ; 
+//      case 18: templatedmain<18> (argv) ; break ; 
+//      case 19: templatedmain<19> (argv) ; break ; 
+//      case 20: templatedmain<20> (argv) ; break ; 
+//      case 21: templatedmain<21> (argv) ; break ; 
+//      case 22: templatedmain<22> (argv) ; break ; 
+//      case 23: templatedmain<23> (argv) ; break ; 
+//      case 24: templatedmain<24> (argv) ; break ; 
+//      case 25: templatedmain<25> (argv) ; break ; 
      default : printf("DEMND was not compiled with support for dimension %d. Please recompile modifying the main function to support that dimension.\n", dd); std::exit(1) ;
  }
  
