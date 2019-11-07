@@ -24,11 +24,14 @@ SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
 LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
-LIBS=-lm
+LIBS=-lm -lprofiler
 FLTO=-flto
 FLTO=
+CCFLAGS=-Wall -Wextra #-std=c++17 # -march=native
+#-Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2
 
-all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include -Wall -fopenmp -lstdc++fs
+
+all: CFLAGS+=-g -O3 -I/usr/local/include -I/opt/local/include $(CCFLAGS) -fopenmp -lstdc++fs -lprofiler
 all: $(SOURCES) $(EXECUTABLE)
 all: LIBS+= -fopenmp -lstdc++fs #-lnetcdf
 all:

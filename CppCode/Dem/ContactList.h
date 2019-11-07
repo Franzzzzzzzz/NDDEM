@@ -8,6 +8,7 @@
 #ifndef CONTACTLIST
 #define CONTACTLIST
 
+// ------------------------------------ Action class -------------------------------------------
 class Action {
 public :
     vector <double> Fn, Ft, Torquei, Torquej ;
@@ -16,6 +17,7 @@ public :
 } ;
 
 
+// ------------------------------------ Contact properties class -------------------------------------------
 class cp // Contact properties class
 {
 public:
@@ -31,6 +33,7 @@ public:
      tspr=c.tspr ;
      contactlength=c.contactlength ;
      infos=c.infos ;
+     return *this ; 
  }
  Action & getinfo () {return *infos ; }
  //void setinfo (Action & a) {if (!infos) infos = new Action ; *infos=a ; }
@@ -45,20 +48,26 @@ public:
  bool owninfos ;
 } ;
 
-//--------------------------
+// ------------------------------------ Contact List class -------------------------------------------
+template <int d>
 class ContactList
 {
 public:
+ ContactList () : deltamap(vector<double>(d,0)),masking(vector<u_int32_t>(d,0)),pbcdim(vector<int>(d,0)) {}
  void reset() {it = v.begin() ;}
  int insert(const cp& a) ;
  void finalise () { while (it!=v.end()) it=v.erase(it) ; }
  list <cp> v ;
  Action * default_action () {return (&def) ; }
  int cid=0 ;
+ vector <double> deltamap ; 
+ vector <u_int32_t> masking ; 
+ vector <int> pbcdim ; 
 
- void check_ghost    (u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
- void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters & P, cv1d &X1, cv1d &X2,           cp & contact) ; 
-
+ //void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
+ void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; 
+ void check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+                   int startd=0, double partialsum=0, bitdim mask=0) ; 
  void coordinance (v1d &Z) ; 
 
 private:
@@ -66,30 +75,94 @@ private:
  Action def ;
 };
 
-
 inline bool operator< (const cp &a, const cp &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; }
 inline bool operator== (const cp &a, const cp &b) {return (a.i==b.i && a.j==b.j) ; }
 
-//============================================================================================================
-//------------------ Quite slow unfortunately. Probably better to use the list implementation ----------------
-/*class sparsevector
-{
-public:
-    sparsevector (int m) : max_size(m) {}
-    void insert_in_place (vector <cp> & v1) ;
-    int find_next_insertion (vector <cp> &v, cp &a) ;
-    void mark_to_delete (vector <cp> & v) ;
-    void finalise (vector<cp> &v) ;
-    void reset(void) {idx=0 ;}
-private:
-    vector <cp> vin ;
-    vector <int> location ;
-    void postpone_insertion(cp & a, int idx) ;
-    void compact (vector <cp> & v) ;
-    int max_size ;
-    int idx ;
-    bool isdeleted (const cp &a) {return (a.i<0) ;}
-} ;*/
 
+/*****************************************************************************************************
+ *                                                                                                   *
+ *                                                                                                   *
+ *                                                                                                   *
+ * IMPLEMENTATIONS                                                                                   *
+ *                                                                                                   *
+ *                                                                                                   *
+ *                                                                                                   *
+ * ***************************************************************************************************/
+
+template <int d>
+int ContactList<d>::insert(const cp &a)
+{
+    while (it!=v.end() && (*it) < a)
+    { it= v.erase(it) ; }
+    if (it==v.end()) {v.push_back(a) ; it=v.end() ; }
+    else
+    {
+        if ((*it)==a)
+        {
+            it->contactlength=a.contactlength ;
+            it->ghost=a.ghost ;
+            it->ghostdir=a.ghostdir ;
+            it++ ;
+        }
+        else {it=v.insert(it,a) ; it++ ; }
+    }
+    return (cid++) ;
+}
+
+//-----------------------------------Fastest version so far ...
+template <int d>
+void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp, 
+                                 int startd, double partialsum, bitdim mask)
+{
+    double sum=partialsum ;  
+    for (int dd=startd ; sum<P.skinsqr && dd<d ; dd++, gst>>=1)
+    {
+        sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ; 
+        if (gst & 1)
+        {
+            double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
+            double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
+            if (sumspawn<P.skinsqr)
+                check_ghost (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ; 
+        }
+        partialsum = sum ; 
+    } 
+    if (sum<P.skinsqr)
+    {
+        tmpcp.contactlength=sqrt(sum) ;
+        tmpcp.ghost=mask ; 
+        insert(tmpcp) ;
+    }
+}
+
+//----------------------------------------
+template <int d>
+void ContactList<d>::check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact)
+{
+  if (gst==0) return ;
+  else
+  {
+    for ( ;(gst&1)==0; gst>>=1,n++) ;
+    check_ghost_dst(gst-1, n, partialsum, mask, P, X1, X2, contact) ;
+    double Delta= (contact.ghostdir&(1<<n)?-1:1) * P.Boundaries[n][2] ;
+    partialsum = partialsum + Delta*(2*(X2[n]-X1[n]) + Delta) ;
+    if (partialsum<contact.contactlength) // Found a lower distance with this ghost
+    {
+      contact.contactlength=partialsum ;
+      contact.ghost = mask|(1<<n) ;
+    }
+    check_ghost_dst(gst-1, n, partialsum, mask|(1<<n), P, X1, X2, contact) ;
+  }
+}
+
+//-----------------------------------
+template <int d>
+void ContactList<d>::coordinance (v1d &Z)
+{
+  for (auto & w : v)
+  {
+      Z[w.i]++ ; Z[w.j] ++ ; 
+  }
+}
 
 #endif

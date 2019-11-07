@@ -10,4 +10,5 @@ using cv1d= const vector <double> ;
 using cv2d= const vector < vector <double> > ;
 using cv3d = const vector<vector<vector<double>>> ; 
 using cv1f = const vector <float> ; 
+using bitdim = unsigned int ; 
 #endif
