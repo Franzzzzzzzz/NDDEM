@@ -1,4 +1,4 @@
-# Install script for directory: /cygdrive/c/Users/AMME2/Documents/GitHub/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src
+# Install script for directory: /Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/cygdrive/c/Users/AMME2/Documents/GitHub/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -2,9 +2,9 @@
 #include <signal.h>
 //#include <gperftools/profiler.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 1
+#define OMP_NUM_THREADS 2
 
-vector <std::pair<ExportType,ExportData>> * toclean ; 
+vector <std::pair<ExportType,ExportData>> * toclean ;
 XMLWriter * xmlout ;
 void sig_handler (int p)
 {
@@ -17,15 +17,15 @@ void sig_handler (int p)
 }
 
 template <int d>
-int templatedmain (char * argv[]) 
+int templatedmain (char * argv[])
 {
  int NN=atoi(argv[2]) ;
- Parameters<d> P(NN) ; 
+ Parameters<d> P(NN) ;
  Tools<d>::initialise() ;
  if (!Tools<d>::check_initialised(d)) printf("ERR: Something terribly wrong happened\n") ;
  assert(d<(static_cast<int>(sizeof(int))*8-1)) ; //TODO
  // Array initialisations
- int N=P.N ; 
+ int N=P.N ;
  std::vector < std::vector <double> > X (N, std::vector <double> (d, 0)) ;
  std::vector < std::vector <double> > V (N, std::vector <double> (d, 0)) ;
  std::vector < std::vector <double> > A (N, std::vector <double> (d*d, 0)) ; for (int i=0 ; i<N ; i++) A[i]=Tools<d>::Eye ;
@@ -56,8 +56,8 @@ int templatedmain (char * argv[])
  //P.init_particles(X, A) ;
  if (strcmp(argv[3], "default"))
      P.load_datafile (argv[3], X, V, Omega) ;
- toclean = &(P.dumps) ; 
- xmlout = P.xmlout ; 
+ toclean = &(P.dumps) ;
+ xmlout = P.xmlout ;
 
  displacement[0]=P.skinsqr*2 ;
  //Contacts C(P) ; //Initialize the Contact class object
@@ -68,9 +68,9 @@ int templatedmain (char * argv[])
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
  double dt=P.dt ;
- FILE *logfile = fopen("Logfile", "w") ; 
+ FILE *logfile = fopen("Logfile", "w") ;
 
-//ProfilerStart("Profiling") ; 
+//ProfilerStart("Profiling") ;
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
    //bool isdumptime = (ti % P.tdump==0) ;
@@ -80,7 +80,7 @@ int templatedmain (char * argv[])
      tnow = clock();
      printf("\r%10g | %5.2g%% | %d iterations in %10gs | %5d | finish in %10gs",t, t/P.T*100, P.tinfo,
             double(tnow - tprevious) / CLOCKS_PER_SEC, ti, ((P.T-t)/(P.tinfo*dt))*(double(tnow - tprevious) / CLOCKS_PER_SEC)) ;
-     fprintf(logfile, "%d %10g %lu %lu\n", ti, double(tnow - tprevious) / CLOCKS_PER_SEC, MP.CLp[0].v.size(), MP.CLw[0].v.size()) ; 
+     fprintf(logfile, "%d %10g %lu %lu\n", ti, double(tnow - tprevious) / CLOCKS_PER_SEC, MP.CLp[0].v.size(), MP.CLw[0].v.size()) ;
      fflush(stdout) ;
      tprevious=tnow ;
    }
@@ -151,7 +151,7 @@ int templatedmain (char * argv[])
    if (recompute)
    {
      //printf("RECOMPUTE\n");
-       fflush(stdout) ; 
+       fflush(stdout) ;
      #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
      {
        int ID = omp_get_thread_num();
@@ -165,15 +165,15 @@ int templatedmain (char * argv[])
 
            for (int j=i+1 ; j<N ; j++) // Regular particles
            {
-               //sum=0 ; 
+               //sum=0 ;
                if (Ghost[j])
-               { 
+               {
                  tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                 CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ; 
+                 CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
                }
                else
                {
-                 sum=0 ; 
+                 sum=0 ;
                  for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
                  if (sum<P.skinsqr)
                  {
@@ -234,7 +234,7 @@ int templatedmain (char * argv[])
          it->contactlength=fabs(X[it->i][w]-P.Boundaries[w][wdir]) ;
        }
      }*/
-     printf("NOT IMPLEMENTED\n") ; 
+     printf("NOT IMPLEMENTED\n") ;
    }
    Benchmark::stop_clock("Contacts");
 
@@ -353,8 +353,8 @@ int templatedmain (char * argv[])
 Benchmark::write_all();
 P.finalise() ;
 printf("This is the end ...\n") ;
-fclose(logfile) ; 
-return 0 ; 
+fclose(logfile) ;
+return 0 ;
 }
 
 
@@ -365,36 +365,36 @@ int main (int argc, char *argv[])
 
  if (argc<4) {printf("Usage: DEMND #dimensions #grains inputfile\n") ; std::exit(1) ; }
  int dd=atoi(argv[1]) ;
- 
+
  switch (dd)
  {
-     case  1: templatedmain<1> (argv) ; break ; 
-     case  2: templatedmain<2> (argv) ; break ; 
-     case  3: templatedmain<3> (argv) ; break ; 
-     case  4: templatedmain<4> (argv) ; break ; 
-//      case  5: templatedmain<5> (argv) ; break ; 
-//      case  6: templatedmain<6> (argv) ; break ; 
-//      case  7: templatedmain<7> (argv) ; break ; 
-//      case  8: templatedmain<8> (argv) ; break ; 
-//      case  9: templatedmain<9> (argv) ; break ; 
-//      case 10: templatedmain<10> (argv) ; break ; 
-//      case 11: templatedmain<11> (argv) ; break ; 
-//      case 12: templatedmain<12> (argv) ; break ; 
-//      case 13: templatedmain<13> (argv) ; break ; 
-//      case 14: templatedmain<14> (argv) ; break ; 
-//      case 15: templatedmain<15> (argv) ; break ; 
-//      case 16: templatedmain<16> (argv) ; break ; 
-//      case 17: templatedmain<17> (argv) ; break ; 
-//      case 18: templatedmain<18> (argv) ; break ; 
-//      case 19: templatedmain<19> (argv) ; break ; 
-//      case 20: templatedmain<20> (argv) ; break ; 
-//      case 21: templatedmain<21> (argv) ; break ; 
-//      case 22: templatedmain<22> (argv) ; break ; 
-//      case 23: templatedmain<23> (argv) ; break ; 
-//      case 24: templatedmain<24> (argv) ; break ; 
-//      case 25: templatedmain<25> (argv) ; break ; 
+     case  1: templatedmain<1> (argv) ; break ;
+     case  2: templatedmain<2> (argv) ; break ;
+     case  3: templatedmain<3> (argv) ; break ;
+     case  4: templatedmain<4> (argv) ; break ;
+     case  5: templatedmain<5> (argv) ; break ;
+     case  6: templatedmain<6> (argv) ; break ;
+     case  7: templatedmain<7> (argv) ; break ;
+     case  8: templatedmain<8> (argv) ; break ;
+//      case  9: templatedmain<9> (argv) ; break ;
+//      case 10: templatedmain<10> (argv) ; break ;
+//      case 11: templatedmain<11> (argv) ; break ;
+//      case 12: templatedmain<12> (argv) ; break ;
+//      case 13: templatedmain<13> (argv) ; break ;
+//      case 14: templatedmain<14> (argv) ; break ;
+//      case 15: templatedmain<15> (argv) ; break ;
+//      case 16: templatedmain<16> (argv) ; break ;
+//      case 17: templatedmain<17> (argv) ; break ;
+//      case 18: templatedmain<18> (argv) ; break ;
+//      case 19: templatedmain<19> (argv) ; break ;
+//      case 20: templatedmain<20> (argv) ; break ;
+//      case 21: templatedmain<21> (argv) ; break ;
+//      case 22: templatedmain<22> (argv) ; break ;
+//      case 23: templatedmain<23> (argv) ; break ;
+//      case 24: templatedmain<24> (argv) ; break ;
+//      case 25: templatedmain<25> (argv) ; break ;
      default : printf("DEMND was not compiled with support for dimension %d. Please recompile modifying the main function to support that dimension.\n", dd); std::exit(1) ;
  }
- 
+
 return 0 ;
 }

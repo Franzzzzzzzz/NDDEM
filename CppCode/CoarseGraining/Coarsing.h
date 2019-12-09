@@ -12,6 +12,10 @@
 #include "NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
 
+#ifdef MATLAB
+#include "mat.h"
+#endif
+
 using namespace std ;
 
 //=========================================================
@@ -81,9 +85,13 @@ public :
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
         //for (int i=0 ; i<d ; i++)
         // printf("%d %d %g %g %g|", d, npt[i], box[1][i], box[0][i], dx[i]) ; fflush(stdout) ;
+        printf("R") ; fflush(stdout) ;
         grid_generate() ;
+        printf("Q") ; fflush(stdout) ;
         grid_neighbour() ;
+        printf("K") ; fflush(stdout) ;
         set_field_struct() ;
+        printf("L") ; fflush(stdout) ;
         Window = new LibLucy3D( &data, w, d) ;
     }
 
@@ -111,7 +119,7 @@ public :
     // Grid functions
     int set_field_struct() ; //< Set the FIELDS structure, with all the different CG properties that can be computed.
     int setWindow (string windowname) ;
-    int setWindow (string windowname, double w) ;
+    int setWindow (string windowname, double w, tuple<int, vector<int>> additionalarg = make_tuple (0, vector<int>(0))) ; 
     int grid_generate() ;
     int grid_neighbour() ;
     int grid_setfields() ;
@@ -149,4 +157,5 @@ public :
     int write_vtk(string sout) ;
     int write_netCDF (string sout) ;
     int write_NrrdIO (string path) ;
+    int write_matlab (string path, bool squeeze = false) ;
 } ;

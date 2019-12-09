@@ -61,6 +61,7 @@ FIELDS.push_back({0x008000, "qRC"  , "VECTOR"});    //Eq 74
 FIELDS.push_back({0x010000, "qRK"  , "VECTOR"});    //Eq 73
 FIELDS.push_back({0x020000, "zT"   , "SCALAR"});    //Eq 75
 FIELDS.push_back({0x040000, "zR"   , "SCALAR"});    //Eq 76
+return 0 ;
 }
 
 //=========================================================
@@ -112,6 +113,7 @@ int Coarsing::grid_neighbour ()
     for (int i=0 ; i<Npt ; i++)
         nsz+=CGP[i].neighbors.size() ;
     printf("Typical neighbor number: %g \n",nsz/Npt) ;
+return 0 ;
 }
 //---------------------------------
 int Coarsing::set_flags (vector <string> s)
@@ -124,6 +126,7 @@ int Coarsing::set_flags (vector <string> s)
          flags |= a->flag ;
  }
  printf("Flags: %X\n", flags) ;
+return 0 ;
 }
 
 //--------------------------------
@@ -270,6 +273,7 @@ int Coarsing::compute_fluc_vel ()
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;
   }
+  return 0 ;
 }
 int Coarsing::compute_fluc_rot ()
 {
@@ -285,6 +289,7 @@ int Coarsing::compute_fluc_rot ()
     for (int dd=0 ; dd<d ; dd++)
       data.rot_fluc[dd][i]=data.omega[dd][i]-omegaavg[dd] ;
   }
+  return 0 ;
 }
 
 v1d Coarsing::interpolate_vel_nearest (int id)
@@ -367,6 +372,7 @@ for (i=0 ; i<Npt ; i++)
       CGP[i].fields[cT][EKRid] /= 2.0 ;
     }
 }
+return 0 ;
 }
 
 //================ PASS 2 : "TK", "MK", "eKT", "eKR", "qTK", "qRK"==============================
@@ -424,6 +430,7 @@ for (i=0 ; i<Npt ; i++)
     if (doqTK) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qTKid+dd] *= (-0.5) ;
     if (doqRK) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qRKid+dd] *= (-0.5) ;
 }
+return 0 ;
 }
 
 //================ PASS 3 : "TC", "MC", "mC", "qTC", "qRC", "zt", "zr"==============================
@@ -511,9 +518,8 @@ for (i=0 ; i<Npt ; i++)
     if (doqRC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qRCid] *= 0.5 ;
     if (doMC) for (dd=0 ; dd<d*d ; dd++) CGP[i].fields[cT][MCid] *= 0.5 ;
 }
+return 0 ;
 }
-
-
 
 //=================================================================
 // Data conversion tools
@@ -668,7 +674,7 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
     printf("Periodic effect: old N = %d, added = %d\n", N, newN) ;
     Nnonper=N ;
     N += newN ;
-
+return 0 ;
 }
 
 //====================================================
@@ -739,8 +745,68 @@ int Coarsing::write_vtk(string sout)
     }
   fclose(out) ;
   }
+return 0 ;
 }
 //-------------------------------------------------------
+int Coarsing::write_matlab (string path, bool squeeze)
+{
+#ifdef MATLAB
+  double * outdata ;
+  MATFile *pmat;
+  pmat = matOpen((path+".mat").c_str(), "w");
+
+  int dimtime=d+2 ;
+  vector <long unsigned int> dimensions (3+d, 0) ; // This type to please matlab
+  for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
+  dimensions[dimtime] = Time ;
+
+  for (int f=0 ; f<Fidx.size() ; f++)
+  {
+    if (Fidx[f]<0) continue ;
+
+    // Data are goind fast to slow in MATLAB ... so probably need some rewrite ...
+    switch (Ftype[f])
+    {
+      case 1: dimensions[0]=dimensions[1]=1 ;  //Scalar
+              outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
+              for (int t=0 ; t<Time ; t++)
+                  for (int i=0 ; i<Npt ; i++)
+                      outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
+            break ;
+      case 2: dimensions[0]=d ; dimensions[1]=1 ; // Vector
+              outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
+              for (int t=0 ; t<Time ; t++)
+                  for (int i=0 ; i<Npt ; i++)
+                      for (int j=0 ; j<d ; j++)
+                          outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
+            break ;
+      case 3: dimensions[0]=dimensions[1]=d ; //Tensor
+              for (int t=0 ; t<Time ; t++)
+                  for (int i=0 ; i<Npt ; i++)
+                      for (int j=0 ; j<d*d ; j++)
+                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
+              outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
+            break ;
+      default: printf("ERR: this should never happen. \n") ;
+    }
+
+    auto tmpdim = dimensions ;
+    if (squeeze)
+      tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
+
+    mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
+    mxSetData (pm, outdata) ;
+    matPutVariable(pmat, Fname[f].c_str(), pm);
+    mxFree(outdata) ;
+  }
+  matClose(pmat) ;
+#else
+  printf("Matlab writing not implemented") ;
+#endif
+return 0 ;
+}
+
+//--------------------------------------------------------
 int Coarsing ::write_NrrdIO (string path)
 {
 #ifdef NRRDIO
@@ -829,6 +895,7 @@ int Coarsing ::write_NrrdIO (string path)
 #else
   printf("ERR: Not compiled with NRRD support.\n") ;
 #endif
+return 0 ;
 }
 
 
@@ -937,8 +1004,8 @@ return 1 ;
 //==================================
 int Coarsing::setWindow (string windowname)
 { double w= (*std::min_element(dx.begin(),dx.end())*1) ; // w automatically set
-  setWindow(windowname, w) ; }
-int Coarsing::setWindow (string windowname, double w)
+  setWindow(windowname, w) ; return 0 ; }
+int Coarsing::setWindow (string windowname, double w, tuple<int, vector<int>> additionalarg)
 {
   cutoff=2.5*w ; //TODO
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
@@ -949,8 +1016,11 @@ int Coarsing::setWindow (string windowname, double w)
     Window = new LibLucy3D (&data,w,d) ;
   else if (windowname=="LibLucyND")
     Window = new LibLucyND (&data,w,d) ;
+  else if (windowname=="LibLucyND_Periodic")
+    Window = new LibLucyND_Periodic (&data,w,d,get<0>(additionalarg),get<1>(additionalarg)) ;
   else
     printf("Unknown window, check Coarsing::setWindow") ;
+return 0 ;
 }
 
 

@@ -24,7 +24,7 @@ SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
 LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
-LIBS=-lm -lprofiler
+LIBS=-lm #-lprofiler
 FLTO=-flto
 FLTO=
 CCFLAGS=-Wall -Wextra #-std=c++17 # -march=native

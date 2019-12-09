@@ -38,19 +38,56 @@ public:
 
 class LibLucyND : public LibBase {
 public:
-  LibLucyND(struct Data * D, double ww, double dd) 
-    { 
-        data=D; w=ww ; d=dd ; 
+  LibLucyND(struct Data * D, double ww, double dd)
+    {
+        data=D; w=ww ; d=dd ;
         double Vol=pow(M_PI,d/2.)/(tgamma(d/2.+1)) ; // N-ball volume
-        scale = Vol * d * (-3./(d+4) + 8./(d+3) - 6./(d+2) + 1./d) ; 
+        scale = Vol * d * (-3./(d+4) + 8./(d+3) - 6./(d+2) + 1./d) ;
         scale = 1/scale ;
-        scale = scale / (pow(w, d)) ; 
-        printf("Lucy function scaling : %f \n", scale) ;  
+        scale = scale / (pow(w, d)) ;
+        printf("Lucy function scaling : %f \n", scale) ;
     }
-  double scale ; 
+  double scale ;
   double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (scale*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
   double window(double r) {return (Lucy(r)) ;}
-} ; 
+} ;
+
+class LibLucyND_Periodic : public LibBase
+{
+  public :
+  LibLucyND_Periodic (struct Data * D, double ww, double dd, int periodic, vector<int> boxes)
+  {
+    maskperiodic = nper = 0 ;
+    for (int i =0 ; i<boxes.size() ; i++)
+      if ((periodic&(1<<i)) && boxes[i]==0)
+      {
+        maskperiodic |= (1<<i) ;
+        nper++ ;
+      }
+
+    data=D; w=ww ; d=dd-nper ;
+    double Vol=pow(M_PI,d/2.)/(tgamma(d/2.+1)) ; // N-ball volume
+    scale = Vol * d * (-3./(d+4) + 8./(d+3) - 6./(d+2) + 1./d) ;
+    scale = 1/scale ;
+    scale = scale / (pow(w, d)) ;
+    printf("Lucy function scaling : %f \n", scale) ;
+  }
+
+  double distance (int id, v1d loc)
+  {
+    double res=0 ;
+    for (int i=0 ; i<d ; i++)
+      if ((maskperiodic&(1<<i))==0)
+        res+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ;
+    return sqrt(res) ;
+  }
+
+  int maskperiodic, nper ;
+  double scale ;
+  double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (scale*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
+  double window(double r) {return (Lucy(r)) ;}
+};
+
 
 /*class LibLucy1DPBC : public LibBase {
 public:
