@@ -2,8 +2,12 @@ HOST=$(shell hostname)
 
 ifeq "$(HOST)" "guillard"
 CC=/opt/local/bin/g++-mp-9 # FG
+CFLAGMAT=-I/Applications/MATLAB_R2017a.app/extern/include -DMATLAB
+LIBFLAGMAT=-L/Applications/MATLAB_R2017a.app/bin/maci64
 else ifeq "$(HOST)" "franz-pavilion"
 CC=g++
+CFLAGMAT=-I/home/franz/Matlab2017a/extern/include -DMATLAB
+LIBFLAGMAT=-L/home/franz/Matlab2017a/bin/glnxa64 
 else
 CC=g++
 endif
@@ -24,8 +28,8 @@ endif
 SOURCES=IONDDEM.cpp Coarsing.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=IO
-CFLAGS=-g -I/opt/local/include -I/Applications/MATLAB_R2017a.app/extern/include -DNETCDF -DNRRDIO -DMATLAB
-LDFLAGS=-g -L/opt/local/lib -L./NrrdIO-1.11.0-src/build -L/Applications/MATLAB_R2017a.app/bin/maci64
+CFLAGS=-g -I/opt/local/include -DNETCDF -DNRRDIO $(CFLAGMAT)
+LDFLAGS=-g -L/opt/local/lib -L./NrrdIO-1.11.0-src/build $(LIBFLAGMAT)
 LIBS=-lz -lm -lnetcdf -lNrrdIO -lmat -lmx
 
 all: $(SOURCES) $(EXECUTABLE)

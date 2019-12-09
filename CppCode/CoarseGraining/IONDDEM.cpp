@@ -108,8 +108,8 @@ struct Param P6 {
   {"RHO", "VAVG"},                    // flags
   {25,1,1,1,1,1},                           // boxes #
   {{}},                               // Boundaries
-  0b111110,                              // PBC (fisrt dimension is LSD)
-  {20, 5, 3.4, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
+  0b111110,                           // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4, 3.4, 3.4},        // Deltas (used for pbcs)
   {},                                 // radii
   "CoarseD6"                          // save location
 };
@@ -199,7 +199,7 @@ int main (int argc, char * argv[])
  Coarsing C(d, P->boxes, P->boundaries, P->maxT-P->skipT) ;
 
   printf("D") ; fflush(stdout) ;
- C.setWindow("LibLucyND_Periodic", 1, {P->pbc, P->boxes}) ;
+ C.setWindow<Windows::LibLucyND_Periodic>(1, P->pbc, P->boxes, P->Delta) ;
 
   printf("D") ; fflush(stdout) ;
  C.set_flags(P->flags) ;
@@ -234,7 +234,7 @@ printf("E") ; fflush(stdout) ;
     for (int j=0 ; j<C.data.N ; j++) for (int k=0 ;k<d ; k++) C.data.vel[k][j] = data[delta][j][k] ;
   }
 
-  C.data.periodic_atoms (d, Bounds, P->pbc, P->Delta, false) ;
+  //C.data.periodic_atoms (d, Bounds, P->pbc, P->Delta, false) ;
   C.pass_1() ;
   C.data.clean_periodic_atoms() ;
   //C.compute_fluc_vel() ;

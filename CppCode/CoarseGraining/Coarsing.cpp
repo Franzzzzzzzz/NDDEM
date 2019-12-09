@@ -1002,26 +1002,6 @@ return 1 ;
 #endif
 }
 //==================================
-int Coarsing::setWindow (string windowname)
-{ double w= (*std::min_element(dx.begin(),dx.end())*1) ; // w automatically set
-  setWindow(windowname, w) ; return 0 ; }
-int Coarsing::setWindow (string windowname, double w, tuple<int, vector<int>> additionalarg)
-{
-  cutoff=2.5*w ; //TODO
-  printf("Window and cutoff: %g %g \n", w, cutoff) ;
-
-  if (windowname=="LibRectND")
-    Window=new LibRectND (&data, w, d) ;
-  else if (windowname=="LibLucy3D")
-    Window = new LibLucy3D (&data,w,d) ;
-  else if (windowname=="LibLucyND")
-    Window = new LibLucyND (&data,w,d) ;
-  else if (windowname=="LibLucyND_Periodic")
-    Window = new LibLucyND_Periodic (&data,w,d,get<0>(additionalarg),get<1>(additionalarg)) ;
-  else
-    printf("Unknown window, check Coarsing::setWindow") ;
-return 0 ;
-}
 
 
 int Coarsing::idx_FastFirst2SlowFirst (int n)

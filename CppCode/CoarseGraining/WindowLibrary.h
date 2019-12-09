@@ -1,4 +1,5 @@
 
+enum class Windows {LibRect3D, LibLucy3D, LibRectND, LibLucyND, LibLucyND_Periodic} ; 
 
 class LibBase {
 public:
@@ -52,25 +53,20 @@ public:
   double window(double r) {return (Lucy(r)) ;}
 } ;
 
-class LibLucyND_Periodic : public LibBase
+class LibLucyND_Periodic : public LibLucyND
 {
   public :
-  LibLucyND_Periodic (struct Data * D, double ww, double dd, int periodic, vector<int> boxes)
+  LibLucyND_Periodic(struct Data * D, double ww, double dd, int periodic, vector<int>boxes, vector<double> deltas)
+    : LibLucyND(D,ww,dd-__builtin_popcount(periodic))
   {
-    maskperiodic = nper = 0 ;
+    maskperiodic = 0 ;
     for (int i =0 ; i<boxes.size() ; i++)
       if ((periodic&(1<<i)) && boxes[i]==0)
       {
         maskperiodic |= (1<<i) ;
-        nper++ ;
+        scale /= deltas[i] ; 
       }
-
-    data=D; w=ww ; d=dd-nper ;
-    double Vol=pow(M_PI,d/2.)/(tgamma(d/2.+1)) ; // N-ball volume
-    scale = Vol * d * (-3./(d+4) + 8./(d+3) - 6./(d+2) + 1./d) ;
-    scale = 1/scale ;
-    scale = scale / (pow(w, d)) ;
-    printf("Lucy function scaling : %f \n", scale) ;
+    printf("NB: do not use periodic_atoms with LibLucyND_Periodic!\n") ; 
   }
 
   double distance (int id, v1d loc)
@@ -82,17 +78,6 @@ class LibLucyND_Periodic : public LibBase
     return sqrt(res) ;
   }
 
-  int maskperiodic, nper ;
-  double scale ;
-  double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (scale*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
-  double window(double r) {return (Lucy(r)) ;}
+  int maskperiodic ;
 };
 
-
-/*class LibLucy1DPBC : public LibBase {
-public:
-    double scale ; // integral over all the non lucy dimensions
-    double Lucy (double r) {static double cst=2*w/5. ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
-    double windows (double r) {return (Lucy(r)*scale) ; }
-    double distance (int id, v1d loc) {return(fabs(loc[0]-data->pos[0][id])) ;}
-};*/

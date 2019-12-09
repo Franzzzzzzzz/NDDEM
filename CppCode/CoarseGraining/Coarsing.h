@@ -118,8 +118,9 @@ public :
 
     // Grid functions
     int set_field_struct() ; //< Set the FIELDS structure, with all the different CG properties that can be computed.
-    int setWindow (string windowname) ;
-    int setWindow (string windowname, double w, tuple<int, vector<int>> additionalarg = make_tuple (0, vector<int>(0))) ; 
+    template <Windows W> int setWindow () ;
+    template <Windows W> int setWindow (double w) ;
+    template <Windows W> int setWindow (double w, int per, vector<int> boxes, vector<double> deltas) ; 
     int grid_generate() ;
     int grid_neighbour() ;
     int grid_setfields() ;
@@ -159,3 +160,58 @@ public :
     int write_NrrdIO (string path) ;
     int write_matlab (string path, bool squeeze = false) ;
 } ;
+
+//-------------------------------------------------------
+template <Windows W>
+int Coarsing::setWindow ()
+{ double w= (*std::min_element(dx.begin(),dx.end())*1) ; // w automatically set
+  setWindow<W>(w) ; return 0 ; }
+//-------------------------------------------------------
+template <Windows W>
+int Coarsing::setWindow (double w)
+{
+  static_assert(W != Windows::LibLucyND_Periodic) ; 
+  cutoff=2.5*w ; //TODO
+  printf("Window and cutoff: %g %g \n", w, cutoff) ;
+  switch (W) {
+      case Windows::LibRect3D :
+        Window=new LibRect3D () ;
+        break ; 
+      case Windows::LibLucy3D :
+        Window=new LibLucy3D (&data, w, d) ;
+        break ; 
+      case Windows::LibRectND :
+        Window=new LibRectND (&data, w, d) ;
+        break ; 
+      case Windows::LibLucyND :
+        Window=new LibLucyND (&data, w, d) ;
+        break ; 
+      default:
+        printf("Unknown window, check Coarsing::setWindow") ;
+  }
+  return 0 ;
+}
+//-------------------------------------------------------
+template <Windows W>
+int Coarsing::setWindow (double w, int per, vector<int> boxes, vector<double> deltas)
+{
+  static_assert(W == Windows::LibLucyND_Periodic) ; 
+  cutoff=2.5*w ; //TODO
+  printf("Window and cutoff: %g %g \n", w, cutoff) ;
+
+  Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
+return 0 ;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
