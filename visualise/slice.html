@@ -19,7 +19,7 @@
         <script>
         container = document.getElementById( 'container' );
         function update_spheres(x) {
-            var R_draw = 1 - Math.abs(x);
+            var R_draw = Math.sqrt(1 - Math.abs(x));
             if ( R_draw == 0 ) { circle.visible = false; }
             else {
                 circle.visible = true;
