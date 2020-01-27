@@ -9,8 +9,10 @@
 #include <vector>
 
 #ifndef TOOLS
-#include "../Dem/Tools.h"
+#include "Tools.h"
 #endif
+
+#include <fstream>
 
 using namespace std ;
 
