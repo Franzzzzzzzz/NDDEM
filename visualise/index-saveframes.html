@@ -1,0 +1,64 @@
+<html lang="en">
+	<head>
+		<title>NDDEM</title>
+		<meta charset="utf-8">
+        <link rel='icon' href='resources/favicon.ico' type='image/x-icon'/ >
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
+        <style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+            #N_tag {
+                color: white;
+                padding: 24px;
+                font: 48px Montserrat;
+                font-weight: bold;
+                position:absolute;
+            }
+		</style>
+	</head>
+	<body>
+		<script src="node_modules/three/build/three.js"></script>
+        <script src="node_modules/three/examples/js/WebGL.js"></script>
+		<script src="js/WebVR.js"></script>
+		<!-- <script src="node_modules/three/examples/js/vr/WebVR.js"></script> -->
+        <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
+        <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
+        <script src="node_modules/three/examples/js/effects/AnaglyphEffect.js"></script>
+        <!-- <script src="node_modules/three/examples/js/loaders/VTKLoader.js"></script> -->
+        <script src="node_modules/three/examples/js/loaders/LoaderSupport.js"></script>
+        <script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
+		<script src="node_modules/three/examples/js/loaders/MTLLoader.js"></script>
+		<!-- <script src="node_modules/three/examples/js/vr/ViveController.js"></script> -->
+		<script src="js/VRController.js"></script>
+        <script src="node_modules/papaparse/papaparse.js"></script>
+        <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <!-- <script src="js/datguivr.js"></script> -->
+        <script src="node_modules/three/examples/js/math/Lut.js"></script>
+        <script>
+            // display_type = "VR";
+            // display_type = "anaglyph";
+            display_type = "keyboard";
+            fname = "D4/";
+            //quality = 4; // REDUCED FOR BOOTH
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
+            if ( urlParams.has('display_type') ) { display_type = urlParams.get('display_type'); };
+            if ( urlParams.has('view_mode') ) { view_mode = urlParams.get('view_mode'); };
+            if ( urlParams.has('autoplay') ) { autoplay = urlParams.get('autoplay'); };
+            if ( urlParams.has('rate') ) { rate = urlParams.get('rate'); };
+            if ( urlParams.has('shadows') ) { shadows = urlParams.get('shadows'); };
+            if ( urlParams.has('quality') ) { quality = urlParams.get('quality'); };
+            if ( urlParams.has('zoom') ) { zoom = urlParams.get('zoom'); };
+            if ( urlParams.has('pinky') ) { pinky = urlParams.get('pinky'); };
+            if ( urlParams.has('cache') ) { cache = urlParams.get('cache'); };
+            if ( urlParams.has('hard_mode') ) { hard_mode = urlParams.get('hard_mode'); };
+            if ( urlParams.has('quasicrystal') ) { quasicrystal = urlParams.get('quasicrystal'); };
+        </script>
+        <script src="js/CCapture.all.min.js"></script>
+        <script src="js/nddem-saveframes.js"></script>
+
+	</body>
+</html>

@@ -1,7 +1,7 @@
 HOST=$(shell hostname)
   
 ifeq "$(HOST)" "guillard"
-CC=/opt/local/bin/g++-mp-6 # FG
+CC=/opt/local/bin/g++-mp-9 # FG
 else ifeq "$(HOST)" "franz-pavilion"
 CC=g++
 else
