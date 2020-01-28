@@ -13,8 +13,21 @@ endif()
 project(NDimensionalDem)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
+# Checking for Matlab
+if (DEFINED ENV{Matlab_ROOT_DIR})
+    set(Matlab_ROOT_DIR $ENV{Matlab_ROOT_DIR})
+endif()
+
+find_package(Matlab COMPONENTS MAT_LIBRARY)
+if (Matlab_FOUND)
+set(Matlab_Macro -DMATLAB)
+set(Matlab_MX_LIBRARY -lmx)
+include_directories(${Matlab_INCLUDE_DIRS})
+link_libraries(${Matlab_LIBRARIES} ${Matlab_MX_LIBRARY})
+endif()
+
 # add the executable
-add_subdirectory(Dem)
+# add_subdirectory(Dem)
 add_subdirectory(NrrdIO-1.11.0-src)
 add_subdirectory(CoarseGraining)
 add_subdirectory(Texturing)
