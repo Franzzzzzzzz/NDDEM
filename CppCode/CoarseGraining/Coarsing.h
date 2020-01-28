@@ -9,7 +9,7 @@
 #endif
 
 #ifdef NRRDIO
-#include "NrrdIO-1.11.0-src/NrrdIO.h"
+#include "../NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
 
 #ifdef MATLAB

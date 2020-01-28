@@ -10,8 +10,8 @@ class Benchmark
 {
 public:
     // Disabled versions:
-    static void start_clock (const std::string &name) {}
-    static void stop_clock (const std::string &name) {}
+    static void start_clock (const std::string &name __attribute__((unused))) {}
+    static void stop_clock (const std::string &name __attribute__((unused))) {}
     static void write_all() {} ; 
 
 

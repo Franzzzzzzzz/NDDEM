@@ -2,7 +2,7 @@
 #ifdef NRRDIO
 #ifndef NRRDIOINCLUDE
 #define NRRDIOINCLUDE
-#include "../CoarseGraining/NrrdIO-1.11.0-src/NrrdIO.h"
+#include "../NrrdIO-1.11.0-src/NrrdIO.h"
 #endif
 #endif
 #include <string>
