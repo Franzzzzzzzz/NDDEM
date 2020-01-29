@@ -55,7 +55,7 @@ int main(void)
             case 3: Texturing3.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing3.N, Texturing3.Ts.size(), Texturing3.R.size()) ; fflush(stdout) ;
                     break ;  
-            /*case 4: Texturing4.initialise(req.params) ;
+            case 4: Texturing4.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing4.N, Texturing4.Ts.size(), Texturing4.R.size()) ; fflush(stdout) ;
                     break ; 
             case 5: Texturing5.initialise(req.params) ;
@@ -75,7 +75,7 @@ int main(void)
                     break ; 
             case 10:Texturing10.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing10.N, Texturing10.Ts.size(), Texturing10.R.size()) ; fflush(stdout) ;
-                    break ; */
+                    break ;
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
         }
         
@@ -103,41 +103,41 @@ int main(void)
                     MasterRenderThread = std::thread(runthread_MasterRender<3>, &Texturing3) ;
                     while (!Texturing3.isrendered()) ;
                     break ;  
-            /*case 4: Texturing<4>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<4>.joinable()) MasterRenderThread<4>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<4>, &Texturings<4>) ;
-                    while (!Texturings<4>.isrendered()) ;
+            case 4: Texturing4.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<4>, &Texturing4) ;
+                    while (!Texturing4.isrendered()) ;
+                    break ;  
+            case 5: Texturing5.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<5>, &Texturing5) ;
+                    while (!Texturing5.isrendered()) ;
+                    break ;   
+            case 6: Texturing6.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<6>, &Texturing6) ;
+                    while (!Texturing6.isrendered()) ;
+                    break ;   
+            case 7: Texturing7.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<7>, &Texturing7) ;
+                    while (!Texturing7.isrendered()) ;
+                    break ;  
+            case 8: Texturing8.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<8>, &Texturing8) ;
+                    while (!Texturing8.isrendered()) ;
+                    break ;  
+            case 9: Texturing9.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<9>, &Texturing9) ;
+                    while (!Texturing9.isrendered()) ;
+                    break ;   
+            case 10:Texturing10.SetNewViewPoint(req.params) ;
+                    if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
+                    MasterRenderThread = std::thread(runthread_MasterRender<10>, &Texturing10) ;
+                    while (!Texturing10.isrendered()) ;
                     break ; 
-            case 5: Texturing<5>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<5>.joinable()) MasterRenderThread<5>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<5>, &Texturings<5>) ;
-                    while (!Texturings<5>.isrendered()) ;
-                    break ; 
-            case 6: Texturing<6>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<6>.joinable()) MasterRenderThread<6>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<6>, &Texturings<6>) ;
-                    while (!Texturings<6>.isrendered()) ;
-                    break ; 
-            case 7: Texturing<7>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<7>.joinable()) MasterRenderThread<7>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<7>, &Texturings<7>) ;
-                    while (!Texturings<7>.isrendered()) ;
-                    break ; 
-            case 8: Texturing<8>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<8>.joinable()) MasterRenderThread<8>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<8>, &Texturings<8>) ;
-                    while (!Texturings<8>.isrendered()) ;
-                    break ; 
-            case 9: Texturing<9>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<9>.joinable()) MasterRenderThread<9>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<9>, &Texturings<9>) ;
-                    while (!Texturings<9>.isrendered()) ;
-                    break ; 
-            case 10:Texturing<10>.SetNewViewPoint(req.params) ;
-                    if (MasterRenderThread<10>.joinable()) MasterRenderThread<10>.join() ;
-                    MasterRenderThread = std::thread(runthread_MasterRender<10>, &Texturings<10>) ;
-                    while (!Texturings<10>.isrendered()) ;
-                    break ; */
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
             }
 
@@ -158,8 +158,14 @@ int main(void)
     svr.Get(R"(/vtkcolormap)", [&](const Request& req, Response& res) {
         switch (curd)
         {
-            case 3: Texturing3.write_colormap_vtk_base() ;
-                break ; 
+            case 3: Texturing3.write_colormap_vtk_base() ; break ; 
+            case 4: Texturing4.write_colormap_vtk_base() ; break ;
+            case 5: Texturing5.write_colormap_vtk_base() ; break ;
+            case 6: Texturing6.write_colormap_vtk_base() ; break ;
+            case 7: Texturing7.write_colormap_vtk_base() ; break ;
+            case 8: Texturing8.write_colormap_vtk_base() ; break ;
+            case 9: Texturing9.write_colormap_vtk_base() ; break ;
+            case 10: Texturing10.write_colormap_vtk_base() ; break ;
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
         }
     });
@@ -167,8 +173,14 @@ int main(void)
     svr.Get(R"(/nrrdcolormap)", [&](const Request& req, Response& res) {
         switch (curd)
         {
-            case 3: Texturing3.write_colormap_nrrd_base (req.params) ;
-                break ; 
+            case 3: Texturing3.write_colormap_nrrd_base (req.params) ; break ; 
+            case 4: Texturing4.write_colormap_nrrd_base (req.params) ; break ; 
+            case 5: Texturing5.write_colormap_nrrd_base (req.params) ; break ; 
+            case 6: Texturing6.write_colormap_nrrd_base (req.params) ; break ; 
+            case 7: Texturing7.write_colormap_nrrd_base (req.params) ; break ; 
+            case 8: Texturing8.write_colormap_nrrd_base (req.params) ; break ; 
+            case 9: Texturing9.write_colormap_nrrd_base (req.params) ; break ; 
+            case 10: Texturing10.write_colormap_nrrd_base (req.params) ; break ; 
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
         }
         printf("NRRD colormap done\n") ; 
@@ -177,8 +189,14 @@ int main(void)
     svr.Get(R"(/vtkmap)", [&](const Request& req, Response& res) {
         switch (curd)
         {
-            case 3: Texturing3.write_vtkmap(req.params) ;
-                break ; 
+            case 3: Texturing3.write_vtkmap(req.params) ; break ; 
+            case 4: Texturing4.write_vtkmap(req.params) ; break ; 
+            case 5: Texturing5.write_vtkmap(req.params) ; break ; 
+            case 6: Texturing6.write_vtkmap(req.params) ; break ; 
+            case 7: Texturing7.write_vtkmap(req.params) ; break ; 
+            case 8: Texturing8.write_vtkmap(req.params) ; break ; 
+            case 9: Texturing9.write_vtkmap(req.params) ; break ; 
+            case 10: Texturing10.write_vtkmap(req.params) ; break ; 
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
         }
         

@@ -37,7 +37,7 @@ public :
 
   v1d lambdagrid, thetagrid ;
   string BasePath = "../../Samples/" ;
-  string DirectorySave ;
+  string DirectorySave = "../../Textures/" ;
   int N ;
   v2d Boundaries ;
 
@@ -106,7 +106,7 @@ int Texturing<d>::initialise (map <string,string> args)
 {
  Tools<d>::initialise() ;
  string Directory=args["path"] ;
- DirectorySave= args["texturepath"] ;
+ //DirectorySave= args["texturepath"] ;
  set_grid (atoi(args["resolution"].c_str())) ;
 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
@@ -348,6 +348,7 @@ RenderedAlready[2*(d-3)] = tsint ;
 RenderedAlready[2*(d-3)+1] = 0;
 do {
 Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+printf("%d ", tsint) ; fflush(stdout) ; 
 tsint++ ;
 RenderedAlready[2*(d-3)+1] ++ ;
 if (tsint>=Ts.size()) tsint=0 ;
