@@ -50,6 +50,7 @@ else { var hard_mode = false; }
 if ( typeof window.quasicrystal !== 'undefined' ) { var quasicrystal = window.quasicrystal == 'true'; } // optional flag to not show wristbands if in catch_particle mode
 
 var root_dir = 'http://localhost:54321/';
+cache=true ;
 if ( window.location.hostname.includes('benjymarks') ) {
     root_dir = 'http://www.benjymarks.com/nddem/';
     cache = true;
@@ -1316,22 +1317,23 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
             spheres = results.data;
             for (i = 0; i<spheres.length; i++) {
                 var object = particles.children[i];
-                x3_unrotated = spheres[i].x3;
+                if ( N>3 ) {
+                  x3_unrotated = spheres[i].x3;
 
-                x0_temp = spheres[i].x0*Math.cos(euler.theta_1) - spheres[i].x3*Math.sin(euler.theta_1);
-                x3_temp = spheres[i].x0*Math.sin(euler.theta_1) + spheres[i].x3*Math.cos(euler.theta_1);
+                  x0_temp = spheres[i].x0*Math.cos(euler.theta_1) - spheres[i].x3*Math.sin(euler.theta_1);
+                  x3_temp = spheres[i].x0*Math.sin(euler.theta_1) + spheres[i].x3*Math.cos(euler.theta_1);
 
-                x1_temp = spheres[i].x1*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
-                x3_temp = spheres[i].x1*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
+                  x1_temp = spheres[i].x1*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
+                  x3_temp = spheres[i].x1*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
 
-                x2_temp = spheres[i].x2*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
-                x3_temp = spheres[i].x2*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
+                  x2_temp = spheres[i].x2*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
+                  x3_temp = spheres[i].x2*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
 
-                spheres[i].x0 = x0_temp;
-                spheres[i].x1 = x1_temp;
-                spheres[i].x2 = x2_temp;
-                spheres[i].x3 = x3_temp;
-
+                  spheres[i].x0 = x0_temp;
+                  spheres[i].x1 = x1_temp;
+                  spheres[i].x2 = x2_temp;
+                  spheres[i].x3 = x3_temp;
+                }
                 if ( N == 1 ) { spheres[i].x1 = 0; };
                 if ( N < 3 ) { spheres[i].x2 = 0; };
                 if (N < 4) {

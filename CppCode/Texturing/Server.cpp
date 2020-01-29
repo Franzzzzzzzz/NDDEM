@@ -18,22 +18,22 @@ void runthread_MasterRender (Texturing<d> * T) {T->MasterRender() ; }
 std::thread MasterRenderThread ;
 std::mutex LockRender ;
 
-Texturing<3> Texturing3 ; 
-Texturing<4> Texturing4 ; 
-Texturing<5> Texturing5 ; 
-Texturing<6> Texturing6 ; 
-Texturing<7> Texturing7 ; 
-Texturing<8> Texturing8 ; 
-Texturing<9> Texturing9 ; 
-Texturing<10> Texturing10 ; 
+Texturing<3> Texturing3 ;
+Texturing<4> Texturing4 ;
+Texturing<5> Texturing5 ;
+Texturing<6> Texturing6 ;
+Texturing<7> Texturing7 ;
+Texturing<8> Texturing8 ;
+Texturing<9> Texturing9 ;
+Texturing<10> Texturing10 ;
 
 
-int curd = -1 ; 
+int curd = -1 ;
 
 int main(void)
 {
     using namespace httplib;
-        
+
     Server svr;
     svr.set_base_dir("../..");
     printf("Starting\n") ; fflush(stdout) ;
@@ -48,38 +48,38 @@ int main(void)
         printf("Loading data") ; fflush(stdout) ;
         if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
         //if (curd!=-1) Texturings[d]->clean() ;
-        
+
         curd = atoi(req.params.at("ND").c_str()) ;
         switch (curd)
         {
             case 3: Texturing3.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing3.N, Texturing3.Ts.size(), Texturing3.R.size()) ; fflush(stdout) ;
-                    break ;  
+                    break ;
             case 4: Texturing4.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing4.N, Texturing4.Ts.size(), Texturing4.R.size()) ; fflush(stdout) ;
-                    break ; 
+                    break ;
             case 5: Texturing5.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing5.N, Texturing5.Ts.size(), Texturing5.R.size()) ; fflush(stdout) ;
-                    break ; 
+                    break ;
             case 6: Texturing6.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing6.N, Texturing6.Ts.size(), Texturing6.R.size()) ; fflush(stdout) ;
-                    break ; 
-            case 7: Texturing7.initialise(req.params) ;
+                    break ;
+            /*case 7: Texturing7.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing7.N, Texturing7.Ts.size(), Texturing7.R.size()) ; fflush(stdout) ;
-                    break ; 
+                    break ;
             case 8: Texturing8.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing8.N, Texturing8.Ts.size(), Texturing8.R.size()) ; fflush(stdout) ;
-                    break ; 
+                    break ;
             case 9: Texturing9.initialise(req.params) ;
                     printf("%d %lu %lu Data loaded\n", Texturing9.N, Texturing9.Ts.size(), Texturing9.R.size()) ; fflush(stdout) ;
-                    break ; 
-            case 10:Texturing10.initialise(req.params) ;
-                    printf("%d %lu %lu Data loaded\n", Texturing10.N, Texturing10.Ts.size(), Texturing10.R.size()) ; fflush(stdout) ;
                     break ;
-            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
+            case 10:Texturing10.initialise(req.params) ;
+                    printf("%d %lu %lu Data loaded\n", Texturing10.N, Texturing10.Ts.size(), Texturing10.R.size()) ; fflush(stdout) ;*/
+
+            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ;
         }
-        
-        
+
+
         //Texturings[d]->initialise(req.params) ;
         //printf("%d %lu %lu Data loaded\n", Texturings[d]->N, Texturings[d]->Ts.size(), Texturings[d]->R.size()) ; fflush(stdout) ;
 
@@ -95,24 +95,24 @@ int main(void)
         else
         {
             printf("S") ;
-            
+
             switch (curd)
             {
             case 3: Texturing3.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<3>, &Texturing3) ;
                     while (!Texturing3.isrendered()) ;
-                    break ;  
+                    break ; 
             case 4: Texturing4.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<4>, &Texturing4) ;
                     while (!Texturing4.isrendered()) ;
-                    break ;  
+                    break ; 
             case 5: Texturing5.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<5>, &Texturing5) ;
                     while (!Texturing5.isrendered()) ;
-                    break ;   
+                    break ; 
             case 6: Texturing6.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<6>, &Texturing6) ;
@@ -183,7 +183,7 @@ int main(void)
             case 10: Texturing10.write_colormap_nrrd_base (req.params) ; break ; 
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
         }
-        printf("NRRD colormap done\n") ; 
+        printf("NRRD colormap done\n") ;
     });
 
     svr.Get(R"(/vtkmap)", [&](const Request& req, Response& res) {
@@ -199,7 +199,7 @@ int main(void)
             case 10: Texturing10.write_vtkmap(req.params) ; break ; 
             default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
         }
-        
+
     });
 
 

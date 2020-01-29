@@ -18,7 +18,7 @@ public:
     v2d X, A ;
 } ;
 
-template <int d> 
+template <int d>
 class Texturing {
 public :
   int Nlambda=32, Ntheta=32 ;
@@ -74,7 +74,7 @@ public :
 
   int write_vtkmap (map <string,string> args) ;
   int write_colormap_vtk_base () ;
-  int write_colormap_nrrd_base (map <string,string> args) ; 
+  int write_colormap_nrrd_base (map <string,string> args) ;
 
 } ;
 
@@ -133,6 +133,7 @@ int Texturing<d>::initialise (map <string,string> args)
   {
     R.clear() ;
     csvread_XR (filelistloc[i].second.c_str(), Ts[i].X, R, d) ;
+    printf("%d ", i) ; fflush(stdout) ;
   }
  for (uint i=0 ; i<filelistA.size() ; i++) csvread_A(filelistA[i].second.c_str(), Ts[i].A, d) ;
  N = Ts[0].X.size() ;
@@ -350,6 +351,7 @@ do {
 Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
 printf("%d ", tsint) ; fflush(stdout) ; 
 tsint++ ;
+printf("%d ", tsint) ; fflush(stdout) ; 
 RenderedAlready[2*(d-3)+1] ++ ;
 if (tsint>=Ts.size()) tsint=0 ;
 } while (tsint != timeidxinit) ;
@@ -629,11 +631,3 @@ int Texturing<d>::write_vtkmap (map <string,string> args)
 
   return 0 ;
 }
-
-
-
-
-
-
-
-

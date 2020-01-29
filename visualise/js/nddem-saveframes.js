@@ -61,7 +61,7 @@ const recorder = new CCapture({
 	framerate: 10,
 	quality: 100,
 	format: 'png',
-	timeLimit: 4,
+	timeLimit: 100,
 	frameLimit: 0,
 	autoSaveTime: 0
 });
@@ -1327,22 +1327,24 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
         complete: function(results) {
             spheres = results.data;
             for (i = 0; i<spheres.length; i++) {
-                var object = particles.children[i];
-                x3_unrotated = spheres[i].x3;
+                  var object = particles.children[i];
+                  if (N>3) {
+                  x3_unrotated = spheres[i].x3;
 
-                x0_temp = spheres[i].x0*Math.cos(euler.theta_1) - spheres[i].x3*Math.sin(euler.theta_1);
-                x3_temp = spheres[i].x0*Math.sin(euler.theta_1) + spheres[i].x3*Math.cos(euler.theta_1);
+                  x0_temp = spheres[i].x0*Math.cos(euler.theta_1) - spheres[i].x3*Math.sin(euler.theta_1);
+                  x3_temp = spheres[i].x0*Math.sin(euler.theta_1) + spheres[i].x3*Math.cos(euler.theta_1);
 
-                x1_temp = spheres[i].x1*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
-                x3_temp = spheres[i].x1*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
+                  x1_temp = spheres[i].x1*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
+                  x3_temp = spheres[i].x1*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
 
-                x2_temp = spheres[i].x2*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
-                x3_temp = spheres[i].x2*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
+                  x2_temp = spheres[i].x2*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
+                  x3_temp = spheres[i].x2*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
 
-                spheres[i].x0 = x0_temp;
-                spheres[i].x1 = x1_temp;
-                spheres[i].x2 = x2_temp;
-                spheres[i].x3 = x3_temp;
+                  spheres[i].x0 = x0_temp;
+                  spheres[i].x1 = x1_temp;
+                  spheres[i].x2 = x2_temp;
+                  spheres[i].x3 = x3_temp;
+                }
 
                 if ( N == 1 ) { spheres[i].x1 = 0; };
                 if ( N < 3 ) { spheres[i].x2 = 0; };
