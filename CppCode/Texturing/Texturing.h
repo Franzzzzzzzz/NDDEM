@@ -349,6 +349,7 @@ RenderedAlready[2*(d-3)] = tsint ;
 RenderedAlready[2*(d-3)+1] = 0;
 do {
 Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
+printf("%d ", tsint) ; fflush(stdout) ; 
 tsint++ ;
 printf("%d ", tsint) ; fflush(stdout) ; 
 RenderedAlready[2*(d-3)+1] ++ ;
