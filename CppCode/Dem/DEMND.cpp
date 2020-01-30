@@ -310,6 +310,7 @@ int templatedmain (char * argv[])
 
    for (int i=0 ; i<N ; i++)
    {
+    printf("[%g %g %g %g]", F[0][1], F[0][1]-P.g[1]*P.m[0], Torque[0][0], Omega[0][0]) ;
     if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; Tools<d>::setzero(V[i]) ; Tools<d>::setzero(Omega[i]) ; }
 
     Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
