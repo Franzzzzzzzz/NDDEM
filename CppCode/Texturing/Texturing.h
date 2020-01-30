@@ -433,7 +433,7 @@ for (int i=0 ; i<N ; i++)
              //sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
              //sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
              
-             //********** Version agreeing with default uv sphere mapping in Blender 2.71
+             //********** Version agreeing with default uv sphere mapping in Blender 2.79
              sp[d-3] *= sin(phi[d-3])*sin(phi[d-2]) ;
              sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
              sp[d-1] *= cos(phi[d-3]) ;
