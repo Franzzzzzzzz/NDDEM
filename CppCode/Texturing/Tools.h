@@ -21,6 +21,8 @@ public:
     
     static double normsq (const vector <double> & a) {double res=0 ; for (int i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; }
     static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; }
+    static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; }
+    static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; }
     
     static v1d Eye ;
     static boost::random::mt19937 rng ;

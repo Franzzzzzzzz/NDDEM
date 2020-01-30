@@ -2,10 +2,11 @@ import bpy
 import bmesh
 import numpy as np
 
-bm = bmesh.new()
-bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, diameter=1)
-
-
+TextureFolder = '/home/franz/Desktop/PostDoc_Local/NDDEM/Textures/' ; 
+D=4 ;
+#path="/Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest/"
+path = "/home/franz/Dropbox/DEM_ND/Samples/SingleTest/" ; 
+frames="/home/franz/Test/" ; 
 
 def render(output_dir, output_file_format):
   bpy.context.scene.render.filepath = output_dir + output_file_format
@@ -27,9 +28,9 @@ def create_sphere (x,y,z,diam,t):
   mat=bpy.data.materials.new('M'+str(n))
   tex=bpy.data.textures.new('CT', type = 'IMAGE')
   if (D==3):
-      img=bpy.data.images.load("/Users/FGuillard/Test/Textures/Texture-"+str(n)+"-"+str(t)+"0000.png")
+      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"0000.png")
   elif (D==4):
-      img=bpy.data.images.load("/Users/FGuillard/Test/Textures/Texture-"+str(n)+"-"+str(t)+"000-1.7.png")
+      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"0000-1.7.png")
   tex.image=img ;
   mtex = mat.texture_slots.add()
   mtex.texture_coords = "OBJECT"
@@ -49,7 +50,10 @@ def clean() :
     for i in bpy.data.images:
         bpy.data.images.remove(i) ;
 
-n=0 ;
+
+bm = bmesh.new()
+bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, diameter=1)
+
 bpy.data.meshes.remove(bpy.data.meshes["Cube"])
 bpy.data.lamps.remove(bpy.data.lamps["Lamp"])
 
@@ -67,10 +71,7 @@ scene.camera.location.z = 15
 bpy.context.scene.world.light_settings.use_environment_light = True
 bpy.context.scene.world.light_settings.environment_energy = 2.
 
-D=3 ;
-path="/Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest/"
-
-for t in range(0, 1000):
+for t in range(0, 300):
     X=np.loadtxt(path+'dump-'+str(t)+'0000.csv', skiprows=1, delimiter=',')
     n=0
     for i in np.atleast_2d(X):
@@ -83,5 +84,5 @@ for t in range(0, 1000):
             create_sphere(i[0],i[1],i[2],r, t) ;
         n=n+1
     name='render'+str(t)+'.png'
-    render('/Users/FGuillard/Test/', name);
+    render(frames, name);
     clean()

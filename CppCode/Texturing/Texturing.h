@@ -141,7 +141,10 @@ int Texturing<d>::initialise (map <string,string> args)
  for (auto & v : Ts)
  {
     for (int i=0 ; i<N ; i++)
+    {
         rotate(v.X[i].begin(), v.X[i].begin()+nrotate, v.X[i].end()) ;
+        Tools<d>::transpose_inplace(v.A[i]) ; 
+    }
  }
  Boundaries.resize(2) ;
  Boundaries[0].resize(d-3, INT_MAX) ;
@@ -424,9 +427,18 @@ for (int i=0 ; i<N ; i++)
              sp[d-3] = R[i] ;
              for (uint j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
              sp[d-2]=sp[d-3] ; sp[d-1]=sp[d-3] ;
-             sp[d-3] *= cos(phi[d-3]) ;
+             
+             //********** The mathematical version (logical):
+             //sp[d-3] *= cos(phi[d-3]) ;
+             //sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
+             //sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
+             
+             //********** Version agreeing with default uv sphere mapping in Blender 2.71
+             sp[d-3] *= sin(phi[d-3])*sin(phi[d-2]) ;
              sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
-             sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
+             sp[d-1] *= cos(phi[d-3]) ;
+             
+             
              //dispvector(sp) ;
              // Now sp should be right, let's check
              //printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;
