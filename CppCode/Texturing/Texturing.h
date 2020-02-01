@@ -143,7 +143,7 @@ int Texturing<d>::initialise (map <string,string> args)
     for (int i=0 ; i<N ; i++)
     {
         rotate(v.X[i].begin(), v.X[i].begin()+nrotate, v.X[i].end()) ;
-        Tools<d>::transpose_inplace(v.A[i]) ; 
+        Tools<d>::transpose_inplace(v.A[i]) ;
     }
  }
  Boundaries.resize(2) ;
@@ -352,9 +352,9 @@ RenderedAlready[2*(d-3)] = tsint ;
 RenderedAlready[2*(d-3)+1] = 0;
 do {
 Render(FileList[dim],View, nrotate, TsName[tsint], Ts[tsint].X, R, Ts[tsint].A) ;
-printf("%d ", tsint) ; fflush(stdout) ; 
+printf("%d ", tsint) ; fflush(stdout) ;
 tsint++ ;
-printf("%d ", tsint) ; fflush(stdout) ; 
+printf("%d ", tsint) ; fflush(stdout) ;
 RenderedAlready[2*(d-3)+1] ++ ;
 if (tsint>=Ts.size()) tsint=0 ;
 } while (tsint != timeidxinit) ;
@@ -427,18 +427,18 @@ for (int i=0 ; i<N ; i++)
              sp[d-3] = R[i] ;
              for (uint j=0 ; j<d-3 ; j++) sp[d-3] *= sin(phi[j]) ;
              sp[d-2]=sp[d-3] ; sp[d-1]=sp[d-3] ;
-             
+
              //********** The mathematical version (logical):
              //sp[d-3] *= cos(phi[d-3]) ;
              //sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
              //sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
-             
+
              //********** Version agreeing with default uv sphere mapping in Blender 2.79
-             sp[d-3] *= sin(phi[d-3])*sin(phi[d-2]) ;
-             sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
+             sp[d-3] *= sin(phi[d-3])*cos(phi[d-2]-M_PI/2.) ;
+             sp[d-2] *= sin(phi[d-3])*sin(phi[d-2]-M_PI/2.) ;
              sp[d-1] *= cos(phi[d-3]) ;
-             
-             
+
+
              //dispvector(sp) ;
              // Now sp should be right, let's check
              //printf("Checking the point on surface: {%g} {%g} should be equal\n", Tools::norm(sp), R[i] ) ;

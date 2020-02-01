@@ -2,11 +2,13 @@ import bpy
 import bmesh
 import numpy as np
 
-TextureFolder = '/home/franz/Desktop/PostDoc_Local/NDDEM/Textures/' ; 
+#TextureFolder = '/home/franz/Desktop/PostDoc_Local/NDDEM/Textures/' ;
+TextureFolder = '/Users/FGuillard/Simulations/MD/DEM_ND/Textures/'
 D=4 ;
-#path="/Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest/"
-path = "/home/franz/Dropbox/DEM_ND/Samples/SingleTest/" ; 
-frames="/home/franz/Test/" ; 
+path="/Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest/"
+#path = "/home/franz/Dropbox/DEM_ND/Samples/SingleTest/" ;
+#frames="/home/franz/Test/" ;
+frames="/Users/FGuillard/Test/"
 
 def render(output_dir, output_file_format):
   bpy.context.scene.render.filepath = output_dir + output_file_format
@@ -28,9 +30,10 @@ def create_sphere (x,y,z,diam,t):
   mat=bpy.data.materials.new('M'+str(n))
   tex=bpy.data.textures.new('CT', type = 'IMAGE')
   if (D==3):
-      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"0000.png")
+      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"000.png")
   elif (D==4):
       img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"0000-1.7.png")
+      #img=bpy.data.images.load("/Users/FGuillard/Test/TestTexture.png")
   tex.image=img ;
   mtex = mat.texture_slots.add()
   mtex.texture_coords = "OBJECT"

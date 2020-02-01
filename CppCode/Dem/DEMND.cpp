@@ -116,7 +116,7 @@ int templatedmain (char * argv[])
       Tools<d>::skewexpand(tmpO, Omega[i]) ;
       Tools<d>::matmult(tmpterm1, tmpO, A[i]) ;
       for (int dd=0 ; dd<d*d ; dd++)
-        A[i][dd] += tmpterm1[dd] * dt ;
+        A[i][dd] -= tmpterm1[dd] * dt ;
       Tools<d>::orthonormalise(A[i]) ;
     }
 
