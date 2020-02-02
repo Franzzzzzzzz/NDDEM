@@ -2,13 +2,14 @@ import bpy
 import bmesh
 import numpy as np
 
-#TextureFolder = '/home/franz/Desktop/PostDoc_Local/NDDEM/Textures/' ;
-TextureFolder = '/Users/FGuillard/Simulations/MD/DEM_ND/Textures/'
-D=4 ;
-path="/Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest/"
-#path = "/home/franz/Dropbox/DEM_ND/Samples/SingleTest/" ;
-#frames="/home/franz/Test/" ;
-frames="/Users/FGuillard/Test/"
+TextureFolder = '/home/franz/Desktop/PostDoc_Local/NDDEM/Textures/' ;
+#TextureFolder = '/Users/FGuillard/Simulations/MD/DEM_ND/Textures/'
+D=5 ;
+#path="/Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest/"
+path = "/home/franz/Dropbox/DEM_ND/Samples/D5/" ;
+frames="/home/franz/Test/" ;
+tdump=1000 ; 
+#frames="/Users/FGuillard/Test/"
 
 def render(output_dir, output_file_format):
   bpy.context.scene.render.filepath = output_dir + output_file_format
@@ -30,9 +31,14 @@ def create_sphere (x,y,z,diam,t):
   mat=bpy.data.materials.new('M'+str(n))
   tex=bpy.data.textures.new('CT', type = 'IMAGE')
   if (D==3):
-      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"000.png")
+      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+'{:05d}'.format(t*tdump)+".png")
   elif (D==4):
-      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+str(t)+"0000-1.7.png")
+      img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+'{:05d}'.format(t*tdump)+"-1.7.png")
+  elif (D==5):
+      try:
+        img=bpy.data.images.load(TextureFolder+"Texture-"+str(n)+"-"+'{:05d}'.format(t*tdump)+"-1.7-1.7.png")
+      except:
+        pass ; 
       #img=bpy.data.images.load("/Users/FGuillard/Test/TestTexture.png")
   tex.image=img ;
   mtex = mat.texture_slots.add()
@@ -74,18 +80,20 @@ scene.camera.location.z = 15
 bpy.context.scene.world.light_settings.use_environment_light = True
 bpy.context.scene.world.light_settings.environment_energy = 2.
 
-for t in range(0, 300):
-    X=np.loadtxt(path+'dump-'+str(t)+'0000.csv', skiprows=1, delimiter=',')
+for t in range(380, 600):
+    X=np.loadtxt(path+'dump-'+'{:05d}'.format(t*tdump)+'.csv', skiprows=1, delimiter=',')
     n=0
     for i in np.atleast_2d(X):
         if (D==3):
             r=i[D] ;
         elif (D==4):
             r = np.sqrt(i[D]*i[D]- (i[3]-1.7)**2) ;
-
+        elif (D==5):
+            r = np.sqrt(i[D]*i[D]- (i[3]-1.7)**2 -(i[4]-1.7)**2) ;
+            
         if (r>0) :
             create_sphere(i[0],i[1],i[2],r, t) ;
         n=n+1
-    name='render'+str(t)+'.png'
+    name='renderD'+str(D)+'-'+str(t)+'.png'
     render(frames, name);
     clean()
