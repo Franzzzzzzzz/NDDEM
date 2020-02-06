@@ -71,6 +71,7 @@ int templatedmain (char * argv[])
  FILE *logfile = fopen("Logfile", "w") ;
 
 //ProfilerStart("Profiling") ;
+printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ; 
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
    //bool isdumptime = (ti % P.tdump==0) ;

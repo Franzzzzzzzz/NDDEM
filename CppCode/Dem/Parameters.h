@@ -42,7 +42,7 @@ public :
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
-        orientationtracking(true),
+        orientationtracking(false),
         wallforcecompute(false)
         {
          reset_ND(NN) ;
@@ -360,7 +360,11 @@ else if (!strcmp(line, "set"))
      else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
      else if (word =="Omega") dumplist |= ExportData::OMEGA ;
      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
-     else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
+     else if (word =="Orientation")
+     {
+       orientationtracking=true ;
+       dumplist |= ExportData::ORIENTATION ;
+     }
      else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
      else printf("Unknown asked data %s\n", word.c_str()) ;
    }
