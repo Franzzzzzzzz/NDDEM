@@ -1,7 +1,7 @@
 HOST=$(shell hostname)
   
 ifeq "$(HOST)" "guillard"
-CC=/opt/local/bin/g++-mp-6 # FG
+CC=/opt/local/bin/g++-mp-9 # FG
 else ifeq "$(HOST)" "franz-pavilion"
 CC=g++
 else
@@ -24,7 +24,7 @@ SOURCES=DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=DEMND
 LDFLAGS=-L/usr/local/lib -L/usr/lib -Wall
-LIBS=-lm -lprofiler
+LIBS=-lm #-lprofiler
 FLTO=-flto
 FLTO=
 CCFLAGS=-Wall -Wextra #-std=c++17 # -march=native

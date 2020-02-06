@@ -1,5 +1,5 @@
 # Incline plane flow
-directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D5
+directory /home/franz/Dropbox/DEM_ND/Samples/D5
 dimensions 5 1445
 
 #set adimensional
@@ -28,6 +28,6 @@ set T 500
 set dt 0.0001
 set dumps XML with 4 Position Velocity Omega Coordination
 set dumps CSV with 1 Orientation
-set tdump 10000
+set tdump 1000
 event 20 gravity -0.9 0.42 0 0 0
 EOF

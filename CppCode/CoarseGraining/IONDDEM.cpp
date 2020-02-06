@@ -108,13 +108,27 @@ struct Param P6 {
   {"RHO", "VAVG"},                    // flags
   {25,1,1,1,1,1},                           // boxes #
   {{}},                               // Boundaries
-  0b111110,                              // PBC (fisrt dimension is LSD)
-  {20, 5, 3.4, 3.4, 3.4, 3.4},                       // Deltas (used for pbcs)
+  0b111110,                           // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4, 3.4, 3.4},        // Deltas (used for pbcs)
   {},                                 // radii
   "CoarseD6"                          // save location
 };
 
 struct Param P6T {} ;
+
+struct Param MUID4 {
+  "/Users/FGuillard/Simulations/MD/DEM_ND/CppCode/Dem/Output_MuI_D4/dump.xml",                                 // dump
+  20,                                 // skipT
+  1120,                                // maxT
+  3.242277876554809,                  // rho
+  {"RHO", "VAVG"},                    // flags
+  {25,1,1,1},                           // boxes #
+  {{}},                               // Boundaries
+  0b001110,                              // PBC (fisrt dimension is LSD)
+  {20, 5, 3.4, 3.4},                       // Deltas (used for pbcs)
+  {},                                 // radii
+  "CoarseMUID4"                          // save location
+};
 
 struct Param P3Channel {
   "../Dem/OutputChannelD3/dump.xml",                                 // dump
@@ -150,23 +164,29 @@ int main (int argc, char * argv[])
     else if (!strcmp("D4Thick", argv[1])) P = &P4T ;
     else if (!strcmp("D5Thick", argv[1])) P = &P5T ;
     else if (!strcmp("D6Thick", argv[1])) P = &P6T;
+    else if (!strcmp("MUID4", argv[1])) P = &MUID4 ;
+    else printf("Unknown") ;
  }
  else
-    P= &P3Channel ;
+ {printf("Nothing to do.\n") ; std::exit(0); }
+  //  P= &P3Channel ;
 
  //P.dump=argv[1] ;
 
  //struct Data D ;
  // Extract path (last slash) for saving
+
+  printf("A") ; fflush(stdout) ;
  int res, t ;
  XMLReader XML(P->dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
  XML.read_boundaries(P->boundaries) ;
- P->boundaries[1][0] = 10 ;
+ P->boundaries[1][0] = 20 ;
  dispvector(P->boundaries) ;
  XML.read_radius (P->radius) ;
  int N = P->radius.size() ;
 
+  printf("B") ; fflush(stdout) ;
  vector <double> mass, Imom ;
 
  for (int i=0 ; i<N ; i++)
@@ -175,15 +195,23 @@ int main (int argc, char * argv[])
      Imom.push_back(InertiaMomentum(d,P->radius[i],P->rho)) ;
  }
 
+ printf("C") ; fflush(stdout) ;
  Coarsing C(d, P->boxes, P->boundaries, P->maxT-P->skipT) ;
- C.setWindow("LibLucyND", 0.5) ;
+
+  printf("D") ; fflush(stdout) ;
+ C.setWindow<Windows::LibLucyND_Periodic>(1, P->pbc, P->boxes, P->Delta) ;
+
+  printf("D") ; fflush(stdout) ;
  C.set_flags(P->flags) ;
  C.grid_setfields() ;
+ printf("E") ; fflush(stdout) ;
  auto Bounds = C.get_bounds() ;
  C.cT=-1 ;
  C.data.N=P->radius.size() ;
  C.data.mass = mass.data() ;
  C.data.Imom = Imom.data() ;
+
+printf("E") ; fflush(stdout) ;
 
  vector <string> names ; vector<vector<vector<double>>> data ;
  for (int t=0 ; t<P->maxT ; t++)
@@ -206,7 +234,7 @@ int main (int argc, char * argv[])
     for (int j=0 ; j<C.data.N ; j++) for (int k=0 ;k<d ; k++) C.data.vel[k][j] = data[delta][j][k] ;
   }
 
-  C.data.periodic_atoms (d, Bounds, P->pbc, P->Delta, false) ;
+  //C.data.periodic_atoms (d, Bounds, P->pbc, P->Delta, false) ;
   C.pass_1() ;
   C.data.clean_periodic_atoms() ;
   //C.compute_fluc_vel() ;
@@ -217,9 +245,10 @@ int main (int argc, char * argv[])
  printf("%d \n", t) ; fflush(stdout) ;
  }
 
- C.mean_time() ;
- C.write_vtk("Coarsed") ;
- C.write_NrrdIO(P->save.c_str()) ;
+ //C.mean_time() ;
+ //C.write_vtk("Coarsed") ;
+ //C.write_NrrdIO(P->save.c_str()) ;
+ C.write_matlab(P->save.c_str(), true) ;
 
 printf("\nA deallocation error may appear at the end. I am not quite sure where that come from (apparently the realloc in periodic_atoms leaves some stuff behind). Hopefully should not affect anything since it is the final deallocaiton as the program exits. \n") ; fflush(stdout) ;
 

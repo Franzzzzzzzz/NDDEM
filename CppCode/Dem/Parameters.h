@@ -17,7 +17,7 @@
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
 enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32} ;
-enum class WallType {PBC=0, WALL=1, MOVINGWALL=2} ; 
+enum class WallType {PBC=0, WALL=1, MOVINGWALL=2} ;
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
@@ -79,7 +79,7 @@ public :
     int set_boundaries() ;
     //int init_particles(v2d & X, v2d & A) ;
     void perform_PBC(v1d & X, u_int32_t & PBCFlags) ;
-    void perform_MOVINGWALL() ; 
+    void perform_MOVINGWALL() ;
     int init_mass() ;
     int init_inertia() ;
 

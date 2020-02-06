@@ -1,3 +1,0 @@
-/cygdrive/c/Users/AMME2/Documents/GitHub/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/rebuild_cache.dir
-/cygdrive/c/Users/AMME2/Documents/GitHub/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/NrrdIO.dir
-/cygdrive/c/Users/AMME2/Documents/GitHub/NDDEM/CppCode/CoarseGraining/NrrdIO-1.11.0-src/build/CMakeFiles/edit_cache.dir

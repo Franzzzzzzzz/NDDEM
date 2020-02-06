@@ -1,0 +1,5 @@
+link_directories(${CMAKE_BINARY_DIR}/NrrdIO-1.11.0-src)
+add_executable(TexturingServer Server.cpp io.cpp Texturing.cpp ../Dem/Tools.cpp TinyPngOut.cpp)
+set_property(TARGET TexturingServer PROPERTY CXX_STANDARD 14)
+target_compile_options(TexturingServer PUBLIC -Wall -fopenmp -lstdc++fs -DNRRDIO)
+target_link_libraries(TexturingServer PUBLIC -fopenmp -lstdc++fs -lNrrdIO)
