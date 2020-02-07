@@ -48,7 +48,7 @@ plot (squeeze(I(6,:,7))', squeeze(Rhoall(6,:,7)/Rhog(6))' , '-^b') ; hold all
 xlim([0 5])
 %% 
 figure (88) ; clf 
-load ../Dem/Output_MuI_D3rev/CoarseGrained.mat
+load ../Dem/Output_MuI_D2rev/CoarseGrained.mat
 imagesc(squeeze(RHO(:,:))) ; hold all
 for i=20:200:size(VAVG,3)
     plot ([i, i],[1, 25], 'r') ; 

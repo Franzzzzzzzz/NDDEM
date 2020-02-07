@@ -53,9 +53,9 @@ event 3820 gravityangle 10 16
 event 4020 gravityangle 10 15
 
 CG skiptime 20
-CG maxtime 2220
+CG maxtime 4220
 CG flags 2 RHO VAVG
-CG boxes 60 1
-CG bound 0 0 40
+CG boxes 25 1
+CG bound 0 0 50
 
 EOF
