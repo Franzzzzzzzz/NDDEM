@@ -231,6 +231,7 @@ std::vector <double> x (d,0) ; std::vector <double> omeg (d*(d-1)/2,0) ;
 
 in>>line;
 if (line[0]=='#') {in.getline(line, 5000) ; return ; } // The line is a comments
+if (line[0]=='C' && line[1]=='G') {in.getline(line, 5000) ; return ; } //This is a coarse graining command, just keep going...
 
 if (!strcmp(line,"event"))
 {

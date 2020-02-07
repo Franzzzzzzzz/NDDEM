@@ -3,6 +3,9 @@
 #include <vector>
 #include "Typedefs.h"
 #include <boost/random.hpp>
+#include <fstream>
+#include <experimental/filesystem>
+#include <boost/math/special_functions/factorials.hpp>
 
 #ifdef NETCDF
 #include <netcdf.h>
@@ -17,6 +20,8 @@
 #endif
 
 using namespace std ;
+
+double Volume (int d , double R) ;
 
 //=========================================================
 /// Coarse graining point
@@ -120,7 +125,7 @@ public :
     int set_field_struct() ; //< Set the FIELDS structure, with all the different CG properties that can be computed.
     template <Windows W> int setWindow () ;
     template <Windows W> int setWindow (double w) ;
-    template <Windows W> int setWindow (double w, int per, vector<int> boxes, vector<double> deltas) ; 
+    template <Windows W> int setWindow (double w, int per, vector<int> boxes, vector<double> deltas) ;
     int grid_generate() ;
     int grid_neighbour() ;
     int grid_setfields() ;
@@ -170,22 +175,22 @@ int Coarsing::setWindow ()
 template <Windows W>
 int Coarsing::setWindow (double w)
 {
-  static_assert(W != Windows::LibLucyND_Periodic) ; 
+  static_assert(W != Windows::LibLucyND_Periodic) ;
   cutoff=2.5*w ; //TODO
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
   switch (W) {
       case Windows::LibRect3D :
         Window=new LibRect3D () ;
-        break ; 
+        break ;
       case Windows::LibLucy3D :
         Window=new LibLucy3D (&data, w, d) ;
-        break ; 
+        break ;
       case Windows::LibRectND :
         Window=new LibRectND (&data, w, d) ;
-        break ; 
+        break ;
       case Windows::LibLucyND :
         Window=new LibLucyND (&data, w, d) ;
-        break ; 
+        break ;
       default:
         printf("Unknown window, check Coarsing::setWindow") ;
   }
@@ -195,7 +200,7 @@ int Coarsing::setWindow (double w)
 template <Windows W>
 int Coarsing::setWindow (double w, int per, vector<int> boxes, vector<double> deltas)
 {
-  static_assert(W == Windows::LibLucyND_Periodic) ; 
+  static_assert(W == Windows::LibLucyND_Periodic) ;
   cutoff=2.5*w ; //TODO
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
 
@@ -205,13 +210,40 @@ return 0 ;
 
 
 
+//==========================================================
+struct Param {
+  string dump ;
+  int skipT ;
+  int maxT ;
+  double rho ;
+  vector <string> flags ;
+  vector <int> boxes ;
+  vector <vector <double> > boundaries ;
+  int pbc = 0 ;
+  vector<double> Delta ;
+  vector <double> radius ;
+  string save = "CoarseGrained";
 
+  void from_file(char path[])
+  {
+    ifstream in ;
 
+    in.open(path) ;
+    if (!in.is_open()) { printf("[Input] file cannot be open\n"); return ;}
 
-
-
-
-
-
-
-
+    while (! in.eof())
+      parsing(in) ;
+  }
+  void disp()
+  {
+    printf("\n-----\n%s\nSkipping: %d\nFinal time: %d\nDensity: %g\nFlags: ", dump.c_str(), skipT, maxT, rho) ;
+    for (auto v: flags) printf("%s ", v.c_str()) ;
+    printf("\nBoxes: ") ;
+    for (auto v: boxes) printf("%d ", v) ;
+    printf("\n PBCs: %X\nDeltas: ", pbc) ;
+    for (auto v: Delta) printf("%g ", v) ;
+    printf("\n-----\n\n") ;
+  }
+private:
+  int parsing (istream & in) ;
+} ;

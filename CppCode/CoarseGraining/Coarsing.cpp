@@ -1048,3 +1048,126 @@ CGPoint * Coarsing::reverseloop (string type)
 
 return NULL ;
 }
+
+//==============================================================================
+double Volume (int d, double R)
+{
+  if (d%2==0)
+    return (pow(boost::math::double_constants::pi,d/2)*pow(R,d)/( boost::math::factorial<double>(d/2) )) ;
+  else
+  {
+   int k=(d-1)/2 ;
+   return(2* boost::math::factorial<double>(k) * pow(4*boost::math::double_constants::pi, k) *pow(R,d) / (boost::math::factorial<double>(d))) ;
+  }
+}
+//--------------------------------------------
+int Param::parsing (istream & in)
+{
+  char line[5000] ; int id ; int rien, dimension ; double mass, radius ;
+
+  in>>line;
+  if (line[0]=='#') {in.getline(line, 5000) ; return 0; } // The line is a comments
+
+  if (!strcmp(line, "directory"))
+  {
+    in>>dump ;
+    save = dump + "/" + save ; 
+    dump += "/dump.xml" ;
+    if (! experimental::filesystem::exists(dump))
+    {
+      printf("[ERR] file do not exist: %s\n", dump.c_str());
+    }
+  }
+  else if (!strcmp(line, "dimensions"))
+  {
+    in >> dimension ; in >> rien ;
+    Delta.resize(dimension, 0) ;
+    boxes.resize(dimension, 0) ;
+  }
+  else if (!strcmp(line, "boundary"))
+  {
+    int walldim ; char type[50] ; double dmin, dmax ;
+    in >> walldim ; in >> type ; in>>dmin ; in >> dmax ;
+    if (!strcmp(type, "PBC"))
+    {
+      pbc |= (1<<walldim) ;
+      Delta[walldim] = dmax-dmin ;
+    }
+    else {} // Other types do not matter
+  }
+  else if (!strcmp(line, "gravity")) {in.getline(line, 5000) ; return 1; }
+  else if (!strcmp(line, "set"))
+  {
+    in >> line ;
+    if (!strcmp(line, "rho")) in >> rho ;
+    else if (!strcmp(line, "Kn")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "Kt")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "GammaN")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "GammaT")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "Mu")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "T")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "tdump")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "orientationtracking")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "skin")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "dumps")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "tinfo")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "dt")) {in.getline(line, 5000) ; return 1;}
+  }
+  else if (!strcmp(line, "radius"))
+  {
+    int id ; double value ;
+    in >> id ; in>>value ;
+    if (id==-1 || id ==0) radius=value ;
+  }
+  else if (!strcmp(line, "mass"))
+  {
+    int id ; double value ;
+    in >> id ; in>>value ;
+    if (id==-1 || id ==0) mass=value ;
+  }
+  else if (!strcmp(line, "auto"))
+  {
+    in >> line ;
+    if (!strcmp(line, "rho"))
+    {
+      rho  = mass / Volume(dimension, radius) ;
+    }
+    else if (!strcmp(line, "location")) {in.getline(line, 5000) ; return 1; } // Do not matter
+    else if (!strcmp(line, "inertia")) {in.getline(line, 5000) ; return 1 ; } // Do not matter
+    else if (!strcmp(line, "mass")) {in.getline(line, 5000) ; return 1 ; } // Do not matter
+  }
+  else if (!strcmp(line, "CG"))
+  {
+    in>>line ;
+    if (!strcmp(line, "skiptime")) in >> skipT ;
+    else if (!strcmp(line, "maxtime")) in >> maxT ;
+    else if (!strcmp(line, "flags"))
+    {
+      int nb ; in >> nb ;
+      for (int i=0 ; i<nb ; i++)
+      {
+        in >> line ;
+        flags.push_back(line) ;
+      }
+    }
+    else if (!strcmp(line, "boxes"))
+      for (auto &v : boxes)
+        in>>v ;
+    else if (!strcmp(line, "boundaries"))
+    {} // TODO
+    else if (!strcmp(line, "radius"))
+    {} // TODO
+    else
+      printf("[Input] Unknown command in input file |CG %s|\n", line) ;
+  }
+  else if (!strcmp(line, "location")){in.getline(line, 5000) ;  return 1 ; }
+  else if (!strcmp(line, "velocity")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "omega")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "freeze")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "gravity")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "gravityangle")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line,"event")) {in.getline(line, 5000) ; return 1 ; }
+  else
+      printf("[Input] Unknown command in input file |%s|\n", line) ;
+return 0 ;
+}
