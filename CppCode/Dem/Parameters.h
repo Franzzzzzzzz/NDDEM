@@ -1,6 +1,9 @@
 #ifndef PARAMETERS
 #define PARAMETERS
 
+/** \addtogroup DEM
+ *  @{ */
+
 #include <cstdlib>
 #include <cmath>
 #include <cstdio>
@@ -717,4 +720,5 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
 return 0 ;
 }
 
+/** @}*/
 #endif

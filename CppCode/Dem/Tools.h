@@ -1,3 +1,7 @@
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
+
 #ifndef TOOLS
 #define TOOLS
 #include <cstdlib>
@@ -50,7 +54,7 @@ class Tools
 {
 public:
 static void initialise () ;
-static void clear() ; 
+static void clear() ;
 static bool check_initialised (int dd) {return (dd==d) ; }
 
 static int savetxt(char path[], const v2d & table, char const header[]) ;
@@ -215,13 +219,13 @@ void Tools<d>::initialise ()
  for (int i=0 ; i<d ; i++) for (int j=0 ; j<d ; j++) MSigns[i][j]=(i<j)*(1)+(i>j)*(-1) ;
 
  MIndexAS.resize(d, vector < int > (d,0)) ;
- MASIndex.resize(d*(d-1)/2, make_pair(0,0)) ; 
+ MASIndex.resize(d*(d-1)/2, make_pair(0,0)) ;
  int n=0 ;
  for (int i=0 ; i<d ; i++)
       for (int j=i+1 ; j<d ; j++,n++)
       {
           MIndexAS[i][j]=n ; MIndexAS[j][i]=n ;
-          MASIndex[n]=make_pair(i,j) ; 
+          MASIndex[n]=make_pair(i,j) ;
           //MASIndex.push_back(make_pair(i, j)) ;
       }
 
@@ -233,9 +237,9 @@ template <int d>
 void Tools<d>::clear()
 {
     MSigns.clear() ;
-    MIndexAS.clear() ; 
-    MASIndex.clear() ; 
-    Eye.clear() ; 
+    MIndexAS.clear() ;
+    MASIndex.clear() ;
+    Eye.clear() ;
 }
 
 //===================================
@@ -273,7 +277,7 @@ return 0 ;
 template <int d>
 void Tools<d>::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z )
 {
- FILE *out ; int dim ; 
+ FILE *out ; int dim ;
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
  dim = X[0].size() ;
  for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
@@ -646,19 +650,19 @@ double Tools<d>::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENS
     double rsqr = normsq(x) ;
     double r= sqrt(rsqr) ;
     int j;
-    phi=vector<double>(d-1, 0) ; 
-    for (j=d-1 ; j>=0 && fabs(x[j])<1e-6 ; j--) ; 
-    int lastnonzero=j ;     
+    phi=vector<double>(d-1, 0) ;
+    for (j=d-1 ; j>=0 && fabs(x[j])<1e-6 ; j--) ;
+    int lastnonzero=j ;
     for (j=0 ; j<d-1 ; j++)
     {
        if (j==lastnonzero)
        {
-           if (x[j]<0) phi[j]=M_PI ; 
+           if (x[j]<0) phi[j]=M_PI ;
            else phi[j]=0 ;
-           return r ; 
+           return r ;
        }
        phi[j] = acos(x[j]/sqrt(rsqr)) ;
-       //printf("[%g %g]", x[j], sqrt(rsqr)) ; 
+       //printf("[%g %g]", x[j], sqrt(rsqr)) ;
        if (isnan(phi[j])) {phi[j]=acos(sgn(x[j])*x[j]) ;} //TODO Check that ................
        rsqr -= x[j]*x[j] ;
     }
@@ -785,3 +789,4 @@ private:
 #endif
 
 #endif
+/** @} */

@@ -1,3 +1,7 @@
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
+
 #ifndef CONTACTS
 #define CONTACTS
 
@@ -185,3 +189,4 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
 }
 
 #endif
+/** @} */
