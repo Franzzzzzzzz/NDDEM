@@ -173,8 +173,9 @@ int main (int argc, char * argv[])
  int res, t ;
  XMLReader XML(P->dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
- XML.read_boundaries(P->boundaries) ;
- P->boundaries[1][0] = 20 ;
+ auto rien = P->boundaries ;
+ XML.read_boundaries(rien) ;
+ //P->boundaries[1][0] = 20 ;
  dispvector(P->boundaries) ;
  XML.read_radius (P->radius) ;
  int N = P->radius.size() ;
@@ -199,8 +200,6 @@ int main (int argc, char * argv[])
  C.data.N=P->radius.size() ;
  C.data.mass = mass.data() ;
  C.data.Imom = Imom.data() ;
-
-printf("E") ; fflush(stdout) ;
 
  vector <string> names ; vector<vector<vector<double>>> data ;
  for (int t=0 ; t<P->maxT ; t++)
@@ -231,7 +230,7 @@ printf("E") ; fflush(stdout) ;
   //C.pass_2() ;
   //C.pass_3() ;
 
- printf("%d \n", t) ; fflush(stdout) ;
+ printf("%d \r", t) ; fflush(stdout) ;
  }
 
  //C.mean_time() ;

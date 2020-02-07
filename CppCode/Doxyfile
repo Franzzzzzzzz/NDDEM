@@ -727,7 +727,7 @@ CITE_BIB_FILES         =
 # messages are off.
 # The default value is: NO.
 
-QUIET                  = NO
+QUIET                  = YES
 
 # The WARNINGS tag can be used to turn on/off the warning messages that are
 # generated to standard error (stderr) by doxygen. If WARNINGS is set to YES
@@ -875,8 +875,8 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE = Dem/gzip.cpp Dem/gzip.hpp Dem/Test.c Dem/Test.cpp
-EXCLUDE += CoarseGraining/gzip.cpp CoarseGraining/gzip.hpp CoarseGrainins/zlib.cpp CoarseGrainins/termcolor
+EXCLUDE =  Dem/gzip.cpp Dem/gzip.hpp Dem/Test.c Dem/Test.cpp
+EXCLUDE += CoarseGraining/gzip.cpp CoarseGraining/gzip.hpp ../CoarseGraining/zlib.cpp CoarseGraining/termcolor.hpp
 EXCLUDE += Texturing/Test.cpp Texturing/TinyPngOut.cpp Texturing/TinyPngOut.hpp
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -2163,7 +2163,7 @@ EXTERNAL_PAGES         = YES
 # interpreter (i.e. the result of 'which perl').
 # The default file (with absolute path) is: /usr/bin/perl.
 
-PERL_PATH              = /usr/bin/perl
+#PERL_PATH              = /usr/bin/perl
 
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
@@ -2185,7 +2185,7 @@ CLASS_DIAGRAMS         = YES
 # the mscgen tool resides. If left empty the tool is assumed to be found in the
 # default search path.
 
-MSCGEN_PATH            =
+#MSCGEN_PATH            =
 
 # You can include diagrams made with dia in doxygen documentation. Doxygen will
 # then run dia to produce the diagram and insert it in the documentation. The

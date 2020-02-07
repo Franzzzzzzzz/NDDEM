@@ -46,6 +46,13 @@ plot (squeeze(I(6,:,7))', squeeze(Rhoall(6,:,7)/Rhog(6))' , '-^b') ; hold all
 %semilogx (permute(I(6,:,:), [2,3,1]), permute(Mu(3,:,:), [2,3,1]) , 'xk') ; hold all 
 
 xlim([0 5])
+%% 
+figure (88) ; clf 
+load ../Dem/Output_MuI_D3rev/CoarseGrained.mat
+imagesc(squeeze(RHO(:,:))) ; hold all
+for i=20:200:size(VAVG,3)
+    plot ([i, i],[1, 25], 'r') ; 
+end ; 
 
 %% Plot velocity fields
 figure (12) ; clf ; 

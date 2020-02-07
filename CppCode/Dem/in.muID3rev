@@ -9,7 +9,7 @@ mass -1 1
 auto rho
 auto inertia
 
-boundary 0 WALL 0 20
+boundary 0 WALL 0 50
 boundary 1 PBC  0 5
 boundary 2 PBC  0 3.4
 #boundary 3 PBC  0 3.4
@@ -24,46 +24,38 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 6020
+set T 4220
 set dt 0.0001
 set dumps XML with 4 Position Velocity Omega Coordination
 #set dumps CSV with 1 Orientation
 set dumps VTK with 2 Velocity Coordination
 set tdump 10000
-event 20 gravityangle 10 40
-event 220 gravityangle 10 39
-event 420 gravityangle 10 38
-event 620 gravityangle 10 37
-event 820 gravityangle 10 36
-event 1020 gravityangle 10 35
-event 1220 gravityangle 10 34
-event 1420 gravityangle 10 33
-event 1620 gravityangle 10 32
-event 1820 gravityangle 10 31
-event 2020 gravityangle 10 30
-event 2220 gravityangle 10 29
-event 2420 gravityangle 10 28
-event 2620 gravityangle 10 27
-event 2820 gravityangle 10 26
-event 3020 gravityangle 10 25
-event 3220 gravityangle 10 24
-event 3420 gravityangle 10 23
-event 3620 gravityangle 10 22
-event 3820 gravityangle 10 21
-event 4020 gravityangle 10 20
-event 4220 gravityangle 10 19
-event 4420 gravityangle 10 18
-event 4620 gravityangle 10 17
-event 4820 gravityangle 10 16
-event 5020 gravityangle 10 15
-event 5220 gravityangle 10 14
-event 5420 gravityangle 10 13
-event 5620 gravityangle 10 12
-event 5820 gravityangle 10 11
+event 20 gravityangle 10 35
+event 220 gravityangle 10 34
+event 420 gravityangle 10 33
+event 620 gravityangle 10 32
+event 820 gravityangle 10 31
+event 1020 gravityangle 10 30
+event 1220 gravityangle 10 29
+event 1420 gravityangle 10 28
+event 1620 gravityangle 10 27
+event 1820 gravityangle 10 26
+event 2020 gravityangle 10 25
+event 2220 gravityangle 10 24
+event 2420 gravityangle 10 23
+event 2620 gravityangle 10 22
+event 2820 gravityangle 10 21
+event 3020 gravityangle 10 20
+event 3220 gravityangle 10 19
+event 3420 gravityangle 10 18
+event 3620 gravityangle 10 17
+event 3820 gravityangle 10 16
+event 4020 gravityangle 10 15
 
 CG skiptime 20
-CG maxtime 6020
+CG maxtime 700
 CG flags 2 RHO VAVG
-CG boxes 25 1 1
+CG boxes 60 1 1
+CG bounds 0 0 50
 
 EOF

@@ -90,13 +90,9 @@ public :
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
         //for (int i=0 ; i<d ; i++)
         // printf("%d %d %g %g %g|", d, npt[i], box[1][i], box[0][i], dx[i]) ; fflush(stdout) ;
-        printf("R") ; fflush(stdout) ;
         grid_generate() ;
-        printf("Q") ; fflush(stdout) ;
         grid_neighbour() ;
-        printf("K") ; fflush(stdout) ;
         set_field_struct() ;
-        printf("L") ; fflush(stdout) ;
         Window = new LibLucy3D( &data, w, d) ;
     }
 

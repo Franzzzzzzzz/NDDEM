@@ -259,7 +259,7 @@ struct Field * Coarsing::get_field(string nm)
 //===================================================
 int Coarsing::compute_fluc_vel ()
 {
-  printf("Starting vel fluctuation computation [d=%d]\n", d) ; fflush(stdout) ;
+  printf("Starting vel fluctuation computation [d=%d]\r", d) ; fflush(stdout) ;
   v1d vavg (d,0) ;
   data.vel_fluc.resize(d, std::vector <double> (data.N, 0.0)) ;
 
@@ -277,7 +277,7 @@ int Coarsing::compute_fluc_vel ()
 }
 int Coarsing::compute_fluc_rot ()
 {
-  printf("Starting rot fluctuation computation\n") ; fflush(stdout) ;
+  printf("Starting rot fluctuation computation\r") ; fflush(stdout) ;
   v1d omegaavg (d,0) ;
   data.rot_fluc.resize(d, v1d (data.N, 0)) ;
   int idrot=get_id("ROT") ;
@@ -316,7 +316,7 @@ int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;}
 int Iid = get_id("I") ; if (Iid<0) doI=false ;
 int velid=get_id("VAVG"); if (velid<0)  dovel=false ;
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
-printf("Starting pass 1...\n") ; fflush(stdout) ;
+printf("Starting pass 1...\r") ; fflush(stdout) ;
 
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
 
@@ -351,7 +351,7 @@ for (i=0 ; i<data.N ; i++)
 bool doEKT=true, doEKR=true ;
 int EKTid=get_id("EKT") ; if (EKTid<0) doEKT=false ;
 int EKRid=get_id("EKR") ; if (EKRid<0) doEKR=false ;
-printf("Starting intermediate pass 1...\n") ; fflush(stdout) ;
+printf("Starting intermediate pass 1...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double rho, Imom ;
@@ -387,7 +387,7 @@ int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ;
 int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ;
 int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;
 int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;
-printf("Starting pass 2...\n") ; fflush(stdout) ;
+printf("Starting pass 2...\r") ; fflush(stdout) ;
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -419,7 +419,7 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 // Intermediate pass (cg points): devide by rho when needed
-printf("Starting intermediate 2...\n") ; fflush(stdout) ;
+printf("Starting intermediate 2...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double tworho ;
@@ -446,7 +446,7 @@ int mCid=get_id("mC") ; if (mCid<0) domC=false ;
 int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ;
 int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ;
 double sum=0 ; int p, q, id ; double rp, rq ; double wpqs, wpqf ;
-printf("Starting pass 3...\n") ; fflush(stdout) ;
+printf("Starting pass 3...\r") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
@@ -508,7 +508,7 @@ for (i=0 ; i<data.Ncf ; i++)
 }
 
 //Last intermediate pass
-printf("Starting intermediate pass 3...\n") ; fflush(stdout) ;
+printf("Starting intermediate pass 3...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
@@ -1071,7 +1071,7 @@ int Param::parsing (istream & in)
   if (!strcmp(line, "directory"))
   {
     in>>dump ;
-    save = dump + "/" + save ; 
+    save = dump + "/" + save ;
     dump += "/dump.xml" ;
     if (! experimental::filesystem::exists(dump))
     {
@@ -1083,11 +1083,14 @@ int Param::parsing (istream & in)
     in >> dimension ; in >> rien ;
     Delta.resize(dimension, 0) ;
     boxes.resize(dimension, 0) ;
+    boundaries.resize(2, vector<double> (dimension, 0)) ;
   }
   else if (!strcmp(line, "boundary"))
   {
     int walldim ; char type[50] ; double dmin, dmax ;
     in >> walldim ; in >> type ; in>>dmin ; in >> dmax ;
+    boundaries[0][walldim]= dmin ;
+    boundaries[1][walldim]= dmax ;
     if (!strcmp(type, "PBC"))
     {
       pbc |= (1<<walldim) ;
@@ -1153,8 +1156,13 @@ int Param::parsing (istream & in)
     else if (!strcmp(line, "boxes"))
       for (auto &v : boxes)
         in>>v ;
-    else if (!strcmp(line, "boundaries"))
-    {} // TODO
+    else if (!strcmp(line, "bound"))
+    {
+      int dim ; double bmin, bmax ;
+      in>>dim >> bmin >> bmax ;
+      boundaries[0][dim] = bmin ;
+      boundaries[1][dim] = bmax ;
+    }
     else if (!strcmp(line, "radius"))
     {} // TODO
     else

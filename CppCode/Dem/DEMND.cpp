@@ -79,7 +79,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
    //bool isdumptime = (ti % P.tdump==0) ;
-   P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
+   //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
    if (ti%P.tinfo==0)
    {
      tnow = clock();
