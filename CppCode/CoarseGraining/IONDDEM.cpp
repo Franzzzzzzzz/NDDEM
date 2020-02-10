@@ -180,7 +180,6 @@ int main (int argc, char * argv[])
  XML.read_radius (P->radius) ;
  int N = P->radius.size() ;
 
-  printf("B") ; fflush(stdout) ;
  vector <double> mass, Imom ;
 
  for (int i=0 ; i<N ; i++)

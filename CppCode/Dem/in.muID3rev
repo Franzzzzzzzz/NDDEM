@@ -24,38 +24,31 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 4220
+set T 7020
 set dt 0.0001
 set dumps XML with 4 Position Velocity Omega Coordination
 #set dumps CSV with 1 Orientation
-set dumps VTK with 2 Velocity Coordination
+#set dumps VTK with 2 Velocity Coordination
 set tdump 10000
 event 20 gravityangle 10 35
-event 220 gravityangle 10 34
-event 420 gravityangle 10 33
-event 620 gravityangle 10 32
-event 820 gravityangle 10 31
-event 1020 gravityangle 10 30
-event 1220 gravityangle 10 29
-event 1420 gravityangle 10 28
-event 1620 gravityangle 10 27
-event 1820 gravityangle 10 26
-event 2020 gravityangle 10 25
-event 2220 gravityangle 10 24
-event 2420 gravityangle 10 23
-event 2620 gravityangle 10 22
-event 2820 gravityangle 10 21
-event 3020 gravityangle 10 20
-event 3220 gravityangle 10 19
-event 3420 gravityangle 10 18
-event 3620 gravityangle 10 17
-event 3820 gravityangle 10 16
-event 4020 gravityangle 10 15
+event 520 gravityangle 10 34
+event 1020 gravityangle 10 33
+event 1520 gravityangle 10 32
+event 2020 gravityangle 10 31
+event 2520 gravityangle 10 30
+event 3020 gravityangle 10 29
+event 3520 gravityangle 10 28
+event 4020 gravityangle 10 27
+event 4520 gravityangle 10 26
+event 5020 gravityangle 10 25
+event 5520 gravityangle 10 24
+event 6020 gravityangle 10 23
+event 6520 gravityangle 10 22
 
 CG skiptime 20
-CG maxtime 700
+CG maxtime 7020
 CG flags 2 RHO VAVG
-CG boxes 60 1 1
-CG bounds 0 0 50
+CG boxes 50 1 1
+CG bound 0 0 20
 
 EOF

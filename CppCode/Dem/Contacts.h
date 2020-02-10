@@ -145,7 +145,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
   if (ovlp<=0) {Act.setzero(d) ; return ;}
-  Tools<d>::unitvec(cn, d, j) ;
+  Tools<d>::unitvec(cn, j) ;
   cn=cn*(-orient) ; // l give the orientation (+1 or -1)
 
   //Relative velocity at contact

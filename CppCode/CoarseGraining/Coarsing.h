@@ -232,11 +232,12 @@ struct Param {
   }
   void disp()
   {
+    auto pbcprint = [](int a) {string s ="" ; for (;a>0; a>>=1) s = ((a&1)?"y":"n") + s ; return s ;} ;
     printf("\n-----\n%s\nSkipping: %d\nFinal time: %d\nDensity: %g\nFlags: ", dump.c_str(), skipT, maxT, rho) ;
     for (auto v: flags) printf("%s ", v.c_str()) ;
     printf("\nBoxes: ") ;
     for (auto v: boxes) printf("%d ", v) ;
-    printf("\n PBCs: %X\nDeltas: ", pbc) ;
+    printf("\nPBCs: %s\nDeltas: ", pbcprint(pbc).c_str()) ;
     for (auto v: Delta) printf("%g ", v) ;
     printf("\n-----\n\n") ;
   }

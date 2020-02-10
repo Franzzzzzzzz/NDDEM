@@ -6,7 +6,7 @@
 #include <signal.h>
 //#include <gperftools/profiler.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 2
+//#define OMP_NUM_THREADS 2
 
 vector <std::pair<ExportType,ExportData>> * toclean ;
 XMLWriter * xmlout ;
@@ -66,8 +66,11 @@ int templatedmain (char * argv[])
  displacement[0]=P.skinsqr*2 ;
  //Contacts C(P) ; //Initialize the Contact class object
  //ContactList CLp, CLw ;
- omp_set_num_threads(OMP_NUM_THREADS) ;
- Multiproc<d> MP(N, OMP_NUM_THREADS, P) ;
+ const char* env_p = std::getenv("OMP_NUM_THREADS") ;
+ int numthread = 2 ;
+ if (env_p!=nullptr) numthread = atoi (env_p) ;
+ omp_set_num_threads(numthread) ;
+ Multiproc<d> MP(N, numthread, P) ;
 
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
