@@ -58,8 +58,13 @@ static void initialise () ;
 static void clear() ;
 static bool check_initialised (int dd) {return (dd==d) ; }
 
+/** @name Vector and matrix initialisation and normalisation
+Vector and matrix initialisation and normalisation 
+*/
 static void unitvec (vector <double> & v, int n) ;                    /// Construct a unit vector in place
-static v1d unitvec (int n) {v1d res (d,0) ; res[n]=1 ; return res ; } /// Construct & return a unit vector \parameter n Unit dimension
+static v1d unitvec (int n) {v1d res (d,0) ; res[n]=1 ; return res ; } /// Construct & return a unit vector
+static void setzero(v2d & a) {for (uint i=0 ; i<a.size() ; i++) for (uint j=0 ; j<a[0].size() ; j++) a[i][j]=0 ; } /// Set a matrix to zero in-place
+static void setzero(v1d & a) {for (uint i=0 ; i<a.size() ; i++) a[i]=0 ; } /// Set a vector to zero in-place
 static double norm (const vector <double> & a) {double res=0 ; for (uint i=0 ; i<a.size() ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; } /// Norm of a vector
 static   void norm (v1d & res, cv2d & a) {for (uint i=0 ; i<a.size() ; i++) res[i] = norm(a[i]) ; } ///Norm of a 2D-matrix, returns a 1D vector with the norms of the individual vectors
 static double normdiff (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; } /// Norm of a vector difference \f$|a-b|\f$
@@ -71,44 +76,28 @@ static double skewnormsq (cv1d & a) {double res=0 ; for (int i=0 ; i<d*(d-1)/2 ;
 static double dot (cv1d & a, cv1d & b) {double res=0; for (int i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; } /// Dot product
 static v1f vsqrt (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=sqrt(a[i]) ; return b ; } ///Component-wise square root
 static v1f vsq (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=a[i]*a[i] ; return b ; } /// Component-wise squaring
-static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } /// Transposition
-static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } /// Transpose in-place
 
-static void setzero(v2d & a) {for (uint i=0 ; i<a.size() ; i++) for (uint j=0 ; j<a[0].size() ; j++) a[i][j]=0 ; } /// Set a matrix to zero in-place
-static void setzero(v1d & a) {for (uint i=0 ; i<a.size() ; i++) a[i]=0 ; } /// Set a vector to zero in-place
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; } /// Set the gravity. \f$\vec a_i = m_i * \vec g \f$
-
-static int savetxt(char path[], const v2d & table, char const header[]) ;
-static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ;
-static void savecsv (char path[], cv2d & A) ;
-static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ;
-
-static int write1D (char path[], v1d table) ;
-static int writeinline(initializer_list< v1d >) ;
-static int writeinline_close(void) ;
-
 static v1d randomize_vec (cv1d v) ; /// Produce a random vector
-static std::pair <double, double> two_max_element (cv1d & v) ;
+///@}
 
+/** @name Coordinate system change */
+///@{
 static double hyperspherical_xtophi (cv1d &x, v1d &phi) ; /// Convert from cartesian to hyperspherical coordinates
 static void   hyperspherical_phitox (double r, cv1d &phi, v1d &x) ; /// Convert from hyperspherical to cartesian coordinates
+///@}
 
+/** @name Special physics computation */
+///@{
 static double Volume (double R) ; /// Compute the hypersphere volume
 static double InertiaMomentum (double R, double rho) ; /// Compute the hypersphere moment of inertia
+///@}
 
-static v1d  skewmatvecmult (cv1d & M, cv1d &v) ;
-static void skewmatvecmult (v1d & r, cv1d & M, cv1d &v) ;
-static v1d  skewmatsquare  (cv1d &A) ;
-static void skewmatsquare  (v1d &r, cv1d &A) ;
-static v1d  skewexpand     (cv1d &A) ;
-static void skewexpand     (v1d & r, cv1d &A) ;
-static v1d  matmult (cv1d &A, cv1d &B) ;
-static void matmult (v1d &r, cv1d &A, cv1d &B) ;
-static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ;
-static v1d  wedgeproduct (cv1d &a, cv1d &b) ;
-static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; // Overloaded faster operation
 
-// Faster vector operations
+/** @name Faster vector operations
+ *  These vector or matrix operations are working in place, and sometimes perform multiple operations at once
+ */
+///@{
 static void vMul  (v1d & res, cv1d &a, double b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]*b ; }    /// Multiply a vector by a scalar in-place
 static void vMul  (v1d & res, cv1d &a, cv1d & b)  {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]*b[i] ; } /// Component-wise multiply 2 vectors in-place
 static void vMinus (v1d & res, cv1d &a, cv1d & b) {for (uint i=0 ; i<a.size() ; i++) res[i]=a[i]-b[i] ; } /// Difference of 2 vectors in-place \f$a-b\f$
@@ -121,8 +110,12 @@ static void vAddScaled (v1d &res , double v, cv1d &a, cv1d &b) {for (uint i=0 ; 
 static void vAddScaled (v1d &res , double v, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] += v*a[i] ; } /// Addition of a scaled vector \f$ res := res + v*a\f$
 static void vSubFew (v1d &res , cv1d &a, cv1d &b)                 {for (uint i=0 ; i<a.size() ; i++) res[i] -= (a[i]+b[i]) ; } /// Subtraction of 2 vectors \f$ res := res - a - b\f$
 static void vSubScaled (v1d &res , double v, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] -= v*a[i] ; } /// Subtraction of a scaled vector \f$ res := res - v*a\f$
+///@}
 
-// Vector operation with floating point error correction
+/** @name Faster vector operations with error corrections (Kahan summation algorithm)
+ *  These vector or matrix operations are working in place, perform multiple operations at once, and are designed to use error correction across multiple calls.
+ */
+///@{
 static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) /// Addition of 3 vectors in-place with error correction (Kahan summation algorithm)
 {
   double Tmp, Previous ;
@@ -171,17 +164,50 @@ static void vSubOne (v1d & res, cv1d &a, v1d & Corr) /// Subtraction of 2 vector
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
 }
+///@}
+
+/** @name Matrix operations, usually operating on flattened matrices */
+///@{
+static v1d  skewmatvecmult (cv1d & M, cv1d &v) ;
+static void skewmatvecmult (v1d & r, cv1d & M, cv1d &v) ;
+static v1d  skewmatsquare  (cv1d &A) ;
+static void skewmatsquare  (v1d &r, cv1d &A) ;
+static v1d  skewexpand     (cv1d &A) ;
+static void skewexpand     (v1d & r, cv1d &A) ;
+static v1d  matmult (cv1d &A, cv1d &B) ;
+static void matmult (v1d &r, cv1d &A, cv1d &B) ;
+static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ;
+static v1d  wedgeproduct (cv1d &a, cv1d &b) ; /// Wedge product of vectors
+static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; /// Wedge product in-place
+static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } /// Transposition
+static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } /// Transpose in-place
+///@}
+
+/** @name Saving and writing functions */
+///@{
+static int savetxt(char path[], const v2d & table, char const header[]) ;
+static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ;
+static void savecsv (char path[], cv2d & A) ;
+static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ;
+
+static int write1D (char path[], v1d table) ;
+static int writeinline(initializer_list< v1d >) ;
+static int writeinline_close(void) ;
+///@}
+
+
+
 
 // Sign function
 static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; }
 static int sgn (double a)   {return a<0 ? -1:1 ; }
+static std::pair <double, double> two_max_element (cv1d & v) ;
 
 static v1d Eye ; /// The identity matrix in dimension \<d\>
 static boost::random::mt19937 rng ;
 static boost::random::uniform_01<boost::mt19937> rand ;
 
 static int getdim (void) {return d;} // Essentially so that the NetCDF class has access to d ...
-
 
 private:
 static vector < vector <int> > MSigns ;

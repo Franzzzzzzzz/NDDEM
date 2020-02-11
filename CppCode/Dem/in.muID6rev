@@ -25,12 +25,11 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 4020
+set T 2820
 set dt 0.0001
 set dumps XML with 4 Position Velocity Omega Coordination
 #set dumps CSV with 1 Orientation
 set tdump 10000
-set orientationtracking 0
 event 20 gravityangle 10 35
 event 220 gravityangle 10 34
 event 420 gravityangle 10 33
@@ -45,11 +44,4 @@ event 2020 gravityangle 10 25
 event 2220 gravityangle 10 24
 event 2420 gravityangle 10 23
 event 2620 gravityangle 10 22
-event 2820 gravityangle 10 21
-event 3020 gravityangle 10 20
-event 3220 gravityangle 10 19
-event 3420 gravityangle 10 18
-event 3620 gravityangle 10 17
-event 3820 gravityangle 10 16
-event 4020 gravityangle 10 15
 EOF
