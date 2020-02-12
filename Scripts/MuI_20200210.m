@@ -1,0 +1,74 @@
+%% Spato-temporal data plotting 
+figure (1) ; clf 
+load ../CppCode/Dem/Output_MuI_D2rev/CoarseGrained.mat
+imagesc(squeeze(RHO(:,:))/1.9098593171027443) ; hold all
+for i=0:500:size(VAVG,3)
+    plot ([i, i],[1, 25], 'r') ; 
+end ; 
+
+%% ======================================
+clear all ; 
+Rhog = [0, 1.2732395447351628, 1.9098593171027443,3.242277876554809, 6.079271018540266, 12.384589222348605] ; 
+g = 10 ; 
+diam = 2 ; 
+
+Test{1}.id='MuI_D2rev' ; 
+Test{1}.d=2 ; 
+Test{1}.firstangle = 35 ;
+Test{1}.deltaangle = 1 ;
+Test{1}.deltatime = 500 ;
+Test{1}.avgtime = 300 ; 
+Test{1}.rhog = Rhog(Test{1}.d) ; 
+Test{1}.dz = 20/50 ; 
+
+Test{2}.id='MuI_D3rev' ; 
+Test{2}.d=3 ; 
+Test{2}.firstangle = 35 ;
+Test{2}.deltaangle = 1 ;
+Test{2}.deltatime = 500 ;
+Test{2}.avgtime = 300 ; 
+Test{2}.rhog = Rhog(Test{2}.d) ; 
+Test{2}.dz = 20/50 ; 
+
+Test{3}.id='MuI_D4rev' ; 
+Test{3}.d=4 ; 
+Test{3}.firstangle = 35 ;
+Test{3}.deltaangle = 1 ;
+Test{3}.deltatime = 500 ;
+Test{3}.avgtime = 300 ; 
+Test{3}.rhog = Rhog(Test{3}.d) ; 
+Test{3}.dz = 20/50 ; 
+
+for i=1:size(Test,2)
+    clear VAVG RHO ; 
+    load(['../CppCode/Dem/Output_' Test{i}.id '/CoarseGrained.mat']) ; 
+    n=1 ; 
+    for j=[1:Test{i}.deltatime:size(VAVG,3)-Test{i}.deltatime-1] 
+        deb = j+Test{i}.deltatime-Test{i}.avgtime-1 ; fin = j+Test{i}.deltatime ; 
+        Angle{i}(n) = Test{i}.firstangle - (n-1) * Test{i}.deltaangle ;
+        Vall{i} (n,:)    = mean(VAVG(2,:,deb:fin),3) ;
+        Rhoall{i} (n,:)  = mean(RHO (:,  deb:fin),2) ;
+        Phiall{i} (n,:)  = Rhoall{i}(n,:)/Test{i}.rhog ; 
+        Pressure{i}(n,:) = cumsum(Rhoall{i}(n,:),2, 'reverse') * g * cosd(Angle{i}(n)) ;
+        Gammadot{i}(n,:) = (Vall{i}(n,3:end) - Vall{i}(n,1:end-2))/(2*Test{i}.dz) ; 
+        Mu{i}(n,:) = tand(Angle{i}(n)) * ones(1,size(RHO,1)-2) ; 
+        I{i}(n,:) = Gammadot{i}(n,:) * diam ./ sqrt(Pressure{i}(n,2:end-1)/Test{i}.rhog) ; 
+        n=n+1 ; 
+    end ; 
+    I{i}([I{i}<0 | isnan(I{i}) | isinf(I{i})]) = nan  ; 
+end ;
+
+
+figure(2) ; clf ; 
+cm = pycolors('inferno') ; 
+axes() ; 
+set(gca, 'ColorOrder', cm(1:256/20:256,:));  hold all
+for i=2:14
+    plot (I{1}(i,1:end), Mu{1}(i,1:end), '*-r') ; hold all
+end 
+for i=2:13
+    plot (I{2}(i,1:end), Mu{2}(i,1:end), 'ob-') ; hold all
+end 
+for i=2:10
+    plot (I{3}(i,1:end), Mu{3}(i,1:end), '*-k') ; hold all
+end 

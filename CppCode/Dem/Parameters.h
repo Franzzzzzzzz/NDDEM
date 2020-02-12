@@ -75,6 +75,7 @@ public :
     string Directory ;
     bool orientationtracking ;
     bool wallforcecompute ;
+    unsigned long int seed = 5489UL ; ///< Seems to be the default seed of the Mersenne twister in Boost
 
     map<float, string> events ;
 
@@ -103,6 +104,7 @@ public :
 // For Xml Writing
     XMLWriter * xmlout ;
 } ;
+/** @}*/
 
 /*****************************************************************************************************
  *                                                                                                   *
@@ -114,6 +116,7 @@ public :
  *                                                                                                   *
  * ***************************************************************************************************/
 
+/// Some Infos on set_boundaries
 template <int d>
 int Parameters<d>::set_boundaries()
 {
@@ -335,6 +338,7 @@ else if (!strcmp(line, "set"))
  else if (!strcmp(line, "Mu")) in>>Mu ;
  else if (!strcmp(line, "T")) in>>T ;
  else if (!strcmp(line, "tdump")) in>>tdump ;
+ else if (!strcmp(line, "seed")) in>>seed ;
  else if (!strcmp(line, "orientationtracking")) in >> orientationtracking ;
  else if (!strcmp(line, "skin")) {in >> skin ; if (skin<r[0]) {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; } skinsqr=skin*skin ; }
  else if (!strcmp(line, "dumps"))
@@ -403,7 +407,7 @@ else if (!strcmp(line, "auto"))
   else printf("[WARN] Unknown auto command in input script\n") ;
   printf("[Input] Doing an auto \n") ;
 }
-else if (!strcmp(line, "directory"))
+else if (!strcmp(line, "directory")) ///< Some info
 {
   in>>Directory ;
   if (! experimental::filesystem::exists(line)) experimental::filesystem::create_directory(Directory);
@@ -411,8 +415,6 @@ else if (!strcmp(line, "directory"))
 else
     printf("[Input] Unknown command in input file |%s|\n", line) ;
 }
-
-
 
 //=====================================
 template <int d>
@@ -459,7 +461,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "randomdrop"))
     {
-        boost::random::mt19937 rng;
+        boost::random::mt19937 rng(seed);
         boost::random::uniform_01<boost::mt19937> rand(rng) ;
 
         for (int i=0 ; i<N ; i++)
@@ -476,7 +478,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "roughinclineplane"))
     {
-      boost::random::mt19937 rng;
+      boost::random::mt19937 rng(seed);
       boost::random::uniform_01<boost::mt19937> rand(rng) ;
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
@@ -502,7 +504,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "roughinclineplane2"))
     {
-      boost::random::mt19937 rng;
+      boost::random::mt19937 rng(seed);
       boost::random::uniform_01<boost::mt19937> rand(rng) ;
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
@@ -720,5 +722,4 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
 return 0 ;
 }
 
-/** @}*/
 #endif

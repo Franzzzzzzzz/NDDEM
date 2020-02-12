@@ -53,7 +53,6 @@ int templatedmain (char * argv[])
  vector <u_int32_t> Ghost_dir (N, 0) ;
 
  v1d Atmp (d*d, 0) ;
- v1d tmpO (d*d,0), tmpT (d*d,0), tmpOO (d*d,0), tmpSUM (d*d,0),  tmpterm1 (d*d,0), tmpterm2 (d*d,0)  ;
 
  // Initial state setup
  P.set_boundaries() ;
@@ -95,11 +94,11 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
    //----- Velocity Verlet step 1 : compute the new positions
    Benchmark::start_clock("Verlet 1st");
-   double disp, totdisp ;
    maxdisp[0] = 0 ; maxdisp[1] = 0 ;
+   #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
    for (int i=0 ; i<N ; i++)
    {
-    totdisp=0 ;
+    double disp, totdisp=0 ;
     for (int dd=0 ; dd<d ; dd++)
     {
         disp = V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
@@ -107,7 +106,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
         totdisp += disp*disp ;
     }
     displacement[i] += sqrt(totdisp) ;
-    if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; }
+    if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; } // ERROR RACE CONDITION ON MAXDISP
 
     /*Tools<d>::skewexpand(tmpO, Omega[i]) ;
     Tools<d>::matmult (tmpterm1, tmpO, A[i]);
@@ -121,6 +120,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
     // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
     if (P.orientationtracking)
     {
+      v1d tmpO (d*d,0), tmpterm1 (d*d,0) ;
       Tools<d>::skewexpand(tmpO, Omega[i]) ;
       Tools<d>::matmult(tmpterm1, tmpO, A[i]) ;
       for (int dd=0 ; dd<d*d ; dd++)
@@ -142,7 +142,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
      else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;
-   }
+  } // END PARALLEL SECTION
    P.perform_MOVINGWALL() ;
    Benchmark::stop_clock("Verlet 1st");
 
@@ -315,7 +315,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
    //---------- Velocity Verlet step 3 : compute the new velocities
    Benchmark::start_clock("Verlet last");
-
+   #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
    for (int i=0 ; i<N ; i++)
    {
     //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
@@ -325,7 +325,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
     Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
     FOld[i]=F[i] ;
     TorqueOld[i]=Torque[i] ;
-   }
+   } // END OF PARALLEL SECTION
 
    Benchmark::stop_clock("Verlet last");
 

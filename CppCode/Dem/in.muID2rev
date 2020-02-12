@@ -50,7 +50,7 @@ event 8020 gravityangle 10 18
 event 8520 gravityangle 10 17
 
 CG skiptime 20
-CG maxtime 8020
+CG maxtime 9020
 CG flags 2 RHO VAVG
 CG boxes 50 1
 CG bound 0 0 20

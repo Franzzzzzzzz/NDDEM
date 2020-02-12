@@ -36,7 +36,7 @@ Input [label="Input File"];
 CGData [label="Coarse-grained data"] ;
 Dem [shape=box,style=filled,color=".8 1.0 .8"] ;
 CoarseGraining [shape=box,style=filled,color=".8 1.0 .8"] ;
-Texturing [shape=box,style=filled,color=".6 1.0 .6"] ;
+Texturing [shape=box,style=filled,color=".8 1.0 .8"] ;
 Visualisation [shape=box,style=filled,color="0.9 0.6 0.6"] ;
 }
 \enddot
