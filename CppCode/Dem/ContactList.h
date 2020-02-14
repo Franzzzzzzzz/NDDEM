@@ -60,7 +60,8 @@ public:
  void reset() {it = v.begin() ;}
  int insert(const cp& a) ;
  void finalise () { while (it!=v.end()) it=v.erase(it) ; }
- list <cp> v ;
+ vector<cp> v ;
+ //list <cp> v ;
  Action * default_action () {return (&def) ; }
  int cid=0 ;
  vector <double> deltamap ;
@@ -74,7 +75,8 @@ public:
  void coordinance (v1d &Z) ;
 
 private:
- list<cp>::iterator it ;
+ //list<cp>::iterator it ;
+ vector<cp>::iterator it ; 
  Action def ;
 };
 

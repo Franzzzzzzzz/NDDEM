@@ -4,8 +4,9 @@
 
 #include "DEMND.h"
 #include <signal.h>
-//#include <gperftools/profiler.h>
+#include <gperftools/profiler.h>
 #include "Benchmark.h"
+#include <mutex>
 //#define OMP_NUM_THREADS 2
 
 vector <std::pair<ExportType,ExportData>> * toclean ;
@@ -52,6 +53,9 @@ int templatedmain (char * argv[])
  vector <u_int32_t> Ghost (N, 0) ;
  vector <u_int32_t> Ghost_dir (N, 0) ;
 
+ vector <ContactList<d>> CLp (N) ;
+ vector <ContactList<d>> CLw (N) ;
+
  v1d Atmp (d*d, 0) ;
 
  // Initial state setup
@@ -69,14 +73,15 @@ int templatedmain (char * argv[])
  int numthread = 2 ;
  if (env_p!=nullptr) numthread = atoi (env_p) ;
  omp_set_num_threads(numthread) ;
- Multiproc<d> MP(N, numthread, P) ;
+ printf("Number of CPU used: %d\n", numthread) ;
+  //Multiproc<d> MP(N, numthread, P) ;
 
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
  double dt=P.dt ;
  FILE *logfile = fopen("Logfile", "w") ;
 
-//ProfilerStart("Profiling") ;
+ProfilerStart("Profiling") ;
 printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
@@ -87,7 +92,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
      tnow = clock();
      printf("\r%10g | %5.2g%% | %d iterations in %10gs | %5d | finish in %10gs",t, t/P.T*100, P.tinfo,
             double(tnow - tprevious) / CLOCKS_PER_SEC, ti, ((P.T-t)/(P.tinfo*dt))*(double(tnow - tprevious) / CLOCKS_PER_SEC)) ;
-     fprintf(logfile, "%d %10g %lu %lu\n", ti, double(tnow - tprevious) / CLOCKS_PER_SEC, MP.CLp[0].v.size(), MP.CLw[0].v.size()) ;
+     //fprintf(logfile, "%d %10g %lu %lu\n", ti, double(tnow - tprevious) / CLOCKS_PER_SEC, MP.CLp[0].v.size(), MP.CLw[0].v.size()) ;
      fflush(stdout) ;
      tprevious=tnow ;
    }
@@ -158,62 +163,57 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    //else recompute=false ;
    if (recompute)
    {
-     //printf("RECOMPUTE\n");
-       fflush(stdout) ;
-     #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
+     //printf("RECOMPUTE\n"); fflush(stdout) ;
+     //CLp.reset() ; CLw.reset();
+     #pragma omp parallel for schedule(dynamic) default(none) shared(CLp) shared(CLw) shared(N) shared(P) shared(X) shared(Ghost) shared(Ghost_dir)
+     for (int i=0 ; i<N ; i++)
      {
-       int ID = omp_get_thread_num();
-       ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
-       CLp.reset() ; CLw.reset();
-
-       for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+       tmpcp.setinfo(CLp[i].default_action()); //TODO
+       CLp[i].reset() ;
+       for (int j=i+1 ; j<N ; j++) // Regular particles
        {
-           tmpcp.setinfo(CLp.default_action());
-
-           for (int j=i+1 ; j<N ; j++) // Regular particles
+           //sum=0 ;
+           if (Ghost[j])
            {
-               //sum=0 ;
-               if (Ghost[j])
-               {
-                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                 CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
-               }
-               else
-               {
-                 sum=0 ;
-                 for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-                 if (sum<P.skinsqr)
-                 {
-                     tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-                     CLp.insert(tmpcp) ;
-                 }
-               }
-             }
-
-           tmpcp.setinfo(CLw.default_action());
-           for (int j=0 ; j<d ; j++) // Wall contacts
-           {
-                if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
-
-                tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
-                if (tmpcp.contactlength<P.skin)
-                {
-                    tmpcp.i=i ; tmpcp.j=(2*j+0);
-                    CLw.insert(tmpcp) ;
-                }
-
-                tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
-                if (tmpcp.contactlength<P.skin)
-                {
-                    tmpcp.i=i ; tmpcp.j=(2*j+1);
-                    CLw.insert(tmpcp) ;
-                }
+             tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+             CLp[i].check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
            }
-       }
-       CLp.finalise() ;
-       CLw.finalise() ;
-     } //END PARALLEL SECTION
+           else
+           {
+             sum=0 ;
+             for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+             if (sum<P.skinsqr)
+             {
+                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                 CLp[i].insert(tmpcp) ;
+             }
+           }
+         }
+
+         tmpcp.setinfo(CLw[i].default_action());
+         CLw[i].reset();
+         for (int j=0 ; j<d ; j++) // Wall contacts
+         {
+              if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
+
+              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+              if (tmpcp.contactlength<P.skin)
+              {
+                  tmpcp.i=i ; tmpcp.j=(2*j+0);
+                  CLw[i].insert(tmpcp) ;
+              }
+
+              tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+              if (tmpcp.contactlength<P.skin)
+              {
+                  tmpcp.i=i ; tmpcp.j=(2*j+1);
+                  CLw[i].insert(tmpcp) ;
+              }
+         }
+         CLp[i].finalise() ;
+         CLw[i].finalise() ;
+     }
    }
    else // Do not recompute the full contact list, but still compute the contact length and all.
    {
@@ -254,40 +254,38 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    Tools<d>::setzero(Torque);
 
    //Particle - particle contacts
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
+
+   //vector <mutex> locks (N) ;
+   #pragma omp parallel for schedule(dynamic) default(none) shared (N) shared(CLp) shared(CLw) shared(X) shared(V) shared(Omega) shared(P) shared(F) shared(Fcorr) shared(Torque) shared(TorqueCorr) shared(locks)
+   for (int i=0 ; i<N ; i++)
    {
-     int ID = omp_get_thread_num();
-     ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
-
-     for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
+     locks[i].lock() ;
+     Contacts<d> C (P);
+     for (auto it = CLp[i].v.begin() ; it!=CLp[i].v.end() ; it++)
      {
-      if (it->ghost==0)
-      {
-          C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
-      }
-      else
-      {
-          C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                               X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
-      }
+        if (it->ghost==0)
+        {
+            C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                  X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+        }
+        else
+        {
+            C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                 X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+        }
 
-      Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-      Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+        Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+        Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-      if (MP.ismine(ID,it->j))
-      {
+        /locks[it->j].lock() ;
         Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
         Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+        locks[it->j].unlock() ;
       }
-      else
-        MP.delaying(ID, it->j, C.Act) ;
-
       //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
       //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
-     }
 
-     for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
+     for (auto it = CLw[i].v.begin() ; it!=CLw[i].v.end() ; it++)
      {
       C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
       //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
@@ -296,20 +294,11 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
       Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
       Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-      if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
+      //if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ; //TODO
      }
-   }
 
-   // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
-   for (int i=0 ; i<MP.P ; i++)
-   {
-     for (uint j=0 ; j<MP.delayed_size[i] ; j++)
-     {
-       Tools<d>::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
-       Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
-     }
+     locks[i].unlock() ;
    }
-   MP.delayed_clean() ;
 
    Benchmark::stop_clock("Forces");
 
@@ -335,7 +324,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    // Output something at some point I guess
    if (ti % P.tdump==0)
    {
-    Tools<d>::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ;
+    Tools<d>::setzero(Z) ; //for (auto &v: MP.CLp) v.coordinance(Z) ; //TODO
     P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
     std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
@@ -343,20 +332,20 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
     {
      char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
      Tools<d>::setzero(WallForce) ;
-     if (P.wallforcecompute)
+     /*if (P.wallforcecompute) //TODO
      {
        for (int i=0 ; i<MP.P ; i++)
            for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
                Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
-     }
+     }*/
      Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
     }
    }
 
-   if (P.wallforcecompute) MP.delayedwall_clean() ;
+   //if (P.wallforcecompute) MP.delayedwall_clean() ; //TODO
  }
 
-//ProfilerStop() ;
+ProfilerStop() ;
 //Tools<d>::write1D ("Res.txt", TmpRes) ;
 //Tools<d>::writeinline_close() ;
 Benchmark::write_all();
@@ -377,14 +366,14 @@ int main (int argc, char *argv[])
 
  switch (dd)
  {
-     case  1: templatedmain<1> (argv) ; break ;
-     case  2: templatedmain<2> (argv) ; break ;
-     case  3: templatedmain<3> (argv) ; break ;
+     //case  1: templatedmain<1> (argv) ; break ;
+     //case  2: templatedmain<2> (argv) ; break ;
+     //case  3: templatedmain<3> (argv) ; break ;
      case  4: templatedmain<4> (argv) ; break ;
-     case  5: templatedmain<5> (argv) ; break ;
-     case  6: templatedmain<6> (argv) ; break ;
-     case  7: templatedmain<7> (argv) ; break ;
-     case  8: templatedmain<8> (argv) ; break ;
+     //case  5: templatedmain<5> (argv) ; break ;
+     //case  6: templatedmain<6> (argv) ; break ;
+     //case  7: templatedmain<7> (argv) ; break ;
+     //case  8: templatedmain<8> (argv) ; break ;
 //      case  9: templatedmain<9> (argv) ; break ;
 //      case 10: templatedmain<10> (argv) ; break ;
 //      case 11: templatedmain<11> (argv) ; break ;
