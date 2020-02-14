@@ -165,7 +165,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    {
      //printf("RECOMPUTE\n"); fflush(stdout) ;
      //CLp.reset() ; CLw.reset();
-     #pragma omp parallel for schedule(dynamic) default(none) shared(CLp) shared(CLw) shared(N) shared(P) shared(X) shared(Ghost) shared(Ghost_dir)
+     #pragma omp parallel for schedule(guided) default(none) shared(CLp) shared(CLw) shared(N) shared(P) shared(X) shared(Ghost) shared(Ghost_dir)
      for (int i=0 ; i<N ; i++)
      {
        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
@@ -255,8 +255,8 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
    //Particle - particle contacts
 
-   //vector <mutex> locks (N) ;
-   #pragma omp parallel for schedule(dynamic) default(none) shared (N) shared(CLp) shared(CLw) shared(X) shared(V) shared(Omega) shared(P) shared(F) shared(Fcorr) shared(Torque) shared(TorqueCorr) shared(locks)
+   vector <mutex> locks (N) ;
+   #pragma omp parallel for schedule(guided) default(none) shared (N) shared(CLp) shared(CLw) shared(X) shared(V) shared(Omega) shared(P) shared(F) shared(Fcorr) shared(Torque) shared(TorqueCorr) shared(locks)
    for (int i=0 ; i<N ; i++)
    {
      locks[i].lock() ;
@@ -277,7 +277,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
         Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
         Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-        /locks[it->j].lock() ;
+        locks[it->j].lock() ;
         Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
         Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
         locks[it->j].unlock() ;
@@ -296,7 +296,6 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
       //if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ; //TODO
      }
-
      locks[i].unlock() ;
    }
 
