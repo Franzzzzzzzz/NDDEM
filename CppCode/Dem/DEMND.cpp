@@ -159,7 +159,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    if (recompute)
    {
      //printf("RECOMPUTE\n");
-       fflush(stdout) ;
+     // fflush(stdout) ;
      #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
      {
        int ID = omp_get_thread_num();
@@ -170,13 +170,12 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
        for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
        {
            tmpcp.setinfo(CLp.default_action());
-
+           tmpcp.i=i ;
            for (int j=i+1 ; j<N ; j++) // Regular particles
            {
-               //sum=0 ;
                if (Ghost[j])
                {
-                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+                 tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
                  CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
                }
                else
@@ -185,13 +184,14 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
                  for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
                  if (sum<P.skinsqr)
                  {
-                     tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                     tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
                      CLp.insert(tmpcp) ;
                  }
                }
              }
 
            tmpcp.setinfo(CLw.default_action());
+           tmpcp.i=i ;
            for (int j=0 ; j<d ; j++) // Wall contacts
            {
                 if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
@@ -199,14 +199,14 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
                 tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
                 if (tmpcp.contactlength<P.skin)
                 {
-                    tmpcp.i=i ; tmpcp.j=(2*j+0);
+                    tmpcp.j=(2*j+0);
                     CLw.insert(tmpcp) ;
                 }
 
                 tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
                 if (tmpcp.contactlength<P.skin)
                 {
-                    tmpcp.i=i ; tmpcp.j=(2*j+1);
+                    tmpcp.j=(2*j+1);
                     CLw.insert(tmpcp) ;
                 }
            }
