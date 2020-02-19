@@ -1,11 +1,3 @@
-%% Spato-temporal data plotting 
-figure (1) ; clf 
-load ../CppCode/Dem/Output_MuI_D2rev/CoarseGrained.mat
-imagesc(squeeze(RHO(:,:))/1.9098593171027443) ; hold all
-for i=0:500:size(VAVG,3)
-    plot ([i, i],[1, 25], 'r') ; 
-end ; 
-
 %% ======================================
 clear all ; 
 Rhog = [0, 1.2732395447351628, 1.9098593171027443,3.242277876554809, 6.079271018540266, 12.384589222348605] ; 
@@ -15,7 +7,7 @@ diam = 2 ;
 Test{1}.id='MuI_D2rev' ; 
 Test{1}.d=2 ; 
 Test{1}.firstangle = 35 ;
-Test{1}.deltaangle = 1 ;
+Test{1}.deltaangle = -1 ;
 Test{1}.deltatime = 500 ;
 Test{1}.avgtime = 300 ; 
 Test{1}.rhog = Rhog(Test{1}.d) ; 
@@ -24,7 +16,7 @@ Test{1}.dz = 20/50 ;
 Test{2}.id='MuI_D3rev' ; 
 Test{2}.d=3 ; 
 Test{2}.firstangle = 35 ;
-Test{2}.deltaangle = 1 ;
+Test{2}.deltaangle = -1 ;
 Test{2}.deltatime = 500 ;
 Test{2}.avgtime = 300 ; 
 Test{2}.rhog = Rhog(Test{2}.d) ; 
@@ -33,19 +25,31 @@ Test{2}.dz = 20/50 ;
 Test{3}.id='MuI_D4rev' ; 
 Test{3}.d=4 ; 
 Test{3}.firstangle = 35 ;
-Test{3}.deltaangle = 1 ;
+Test{3}.deltaangle = -1 ;
 Test{3}.deltatime = 500 ;
 Test{3}.avgtime = 300 ; 
 Test{3}.rhog = Rhog(Test{3}.d) ; 
 Test{3}.dz = 20/50 ; 
 
+%% Spato-temporal data plotting 
+figure (1) ; clf 
+Tmp = Test{3} ; 
+load(['../CppCode/Dem/Output_' Tmp.id '/CoarseGrained.mat']) ; 
+imagesc(squeeze(RHO(:,:))/Tmp.rhog) ; hold all
+for i=0:Tmp.deltatime:size(VAVG,3)
+    plot ([i, i],[1, 25], 'r') ; 
+    text(i+10, 10, num2str(Tmp.firstangle + Tmp.deltaangle*(i/Tmp.deltatime))) ; 
+end ; 
+
+
+%% ======================================
 for i=1:size(Test,2)
     clear VAVG RHO ; 
     load(['../CppCode/Dem/Output_' Test{i}.id '/CoarseGrained.mat']) ; 
     n=1 ; 
     for j=[1:Test{i}.deltatime:size(VAVG,3)-Test{i}.deltatime-1] 
         deb = j+Test{i}.deltatime-Test{i}.avgtime-1 ; fin = j+Test{i}.deltatime ; 
-        Angle{i}(n) = Test{i}.firstangle - (n-1) * Test{i}.deltaangle ;
+        Angle{i}(n) = Test{i}.firstangle + (n-1) * Test{i}.deltaangle ;
         Vall{i} (n,:)    = mean(VAVG(2,:,deb:fin),3) ;
         Rhoall{i} (n,:)  = mean(RHO (:,  deb:fin),2) ;
         Phiall{i} (n,:)  = Rhoall{i}(n,:)/Test{i}.rhog ; 
@@ -59,13 +63,18 @@ for i=1:size(Test,2)
 end ;
 
 
-figure(2) ; clf ; 
+
+
+figure(4) ; clf ; 
 cm = pycolors('inferno') ; 
 axes() ; 
 set(gca, 'ColorOrder', cm(1:256/20:256,:));  hold all
-for i=2:14
-    plot (I{1}(i,1:end), Mu{1}(i,1:end), '*-r') ; hold all
+for i=1:13
+    %plot (I{1}(i,2:end), Phiall{1}(i,3:end-1), '*r') ; hold all
+    plot (Phiall{1}(i,:), '-') ; hold all
 end 
+
+%%
 for i=2:13
     plot (I{2}(i,1:end), Mu{2}(i,1:end), 'ob-') ; hold all
 end 

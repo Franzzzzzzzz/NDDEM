@@ -163,6 +163,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
      #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
      {
        int ID = omp_get_thread_num();
+       double timebeg = omp_get_wtime();
        ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
        CLp.reset() ; CLw.reset();
@@ -213,6 +214,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
        }
        CLp.finalise() ;
        CLw.finalise() ;
+       MP.timing[ID] += omp_get_wtime()-timebeg;
      } //END PARALLEL SECTION
    }
    else // Do not recompute the full contact list, but still compute the contact length and all.
@@ -257,6 +259,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
    {
      int ID = omp_get_thread_num();
+     double timebeg = omp_get_wtime();
      ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
 
      for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
@@ -298,7 +301,8 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
       if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
      }
-   }
+     MP.timing[ID] += omp_get_wtime()-timebeg;
+   } //END PARALLEL PART
 
    // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
    for (int i=0 ; i<MP.P ; i++)
@@ -312,7 +316,6 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    MP.delayed_clean() ;
 
    Benchmark::stop_clock("Forces");
-
    //---------- Velocity Verlet step 3 : compute the new velocities
    Benchmark::start_clock("Verlet last");
    #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
@@ -354,6 +357,16 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    }
 
    if (P.wallforcecompute) MP.delayedwall_clean() ;
+
+   // Load balancing on the procs as needed
+   MP.num_time++ ;
+   if (MP.num_time>100)
+   {
+     MP.load_balance() ;
+     // Cleaning the load balancing
+     MP.num_time = 0 ;
+     MP.timing = vector<double>(MP.P,0) ;
+   }
  }
 
 //ProfilerStop() ;

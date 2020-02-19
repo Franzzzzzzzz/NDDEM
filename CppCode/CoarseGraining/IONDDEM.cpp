@@ -190,7 +190,7 @@ int main (int argc, char * argv[])
 
  Coarsing C(d, P->boxes, P->boundaries, P->maxT-P->skipT) ;
 
- C.setWindow<Windows::LibLucyND_Periodic>(1, P->pbc, P->boxes, P->Delta) ;
+ C.setWindow<Windows::LibLucyND_Periodic>(P->windowsize, P->cuttoff, P->pbc, P->boxes, P->Delta) ;
 
  C.set_flags(P->flags) ;
  C.grid_setfields() ;

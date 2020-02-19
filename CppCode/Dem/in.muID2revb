@@ -55,5 +55,6 @@ CG maxtime 9020
 CG flags 2 RHO VAVG
 CG boxes 50 1
 CG bound 0 0 20
+CG windowsize 1.5
 
 EOF

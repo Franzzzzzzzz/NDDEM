@@ -121,7 +121,7 @@ public :
     int set_field_struct() ; //< Set the FIELDS structure, with all the different CG properties that can be computed.
     template <Windows W> int setWindow () ;
     template <Windows W> int setWindow (double w) ;
-    template <Windows W> int setWindow (double w, int per, vector<int> boxes, vector<double> deltas) ;
+    template <Windows W> int setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas) ;
     int grid_generate() ;
     int grid_neighbour() ;
     int grid_setfields() ;
@@ -194,10 +194,11 @@ int Coarsing::setWindow (double w)
 }
 //-------------------------------------------------------
 template <Windows W>
-int Coarsing::setWindow (double w, int per, vector<int> boxes, vector<double> deltas)
+int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas)
 {
   static_assert(W == Windows::LibLucyND_Periodic) ;
-  cutoff=2.5*w ; //TODO
+  //cutoff=2.5*w ; //TODO
+  cutoff = cuttoff ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
 
   Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
@@ -219,6 +220,8 @@ struct Param {
   vector<double> Delta ;
   vector <double> radius ;
   string save = "CoarseGrained";
+  double windowsize = 1 ;
+  double cuttoff = 2.5 ;
 
   void from_file(char path[])
   {
@@ -237,7 +240,7 @@ struct Param {
     for (auto v: flags) printf("%s ", v.c_str()) ;
     printf("\nBoxes: ") ;
     for (auto v: boxes) printf("%d ", v) ;
-    printf("\nPBCs: %s\nDeltas: ", pbcprint(pbc).c_str()) ;
+    printf("\nPBCs: %s\nWindowSize: %g\n Cut-off: %g\nDeltas: ", pbcprint(pbc).c_str(), windowsize, cuttoff) ;
     for (auto v: Delta) printf("%g ", v) ;
     printf("\n-----\n\n") ;
   }

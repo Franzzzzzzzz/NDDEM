@@ -1165,6 +1165,15 @@ int Param::parsing (istream & in)
     }
     else if (!strcmp(line, "radius"))
     {} // TODO
+    else if (!strcmp(line, "windowsize"))
+    {
+      in >> windowsize ;
+      cuttoff = 2*windowsize ;
+    }
+    else if (!strcmp(line, "cutoff"))
+    {
+      in >> cuttoff ;
+    }
     else
       printf("[Input] Unknown command in input file |CG %s|\n", line) ;
   }
