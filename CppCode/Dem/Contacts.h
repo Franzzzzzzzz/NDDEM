@@ -34,7 +34,7 @@ public:
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
-        static vector <double> loc (d, 0) ;
+        vector <double> loc (d, 0) ;
         loc=Xj ;
         u_int32_t gh=Contact.ghost, ghd=Contact.ghostdir ;
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)

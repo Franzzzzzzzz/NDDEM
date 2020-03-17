@@ -316,9 +316,10 @@ int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;}
 int Iid = get_id("I") ; if (Iid<0) doI=false ;
 int velid=get_id("VAVG"); if (velid<0)  dovel=false ;
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
-printf("Starting pass 1...\r") ; fflush(stdout) ;
+//printf("Starting pass 1...\r") ; fflush(stdout) ;
 
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
+vector<double> totweight(data.N,0) ;
 
 for (i=0 ; i<data.N ; i++)
 {
@@ -330,6 +331,7 @@ for (i=0 ; i<data.N ; i++)
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
      wp=Window->window(Window->distance(i,CGP[*j].location)) ;
+     totweight[i]+=wp ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
      CGP[*j].phi += wp ;
@@ -347,11 +349,16 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 
+int nbzero = 0 ;
+for (auto v : totweight)
+  if (v==0) nbzero++ ;
+printf("%d \n", nbzero) ;fflush(stdout) ;
+
 // Intermediate pass (cg points)
 bool doEKT=true, doEKR=true ;
 int EKTid=get_id("EKT") ; if (EKTid<0) doEKT=false ;
 int EKRid=get_id("EKR") ; if (EKRid<0) doEKR=false ;
-printf("Starting intermediate pass 1...\r") ; fflush(stdout) ;
+//printf("Starting intermediate pass 1...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double rho, Imom ;

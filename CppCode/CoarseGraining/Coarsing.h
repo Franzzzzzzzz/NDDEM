@@ -84,7 +84,7 @@ public :
         dx.resize(d, 0) ;
         for (int i=0 ; i<d ; i++)
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
-
+        printf("{%g %g %g %g}", dx[0], dx[1], dx[2], dx[3]) ; 
         double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
@@ -240,9 +240,16 @@ struct Param {
     for (auto v: flags) printf("%s ", v.c_str()) ;
     printf("\nBoxes: ") ;
     for (auto v: boxes) printf("%d ", v) ;
-    printf("\nPBCs: %s\nWindowSize: %g\n Cut-off: %g\nDeltas: ", pbcprint(pbc).c_str(), windowsize, cuttoff) ;
+    printf("\nPBCs: %s\nWindowSize: %g\nCut-off: %g\nDeltas: ", pbcprint(pbc).c_str(), windowsize, cuttoff) ;
     for (auto v: Delta) printf("%g ", v) ;
-    printf("\n-----\n\n") ;
+    printf("\nBoundaries:") ;
+    for (auto v:boundaries)
+    {
+      printf("\n") ;
+      for (auto w:v)
+        printf("%g ", w);
+    }
+    printf("\n-----\n\n") ; fflush(stdout) ;
   }
 private:
   int parsing (istream & in) ;

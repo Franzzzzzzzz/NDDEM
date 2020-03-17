@@ -47,6 +47,6 @@ CG skiptime 20
 CG maxtime 7020
 CG flags 2 RHO VAVG
 CG boxes 50 1 1 1
-CG bounds 0 0 20
+CG bound 0 0 20
 
 EOF
