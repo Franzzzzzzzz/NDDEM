@@ -51,7 +51,7 @@ if ( typeof window.quasicrystal !== 'undefined' ) { var quasicrystal = window.qu
 if ( typeof window.mercury !== 'undefined' ) { var mercury = true }
 else { var mercury = false; var num_particles; }; // load mercury data instead of csvs
 
-if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme == 'normal'; } // invert global colours
+if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme; } // invert global colours
 
 var root_dir = 'http://localhost:54321/';
 cache=true ;
