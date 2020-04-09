@@ -20,7 +20,7 @@ var human_height = 0.; // height of the human in m
 var x_offset = 0.; // NOT USED
 var y_offset = 0.; // NOT USED
 // var human_height = 0.; // height of the human in m
-var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate
+var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, inverted
 var velocity = {'vmax': 1, 'omegamax': 100} // default GUI options
 var roof; // top boundary
 var bg; // background mesh with texture attached
@@ -40,7 +40,7 @@ if ( typeof window.pinky !== 'undefined' ) { var pinky = parseInt(window.pinky) 
 else { var pinky = 100}; // which particle to catch in catch_particle mode
 var fname = window.fname; // which folder to load data from
 if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
-var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
+var lut = new THREE.Lut( "rainbow", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material; // material used for arrows to show dimensions
 if ( typeof window.cache !== 'undefined' ) { var cache = window.cache == 'true' } // should we use cached data or not
 else { var cache = false; };
@@ -150,8 +150,12 @@ function build_world() {
     container.appendChild(N_tag);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
-    // scene.background = new THREE.Color( 0xFFFFFF ); // white
+    if ( view_mode === 'inverted' ) {
+        scene.background = new THREE.Color( 0xFFFFFF ); // white
+    }
+    else {
+        scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
+    }
     if ( display_type === 'VR' ) {
         var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
         // invert the geometry on the x-axis so that all of the faces point inward
@@ -740,6 +744,12 @@ function aim_camera() {
 
 function make_axes() {
     if (typeof axesLabels == 'undefined') {
+        if ( view_mode === 'inverted' ) {
+            var arrow_colour = 0x333333;
+        }
+        else {
+            var arrow_colour = 0xdddddd;
+        }
         axeslength = 5 ; // length of axes vectors
         fontsize = 0.5; // font size
         thickness = 0.1; // line thickness
@@ -761,7 +771,7 @@ function make_axes() {
 
         var arrow_body = new THREE.CylinderGeometry( thickness, thickness, axeslength, Math.pow(2,quality), Math.pow(2,quality) );
         var arrow_head = new THREE.CylinderGeometry( 0., 2.*thickness, 4*thickness, Math.pow(2,quality), Math.pow(2,quality) );
-        arrow_material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+        arrow_material = new THREE.MeshPhongMaterial( { color: arrow_colour } );
         // var arrow_material_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
         // var arrow_material_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
         var arrow_x = new THREE.Mesh( arrow_body, arrow_material );
@@ -1013,9 +1023,17 @@ function add_torus() {
     if (display_type == "VR") { R = 0.1; }
     else { R = 0.5; }
     r = R/2.;
+    if ( view_mode === 'inverted' ) {
+        var torus_colour = 0x111111;
+        var wristband_colour = 0xFFFFFF;
+    }
+    else {
+        var torus_colour = 0xaaaaaa;
+        var wristband_colour = 0x000000;
+    }
     var geometry = new THREE.TorusBufferGeometry( R, r, Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     var material = new THREE.MeshPhongMaterial( {
-        color: 0xaaaaaa,
+        color: torus_colour,
         // roughness: 0.7,
         // metalness: 0.5
     } );
@@ -1028,7 +1046,7 @@ function add_torus() {
 
     var geometry = new THREE.TorusBufferGeometry( r+R-r/6., r/5., Math.pow(2,quality+1)*2, Math.pow(2,quality+1) );
     var material = new THREE.MeshPhongMaterial( {
-        color: 0x000000,
+        color: wristband_colour,
         // roughness: 0.7,
     } );
     wristband1_phi = new THREE.Mesh( geometry, material );
