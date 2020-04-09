@@ -40,7 +40,7 @@ if ( typeof window.pinky !== 'undefined' ) { var pinky = parseInt(window.pinky) 
 else { var pinky = 100}; // which particle to catch in catch_particle mode
 var fname = window.fname; // which folder to load data from
 if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
-var lut = new THREE.Lut( "rainbow", 512 ); // options are rainbow, cooltowarm and blackbody
+var lut = new THREE.Lut( "cooltowarm", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material; // material used for arrows to show dimensions
 if ( typeof window.cache !== 'undefined' ) { var cache = window.cache == 'true' } // should we use cached data or not
 else { var cache = false; };
@@ -1027,7 +1027,7 @@ function add_torus() {
     r = R/2.;
     if ( colour_scheme === 'inverted' ) {
         var torus_colour = 0x111111;
-        var wristband_colour = 0xFFFFFF;
+        var wristband_colour = 0xeeeeee;
     }
     else {
         var torus_colour = 0xaaaaaa;
@@ -1507,12 +1507,12 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                 if (isNaN(R_draw)) {
                     object.visible = false;
                     if ( view_mode === 'D4' || view_mode === 'D5' ) {
-                        if ( colour_scheme === 'inverted' ) {
-                            wristband1.children[i].material.color = new THREE.Color( 0xffffff );
-                        }
-                        else {
-                            wristband1.children[i].material.color = new THREE.Color( 0x111111 );
-                        }
+                        // if ( colour_scheme === 'inverted' ) {
+                            wristband1.children[i].material.color = new THREE.Color( 0x777777 );
+                        // }
+                        // else {
+                            // wristband1.children[i].material.color = new THREE.Color( 0x111111 );
+                        // }
                     }
                 }
                 else {
