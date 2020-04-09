@@ -1504,7 +1504,12 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                                              Math.pow( (world[26].cur - spheres[i].x26), 2) - Math.pow( (world[27].cur - spheres[i].x27), 2) - Math.pow( (world[28].cur - spheres[i].x28), 2) - Math.pow( (world[29].cur - spheres[i].x29), 2)
                                          );
                  };
-                if (isNaN(R_draw)) { object.visible = false; }
+                if (isNaN(R_draw)) {
+                    object.visible = false;
+                    if ( view_mode === 'D4' || view_mode === 'D5' ) {
+                        wristband1.children[i].material.color = new THREE.Color( 0xffffff );
+                    }
+                }
                 else {
                     if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
                     else {
@@ -1529,10 +1534,20 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                             object.material.color = lut.getColor(spheres[i].Omegamag);
                         }
                         else if ( view_mode === 'D4' ) {
-
-                            lut.setMin(world[3].min);
-                            lut.setMax(world[3].max);
-                            object.material.color = lut.getColor(x3_unrotated);
+                            //lut.setMin(world[3].min);
+                            //lut.setMax(world[3].max);
+                            lut.setMin(world[3].cur-2*r) ;
+                            lut.setMax(world[3].cur+2*r) ;
+                            object.material.color  = lut.getColor(x3_unrotated);
+                            wristband1.children[i].material.color = lut.getColor(x3_unrotated);
+                        }
+                        else if ( view_mode === 'D5' ) {
+                            //lut.setMin(world[4].min);
+                            //lut.setMax(world[4].max);
+                            lut.setMin(world[4].cur-2*r) ;
+                            lut.setMax(world[4].cur+2*r) ;
+                            object.material.color  = lut.getColor(spheres[i].x4);
+                            wristband1.children[i].material.color = lut.getColor(spheres[i].x4);
                         }
                     }
                 };
