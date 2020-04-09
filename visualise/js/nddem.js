@@ -1507,7 +1507,12 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                 if (isNaN(R_draw)) {
                     object.visible = false;
                     if ( view_mode === 'D4' || view_mode === 'D5' ) {
-                        wristband1.children[i].material.color = new THREE.Color( 0xffffff );
+                        if ( colour_scheme === 'inverted' ) {
+                            wristband1.children[i].material.color = new THREE.Color( 0xffffff );
+                        }
+                        else {
+                            wristband1.children[i].material.color = new THREE.Color( 0x111111 );
+                        }
                     }
                 }
                 else {
