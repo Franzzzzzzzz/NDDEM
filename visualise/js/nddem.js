@@ -51,6 +51,8 @@ if ( typeof window.quasicrystal !== 'undefined' ) { var quasicrystal = window.qu
 if ( typeof window.mercury !== 'undefined' ) { var mercury = true }
 else { var mercury = false; var num_particles; }; // load mercury data instead of csvs
 
+if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme == 'normal'; } // invert global colours
+
 var root_dir = 'http://localhost:54321/';
 cache=true ;
 if ( window.location.hostname.includes('benjymarks') ) {
@@ -150,7 +152,7 @@ function build_world() {
     container.appendChild(N_tag);
 
     scene = new THREE.Scene();
-    if ( view_mode === 'inverted' ) {
+    if ( colour_scheme === 'inverted' ) {
         scene.background = new THREE.Color( 0xFFFFFF ); // white
     }
     else {
@@ -744,7 +746,7 @@ function aim_camera() {
 
 function make_axes() {
     if (typeof axesLabels == 'undefined') {
-        if ( view_mode === 'inverted' ) {
+        if ( colour_scheme === 'inverted' ) {
             var arrow_colour = 0x333333;
         }
         else {
@@ -1023,7 +1025,7 @@ function add_torus() {
     if (display_type == "VR") { R = 0.1; }
     else { R = 0.5; }
     r = R/2.;
-    if ( view_mode === 'inverted' ) {
+    if ( colour_scheme === 'inverted' ) {
         var torus_colour = 0x111111;
         var wristband_colour = 0xFFFFFF;
     }
