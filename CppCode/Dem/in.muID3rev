@@ -1,0 +1,54 @@
+# Incline plane flow
+directory Output_MuI_D3rev
+#directory OutputTest
+dimensions 3 125
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 50
+boundary 1 PBC  0 5
+boundary 2 PBC  0 3.4
+#boundary 3 PBC  0 3.4
+
+auto location roughinclineplane
+
+gravity -1 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 7020
+set dt 0.0001
+set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 1 Orientation
+#set dumps VTK with 2 Velocity Coordination
+set tdump 10000
+event 20 gravityangle 10 35
+event 520 gravityangle 10 34
+event 1020 gravityangle 10 33
+event 1520 gravityangle 10 32
+event 2020 gravityangle 10 31
+event 2520 gravityangle 10 30
+event 3020 gravityangle 10 29
+event 3520 gravityangle 10 28
+event 4020 gravityangle 10 27
+event 4520 gravityangle 10 26
+event 5020 gravityangle 10 25
+event 5520 gravityangle 10 24
+event 6020 gravityangle 10 23
+event 6520 gravityangle 10 22
+
+CG skiptime 20
+CG maxtime 7020
+CG flags 2 RHO VAVG
+CG boxes 50 1 1
+CG bound 0 0 20
+
+EOF

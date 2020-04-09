@@ -16,7 +16,7 @@ template <int d>
 class Multiproc
 {
 public:
-  Multiproc (int NN, int PP, Parameters<d> & Param) : share(PP+1,0),P(PP), N(NN) {
+  Multiproc (int NN, int PP, Parameters<d> & Param) : share(PP+1,0), num_time(0),P(PP), N(NN) {
     share[share.size()-1]=NN ;
     split(N,P) ;
     disp_share() ;
@@ -29,27 +29,31 @@ public:
     delayedwall.resize(P) ;
     delayedwallj.resize(P) ;
     delayedwall_size.resize(P,0) ;
+    timing.resize(P,0) ;
     }
   void disp_share();
   bool ismine (int ID, int j) {if (j>=share[ID] && j<share[ID+1]) return true ; return false ; }
   void delaying (int ID, int j, Action & act) ;
-  void delayed_clean() ; 
+  void delayed_clean() ;
   void delayingwall (int ID, int j, Action & act) ;
-  void delayedwall_clean() ; 
+  void delayedwall_clean() ;
+  void load_balance() ;
 
   vector <ContactList<d>> CLp ;
   vector <ContactList<d>> CLw ;
   vector <Contacts<d>> C ;
   vector <int> share ;
+  vector <double> timing ;
+  int num_time ;
 
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
   vector <vector <Action> > delayed ;
   vector <vector <int> > delayedj ;
   vector <uint> delayed_size ;
-  
-  vector <vector <Action> > delayedwall ; 
-  vector <vector <int> > delayedwallj ; 
-  vector <uint> delayedwall_size ; 
+
+  vector <vector <Action> > delayedwall ;
+  vector <vector <int> > delayedwallj ;
+  vector <uint> delayedwall_size ;
 
   int P ;
 
@@ -164,6 +168,84 @@ void Multiproc<d>::delayedwall_clean()
     val=0 ;
   }
 }
+//--------------------------------------------
+template <int d>
+void Multiproc<d>::load_balance()
+{
+  if (P==1) return ;
+  double target = std::accumulate(timing.begin(), timing.end(), 0.) / P / num_time ;
+  bool doloadbalance = false ;
+  for (int i=0 ; i<P ; i++) // Checking that it's worth balancing the load
+  {
+    if (abs(1-timing[i]/num_time/target)>0.1)
+      doloadbalance = true ;
+  }
+  if (!doloadbalance)
+    return ;
 
 
+
+  vector <double> timeperatom ;
+  for (int i=0 ; i<P ; i++)
+    timeperatom.push_back( (timing[i] / (share[i+1]-share[i])) / num_time) ;
+
+  double time ;
+  //for (auto v: timing) printf("%g ", v) ;
+  vector <int> newshare(P+1,0) ;
+
+  int curp=1 ;
+  for (int p=1 ; p<P ; p++)
+  {
+    //printf("%d\n", newshare.size()) ; fflush(stdout) ;
+    time=0 ; newshare[p] = newshare[p-1] ;
+    //printf("%g\n", target) ; fflush(stdout) ;
+    while (time<target)
+    {
+      if (newshare[p] >= share[curp])
+        curp++ ;
+      newshare[p]++ ;
+      if (newshare[p]==N-(P-p)) break ; // To ensure at least 1 particle per core, not taking any risk
+      time += timeperatom[curp-1] ;
+    }
+  }
+  newshare[P] = N;
+
+  /* For testing purposes (random allocation to proc)
+  newshare[0] = 0 ; newshare[P]=N ;
+  for (int i=1; i<P ; i++)
+  {
+    do {
+    newshare[i] = newshare[i-1]+rand()%(N-newshare[i-1]-1)+1 ;
+  } while (newshare[i]>=N-(P-i)) ;
+  }*/
+
+  printf("\nBalancing the load: processor migration\n") ;
+  for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
+  printf("\n") ; fflush(stdout) ;
+
+  share=newshare ;
+  ContactList<d> temp_p, temp_w ;
+
+  for (int i=0 ; i<P ; i++)
+  {
+    temp_p.v.splice(temp_p.v.end(), CLp[i].v) ;
+    temp_w.v.splice(temp_w.v.end(), CLw[i].v) ;
+  }
+
+  //for (auto v: temp_p.v) printf("%d ", v.i) ;
+  for (int p=0 ; p<P ; p++)
+  {
+    auto itp=temp_p.v.begin() ;
+    while ( itp != temp_p.v.end() && itp->i < newshare[p+1]) itp++ ;
+    CLp[p].v.splice(CLp[p].v.begin(), temp_p.v, temp_p.v.begin(), itp) ;
+
+    auto itw=temp_w.v.begin() ;
+    while ( itw != temp_w.v.end() && itw->i < newshare[p+1]) itw++ ;
+    CLw[p].v.splice(CLw[p].v.begin(), temp_w.v, temp_w.v.begin(), itw) ;
+
+  }
+
+  for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
+  printf("\n") ; fflush(stdout) ;
+}
 #endif

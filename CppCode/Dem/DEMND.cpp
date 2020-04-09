@@ -1,8 +1,12 @@
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
+
 #include "DEMND.h"
 #include <signal.h>
 //#include <gperftools/profiler.h>
 #include "Benchmark.h"
-#define OMP_NUM_THREADS 2
+//#define OMP_NUM_THREADS 2
 
 vector <std::pair<ExportType,ExportData>> * toclean ;
 XMLWriter * xmlout ;
@@ -49,7 +53,6 @@ int templatedmain (char * argv[])
  vector <u_int32_t> Ghost_dir (N, 0) ;
 
  v1d Atmp (d*d, 0) ;
- v1d tmpO (d*d,0), tmpT (d*d,0), tmpOO (d*d,0), tmpSUM (d*d,0),  tmpterm1 (d*d,0), tmpterm2 (d*d,0)  ;
 
  // Initial state setup
  P.set_boundaries() ;
@@ -62,8 +65,11 @@ int templatedmain (char * argv[])
  displacement[0]=P.skinsqr*2 ;
  //Contacts C(P) ; //Initialize the Contact class object
  //ContactList CLp, CLw ;
- omp_set_num_threads(OMP_NUM_THREADS) ;
- Multiproc<d> MP(N, OMP_NUM_THREADS, P) ;
+ const char* env_p = std::getenv("OMP_NUM_THREADS") ;
+ int numthread = 2 ;
+ if (env_p!=nullptr) numthread = atoi (env_p) ;
+ omp_set_num_threads(numthread) ;
+ Multiproc<d> MP(N, numthread, P) ;
 
  clock_t tnow, tprevious ; tprevious=clock() ;
  double t ; int ti ;
@@ -71,10 +77,11 @@ int templatedmain (char * argv[])
  FILE *logfile = fopen("Logfile", "w") ;
 
 //ProfilerStart("Profiling") ;
+printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
  for (t=0, ti=0 ; t<P.T ; t+=dt, ti++)
  {
    //bool isdumptime = (ti % P.tdump==0) ;
-   P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
+   //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
    if (ti%P.tinfo==0)
    {
      tnow = clock();
@@ -87,11 +94,11 @@ int templatedmain (char * argv[])
 
    //----- Velocity Verlet step 1 : compute the new positions
    Benchmark::start_clock("Verlet 1st");
-   double disp, totdisp ;
    maxdisp[0] = 0 ; maxdisp[1] = 0 ;
+   #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
    for (int i=0 ; i<N ; i++)
    {
-    totdisp=0 ;
+    double disp, totdisp=0 ;
     for (int dd=0 ; dd<d ; dd++)
     {
         disp = V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
@@ -99,7 +106,7 @@ int templatedmain (char * argv[])
         totdisp += disp*disp ;
     }
     displacement[i] += sqrt(totdisp) ;
-    if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; }
+    if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; } // ERROR RACE CONDITION ON MAXDISP
 
     /*Tools<d>::skewexpand(tmpO, Omega[i]) ;
     Tools<d>::matmult (tmpterm1, tmpO, A[i]);
@@ -113,6 +120,7 @@ int templatedmain (char * argv[])
     // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
     if (P.orientationtracking)
     {
+      v1d tmpO (d*d,0), tmpterm1 (d*d,0) ;
       Tools<d>::skewexpand(tmpO, Omega[i]) ;
       Tools<d>::matmult(tmpterm1, tmpO, A[i]) ;
       for (int dd=0 ; dd<d*d ; dd++)
@@ -134,7 +142,7 @@ int templatedmain (char * argv[])
      else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;
-   }
+  } // END PARALLEL SECTION
    P.perform_MOVINGWALL() ;
    Benchmark::stop_clock("Verlet 1st");
 
@@ -151,10 +159,11 @@ int templatedmain (char * argv[])
    if (recompute)
    {
      //printf("RECOMPUTE\n");
-       fflush(stdout) ;
+     // fflush(stdout) ;
      #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
      {
        int ID = omp_get_thread_num();
+       double timebeg = omp_get_wtime();
        ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
        CLp.reset() ; CLw.reset();
@@ -162,13 +171,12 @@ int templatedmain (char * argv[])
        for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
        {
            tmpcp.setinfo(CLp.default_action());
-
+           tmpcp.i=i ;
            for (int j=i+1 ; j<N ; j++) // Regular particles
            {
-               //sum=0 ;
                if (Ghost[j])
                {
-                 tmpcp.i=i ; tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+                 tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
                  CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
                }
                else
@@ -177,13 +185,14 @@ int templatedmain (char * argv[])
                  for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
                  if (sum<P.skinsqr)
                  {
-                     tmpcp.i=i ; tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                     tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
                      CLp.insert(tmpcp) ;
                  }
                }
              }
 
            tmpcp.setinfo(CLw.default_action());
+           tmpcp.i=i ;
            for (int j=0 ; j<d ; j++) // Wall contacts
            {
                 if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
@@ -191,20 +200,21 @@ int templatedmain (char * argv[])
                 tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
                 if (tmpcp.contactlength<P.skin)
                 {
-                    tmpcp.i=i ; tmpcp.j=(2*j+0);
+                    tmpcp.j=(2*j+0);
                     CLw.insert(tmpcp) ;
                 }
 
                 tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
                 if (tmpcp.contactlength<P.skin)
                 {
-                    tmpcp.i=i ; tmpcp.j=(2*j+1);
+                    tmpcp.j=(2*j+1);
                     CLw.insert(tmpcp) ;
                 }
            }
        }
        CLp.finalise() ;
        CLw.finalise() ;
+       MP.timing[ID] += omp_get_wtime()-timebeg;
      } //END PARALLEL SECTION
    }
    else // Do not recompute the full contact list, but still compute the contact length and all.
@@ -249,6 +259,7 @@ int templatedmain (char * argv[])
    #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
    {
      int ID = omp_get_thread_num();
+     double timebeg = omp_get_wtime();
      ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
 
      for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
@@ -290,7 +301,8 @@ int templatedmain (char * argv[])
 
       if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
      }
-   }
+     MP.timing[ID] += omp_get_wtime()-timebeg;
+   } //END PARALLEL PART
 
    // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
    for (int i=0 ; i<MP.P ; i++)
@@ -304,10 +316,9 @@ int templatedmain (char * argv[])
    MP.delayed_clean() ;
 
    Benchmark::stop_clock("Forces");
-
    //---------- Velocity Verlet step 3 : compute the new velocities
    Benchmark::start_clock("Verlet last");
-
+   #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
    for (int i=0 ; i<N ; i++)
    {
     //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
@@ -317,7 +328,7 @@ int templatedmain (char * argv[])
     Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
     FOld[i]=F[i] ;
     TorqueOld[i]=Torque[i] ;
-   }
+   } // END OF PARALLEL SECTION
 
    Benchmark::stop_clock("Verlet last");
 
@@ -346,6 +357,16 @@ int templatedmain (char * argv[])
    }
 
    if (P.wallforcecompute) MP.delayedwall_clean() ;
+
+   // Load balancing on the procs as needed
+   MP.num_time++ ;
+   if (MP.num_time>100)
+   {
+     MP.load_balance() ;
+     // Cleaning the load balancing
+     MP.num_time = 0 ;
+     MP.timing = vector<double>(MP.P,0) ;
+   }
  }
 
 //ProfilerStop() ;
@@ -399,3 +420,5 @@ int main (int argc, char *argv[])
 
 return 0 ;
 }
+
+/** @} */

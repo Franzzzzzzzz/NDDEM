@@ -1,3 +1,7 @@
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
+
 #ifndef CONTACTS
 #define CONTACTS
 
@@ -30,7 +34,7 @@ public:
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
-        static vector <double> loc (d, 0) ;
+        vector <double> loc (d, 0) ;
         loc=Xj ;
         u_int32_t gh=Contact.ghost, ghd=Contact.ghostdir ;
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
@@ -141,7 +145,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
   if (ovlp<=0) {Act.setzero(d) ; return ;}
-  Tools<d>::unitvec(cn, d, j) ;
+  Tools<d>::unitvec(cn, j) ;
   cn=cn*(-orient) ; // l give the orientation (+1 or -1)
 
   //Relative velocity at contact
@@ -185,3 +189,4 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
 }
 
 #endif
+/** @} */

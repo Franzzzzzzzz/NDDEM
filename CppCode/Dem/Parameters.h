@@ -1,6 +1,9 @@
 #ifndef PARAMETERS
 #define PARAMETERS
 
+/** \addtogroup DEM
+ *  @{ */
+
 #include <cstdlib>
 #include <cmath>
 #include <cstdio>
@@ -8,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <boost/variant.hpp>
 #include <experimental/filesystem>
 #include "Typedefs.h"
 #include "Xml.h"
@@ -42,7 +46,7 @@ public :
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
-        orientationtracking(true),
+        orientationtracking(false),
         wallforcecompute(false)
         {
          reset_ND(NN) ;
@@ -72,6 +76,7 @@ public :
     string Directory ;
     bool orientationtracking ;
     bool wallforcecompute ;
+    unsigned long int seed = 5489UL ; ///< Seems to be the default seed of the Mersenne twister in Boost
 
     map<float, string> events ;
 
@@ -100,6 +105,7 @@ public :
 // For Xml Writing
     XMLWriter * xmlout ;
 } ;
+/** @}*/
 
 /*****************************************************************************************************
  *                                                                                                   *
@@ -111,6 +117,7 @@ public :
  *                                                                                                   *
  * ***************************************************************************************************/
 
+/// Some Infos on set_boundaries
 template <int d>
 int Parameters<d>::set_boundaries()
 {
@@ -223,6 +230,182 @@ void Parameters<d>::check_events(float time, v2d & X, v2d & V, v2d & Omega)
 
 }
 //------------------------------------------------------
+std::istream& operator>>(std::istream& in, boost::variant<int&,double&,bool&> v)
+{
+  switch(v.which())
+  {
+    case 0: in >> boost::get<int&>(v) ; break ;
+    case 1: in >> boost::get<double&>(v); break ;
+    case 2: in >> boost::get<bool&>(v); break ;
+  }
+  return(in) ;}
+//------------------------------------------------------
+template <int d>
+void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
+{
+  map <string, boost::variant<int&,double&,bool&>> SetValueMap = {
+     {"Kn",Kn},
+     {"Kt",Kt},
+     {"GammaN",Gamman},
+     {"GammaT",Gammat},
+     {"rho",rho},
+     {"Mu",Mu},
+     {"T",T},
+     {"tdump",tdump},
+     {"orientationtracking",orientationtracking},
+     {"tinfo",tinfo},
+     {"dt",dt},
+     {"skin", skin}
+  } ;
+
+// Lambda definitions
+ auto discard_line = [&](){char line [5000] ; in.getline(line, 5000) ; } ;
+ auto read_event = [&](){float time ; char line [5000] ; in >> time ; in.getline (line, 5000) ; events.insert(make_pair(time,line)) ; printf("[INFO] Registering an event: %s\n", events.begin()->second.c_str()) ;} ;
+ auto doauto = [&]() { char line [5000] ; in>>line ;
+   if (!strcmp(line, "mass")) init_mass() ;
+   else if (!strcmp(line, "rho"))
+   {
+     rho= m[0]/Tools<d>::Volume(r[0]) ;
+     printf("[INFO] Using first particle mass to set rho: %g [M].[L]^-%d\n", rho, d) ;
+   }
+   else if (!strcmp(line, "inertia")) init_inertia() ;
+   else if (!strcmp(line, "location"))
+   {
+       in >> line ;
+       init_locations(line, X) ;
+       printf("[INFO] Set all particle locations\n") ;
+   }
+   else printf("[WARN] Unknown auto command in input script\n") ;
+   printf("[INFO] Doing an auto \n") ;
+   } ;
+ auto setvalue = [&]() { char line[5000] ; in >> line ;
+   try {
+     in >> SetValueMap.at(line) ;
+     if (!strcmp(line, "skin"))
+     {
+       if (skin<r[0])
+         {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; }
+       skinsqr=skin*skin ;
+     }
+   }
+   catch (const std::out_of_range & e) {
+     if (!strcmp(line, "dumps"))
+     {
+       string word ;
+       in>>word ;
+       ExportType dumpkind=ExportType::NONE ;
+       if (word=="CSV") dumpkind = ExportType::CSV ;
+       else if (word=="VTK") dumpkind = ExportType::VTK ;
+       else if (word=="NETCDFF") dumpkind = ExportType::NETCDFF ;
+       else if (word=="XML") dumpkind = ExportType::XML ;
+       else if (word=="XMLbase64") dumpkind = ExportType::XMLbase64 ;
+       else if (word=="CSVA") dumpkind = ExportType::CSVA ;
+       else if (word=="WALLFORCE") {wallforcecompute = true ; goto LABEL_leave ;} //Jumps at the end of the section
+       else {printf("Unknown dump type\n") ; }
+
+       { // New section so g++ doesn't complains about the goto ...
+       in>>word ;
+       if (word != "with") printf("ERR: expecting keyword 'with'\n") ;
+       int nbparam ;
+       ExportData dumplist = ExportData::NONE ;
+       in>>nbparam ;
+       for (int i=0 ; i<nbparam ; i++)
+       {
+         in>>word ;
+         if (word=="Position") dumplist |= ExportData::POSITION ;
+         else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
+         else if (word =="Omega") dumplist |= ExportData::OMEGA ;
+         else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
+         else if (word =="Orientation")
+         {
+           orientationtracking=true ;
+           dumplist |= ExportData::ORIENTATION ;
+         }
+         else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
+         else printf("Unknown asked data %s\n", word.c_str()) ;
+       }
+
+       dumps.push_back(make_pair(dumpkind,dumplist)) ;
+       }
+       LABEL_leave: ; // Goto label (I know, not beautiful, but makes sense here really)
+     }
+     else
+       printf("[ERROR] Unknown parameter to set\n") ;
+   }
+ } ; // END of the setvalue lambda
+
+// Function mapping
+ map<string, function<void()>> Lvl0 ;
+ Lvl0["event"] = read_event ;
+ Lvl0["CG"] = discard_line ; // Discard CoarseGraining functions in DEM
+ Lvl0["set"] = setvalue ;
+ Lvl0["auto"] = doauto ;
+
+ Lvl0["directory"] = [&](){in>>Directory ; if (! experimental::filesystem::exists(Directory)) experimental::filesystem::create_directory(Directory);};
+ Lvl0["dimensions"] = [&](){int nn; int dd ; in>>dd>>nn ; if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }} ;
+ Lvl0["location"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} printf("[INFO] Changing particle location.\n") ; } ;
+ Lvl0["velocity"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> V[id][i] ;} printf("[INFO] Changing particle velocity.\n") ; } ;
+ Lvl0["omega"]    = [&](){int id ; in>>id ; for (int i=0 ; i<d*(d-1)/2 ; i++) {in >> Omega[id][i] ;} printf("[INFO] Changing particle angular velocity.\n") ; } ;
+ Lvl0["freeze"]   = [&](){int id ; in>>id ; Frozen[id]=true ; printf("[INFO] Freezing particle.\n") ;} ;
+ Lvl0["radius"]   = [&](){int id ; double radius ; in>>id>>radius ; if(id==-1) r = v1d(N,radius) ; else r[id]=radius ; printf("[INFO] Set radius of particle.\n") ;} ;
+ Lvl0["mass"]     = [&](){int id ; double mass ;   in>>id>>mass   ; if(id==-1) m = v1d(N,mass  ) ; else r[id]=mass   ; printf("[INFO] Set mass of particle.\n") ;} ;
+ Lvl0["gravity"]  = [&](){for (int i=0 ; i<d ; i++) {in >> g[i] ;} printf("[INFO] Changing gravity.\n") ; } ;
+ Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
+    Tools<d>::setzero(g) ;
+    g[0] = -intensity * cos(angle / 180. * M_PI) ;
+    g[1] = intensity * sin(angle / 180. * M_PI) ;
+    printf("[INFO] Changing gravity angle in degree between x0 and x1.\n") ;
+    } ;
+ Lvl0["boundary"] = [&](){int id ; in>>id ; char line [5000] ; in>>line ;
+    if (!strcmp(line, "PBC")) Boundaries[id][3]=static_cast<int>(WallType::PBC) ;
+    else if (!strcmp(line, "WALL")) Boundaries[id][3]=static_cast<int>(WallType::WALL) ;
+    else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
+    else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
+    in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
+    Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
+    if (Boundaries[id][3]==static_cast<int>(WallType::MOVINGWALL))
+       {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ; }
+    printf("[INFO] Changing BC.\n") ;
+    } ;
+
+// Processing
+ string line ;
+ in>>line;
+ if (line[0]=='#') {discard_line() ; return  ;}
+ try {Lvl0.at(line)() ;}
+ catch (const std::out_of_range & e) { printf("LVL0 command unknown: %s\n", line.c_str()) ; discard_line() ; }
+
+}
+
+
+//================================================================================================================================================
+/*
+ else if (!strcmp(line, "auto"))
+ {
+   in>>line ;
+   if (!strcmp(line, "mass")) init_mass() ;
+   else if (!strcmp(line, "rho"))
+   {
+     rho= m[0]/Tools<d>::Volume(r[0]) ;
+     printf("[Input] Using first particle mass to set rho: %g [M].[L]^-%d\n", rho, d) ;
+   }
+   else if (!strcmp(line, "inertia")) init_inertia() ;
+   else if (!strcmp(line, "location"))
+   {
+       in >> line ;
+       init_locations(line, X) ;
+       printf("[Input] Set all particle locations\n") ;
+   }
+   else printf("[WARN] Unknown auto command in input script\n") ;
+   printf("[Input] Doing an auto \n") ;
+ }
+ else
+     printf("[Input] Unknown command in input file |%s|\n", line) ;
+
+*/
+
+
+/*
 template <int d>
 void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
 {
@@ -231,6 +414,7 @@ std::vector <double> x (d,0) ; std::vector <double> omeg (d*(d-1)/2,0) ;
 
 in>>line;
 if (line[0]=='#') {in.getline(line, 5000) ; return ; } // The line is a comments
+if (line[0]=='C' && line[1]=='G') {in.getline(line, 5000) ; return ; } //This is a coarse graining command, just keep going...
 
 if (!strcmp(line,"event"))
 {
@@ -331,6 +515,7 @@ else if (!strcmp(line, "set"))
  else if (!strcmp(line, "Mu")) in>>Mu ;
  else if (!strcmp(line, "T")) in>>T ;
  else if (!strcmp(line, "tdump")) in>>tdump ;
+ else if (!strcmp(line, "seed")) in>>seed ;
  else if (!strcmp(line, "orientationtracking")) in >> orientationtracking ;
  else if (!strcmp(line, "skin")) {in >> skin ; if (skin<r[0]) {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; } skinsqr=skin*skin ; }
  else if (!strcmp(line, "dumps"))
@@ -360,7 +545,11 @@ else if (!strcmp(line, "set"))
      else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
      else if (word =="Omega") dumplist |= ExportData::OMEGA ;
      else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
-     else if (word =="Orientation") dumplist |= ExportData::ORIENTATION ;
+     else if (word =="Orientation")
+     {
+       orientationtracking=true ;
+       dumplist |= ExportData::ORIENTATION ;
+     }
      else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
      else printf("Unknown asked data %s\n", word.c_str()) ;
    }
@@ -395,7 +584,7 @@ else if (!strcmp(line, "auto"))
   else printf("[WARN] Unknown auto command in input script\n") ;
   printf("[Input] Doing an auto \n") ;
 }
-else if (!strcmp(line, "directory"))
+else if (!strcmp(line, "directory")) ///< Some info
 {
   in>>Directory ;
   if (! experimental::filesystem::exists(line)) experimental::filesystem::create_directory(Directory);
@@ -403,9 +592,7 @@ else if (!strcmp(line, "directory"))
 else
     printf("[Input] Unknown command in input file |%s|\n", line) ;
 }
-
-
-
+*/
 //=====================================
 template <int d>
 void Parameters<d>::remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld)
@@ -451,7 +638,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "randomdrop"))
     {
-        boost::random::mt19937 rng;
+        boost::random::mt19937 rng(seed);
         boost::random::uniform_01<boost::mt19937> rand(rng) ;
 
         for (int i=0 ; i<N ; i++)
@@ -468,7 +655,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "roughinclineplane"))
     {
-      boost::random::mt19937 rng;
+      boost::random::mt19937 rng(seed);
       boost::random::uniform_01<boost::mt19937> rand(rng) ;
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
@@ -494,7 +681,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "roughinclineplane2"))
     {
-      boost::random::mt19937 rng;
+      boost::random::mt19937 rng(seed);
       boost::random::uniform_01<boost::mt19937> rand(rng) ;
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius

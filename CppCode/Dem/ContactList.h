@@ -1,3 +1,6 @@
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
 #include <vector>
 #include <list>
 #include "Typedefs.h"
@@ -33,7 +36,7 @@ public:
      tspr=c.tspr ;
      contactlength=c.contactlength ;
      infos=c.infos ;
-     return *this ; 
+     return *this ;
  }
  Action & getinfo () {return *infos ; }
  //void setinfo (Action & a) {if (!infos) infos = new Action ; *infos=a ; }
@@ -60,15 +63,15 @@ public:
  list <cp> v ;
  Action * default_action () {return (&def) ; }
  int cid=0 ;
- vector <double> deltamap ; 
- vector <u_int32_t> masking ; 
- vector <int> pbcdim ; 
+ vector <double> deltamap ;
+ vector <u_int32_t> masking ;
+ vector <int> pbcdim ;
 
  //void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
- void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; 
+ void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ;
  void check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
-                   int startd=0, double partialsum=0, bitdim mask=0) ; 
- void coordinance (v1d &Z) ; 
+                   int startd=0, double partialsum=0, bitdim mask=0) ;
+ void coordinance (v1d &Z) ;
 
 private:
  list<cp>::iterator it ;
@@ -111,26 +114,26 @@ int ContactList<d>::insert(const cp &a)
 
 //-----------------------------------Fastest version so far ...
 template <int d>
-void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp, 
+void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
                                  int startd, double partialsum, bitdim mask)
 {
-    double sum=partialsum ;  
+    double sum=partialsum ;
     for (int dd=startd ; sum<P.skinsqr && dd<d ; dd++, gst>>=1)
     {
-        sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ; 
+        sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ;
         if (gst & 1)
         {
             double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
             if (sumspawn<P.skinsqr)
-                check_ghost (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ; 
+                check_ghost (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
         }
-        partialsum = sum ; 
-    } 
+        partialsum = sum ;
+    }
     if (sum<P.skinsqr)
     {
         tmpcp.contactlength=sqrt(sum) ;
-        tmpcp.ghost=mask ; 
+        tmpcp.ghost=mask ;
         insert(tmpcp) ;
     }
 }
@@ -161,8 +164,9 @@ void ContactList<d>::coordinance (v1d &Z)
 {
   for (auto & w : v)
   {
-      Z[w.i]++ ; Z[w.j] ++ ; 
+      Z[w.i]++ ; Z[w.j] ++ ;
   }
 }
 
 #endif
+/** @} */

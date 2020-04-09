@@ -1,0 +1,47 @@
+# Incline plane flow
+directory Output_MuI_D7rev
+dimensions 7 34280
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 60
+boundary 1 PBC  0 5
+boundary 2 PBC  0 3.4
+boundary 3 PBC  0 3.4
+boundary 4 PBC  0 3.4
+boundary 5 PBC  0 3.4
+boundary 6 PBC  0 3.4
+auto location roughinclineplane
+
+gravity -1 0 0 0 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 2820
+set dt 0.0001
+set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 1 Orientation
+set tdump 10000
+event 20 gravityangle 10 35
+event 220 gravityangle 10 34
+event 420 gravityangle 10 33
+event 620 gravityangle 10 32
+event 820 gravityangle 10 31
+event 1020 gravityangle 10 30
+event 1220 gravityangle 10 29
+event 1420 gravityangle 10 28
+event 1620 gravityangle 10 27
+event 1820 gravityangle 10 26
+event 2020 gravityangle 10 25
+event 2220 gravityangle 10 24
+event 2420 gravityangle 10 23
+event 2620 gravityangle 10 22
+EOF

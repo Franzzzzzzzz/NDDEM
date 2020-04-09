@@ -1,19 +1,7 @@
 #include "IONDDEM.h"
 #include <boost/math/special_functions/factorials.hpp>
 
-struct Param {
-  string dump ;
-  int skipT ;
-  int maxT ;
-  double rho ;
-  vector <string> flags ;
-  vector <int> boxes ;
-  vector <vector <double> > boundaries ;
-  int pbc ;
-  vector<double> Delta ;
-  vector <double> radius ;
-  string save;
-} ;
+
 
 // Struct init
 struct Param P2 {
@@ -147,13 +135,14 @@ struct Param P3Channel {
 void dispvector (v2d &u) {for (auto v:u) {for (auto w:v) printf("%g ", w) ; printf("\n") ; } fflush(stdout) ; }
 void dispvector (v1d &u) {for (auto v:u) printf("%g ", v) ; printf("\n") ; fflush(stdout) ;}
 
-double Volume (int d , double R) ;
+
+
 double InertiaMomentum (int d, double R, double rho) ;
 
 //===================================================
 int main (int argc, char * argv[])
 {
-  struct Param * P  ;
+ struct Param * P  ;
  if (argc >= 2)
  {
          if (!strcmp("D2", argv[1])) P = &P2 ;
@@ -165,28 +154,32 @@ int main (int argc, char * argv[])
     else if (!strcmp("D5Thick", argv[1])) P = &P5T ;
     else if (!strcmp("D6Thick", argv[1])) P = &P6T;
     else if (!strcmp("MUID4", argv[1])) P = &MUID4 ;
-    else printf("Unknown") ;
+    else
+    {
+      printf("Assumes it's an input file\n") ;
+      P = new Param ;
+      P->from_file(argv[1]) ;
+      P->disp() ;
+    }
  }
  else
  {printf("Nothing to do.\n") ; std::exit(0); }
   //  P= &P3Channel ;
-
  //P.dump=argv[1] ;
 
  //struct Data D ;
  // Extract path (last slash) for saving
 
-  printf("A") ; fflush(stdout) ;
  int res, t ;
  XMLReader XML(P->dump) ;
  int d=atoi(XML.tags.second["dimensions"].c_str()) ;
- XML.read_boundaries(P->boundaries) ;
- P->boundaries[1][0] = 20 ;
+ auto rien = P->boundaries ;
+ XML.read_boundaries(rien) ;
+ //P->boundaries[1][0] = 20 ;
  dispvector(P->boundaries) ;
  XML.read_radius (P->radius) ;
  int N = P->radius.size() ;
 
-  printf("B") ; fflush(stdout) ;
  vector <double> mass, Imom ;
 
  for (int i=0 ; i<N ; i++)
@@ -195,23 +188,17 @@ int main (int argc, char * argv[])
      Imom.push_back(InertiaMomentum(d,P->radius[i],P->rho)) ;
  }
 
- printf("C") ; fflush(stdout) ;
  Coarsing C(d, P->boxes, P->boundaries, P->maxT-P->skipT) ;
 
-  printf("D") ; fflush(stdout) ;
- C.setWindow<Windows::LibLucyND_Periodic>(1, P->pbc, P->boxes, P->Delta) ;
+ C.setWindow<Windows::LibLucyND_Periodic>(P->windowsize, P->cuttoff, P->pbc, P->boxes, P->Delta) ;
 
-  printf("D") ; fflush(stdout) ;
  C.set_flags(P->flags) ;
  C.grid_setfields() ;
- printf("E") ; fflush(stdout) ;
  auto Bounds = C.get_bounds() ;
  C.cT=-1 ;
  C.data.N=P->radius.size() ;
  C.data.mass = mass.data() ;
  C.data.Imom = Imom.data() ;
-
-printf("E") ; fflush(stdout) ;
 
  vector <string> names ; vector<vector<vector<double>>> data ;
  for (int t=0 ; t<P->maxT ; t++)
@@ -236,13 +223,13 @@ printf("E") ; fflush(stdout) ;
 
   //C.data.periodic_atoms (d, Bounds, P->pbc, P->Delta, false) ;
   C.pass_1() ;
-  C.data.clean_periodic_atoms() ;
+  //C.data.clean_periodic_atoms() ;
   //C.compute_fluc_vel() ;
   //C.compute_fluc_rot() ;
   //C.pass_2() ;
   //C.pass_3() ;
 
- printf("%d \n", t) ; fflush(stdout) ;
+ printf("%d \r", t) ; fflush(stdout) ;
  }
 
  //C.mean_time() ;
@@ -270,16 +257,7 @@ vector <double *> pospq, lpq, fpq, mpq, mqp ;
 
 }
 //==============================================
-double Volume (int d, double R)
-{
-  if (d%2==0)
-    return (pow(boost::math::double_constants::pi,d/2)*pow(R,d)/( boost::math::factorial<double>(d/2) )) ;
-  else
-  {
-   int k=(d-1)/2 ;
-   return(2* boost::math::factorial<double>(k) * pow(4*boost::math::double_constants::pi, k) *pow(R,d) / (boost::math::factorial<double>(d))) ;
-  }
-}
+
 #define MAXDEFDIM 30
 //----------------------------------------
 double InertiaMomentum (int d , double R, double rho)

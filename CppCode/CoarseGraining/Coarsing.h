@@ -3,6 +3,9 @@
 #include <vector>
 #include "Typedefs.h"
 #include <boost/random.hpp>
+#include <fstream>
+#include <experimental/filesystem>
+#include <boost/math/special_functions/factorials.hpp>
 
 #ifdef NETCDF
 #include <netcdf.h>
@@ -17,6 +20,8 @@
 #endif
 
 using namespace std ;
+
+double Volume (int d , double R) ;
 
 //=========================================================
 /// Coarse graining point
@@ -79,19 +84,15 @@ public :
         dx.resize(d, 0) ;
         for (int i=0 ; i<d ; i++)
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
-
+        printf("{%g %g %g %g}", dx[0], dx[1], dx[2], dx[3]) ; 
         double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
         //for (int i=0 ; i<d ; i++)
         // printf("%d %d %g %g %g|", d, npt[i], box[1][i], box[0][i], dx[i]) ; fflush(stdout) ;
-        printf("R") ; fflush(stdout) ;
         grid_generate() ;
-        printf("Q") ; fflush(stdout) ;
         grid_neighbour() ;
-        printf("K") ; fflush(stdout) ;
         set_field_struct() ;
-        printf("L") ; fflush(stdout) ;
         Window = new LibLucy3D( &data, w, d) ;
     }
 
@@ -120,7 +121,7 @@ public :
     int set_field_struct() ; //< Set the FIELDS structure, with all the different CG properties that can be computed.
     template <Windows W> int setWindow () ;
     template <Windows W> int setWindow (double w) ;
-    template <Windows W> int setWindow (double w, int per, vector<int> boxes, vector<double> deltas) ; 
+    template <Windows W> int setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas) ;
     int grid_generate() ;
     int grid_neighbour() ;
     int grid_setfields() ;
@@ -170,22 +171,22 @@ int Coarsing::setWindow ()
 template <Windows W>
 int Coarsing::setWindow (double w)
 {
-  static_assert(W != Windows::LibLucyND_Periodic) ; 
+  static_assert(W != Windows::LibLucyND_Periodic) ;
   cutoff=2.5*w ; //TODO
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
   switch (W) {
       case Windows::LibRect3D :
         Window=new LibRect3D () ;
-        break ; 
+        break ;
       case Windows::LibLucy3D :
         Window=new LibLucy3D (&data, w, d) ;
-        break ; 
+        break ;
       case Windows::LibRectND :
         Window=new LibRectND (&data, w, d) ;
-        break ; 
+        break ;
       case Windows::LibLucyND :
         Window=new LibLucyND (&data, w, d) ;
-        break ; 
+        break ;
       default:
         printf("Unknown window, check Coarsing::setWindow") ;
   }
@@ -193,10 +194,11 @@ int Coarsing::setWindow (double w)
 }
 //-------------------------------------------------------
 template <Windows W>
-int Coarsing::setWindow (double w, int per, vector<int> boxes, vector<double> deltas)
+int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas)
 {
-  static_assert(W == Windows::LibLucyND_Periodic) ; 
-  cutoff=2.5*w ; //TODO
+  static_assert(W == Windows::LibLucyND_Periodic) ;
+  //cutoff=2.5*w ; //TODO
+  cutoff = cuttoff ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
 
   Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
@@ -205,13 +207,50 @@ return 0 ;
 
 
 
+//==========================================================
+struct Param {
+  string dump ;
+  int skipT ;
+  int maxT ;
+  double rho ;
+  vector <string> flags ;
+  vector <int> boxes ;
+  vector <vector <double> > boundaries ;
+  int pbc = 0 ;
+  vector<double> Delta ;
+  vector <double> radius ;
+  string save = "CoarseGrained";
+  double windowsize = 1 ;
+  double cuttoff = 2.5 ;
 
+  void from_file(char path[])
+  {
+    ifstream in ;
 
+    in.open(path) ;
+    if (!in.is_open()) { printf("[Input] file cannot be open\n"); return ;}
 
-
-
-
-
-
-
-
+    while (! in.eof())
+      parsing(in) ;
+  }
+  void disp()
+  {
+    auto pbcprint = [](int a) {string s ="" ; for (;a>0; a>>=1) s = ((a&1)?"y":"n") + s ; return s ;} ;
+    printf("\n-----\n%s\nSkipping: %d\nFinal time: %d\nDensity: %g\nFlags: ", dump.c_str(), skipT, maxT, rho) ;
+    for (auto v: flags) printf("%s ", v.c_str()) ;
+    printf("\nBoxes: ") ;
+    for (auto v: boxes) printf("%d ", v) ;
+    printf("\nPBCs: %s\nWindowSize: %g\nCut-off: %g\nDeltas: ", pbcprint(pbc).c_str(), windowsize, cuttoff) ;
+    for (auto v: Delta) printf("%g ", v) ;
+    printf("\nBoundaries:") ;
+    for (auto v:boundaries)
+    {
+      printf("\n") ;
+      for (auto w:v)
+        printf("%g ", w);
+    }
+    printf("\n-----\n\n") ; fflush(stdout) ;
+  }
+private:
+  int parsing (istream & in) ;
+} ;

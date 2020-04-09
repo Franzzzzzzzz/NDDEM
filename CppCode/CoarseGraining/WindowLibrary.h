@@ -1,5 +1,5 @@
 
-enum class Windows {LibRect3D, LibLucy3D, LibRectND, LibLucyND, LibLucyND_Periodic} ; 
+enum class Windows {LibRect3D, LibLucy3D, LibRectND, LibLucyND, LibLucyND_Periodic} ;
 
 class LibBase {
 public:
@@ -61,12 +61,12 @@ class LibLucyND_Periodic : public LibLucyND
   {
     maskperiodic = 0 ;
     for (int i =0 ; i<boxes.size() ; i++)
-      if ((periodic&(1<<i)) && boxes[i]==0)
+      if ((periodic&(1<<i)) && boxes[i]==1)
       {
         maskperiodic |= (1<<i) ;
-        scale /= deltas[i] ; 
+        scale /= deltas[i] ;
       }
-    printf("NB: do not use periodic_atoms with LibLucyND_Periodic!\n") ; 
+    printf("NB: do not use periodic_atoms with LibLucyND_Periodic!\n") ;
   }
 
   double distance (int id, v1d loc)
@@ -80,4 +80,3 @@ class LibLucyND_Periodic : public LibLucyND
 
   int maskperiodic ;
 };
-

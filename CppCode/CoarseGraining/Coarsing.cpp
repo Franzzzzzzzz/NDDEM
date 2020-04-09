@@ -259,7 +259,7 @@ struct Field * Coarsing::get_field(string nm)
 //===================================================
 int Coarsing::compute_fluc_vel ()
 {
-  printf("Starting vel fluctuation computation [d=%d]\n", d) ; fflush(stdout) ;
+  printf("Starting vel fluctuation computation [d=%d]\r", d) ; fflush(stdout) ;
   v1d vavg (d,0) ;
   data.vel_fluc.resize(d, std::vector <double> (data.N, 0.0)) ;
 
@@ -277,7 +277,7 @@ int Coarsing::compute_fluc_vel ()
 }
 int Coarsing::compute_fluc_rot ()
 {
-  printf("Starting rot fluctuation computation\n") ; fflush(stdout) ;
+  printf("Starting rot fluctuation computation\r") ; fflush(stdout) ;
   v1d omegaavg (d,0) ;
   data.rot_fluc.resize(d, v1d (data.N, 0)) ;
   int idrot=get_id("ROT") ;
@@ -316,9 +316,10 @@ int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;}
 int Iid = get_id("I") ; if (Iid<0) doI=false ;
 int velid=get_id("VAVG"); if (velid<0)  dovel=false ;
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
-printf("Starting pass 1...\n") ; fflush(stdout) ;
+//printf("Starting pass 1...\r") ; fflush(stdout) ;
 
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
+vector<double> totweight(data.N,0) ;
 
 for (i=0 ; i<data.N ; i++)
 {
@@ -330,6 +331,7 @@ for (i=0 ; i<data.N ; i++)
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
      wp=Window->window(Window->distance(i,CGP[*j].location)) ;
+     totweight[i]+=wp ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
      CGP[*j].phi += wp ;
@@ -347,11 +349,16 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 
+int nbzero = 0 ;
+for (auto v : totweight)
+  if (v==0) nbzero++ ;
+printf("%d \n", nbzero) ;fflush(stdout) ;
+
 // Intermediate pass (cg points)
 bool doEKT=true, doEKR=true ;
 int EKTid=get_id("EKT") ; if (EKTid<0) doEKT=false ;
 int EKRid=get_id("EKR") ; if (EKRid<0) doEKR=false ;
-printf("Starting intermediate pass 1...\n") ; fflush(stdout) ;
+//printf("Starting intermediate pass 1...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double rho, Imom ;
@@ -387,7 +394,7 @@ int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ;
 int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ;
 int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;
 int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;
-printf("Starting pass 2...\n") ; fflush(stdout) ;
+printf("Starting pass 2...\r") ; fflush(stdout) ;
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -419,7 +426,7 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 // Intermediate pass (cg points): devide by rho when needed
-printf("Starting intermediate 2...\n") ; fflush(stdout) ;
+printf("Starting intermediate 2...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double tworho ;
@@ -446,7 +453,7 @@ int mCid=get_id("mC") ; if (mCid<0) domC=false ;
 int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ;
 int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ;
 double sum=0 ; int p, q, id ; double rp, rq ; double wpqs, wpqf ;
-printf("Starting pass 3...\n") ; fflush(stdout) ;
+printf("Starting pass 3...\r") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
@@ -508,7 +515,7 @@ for (i=0 ; i<data.Ncf ; i++)
 }
 
 //Last intermediate pass
-printf("Starting intermediate pass 3...\n") ; fflush(stdout) ;
+printf("Starting intermediate pass 3...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
@@ -1047,4 +1054,144 @@ CGPoint * Coarsing::reverseloop (string type)
   }
 
 return NULL ;
+}
+
+//==============================================================================
+double Volume (int d, double R)
+{
+  if (d%2==0)
+    return (pow(boost::math::double_constants::pi,d/2)*pow(R,d)/( boost::math::factorial<double>(d/2) )) ;
+  else
+  {
+   int k=(d-1)/2 ;
+   return(2* boost::math::factorial<double>(k) * pow(4*boost::math::double_constants::pi, k) *pow(R,d) / (boost::math::factorial<double>(d))) ;
+  }
+}
+//--------------------------------------------
+int Param::parsing (istream & in)
+{
+  char line[5000] ; int id ; int rien, dimension ; double mass, radius ;
+
+  in>>line;
+  if (line[0]=='#') {in.getline(line, 5000) ; return 0; } // The line is a comments
+
+  if (!strcmp(line, "directory"))
+  {
+    in>>dump ;
+    save = dump + "/" + save ;
+    dump += "/dump.xml" ;
+    if (! experimental::filesystem::exists(dump))
+    {
+      printf("[ERR] file do not exist: %s\n", dump.c_str());
+    }
+  }
+  else if (!strcmp(line, "dimensions"))
+  {
+    in >> dimension ; in >> rien ;
+    Delta.resize(dimension, 0) ;
+    boxes.resize(dimension, 0) ;
+    boundaries.resize(2, vector<double> (dimension, 0)) ;
+  }
+  else if (!strcmp(line, "boundary"))
+  {
+    int walldim ; char type[50] ; double dmin, dmax ;
+    in >> walldim ; in >> type ; in>>dmin ; in >> dmax ;
+    boundaries[0][walldim]= dmin ;
+    boundaries[1][walldim]= dmax ;
+    if (!strcmp(type, "PBC"))
+    {
+      pbc |= (1<<walldim) ;
+      Delta[walldim] = dmax-dmin ;
+    }
+    else {} // Other types do not matter
+  }
+  else if (!strcmp(line, "gravity")) {in.getline(line, 5000) ; return 1; }
+  else if (!strcmp(line, "set"))
+  {
+    in >> line ;
+    if (!strcmp(line, "rho")) in >> rho ;
+    else if (!strcmp(line, "Kn")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "Kt")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "GammaN")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "GammaT")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "Mu")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "T")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "tdump")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "orientationtracking")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "skin")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "dumps")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "tinfo")) {in.getline(line, 5000) ; return 1;}
+    else if (!strcmp(line, "dt")) {in.getline(line, 5000) ; return 1;}
+  }
+  else if (!strcmp(line, "radius"))
+  {
+    int id ; double value ;
+    in >> id ; in>>value ;
+    if (id==-1 || id ==0) radius=value ;
+  }
+  else if (!strcmp(line, "mass"))
+  {
+    int id ; double value ;
+    in >> id ; in>>value ;
+    if (id==-1 || id ==0) mass=value ;
+  }
+  else if (!strcmp(line, "auto"))
+  {
+    in >> line ;
+    if (!strcmp(line, "rho"))
+    {
+      rho  = mass / Volume(dimension, radius) ;
+    }
+    else if (!strcmp(line, "location")) {in.getline(line, 5000) ; return 1; } // Do not matter
+    else if (!strcmp(line, "inertia")) {in.getline(line, 5000) ; return 1 ; } // Do not matter
+    else if (!strcmp(line, "mass")) {in.getline(line, 5000) ; return 1 ; } // Do not matter
+  }
+  else if (!strcmp(line, "CG"))
+  {
+    in>>line ;
+    if (!strcmp(line, "skiptime")) in >> skipT ;
+    else if (!strcmp(line, "maxtime")) in >> maxT ;
+    else if (!strcmp(line, "flags"))
+    {
+      int nb ; in >> nb ;
+      for (int i=0 ; i<nb ; i++)
+      {
+        in >> line ;
+        flags.push_back(line) ;
+      }
+    }
+    else if (!strcmp(line, "boxes"))
+      for (auto &v : boxes)
+        in>>v ;
+    else if (!strcmp(line, "bound"))
+    {
+      int dim ; double bmin, bmax ;
+      in>>dim >> bmin >> bmax ;
+      boundaries[0][dim] = bmin ;
+      boundaries[1][dim] = bmax ;
+    }
+    else if (!strcmp(line, "radius"))
+    {} // TODO
+    else if (!strcmp(line, "windowsize"))
+    {
+      in >> windowsize ;
+      cuttoff = 2*windowsize ;
+    }
+    else if (!strcmp(line, "cutoff"))
+    {
+      in >> cuttoff ;
+    }
+    else
+      printf("[Input] Unknown command in input file |CG %s|\n", line) ;
+  }
+  else if (!strcmp(line, "location")){in.getline(line, 5000) ;  return 1 ; }
+  else if (!strcmp(line, "velocity")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "omega")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "freeze")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "gravity")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line, "gravityangle")){in.getline(line, 5000) ; return 1 ; }
+  else if (!strcmp(line,"event")) {in.getline(line, 5000) ; return 1 ; }
+  else
+      printf("[Input] Unknown command in input file |%s|\n", line) ;
+return 0 ;
 }
