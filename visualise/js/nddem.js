@@ -40,7 +40,7 @@ if ( typeof window.pinky !== 'undefined' ) { var pinky = parseInt(window.pinky) 
 else { var pinky = 100}; // which particle to catch in catch_particle mode
 var fname = window.fname; // which folder to load data from
 if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
-var lut = new THREE.Lut( "cooltowarm", 512 ); // options are rainbow, cooltowarm and blackbody
+var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material; // material used for arrows to show dimensions
 if ( typeof window.cache !== 'undefined' ) { var cache = window.cache == 'true' } // should we use cached data or not
 else { var cache = false; };
@@ -818,17 +818,22 @@ function make_axes() {
 
     if (ref_dim.c != ref_dim.x) {
         ref_dim.x = ref_dim.c;
-        if (ref_dim.c < N - 1) { ref_dim.y = ref_dim.c + 1; }
-        else { ref_dim.y = ref_dim.c + 1 - N; }
-        if (ref_dim.c < N - 2) { ref_dim.z = ref_dim.c + 2; }
-        else { ref_dim.z = ref_dim.c + 2 - N; }
-
+        if ( N > 3 ) {
+            if (ref_dim.c < N - 1) { ref_dim.y = ref_dim.c + 1; }
+            else { ref_dim.y = ref_dim.c + 1 - N; }
+            if (ref_dim.c < N - 2) { ref_dim.z = ref_dim.c + 2; }
+            else { ref_dim.z = ref_dim.c + 2 - N; }
+        }
+        else {
+            ref_dim.y = ref_dim.c + 1; ref_dim.z = ref_dim.c + 2;
+        }
         if (axesLabels.children.length > 0 ) {
             for( var i = axesLabels.children.length - 1; i >= 0; i--) {
                 obj = axesLabels.children[i];
                 axesLabels.remove(obj);
             }
         }
+        console.log(ref_dim)
         var loader = new THREE.FontLoader();
     	loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
     		var textGeo_x = new THREE.TextBufferGeometry( "x" + ref_dim.x, { font: font, size: fontsize, height: fontsize/5., } );

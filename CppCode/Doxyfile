@@ -23,8 +23,8 @@
 # built into libc) for the transcoding. See
 # https://www.gnu.org/software/libiconv/ for the list of possible encodings.
 # The default value is: UTF-8.
-OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/doc_doxygen/
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/Dem @CMAKE_CURRENT_SOURCE_DIR@/Texturing @CMAKE_CURRENT_SOURCE_DIR@/CoarseGraining
+OUTPUT_DIRECTORY       = /Users/benjymarks/github/NDDEM/CppCode/doc_doxygen/
+INPUT                  = /Users/benjymarks/github/NDDEM/CppCode/Dem /Users/benjymarks/github/NDDEM/CppCode/Texturing /Users/benjymarks/github/NDDEM/CppCode/CoarseGraining
 
 DOXYFILE_ENCODING      = UTF-8
 
