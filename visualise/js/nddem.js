@@ -1079,7 +1079,7 @@ function add_torus() {
         // wristband1.position.set(      2.5,-3*R,  0.5);
         wristband1.rotation.set(0.,0.,Math.PI);
         // wristband1_phi.position.set(  2.5,-3*R,  0.5);
-        wristband1_theta.position.set(0,R,);
+        wristband1_theta.position.set(0,R,0);
 
         wristband1_parent.add( wristband1 );
         wristband1_parent.add( wristband1_phi );
