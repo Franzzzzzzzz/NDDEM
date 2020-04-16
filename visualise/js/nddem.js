@@ -1073,26 +1073,19 @@ function add_torus() {
         controller1.add( wristband1_theta );
     }
     else {
-        wristband1_parent = new THREE.Object3D();
-        scene.add(wristband1_parent);
+        controller1 = new THREE.Object3D();
+        scene.add(controller1);
 
-        // wristband1.position.set(      2.5,-3*R,  0.5);
         wristband1.rotation.set(0.,0.,Math.PI);
-        // wristband1_phi.position.set(  2.5,-3*R,  0.5);
         wristband1_theta.position.set(0,R,0);
 
-        wristband1_parent.add( wristband1 );
-        wristband1_parent.add( wristband1_phi );
-        wristband1_parent.add( wristband1_theta );
-        wristband1_parent.position.set(2.5,-3*R,0.5);
+        controller1.add( wristband1 );
+        controller1.add( wristband1_phi );
+        controller1.add( wristband1_theta );
+        controller1.position.set(2.5,-3*R,0.5);
     }
 
-    if ( window.rotate_torus !== undefined ) {
-        // console.log('hi')
-        // console.log(wristband1.rotation)
-        wristband1_parent.rotation.x += window.rotate_torus/180*Math.PI;
-        // console.log(wristband1.rotation)
-    }
+    if ( window.rotate_torus !== undefined ) { controller1.rotation.x += window.rotate_torus/180*Math.PI; }
 
 
     if ( N > 5 ) {
