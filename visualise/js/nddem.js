@@ -1088,10 +1088,10 @@ function add_torus() {
     }
 
     if ( window.rotate_torus !== undefined ) {
-        console.log('hi')
-        console.log(wristband1.rotation)
+        // console.log('hi')
+        // console.log(wristband1.rotation)
         wristband1_parent.rotation.x += window.rotate_torus/180*Math.PI;
-        console.log(wristband1.rotation)
+        // console.log(wristband1.rotation)
     }
 
 
