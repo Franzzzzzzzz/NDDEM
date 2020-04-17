@@ -32,11 +32,17 @@
 		}
 
         var root_dir = 'http://localhost:54321/';
+        var data_dir = root_dir;
         if ( window.location.hostname.includes('benjymarks') ) {
-            root_dir = 'http://www.benjymarks.com/nddem/';
+            root_dir = window.location.href;
+            data_dir = root_dir;
             cache = true;
         }
-        else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache = true; }
+        else if ( window.location.hostname.includes('github') ) {
+            root_dir = 'https://franzzzzzzzz.github.io/NDDEM/';
+            data_dir = 'https://www.benjymarks.com/nddem/';
+            cache=true;
+        }
 
 		var container,
 			renderer,
@@ -111,7 +117,7 @@
 
 			// Load the data ...
 			new THREE.NRRDLoader()
-                .load( root_dir + fname, function ( volume ) {
+                .load( data_dir + fname, function ( volume ) {
                 time = {'min':0,'max':1,'cur':0,'rate':0.5,'play':false,'c':0}; // c is which component to show
                 time.max = volume.time;
                 time.nc = volume.dimensions[0]*volume.dimensions[1];
