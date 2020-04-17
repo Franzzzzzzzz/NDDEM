@@ -3,10 +3,6 @@ AKA Most Useless DEM.
 
 This git repository contains the code for discrete element numerical modelling of granular material in a general number of spatial dimensions. The Dropbox folder for the code **should not** be used anymore.  
 
-## Support
-Installation instructions and documentation for the whole project is [available here](https://franzzzzzzzz.github.io/NDDEM/).
-<!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
-
 ## Structure
 The code is split into different modules, with different purposes. The main modules are:
 - CppCode: `cpp` Main DEM simulation *@Franzzzzzzzz*
@@ -14,6 +10,14 @@ The code is split into different modules, with different purposes. The main modu
 - CoarseGrainingCode: `cpp` Multi-dimensional coarse-graining code. Some parts are still triggered only for 3D.
 - Liggghts: `lmp` Used for comparison of the NDDEM with existing DEM code in 3D, ie. Liggghts.
 - PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
+
+## Support
+Installation instructions and documentation is split between each of the modules, and can be found here:
+ - [NDDEM]()
+ - [Texturing]()
+ - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/docs/visualise/index.html)
+<!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
+
 
 ## Contributing
 If you would like to contribute to the code, please contact francois.guillard [at] sydney.edu.au. For feature requests, please use the issue tracker above.
