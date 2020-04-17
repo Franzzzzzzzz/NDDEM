@@ -56,13 +56,13 @@ if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.
 var root_dir = 'http://localhost:54321/';
 var data_dir = root_dir;
 if ( window.location.hostname.includes('benjymarks') ) {
-    root_dir = 'http://www.benjymarks.com/nddem/';
+    root_dir = window.location.href;
     data_dir = root_dir;
     cache = true;
 }
 else if ( window.location.hostname.includes('github') ) {
     root_dir = 'https://franzzzzzzzz.github.io/NDDEM/';
-    data_dir = 'http://www.benjymarks.com/nddem/';
+    data_dir = 'https://www.benjymarks.com/nddem/';
     cache=true; }
 
 
