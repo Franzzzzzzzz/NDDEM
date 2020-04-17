@@ -3,7 +3,9 @@ AKA Most Useless DEM.
 
 This git repository contains the code for discrete element numerical modelling of granular material in a general number of spatial dimensions. The Dropbox folder for the code **should not** be used anymore.  
 
-Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS).
+## Support
+Installation instructions and documentation for the whole project is [available here](https://franzzzzzzzz.github.io/NDDEM/).
+<!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
 
 The code is split in different modules, with different purposes. Some of the important folders are given there:
 - CppCode: `cpp` Main DEM simulation *@Franzzzzzzzz*
@@ -13,7 +15,7 @@ The code is split in different modules, with different purposes. Some of the imp
 - PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
 
 ## Contributing
-If you would like to contribute to the code, please contact francois.guillard [at] sydney.edu.au.
+If you would like to contribute to the code, please contact francois.guillard [at] sydney.edu.au. For feature requests, please use the issue tracker above.
 
 ## License
 This project is licensed under the GNU GPL License - see the LICENSE file for details
