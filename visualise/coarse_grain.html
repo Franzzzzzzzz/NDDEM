@@ -30,6 +30,13 @@
 		if ( WEBGL.isWebGL2Available() === false ) {
 			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
 		}
+
+        var root_dir = 'http://localhost:54321/';
+        if ( window.location.hostname.includes('benjymarks') ) {
+            root_dir = 'http://www.benjymarks.com/nddem/';
+            cache = true;
+        }
+
 		var container,
 			renderer,
 			scene,
@@ -52,11 +59,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         // fname = "Samples/D3/CoarsedRHO.nrrd"
          // fname = "Samples/D3/CoarsedVAVG.nrrd"
-        fname = "Samples/ColormapD5.nrrd"
+        // fname = "Samples/ColormapD4_large.nrrd"
         // fname = "Samples/Colormap_fake.nrrd"
         // fname = "Samples/4D_fake.nrrd"
         // fname = "CppCode/CoarseGraining/CoarsedVAVG.nrrd"
         // fname = "CppCode/CoarseGraining/CoarsedRHO.nrrd"
+        fname = "Samples/ColormapD5.nrrd"
 
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
 		init();
@@ -99,7 +107,7 @@
 
 			// Load the data ...
 			new THREE.NRRDLoader()
-                .load( "http://localhost:54321/" + fname, function ( volume ) {
+                .load( root_dir + fname, function ( volume ) {
                 time = {'min':0,'max':1,'cur':0,'rate':0.5,'play':false,'c':0}; // c is which component to show
                 time.max = volume.time;
                 time.nc = volume.dimensions[0]*volume.dimensions[1];
@@ -165,9 +173,9 @@
 				texture.needsUpdate = true;
 				// Colormap textures
 				cmtextures = {
-                    inferno: new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/cm_inferno.png', render ),
-                    viridis: new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/cm_viridis.png', render ),
-					gray: new THREE.TextureLoader().load( 'http://localhost:54321/visualise/resources/cm_gray.png', render )
+                    inferno: new THREE.TextureLoader().load( root_dir + 'visualise/resources/cm_inferno.png', render ),
+                    viridis: new THREE.TextureLoader().load( root_dir + 'visualise/resources/cm_viridis.png', render ),
+					gray: new THREE.TextureLoader().load( root_dir + 'visualise/resources/cm_gray.png', render )
 				};
 				// Material
                 if ( volume.RGB ) { var shader = THREE.VolumeRenderShaderRGB; }
