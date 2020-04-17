@@ -32,5 +32,5 @@ As we can't render the textures needed to do this without a computer, below is a
 <video style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" controls><source src="https://www.benjymarks.com/nddem/videos/RenderMultiD.mp4"></video>
 
 
-### Trying out VR
+### Trying out VR (this will look blank if you don't have a VR headset attached)
 <iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/vr-menu.html"></iframe>
