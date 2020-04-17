@@ -10,11 +10,11 @@
 		</style>
 	</head>
 	<body>
-		<script src="node_modules/three/build/three.js"></script>
-        <script src="node_modules/three/examples/js/WebGL.js"></script>
-        <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
-        <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
-        <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+		<script src="../node_modules/three/build/three.js"></script>
+        <script src="../node_modules/three/examples/js/WebGL.js"></script>
+        <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script>
+        <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
+        <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <script>
 
         function update_texture(t) {
@@ -23,7 +23,7 @@
             }
         };
 
-        var fname = "visualise/resources/earth2d.jpg";
+        var fname = "visualise/resources/earthmap.jpg";
 
         const urlParams = new URLSearchParams(window.location.search);
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
@@ -63,8 +63,6 @@
                 sphere.position.x = 4
                 rect.position.x = 0
                 rect.scale.set(4,2,1);
-                rect.rotation.z = Math.PI;
-                sphere.rotation.z = Math.PI;
                 sphere.rotation.y = Math.PI/2.;
 
                 scene.add( sphere );

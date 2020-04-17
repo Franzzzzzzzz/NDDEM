@@ -14,17 +14,17 @@
 </head>
 
 <body>
-	<script src="node_modules/three/build/three.js"></script>
+	<script src="../node_modules/three/build/three.js"></script>
 
-	<script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
+	<script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
 
-	<script src="node_modules/three/examples/js/Volume.js"></script>
-	<script src="js/NRRDLoader.js"></script> <!-- CUSTOM VERSION -->
-	<script src="node_modules/three/examples/js/shaders/VolumeShader.js"></script>
+	<script src="../node_modules/three/examples/js/Volume.js"></script>
+	<script src="../js/NRRDLoader.js"></script> <!-- CUSTOM VERSION -->
+	<script src="../node_modules/three/examples/js/shaders/VolumeShader.js"></script>
 
-	<script src="node_modules/three/examples/js/WebGL.js"></script>
-	<script src="node_modules/three/examples/js/libs/gunzip.min.js"></script>
-	<script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+	<script src="../node_modules/three/examples/js/WebGL.js"></script>
+	<script src="../node_modules/three/examples/js/libs/gunzip.min.js"></script>
+	<script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
 
 	<script>
 		if ( WEBGL.isWebGL2Available() === false ) {
@@ -46,9 +46,9 @@
             rgb,
             nx,ny,nz;
 
-        // fname = "Samples/D3/CoarsedRHO.nrrd"
+        fname = "Samples/D3/CoarsedRHO.nrrd"
         // fname = "Samples/D3/CoarsedVAVG.nrrd"
-        fname = "Samples/Colormap.nrrd"
+        // fname = "Samples/Colormaps/Colormap.nrrd"
 		init();
 		function init() {
 			scene = new THREE.Scene();
@@ -79,8 +79,8 @@
 
 
 			new THREE.NRRDLoader()
-                // .load( "http://localhost:8000/visualise/resources/stent.nrrd", function ( volume ) {
-                .load( "http://localhost:8000/" + fname, function ( volume ) {
+                // .load( "http://localhost:54321/visualise/resources/stent.nrrd", function ( volume ) {
+                .load( "http://localhost:54321/" + fname, function ( volume ) {
                 // Get correct slice of current data
 
                 nx = volume.dimensions[1];
