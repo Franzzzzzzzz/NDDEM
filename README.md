@@ -7,7 +7,8 @@ This git repository contains the code for discrete element numerical modelling o
 Installation instructions and documentation for the whole project is [available here](https://franzzzzzzzz.github.io/NDDEM/).
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
 
-The code is split in different modules, with different purposes. Some of the important folders are given there:
+## Structure
+The code is split into different modules, with different purposes. The main modules are:
 - CppCode: `cpp` Main DEM simulation *@Franzzzzzzzz*
 - visualise: `html+js` VR visualisation module of NDDEM *@benjym*
 - CoarseGrainingCode: `cpp` Multi-dimensional coarse-graining code. Some parts are still triggered only for 3D.
