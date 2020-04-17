@@ -1,5 +1,6 @@
 .DS_Store
 *.o
+*.exe
 node_modules/
 CppCode/Dem/DEMND
 CppCode/Dem/xml2vtk
