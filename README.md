@@ -18,6 +18,7 @@ If you would like to contribute to the code, please contact francois.guillard [a
 ## License
 This project is licensed under the GNU GPL License - see the LICENSE file for details
 
+## Contact details
 For help or questions, please contact francois.guillard [at] sydney.edu.au.
 
-Edited 13/12/2018.
+Edited 17/04/2020.
