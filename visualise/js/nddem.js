@@ -202,6 +202,9 @@ function build_world() {
     //if ( display_type === 'VR' ) { add_vive_models(); }
 }
 
+/**
+* Get the current orientation of the left hand controller and set world coordinates appropriately
+*/
 function update_higher_dims_left() {
     controller1.getWorldQuaternion(left_hand.current_direction);
     left_hand.diff = left_hand.current_direction.inverse().multiply(left_hand.previous_direction);
@@ -224,6 +227,9 @@ function update_higher_dims_left() {
     }
 }
 
+/**
+* Get the current orientation of the right hand controller and set world coordinates appropriately
+*/
 function update_higher_dims_right() {
     controller2.getWorldQuaternion(right_hand.current_direction);
     right_hand.diff = right_hand.current_direction.inverse().multiply(right_hand.previous_direction);
@@ -245,9 +251,10 @@ function update_higher_dims_right() {
     }
 }
 
-// add_left_oculus_model(1);
-// add_right_oculus_model(1);
-
+/**
+* Add the left oculus controller
+* @param {number} controller controller number (0 or 1)
+*/
 function add_left_oculus_model(controller) {
     new THREE.MTLLoader()
     .setPath( root_dir + 'visualise/resources/oculus/' )
@@ -326,6 +333,10 @@ function add_left_oculus_model(controller) {
     } );
 }
 
+/**
+* Add the right oculus controller
+* @param {number} controller controller number (0 or 1)
+*/
 function add_right_oculus_model(controller) {
     new THREE.MTLLoader()
     .setPath( root_dir + 'visualise/resources/oculus/' )
@@ -403,60 +414,64 @@ function add_right_oculus_model(controller) {
         });
     } );
 }
+/**
+* Add the two vive controllers
+*/
+function add_vive_models() {
+    var loader = new THREE.OBJLoader();
+	loader.setPath( root_dir + 'visualise/resources/vive/' );
+	loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+		var loader = new THREE.TextureLoader();
+		loader.setPath( root_dir + 'visualise/resources/vive/' );
+		var controller = object.children[ 0 ];
+		controller.material.map = loader.load( 'onepointfive_texture.png' );
+		controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+		controller.castShadow = true;
+		controller.receiveShadow = true;
 
-    function add_vive_models() {
-        var loader = new THREE.OBJLoader();
-    		loader.setPath( root_dir + 'visualise/resources/vive/' );
-    		loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
-    			var loader = new THREE.TextureLoader();
-    			loader.setPath( root_dir + 'visualise/resources/vive/' );
-    			var controller = object.children[ 0 ];
-    			controller.material.map = loader.load( 'onepointfive_texture.png' );
-    			controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-    			controller.castShadow = true;
-    			controller.receiveShadow = true;
+        // Pause label
+        var font_loader = new THREE.FontLoader();
+        font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+            var fontsize = 0.005;
+            var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
+            var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+            var pause_label = new THREE.Mesh( geometry, textMaterial );
+            pause_label.rotation.x = -Math.PI/2.;
+            pause_label.position.y = fontsize;
+            pause_label.position.x = -0.01;
+            pause_label.position.z = 0.05;
+            controller.add(pause_label);
 
-                // Pause label
-                var font_loader = new THREE.FontLoader();
-                font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
-                    var fontsize = 0.005;
-                    var geometry = new THREE.TextBufferGeometry( "  Play \nPause", { font: font, size: fontsize, height: fontsize/5. } );
-                    var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-                    var pause_label = new THREE.Mesh( geometry, textMaterial );
-                    pause_label.rotation.x = -Math.PI/2.;
-                    pause_label.position.y = fontsize;
-                    pause_label.position.x = -0.01;
-                    pause_label.position.z = 0.05;
-                    controller.add(pause_label);
+            var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
+            var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+            var menu_label = new THREE.Mesh( geometry, textMaterial );
+            menu_label.rotation.x = -Math.PI/2.;
+            menu_label.position.y = 2*fontsize;
+            menu_label.position.x = -0.008;
+            menu_label.position.z = 0.023;
+            controller.add(menu_label);
 
-                    var geometry = new THREE.TextBufferGeometry( "Menu", { font: font, size: fontsize, height: fontsize/5. } );
-                    var textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-                    var menu_label = new THREE.Mesh( geometry, textMaterial );
-                    menu_label.rotation.x = -Math.PI/2.;
-                    menu_label.position.y = 2*fontsize;
-                    menu_label.position.x = -0.008;
-                    menu_label.position.z = 0.023;
-                    controller.add(menu_label);
+            controller1.add( controller.clone() );
+            controller2.add( controller.clone() );
 
-                    controller1.add( controller.clone() );
-                    controller2.add( controller.clone() );
-
-                    if ( !hard_mode ) {
-                        // Move label
-                        geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
-                        var move_label = new THREE.Mesh( geometry, textMaterial );
-                        move_label.rotation.x = -Math.PI/2.;
-                        move_label.rotation.y = Math.PI;
-                        move_label.position.y = -0.03 -fontsize;
-                        move_label.position.x = 0.01;
-                        move_label.position.z = 0.045;
-                        if ( N > 3 ) { controller1.add(move_label); }
-                        if ( N > 5 ) { controller2.add(move_label); }
-                        }
-                    });
-              });
+            if ( !hard_mode ) {
+                // Move label
+                geometry = new THREE.TextBufferGeometry( "Move", { font: font, size: fontsize, height: fontsize/5. } );
+                var move_label = new THREE.Mesh( geometry, textMaterial );
+                move_label.rotation.x = -Math.PI/2.;
+                move_label.rotation.y = Math.PI;
+                move_label.position.y = -0.03 -fontsize;
+                move_label.position.x = 0.01;
+                move_label.position.z = 0.045;
+                if ( N > 3 ) { controller1.add(move_label); }
+                if ( N > 5 ) { controller2.add(move_label); }
+                }
+            });
+      });
 }
-
+/**
+* Make the camera and position it
+*/
 function make_camera() {
     var aspect = window.innerWidth / window.innerHeight;
     if ( N < 3 ) {
@@ -491,6 +506,10 @@ function make_camera() {
         }
     }
 }
+
+/**
+* Add the renderer and associated VR warnings if necessary
+*/
 function add_renderer() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -504,6 +523,9 @@ function add_renderer() {
     container.appendChild( renderer.domElement );
 }
 
+/**
+* Add the non-VR GUI and set all sliders
+*/
 function add_gui() {
     if ( display_type == 'anaglyph' || display_type == 'keyboard' ) {
         var gui = new dat.GUI();
@@ -530,30 +552,11 @@ function add_gui() {
         }
         gui.open();
     }
-    // else {
-    //     var gui = dat.GUIVR.create('MuDEM');
-    //     dat.GUIVR.enableMouse( camera, renderer );
-    //     gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension') ;
-    //     if (N > 3) {
-    //         for (i=3;i<N;i++) {
-    //             gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).name('X'+i) ;
-    //         }
-    //     }
-    //     gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
-    //     gui.add( time, 'rate').min(0).max(1.0).name('Autoplay rate') ;
-    //     gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
-    //
-    //     gui.position.set(0,0,0.)
-    //     gui.rotation.x = -Math.PI/3.;
-    //     gui.scale.set(0.5,0.5,0.5);
-    //     controller2.add( gui );
-    //     var input1 = dat.GUIVR.addInputObject( controller1, renderer );
-    //     //var input2 = dat.GUIVR.addInputObject( controller2 , renderer);
-    //     scene.add( input1 );
-    //     //scene.add( input2 );
-    // }
 }
 
+/**
+* Add the non-VR and/or VR controllers and associated buttons
+*/
 function add_controllers() {
     if ( display_type == "VR" ) {
         window.addEventListener( 'vr controller connected', function( event ){
@@ -727,6 +730,10 @@ function add_controllers() {
         console.log('Anaglyph mode loaded');
     };
 }
+
+/**
+* If the current example requires a specific direction for the camera to face at all times (e.g. a 1D or 2D simulation) then set that
+*/
 function aim_camera() {
     if ( fname.includes('Lonely') || fname.includes('Drops')) {
         controls.target0.set(
@@ -750,7 +757,9 @@ function aim_camera() {
 // function handleOrientation( event ) {
 //     alert(event.absolute);
 // }
-
+/**
+* Make the axes, including labels and arrows
+*/
 function make_axes() {
     if (typeof axesLabels == 'undefined') {
         if ( colour_scheme === 'inverted' ) {
@@ -883,6 +892,9 @@ function make_axes() {
     }
 }
 
+/**
+* Make the scene lighting
+*/
 function make_lights() {
     var background_light = new THREE.AmbientLight( 0x909090 );
     scene.add( background_light );
@@ -905,6 +917,9 @@ function make_lights() {
     scene.add( light1 );
 }
 
+/**
+* Make any necessary walls
+*/
 function make_walls() {
     if ( display_type === 'VR' ) {
         var base_plain_geometry = new THREE.PlaneBufferGeometry( 1, 1 );
@@ -1033,6 +1048,9 @@ function make_walls() {
 
 }
 
+/**
+* Add the torus(es) as necessary
+*/
 function add_torus() {
     if (display_type == "VR") { R = 0.1; }
     else { R = 0.5; }
@@ -1146,6 +1164,9 @@ function add_torus() {
 
 }
 
+/**
+* Remove everything from scene - very useful for presentation mode when we don't want to kill the computer by loading multiple scenes simultaneously
+*/
 function remove_everything() {
     window.addEventListener("message", receiveMessage, false);
     function receiveMessage(event) {
@@ -1182,13 +1203,9 @@ function remove_everything() {
     }
 }
 
-/*function load_hyperspheres_VTK() {
-    var loader = new THREE.VTKLoader();
-    loader.load(root_dir + "visualise/data/vtk//dump-00000.vtu", function ( geometry ) {
-        console.log(geometry);
-    } );
-};*/ // FG: Removed as I don't think we use that anymore
-
+/**
+* Make the initial texturing if showing rotations
+*/
 function make_initial_sphere_texturing() {
     var commandstring = "" ;
     for ( i=3 ; i<N ; i++)
@@ -1219,6 +1236,9 @@ function make_initial_sphere_texturing() {
     // request.onreadystatechange = function () {}
 };
 
+/**
+* Load particles from MercuryDPM file format - NOTE: THIS IS NOT WORKING YET
+*/
 function make_initial_spheres_Mercury() {
     if ( cache ) { var filename = data_dir + "Samples/" + fname }
     else { var filename = data_dir + "Samples/" + fname + "?_="+ (new Date).getTime(); }
@@ -1304,6 +1324,9 @@ function make_initial_spheres_Mercury() {
     // });
 };
 
+/**
+* Make the initial particles
+*/
 function make_initial_spheres_CSV() {
     if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-00000.csv" }
     else { var filename = data_dir + "Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
@@ -1375,6 +1398,11 @@ function make_initial_spheres_CSV() {
     });
 };
 
+/**
+* Load textures from TexturingServer
+* @param {number} t timestep
+* @param {number} Viewpoint where we are in D>3 space
+*/
 function load_textures(t, Viewpoint) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
@@ -1397,6 +1425,10 @@ function load_textures(t, Viewpoint) {
     }
 }
 
+/**
+* Update textures from TexturingServer
+* @param {number} t timestep
+*/
 function update_spheres_texturing (t) {
       if  ( true ) { //TODO Do something better ...
           var commandstring = "" ; var Viewpoint = String(t*time.save_rate).padStart(5,'0')  ;
@@ -1430,6 +1462,11 @@ function update_spheres_texturing (t) {
       }
 }
 
+/**
+* Update sphere locations
+* @param {number} t timestep
+* @param {number} changed_higher_dim_view flag to determine if we have changed which dimensions we are representing --- NOTE: CURRENTLY NOT DOING ANYTHING
+*/
 function update_spheres_CSV(t,changed_higher_dim_view) {
     if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
     else { var filename = data_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
@@ -1618,6 +1655,9 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
     });
 };
 
+/**
+* Update camera and renderer if window size changes
+*/
 function onWindowResize() {
     if ( N < 3 ) {
         var aspect = window.innerWidth / window.innerHeight;
@@ -1711,6 +1751,9 @@ function onWindowResize() {
 //     }
 // };
 
+/**
+* In catch_mode, let the user know if they found the pink ball
+*/
 function check_if_won() {
     if ( particles !== undefined ) {
         if ( particles.children[pinky].visible === true ) {
@@ -1734,6 +1777,9 @@ function check_if_won() {
      }
 }
 
+/**
+* Animation loop that runs every frame
+*/
 function animate() {
     if ( view_mode === 'catch_particle' ) { check_if_won(); }
     THREE.VRController.update();
@@ -1771,6 +1817,9 @@ function animate() {
     renderer.setAnimationLoop( render );
 };
 
+/**
+* Do the actual rendering
+*/
 function render() {
     if (display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }

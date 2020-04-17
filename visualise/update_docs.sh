@@ -1,1 +1,1 @@
-documentation build js/nddem.js --config ../docs/visualise/documentation.yml -f html -o ../docs/visualise
+documentation build js/nddem.js --config ../docs/visualise/documentation.yml --project-name NDDEM -f html -o ../docs/visualise

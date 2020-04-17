@@ -39,4 +39,4 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 - `colour_scheme`: set to `inverted` to invert global colour scheme to have a white background.
 - `rotate_torus`: `float` to rotate the torus around the x1 axis in degrees
 
-An example command that works for me, when the TexturingServer is running: /path/to/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5&display_type=keyboard
+An example command that works for me, when the TexturingServer is running: `/path/to/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5&display_type=keyboard`
