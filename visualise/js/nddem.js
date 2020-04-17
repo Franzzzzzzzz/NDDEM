@@ -54,11 +54,11 @@ else { var mercury = false; var num_particles; }; // load mercury data instead o
 if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme; } // invert global colours
 
 var root_dir = 'http://localhost:54321/';
-cache=true ;
 if ( window.location.hostname.includes('benjymarks') ) {
     root_dir = 'http://www.benjymarks.com/nddem/';
     cache = true;
 }
+else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
 
 
 let promise = new Promise( function(resolve, reject) {

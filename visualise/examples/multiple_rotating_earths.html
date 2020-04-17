@@ -17,6 +17,10 @@
         <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <script>
 
+        var root_dir = 'http://localhost:54321/';
+        if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/' }
+        else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/' }
+
         function update_texture(t) {
             if ( sphere1 !== undefined ) {
                 sphere1.rotation.x = -t/5.;/// console.log(t);
@@ -66,7 +70,7 @@
         var sphere1, sphere2, sphere3,sphere4, sphere5, sphere6;
 
         var loader1 = new THREE.TextureLoader()
-            .load( "http://localhost:54321/" + fname, function( texture ) {
+            .load( root_dir + fname, function( texture ) {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 var sphere_geometry = new THREE.SphereGeometry( 1, 32, 32 );
