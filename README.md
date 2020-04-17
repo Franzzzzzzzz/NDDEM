@@ -12,6 +12,8 @@ The code is split in different modules, with different purposes. Some of the imp
 - Liggghts: `lmp` Used for comparison of the NDDEM with existing DEM code in 3D, ie. Liggghts.
 - PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
 
+## Contributing
+If you would like to contribute to the code, please contact francois.guillard [at] sydney.edu.au.
 
 For help or questions, please contact francois.guillard [at] sydney.edu.au.
 
