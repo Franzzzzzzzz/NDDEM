@@ -17,6 +17,9 @@
         <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <script>
 
+        var root_dir = 'http://localhost:54321/';
+        if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}
+
         function update_texture( rot ) {
             if ( sphere1 !== undefined ) {
                 sphere1.rotation.x = rot.x;
@@ -56,7 +59,7 @@
         scene.add( axesHelper );
 
         var loader1 = new THREE.TextureLoader()
-            .load( "http://localhost:54321/" + fname, function( texture ) {
+            .load( root_dir + fname, function( texture ) {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 var sphere_geometry = new THREE.SphereGeometry( 1, 32, 32 );

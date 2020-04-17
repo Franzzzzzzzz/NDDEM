@@ -141,7 +141,9 @@ promise.then(
 );
 
 
-
+/**
+* Initialise the threejs scene, adding everything necessary, such as camera, controls, lighting etc.
+*/
 function build_world() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
