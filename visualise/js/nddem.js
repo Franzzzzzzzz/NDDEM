@@ -54,17 +54,22 @@ else { var mercury = false; var num_particles; }; // load mercury data instead o
 if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme; } // invert global colours
 
 var root_dir = 'http://localhost:54321/';
+var data_dir = root_dir;
 if ( window.location.hostname.includes('benjymarks') ) {
     root_dir = 'http://www.benjymarks.com/nddem/';
+    data_dir = root_dir;
     cache = true;
 }
-else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
+else if ( window.location.hostname.includes('github') ) {
+    root_dir = 'https://franzzzzzzzz.github.io/NDDEM/';
+    data_dir = 'http://www.benjymarks.com/nddem/';
+    cache=true; }
 
 
 let promise = new Promise( function(resolve, reject) {
     var request = new XMLHttpRequest();
-    if ( cache ) { request.open('GET', root_dir + "Samples/" + fname + "in", true); }
-    else { request.open('GET', root_dir + "Samples/" + fname + "in?_="+ (new Date).getTime(), true); }
+    if ( cache ) { request.open('GET', data_dir + "Samples/" + fname + "in", true); }
+    else { request.open('GET', data_dir + "Samples/" + fname + "in?_="+ (new Date).getTime(), true); }
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && ( request.status === 200 || request.status === 304 ) ) { // fully loaded and ( fresh or cached )
@@ -1215,8 +1220,8 @@ function make_initial_sphere_texturing() {
 };
 
 function make_initial_spheres_Mercury() {
-    if ( cache ) { var filename = root_dir + "Samples/" + fname }
-    else { var filename = root_dir + "Samples/" + fname + "?_="+ (new Date).getTime(); }
+    if ( cache ) { var filename = data_dir + "Samples/" + fname }
+    else { var filename = data_dir + "Samples/" + fname + "?_="+ (new Date).getTime(); }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
@@ -1300,8 +1305,8 @@ function make_initial_spheres_Mercury() {
 };
 
 function make_initial_spheres_CSV() {
-    if ( cache ) { var filename = root_dir + "Samples/" + fname + "dump-00000.csv" }
-    else { var filename = root_dir + "Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
+    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-00000.csv" }
+    else { var filename = data_dir + "Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
@@ -1333,7 +1338,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            texture_path = root_dir + "Textures/Texture-"+i+"-00000"
+                            texture_path = data_dir + "Textures/Texture-"+i+"-00000"
                             for ( var iiii=3;iiii<N;iiii++) { texture_path += "-0.0"; }
                             var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -1374,8 +1379,8 @@ function load_textures(t, Viewpoint) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
         for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
-            if ( cache ) { var filename = root_dir + "Textures/" + "Texture-" + ii + "-" + Viewpoint+".png" }
-            else { var filename = root_dir + "Textures/" + "Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
+            if ( cache ) { var filename = data_dir + "Textures/" + "Texture-" + ii + "-" + Viewpoint+".png" }
+            else { var filename = data_dir + "Textures/" + "Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
             loader.load(filename,
                         function( texture ) { //TODO not sure why not working ... ...
                             //var myRe = /-[0-9]+.png/g
@@ -1413,7 +1418,7 @@ function update_spheres_texturing (t) {
                        true);*/
           var runvalue = 0 ;
           if (time.play) runvalue = 1 ;
-          request.open('GET', root_dir + 'render?ts='+String(t*time.save_rate).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
+          request.open('GET', data_dir + 'render?ts='+String(t*time.save_rate).padStart(5,'0') + commandstring + '&running=' + runvalue, true) ;
 
           request.onload = function() {
               load_textures(t, Viewpoint);
@@ -1426,8 +1431,8 @@ function update_spheres_texturing (t) {
 }
 
 function update_spheres_CSV(t,changed_higher_dim_view) {
-    if ( cache ) { var filename = root_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
-    else { var filename = root_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
+    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
+    else { var filename = data_dir + "Samples/" + fname + "dump-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
