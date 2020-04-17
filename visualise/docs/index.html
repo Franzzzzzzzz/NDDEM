@@ -58,6 +58,16 @@
               
                 
                 <li><a
+                  href='#reference'
+                  class="h5 bold black caps">
+                  Reference
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#build_world'
                   class="">
                   build_world
@@ -83,7 +93,49 @@
   </h2>
 
   
-    <h2>Usage</h2>
+    <p>This module contains two distinct methods for:</p>
+<ol>
+<li>Particle visualisation</li>
+<li>Coarse grained data visualisation</li>
+<li></li>
+</ol>
+<p>These methods both leverage <a href="https://threejs.org/">three.js</a> to render the visualisations in the browser. Visualisation options are controlled by setting the URL of the browser correctly.</p>
+<h3>Installation</h3>
+<p>To be able to view local data, that data needs to be served from a local server. This can be done by using the TexturingServer described elsewhere, or if no texturing is needed, two lightweight servers are included that work under Python or JS:</p>
+<h4>TexturingServer method</h4>
+<p>Follow the instructions to compile the TexturingServer.</p>
+<h4>JS Method</h4>
+<ol>
+<li>Install node.js. Try <code>sudo apt-get install nodejs</code> (tested with node.js v11.13.0)</li>
+<li>Install required packages by running <code>npm install --global express cors glob</code></li>
+</ol>
+<h4>Python method</h4>
+<p>This should work under <code>python2</code> or <code>python3</code>, with no additional dependencies, so as long as you have either of these installed on your system you have no need to install anything</p>
+<h3>Usage</h3>
+<ol>
+<li>Navigate to the main github directory and run <code>node server.js</code> or <code>python server.py</code> or <code>./Texturing/TexturingServer</code> to start a web server which will be used to serve local files.</li>
+<li>Open <code>visualise/index.html</code> in chrome or firefox. Supermedium is recommended if you want to use VR.</li>
+<li>Visualisation flags can either be hardcoded in <code>index.html</code> or can be set via the URL, for example: <code>index.html?fname=Samples/SpinnerD5/&#x26;view_mode=rotations</code></li>
+</ol>
+<h3>Flags:</h3>
+<ul>
+<li><code>fname</code>: folder name where data is stored. Trailing slash is optional. Default is <code>Samples/D4/</code></li>
+<li><code>display_type</code>: <code>VR</code>, <code>keyboard</code> or <code>anaglyph</code>. Default is <code>keyboard</code>.</li>
+<li><code>view_mode</code>: <code>undefined</code> (normal and default), <code>catch_particle</code>, <code>rotations</code>, <code>velocity</code> or <code>rotation_rate</code></li>
+<li><code>autoplay</code>: <code>true</code> or <code>false</code> to start time marching on load. Default is <code>false</code>.</li>
+<li><code>rate</code>: <code>float</code> that sets the speed of time marching. Units are DEM time units\second. Default is <code>5.0</code>.</li>
+<li><code>shadows</code>: <code>true</code> or <code>false</code> to render shadows. Default is <code>true</code>.</li>
+<li><code>quality</code>: <code>int</code> to set quality of rendering. Higher is more compute expensive. Default is <code>5</code>.</li>
+<li><code>zoom</code>: <code>float</code> to set how much to zoom in. Default is <code>20</code>.</li>
+<li><code>pinky</code>: only used if <code>view_mode</code> is <code>catch_particle</code>. <code>int</code> that sets which particle to render in pink. Default is <code>100</code>.</li>
+<li><code>cache</code>: <code>true</code> or <code>false</code> to cache local data in the browser. Default is <code>false</code>.</li>
+<li><code>hard_mode</code>: <code>true</code> or <code>false</code> to disable tori in VR mode to make things harder for the user. Default is <code>false</code>. This is meant to be more 'fun' but YMMV.</li>
+<li><code>quasicrystal</code>: <code>true</code> or <code>false</code> to view in quasicrystal mode. Default is <code>false</code>.</li>
+<li><code>mercury</code>: <code>true</code> or <code>false</code> to load MercuryDPM data instead of NDDEM data. Default is <code>false</code>.</li>
+<li><code>colour_scheme</code>: set to <code>inverted</code> to invert global colour scheme to have a white background.</li>
+<li><code>rotate_torus</code>: <code>float</code> to rotate the torus around the x1 axis in degrees</li>
+</ul>
+<p>An example command that works for me, when the TexturingServer is running: /path/to/index.html?fname=D5Cristal/&#x26;view_mode=D4&#x26;colour_scheme=inverted&#x26;time=350&#x26;rate=5&#x26;display_type=keyboard</p>
 
   
 </section></div>
@@ -122,6 +174,20 @@
 
   
     <iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="http://benjymarks.com/nddem/visualise/coarse_grain.html"></iframe>
+
+  
+</section></div>
+          
+        
+          
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='reference' class='mt0'>
+    Reference
+  </h2>
+
+  
+    
 
   
 </section></div>
