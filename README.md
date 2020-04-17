@@ -11,7 +11,6 @@ The code is split in different modules, with different purposes. Some of the imp
 - CoarseGrainingCode: `cpp` Multi-dimensional coarse-graining code. Some parts are still triggered only for 3D.
 - Liggghts: `lmp` Used for comparison of the NDDEM with existing DEM code in 3D, ie. Liggghts.
 - PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
-- TestNetCDFjs: `js` Test for reading NetCDF files in javascript. Can probably be removed at some point
 
 
 For help or questions, please contact francois.guillard [at] sydney.edu.au.
