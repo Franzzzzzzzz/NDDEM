@@ -52,6 +52,9 @@ if ( typeof window.mercury !== 'undefined' ) { var mercury = true }
 else { var mercury = false; var num_particles; }; // load mercury data instead of csvs
 
 if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme; } // invert global colours
+if ( typeof window.record !== 'undefined' ) { var record = window.record == 'true'; } // record every frame, by default false
+// if ( typeof window.initial_camera_location !== 'undefined' ) { var initial_camera_location = window.initial_camera_location; } // invert global colours
+
 
 var root_dir = 'http://localhost:54321/';
 var data_dir = root_dir;
@@ -65,6 +68,16 @@ else if ( window.location.hostname.includes('github') ) {
     data_dir = 'https://www.benjymarks.com/nddem/';
     cache=true; }
 
+const recorder = new CCapture({
+	verbose: true,
+	display: true,
+	framerate: 10,
+	quality: 100,
+	format: 'png',
+	timeLimit: 100,
+	frameLimit: 0,
+	autoSaveTime: 0
+});
 
 let promise = new Promise( function(resolve, reject) {
     var request = new XMLHttpRequest();
@@ -505,6 +518,11 @@ function make_camera() {
             }
         }
     }
+    if ( typeof window.initial_camera_location !== 'undefined' ) {
+        pos = window.initial_camera_location.split(',')
+        camera.position.set(parseFloat(pos[0]),parseFloat(pos[1]),parseFloat(pos[2]));
+        console.log('Set new camera position:')
+    }
 }
 
 /**
@@ -538,7 +556,19 @@ function add_gui() {
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
         gui.add( time, 'play_rate').min(0).max(10.0).name('Rate') ;
-        gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
+        // gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
+        gui.add( time, 'play').name('Autoplay').onChange( function(flag) {
+            time.play = flag;
+            if (flag && record) {
+                recorder.start();
+                console.log('Recording');
+            }
+            else if ( record ) {
+                recorder.stop();
+                recorder.save();
+                console.log('saving recording');
+            }
+        })
         if ( quasicrystal ) {
             gui.add( euler, 'theta_1').name('Theta1').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
             gui.add( euler, 'theta_2').name('Theta2').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
@@ -735,19 +765,26 @@ function add_controllers() {
 * If the current example requires a specific direction for the camera to face at all times (e.g. a 1D or 2D simulation) then set that
 */
 function aim_camera() {
-    if ( fname.includes('Lonely') || fname.includes('Drops')) {
-        controls.target0.set(
-            (world[0].min + world[0].max)/2.,
-            (world[1].min + world[1].max)/2.,
-            (world[2].min + world[2].max)/2.,
-        );
+    if ( typeof window.camera_target !== 'undefined' ) {
+        pos = window.camera_target.split(',')
+        controls.target0.set(parseFloat(pos[0]),parseFloat(pos[1]),parseFloat(pos[2]));
+        console.log('Set default target')
     }
-    else if ( N > 2 ) {
-        controls.target0.set(
-            (world[0].min + world[0].max)/2./2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
-            (world[1].min + world[1].max)/2.,
-            (world[2].min + world[2].max)/2.,
-        );
+    else {
+        if ( fname.includes('Lonely') || fname.includes('Drops')) {
+            controls.target0.set(
+                (world[0].min + world[0].max)/2.,
+                (world[1].min + world[1].max)/2.,
+                (world[2].min + world[2].max)/2.,
+            );
+        }
+        else if ( N > 2 ) {
+            controls.target0.set(
+                (world[0].min + world[0].max)/2./2., // NOTE: HARDCODED a FACTOR OF 2 BECAUSE OF CONSOLIDATION
+                (world[1].min + world[1].max)/2.,
+                (world[2].min + world[2].max)/2.,
+            );
+        }
     }
     if ( fname.includes('Spinner') ) { controls.up0.set( 0, 1, 0 ); } // set x as up
     else { controls.up0.set( 1, 0, 0 ); }
@@ -849,7 +886,7 @@ function make_axes() {
                 axesLabels.remove(obj);
             }
         }
-        console.log(ref_dim)
+        // console.log(ref_dim)
         var loader = new THREE.FontLoader();
     	loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
     		var textGeo_x = new THREE.TextBufferGeometry( "x" + ref_dim.x, { font: font, size: fontsize, height: fontsize/5., } );
@@ -1823,4 +1860,5 @@ function animate() {
 function render() {
     if (display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
+    if ( record ) { recorder.capture(renderer.domElement); }
 };
