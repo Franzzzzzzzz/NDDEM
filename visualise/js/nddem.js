@@ -53,7 +53,7 @@ else { var mercury = false; var num_particles; }; // load mercury data instead o
 
 if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme; } // invert global colours
 if ( typeof window.record !== 'undefined' ) { var record = window.record == 'true'; } // record every frame, by default false
-// if ( typeof window.initial_camera_location !== 'undefined' ) { var initial_camera_location = window.initial_camera_location; } // invert global colours
+if ( typeof window.t0 !== 'undefined' ) { time.cur = parseFloat(window.t0); } // record every frame, by default false
 
 
 var root_dir = 'http://localhost:54321/';
@@ -1365,8 +1365,9 @@ function make_initial_spheres_Mercury() {
 * Make the initial particles
 */
 function make_initial_spheres_CSV() {
-    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-00000.csv" }
-    else { var filename = data_dir + "Samples/" + fname + "dump-00000.csv" + "?_="+ (new Date).getTime(); }
+    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-"+String(time.cur*time.save_rate).padStart(5,'0') +".csv" }
+    else {         var filename = data_dir + "Samples/" + fname + "dump-"+String(time.cur*time.save_rate).padStart(5,'0') +".csv" + "?_="+ (new Date).getTime(); }
+    console.log(filename)
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
