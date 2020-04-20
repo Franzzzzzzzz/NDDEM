@@ -1869,9 +1869,11 @@ function render() {
     if ( record ) {
         recorder.capture(renderer.domElement);
         if ( time.snapshot ) {
-            time.snapshot = false;
-            recorder.stop();
-            recorder.save();
+            setTimeout(() => {
+                time.snapshot = false;
+                recorder.stop();
+                recorder.save();
+            }, 30);
         }
     }
 };
