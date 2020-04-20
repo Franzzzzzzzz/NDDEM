@@ -132,7 +132,7 @@ static void vSubScaled (v1d &res , double v, cv1d &a)          {for (uint i=0 ; 
  *  These vector or matrix operations are working in place, perform multiple operations at once, and are designed to use error correction across multiple calls.
  */
 ///@{
-static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) ///< Addition of 3 vectors in-place with error correction (Kahan summation algorithm)
+static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) 
 {
   double Tmp, Previous ;
 
@@ -143,8 +143,8 @@ static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) ///< Addition of 3
   res[i] += Tmp ;
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
-}
-static void vSubFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) ///< Subtraction of 2 vectors \f$ res := res - a - b\f$ with error correction
+} ///< Addition of 3 vectors in-place with error correction (Kahan summation algorithm)
+static void vSubFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) 
 {
   double Tmp, Previous ;
 
@@ -155,8 +155,8 @@ static void vSubFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) ///< Subtraction o
   res[i] += Tmp ;
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
-}
-static void vAddOne (v1d & res, cv1d &a, v1d & Corr) ///< Addition of 2 vectors in-place with error correction (Kahan summation algorithm)
+} ///< Subtraction of 2 vectors \f$ res := res - a - b\f$ with error correction
+static void vAddOne (v1d & res, cv1d &a, v1d & Corr)
 {
   double Tmp, Previous ;
 
@@ -167,8 +167,8 @@ static void vAddOne (v1d & res, cv1d &a, v1d & Corr) ///< Addition of 2 vectors 
   res[i] += Tmp ;
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
-}
-static void vSubOne (v1d & res, cv1d &a, v1d & Corr) ///< Subtraction of 2 vectors in-place with error correction (Kahan summation algorithm)
+} ///< Addition of 2 vectors in-place with error correction (Kahan summation algorithm)
+static void vSubOne (v1d & res, cv1d &a, v1d & Corr) 
 {
   double Tmp, Previous ;
 
@@ -179,7 +179,7 @@ static void vSubOne (v1d & res, cv1d &a, v1d & Corr) ///< Subtraction of 2 vecto
   res[i] += Tmp ;
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
-}
+}///< Subtraction of 2 vectors in-place with error correction (Kahan summation algorithm)
 ///@}
 
 /** @name Matrix operations, usually operating on flattened matrices, cf. the description for more information on matrix storage */

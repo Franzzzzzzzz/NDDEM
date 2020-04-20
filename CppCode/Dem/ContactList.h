@@ -79,7 +79,7 @@ public:
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which open. 
  list <cp> v ; ///< Contains the list of contact
  Action * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts. 
- int cid=0 ; ///< \legacy not used for anything anymore I think. 
+ int cid=0 ; ///< \deprecated not used for anything anymore I think. 
 
  //void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
  void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; ///< \deprecated Measure distance between a ghost and a particle
