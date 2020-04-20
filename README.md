@@ -12,10 +12,9 @@ The code is split into different modules, with different purposes. The main modu
 - PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
 
 ## Support
-Installation instructions and documentation is split between each of the modules, and can be found here:
- - [NDDEM]()
- - [Texturing]()
- - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/docs/visualise/index.html)
+Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
+ - [NDDEM solver and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/docs/index.html)
+ - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
 
 

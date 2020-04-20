@@ -1,0 +1,8 @@
+\form#0:$|a-b|$
+\form#1:$|a-b|^2$
+\form#2:$\vec a_i = m_i * \vec g $
+\form#3:$a-b$
+\form#4:$ res := res + v*(a+b)$
+\form#5:$ res := res + v*a$
+\form#6:$ res := res - a - b$
+\form#7:$ res := res - v*a$
