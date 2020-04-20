@@ -20,17 +20,20 @@
 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
-enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32} ;
-enum class WallType {PBC=0, WALL=1, MOVINGWALL=2} ;
+enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32} ; ///< Flags for export data control
+enum class WallType {PBC=0, WALL=1, MOVINGWALL=2} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
+/** \brief Generic class to handle the simulation set up
+ * 
+ */
 template <int d>
 class Parameters {
 public :
-    Parameters (int NN):
+    Parameters (int NN): 
         N(5),           //number of particles
         tdump(1),       //dump data every these timesteps
         tinfo(100),
@@ -50,9 +53,9 @@ public :
         wallforcecompute(false)
         {
          reset_ND(NN) ;
-        }
+        } ///< Set the default values for all parameters. Calls to setup parameter function should be provided after initialisation of this class. 
 
-    void reset_ND (int NN)
+    void reset_ND (int NN) 
     {
      N=NN ; r.resize(N,0.15) ; //particle size
      m.resize(N, 1e-2); // Set the masses directly
@@ -61,45 +64,57 @@ public :
      Frozen.resize(N,false) ;
 
      Boundaries.resize(d, vector <double> (4,0.0)) ; // Boundary type in [:,3]: 0=regular pbc, 1=wall}
-    }
+    }///< reset the full simulation.
 
-    int N, tdump, tinfo ;
-    double T ;
-    double dt, rho, Kn, Kt, Gamman, Gammat, Mu ;
-    double skin, skinsqr ;
-    vector <std::pair<ExportType,ExportData>> dumps ;
+    int N; ///< Number of particles
+    int tdump ; ///< Write dump file every this many timesteps
+    int tinfo ; ///< Show detail information on scren every this many timesteps
+    double T ; ///< Run until this time (note it is a floating point). 
+    double dt ; ///< timestep
+    double rho; ///< density
+    double Kn ; ///< Normal spring constant 
+    double Kt ; ///< Tangential spring constant
+    double Gamman; ///< Normal dissipation
+    double Gammat ; ///< Tangential dissipation
+    double Mu ; ///< Fricton
+    double skin ; ///< Skin for use in verlet list \warning Experimental 
+    double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental 
+    vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
     //ExportType dumpkind ;
     //ExportData dumplist ;
-    vector <double> r, m, I, g ;
-    vector <bool> Frozen ;
-    vector < vector <double> > Boundaries ;
-    string Directory ;
-    bool orientationtracking ;
-    bool wallforcecompute ;
-    unsigned long int seed = 5489UL ; ///< Seems to be the default seed of the Mersenne twister in Boost
+    vector <double> r ; ///< Particle radii
+    vector <double> m ; ///< Particle mass
+    vector <double> I ; ///< Particule moment of inertia
+    vector <double> g ; ///< Gravity vector
+    vector <bool> Frozen ; ///< Frozen atom if true
+    vector < vector <double> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}. 
+    string Directory ; ///< Saving directory
+    bool orientationtracking ; ///< Track orientation? 
+    bool wallforcecompute ; ///< Compute for on the wall? 
+    unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
 
-    map<float, string> events ;
+    map<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered. 
 
 // Useful functions
-    int set_boundaries() ;
+    int set_boundaries() ;  ///< Set default boundaries
     //int init_particles(v2d & X, v2d & A) ;
-    void perform_PBC(v1d & X, u_int32_t & PBCFlags) ;
-    void perform_MOVINGWALL() ;
-    int init_mass() ;
-    int init_inertia() ;
+    void perform_PBC(v1d & X, u_int32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
+    void perform_MOVINGWALL() ; ///< Move the boundary wall if moving. 
+    int init_mass() ; ///< Initialise particle mass
+    int init_inertia() ; ///< Initialise particle moment of inertia
 
-    void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ;
-    void check_events(float time, v2d & X, v2d & V, v2d & Omega) ;
-    void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ;
-    void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ;
-    void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; // Not implemented
-    void init_locations (char *line, v2d & X) ;
+    void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script 
+    void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time. 
+    void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ; ///< Parse input script commands
+    void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ; ///< Not tested. \warning not really tested
+    void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; ///< Not implemented
+    void init_locations (char *line, v2d & X) ; ///< Set particle locations
 
-    void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ;
-    void quit_cleanly() ;
-    void finalise();
-    void xml_header () ;
-    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags, v1d & Z) ;
+    void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ; ///< On screen information display
+    void quit_cleanly() ; ///< Close opened dump files in the event of an emergency quit (usually a SIGINT signal to the process)
+    void finalise(); ///< Close opened dump files 
+    void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
+    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags, v1d & Z) ; ///< Dump writing functions
 
 
 // For Xml Writing

@@ -16,7 +16,7 @@
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/random.hpp>
 
-#define MAXDEFDIM 30
+#define MAXDEFDIM 30 ///< For larger number of dimension,  be taken in particular for periodic boundary conditions
 
 
 v1d operator* (v1d a, double b) ;
@@ -40,7 +40,9 @@ v1f & operator/= (v1f & a, cv1f &b) ;
 v1d & operator/= (v1d & a, double b) ;
 v1f & operator/= (v1f & a, double b) ;
 
-enum class TensorType {SCALAR, VECTOR, TENSOR, SYMTENSOR, SKEWTENSOR, NONE} ;
+enum class TensorType {SCALAR, VECTOR, TENSOR, SYMTENSOR, SKEWTENSOR, NONE} ; ///< Different types of mathematical objects
+/** \brief Limited use: used to transfer data to the VTK writer
+ */
 class TensorInfos
 {
 public :
@@ -49,18 +51,31 @@ public :
   v2d * data ;
 } ;
 
-/// \brief Static class to handle multi-dimensional mathematics, and more. It gets specialised for speed with template parameter d:dimension
+/** \brief Static class to handle multi-dimensional mathematics, and more. It gets specialised for speed with template parameter d:dimension
+ */
+
+/**  \par Matrix storage
+ *   <UL> 
+ *   <LI> Arbitrary square matrix are stored as linear array, in the order x11, x12, x13 ... x21, x22 ... xdd. They have d^2 components. </LI>
+ *   <LI> Skew-symetric matrix only store their top right side, in the order x12, x13, x14 ... x23, x24 ... x(d-1)d. They have d(d-1)/2 components. These are handled using the specific function skewmatvecmult() and similar, and make use of the special variables #MSigns, #MIndexAS and #MASIndex </LI> 
+ *   <LI> Symetric matrix are not really needed anywhere, but would store only the top right side + diagonal as a linear array, in the order x11, x12 ... x22, x23, ... xdd. They have d(d+1)/2 components.  </LI>
+ *   </UL>
+ * */
 template <int d>
 class Tools
 {
 public:
-static void initialise () ;
-static void clear() ;
+/** @name General functions */
+///@{
+static void initialise () ; ///< Initialise the member variables, in particular the variables to handle skew-symmetric flattened matrix, cf. the class detailed description. 
+static void clear() ; ///< Get the class ready for a different dimension. 
 static bool check_initialised (int dd) {return (dd==d) ; }
+static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; } ///< Sign function
+static int sgn (double a)   {return a<0 ? -1:1 ; } ///< Sign function
+static std::pair <double, double> two_max_element (cv1d & v) ; ///< Return the two largest elements of v
+///@}
 
-/** @name Vector and matrix initialisation and normalisation
-Vector and matrix initialisation and normalisation
-*/
+/** @name Vector and matrix initialisation and normalisation */
 ///@{
 static void unitvec (vector <double> & v, int n) ;                    ///< Construct a unit vector in place
 static v1d unitvec (int n) {v1d res (d,0) ; res[n]=1 ; return res ; } ///< Construct & return a unit vector
@@ -79,7 +94,7 @@ static v1f vsqrt (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=sq
 static v1f vsq (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=a[i]*a[i] ; return b ; } ///< Component-wise squaring
 
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; } ///< Set the gravity. \f$\vec a_i = m_i * \vec g \f$
-static v1d randomize_vec (cv1d v) ; /// Produce a random vector
+static v1d randomize_vec (cv1d v) ; ///< Produce a random vector
 ///@}
 
 /** @name Coordinate system change */
@@ -167,17 +182,17 @@ static void vSubOne (v1d & res, cv1d &a, v1d & Corr) ///< Subtraction of 2 vecto
 }
 ///@}
 
-/** @name Matrix operations, usually operating on flattened matrices */
+/** @name Matrix operations, usually operating on flattened matrices, cf. the description for more information on matrix storage */
 ///@{
-static v1d  skewmatvecmult (cv1d & M, cv1d &v) ;
-static void skewmatvecmult (v1d & r, cv1d & M, cv1d &v) ;
-static v1d  skewmatsquare  (cv1d &A) ;
-static void skewmatsquare  (v1d &r, cv1d &A) ;
-static v1d  skewexpand     (cv1d &A) ;
-static void skewexpand     (v1d & r, cv1d &A) ;
-static v1d  matmult (cv1d &A, cv1d &B) ;
-static void matmult (v1d &r, cv1d &A, cv1d &B) ;
-static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ;
+static v1d  skewmatvecmult (cv1d & M, cv1d &v) ; ///< Multiply the skew symetric matrix M with vector v
+static void skewmatvecmult (v1d & r, cv1d & M, cv1d &v) ; ///< Multiply the skew symetric matrix M with vector v in place
+static v1d  skewmatsquare  (cv1d &A) ;///< Square the skew symetric matrix M
+static void skewmatsquare  (v1d &r, cv1d &A) ; ///< Square the skew symetric matrix M in place
+static v1d  skewexpand     (cv1d &A) ; ///< Return the skew symetrix matrix M stored on d(d-1)/2 component as a full flattened matrix with d^2 components
+static void skewexpand     (v1d & r, cv1d &A) ; ///< Return the skew symetrix matrix M stored on d(d-1)/2 component as a full flattened matrix with d^2 components in place
+static v1d  matmult (cv1d &A, cv1d &B) ; ///< Multiply 2 matrix together
+static void matmult (v1d &r, cv1d &A, cv1d &B) ; ///< Multiply 2 matrix together in place
+static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ; ///< Multiply a matrix with a vector, in place. 
 static v1d  wedgeproduct (cv1d &a, cv1d &b) ; ///< Wedge product of vectors
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; ///< Wedge product in-place
 static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } ///< Transposition
@@ -187,34 +202,26 @@ static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i
 /** @name Saving and writing functions */
 ///@{
 static int savetxt(char path[], const v2d & table, char const header[]) ;
-static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ;
-static void savecsv (char path[], cv2d & A) ;
-static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ;
+static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ; ///< Save the location and a few more informations in a CSV file.
+static void savecsv (char path[], cv2d & A) ; ///< Save the orientation in a CSV file
+static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ; ///< Save as a vtk file. Dimensions higher than 3 are stored as additional scalars. Additional informations can be passed as a vector of #TensorInfos. 
 
 static int write1D (char path[], v1d table) ;
 static int writeinline(initializer_list< v1d >) ;
 static int writeinline_close(void) ;
 ///@}
 
+static v1d Eye ; ///< The identity matrix in dimension \<d\>
+static boost::random::mt19937 rng ; ///< Random number generator
+static boost::random::uniform_01<boost::mt19937> rand ; ///< Returns a random number between 0 and 1
 
-
-
-// Sign function
-static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; }
-static int sgn (double a)   {return a<0 ? -1:1 ; }
-static std::pair <double, double> two_max_element (cv1d & v) ;
-
-static v1d Eye ; /// The identity matrix in dimension \<d\>
-static boost::random::mt19937 rng ;
-static boost::random::uniform_01<boost::mt19937> rand ;
-
-static int getdim (void) {return d;} // Essentially so that the NetCDF class has access to d ...
+static int getdim (void) {return d;} ///< Return the dimension. \deprecated{Probably deprecated: essentially so that the NetCDF class has access to d.}
 
 private:
-static vector < vector <int> > MSigns ;
-static vector < vector <int> > MIndexAS ;
-static vector < pair <int,int> > MASIndex ;
-static vector <FILE *> outs ;
+static vector < vector <int> > MSigns ; ///< For skew symetric matrix. -1 below the diagonal, 0 on the diagonal, +1 above the diagnal
+static vector < vector <int> > MIndexAS ; ///< For skew symmetric matrix, make the correspondance between linear index of a full matrix with the linear index of the skew-symetric storage. 
+static vector < pair <int,int> > MASIndex ; ///< For skew symmetric matrix, make the correspondance between linear index and (row,column) index. 
+static vector <FILE *> outs ; ///< Store the output file descriptors.
 } ;
 
 // Static member definitions ---------------------------------------------------
@@ -671,7 +678,7 @@ double Tools<d>::InertiaMomentum (double R, double rho)
 
 //--------------------------------
 template <int d>
-double Tools<d>::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVELY TESTED
+double Tools<d>::hyperspherical_xtophi (cv1d &x, v1d &phi)
 {
     double rsqr = normsq(x) ;
     double r= sqrt(rsqr) ;
@@ -698,7 +705,7 @@ double Tools<d>::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENS
 }
 
 template <int d>
-void Tools<d>::hyperspherical_phitox (double r, cv1d &phi, v1d &x) // WARNING NOT EXTENSIVELY TESTED
+void Tools<d>::hyperspherical_phitox (double r, cv1d &phi, v1d &x) 
 {
     x = v1d (d,r) ;
     for (int i=0 ; i<d-1 ; i++)

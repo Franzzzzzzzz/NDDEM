@@ -16,21 +16,25 @@
 #include "Tools.h"
 #include "ContactList.h"
 
+/** \brief Calculate contact forces
+ */
 template <int d>
 class Contacts
 {
 public:
     Contacts (Parameters<d> &P) ;
 
-    int N ; // These and following should really be const but that's a pain for assignements
-    double dt, Kn, Kt, Mu, Gamman, Gammat ;
-    Parameters<d> *ptrP ;
-    vector < double > Torquei,Torquej, vrel ;
+    //int N ; ///< Number of particles // These and following should really be const but that's a pain for assignements
+    double dt, Kn, Kt, Mu, Gamman, Gammat ; ///< Same meaning as in Parameters 
+    Parameters<d> *ptrP ; ///< Pointer to the Parameters structure. 
+    vector < double > Torquei ; ///< Torque on particle i
+    vector < double > Torquej ; ///< Torque on particle j
+    vector < double > vrel ; ///< Relative velocity
 
     void particle_particle (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ;
+                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Force & torque between 2 particles
     void particle_wall     ( cv1d & Vi, cv1d &Omegai, double ri,
-                                 int j, int orient, cp & Contact) ;
+                                 int j, int orient, cp & Contact) ; ///< Force & torque between a particle and a wall
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
@@ -43,12 +47,12 @@ public:
             loc[n] += ptrP->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
         return (particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ) ;
-    }
+    } ///< Force and torque between an particle and a ghost (moves the ghost and calls particle_particle()
 
-    Action Act ;
+    Action Act ; ///< Resulting Action
 
 private:
-  // Temporary variables for internal use, to avoid reallocation at each call
+  /** Temporary variables for internal use, to avoid reallocation at each call */
   double contactlength, ovlp, dotvrelcn, Coulomb, tsprn, tsprcn ;
   vector <double> cn, rri, rrj, vn, vt, Fn, Ft, tvec, Ftc, tspr, tsprc ;
 
@@ -66,7 +70,7 @@ private:
  * ***************************************************************************************************/
 
 template <int d>
-Contacts<d>::Contacts (Parameters<d> &P) : N(P.N), dt(P.dt), Kn(P.Kn), Kt(P.Kt), Mu(P.Mu), Gamman(P.Gamman), Gammat(P.Gammat), ptrP(&P)
+Contacts<d>::Contacts (Parameters<d> &P) : dt(P.dt), Kn(P.Kn), Kt(P.Kt), Mu(P.Mu), Gamman(P.Gamman), Gammat(P.Gammat), ptrP(&P)
 {
 
   Torquei.resize(d*(d-1)/2, 0) ;

@@ -12,6 +12,8 @@
 #define CONTACTLIST
 
 // ------------------------------------ Action class -------------------------------------------
+/** \brief Handle force and torque contact information 
+ * */
 class Action {
 public :
     vector <double> Fn, Ft, Torquei, Torquej ;
@@ -21,12 +23,22 @@ public :
 
 
 // ------------------------------------ Contact properties class -------------------------------------------
-class cp // Contact properties class
+/** \brief Contact properties class. 
+ *  \par How ghost work
+ *  Image particles though periodic boundary conditions (PBC) are called ghost. A ghost can be an image through multiple PBC. 
+ *  #ghost indicate if particle #j is making contact through 1 or more PBC (of #ghost>0), and if so through which PBC. A bit set to 1 at position n in #ghost indicates an image through the PBC in the n-th dimension. Least significant bit (LSB) correspond to dimension 0. Walls are counted identically as PBC for dimension counting. 
+ *  #ghostdir follows the same logic as #ghost but a bit set to 1 (resp. 0) at position n indicates an image through the high (resp. low) n-th dimension, which should be a PBC. 
+ *  
+ *  \warning A #ghost bit of 1 should never happen on a non PBC dimension. A #ghostdir bit of 1 should never happen on a non PBC dimension, or without a 1 bit at the same location in #ghost.  
+ *  \warning The number of dimensions is limited to sizeof(u_int32_t) because of these ghost, as they are using 32 bit datatype. There is a risk of overflowing the datatype if using PBC at higher than 32 dimensions, or if using a PBC in dimension 32 (since the last bit could be interpreted as a sign bit). Walls in dimensions higher than 32 may be ok, but without guarantee. 
+ *  \todo Ghosts should be improved in order to use either a bitset datatype, or a custom datatype, to avoid the limitation to sizeof(u_int32_t) in the number of dimension. 
+ */
+class cp
 {
 public:
- cp (int ii, int jj, int d, double ctlength, Action * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} //creator
- ~cp () { if (owninfos) delete(infos) ; }
- cp & operator= (const cp & c)
+ cp (int ii, int jj, int d, double ctlength, Action * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} ///< New contact creation
+ ~cp () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
+ cp & operator= (const cp & c) 
  {
      i=c.i ;
      if (c.i<0) return *this ; //is a deleted element, just keep moving
@@ -37,49 +49,51 @@ public:
      contactlength=c.contactlength ;
      infos=c.infos ;
      return *this ;
- }
- Action & getinfo () {return *infos ; }
+ } ///< Affect contact. 
+ 
+ Action & getinfo () {return *infos ; } ///< Returning stored information \warning Poorly tested
  //void setinfo (Action & a) {if (!infos) infos = new Action ; *infos=a ; }
- void setinfo (Action * a) {infos=a ; }
+ void setinfo (Action * a) {infos=a ; } ///< Set information for contact force dump to file. \warning Poorly tested. 
 
- int i, j ;
- double contactlength ;
+ int i ;  ///< Index of contacting particle.
+ int j ; ///< Index of second contacting particle or wall. If this is a wall contact, j=2*walldimension + (0 or 1 if it is the low wall or high wall) 
+ double contactlength ; ///< Length of the contact
  //int8_t isghost ;        // LIMIT d<128
- u_int32_t ghost, ghostdir ;
- vector <double> tspr;
- Action * infos ;
- bool owninfos ;
+ u_int32_t ghost ; ///< Contain ghost information about ghost contact, cf detailed description
+ u_int32_t ghostdir ; ///< Contain ghost information about ghost direction, cf detailed description
+ vector <double> tspr; ///< Vector of tangential contact history
+ Action * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested. 
+ bool owninfos ; ///< True if the contact contains stored information for dump retrieval
 } ;
 
 // ------------------------------------ Contact List class -------------------------------------------
+/** \brief Handles lists of contacts
+ */
 template <int d>
 class ContactList
 {
 public:
- ContactList () : deltamap(vector<double>(d,0)),masking(vector<u_int32_t>(d,0)),pbcdim(vector<int>(d,0)) {}
- void reset() {it = v.begin() ;}
- int insert(const cp& a) ;
- void finalise () { while (it!=v.end()) it=v.erase(it) ; }
- list <cp> v ;
- Action * default_action () {return (&def) ; }
- int cid=0 ;
- vector <double> deltamap ;
- vector <u_int32_t> masking ;
- vector <int> pbcdim ;
+ ContactList () {}
+ void reset() {it = v.begin() ;}  ///< Go to the contact list beginning
+ int insert(const cp& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal. 
+ void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which open. 
+ list <cp> v ; ///< Contains the list of contact
+ Action * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts. 
+ int cid=0 ; ///< \legacy not used for anything anymore I think. 
 
  //void check_ghost    (u_int32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
- void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ;
+ void check_ghost_dst(u_int32_t gst, int n, double partialsum, u_int32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; ///< \deprecated Measure distance between a ghost and a particle
  void check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
-                   int startd=0, double partialsum=0, bitdim mask=0) ;
- void coordinance (v1d &Z) ;
+                   int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself. 
+ void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
 
 private:
- list<cp>::iterator it ;
- Action def ;
+ list<cp>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering. 
+ Action def ; ///< Default action
 };
 
-inline bool operator< (const cp &a, const cp &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; }
-inline bool operator== (const cp &a, const cp &b) {return (a.i==b.i && a.j==b.j) ; }
+inline bool operator< (const cp &a, const cp &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; } ///< The contact list is order in increasing order of index i, and for two identical i in increasing order of j. 
+inline bool operator== (const cp &a, const cp &b) {return (a.i==b.i && a.j==b.j) ; } ///< Contact equivalence is based solely on the index of objects in contact i and j. 
 
 
 /*****************************************************************************************************

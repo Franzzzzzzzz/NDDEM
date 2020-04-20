@@ -1,3 +1,7 @@
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
+
 #ifndef MULTIPROC
 #define MULTIPROC
 
@@ -12,6 +16,8 @@
 #include "Parameters.h"
 
 using namespace std ;
+/** \brief Manual multiprocessor handling for OpenMP, for max efficiency & avoiding bugs & race conditions, hopefully. 
+ */
 template <int d>
 class Multiproc
 {
@@ -31,35 +37,35 @@ public:
     delayedwall_size.resize(P,0) ;
     timing.resize(P,0) ;
     }
-  void disp_share();
-  bool ismine (int ID, int j) {if (j>=share[ID] && j<share[ID+1]) return true ; return false ; }
-  void delaying (int ID, int j, Action & act) ;
-  void delayed_clean() ;
-  void delayingwall (int ID, int j, Action & act) ;
-  void delayedwall_clean() ;
-  void load_balance() ;
+  void disp_share(); ///< Display the # of particle on each thread. 
+  bool ismine (int ID, int j) {if (j>=share[ID] && j<share[ID+1]) return true ; return false ; } ///< Check if a particle j belongs to the thread ID. 
+  void delaying (int ID, int j, Action & act) ; ///< Record the action to be added later to the relevent atom in sequencial settings, avoid potential race condition if an action was added to an atom that is not owned by the thread. This is for a particle-particle contact
+  void delayed_clean() ; ///< Clean the record list. 
+  void delayingwall (int ID, int j, Action & act) ; ///< Record the action on the wall. Only usefull if the force on the wall needs to be calculated
+  void delayedwall_clean() ; ///< Clean the record of the force on the wal. 
+  void load_balance() ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations. 
 
-  vector <ContactList<d>> CLp ;
-  vector <ContactList<d>> CLw ;
-  vector <Contacts<d>> C ;
-  vector <int> share ;
-  vector <double> timing ;
-  int num_time ;
+  vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
+  vector <ContactList<d>> CLw ; ///< ContactList particle-wall for each processor
+  vector <Contacts<d>> C ; ///< Dummy Contacts for independent calculation per processor
+  vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=d+1. 
+  vector <double> timing ; ///< Used to record the time spent by each thread. 
+  int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
 
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
-  vector <vector <Action> > delayed ;
-  vector <vector <int> > delayedj ;
-  vector <uint> delayed_size ;
+  vector <vector <Action> > delayed ; ///< Records the delayed Action
+  vector <vector <int> > delayedj ; ///< Records the j id of the particle in the associated delayed action
+  vector <uint> delayed_size ; ///< Max length of the delayed vector for each thread. Can grow as needed on call to delaying()
 
-  vector <vector <Action> > delayedwall ;
-  vector <vector <int> > delayedwallj ;
-  vector <uint> delayedwall_size ;
+  vector <vector <Action> > delayedwall ; ///< Records the delayed Action
+  vector <vector <int> > delayedwallj ; ///< Records the j id of the wall in the associated delayed action
+  vector <uint> delayedwall_size ; ///< Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()
 
-  int P ;
+  int P ; ///< Number of threads
 
 private:
-  int N ;
-  void split (int N, int P) ;
+  int N ; ///< Number of grains
+  void split (int N, int P) ; ///< Function to allocate the grains to threads taking into account the load balance in the contact detection. load_balance() takes over after a few iteration have run, and is usually more efficient.
 } ;
 
 /*****************************************************************************************************
@@ -249,3 +255,5 @@ void Multiproc<d>::load_balance()
   printf("\n") ; fflush(stdout) ;
 }
 #endif
+
+/** @} */

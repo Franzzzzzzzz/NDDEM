@@ -10,6 +10,9 @@
 
 vector <std::pair<ExportType,ExportData>> * toclean ;
 XMLWriter * xmlout ;
+
+/** \brief Function handling signal reception for clean closing on SIGINT for example. 
+ */
 void sig_handler (int p)
 {
     Benchmark::write_all() ;
@@ -20,6 +23,8 @@ void sig_handler (int p)
     std::exit(p) ;
 }
 
+/** \brief Main simulation run. All the simulation is handled by this function. 
+ */
 template <int d>
 int templatedmain (char * argv[])
 {
@@ -381,6 +386,8 @@ return 0 ;
 
 
 //===================================================
+/** \brief Calls the appropriate templatedmain() function. Templated function are used to allow compiler optimisation for speed. Only a handful of dimension are compiled on the base code to limit compilation time and memory. If you need dimensions that are not cmpiled by default, have a look at the code it's pretty straightforward to activate the needed dimension. If the compilation failed with low meomry, in particular on older system, head to the code and comment the dimensions which are unused. 
+ */
 int main (int argc, char *argv[])
 {
  signal (SIGINT, sig_handler);   // Catch all signals ...
