@@ -40,5 +40,6 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 - `record`: `true` or `false` to save frames when autoplay is ticked. Default is `false`.
 - `initial_camera_location`: three numbers (e.g. `initial_camera_location=1,2,3`) to set the initial camera location if so desired.
 - `camera_target`: three numbers (e.g. `camera_target=1,2,3`) to set what the camera is pointing at if so desired.
+- `t0`: `float` to set the initial timestep to display. Default is `0`.
 
 An example command that works for me, when the TexturingServer is running: `/path/to/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5&display_type=keyboard`

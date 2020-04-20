@@ -10,7 +10,7 @@ var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
-var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000} // temporal properties
+var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000, 'snapshot':false} // temporal properties
 var euler = {'theta_1': 0, 'theta_2': 0, 'theta_3': 0}; // rotations in higher dimensions!!!!!!!!!!
 if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
 if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // DEM time units/second
@@ -21,7 +21,7 @@ var x_offset = 0.; // NOT USED
 var y_offset = 0.; // NOT USED
 // var human_height = 0.; // height of the human in m
 var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, inverted
-var velocity = {'vmax': 1, 'omegamax': 100} // default GUI options
+var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 var roof; // top boundary
 var bg; // background mesh with texture attached
 var redraw_left = false; // force redrawing of particles from movement in left hand
@@ -557,7 +557,7 @@ function add_gui() {
         gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
         gui.add( time, 'play_rate').min(0).max(10.0).name('Rate') ;
         // gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
-        gui.add( time, 'play').name('Autoplay').onChange( function(flag) {
+        gui.add( time, 'play').name('Play').onChange( function(flag) {
             time.play = flag;
             if (flag && record) {
                 recorder.start();
@@ -578,7 +578,12 @@ function add_gui() {
             gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
         }
         if ( view_mode === 'rotation_rate' ) {
-            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(100).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(10).step(0.01).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+        }
+        if ( record ) {
+            gui.add( time, 'snapshot').name('Snapshot').listen().onChange( function(flag) {
+                if ( flag ) { recorder.start(); }
+            })
         }
         gui.open();
     }
@@ -1861,5 +1866,12 @@ function animate() {
 function render() {
     if (display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
-    if ( record ) { recorder.capture(renderer.domElement); }
+    if ( record ) {
+        recorder.capture(renderer.domElement);
+        if ( time.snapshot ) {
+            time.snapshot = false;
+            recorder.stop();
+            recorder.save();
+        }
+    }
 };
