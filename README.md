@@ -13,7 +13,7 @@ The code is split into different modules, with different purposes. The main modu
 
 ## Support
 Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
- - [NDDEM solver and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/docs/index.html)
+ - [NDDEM solver and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
 
