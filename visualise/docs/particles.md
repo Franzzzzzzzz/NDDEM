@@ -14,7 +14,7 @@ Now, lets try that same thing, but we are going to slice a 5D hypersphere with a
 
 Let's now go and look at inclined plane flow in 5D
 
-<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/index.html?fname=D5"></iframe>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/index.html?fname=D5&rotate_torus=-150"></iframe>
 
 ### Particle rotation
 
