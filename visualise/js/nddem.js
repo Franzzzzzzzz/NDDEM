@@ -898,7 +898,12 @@ function make_axes() {
 
         var arrow_body = new THREE.CylinderGeometry( thickness, thickness, axeslength, Math.pow(2,quality), Math.pow(2,quality) );
         var arrow_head = new THREE.CylinderGeometry( 0., 2.*thickness, 4*thickness, Math.pow(2,quality), Math.pow(2,quality) );
-        arrow_material = new THREE.MeshPhongMaterial( { color: arrow_colour } );
+        if ( N < 3 ) {
+            var arrow_material = new THREE.PointsMaterial( { color: arrow_colour } );
+        }
+        else {
+            var arrow_material = new THREE.MeshPhongMaterial( { color: arrow_colour } );
+        }
         // var arrow_material_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
         // var arrow_material_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
         var arrow_x = new THREE.Mesh( arrow_body, arrow_material );
@@ -1460,7 +1465,7 @@ function make_initial_spheres_CSV() {
             var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
             var scale = 20.; // size of particles on tori
             for (var i = 0; i<spheres.length; i++) {
-                if ( N === 2 ) {
+                if ( N < 3 ) {
                     var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
                     var material = new THREE.PointsMaterial( {
                         color: color,
