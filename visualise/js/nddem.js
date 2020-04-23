@@ -109,6 +109,9 @@ else {
 if ( urlParams.has('rotate_torus') ) {
     var rotate_torus = urlParams.get('rotate_torus');
 }
+else {
+    var rotate_torus = 0;
+}
 if ( urlParams.has('initial_camera_location') ) {
     var initial_camera_location = urlParams.get('initial_camera_location');
 }
