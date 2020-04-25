@@ -1,6 +1,8 @@
 
 enum class Windows {LibRect3D, LibLucy3D, LibRectND, LibLucyND, LibLucyND_Periodic} ;
 
+/** \brief A window base class that needs to be specialised to a specific CG window
+ */
 class LibBase {
 public:
     LibBase(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }

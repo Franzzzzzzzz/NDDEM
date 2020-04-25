@@ -1,3 +1,7 @@
+/** \addtogroup Texturing Texturing server
+ * This module handles the Texturing of higher dimensional rotating hyperspheres. It is designed to produced 2D textures that can be wrapped around spheres for visualisations. 
+ *  @{ */
+
 #include "Server.h"
 #include "io.h"
 #include "Texturing.h"
@@ -12,10 +16,10 @@ vector <FILE *> Tools::outs ;
 boost::random::mt19937 Tools::rng ;
 boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;*/
 
-map<string,string> parse_url (string & url) ;
+map<string,string> parse_url (string & url) ; ///< \deprecated Do not use
 template <int d>
-void runthread_MasterRender (Texturing<d> * T) {T->MasterRender() ; }
-std::thread MasterRenderThread ;
+void runthread_MasterRender (Texturing<d> * T) {T->MasterRender() ; } ///< Function to call Texturing::MasterRender()
+std::thread MasterRenderThread ; 
 std::mutex LockRender ;
 
 Texturing<3> Texturing3 ;
@@ -30,6 +34,15 @@ Texturing<10> Texturing10 ;
 
 int curd = -1 ;
 
+/** \brief Starts the server and handles the dispatching of the various commands. Default port is 54321
+ *  \details URL Commands:
+ *  \details /load : load the data. Should always be called first. 
+ *  \details /render : renders the current timestep and location, and may also cache some additional ts and locations
+ *  \details /forcerender : DEPRECATED
+ *  \details /vtkcolormap : export the colormap in vtk format
+ *  \details /nrrdcolormap : export the colormap in nrrd format 
+ *  \details /vtkmap : export the textures as vtk surfaces through the colormap instead of plane textures.
+ */
 int main(void)
 {
     using namespace httplib;
@@ -204,7 +217,7 @@ int main(void)
 
 
     svr.listen("localhost", 54321);
-}
+} 
 
 //=======================================================
 map<string,string> parse_url (string & url) // Unused
@@ -223,3 +236,6 @@ map<string,string> parse_url (string & url) // Unused
     }
     return (res) ;
 }
+
+
+/** @} */

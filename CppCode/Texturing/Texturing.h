@@ -1,3 +1,16 @@
+/** \addtogroup Texturing Texturing server
+ * 
+ * It acts as an http server receiving calls from the visualation side, and producing textures as individual png files per particle/location/timestep. Unknown commands are trying to provide the requested file. <br>
+ * Default port is 54321 <br>
+ * Example: http://localhost:54321/load?path=XXXX&resolution=5<br>
+ * Example: http://localhost:54321/render?ts=XXX&x4=2.5&5=3.2 <br>
+ * 
+ * More commands are available, cf. the main() function. 
+ * 
+ * 
+ *  @{ */
+
+
 #include "Tools.h"
 #include "io.h"
 
@@ -7,74 +20,80 @@
 #include <experimental/filesystem>
 
 
-#define DeltaX 0.1
-#define FilePerLine 100
+#define DeltaX 0.1 ///< Step in location for the visualisation \warning ad-hoc \todo should be runtime value.  
+#define FilePerLine 100 ///< Line size for single file tiled output \deprecated not really used at the moment. 
 
-void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<float>> & colors) ;
+void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<float>> & colors) ; ///< Convert from hyperspherical coordinates to actual pixel color, using the provided vector of colors. 
 using namespace std ;
 
+/** \brief Individual timestep data */
 class Timestep {
 public:
-    v2d X, A ;
+    v2d X ; ///< Particle locations
+    v2d A ; ///< Particle attached frame
 } ;
 
+/** \brief Handles all the computation for the textures */
 template <int d>
 class Texturing {
 public :
-  int Nlambda=32, Ntheta=32 ;
-  vector<vector<float>> colors ;
+  int Nlambda=32 ; ///< Resolution in latitude
+  int Ntheta=32 ; ///< Resolution in longitude
+  vector<vector<float>> colors ; ///< Colors vector for the different dimensions
   const vector<vector<float>> allcolorslist = {
       {1,0,0},
       {0,1,0},
       {0,0,1},
       {1,1,0},
       {0,1,1},
-      {1,0,1}} ;
+      {1,0,1}} ; ///< Default colors
 
   const vector<vector<vector<float>>> allcolors = {
       {{231./256., 37./256., 100./256.}}, // official NDDEM pink
-      {{1,1,0},{0,1,1}}};
+      {{1,1,0},{0,1,1}}}; ///< Default colors
 
-  v1d lambdagrid, thetagrid ;
-  string BasePath = "../../Samples/" ;
-  string DirectorySave = "../../Textures/" ;
-  int N ;
-  v2d Boundaries ;
+  v1d lambdagrid ; ///< Pixel grid in latitude
+  v1d thetagrid ; ///< Pixel grid in longitude
+  string BasePath = "../../Samples/" ; ///< Default directory for simulation results
+  string DirectorySave = "../../Textures/" ; ///< Default directory for saving the resulting textures
+  int N ; ///< Number of grains
+  v2d Boundaries ; ///< List of boundaries
 
-  vector <Timestep> Ts ;
-  vector <int> TsName ;
-  v1d R ;
-  v1d View ;
-  vector <int> ViewPoint, NewViewPoint ;
-  vector <int> RenderedAlready ;
-  bool runfast ;
-  bool singlerendered ;
+  vector <Timestep> Ts ; ///< List of Timestep
+  vector <int> TsName ; ///< Actual integer timestep
+  v1d R ; ///< Particle radii
+  v1d View ; ///< Location of the rendering in the ND space
+  vector <int> ViewPoint ; ///< Current location&timestep for rendering
+  vector <int> NewViewPoint ; ///< Used if the location&timestep require a modification. Eventually transfered to ViewPoint when the rendering has been processed. 
+  vector <int> RenderedAlready ; ///< Keeps track of what location/timesteps have already been rendered and do not need to be recomputed. 
+  bool runfast ; ///< Render only the current location&timestep, not doing any additional rendering for caching purposes. 
+  bool singlerendered ; ///< Render a single location&timestep
 
-  bool justloaded ;
-  int nrotate ;
-  vector<vector<string>> FileList ;
-  vector <std::thread> Threads;
-  const bool singlefiles = true ;
+  bool justloaded ; ///< Keep track if no render happened yet (used for the 3D simulation)
+  int nrotate ; ///< \deprecated used to keep track if the rendered view is not using the first 3 dimensions. Effectively not used currently as this feature is not implemented in the visualisation side. \todo Implement in the visualisation the possible of rendering other dimensions than 1-2-3
+  vector<vector<string>> FileList ; ///< Data file list
+  vector <std::thread> Threads; ///< Rendering thread list
+  const bool singlefiles = true ; ///< \deprecated Render the textures as a tilemap instead of individual files. \todo implement tile rendering in the visualisation. 
 
   // function
-  int initialise (map <string,string> args) ;
-  int clean() ;
-  int set_grid (int nb) ;
-  void spaceloop (v1d View, uint tsint, int nrotate, int dim) ;
-  void timeloop  (v1d View, uint tsint, int nrotate) ;
-  void hereandnow(v1d View, uint tsint, int nrotate) ;
-  int MasterRender() ;
-  int SetNewViewPoint (map <string,string>  args) ;
-  bool isrendered () ;
-  void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A) ;
-  int viewpermute (v1d & View) ;
-  void rescale (v1f & c, cv1f sum) ;
-  void filepathname (char * path, int n, int time, cv1d & View);
-  void filepathname (char * path, int time, cv1d & View);
+  int initialise (map <string,string> args) ; ///< Loads all the data for the requested simulation in memory \warning No check is made that they fit in memory, be careful for large datasets
+  int clean() ; ///< Clean the data to get ready for another simulation rendering
+  int set_grid (int nb) ; ///< Set the grid in latitude-longitude
+  void spaceloop (v1d View, uint tsint, int nrotate, int dim) ; ///< Run all the rendering in the current location, at all timesteps
+  void timeloop  (v1d View, uint tsint, int nrotate) ; ///< Run all the rendering for the curent timestep, for all other location in dimensions higher than 3D view (ie. 4th dim, 5dim etc), varying only 1 dimension at a time. 
+  void hereandnow(v1d View, uint tsint, int nrotate) ; ///< Render the current location at the current timestep
+  int MasterRender() ; ///< Handle the rendering threads
+  int SetNewViewPoint (map <string,string>  args) ; ///< Modify the current location and/or timestep en render. 
+  bool isrendered () ; ///< Verify if the current location/timestep is already rendered
+  void Render (vector <string> & filerendered, cv1d & View, int nrotate, int time, cv2d &X, cv1d & R, cv2d &A) ; ///< Do the actual rendering of the textures
+  int viewpermute (v1d & View) ; ///< Rotate the viewpoint so that the rendered view is using the first 3 dimensions. Effectively unused since the visualisation only handles the rendring of the first 3 dimensions currently. 
+  void rescale (v1f & c, cv1f sum) ; ///< Coloring rescaling
+  void filepathname (char * path, int n, int time, cv1d & View); ///< Generates the proper texture name
+  void filepathname (char * path, int time, cv1d & View); ///< Generates the proper texture name
 
-  int write_vtkmap (map <string,string> args) ;
-  int write_colormap_vtk_base () ;
-  int write_colormap_nrrd_base (map <string,string> args) ;
+  int write_vtkmap (map <string,string> args) ; ///< Outputs the texture as a vtk surface
+  int write_colormap_vtk_base () ; ///< Output the colormap as a vtk volume \warning (only working for 3D)
+  int write_colormap_nrrd_base (map <string,string> args) ; ///< Output the texture as an NRRD file 
 
 } ;
 
@@ -88,17 +107,17 @@ public :
  *                                                                                                   *
  *                                                                                                   *
  * ***************************************************************************************************/
-inline void dispvector (const v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
-inline void dispvector (const v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; }
-inline void dispvector (const vector<int> & a) {for (auto v: a) printf("%d ", v); printf("\n") ; fflush(stdout) ; }
+inline void dispvector (const v1d & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; } ///< Convenient function to print a vector on screen
+inline void dispvector (const v1f & a) {for (auto v: a) printf("%g ", v); printf("\n") ; fflush(stdout) ; } ///< Convenient function to print a vector on screen
+inline void dispvector (const vector<int> & a) {for (auto v: a) printf("%d ", v); printf("\n") ; fflush(stdout) ; } ///< Convenient function to print a vector on screen
 
 template <int d>
-void runthread_timeloop (Texturing<d> * T, v1d View, uint tsint, int nrotate)
-{T->timeloop(View, tsint,nrotate) ; }
+void runthread_timeloop (Texturing<d> * T, v1d View, uint tsint, int nrotate) 
+{T->timeloop(View, tsint,nrotate) ; } ///< Function to call Texturing::timeloop()
 
 template <int d>
 void runthread_spaceloop (Texturing<d> * T, v1d View, uint tsint, int nrotate, int dim)
-{T->spaceloop(View, tsint,nrotate, dim) ; }
+{T->spaceloop(View, tsint,nrotate, dim) ; } ///< Function to call Texturing::spaceloop()
 //=========================================================================
 
 template <int d>
@@ -643,3 +662,6 @@ int Texturing<d>::write_vtkmap (map <string,string> args)
 
   return 0 ;
 }
+
+
+/** @} */
