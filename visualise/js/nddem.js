@@ -1,26 +1,19 @@
 // var THREE = require('three');
-
 var container; // main div element
 var camera, scene, controls, renderer; // UI elements
 var controller1, controller2; // VR controllers
 // var raycaster, intersected = []; // catching grains
 // var tempMatrix = new THREE.Matrix4(); // catching grains
-var particles, wristband1, wristband2, axesHelper, axesLabels; // groups of objects
+var particles, wristband1, wristband2, axesHelper, axesLabels, walls; // groups of objects
 var R,r; // parameters of torus
 var N; // number of dimensions
 var world = []; // properties that describe the domain
 var ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000, 'snapshot':false} // temporal properties
 var euler = {'theta_1': 0, 'theta_2': 0, 'theta_3': 0}; // rotations in higher dimensions!!!!!!!!!!
-if ( typeof window.autoplay !== 'undefined' ) { time.play = window.autoplay === 'true' };
-if ( typeof window.rate !== 'undefined' ) { time.play_rate = parseFloat(window.rate) }; // DEM time units/second
 var axeslength, fontsize; // axis properties
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 0.; // height of the human in m
-var x_offset = 0.; // NOT USED
-var y_offset = 0.; // NOT USED
-// var human_height = 0.; // height of the human in m
-var view_mode = window.view_mode; // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, inverted
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 var roof; // top boundary
 var bg; // background mesh with texture attached
@@ -30,30 +23,110 @@ var left_hand, right_hand; // store parameters for movement in higher dims via h
 var winning = false; // did you win the game?
 var winning_texture; // texture to hold 'WINNING' sign for catch_particle mode
 var clock = new THREE.Clock; // global clock
-if ( typeof window.zoom !== 'undefined' ) { var zoom = parseFloat(window.zoom); }
-else { var zoom = 20; } // default zoom level
-if ( typeof window.shadows !== 'undefined' ) { var shadows = window.shadows == 'true' }
-else { var shadows = true; };
-if ( typeof window.quality !== 'undefined' ) { var quality = parseInt(window.quality) }
-else { var quality = 5}; // quality flag - 5 is default, 8 is ridiculous
-if ( typeof window.pinky !== 'undefined' ) { var pinky = parseInt(window.pinky) }
-else { var pinky = 100}; // which particle to catch in catch_particle mode
-var fname = window.fname; // which folder to load data from
-if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
 var lut = new THREE.Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var arrow_material; // material used for arrows to show dimensions
-if ( typeof window.cache !== 'undefined' ) { var cache = window.cache == 'true' } // should we use cached data or not
-else { var cache = false; };
-if ( typeof window.hard_mode !== 'undefined' ) { var hard_mode = window.hard_mode == 'true'; } // optional flag to not show wristbands if in catch_particle mode
-else { var hard_mode = false; }
-
-if ( typeof window.quasicrystal !== 'undefined' ) { var quasicrystal = window.quasicrystal == 'true'; } // optional flag to not show wristbands if in catch_particle mode
-if ( typeof window.mercury !== 'undefined' ) { var mercury = true }
-else { var mercury = false; var num_particles; }; // load mercury data instead of csvs
-
-if ( typeof window.colour_scheme !== 'undefined' ) { var colour_scheme = window.colour_scheme; } // invert global colours
-if ( typeof window.record !== 'undefined' ) { var record = window.record == 'true'; } // record every frame, by default false
-if ( typeof window.t0 !== 'undefined' ) { time.cur = parseFloat(window.t0); } // record every frame, by default false
+const urlParams = new URLSearchParams(window.location.search);
+if ( urlParams.has('fname') ) {
+    var fname = urlParams.get('fname');
+    if (fname.substr(-1) != '/') { fname += '/' }; // add trailing slash if required
+}
+else {
+    var fname = "D4/";
+}
+if ( urlParams.has('display_type') ) {
+    var display_type = urlParams.get('display_type');
+}
+else {
+    var display_type = "keyboard";
+}
+if ( urlParams.has('view_mode') ) {
+    var view_mode = urlParams.get('view_mode');  // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, inverted
+}
+else {
+    var view_mode = 'normal'
+}
+if ( urlParams.has('autoplay') ) {
+    time.play = urlParams.get('autoplay') === 'true';
+}
+if ( urlParams.has('rate') ) {
+    var rate = urlParams.get('rate');
+    time.play_rate = parseFloat(rate);
+}
+if ( urlParams.has('shadows') ) {
+    var shadows = true;
+}
+else {
+    var shadows = false;
+}
+if ( urlParams.has('quality') ) {  // quality flag - 5 is default, 8 is ridiculous
+    var quality = parseInt(urlParams.get('quality'));
+}
+else {
+    var quality = 5;
+}
+if ( urlParams.has('zoom') ) {
+    var zoom = parseFloat(urlParams.get('zoom'));
+}
+else {
+    var zoom = 20;
+}
+if ( urlParams.has('pinky') ) {
+    var pinky = parseInt(urlParams.get('pinky'));
+}
+else {
+    var pinky = 100;
+}
+if ( urlParams.has('cache') ) {
+    var cache = true;
+}
+else {
+    var cache = false;
+}
+if ( urlParams.has('hard_mode') ) { // optional flag to not show wristbands if in catch_particle mode
+    var hard_mode = true;
+}
+else {
+    var hard_mode = false;
+}
+if ( urlParams.has('quasicrystal') ) {
+    var quasicrystal = true;
+}
+else {
+    var quasicrystal = false;
+}
+if ( urlParams.has('mercury') ) {
+    var mercury = true;
+}
+else {
+    var mercury = false;
+}
+if ( urlParams.has('colour_scheme') ) {
+    var colour_scheme = urlParams.get('colour_scheme');
+}
+else {
+    var colour_scheme = 'dark';
+}
+if ( urlParams.has('rotate_torus') ) {
+    var rotate_torus = urlParams.get('rotate_torus');
+}
+else {
+    var rotate_torus = 0;
+}
+if ( urlParams.has('initial_camera_location') ) {
+    var initial_camera_location = urlParams.get('initial_camera_location');
+}
+if ( urlParams.has('camera_target') ) {
+    var camera_target = urlParams.get('camera_target');
+}
+if ( urlParams.has('record') ) {
+    var record = true;
+}
+else {
+    var record = false;
+}
+if ( urlParams.has('t0') ) {
+    time.cur = parseFloat(urlParams.get('t0'));
+}
 
 
 var root_dir = 'http://localhost:54321/';
@@ -518,8 +591,8 @@ function make_camera() {
             }
         }
     }
-    if ( typeof window.initial_camera_location !== 'undefined' ) {
-        pos = window.initial_camera_location.split(',')
+    if ( typeof initial_camera_location !== 'undefined' ) {
+        pos = initial_camera_location.split(',')
         camera.position.set(parseFloat(pos[0]),parseFloat(pos[1]),parseFloat(pos[2]));
         console.log('Set new camera position:')
     }
@@ -770,8 +843,8 @@ function add_controllers() {
 * If the current example requires a specific direction for the camera to face at all times (e.g. a 1D or 2D simulation) then set that
 */
 function aim_camera() {
-    if ( typeof window.camera_target !== 'undefined' ) {
-        pos = window.camera_target.split(',')
+    if ( typeof camera_target !== 'undefined' ) {
+        pos = camera_target.split(',')
         controls.target0.set(parseFloat(pos[0]),parseFloat(pos[1]),parseFloat(pos[2]));
         console.log('Set default target')
     }
@@ -796,14 +869,11 @@ function aim_camera() {
     controls.reset();
 }
 
-// function handleOrientation( event ) {
-//     alert(event.absolute);
-// }
 /**
 * Make the axes, including labels and arrows
 */
 function make_axes() {
-    if (typeof axesLabels == 'undefined') {
+    if (typeof axesLabels == 'undefined') { // if you haven't already made the axes
         if ( colour_scheme === 'inverted' ) {
             var arrow_colour = 0x333333;
         }
@@ -831,7 +901,12 @@ function make_axes() {
 
         var arrow_body = new THREE.CylinderGeometry( thickness, thickness, axeslength, Math.pow(2,quality), Math.pow(2,quality) );
         var arrow_head = new THREE.CylinderGeometry( 0., 2.*thickness, 4*thickness, Math.pow(2,quality), Math.pow(2,quality) );
-        arrow_material = new THREE.MeshPhongMaterial( { color: arrow_colour } );
+        if ( N < 3 ) {
+            var arrow_material = new THREE.PointsMaterial( { color: arrow_colour } );
+        }
+        else {
+            var arrow_material = new THREE.MeshPhongMaterial( { color: arrow_colour } );
+        }
         // var arrow_material_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
         // var arrow_material_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
         var arrow_x = new THREE.Mesh( arrow_body, arrow_material );
@@ -870,7 +945,6 @@ function make_axes() {
             axesHelper.add( arrow_z );
             axesHelper.add( arrow_head_z );
         };
-
 
     }
 
@@ -932,6 +1006,8 @@ function make_axes() {
         });
 
     }
+    axesHelper.position.set(world[0].min, world[1].min, world[2].min); // move to bottom left hand corner
+    axesLabels.position.set(world[0].min, world[1].min, world[2].min); // move to bottom left hand corner
 }
 
 /**
@@ -963,6 +1039,7 @@ function make_lights() {
 * Make any necessary walls
 */
 function make_walls() {
+    walls = new THREE.Group;
     if ( display_type === 'VR' ) {
         var base_plain_geometry = new THREE.PlaneBufferGeometry( 1, 1 );
         var base_plain_material = new THREE.MeshStandardMaterial( {
@@ -1001,10 +1078,10 @@ function make_walls() {
         }
         else {
             floor.scale.set(world[2].max - world[2].min,world[1].max - world[1].min,1);
-            floor.rotation.y = + Math.PI / 2;
             floor.position.set(world[0].min,(world[1].max - world[1].min)/2.,(world[2].max - world[2].min)/2.);
+            floor.rotation.y = + Math.PI / 2;
         }
-        scene.add( floor );
+        walls.add( floor );
 
         roof = new THREE.Mesh( geometry, material );
         if ( display_type === 'VR' ) {
@@ -1025,7 +1102,7 @@ function make_walls() {
             floor.material.side = THREE.DoubleSide;
             floor.material.opacity = 0.9;
         }
-        scene.add( roof );
+        walls.add( roof );
     }
 
     if ( world[1].wall ) {
@@ -1041,7 +1118,7 @@ function make_walls() {
             left_wall.rotation.x = - Math.PI / 2;
             left_wall.position.set((world[0].max - world[0].min)/2.,world[1].min,(world[2].max - world[2].min)/2.);
         }
-        scene.add( left_wall );
+        walls.add( left_wall );
 
         var right_wall = new THREE.Mesh( geometry, material );
         if ( display_type === 'VR' ) {
@@ -1055,7 +1132,7 @@ function make_walls() {
             right_wall.rotation.x = Math.PI / 2;
             right_wall.position.set((world[0].max - world[0].min)/2.,world[1].max,(world[2].max - world[2].min)/2.);
         }
-        scene.add( right_wall );
+        walls.add( right_wall );
     }
 
     if (N > 2) {
@@ -1084,9 +1161,10 @@ function make_walls() {
                 back_wall.rotation.y = Math.PI;
                 back_wall.position.set((world[0].max - world[0].min)/2.,(world[1].max - world[1].min)/2.,world[2].max);
             }
-            scene.add( back_wall );
+            walls.add( back_wall );
         }
     }
+    scene.add(walls);
 
 }
 
@@ -1152,7 +1230,7 @@ function add_torus() {
         controller1.position.set(2.5,-3*R,0.5);
     }
 
-    if ( window.rotate_torus !== undefined ) { controller1.rotation.x += window.rotate_torus/180*Math.PI; }
+    controller1.rotation.x += rotate_torus/180*Math.PI;
 
 
     if ( N > 5 ) {
@@ -1390,7 +1468,7 @@ function make_initial_spheres_CSV() {
             var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
             var scale = 20.; // size of particles on tori
             for (var i = 0; i<spheres.length; i++) {
-                if ( N === 2 ) {
+                if ( N < 3 ) {
                     var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
                     var material = new THREE.PointsMaterial( {
                         color: color,

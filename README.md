@@ -11,12 +11,14 @@ The code is split into different modules, with different purposes. The main modu
 - Liggghts: `lmp` Used for comparison of the NDDEM with existing DEM code in 3D, ie. Liggghts.
 - PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
 
-## Support
+## Operating system support
+All parts of this code have been tested on all recent versions of Windows, Mac and Linux.
+
+## Installating instructions and documentation
 Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
  - [NDDEM solver and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
-
 
 ## Contributing
 If you would like to contribute to the code, please contact francois.guillard [at] sydney.edu.au. For feature requests, please use the issue tracker above.

@@ -24,7 +24,7 @@
     <!-- <script src="https://raw.githack.com/benjym/CIVL5999/master/ammo.js"></script> -->
     <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/WebGL.js"></script> -->
     <!-- <script src="https://gitcdn.xyz/repo/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js"></script> -->
-
+    <script src="../js/CCapture.all.min.js"></script>
 	<script src="../node_modules/three/build/three.js"></script>
 	<script src="../node_modules/three/examples/js/libs/ammo.js"></script>
 	<!-- <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
@@ -49,6 +49,18 @@
 	</script>
 
 	<script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const recorder = new CCapture({
+        	verbose: true,
+        	display: true,
+        	framerate: 30,
+        	quality: 100,
+        	format: 'png',
+        	timeLimit: 100,
+        	frameLimit: 0,
+        	autoSaveTime: 0
+        });
+
 		if ( WEBGL.isWebGLAvailable() === false ) {
 
 			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
@@ -77,10 +89,11 @@
 		var ballRadius = 0.1;
         var earth;
         var stars;
+        var record = false;
 
         var screenshot = false;
         var root_dir = 'http://localhost:54321/';
-        if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/' }
+        if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'https://www.benjymarks.com/nddem/' }
         else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/' }
 
         init();
@@ -91,7 +104,23 @@
 			initPhysics();
 			createObjects();
             makeStars();
+            if ( urlParams.has('record') ) { addRecordOnKeypress() };
 		}
+
+        function addRecordOnKeypress() {
+            document.addEventListener("keydown", function(event) {
+                if (event.code == 'Space') {
+                    if (record) {
+                        recorder.stop();
+                        recorder.save();
+                    }
+                    else {
+                        recorder.start();
+                    }
+                    record = !record;
+                }
+            }, false);
+        }
 
 		function initGraphics() {
 			container = document.getElementById( 'container' );
@@ -398,6 +427,10 @@
 			updatePhysics( deltaTime );
 
 			renderer.render( scene, camera );
+
+            if ( record ) {
+                recorder.capture(renderer.domElement);
+            }
 
 		}
 

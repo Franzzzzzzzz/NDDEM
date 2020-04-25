@@ -15,12 +15,13 @@
         <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script>
         <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
         <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <script src="../js/CCapture.all.min.js"></script>
         <script>
 
         var root_dir = 'http://localhost:54321/';
         if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}
         else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
-        
+
         function update_texture(t) {
             if ( sphere !== undefined ) {
                 sphere.material.map.offset.x = t/10.;/// console.log(t);
@@ -30,6 +31,18 @@
         var fname = "visualise/resources/earthmap.jpg";
 
         const urlParams = new URLSearchParams(window.location.search);
+        const recorder = new CCapture({
+        	verbose: true,
+        	display: true,
+        	framerate: 30,
+        	quality: 100,
+        	format: 'png',
+        	timeLimit: 100,
+        	frameLimit: 0,
+        	autoSaveTime: 0
+        });
+        var record = false;
+
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
 
         clock = new THREE.Clock();
@@ -77,11 +90,31 @@
         // gui.add( slice, 'loc').min(-1).max(1).step(0.01).listen().name('Slice').onChange( function( val ) { update_spheres(val); }) ;
         // gui.open();
 
+        if ( urlParams.has('record') ) { addRecordOnKeypress() };
+
+        function addRecordOnKeypress() {
+            document.addEventListener("keydown", function(event) {
+                if (event.code == 'Space') {
+                    if (record) {
+                        recorder.stop();
+                        recorder.save();
+                    }
+                    else {
+                        recorder.start();
+                    }
+                    record = !record;
+                }
+            }, false);
+        }
+
 		var animate = function () {
             // controls.update();
             update_texture( clock.getElapsedTime() );
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
+            if ( record ) {
+                recorder.capture(renderer.domElement);
+            }
 
 		};
         window.addEventListener( 'resize', onWindowResize, false );
@@ -91,7 +124,7 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize( window.innerWidth, window.innerHeight );
-            controls.handleResize();
+            if ( controls !== undefined ) { controls.handleResize(); }
         };
         </script>
 

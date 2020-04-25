@@ -36,35 +36,6 @@
         <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <!-- <script src="js/datguivr.js"></script> -->
         <script src="node_modules/three/examples/js/math/Lut.js"></script>
-        <script>
-            // display_type = "VR";
-            // display_type = "anaglyph";
-            display_type = "keyboard";
-            fname = "D4/";
-            //quality = 4; // REDUCED FOR BOOTH
-
-            const urlParams = new URLSearchParams(window.location.search);
-            if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
-            if ( urlParams.has('display_type') ) { display_type = urlParams.get('display_type'); };
-            if ( urlParams.has('view_mode') ) { view_mode = urlParams.get('view_mode'); };
-            if ( urlParams.has('autoplay') ) { autoplay = urlParams.get('autoplay'); };
-            if ( urlParams.has('rate') ) { rate = urlParams.get('rate'); };
-            if ( urlParams.has('shadows') ) { shadows = urlParams.get('shadows'); };
-            if ( urlParams.has('quality') ) { quality = urlParams.get('quality'); };
-            if ( urlParams.has('zoom') ) { zoom = urlParams.get('zoom'); };
-            if ( urlParams.has('pinky') ) { pinky = urlParams.get('pinky'); };
-            if ( urlParams.has('cache') ) { cache = urlParams.get('cache'); };
-            if ( urlParams.has('hard_mode') ) { hard_mode = urlParams.get('hard_mode'); };
-            if ( urlParams.has('quasicrystal') ) { quasicrystal = urlParams.get('quasicrystal'); };
-            if ( urlParams.has('mercury') ) { mercury = urlParams.get('mercury'); };
-            if ( urlParams.has('colour_scheme') ) { colour_scheme = urlParams.get('colour_scheme'); };
-            if ( urlParams.has('rotate_torus') ) { rotate_torus = urlParams.get('rotate_torus'); };
-            if ( urlParams.has('initial_camera_location') ) { initial_camera_location = urlParams.get('initial_camera_location'); };
-            if ( urlParams.has('camera_target') ) { camera_target = urlParams.get('camera_target'); };
-            if ( urlParams.has('record') ) { record = urlParams.get('record'); };
-            if ( urlParams.has('t0') ) { t0 = urlParams.get('t0'); };
-
-        </script>
         <script src="js/CCapture.all.min.js"></script>
         <script src="js/nddem.js"></script>
 	</body>

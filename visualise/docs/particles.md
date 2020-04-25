@@ -14,7 +14,7 @@ Now, lets try that same thing, but we are going to slice a 5D hypersphere with a
 
 Let's now go and look at inclined plane flow in 5D
 
-<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/index.html?fname=D5"></iframe>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/index.html?fname=D5&rotate_torus=-150"></iframe>
 
 ### Particle rotation
 
@@ -24,11 +24,11 @@ To be able to see a particle rotate, we need to attach a texture to it. Here is 
 In 3D, there are three directions that an object can rotate in.
 <iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/multiple_rotating_earths.html"></iframe>
 
-<span style="color:red">In higher dimensions, there are more!... Information needed. See paper. Maybe just include the full movie we are making for the supplementary information?</span>
+<!-- <span style="color:red">In higher dimensions, there are more!... Information needed. See paper. Maybe just include the full movie we are making for the supplementary information?</span> -->
 
-As we can't render the textures needed to do this without a computer, below is a video of inclined plane flow in D3, D4 and D5 with textures attached.
+As we can't render the textures needed to do this without a local installation, here is a video explaining how rotations work
 
-<video style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" controls><source src="https://www.benjymarks.com/nddem/videos/RenderMultiD.mp4"></video>
+<video style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" controls><source src="https://www.benjymarks.com/nddem/videos/hypersphere-rotations.mp4"></video>
 
 
 ### Trying out VR (this will look blank if you don't have a VR headset attached)
