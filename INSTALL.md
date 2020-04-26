@@ -1,9 +1,14 @@
-# External Libraries included in the sources
+# External Libraries and ressources included in the sources
 - NrrdIO-1.11.0: Distributed under LGPLv2. Consult the file src/NrrdIO-1.11.0-src/LICENSE_lgpl-2.1.txt for more information, or the project website: http://teem.sourceforge.net/nrrd/index.html
 - gzip: Distributed under the Boost Software License, Version 1.0.
 - zlib: Distributed under the Boost Software License, Version 1.0.
 - httplib.h: Distributed under MIT License. https://github.com/yhirose/cpp-httplib
 - Tinypng: Distributed under LGPLv3. https://www.nayuki.io/page/tiny-png-output
+- Threejs: Distributed under MIT licence. https://threejs.org/
+- papaparse: Distributed under MIT licence. https://www.papaparse.com/
+- aframe: Distributed under MIT licence. https://github.com/aframevr/aframe
+- 1227 Earth.bin: Poly by Google. Distributed under CC-BY. https://poly.google.com/view/58PjkXNdpPb
+- eso0932a.jpg: ESO. Distributed under CC-BY. https://www.eso.org/public/images/eso0932a/
 
 # Prerequisites
 - Cmake: tested with version 3.10.2. https://cmake.org/
