@@ -1,8 +1,9 @@
 # Incline plane flow
 #directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D4
 #directory /Users/FGuillard/Dropbox/DEM_ND/Samples/SingleTest
-directory /home/franz/Dropbox/DEM_ND/Samples/SingleTest
-dimensions 4 1
+#directory /home/franz/Dropbox/DEM_ND/Samples/SingleTest
+directory Output_fun
+dimensions 46340 1
 
 #set adimensional
 radius -1 0.5
@@ -10,15 +11,11 @@ mass -1 1
 auto rho
 auto inertia
 
-boundary 0 PBC 0 20
-boundary 1 PBC  0 5
-boundary 2 PBC  0 3.4
-boundary 3 PBC  0 3.4
+auto location randomdrop
 
-location 0 0 0.6 0 1.7
-omega 0 0.1 0 0 0 0 0
+#location 0 5 2 1.7 1.7
+#omega 0 0.1 0 0 0 0 0
 
-gravity 0 0 0 0
 set Kn 2e5
 set Kt 8e4
 set GammaN 75
@@ -28,15 +25,15 @@ set Mu 0.5
 
 set T 40
 set dt 0.0001
-#set dumps XML with 4 Position Velocity Omega Coordination
+set dumps XML with 4 Position Velocity Omega Coordination
 set dumps CSV with 1 Orientation
 set dumps VTK with 1 Omega
-set tdump 10000
+set tdump 1000
 #event 20 gravity 0.05 -0.9 0 0
 
-event 20 omega  0 0 0.1 0 0 0 0
-event 40 omega 0 0 0 0.1 0 0 0
-event 60 omega 0 0 0 0 0.1 0 0
-event 80 omega 0 0 0 0 0 0.1 0
-event 100 omega 0 0 0 0 0 0 0.1
+#event 20 omega  0 0 0.1 0 0 0 0
+#event 40 omega 0 0 0 0.1 0 0 0
+#event 60 omega 0 0 0 0 0.1 0 0
+#event 80 omega 0 0 0 0 0 0.1 0
+#event 100 omega 0 0 0 0 0 0 0.1
 EOF

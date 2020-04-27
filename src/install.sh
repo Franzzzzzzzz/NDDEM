@@ -1,14 +1,11 @@
 #!/bin/bash
 
-
-
-
-if [ -e "Samples" ]
+if [ -e "../Samples" ]
 then 
-    echo "The Samples file already exist and has been kept"
+    echo -e "\nThe Samples file already exist and has been kept"
 else
     while [ 1 ] ; do
-    echo -e "A folder containing simulation results that Texturing can access is necessary. What type of folder do you want to create? \n [1] Regular folder (./Samples) \n [2] Symbolic link\n [3] Skip"
+    echo -e "\nA folder containing simulation results that Texturing can access is necessary. What type of folder do you want to create? \n [1] Regular folder (./Samples) \n [2] Symbolic link\n [3] Skip"
     read -p '>>>' -n 1 res
     
     if [ "$res" -eq 1 ]
@@ -18,7 +15,7 @@ else
         break 
     elif [ "$res" -eq 2 ]
     then 
-        echo -e "Where do you want the symlink to point to?"
+        echo -e "\nWhere do you want the symlink to point to?"
         read -p '>>>' lnk 
         ln -s "$lnk" ./Samples
         break 
@@ -30,12 +27,12 @@ else
 fi
 
 
-if [ -e "Textures" ]
+if [ -e "../Textures" ]
 then 
-    echo "The Textures file already exist and has been kept"
+    echo -e "\nThe Textures file already exist and has been kept"
 else
     while [ 1 ] ; do
-    echo -e "A folder to hold the textures is required for Texturing. What type of folder do you want to create? \n [1] Regular folder (./Textures) \n [2] Symbolic link\n [3] Skip"
+    echo -e "\nA folder to hold the textures is required for Texturing. What type of folder do you want to create? \n [1] Regular folder (./Textures) \n [2] Symbolic link\n [3] Skip"
     read -p '>>>' -n 1 res
     
     if [ "$res" -eq 1 ]
@@ -45,7 +42,7 @@ else
         break 
     elif [ "$res" -eq 2 ]
     then 
-        echo -e "Where do you want the symlink to point to?"
+        echo -e "\nWhere do you want the symlink to point to?"
         read -p '>>>' lnk 
         ln -s "$lnk" ./Textures
         break 

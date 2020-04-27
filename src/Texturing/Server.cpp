@@ -48,12 +48,17 @@ int main(void)
     using namespace httplib;
 
     Server svr;
-    svr.set_base_dir("../..");
+    
+    #ifdef TEXTURINGPATH
+      svr.set_base_dir(TEXTURINGPATH "/..");
+    #else
+      svr.set_base_dir("..");
+    #endif
     printf("Starting\n") ; fflush(stdout) ;
     /*svr.Get("/hi", [](const Request& req, Response& res) {
         res.set_content("Hello World!", "text/plain");
     });*/
-
+    //printf("[%s]", Texturing4.DirectorySave.c_str()) ; fflush(stdout);
     //svr.Get("/something", [](const Request& req, Response& res) {
     //});
 

@@ -54,8 +54,13 @@ public :
 
   v1d lambdagrid ; ///< Pixel grid in latitude
   v1d thetagrid ; ///< Pixel grid in longitude
-  string BasePath = "../../Samples/" ; ///< Default directory for simulation results
-  string DirectorySave = "../../Textures/" ; ///< Default directory for saving the resulting textures
+  #ifdef TEXTURINGPATH
+  string BasePath = TEXTURINGPATH "/../Samples/" ; ///< Default directory for simulation results
+  string DirectorySave = TEXTURINGPATH "/../Textures/" ; ///< Default directory for saving the resulting textures
+  #else
+  string BasePath = "../Samples/" ; ///< Default directory for simulation results
+  string DirectorySave = "../Textures/" ; ///< Default directory for saving the resulting textures
+  #endif
   int N ; ///< Number of grains
   v2d Boundaries ; ///< List of boundaries
 
@@ -124,6 +129,7 @@ template <int d>
 int Texturing<d>::initialise (map <string,string> args)
 {
  Tools<d>::initialise() ;
+ printf("{%s}", DirectorySave.c_str()) ; 
  string Directory=args["path"] ;
  //DirectorySave= args["texturepath"] ;
  set_grid (atoi(args["resolution"].c_str())) ;

@@ -14,7 +14,7 @@ endif()
 
 # set the project name
 project(NDimensionalDem)
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 
 # policy??
 cmake_policy(SET CMP0003 NEW)
@@ -71,3 +71,5 @@ add_subdirectory(Dem)
 add_subdirectory(NrrdIO-1.11.0-src)
 add_subdirectory(CoarseGraining)
 add_subdirectory(Texturing)
+
+execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/install.sh)
