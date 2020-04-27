@@ -5,18 +5,17 @@ This git repository contains the code for discrete element numerical modelling o
 
 ## Structure
 The code is split into different modules, with different purposes. The main modules are:
-- CppCode: `cpp` Main DEM simulation *@Franzzzzzzzz*
+- src/Dem: `cpp` Main DEM simulation *@Franzzzzzzzz*
+- src/CoarseGraining: `cpp` Multi-dimensional coarse-graining code. *@Franzzzzzzzz*
+- src/TexturingServer: `cpp` Server to generate textures to visualise rotating particles. *@Franzzzzzzzz*
 - visualise: `html+js` VR visualisation module of NDDEM *@benjym*
-- CoarseGrainingCode: `cpp` Multi-dimensional coarse-graining code. Some parts are still triggered only for 3D.
-- Liggghts: `lmp` Used for comparison of the NDDEM with existing DEM code in 3D, ie. Liggghts.
-- PyCode: `py` Initial NDDEM code written in python, conserved for historical purposes only. Limited use and features.
 
 ## Operating system support
 All parts of this code have been tested on all recent versions of Windows, Mac and Linux.
 
 ## Installation instructions and documentation
 Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
- - [NDDEM solver and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/html/index.html)
+ - [NDDEM solver, coarse graining and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
 
@@ -29,4 +28,4 @@ This project uses many open source resources and is itself distributed under the
 ## Contact details
 For help or questions, please contact francois.guillard [at] sydney.edu.au.
 
-Edited 17/04/2020.
+<!--- Edited 27/04/2020. -->
