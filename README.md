@@ -14,7 +14,7 @@ The code is split into different modules, with different purposes. The main modu
 ## Operating system support
 All parts of this code have been tested on all recent versions of Windows, Mac and Linux.
 
-## Installating instructions and documentation
+## Installation instructions and documentation
 Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
  - [NDDEM solver and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
@@ -24,7 +24,7 @@ Installation instructions and documentation is split between the c++ and javascr
 If you would like to contribute to the code, please contact francois.guillard [at] sydney.edu.au. For feature requests, please use the issue tracker above.
 
 ## License
-This project is licensed under the GNU GPL License - see the LICENSE file for details
+This project uses many open source resources and is itself distributed under the GNU GPL License - see the INSTALL.md and LICENSE files for details.
 
 ## Contact details
 For help or questions, please contact francois.guillard [at] sydney.edu.au.
