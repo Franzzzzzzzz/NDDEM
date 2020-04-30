@@ -1,6 +1,8 @@
 # N dimensional Discrete Element Modelling code (N ⊂ ℕ*).
 AKA Most Useless DEM.
- 
+
+[For a live demonstration of NDDEM, see here.](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
+
 This git repository contains the code for discrete element numerical modelling of granular material in a general number of spatial dimensions. The Dropbox folder for the code **should not** be used anymore.  
 
 ## Structure
