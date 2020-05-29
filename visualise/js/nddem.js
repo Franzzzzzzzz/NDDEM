@@ -1,35 +1,3 @@
-// function do_preprogrammed_motion() {
-//             if (not_started) { recorder.start(); not_started = false; }
-//             else if (segment == 0) {
-//                 world[3].cur += 0.02;
-//                 if (world[3].cur >= 3) { segment += 1; }
-//             }
-//             else if (segment == 1) {
-//                 world[3].cur -= 0.02;
-//                 if (world[3].cur <= 1) { segment += 1; }
-//             }
-//             else if (segment == 2) {
-//                 world[3].cur += 0.02;
-//                 if (world[3].cur >= 2) { segment += 1; }
-//             }
-//             else if (segment == 3) {
-//                 world[3].cur = 2;
-//                 world[4].cur += 0.02;
-//                 if (world[4].cur >= 3) { segment += 1; }
-//             }
-//             else if (segment == 4) {
-//                 world[4].cur -= 0.02;
-//                 if (world[4].cur <= 1) { segment += 1; }
-//             }
-//             else if (segment == 5) {
-//                 recorder.stop();
-//                 recorder.save();
-//             }
-//             // update_spheres();
-//
-//         }
-// var segment = 0; parametric = 0; spiral = 1; not_started = true;
-
 // var THREE = require('three');
 var container; // main div element
 var camera, scene, controls, renderer; // UI elements
@@ -299,8 +267,8 @@ function build_world() {
     }
 
     make_camera();
-    make_walls();
-    if ( !fname.includes('Spinner') && !quasicrystal ) { make_axes(); }
+    if ( !urlParams.has('no_walls') ) { make_walls(); }
+    if ( !urlParams.has('no_axes') && !quasicrystal ) { make_axes(); }
     make_lights();
     add_renderer();
     if ( !fname.includes('Submarine') ) { add_controllers(); }
@@ -655,11 +623,11 @@ function add_gui() {
         //gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
             for (i=3;i<N;i++) {
-                if ( view_mode === 'rotations' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).listen().name('x'+(i+1)) ; }
-                else { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).listen().name('x'+(i+1)) ; }
+                if ( view_mode === 'rotations' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x'+(i+1)) ; }
+                else { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('x'+(i+1)) ; }
             }
         }
-        gui.add( time, 'cur').min(time.min).max(time.max).step(1).listen().name('Time') ;
+        gui.add( time, 'cur').min(time.min).max(time.max).step(0.1).listen().name('Time') ;
         gui.add( time, 'play_rate').min(0).max(10.0).name('Rate') ;
         // gui.add( time, 'play').name('Autoplay').onChange( function(flag) { time.play = flag; })
         gui.add( time, 'play').name('Play').onChange( function(flag) {
@@ -1528,6 +1496,7 @@ function make_initial_spheres_CSV() {
                 var object = new THREE.Mesh( geometry, material );
                 object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
                 object.rotation.z = Math.PI/2.;
+                if ( fname.includes('Coll') || fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
                 if ( shadows ) {
                     object.castShadow = true;
                     object.receiveShadow = true;
@@ -1977,7 +1946,6 @@ function render() {
     if (display_type == "anaglyph") { effect.render( scene, camera ); }
     else { renderer.render( scene, camera ); }
     if ( record ) {
-        // do_preprogrammed_motion();
         recorder.capture(renderer.domElement);
         if ( time.snapshot ) {
             setTimeout(() => {
