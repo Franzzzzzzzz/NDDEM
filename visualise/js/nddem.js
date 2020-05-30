@@ -127,13 +127,19 @@ else {
 if ( urlParams.has('t0') ) {
     time.cur = parseFloat(urlParams.get('t0'));
 }
+if ( urlParams.has('texture_path') ) {
+    texture_dir = urlParams.get('texture_path');
+}
+else {
+    texture_dir = 'Textures/';
+}
 
 
 var root_dir = 'http://localhost:54321/';
 var data_dir = root_dir;
 if ( window.location.hostname.includes('benjymarks') ) {
-    root_dir = window.location.href;
-    data_dir = root_dir;
+    root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; //window.location.href;
+    data_dir = 'https://www.benjymarks.com/nddem/'; //root_dir;
     cache = true;
 }
 else if ( window.location.hostname.includes('github') ) {
@@ -1341,7 +1347,7 @@ function make_initial_sphere_texturing() {
                  "&quality=" + quality +
                  "&fname=" + fname,
                  true);*/
-    request.open('GET', root_dir + 'load?ND=' + N + '&path='+ fname + '&texturepath=../../Textures&resolution=' + quality, true)
+    request.open('GET', root_dir + 'load?ND=' + N + '&path='+ fname + '&texturepath=../../' + texture_dir + '&resolution=' + quality, true)
     request.send(null)
 
     request.onload = function() {
@@ -1482,7 +1488,7 @@ function make_initial_spheres_CSV() {
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
-                            texture_path = data_dir + "Textures/Texture-"+i+"-00000"
+                            texture_path = data_dir + texture_dir + "/Texture-"+i+"-00000"
                             for ( var iiii=3;iiii<N;iiii++) { texture_path += "-0.0"; }
                             var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
                             var material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -1529,8 +1535,8 @@ function load_textures(t, Viewpoint) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
         for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
-            if ( cache ) { var filename = data_dir + "Textures/" + "Texture-" + ii + "-" + Viewpoint+".png" }
-            else { var filename = data_dir + "Textures/" + "Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
+            if ( cache ) { var filename = data_dir + texture_dir + "/Texture-" + ii + "-" + Viewpoint+".png" }
+            else { var filename = data_dir + texture_dir + "/Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
             loader.load(filename,
                         function( texture ) { //TODO not sure why not working ... ...
                             //var myRe = /-[0-9]+.png/g
