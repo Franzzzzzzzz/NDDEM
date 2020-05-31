@@ -11,12 +11,24 @@
 	</head>
 	<body>
         <div id="container"></div>
+        <script src="../js/CCapture.all.min.js"></script>
 		<script src="../node_modules/three/build/three.js"></script>
         <script src="../node_modules/three/examples/js/WebGL.js"></script>
         <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script>
         <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
         <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const recorder = new CCapture({
+        	verbose: true,
+        	display: true,
+        	framerate: 30,
+        	quality: 100,
+        	format: 'png',
+        	timeLimit: 100,
+        	frameLimit: 0,
+        	autoSaveTime: 0
+        });
         container = document.getElementById( 'container' );
         function update_spheres(x) {
             var R_draw = Math.sqrt(1 - Math.abs(x));
@@ -28,6 +40,7 @@
 
             wall.position.x = x;
         };
+        var record = false; sign = 1;
         var controls;
         var slice = {'loc':-1};
         var scene = new THREE.Scene();
@@ -36,6 +49,21 @@
 		camera.position.z = 4;
         camera.position.x = 1.5;
 
+        if ( urlParams.has('record') ) { addRecordOnKeypress() };
+        function addRecordOnKeypress() {
+            document.addEventListener("keydown", function(event) {
+                if (event.code == 'Space') {
+                    if (record) {
+                        recorder.stop();
+                        recorder.save();
+                    }
+                    else {
+                        recorder.start();
+                    }
+                    record = !record;
+                }
+            }, false);
+        }
 
 		var renderer = new THREE.WebGLRenderer();
         // var controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -80,7 +108,12 @@
             if ( controls !== undefined) { controls.update(); }
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
-
+            if ( record ) {
+                recorder.capture(renderer.domElement);
+                slice.loc += sign*0.05; update_spheres(slice.loc);
+                if ( slice.loc > 1) {sign = -1;}
+                else if( slice.loc < -1) { sign = 1;}
+            }
 		};
         window.addEventListener( 'resize', onWindowResize, false );
 		animate();
