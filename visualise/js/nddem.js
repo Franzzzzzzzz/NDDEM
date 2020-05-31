@@ -629,7 +629,7 @@ function add_gui() {
         //gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
             for (i=3;i<N;i++) {
-                if ( view_mode === 'rotations' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x'+(i+1)) ; }
+                if ( view_mode === 'rotations' || view_mode === 'rotations2' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x'+(i+1)) ; }
                 else { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('x'+(i+1)) ; }
             }
         }
@@ -1469,7 +1469,8 @@ function make_initial_spheres_CSV() {
                 var geometry = new THREE.CylinderGeometry( 1, 1, 2, Math.pow(2,quality), Math.pow(2,quality) );
             }
             else {
-                var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
+                // var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
+                var geometry  = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) ) );
             }
             var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
             var scale = 20.; // size of particles on tori
@@ -1485,6 +1486,27 @@ function make_initial_spheres_CSV() {
                         if ( i == pinky ) { var color = 0xe72564; }
                         else              { var color = 0xaaaaaa; }
                         var material = new THREE.MeshPhongMaterial( { color: color } );
+                    }
+                    else if ( view_mode === 'rotations2' ) {
+                        var uniforms = {
+                            N: {value: N},
+                            N_lines: {value: 20.0},
+                            A: { value: new THREE.Matrix4() },
+                			x4: { value: 0 },
+                            xp: {value: new THREE.Vector4() },
+                            R: { value: 1 },
+                		};
+                        if ( N > 3 ) { uniforms.x4.value = world[3].cur; }
+                        uniforms.A.value.set(1,0,0,0,
+                                             0,1,0,0,
+                                             0,0,1,0,
+                                             0,0,0,1);
+                        var material = new THREE.ShaderMaterial( {
+                			uniforms: uniforms,
+                			// vertexShader: document.getElementById( 'vertexshader' ).textContent,
+                            vertexShader: document.getElementById( 'vertexshader-4D' ).textContent,
+                			fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+                		} );
                     }
                     else {
                         if ( view_mode === 'rotations' ) {
@@ -1502,7 +1524,7 @@ function make_initial_spheres_CSV() {
                 var object = new THREE.Mesh( geometry, material );
                 object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
                 object.rotation.z = Math.PI/2.;
-                if ( fname.includes('Coll') || fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
+                // if ( fname.includes('Coll') || fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
                 if ( shadows ) {
                     object.castShadow = true;
                     object.receiveShadow = true;
@@ -1525,6 +1547,28 @@ function make_initial_spheres_CSV() {
         }
     });
 };
+
+function load_orientation(t,changed_higher_dim_view) {
+    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dumpA-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
+    else { var filename = data_dir + "Samples/" + fname + "dumpA-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
+    Papa.parse(filename, {
+        download: true,
+        dynamicTyping: true,
+        header: true,
+        cache: cache,
+        complete: function(results) {
+            spheres = results.data;
+            for (i = 0; i<spheres.length; i++) {
+                var object = particles.children[i];
+                // console.log(spheres[i])
+                object.material.uniforms.A.value.elements = spheres[i];
+                object.material.needsUpdate = true;
+                object.material.uniforms.A.needsUpdate = true;
+                console.log(object);
+            }
+        }
+    });
+}
 
 /**
 * Load textures from TexturingServer
@@ -1720,6 +1764,10 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                             lut.setMin(0);
                             lut.setMax(velocity.omegamax);
                             object.material.color = lut.getColor(spheres[i].Omegamag);
+                        }
+                        else if ( view_mode === 'rotations2' ) {
+                            object.material.uniforms.xp.value = new THREE.Vector4(spheres[i].x1,spheres[i].x2,spheres[i].x3,spheres[i].x4)
+                            // object.material.uniforms.R.value = R_draw;
                         }
                         else if ( view_mode === 'D4' ) {
                             //lut.setMin(world[3].min);
@@ -1922,6 +1970,7 @@ function animate() {
             if (world[iii].cur != world[iii].prev) {
                 update_spheres_CSV(time.frame,true);
                 if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
+                else if (view_mode === 'rotations2') {load_orientation(time.frame,) ;}
                 world[iii].prev = world[iii].cur;
             }
         }
@@ -1937,6 +1986,7 @@ function animate() {
     if ( time.frame !== time.prev_frame ) {
         update_spheres_CSV(time.frame,false);
         if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
+        else if (view_mode === 'rotations2') {load_orientation(time.frame,) ;}
         time.prev_frame = time.frame;
     };
     if (time.cur > time.max) { time.cur = 0; }

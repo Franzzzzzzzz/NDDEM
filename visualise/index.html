@@ -37,6 +37,77 @@
         <!-- <script src="js/datguivr.js"></script> -->
         <script src="node_modules/three/examples/js/math/Lut.js"></script>
         <script src="js/CCapture.all.min.js"></script>
+        <script type="x-shader/x-vertex" id="vertexshader-4D">
+            uniform int N;
+            uniform float N_lines;
+			uniform mat4 A;
+            // uniform vec4 A2;
+            // uniform vec4 A3;
+            uniform vec4 xp; // location of the particle
+            uniform float x4;
+            uniform float R;
+			// attribute vec3 orientation;
+            // varying vec4 x;
+            // varying vec4 x_unrotated;
+			varying vec3 vColor;
+            varying vec3 vNormal;
+
+			void main() {
+                vNormal = normal; // for directional lighting
+                const float pi = 3.14159265359;
+                if ( R > 0.0 ) {
+                    vec4 x;
+                    vec4 x_unrotated;
+                    // get 3d locations in x,y,z
+                    x.x = R*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.y = R*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    x.z = R*sin((uv.y-0.5)*pi);
+                    x.w = x4;
+
+                    // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
+                    x_unrotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
+                    x_unrotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
+                    x_unrotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
+                    x_unrotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
+                    // console.log(x_unrotated)
+                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                    float phi = x_unrotated.x;
+                    float theta1 = x_unrotated.y;
+                    float theta2 = x_unrotated.z;
+
+                    vColor.r = pow(cos(phi*N_lines),2.0);;
+                    vColor.g = pow(cos(theta1*N_lines),2.0);
+                    vColor.b = pow(cos(theta2*N_lines),2.0);
+
+                    // vColor.r = x_unrotated.x;
+                    // vColor.g = x_unrotated.y;
+                    // vColor.b = x_unrotated.z;
+                }
+                else { vColor.r = 0.0; }
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+            varying vec3 vNormal;
+            varying vec3 vColor;
+
+            void main() {
+
+                // add directional lighting
+                const float ambient = 0.8;
+                vec3 light = vec3( 1.0 );
+                light = normalize( light );
+                float directional = max( dot( vNormal, light ), 0.0 );
+                gl_FragColor = vec4( ( ambient + directional ) * vColor, 1.0 ); // colours by vertex colour
+
+                // no directional lighting
+                // const float ambient = 1.0;
+                // gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
+
+            }
+        </script>
         <script src="js/nddem.js"></script>
 	</body>
 </html>
