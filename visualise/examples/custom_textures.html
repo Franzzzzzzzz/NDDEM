@@ -25,8 +25,7 @@
             uniform float omega4;
             uniform float omega5;
             uniform float omega6;
-            uniform float d4;
-            uniform float d5;
+            uniform float x4;
 			// attribute vec3 orientation;
 			varying vec3 vColor;
             varying vec3 vNormal;
@@ -34,35 +33,39 @@
 			void main() {
                 vNormal = normal; // for directional lighting
                 const float pi = 3.14159265359;
-                const float R = 1.0;
-                float theta2;
-                // get 3d locations in x,y,z
-                float x = R*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
-                float y = R*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
-                float z = R*sin((uv.y-0.5)*pi);
+                float R;
+                float R_squared = pow(0.5,2.0)-pow(x4,2.0);
+                if ( R_squared > 0.0 ) {
+                    R = sqrt(R_squared);
+                    float theta2;
+                    // get 3d locations in x,y,z
+                    float x = R*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    float y = R*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    float z = R*sin((uv.y-0.5)*pi);
 
-                // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
-                float x_unrotated = cos(omega1)*cos(omega2)*x + sin(omega1)*cos(omega2)*y - sin(omega2)*z;
-                float y_unrotated = (cos(omega1)*sin(omega2)*sin(omega3) - sin(omega1)*cos(omega3))*x + (sin(omega1)*sin(omega2)*sin(omega3) + cos(omega1)*cos(omega3))*y + cos(omega2)*sin(omega3)*z;
-                float z_unrotated = (cos(omega1)*sin(omega2)*cos(omega3) + sin(omega1)*sin(omega3))*x + (sin(omega1)*sin(omega2)*cos(omega3) - cos(omega1)*sin(omega3))*y + cos(omega2)*cos(omega3)*z;
-                // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
-                float phi = pow(sin(x_unrotated*N_lines),2.0);
-                float theta1 = pow(cos(y_unrotated*N_lines),2.0);
-                if ( N == 4 ) {
-                    theta2 = pow(cos(z_unrotated*N_lines),2.0);
+                    // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
+                    float x_unrotated = cos(omega1)*cos(omega2)*x + sin(omega1)*cos(omega2)*y - sin(omega2)*z;
+                    float y_unrotated = (cos(omega1)*sin(omega2)*sin(omega3) - sin(omega1)*cos(omega3))*x + (sin(omega1)*sin(omega2)*sin(omega3) + cos(omega1)*cos(omega3))*y + cos(omega2)*sin(omega3)*z;
+                    float z_unrotated = (cos(omega1)*sin(omega2)*cos(omega3) + sin(omega1)*sin(omega3))*x + (sin(omega1)*sin(omega2)*cos(omega3) - cos(omega1)*sin(omega3))*y + cos(omega2)*cos(omega3)*z;
+                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                    float phi = pow(sin(x_unrotated*N_lines),2.0);
+                    float theta1 = pow(cos(y_unrotated*N_lines),2.0);
+                    if ( N == 4 ) {
+                        theta2 = pow(cos(z_unrotated*N_lines),2.0);
 
+                    }
+                    // color according to the hyperspherical coordinates (cf. the phi2color function in Texturing.cpp)
+                    if ( N == 3 ) {
+                        vColor.r = phi;
+                        vColor.g = theta1;
+                    }
+                    if ( N == 4 ) {
+                        vColor.r = phi;
+                        vColor.g = theta1;
+                        vColor.b = theta2;
+                    }
                 }
-                // color according to the hyperspherical coordinates (cf. the phi2color function in Texturing.cpp)
-                if ( N == 3 ) {
-                    vColor.r = phi;
-                    vColor.g = theta1;
-                }
-                if ( N == 4 ) {
-                    vColor.r = phi;
-                    vColor.g = theta1;
-                    vColor.b = theta2;
-                }
-
+                else { vColor.r = 0.0; }
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
@@ -70,26 +73,24 @@
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentshader">
+            varying vec3 vNormal;
+            varying vec3 vColor;
 
-			varying vec3 vNormal;
-			varying vec3 vColor;
-
-			void main() {
+            void main() {
 
                 // add directional lighting
-				const float ambient = 0.5;
-				vec3 light = vec3( 1.0 );
-				light = normalize( light );
-				float directional = max( dot( vNormal, light ), 0.0 );
-				gl_FragColor = vec4( ( ambient + directional ) * vColor, 1.0 ); // colours by vertex colour
+                const float ambient = 0.5;
+                vec3 light = vec3( 1.0 );
+                light = normalize( light );
+                float directional = max( dot( vNormal, light ), 0.0 );
+                gl_FragColor = vec4( ( ambient + directional ) * vColor, 1.0 ); // colours by vertex colour
 
                 // no directional lighting
-				// const float ambient = 1.0;
+                // const float ambient = 1.0;
                 // gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
 
-			}
-
-		</script>
+            }
+        </script>
         <script>
 
         var root_dir = 'http://localhost:54321/';
@@ -139,14 +140,14 @@
 
         var uniforms = {
             N: {value: 4},
-            N_lines: {value: 10.0},
+            N_lines: {value: 25.0},
             omega1: {value: 0.0},
             omega2: {value: 0.0},
             omega3: {value: 0.0},
             omega4: {value: 0.0},
             omega5: {value: 0.0},
             omega6: {value: 0.0},
-			d4: { value: 0.0 },
+			x4: { value: 0.0 },
 		};
         if ( urlParams.has('N') ) { uniforms.N.value = parseInt(urlParams.get('N')); }
         var rect_geometry = new THREE.PlaneBufferGeometry( 1, 1, Math.pow(2,quality), Math.pow(2,quality) );
@@ -176,17 +177,27 @@
         scene.add( rect );
 
         var gui = new dat.GUI();
-        gui.add( slice, 'omega1').min(-1).max(1).step(0.01).listen().name('&omega;<sub>1</sub> rate') ;
-        gui.add( slice, 'omega2').min(-1).max(1).step(0.01).listen().name('&omega;<sub>2</sub> rate') ;
-        gui.add( slice, 'omega3').min(-1).max(1).step(0.01).listen().name('&omega;<sub>3</sub> rate') ;
+        gui.add( slice, 'omega1').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>1</sub>') ;
+        gui.add( slice, 'omega2').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>2</sub>') ;
+        gui.add( slice, 'omega3').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>3</sub>') ;
         if ( uniforms.N.value > 3 ) {
-            gui.add( slice, 'omega4').min(-1).max(1).step(0.01).listen().name('&omega;<sub>4</sub>rate') ;
-            gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('&omega;<sub>5</sub> rate') ;
-            gui.add( slice, 'omega6').min(-1).max(1).step(0.01).listen().name('&omega;<sub>6</sub> rate') ;
-            gui.add( slice, 'x4').min(-1).max(1).step(0.01).listen().name('x<sub>4</sub>') ;
+            gui.add( slice, 'omega4').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>4</sub>') ;
+            gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>5</sub>') ;
+            gui.add( slice, 'omega6').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>6</sub>') ;
+            gui.add( slice, 'x4').min(-1).max(1).step(0.01).listen().name('x<sub>4</sub>').onChange( function( ) {
+                R_squared = Math.pow(0.5,2) - Math.pow(0.0 - slice.x4,2);
+                if ( R_squared > 0 ) {
+                    sphere.visible = true;
+                    R = 2.*Math.sqrt(R_squared); // factor of two just for this example to make it look bigger
+                    sphere.scale.set(R,R,R);
+                }
+                else {
+                    sphere.visible = false;
+                }
+            });
         }
         // if ( N > 4 ) {
-            // gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('Omega 5 rate') ;
+            // gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('Omega 5') ;
         // }
         gui.open();
 
@@ -216,6 +227,7 @@
             uniforms.omega4.value += slice.omega4*delta;
             uniforms.omega5.value += slice.omega5*delta;
             uniforms.omega6.value += slice.omega6*delta;
+            uniforms.x4.value = slice.x4;
             // console.log(uniforms.omega1.value);
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
