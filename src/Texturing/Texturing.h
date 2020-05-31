@@ -19,6 +19,7 @@
 #include <limits>
 #include <experimental/filesystem>
 
+extern bool blenderrender ; 
 
 #define DeltaX 0.1 ///< Step in location for the visualisation \warning ad-hoc \todo should be runtime value.  
 #define FilePerLine 100 ///< Line size for single file tiled output \deprecated not really used at the moment. 
@@ -458,11 +459,20 @@ for (int i=0 ; i<N ; i++)
              //sp[d-2] *= sin(phi[d-3])*cos(phi[d-2]) ;
              //sp[d-1] *= sin(phi[d-3])*sin(phi[d-2]) ;
 
-             //********** Version agreeing with default uv sphere mapping in Blender 2.79
-             sp[d-3] *= sin(phi[d-3])*cos(phi[d-2]-M_PI/2.) ;
-             sp[d-2] *= sin(phi[d-3])*sin(phi[d-2]-M_PI/2.) ;
-             sp[d-1] *= cos(phi[d-3]) ;
-
+             if (blenderrender)
+             {
+                 //********** Version agreeing with default uv sphere mapping in Blender 2.79
+                 sp[d-3] *= sin(phi[d-3])*cos(phi[d-2]-M_PI/2.) ;
+                 sp[d-2] *= sin(phi[d-3])*sin(phi[d-2]-M_PI/2.) ;
+                 sp[d-1] *= cos(phi[d-3]) ;
+             }
+             else
+             {
+                 //********** Version agreeing with the Threejs visualisation
+                sp[d-3] *= cos(phi[d-3]) ;
+                sp[d-2] *= sin(phi[d-3])*cos(-phi[d-2]) ;
+                sp[d-1] *= sin(phi[d-3])*sin(-phi[d-2]) ;
+             }
 
              //dispvector(sp) ;
              // Now sp should be right, let's check
