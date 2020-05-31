@@ -21,6 +21,7 @@ template <int d>
 void runthread_MasterRender (Texturing<d> * T) {T->MasterRender() ; } ///< Function to call Texturing::MasterRender()
 std::thread MasterRenderThread ; 
 std::mutex LockRender ;
+bool blenderrender=false ; 
 
 Texturing<3> Texturing3 ;
 Texturing<4> Texturing4 ;
@@ -43,10 +44,19 @@ int curd = -1 ;
  *  \details /nrrdcolormap : export the colormap in nrrd format 
  *  \details /vtkmap : export the textures as vtk surfaces through the colormap instead of plane textures.
  */
-int main(void)
+int main(int argc, char * argv[])
 {
     using namespace httplib;
-
+    
+    if (argc>1)
+        if (!strcmp(argv[1], "blender"))
+            blenderrender = true ; 
+        
+    if (blenderrender)
+        printf("Rendering in blender compatible format\n") ; 
+    else
+        printf("The texturing server now defaults to render textures for Threejs mapping. Use the blender command line option to render in Blender compatible textures.\n") ; 
+        
     Server svr;
     
     #ifdef TEXTURINGPATH
