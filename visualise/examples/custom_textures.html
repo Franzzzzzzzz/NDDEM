@@ -309,7 +309,7 @@
             var Sum = uniforms.A.value.elements.map(function (num, idx) {
               return num + dA[idx];
             });
-            uniforms.A.value.elements = Sum;
+            sphere.material.uniforms.A.value.elements = Sum;
             // console.log(Sum);
             // console.log(dA);
             // uniforms.A1 *= .value.y +=  slice.omega1*delta;
