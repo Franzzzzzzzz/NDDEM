@@ -17,7 +17,8 @@
         <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <script src="../js/CCapture.all.min.js"></script>
         <script type="x-shader/x-vertex" id="vertexshader">
-
+            uniform int N;
+            uniform float N_lines;
 			uniform float omega1;
             uniform float omega2;
             uniform float omega3;
@@ -32,11 +33,10 @@
 
 			void main() {
                 vNormal = normal; // for directional lighting
-                const float N_lines = 20.0;
                 const float pi = 3.14159265359;
-                const float two_pi = 6.28318530718;
-                // get 3d locations in x,y,z
                 const float R = 1.0;
+                float theta2;
+                // get 3d locations in x,y,z
                 float x = R*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
                 float y = R*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
                 float z = R*sin((uv.y-0.5)*pi);
@@ -46,17 +46,22 @@
                 float y_unrotated = (cos(omega1)*sin(omega2)*sin(omega3) - sin(omega1)*cos(omega3))*x + (sin(omega1)*sin(omega2)*sin(omega3) + cos(omega1)*cos(omega3))*y + cos(omega2)*sin(omega3)*z;
                 float z_unrotated = (cos(omega1)*sin(omega2)*cos(omega3) + sin(omega1)*sin(omega3))*x + (sin(omega1)*sin(omega2)*cos(omega3) - cos(omega1)*sin(omega3))*y + cos(omega2)*cos(omega3)*z;
                 // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                float phi = pow(sin(x_unrotated*N_lines),2.0);
+                float theta1 = pow(cos(y_unrotated*N_lines),2.0);
+                if ( N == 4 ) {
+                    theta2 = pow(cos(z_unrotated*N_lines),2.0);
 
+                }
                 // color according to the hyperspherical coordinates (cf. the phi2color function in Texturing.cpp)
-
-
-
-                // float phi =
-                vColor.r = pow(sin(x_unrotated*N_lines),2.0);
-                vColor.g = pow(cos(y_unrotated*N_lines),2.0);
-                // vColor.r = x;
-                // vColor.g = y;
-                // vColor.b = z;
+                if ( N == 3 ) {
+                    vColor.r = phi;
+                    vColor.g = theta1;
+                }
+                if ( N == 4 ) {
+                    vColor.r = phi;
+                    vColor.g = theta1;
+                    vColor.b = theta2;
+                }
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
@@ -71,15 +76,16 @@
 
 			void main() {
 
-				const float ambient = 1.0;
-
                 // add directional lighting
-				// vec3 light = vec3( 1.0 );
-				// light = normalize( light );
-				// float directional = max( dot( vNormal, light ), 0.0 );
-				// gl_FragColor = vec4( ( ambient + directional ) * vColor, 1.0 ); // colours by vertex colour
+				const float ambient = 0.5;
+				vec3 light = vec3( 1.0 );
+				light = normalize( light );
+				float directional = max( dot( vNormal, light ), 0.0 );
+				gl_FragColor = vec4( ( ambient + directional ) * vColor, 1.0 ); // colours by vertex colour
 
-                gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
+                // no directional lighting
+				// const float ambient = 1.0;
+                // gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
 
 			}
 
@@ -104,16 +110,19 @@
         	autoSaveTime: 0
         });
         var record = false; var quality = 7;
-        var slice = {'omega1':0,'omega2':0,'omega3':0}
+        var slice = {'omega1':0,'omega2':0,'omega3':0,'omega4':0,'omega5':0,'omega6':0,'x4':0}
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
         if ( urlParams.has('quality') ) { quality = parseInt(urlParams.get('quality'))}
         clock = new THREE.Clock();
         var scene = new THREE.Scene();
         scene.background = new THREE.Color( 0x111111 );
 		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 0.1, 1000 );
+        // var width = 6;
+        // var height = 3;
+        // camera = new THREE.OrthographicCamera(-width/2, width/2, -height/2, height/2, 1, 1000);
 		camera.position.z = 6;
 
-		var renderer = new THREE.WebGLRenderer();
+		var renderer = new THREE.WebGLRenderer({'antialias': true}); // NEED TO ENABLE THIS TO GET RID OF JAGGED EDGES
         if ( urlParams.has('controls') ) { var controls = new THREE.TrackballControls( camera, renderer.domElement ); }
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
@@ -129,6 +138,8 @@
         var rect;
 
         var uniforms = {
+            N: {value: 4},
+            N_lines: {value: 10.0},
             omega1: {value: 0.0},
             omega2: {value: 0.0},
             omega3: {value: 0.0},
@@ -136,8 +147,8 @@
             omega5: {value: 0.0},
             omega6: {value: 0.0},
 			d4: { value: 0.0 },
-            d5: { value: 0.0 },
 		};
+        if ( urlParams.has('N') ) { uniforms.N.value = parseInt(urlParams.get('N')); }
         var rect_geometry = new THREE.PlaneBufferGeometry( 1, 1, Math.pow(2,quality), Math.pow(2,quality) );
         sphere_geometry = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) ) );
 
@@ -165,9 +176,18 @@
         scene.add( rect );
 
         var gui = new dat.GUI();
-        gui.add( slice, 'omega1').min(-1).max(1).step(0.01).listen().name('Omega 1 rate') ;
-        gui.add( slice, 'omega2').min(-1).max(1).step(0.01).listen().name('Omega 2 rate') ;
-        gui.add( slice, 'omega3').min(-1).max(1).step(0.01).listen().name('Omega 3 rate') ;
+        gui.add( slice, 'omega1').min(-1).max(1).step(0.01).listen().name('&omega;<sub>1</sub> rate') ;
+        gui.add( slice, 'omega2').min(-1).max(1).step(0.01).listen().name('&omega;<sub>2</sub> rate') ;
+        gui.add( slice, 'omega3').min(-1).max(1).step(0.01).listen().name('&omega;<sub>3</sub> rate') ;
+        if ( uniforms.N.value > 3 ) {
+            gui.add( slice, 'omega4').min(-1).max(1).step(0.01).listen().name('&omega;<sub>4</sub>rate') ;
+            gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('&omega;<sub>5</sub> rate') ;
+            gui.add( slice, 'omega6').min(-1).max(1).step(0.01).listen().name('&omega;<sub>6</sub> rate') ;
+            gui.add( slice, 'x4').min(-1).max(1).step(0.01).listen().name('x<sub>4</sub>') ;
+        }
+        // if ( N > 4 ) {
+            // gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('Omega 5 rate') ;
+        // }
         gui.open();
 
         if ( urlParams.has('record') ) { addRecordOnKeypress() };
@@ -193,6 +213,9 @@
             uniforms.omega1.value += slice.omega1*delta;
             uniforms.omega2.value += slice.omega2*delta;
             uniforms.omega3.value += slice.omega3*delta;
+            uniforms.omega4.value += slice.omega4*delta;
+            uniforms.omega5.value += slice.omega5*delta;
+            uniforms.omega6.value += slice.omega6*delta;
             // console.log(uniforms.omega1.value);
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
