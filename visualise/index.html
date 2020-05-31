@@ -43,9 +43,8 @@
 			uniform mat4 A;
             // uniform vec4 A2;
             // uniform vec4 A3;
-            uniform vec4 xp; // location of the particle
+            // uniform vec4 A4;
             uniform float x4;
-            uniform float R;
 			// attribute vec3 orientation;
             // varying vec4 x;
             // varying vec4 x_unrotated;
@@ -55,7 +54,10 @@
 			void main() {
                 vNormal = normal; // for directional lighting
                 const float pi = 3.14159265359;
-                if ( R > 0.0 ) {
+                float R;
+                float R_squared = pow(0.5,2.0)-pow(x4,2.0);
+                if ( R_squared > 0.0 ) {
+                    R = sqrt(R_squared);
                     vec4 x;
                     vec4 x_unrotated;
                     // get 3d locations in x,y,z
@@ -69,15 +71,24 @@
                     x_unrotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
                     x_unrotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
                     x_unrotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
-                    // console.log(x_unrotated)
-                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
-                    float phi = x_unrotated.x;
-                    float theta1 = x_unrotated.y;
-                    float theta2 = x_unrotated.z;
 
-                    vColor.r = pow(cos(phi*N_lines),2.0);;
-                    vColor.g = pow(cos(theta1*N_lines),2.0);
-                    vColor.b = pow(cos(theta2*N_lines),2.0);
+                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                    // NOTE: STILL PROBABLY NOT RIGHT
+                    float phi = atan(x_unrotated.y/x_unrotated.x);
+                    float theta1 = asin(x_unrotated.y/R);
+                    float theta2 = asin(x_unrotated.z/R);
+
+                    // vColor.r = abs(cos(phi));
+                    vColor.r = abs(cos(theta1))*abs(cos(theta2))*abs(cos(phi*N_lines));
+                    // vColor.r = abs(cos(phi))*abs(cos(phi*N_lines));
+                    // vColor.g = abs(cos(theta1));
+                    // vColor.g = abs(cos(theta1*N_lines));
+                    vColor.g = abs(cos(theta1))*abs(cos(theta2))*abs(cos(theta1*N_lines));
+                    if ( N > 3 ) {
+                        // vColor.b = abs(cos(theta2));
+                        // vColor.b = abs(cos(theta2*N_lines));
+                        vColor.b = abs(cos(theta1))*abs(cos(theta2))*abs(cos(theta2*N_lines));
+                    }
 
                     // vColor.r = x_unrotated.x;
                     // vColor.g = x_unrotated.y;
@@ -96,7 +107,7 @@
             void main() {
 
                 // add directional lighting
-                const float ambient = 0.8;
+                const float ambient = 0.5;
                 vec3 light = vec3( 1.0 );
                 light = normalize( light );
                 float directional = max( dot( vNormal, light ), 0.0 );

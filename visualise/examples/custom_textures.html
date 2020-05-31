@@ -111,13 +111,22 @@
                     x_unrotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
 
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
-                    float phi = acos(x_unrotated.x);
-                    float theta1 = acos(x_unrotated.y);
-                    float theta2 = acos(x_unrotated.z);
+                    // NOTE: STILL PROBABLY NOT RIGHT
+                    float phi = atan(x_unrotated.y/x_unrotated.x);
+                    float theta1 = asin(x_unrotated.y/R);
+                    float theta2 = asin(x_unrotated.z/R);
 
-                    vColor.r = pow(cos(phi*N_lines),2.0);;
-                    vColor.g = pow(cos(theta1*N_lines),2.0);
-                    if ( N > 3 ) { vColor.b = pow(cos(theta2*N_lines),2.0); }
+                    // vColor.r = abs(cos(phi));
+                    vColor.r = abs(cos(theta1))*abs(cos(theta2))*abs(cos(phi*N_lines));
+                    // vColor.r = abs(cos(phi))*abs(cos(phi*N_lines));
+                    // vColor.g = abs(cos(theta1));
+                    // vColor.g = abs(cos(theta1*N_lines));
+                    vColor.g = abs(cos(theta1))*abs(cos(theta2))*abs(cos(theta1*N_lines));
+                    if ( N > 3 ) {
+                        // vColor.b = abs(cos(theta2));
+                        // vColor.b = abs(cos(theta2*N_lines));
+                        vColor.b = abs(cos(theta1))*abs(cos(theta2))*abs(cos(theta2*N_lines));
+                    }
 
                     // vColor.r = x_unrotated.x;
                     // vColor.g = x_unrotated.y;
@@ -206,7 +215,7 @@
 
         var uniforms = {
             N: {value: 4},
-            N_lines: {value: 20.0},
+            N_lines: {value: 5.0},
             A: { value: new THREE.Matrix4() },
 			x4: { value: 0.0 },
 		};

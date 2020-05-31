@@ -1490,7 +1490,7 @@ function make_initial_spheres_CSV() {
                     else if ( view_mode === 'rotations2' ) {
                         var uniforms = {
                             N: {value: N},
-                            N_lines: {value: 20.0},
+                            N_lines: {value: 5.0},
                             A: { value: new THREE.Matrix4() },
                 			x4: { value: 0 },
                             xp: {value: new THREE.Vector4() },
