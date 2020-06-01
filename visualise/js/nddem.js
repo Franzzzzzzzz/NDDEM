@@ -1570,7 +1570,8 @@ function load_orientation(t,changed_higher_dim_view) {
                         0,0,0,1]); } // fill empty holes so it is a Matrix4
                 // console.log(A);
                 object.material.uniforms.A.value.fromArray(A);
-                // console.log(object.material.uniforms);
+                // console.log(object.material.uniforms.x4);
+                // console.log(object.material.uniforms.x4p);
             }
         }
     });
@@ -1774,6 +1775,7 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                         else if ( view_mode === 'rotations2' ) {
                             if ( N > 3 ) {
                                 object.material.uniforms.x4p.value = spheres[i].x3;
+                                object.material.uniforms.x4.value = world[3].cur;
                             }
                             else {
                                 object.material.uniforms.x4p.value = 0.0;

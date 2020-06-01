@@ -51,8 +51,8 @@
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     // NOTE: STILL PROBABLY NOT RIGHT
                     float phi = atan(x_rotated.y/x_rotated.x);
-                    float theta1 = asin(x_rotated.z/R);
-                    float theta2 = asin(x_rotated.w/R);
+                    float theta1 = asin(x_rotated.z/R_draw);
+                    float theta2 = asin(x_rotated.w/R_draw);
 
                     vColor.r = abs(cos(phi*N_lines));
                     vColor.g = abs(cos(theta1*N_lines));
