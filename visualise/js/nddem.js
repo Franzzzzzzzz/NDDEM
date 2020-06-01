@@ -629,7 +629,7 @@ function add_gui() {
         //gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
             for (i=3;i<N;i++) {
-                if ( view_mode === 'rotations' || view_mode === 'rotations2' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x'+(i+1)) ; }
+                if ( view_mode === 'rotations' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x'+(i+1)) ; }
                 else { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('x'+(i+1)) ; }
             }
         }
@@ -1476,10 +1476,11 @@ function make_initial_spheres_CSV() {
             var scale = 20.; // size of particles on tori
             if ( view_mode === 'rotations2' ) {
                 var uniforms = {
-                    N: {value: N},
-                    N_lines: {value: 5.0},
+                    N: { value: N },
+                    N_lines: { value: 5.0 },
                     A: { value: new THREE.Matrix4() },
                     x4: { value: 0 },
+                    x4p: { value: 0 },
                     R: { value: 1 },
                 };
                 if ( N > 3 ) { uniforms.x4.value = world[3].cur; }
@@ -1489,7 +1490,6 @@ function make_initial_spheres_CSV() {
                                      0,0,0,1);
                 var shaderMaterial = new THREE.ShaderMaterial( {
                     uniforms: uniforms,
-                    // vertexShader: document.getElementById( 'vertexshader' ).textContent,
                     vertexShader: document.getElementById( 'vertexshader-4D' ).textContent,
                     fragmentShader: document.getElementById( 'fragmentshader' ).textContent
                 } );
@@ -1508,7 +1508,6 @@ function make_initial_spheres_CSV() {
                         var material = new THREE.MeshPhongMaterial( { color: color } );
                     }
                     else if ( view_mode === 'rotations2' ) {
-
                         var material = shaderMaterial.clone();
                     }
                     else {
@@ -1561,11 +1560,17 @@ function load_orientation(t,changed_higher_dim_view) {
         cache: cache,
         complete: function(results) {
             spheres = results.data;
-            for (i = 1; i<spheres.length+1; i++) {
-            // for (i = 1; i<2; i++) {
+            for (i = 1; i<spheres.length; i++) { // skip header
                 var object = particles.children[i-1];
-                object.material.uniforms.A.value.fromArray(spheres[i]);
-                // console.log(spheres[i]);
+                var A = spheres[i];
+                if ( N == 3 ) {
+                    A = A.slice(0,3).concat([0],
+                        A.slice(3,6),[0],
+                        A.slice(6,9),[0,
+                        0,0,0,1]); } // fill empty holes so it is a Matrix4
+                // console.log(A);
+                object.material.uniforms.A.value.fromArray(A);
+                // console.log(object.material.uniforms);
             }
         }
     });
@@ -1767,6 +1772,12 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
                             object.material.color = lut.getColor(spheres[i].Omegamag);
                         }
                         else if ( view_mode === 'rotations2' ) {
+                            if ( N > 3 ) {
+                                object.material.uniforms.x4p.value = spheres[i].x3;
+                            }
+                            else {
+                                object.material.uniforms.x4p.value = 0.0;
+                            }
                             // object.material.uniforms.xp.value = new THREE.Vector4(spheres[i].x1,spheres[i].x2,spheres[i].x3,spheres[i].x4)
                             // object.material.uniforms.R.value = R_draw;
                         }
