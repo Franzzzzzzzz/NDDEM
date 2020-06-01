@@ -14,26 +14,26 @@ class Tools
 {
 public:
     static void initialise ();
-    static void clear() ; 
+    static void clear() ;
     static void matvecmult (v1d & res, cv1d &A, cv1d &v);
     static double hyperspherical_xtophi (cv1d &x, v1d &phi);
     static void hyperspherical_phitox (double r, cv1d &phi, v1d &x) ;
-    
+
     static double normsq (const vector <double> & a) {double res=0 ; for (int i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; }
     static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; }
     static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; }
     static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; }
-    
+
     static v1d Eye ;
     static boost::random::mt19937 rng ;
     static boost::random::uniform_01<boost::mt19937> rand ;
-    
+
 private:
     static vector < vector <int> > MSigns ;
     static vector < vector <int> > MIndexAS ;
     static vector < pair <int,int> > MASIndex ;
     static vector <FILE *> outs ;
-}; 
+};
 
 // Static member definitions ---------------------------------------------------
 template <int d> vector < vector <int> > Tools<d>::MSigns ;
@@ -83,13 +83,13 @@ void Tools<d>::initialise ()
  for (int i=0 ; i<d ; i++) for (int j=0 ; j<d ; j++) MSigns[i][j]=(i<j)*(1)+(i>j)*(-1) ;
 
  MIndexAS.resize(d, vector < int > (d,0)) ;
- MASIndex.resize(d*(d-1)/2, make_pair(0,0)) ; 
+ MASIndex.resize(d*(d-1)/2, make_pair(0,0)) ;
  int n=0 ;
  for (int i=0 ; i<d ; i++)
       for (int j=i+1 ; j<d ; j++,n++)
       {
           MIndexAS[i][j]=n ; MIndexAS[j][i]=n ;
-          MASIndex[n]=make_pair(i,j) ; 
+          MASIndex[n]=make_pair(i,j) ;
           //MASIndex.push_back(make_pair(i, j)) ;
       }
 
@@ -101,9 +101,9 @@ template <int d>
 void Tools<d>::clear()
 {
     MSigns.clear() ;
-    MIndexAS.clear() ; 
-    MASIndex.clear() ; 
-    Eye.clear() ; 
+    MIndexAS.clear() ;
+    MASIndex.clear() ;
+    Eye.clear() ;
 }
 //-------------------------------
 template <int d>
@@ -118,22 +118,22 @@ void Tools<d>::matvecmult (v1d & res, cv1d &A, cv1d &v)
 template <int d>
 double Tools<d>::hyperspherical_xtophi (cv1d &x, v1d &phi) // WARNING NOT EXTENSIVELY TESTED
 {
-    double rsqr = normsq(x) ;
+    double rsqr = normsq(x) ; // norm of x_rotated
     double r= sqrt(rsqr) ;
     int j;
-    phi=vector<double>(d-1, 0) ; 
-    for (j=d-1 ; j>=0 && fabs(x[j])<1e-6 ; j--) ; 
-    int lastnonzero=j ;     
+    phi=vector<double>(d-1, 0) ;
+    for (j=d-1 ; j>=0 && fabs(x[j])<1e-6 ; j--) ;
+    int lastnonzero=j ;
     for (j=0 ; j<d-1 ; j++)
     {
        if (j==lastnonzero)
        {
-           if (x[j]<0) phi[j]=M_PI ; 
+           if (x[j]<0) phi[j]=M_PI ;
            else phi[j]=0 ;
-           return r ; 
+           return r ;
        }
        phi[j] = acos(x[j]/sqrt(rsqr)) ;
-       //printf("[%g %g]", x[j], sqrt(rsqr)) ; 
+       //printf("[%g %g]", x[j], sqrt(rsqr)) ;
        if (isnan(phi[j])) {phi[j]=acos(sgn(x[j])*x[j]) ;} //TODO Check that ................
        rsqr -= x[j]*x[j] ;
     }

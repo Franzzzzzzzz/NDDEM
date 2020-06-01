@@ -36,7 +36,6 @@
                     vec4 x;
                     vec4 x_rotated;
                     // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
-                    // HACK: R or R_draw below???
                     x.x = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
                     x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
                     x.z = R_draw*sin((uv.y-0.5)*pi);
@@ -50,20 +49,29 @@
 
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     // NOTE: STILL PROBABLY NOT RIGHT
-                    float phi = atan(x_rotated.y/x_rotated.x);
-                    float theta1 = asin(x_rotated.z/R_draw);
-                    float theta2 = asin(x_rotated.w/R_draw);
+                    float rsqr = pow(length(x_rotated),2.0);
+                    float phi0 = acos(x_rotated.x/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.x*x_rotated.x;
+                    float phi1 = acos(x_rotated.y/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.y*x_rotated.y;
+                    float phi2 = acos(x_rotated.z/sqrt(rsqr));
+                    // rsqr -= x_rotated.z^2;
 
-                    vColor.r = abs(cos(phi*N_lines));
-                    vColor.g = abs(cos(theta1*N_lines));
+                    if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
+
+                    vColor.r = abs(sin(phi0*3.));
+                    vColor.g = abs(sin(phi1*3.));
                     if ( N > 3 ) {
-                        vColor.b = abs(cos(theta2*N_lines));
-                        vColor = vColor * abs(cos(theta2));
+                        vColor.b = abs(sin(phi2*2.));
+                        vColor = vColor * abs(sin(phi2));
                     }
-                    vColor = vColor * abs(cos(theta1));
-                    // vColor.r = x_unrotated.x;
-                    // vColor.g = x_unrotated.y;
-                    // vColor.b = x_unrotated.z;
+                    vColor = vColor * abs(sin(phi0));
+                    vColor = vColor * abs(sin(phi1));
+                    // vColor.r = x_rotated.x;
+                    // vColor.g = x_rotated.y;
+                    // vColor.b = x_rotated.z;
+
+                    // if ( N > 4 ) { rescale(vColor); }
                 }
                 else { vColor.r = 0.0; }
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
@@ -78,7 +86,7 @@
             void main() {
 
                 // add directional lighting
-                const float ambient = 0.5;
+                const float ambient = 1.0;
                 vec3 light = vec3( 1.0 );
                 light = normalize( light );
                 float directional = max( dot( vNormal, light ), 0.0 );
@@ -138,7 +146,7 @@
 
         var background_light = new THREE.AmbientLight( 0xffffff );
         scene.add( background_light );
-        var light = new THREE.DirectionalLight(0x505050);
+        var light = new THREE.DirectionalLight(0xaaaaaa);
         light.position.x = -2
         light.position.z = 2
         scene.add( light );
