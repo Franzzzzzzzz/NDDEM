@@ -157,6 +157,8 @@ const recorder = new CCapture({
 	frameLimit: 0,
 	autoSaveTime: 0
 });
+var all_locs;
+var all_rots;
 
 let promise = new Promise( function(resolve, reject) {
     var request = new XMLHttpRequest();
@@ -226,7 +228,8 @@ let promise = new Promise( function(resolve, reject) {
 });
 
 promise.then(
-    function(result) { build_world();
+    function(result) { if ( urlParams.has('binary') ) { load_particles_from_binaries(); }
+                       build_world();
                        remove_everything(); // only runs on postMessage receive
                        animate();
                        setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 300); // for safety
@@ -1450,6 +1453,126 @@ function make_initial_spheres_Mercury() {
     // });
 };
 
+function make_initial_spheres_binary() {
+    var locfilename = data_dir + "Samples/" + fname + "loc.bin";
+    var lReq = new XMLHttpRequest();
+    lReq.open("GET", locfilename, true);
+    lReq.responseType = "arraybuffer";
+    lReq.onload = function (oEvent) {
+        var arrayBuffer = lReq.response;
+        var dataview = new DataView(arrayBuffer);
+        all_locs = new Float32Array(arrayBuffer.byteLength / 4);
+        for (var i = 0; i < all_locs.length; i++) {
+            all_locs[i] = dataview.getFloat32(i * 4, true); // At every 4th byte
+        }
+    };
+    lReq.send(null);
+    make_initial_spheres(spheres)
+    
+    if ( view_mode === 'rotations2' ) {
+        var rotfilename = data_dir + "Samples/" + fname + "rot.bin";
+        var rReq = new XMLHttpRequest();
+        rReq.open("GET", rotfilename, true);
+        rReq.responseType = "arraybuffer";
+        rReq.onload = function (oEvent) {
+            var arrayBuffer = rReq.response;
+            var dataview = new DataView(arrayBuffer);
+            all_rots = new Float32Array(arrayBuffer.byteLength / 4);
+            for (var i = 0; i < all_rots.length; i++) {
+                all_rots[i] = dataview.getFloat32(i * 4, true); // At every 4th byte
+            }
+        };
+        rReq.send(null);
+    }
+
+}
+
+function make_initial_spheres(spheres) {
+    particles = new THREE.Group();
+    scene.add( particles );
+    if ( N == 1 ) {
+        var geometry = new THREE.CylinderGeometry( 1, 1, 2, Math.pow(2,quality), Math.pow(2,quality) );
+    }
+    else {
+        // var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
+        var geometry  = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) ) );
+    }
+    var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
+    var scale = 20.; // size of particles on tori
+    if ( view_mode === 'rotations2' ) {
+        var uniforms = {
+            N: { value: N },
+            N_lines: { value: 5.0 },
+            A: { value: new THREE.Matrix4() },
+            x4: { value: 0 },
+            x4p: { value: 0 },
+            R: { value: 1 },
+        };
+        if ( N > 3 ) { uniforms.x4.value = world[3].cur; }
+        uniforms.A.value.set(1,0,0,0,
+                             0,1,0,0,
+                             0,0,1,0,
+                             0,0,0,1);
+        var shaderMaterial = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            vertexShader: document.getElementById( 'vertexshader-4D' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+        } );
+    }
+    for (var i = 0; i<spheres.length; i++) {
+        if ( N < 3 ) {
+            var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
+            var material = new THREE.PointsMaterial( {
+                color: color,
+            } );
+        }
+        else {
+            if ( view_mode === 'catch_particle' || fname.includes('Lonely') ) {
+                if ( i == pinky ) { var color = 0xe72564; }
+                else              { var color = 0xaaaaaa; }
+                var material = new THREE.MeshPhongMaterial( { color: color } );
+            }
+            else if ( view_mode === 'rotations2' ) {
+                var material = shaderMaterial.clone();
+            }
+            else {
+                if ( view_mode === 'rotations' ) {
+                    texture_path = data_dir + texture_dir + "/Texture-"+i+"-00000"
+                    for ( var iiii=3;iiii<N;iiii++) { texture_path += "-0.0"; }
+                    var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
+                    var material = new THREE.MeshBasicMaterial( { map: texture } );
+                }
+                else {
+                    var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
+                    var material = new THREE.MeshPhongMaterial( { color: color } );
+                }
+            };
+        }
+        var object = new THREE.Mesh( geometry, material );
+        object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
+        object.rotation.z = Math.PI/2.;
+        // if ( fname.includes('Coll') || fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
+        if ( shadows ) {
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+        particles.add( object );
+        if ( N > 3 && !fname.includes('Spinner') && !hard_mode) {
+            pointsMaterial = new THREE.PointsMaterial( { color: color } );
+            object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
+            if ( fname.includes('Lonely') ) { object2.scale.set(2.*R/scale,2.*R/scale,2.*R/scale); }
+            else { object2.scale.set(R/scale,R/scale,R/scale); }
+            object2.position.set(0.,0.,0.);
+            wristband1.add(object2);
+            if ( N > 5 ) {
+                object3 = object2.clone();
+                wristband2.add(object3);
+            }
+        }
+    }
+    if ( fname.includes("Submarine") ) { camera.position.set(particles.children[pinky].position.x,particles.children[pinky].position.y,particles.children[pinky].position.z); console.log(camera.position) }
+}
+
 /**
 * Make the initial particles
 */
@@ -1462,90 +1585,7 @@ function make_initial_spheres_CSV() {
         dynamicTyping: true,
         header: true,
         complete: function(results) {
-            particles = new THREE.Group();
-            scene.add( particles );
-            spheres = results.data;
-            if ( N == 1 ) {
-                var geometry = new THREE.CylinderGeometry( 1, 1, 2, Math.pow(2,quality), Math.pow(2,quality) );
-            }
-            else {
-                // var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
-                var geometry  = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) ) );
-            }
-            var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
-            var scale = 20.; // size of particles on tori
-            if ( view_mode === 'rotations2' ) {
-                var uniforms = {
-                    N: { value: N },
-                    N_lines: { value: 5.0 },
-                    A: { value: new THREE.Matrix4() },
-                    x4: { value: 0 },
-                    x4p: { value: 0 },
-                    R: { value: 1 },
-                };
-                if ( N > 3 ) { uniforms.x4.value = world[3].cur; }
-                uniforms.A.value.set(1,0,0,0,
-                                     0,1,0,0,
-                                     0,0,1,0,
-                                     0,0,0,1);
-                var shaderMaterial = new THREE.ShaderMaterial( {
-                    uniforms: uniforms,
-                    vertexShader: document.getElementById( 'vertexshader-4D' ).textContent,
-                    fragmentShader: document.getElementById( 'fragmentshader' ).textContent
-                } );
-            }
-            for (var i = 0; i<spheres.length; i++) {
-                if ( N < 3 ) {
-                    var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
-                    var material = new THREE.PointsMaterial( {
-                        color: color,
-                    } );
-                }
-                else {
-                    if ( view_mode === 'catch_particle' || fname.includes('Lonely') ) {
-                        if ( i == pinky ) { var color = 0xe72564; }
-                        else              { var color = 0xaaaaaa; }
-                        var material = new THREE.MeshPhongMaterial( { color: color } );
-                    }
-                    else if ( view_mode === 'rotations2' ) {
-                        var material = shaderMaterial.clone();
-                    }
-                    else {
-                        if ( view_mode === 'rotations' ) {
-                            texture_path = data_dir + texture_dir + "/Texture-"+i+"-00000"
-                            for ( var iiii=3;iiii<N;iiii++) { texture_path += "-0.0"; }
-                            var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
-                            var material = new THREE.MeshBasicMaterial( { map: texture } );
-                        }
-                        else {
-                            var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
-                            var material = new THREE.MeshPhongMaterial( { color: color } );
-                        }
-                    };
-                }
-                var object = new THREE.Mesh( geometry, material );
-                object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
-                object.rotation.z = Math.PI/2.;
-                // if ( fname.includes('Coll') || fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
-                if ( shadows ) {
-                    object.castShadow = true;
-                    object.receiveShadow = true;
-                }
-                particles.add( object );
-                if ( N > 3 && !fname.includes('Spinner') && !hard_mode) {
-                    pointsMaterial = new THREE.PointsMaterial( { color: color } );
-                    object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
-                    if ( fname.includes('Lonely') ) { object2.scale.set(2.*R/scale,2.*R/scale,2.*R/scale); }
-                    else { object2.scale.set(R/scale,R/scale,R/scale); }
-                    object2.position.set(0.,0.,0.);
-                    wristband1.add(object2);
-                    if ( N > 5 ) {
-                        object3 = object2.clone();
-                        wristband2.add(object3);
-                    }
-                }
-            }
-            if ( fname.includes("Submarine") ) { camera.position.set(particles.children[pinky].position.x,particles.children[pinky].position.y,particles.children[pinky].position.z); console.log(camera.position) }
+            make_initial_spheres(results.data)
         }
     });
 };
