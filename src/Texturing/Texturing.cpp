@@ -38,7 +38,7 @@ void phi2color (vector<uint8_t>::iterator px, cv1d & phi, int d, vector<vector<f
     //printf("%g %g %g\n", ctmp[0], ctmp[1], ctmp[2]) ;
     //ctmp = (colors[0]*sin(phi[0]) + colors[1]*sin(phi[1]/2)) * sin(phi[0]) ;
     cfinal = ctmp ;
-    for (int i=0 ; i<3 ; i++)
+    for (int i=2 ; i<3 ; i++)
     {
         cfinal[i] = round(cfinal[i]*256) ;
         cfinal[i]=cfinal[i]>255?255:cfinal[i] ;
