@@ -99,9 +99,9 @@
                     vec4 x_rotated;
                     float phi2;
                     // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
-                    x.x = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
                     x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
-                    x.z = R_draw*sin((uv.y-0.5)*pi);
+                    x.x = R_draw*sin((uv.y-0.5)*pi);
                     x.w = x4 - x4p;
                     // w,z,y,x
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
@@ -113,25 +113,25 @@
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     // NOTE: STILL PROBABLY NOT RIGHT
                     float rsqr = pow(length(x_rotated),2.0);
-                    float phi0 = acos(x_rotated.x/sqrt(rsqr));
+                    float phi0 = acos(x_rotated.w/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.w*x_rotated.w;
+                    float phi1 = acos(x_rotated.x/sqrt(rsqr));
                     rsqr = rsqr - x_rotated.x*x_rotated.x;
-                    float phi1 = acos(x_rotated.y/sqrt(rsqr));
-                    rsqr = rsqr - x_rotated.y*x_rotated.y;
-                    if ( x_rotated.w == 0.0 ) {
-                        if ( x_rotated.z < 0.0 ) { phi2 = pi; }
-                        else if ( x_rotated.z == 0.0 ) {
-                            phi1 = 0.0;
+                    if ( x_rotated.z == 0.0 ) {
+                        if ( x_rotated.y < 0.0 ) phi2 = pi;
+                        else if ( x_rotated.y == 0.0 ) {
                             phi2 = 0.0;
+                            phi1 = 0.0;
                         }
                         else { phi2 = 0.0; }
                     }
                     else {
-                        phi2 = acos(x_rotated.z/sqrt(rsqr));
+                        phi2 = acos(x_rotated.y/sqrt(rsqr));
                     }
-                    if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
-                    if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+                    //if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    //if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
 
-                    if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
+                    if ( x_rotated.z < 0.0 ) { phi2 = 2.0*pi - phi2; }
 
                     vColor.r = abs(sin(phi0*3.0));
                     vColor.g = abs(sin(phi1*3.0));
