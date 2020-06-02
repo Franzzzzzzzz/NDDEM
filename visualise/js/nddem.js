@@ -1488,6 +1488,7 @@ function make_initial_spheres_binary() {
         }
         make_initial_spheres(all_locs[0])
         update_spheres(all_locs[0],true);
+        remove_loading_screen();
     };
     lReq.send(null);
 
@@ -1532,6 +1533,7 @@ function make_initial_spheres_CSV() {
         header: false,
         complete: function(results) {
             make_initial_spheres(results.data.slice(1)) // skip header
+            remove_loading_screen();
         }
     });
 };
@@ -2133,3 +2135,20 @@ function render() {
         }
     }
 };
+
+/**
+* Remove loading screen
+*/
+function remove_loading_screen() {
+    const loadingScreen = document.getElementById( 'loading-screen' );
+    loadingScreen.classList.add( 'fade-out' );
+
+    // optional: remove loader from DOM via event listener
+    loadingScreen.addEventListener( 'transitionend', onTransitionEnd );
+}
+function onTransitionEnd( event ) {
+
+	const element = event.target;
+	element.remove();
+
+}
