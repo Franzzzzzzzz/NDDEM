@@ -1,0 +1,69 @@
+<html lang="en">
+	<body>
+        <script>
+            var loc = 'http://localhost:54321/Samples/SpinnerD4/loc.bin';
+
+            // METHOD 1: XMLHttpRequest - THIS WORKS!!!!
+            // var oReq = new XMLHttpRequest();
+            // oReq.open("GET", loc, true);
+            // oReq.responseType = "arraybuffer";
+            //
+            // oReq.onload = function (oEvent) {
+            //     var arrayBuffer = oReq.response;
+            //     var dataview = new DataView(arrayBuffer);
+            //     var N = 4;
+            //     var num_particles = 12;
+            //     var num_data_pts = arrayBuffer.byteLength / 4;
+            //     var nt = num_data_pts/num_particles/(N+4);
+            //
+            //     all_locs = new Array(nt);
+            //     for (var i = 0; i < nt; i++) {
+            //         all_locs[i] = new Array(num_particles);
+            //         for (var j = 0; j < num_particles; j++) {
+            //             all_locs[i][j] = new Array(N+4);
+            //             for (var k = 0; k < N+4; k++) {
+            //                 all_locs[i][j][k] = dataview.getFloat32(4 * (k + (N+4)*(j + num_particles*i)), true);
+            //                 }
+            //             }
+            //         // mFloatArray[i] = dataview.getFloat32(i * 4, true); // At every 4th byte
+            //         }
+            //         console.log(all_locs[0][3])
+            //         console.log(all_locs[50][3])
+            // };
+            // oReq.send(null);
+
+            // METHOD 2: Streaming with Fetch
+            fetch(loc)
+            // Retrieve its body as ReadableStream
+            .then(response => {
+                const reader = response.body.getReader();
+            })
+
+            oReq.onload = function (oEvent) {
+                var arrayBuffer = oReq.response;
+                var dataview = new DataView(arrayBuffer);
+                var N = 4;
+                var num_particles = 12;
+                var num_data_pts = arrayBuffer.byteLength / 4;
+                var nt = num_data_pts/num_particles/(N+4);
+
+                all_locs = new Array(nt);
+                for (var i = 0; i < nt; i++) {
+                    all_locs[i] = new Array(num_particles);
+                    for (var j = 0; j < num_particles; j++) {
+                        all_locs[i][j] = new Array(N+4);
+                        for (var k = 0; k < N+4; k++) {
+                            all_locs[i][j][k] = dataview.getFloat32(4 * (k + (N+4)*(j + num_particles*i)), true);
+                            }
+                        }
+                    // mFloatArray[i] = dataview.getFloat32(i * 4, true); // At every 4th byte
+                    }
+                    console.log(all_locs[0][3])
+                    console.log(all_locs[50][3])
+            };
+            oReq.send(null);
+
+
+        </script>
+	</body>
+</html>
