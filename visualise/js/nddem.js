@@ -1564,7 +1564,7 @@ function make_initial_spheres(spheres) {
                              0,0,0,1);
         var shaderMaterial = new THREE.ShaderMaterial( {
             uniforms: uniforms,
-            vertexShader: document.getElementById( 'vertexshader-4D' ).textContent,
+            vertexShader: document.getElementById( 'vertexshader-'+String(uniforms.N.value)+'D' ).textContent,
             fragmentShader: document.getElementById( 'fragmentshader' ).textContent
         } );
     }

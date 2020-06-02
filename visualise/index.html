@@ -37,6 +37,68 @@
         <!-- <script src="js/datguivr.js"></script> -->
         <script src="node_modules/three/examples/js/math/Lut.js"></script>
         <script src="js/CCapture.all.min.js"></script>
+        <script type="x-shader/x-vertex" id="vertexshader-3D">
+            uniform int N; // number of dimensions in simulation
+            uniform float N_lines; // number of lines to render across particle
+			uniform mat4 A;  // orientation matrix for this particle
+            uniform float R; // particle radius
+            uniform float x4; // loc of viewing position
+            uniform float x4p; // loc of centre of particle in D4
+			varying vec3 vColor; // colour at vertex (output)
+            varying vec3 vNormal; // normal at vertex (output)
+
+            void main() {
+                vNormal = normal; // for directional lighting
+                const float pi = 3.14159265359;
+                float R_draw; // radius particle will be drawn at
+                float R_draw_squared = pow(R,2.0)-pow(x4-x4p,2.0);
+                if ( R_draw_squared > 0.0 ) { // only if visible
+                    R_draw = sqrt(R_draw_squared);
+                    vec4 x;
+                    vec4 x_rotated;
+                    float phi2;
+                    // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
+                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    x.x = R_draw*sin((uv.y-0.5)*pi);
+                    x.w = x4 - x4p;
+
+                    // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
+                    x_rotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
+                    x_rotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
+                    x_rotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
+                    x_rotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
+
+                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                    float rsqr = pow(length(x_rotated),2.0);
+                    float phi0 = acos(x_rotated.x/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.x*x_rotated.x;
+                    float phi1 = acos(x_rotated.y/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.y*x_rotated.y;
+                    if ( x_rotated.w == 0.0 ) {
+                        if ( x_rotated.z < 0.0 ) { phi2 = pi; }
+                        else if ( x_rotated.z == 0.0 ) {
+                            phi1 = 0.0;
+                            phi2 = 0.0;
+                        }
+                        else { phi2 = 0.0; }
+                    }
+                    else {
+                        phi2 = acos(x_rotated.z/sqrt(rsqr));
+                    }
+                    if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+                    if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
+
+                    vColor.r = abs(sin(phi0*3.0));
+                    vColor.g = abs(sin(phi1*2.));
+                    vColor = vColor * abs(sin(phi0));
+                }
+                else { vColor.r = 0.0; }
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+		</script>
         <script type="x-shader/x-vertex" id="vertexshader-4D">
             uniform int N; // number of dimensions in simulation
             uniform float N_lines; // number of lines to render across particle
@@ -56,12 +118,13 @@
                     R_draw = sqrt(R_draw_squared);
                     vec4 x;
                     vec4 x_rotated;
+                    float phi2;
                     // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
-                    x.x = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
                     x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
-                    x.z = R_draw*sin((uv.y-0.5)*pi);
-                    x.w = x4p - x4;
-
+                    x.x = R_draw*sin((uv.y-0.5)*pi);
+                    x.w = x4 - x4p;
+                    // w,z,y,x
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
                     x_rotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
                     x_rotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
@@ -71,25 +134,47 @@
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     // NOTE: STILL PROBABLY NOT RIGHT
                     float rsqr = pow(length(x_rotated),2.0);
-                    float phi0 = acos(x_rotated.x/sqrt(rsqr));
+                    float phi0 = acos(x_rotated.w/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.w*x_rotated.w;
+                    float phi1 = acos(x_rotated.x/sqrt(rsqr));
                     rsqr = rsqr - x_rotated.x*x_rotated.x;
-                    float phi1 = acos(x_rotated.y/sqrt(rsqr));
-                    rsqr = rsqr - x_rotated.y*x_rotated.y;
-                    float phi2 = acos(x_rotated.z/sqrt(rsqr));
-                    // rsqr -= x_rotated.z^2;
-
-                    if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
-
-                    vColor.r = abs(sin(phi0*3.));
-                    vColor.g = abs(sin(phi1*3.));
-                    if ( N > 3 ) {
-                        vColor.b = abs(sin(phi2*2.));
-                        vColor = vColor * abs(sin(phi2));
+                    if ( x_rotated.z == 0.0 ) {
+                        if ( x_rotated.y < 0.0 ) phi2 = pi;
+                        else if ( x_rotated.y == 0.0 ) {
+                            phi2 = 0.0;
+                            phi1 = 0.0;
+                        }
+                        else { phi2 = 0.0; }
                     }
+                    else {
+                        phi2 = acos(x_rotated.y/sqrt(rsqr));
+                    }
+                    //if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    //if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+
+                    if ( x_rotated.z < 0.0 ) { phi2 = 2.0*pi - phi2; }
+
+                    vColor.r = abs(sin(phi0*3.0));
+                    vColor.g = abs(sin(phi1*3.0));
+                    vColor.b = abs(sin(phi2*2.0));
+                    vColor = vColor * abs(sin(phi0));
                     vColor = vColor * abs(sin(phi1));
-                    // vColor.r = x_rotated.x;
-                    // vColor.g = x_rotated.y;
-                    // vColor.b = x_rotated.z;
+
+                    // vColor.r = 0.0;
+                    // vColor.g = 0.0;
+                    // vColor.b = 0.0;
+
+
+                    // vColor.r = abs(x_rotated.x);
+                    // vColor.g = abs(x_rotated.y);
+                    // vColor.b = abs(x_rotated.z);
+
+                    // vColor.r = phi0/2.0/pi;
+                    // vColor.g = phi1/2.0/pi;
+                    // vColor.b = phi2/2.0/pi;
+
+
+
 
                     // if ( N > 4 ) { rescale(vColor); }
                 }
