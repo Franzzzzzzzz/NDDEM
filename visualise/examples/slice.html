@@ -7,6 +7,13 @@
         <style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
+            #N_tag {
+                color: white;
+                padding: 24px;
+                font: 48px Montserrat;
+                font-weight: bold;
+                position:absolute;
+            }
 		</style>
 	</head>
 	<body>
@@ -18,6 +25,7 @@
         <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
         <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
         <script>
+
         const urlParams = new URLSearchParams(window.location.search);
         const recorder = new CCapture({
         	verbose: true,
@@ -30,6 +38,11 @@
         	autoSaveTime: 0
         });
         container = document.getElementById( 'container' );
+        N_tag = document.createElement( 'div' );
+        N_tag.setAttribute("id", "N_tag");
+        N_tag.innerHTML = "3D";
+        container.appendChild(N_tag);
+
         function update_spheres(x) {
             var R_draw = Math.sqrt(1 - Math.abs(x));
             if ( R_draw == 0 ) { circle.visible = false; }
