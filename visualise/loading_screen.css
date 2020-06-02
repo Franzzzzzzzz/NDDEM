@@ -6,7 +6,7 @@ body{
     /* background:radial-gradient(#9b59b6, #8e44ad); */
 }
 .wrapper{
-    width:200px;
+    width:500px;
     height:60px;
     position: absolute;
     left:50%;
@@ -18,7 +18,8 @@ body{
     height:20px;
     position: absolute;
     border-radius: 50%;
-    background-color: #fff;
+    /* background-color: #fff; */
+    background-color: #e72564;
     left:15%;
     transform-origin: 50%;
     animation: circle .5s alternate infinite ease;
@@ -89,13 +90,19 @@ body{
     right:15%;
     animation-delay: .3s;
 }
+.wrapper{
+    text-align: center;
+}
 .wrapper span{
-    position: absolute;
+    position: relative;
     top:75px;
     font-family: 'Montserrat';
     font-weight: 600;
     font-size: 60px;
     /* letter-spacing: 6px; */
-    color: #fff;
-    left:-12%;
+    /* color: #fff; */
+    color: #e72564;
+    /* left:-12%; */
+    /* text-align: center; */
+
 }

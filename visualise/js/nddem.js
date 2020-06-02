@@ -1471,24 +1471,30 @@ function make_initial_spheres_binary() {
     lReq.open("GET", locfilename, true);
     lReq.responseType = "arraybuffer";
     lReq.onload = function (oEvent) {
-        var arrayBuffer = lReq.response;
-        var dataview = new DataView(arrayBuffer);
-        var num_data_pts = arrayBuffer.byteLength / 4;
-        var nt = num_data_pts/num_particles/(N+4);
+        if(lReq.status == 404)  {
+            const loadingText = document.getElementById( 'loading-text' );
+            loadingText.innerHTML = "File not found!";
+        }
+        else {
+            var arrayBuffer = lReq.response;
+            var dataview = new DataView(arrayBuffer);
+            var num_data_pts = arrayBuffer.byteLength / 4;
+            var nt = num_data_pts/num_particles/(N+4);
 
-        all_locs = new Array(nt);
-        for (var i = 0; i < nt; i++) {
-            all_locs[i] = new Array(num_particles);
-            for (var j = 0; j < num_particles; j++) {
-                all_locs[i][j] = new Array(N+4);
-                for (var k = 0; k < N+4; k++) {
-                    all_locs[i][j][k] = dataview.getFloat32(4 * (k + (N+4)*(j + num_particles*i)), true);
+            all_locs = new Array(nt);
+            for (var i = 0; i < nt; i++) {
+                all_locs[i] = new Array(num_particles);
+                for (var j = 0; j < num_particles; j++) {
+                    all_locs[i][j] = new Array(N+4);
+                    for (var k = 0; k < N+4; k++) {
+                        all_locs[i][j][k] = dataview.getFloat32(4 * (k + (N+4)*(j + num_particles*i)), true);
+                    }
                 }
             }
+            make_initial_spheres(all_locs[0])
+            update_spheres(all_locs[0],true);
+            remove_loading_screen();
         }
-        make_initial_spheres(all_locs[0])
-        update_spheres(all_locs[0],true);
-        remove_loading_screen();
     };
     lReq.send(null);
 
