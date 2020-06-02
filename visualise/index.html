@@ -59,16 +59,16 @@
                     vec4 x_rotated;
                     float phi2;
                     // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
-                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
-                    x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
-                    x.x = R_draw*sin((uv.y-0.5)*pi);
+                    x.y = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.z = - R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    x.x = - R_draw*sin((uv.y-0.5)*pi);
                     x.w = x4 - x4p;
 
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
-                    x_rotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
-                    x_rotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
-                    x_rotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
-                    x_rotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
+                    x_rotated.x = A[0].x*x.x + A[1].x*x.y + A[2].x*x.z + A[3].x*x.w;
+                    x_rotated.y = A[0].y*x.x + A[1].y*x.y + A[2].y*x.z + A[3].y*x.w;
+                    x_rotated.z = A[0].z*x.x + A[1].z*x.y + A[2].z*x.z + A[3].z*x.w;
+                    x_rotated.w = A[0].w*x.x + A[1].w*x.y + A[2].w*x.z + A[3].w*x.w;
 
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     float rsqr = pow(length(x_rotated),2.0);
@@ -121,16 +121,17 @@
                     vec4 x_rotated;
                     float phi2;
                     // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
-                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
-                    x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
-                    x.x = R_draw*sin((uv.y-0.5)*pi);
+                    x.y = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.z = - R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    x.x = - R_draw*sin((uv.y-0.5)*pi);
                     x.w = x4 - x4p;
+                    
                     // w,z,y,x
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
-                    x_rotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
-                    x_rotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
-                    x_rotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
-                    x_rotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
+                    x_rotated.x = A[0].x*x.x + A[1].x*x.y + A[2].x*x.z + A[3].x*x.w;
+                    x_rotated.y = A[0].y*x.x + A[1].y*x.y + A[2].y*x.z + A[3].y*x.w;
+                    x_rotated.z = A[0].z*x.x + A[1].z*x.y + A[2].z*x.z + A[3].z*x.w;
+                    x_rotated.w = A[0].w*x.x + A[1].w*x.y + A[2].w*x.z + A[3].w*x.w;
 
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     // NOTE: STILL PROBABLY NOT RIGHT
@@ -161,6 +162,8 @@
                     vColor = vColor * abs(sin(phi0));
                     vColor = vColor * abs(sin(phi1));
 
+                    //vColor.r = x.z ; 
+                    
                     // vColor.r = 0.0;
                     // vColor.g = 0.0;
                     // vColor.b = 0.0;

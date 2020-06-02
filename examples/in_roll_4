@@ -1,0 +1,38 @@
+# Two particle collision
+directory /home/franz/Dropbox/DEM_ND/Samples/TestUnique
+dimensions 3 1
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL -0.6 5
+boundary 1 WALL -0.6 5
+boundary 2 WALL -5 5
+#boundary 3 WALL -5 5
+#boundary 4 WALL -5 5
+
+location 0 0 0 0
+#location 1 1 0 0 0.1
+#freeze 0
+#velocity 0 1 0 0 0 0 0
+#velocity 1 -1 0 0 0 0 0
+
+
+gravity -1 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+set T 20
+event 10 gravity -1 0 0.1 
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+set dumps CSV with 1 Orientation
+#set dumps VTK with 0
+set tdump 1000
+EOF
