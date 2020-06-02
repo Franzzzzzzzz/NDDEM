@@ -263,6 +263,7 @@ function build_world() {
     scene = new THREE.Scene();
     if ( colour_scheme === 'inverted' ) {
         scene.background = new THREE.Color( 0xFFFFFF ); // white
+        N_tag.style.color = "black";
     }
     else {
         scene.background = new THREE.Color( 0x111111 ); // revealjs background colour
@@ -1397,72 +1398,6 @@ function make_initial_spheres_Mercury() {
         }
     });
     console.log(num_particles)
-    // Papa.parse(filename, {
-    //     download: true,
-    //     dynamicTyping: true,
-    //     header: true,
-    //     preview: 1 // just load one line!
-    //     complete: function(results) {
-    //         particles = new THREE.Group();
-    //         scene.add( particles );
-    //         spheres = results.data;
-    //         if ( N == 1 ) {
-    //             var geometry = new THREE.CylinderGeometry( 1, 1, 2, Math.pow(2,quality), Math.pow(2,quality) );
-    //         }
-    //         else {
-    //             var geometry = new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) );
-    //         }
-    //         var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,quality-2),4), Math.max(Math.pow(2,quality-2),4) );
-    //         var scale = 20.; // size of particles on tori
-    //         for (var i = 0; i<spheres.length; i++) {
-    //             if ( N === 2 ) {
-    //                 var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
-    //                 var material = new THREE.PointsMaterial( {
-    //                     color: color,
-    //                 } );
-    //             }
-    //             else {
-    //                 if ( view_mode === 'catch_particle' || fname.includes('Lonely') ) {
-    //                     if ( i == pinky ) { var color = 0xe72564; }
-    //                     else              { var color = 0xaaaaaa; }
-    //                     var material = new THREE.MeshPhongMaterial( { color: color } );
-    //                 }
-    //                 else {
-    //                     if ( view_mode === 'rotations' ) {
-    //                         texture_path = root_dir + "Textures/Texture-"+i+"-00000"
-    //                         for ( var iiii=3;iiii<N;iiii++) { texture_path += "-0.0"; }
-    //                         var texture = new THREE.TextureLoader().load(texture_path + ".png"); //TODO
-    //                         var material = new THREE.MeshBasicMaterial( { map: texture } );
-    //                     }
-    //                     else {
-    //                         var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
-    //                         var material = new THREE.MeshPhongMaterial( { color: color } );
-    //                     }
-    //                 };
-    //             }
-    //             var object = new THREE.Mesh( geometry, material );
-    //             object.position.set(spheres[i][0],spheres[i][1],spheres[i][2]);
-    //             object.rotation.z = Math.PI/2.;
-    //             if ( shadows ) {
-    //                 object.castShadow = true;
-    //                 object.receiveShadow = true;
-    //             }
-    //             particles.add( object );
-    //             if ( N > 3 && !fname.includes('Spinner') && !hard_mode) {
-    //                 pointsMaterial = new THREE.PointsMaterial( { color: color } );
-    //                 object2 =  new THREE.Mesh( pointsGeometry, pointsMaterial );
-    //                 if ( fname.includes('Lonely') ) { object2.scale.set(2.*R/scale,2.*R/scale,2.*R/scale); }
-    //                 else { object2.scale.set(R/scale,R/scale,R/scale); }
-    //                 object2.position.set(0.,0.,0.);
-    //                 wristband1.add(object2);
-    //                 if ( N > 5 ) {
-    //                     object3 = object2.clone();
-    //                     wristband2.add(object3);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // });
 };
 
 function make_initial_spheres_binary() {

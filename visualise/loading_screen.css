@@ -20,7 +20,7 @@ body{
     border-radius: 50%;
     /* background-color: #fff; */
     background-color: #e72564;
-    left:15%;
+    left:35%;
     transform-origin: 50%;
     animation: circle .5s alternate infinite ease;
 }
@@ -46,12 +46,12 @@ body{
     }
 }
 .circle:nth-child(2){
-    left:45%;
+    left:50%;
     animation-delay: .2s;
 }
 .circle:nth-child(3){
-    left:auto;
-    right:15%;
+    /* left:auto; */
+    left:65%;
     animation-delay: .3s;
 }
 .shadow{
@@ -63,7 +63,7 @@ body{
     top:62px;
     transform-origin: 50%;
     z-index: -1;
-    left:15%;
+    left:35%;
     filter: blur(1px);
     animation: shadow .5s alternate infinite ease;
 }
@@ -82,12 +82,12 @@ body{
     }
 }
 .shadow:nth-child(4){
-    left: 45%;
+    left: 50%;
     animation-delay: .2s
 }
 .shadow:nth-child(5){
-    left:auto;
-    right:15%;
+    /* left:auto; */
+    left:65%;
     animation-delay: .3s;
 }
 .wrapper{
