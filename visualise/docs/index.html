@@ -326,6 +326,16 @@
                 
                 </li>
               
+                
+                <li><a
+                  href='#remove_loading_screen'
+                  class="">
+                  remove_loading_screen
+                  
+                </a>
+                
+                </li>
+              
             </ul>
           </div>
           <div class='mt1 h6 quiet'>
@@ -370,7 +380,7 @@
 <ul>
 <li><code>fname</code>: folder name where data is stored. Trailing slash is optional. Default is <code>Samples/D4/</code></li>
 <li><code>display_type</code>: <code>VR</code>, <code>keyboard</code> or <code>anaglyph</code>. Default is <code>keyboard</code>.</li>
-<li><code>view_mode</code>: <code>undefined</code> (normal and default), <code>catch_particle</code>, <code>rotations</code>, <code>velocity</code> or <code>rotation_rate</code></li>
+<li><code>view_mode</code>: <code>undefined</code> (normal and default), <code>catch_particle</code>, <code>rotations</code>, <code>rotations2</code>, <code>velocity</code> or <code>rotation_rate</code>. <code>rotations</code> requires the <code>TexturingServer</code> to be running and works in any number of dimensions. <code>rotations2</code> can be computed in the browser, and can be used with any server, and does the calculations on the GPU at render time, but only works for <code>N</code> = 3 or 4.</li>
 <li><code>autoplay</code>: <code>true</code> or <code>false</code> to start time marching on load. Default is <code>false</code>.</li>
 <li><code>rate</code>: <code>float</code> that sets the speed of time marching. Units are DEM time units\second. Default is <code>5.0</code>.</li>
 <li><code>shadows</code>: <code>true</code> or <code>false</code> to render shadows. Default is <code>true</code>.</li>
@@ -379,6 +389,8 @@
 <li><code>pinky</code>: only used if <code>view_mode</code> is <code>catch_particle</code>. <code>int</code> that sets which particle to render in pink. Default is <code>100</code>.</li>
 <li><code>cache</code>: <code>true</code> or <code>false</code> to cache local data in the browser. Default is <code>false</code>.</li>
 <li><code>hard_mode</code>: <code>true</code> or <code>false</code> to disable tori in VR mode to make things harder for the user. Default is <code>false</code>. This is meant to be more 'fun' but YMMV.</li>
+<li><code>no_axes</code>: include this flag to disable drawing of axes.</li>
+<li><code>no_walls</code>: include this flag to disable drawing of walls.</li>
 <li><code>quasicrystal</code>: <code>true</code> or <code>false</code> to view in quasicrystal mode. Default is <code>false</code>.</li>
 <li><code>mercury</code>: <code>true</code> or <code>false</code> to load MercuryDPM data instead of NDDEM data. Default is <code>false</code>.</li>
 <li><code>colour_scheme</code>: set to <code>inverted</code> to invert global colour scheme to have a white background.</li>
@@ -387,6 +399,8 @@
 <li><code>initial_camera_location</code>: three numbers (e.g. <code>initial_camera_location=1,2,3</code>) to set the initial camera location if so desired.</li>
 <li><code>camera_target</code>: three numbers (e.g. <code>camera_target=1,2,3</code>) to set what the camera is pointing at if so desired.</li>
 <li><code>t0</code>: <code>float</code> to set the initial timestep to display. Default is <code>0</code>.</li>
+<li><code>binary</code>: if included, this flag loads from binary data instead of csv data. You can convert csv to binary data using the included script <code>binarise_output.py</code> in the <code>scripts</code> folder.</li>
+<li></li>
 </ul>
 <p>An example command that works for me, when the TexturingServer is running: <code>/path/to/index.html?fname=D5Cristal/&#x26;view_mode=D4&#x26;colour_scheme=inverted&#x26;time=350&#x26;rate=5&#x26;display_type=keyboard</code></p>
 
@@ -1809,6 +1823,56 @@
   <p>Do the actual rendering</p>
 
     <div class='pre p1 fill-light mt0'>render()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='remove_loading_screen'>
+      remove_loading_screen
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Remove loading screen</p>
+
+    <div class='pre p1 fill-light mt0'>remove_loading_screen()</div>
   
   
 

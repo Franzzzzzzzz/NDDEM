@@ -24,7 +24,7 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 ### Flags:
 - `fname`: folder name where data is stored. Trailing slash is optional. Default is `Samples/D4/`
 - `display_type`: `VR`, `keyboard` or `anaglyph`. Default is `keyboard`.
-- `view_mode`: `undefined` (normal and default), `catch_particle`, `rotations`, `velocity` or `rotation_rate`
+- `view_mode`: `undefined` (normal and default), `catch_particle`, `rotations`, `rotations2`, `velocity` or `rotation_rate`. `rotations` requires the `TexturingServer` to be running and works in any number of dimensions. `rotations2` can be computed in the browser, and can be used with any server, and does the calculations on the GPU at render time, but only works for `N` = 3 or 4.
 - `autoplay`: `true` or `false` to start time marching on load. Default is `false`.
 - `rate`: `float` that sets the speed of time marching. Units are DEM time units\second. Default is `5.0`.
 - `shadows`: `true` or `false` to render shadows. Default is `true`.
@@ -33,6 +33,8 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 - `pinky`: only used if `view_mode` is `catch_particle`. `int` that sets which particle to render in pink. Default is `100`.
 - `cache`: `true` or `false` to cache local data in the browser. Default is `false`.
 - `hard_mode`: `true` or `false` to disable tori in VR mode to make things harder for the user. Default is `false`. This is meant to be more 'fun' but YMMV.
+- `no_axes`: include this flag to disable drawing of axes.
+- `no_walls`: include this flag to disable drawing of walls.
 - `quasicrystal`: `true` or `false` to view in quasicrystal mode. Default is `false`.
 - `mercury`: `true` or `false` to load MercuryDPM data instead of NDDEM data. Default is `false`.
 - `colour_scheme`: set to `inverted` to invert global colour scheme to have a white background.
@@ -41,5 +43,7 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 - `initial_camera_location`: three numbers (e.g. `initial_camera_location=1,2,3`) to set the initial camera location if so desired.
 - `camera_target`: three numbers (e.g. `camera_target=1,2,3`) to set what the camera is pointing at if so desired.
 - `t0`: `float` to set the initial timestep to display. Default is `0`.
+- `binary`: if included, this flag loads from binary data instead of csv data. You can convert csv to binary data using the included script `binarise_output.py` in the `scripts` folder.
+-
 
 An example command that works for me, when the TexturingServer is running: `/path/to/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5&display_type=keyboard`
