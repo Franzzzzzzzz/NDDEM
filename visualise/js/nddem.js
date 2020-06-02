@@ -645,8 +645,8 @@ function add_gui() {
         //gui.add( ref_dim, 'c').min(0).max(N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
         if (N > 3) {
             for (i=3;i<N;i++) {
-                if ( view_mode === 'rotations' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x'+(i+1)) ; }
-                else { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('x'+(i+1)) ; }
+                if ( view_mode === 'rotations' ) { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.1).name('x<sub>'+(i+1)+'</sub>') ; }
+                else { gui.add( world[i], 'cur').min(world[i].min).max(world[i].max).step(0.01).name('x<sub>'+(i+1)+'</sub>') ; }
             }
         }
         gui.add( time, 'cur').min(time.min).max(time.max).step(0.1).listen().name('Time') ;
@@ -665,9 +665,9 @@ function add_gui() {
             }
         })
         if ( quasicrystal ) {
-            gui.add( euler, 'theta_1').name('Theta1').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
-            gui.add( euler, 'theta_2').name('Theta2').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
-            gui.add( euler, 'theta_3').name('Theta3').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( euler, 'theta_1').name('&theta;<sub>1</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( euler, 'theta_2').name('&theta;<sub>2</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( euler, 'theta_3').name('&theta;<sub>3</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
         }
         if ( view_mode === 'velocity' ) {
             gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
@@ -2085,7 +2085,8 @@ function remove_loading_screen() {
     loadingScreen.classList.add( 'fade-out' );
 
     // optional: remove loader from DOM via event listener
-    loadingScreen.addEventListener( 'transitionend', onTransitionEnd );
+    // loadingScreen.addEventListener( 'transitionend', onTransitionEnd );
+    loadingScreen.remove();
 }
 function onTransitionEnd( event ) {
 
