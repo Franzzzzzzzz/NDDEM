@@ -351,9 +351,25 @@
 
             var dA = O.multiply(uniforms.A.value).multiplyScalar(delta).toArray();
             var Sum = uniforms.A.value.elements.map(function (num, idx) {
-              return num + dA[idx];
+              return num - dA[idx];
             });
-            sphere.material.uniforms.A.value.elements = Sum;
+            uniforms.A.value.elements = Sum;
+            
+            //Orthonormalisation
+            for (i=0 ; i<uniforms.N.value ; i++)
+            {
+                for (j=0 ; j<i ; j++)
+                {
+                    for (dd=0, dot=0 ; dd<uniforms.N.value ; dd++)
+                        dot += uniforms.A.value.elements[i*4+dd] * uniforms.A.value.elements[j*4+dd] ; 
+                    for (dd=0 ; dd<uniforms.N.value ; dd++)
+                        uniforms.A.value.elements[i*4+dd] -= uniforms.A.value.elements[j*4+dd] * dot ; 
+                }
+                for (dd=0, norme=0 ; dd<uniforms.N.value ; dd++)
+                    norme += uniforms.A.value.elements[i*4+dd]*uniforms.A.value.elements[i*4+dd] ; 
+                for (dd=0 ; dd<uniforms.N.value ; dd++)
+                    uniforms.A.value.elements[i*4+dd] /= norme ; 
+            }
             uniforms.x4.value = slice.x4;
 
 			requestAnimationFrame( animate );
