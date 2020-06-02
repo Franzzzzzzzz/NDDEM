@@ -159,6 +159,7 @@ const recorder = new CCapture({
 });
 var all_locs;
 var all_rots;
+var num_particles;
 
 let promise = new Promise( function(resolve, reject) {
     var request = new XMLHttpRequest();
@@ -176,6 +177,7 @@ let promise = new Promise( function(resolve, reject) {
                     l = line.split(' ')
                     if (l[0] == 'dimensions') {
                         N = parseInt(l[1]);
+                        num_particles = parseInt(l[2]);
                         for (j=0;j<N;j++) {
                             world.push({});
                             world[j].min = 0.;
@@ -228,14 +230,19 @@ let promise = new Promise( function(resolve, reject) {
 });
 
 promise.then(
-    function(result) { if ( urlParams.has('binary') ) { load_particles_from_binaries(); }
+    function(result) {
                        build_world();
                        remove_everything(); // only runs on postMessage receive
                        animate();
-                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 300); // for safety
-                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 1000); // for safety
-                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 2000); // for safety
-                       setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 5000); // for safety
+                       if ( urlParams.has('binary') ) {
+                           // update_spheres_binary(time.frame, true);
+                       }
+                       else {
+                           setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 300); // for safety
+                           setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 1000); // for safety
+                           setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 2000); // for safety
+                           setTimeout(function(){ update_spheres_CSV(time.frame, true); }, 5000); // for safety
+                       }
                      },
     function(error) { }
 );
@@ -289,7 +296,12 @@ function build_world() {
     }
     else {
         if ( view_mode === 'rotations' ) { make_initial_sphere_texturing(); }
-        else { make_initial_spheres_CSV(); update_spheres_CSV(0,false);}
+        else {
+            if ( urlParams.has('binary') ) {
+                make_initial_spheres_binary();
+            }
+            else { make_initial_spheres_CSV(); update_spheres_CSV(0,false); }
+        }
     }
     //update_spheres_CSV(0,false);
     add_gui();
@@ -1050,15 +1062,15 @@ function make_lights() {
 function make_walls() {
     walls = new THREE.Group;
     if ( display_type === 'VR' ) {
-        var base_plain_geometry = new THREE.PlaneBufferGeometry( 1, 1 );
-        var base_plain_material = new THREE.MeshStandardMaterial( {
+        var base_plane_geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+        var base_plane_material = new THREE.MeshStandardMaterial( {
             color: 0x000000,
         } );
-        var base_plain = new THREE.Mesh( base_plain_geometry, base_plain_material );
-        base_plain.rotation.x = -Math.PI/2;
-        base_plain.scale.set(10,10,10);
-        base_plain.position.y = -0.1 - human_height;
-        scene.add(base_plain);
+        var base_plane = new THREE.Mesh( base_plane_geometry, base_plane_material );
+        base_plane.rotation.x = -Math.PI/2;
+        base_plane.scale.set(10,10,10);
+        base_plane.position.y = -0.1 - human_height;
+        scene.add(base_plane);
     }
 
     var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
@@ -1429,7 +1441,7 @@ function make_initial_spheres_Mercury() {
     //                 };
     //             }
     //             var object = new THREE.Mesh( geometry, material );
-    //             object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
+    //             object.position.set(spheres[i][0],spheres[i][1],spheres[i][2]);
     //             object.rotation.z = Math.PI/2.;
     //             if ( shadows ) {
     //                 object.castShadow = true;
@@ -1461,14 +1473,25 @@ function make_initial_spheres_binary() {
     lReq.onload = function (oEvent) {
         var arrayBuffer = lReq.response;
         var dataview = new DataView(arrayBuffer);
-        all_locs = new Float32Array(arrayBuffer.byteLength / 4);
-        for (var i = 0; i < all_locs.length; i++) {
-            all_locs[i] = dataview.getFloat32(i * 4, true); // At every 4th byte
+        var num_data_pts = arrayBuffer.byteLength / 4;
+        var nt = num_data_pts/num_particles/(N+4);
+
+        all_locs = new Array(nt);
+        for (var i = 0; i < nt; i++) {
+            all_locs[i] = new Array(num_particles);
+            for (var j = 0; j < num_particles; j++) {
+                all_locs[i][j] = new Array(N+4);
+                for (var k = 0; k < N+4; k++) {
+                    all_locs[i][j][k] = dataview.getFloat32(4 * (k + (N+4)*(j + num_particles*i)), true);
+                }
+            }
         }
+        make_initial_spheres(all_locs[0])
+        update_spheres(all_locs[0],true);
     };
     lReq.send(null);
-    make_initial_spheres(spheres)
-    
+
+
     if ( view_mode === 'rotations2' ) {
         var rotfilename = data_dir + "Samples/" + fname + "rot.bin";
         var rReq = new XMLHttpRequest();
@@ -1477,15 +1500,41 @@ function make_initial_spheres_binary() {
         rReq.onload = function (oEvent) {
             var arrayBuffer = rReq.response;
             var dataview = new DataView(arrayBuffer);
-            all_rots = new Float32Array(arrayBuffer.byteLength / 4);
-            for (var i = 0; i < all_rots.length; i++) {
-                all_rots[i] = dataview.getFloat32(i * 4, true); // At every 4th byte
-            }
+            var num_data_pts = arrayBuffer.byteLength / 4;
+            var nt = num_data_pts/num_particles/(N*N);
+
+            all_rots = new Array(nt);
+            for (var i = 0; i < nt; i++) {
+                all_rots[i] = new Array(num_particles);
+                for (var j = 0; j < num_particles; j++) {
+                    all_rots[i][j] = new Array(N*N);
+                    for (var k = 0; k < N*N; k++) {
+                        all_rots[i][j][k] = dataview.getFloat32(4 * (k + (N*N)*(j + num_particles*i)), true);
+                        }
+                    }
+                }
+                // console.log(all_locs)
         };
         rReq.send(null);
     }
-
 }
+
+/**
+* Make the initial particles
+*/
+function make_initial_spheres_CSV() {
+    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-"+String(time.cur*time.save_rate).padStart(5,'0') +".csv" }
+    else {         var filename = data_dir + "Samples/" + fname + "dump-"+String(time.cur*time.save_rate).padStart(5,'0') +".csv" + "?_="+ (new Date).getTime(); }
+    console.log(filename)
+    Papa.parse(filename, {
+        download: true,
+        dynamicTyping: true,
+        header: false,
+        complete: function(results) {
+            make_initial_spheres(results.data.slice(1)) // skip header
+        }
+    });
+};
 
 function make_initial_spheres(spheres) {
     particles = new THREE.Group();
@@ -1549,7 +1598,7 @@ function make_initial_spheres(spheres) {
             };
         }
         var object = new THREE.Mesh( geometry, material );
-        object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
+        object.position.set(spheres[i][0],spheres[i][1],spheres[i][2]);
         object.rotation.z = Math.PI/2.;
         // if ( fname.includes('Coll') || fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
         if ( shadows ) {
@@ -1573,24 +1622,11 @@ function make_initial_spheres(spheres) {
     if ( fname.includes("Submarine") ) { camera.position.set(particles.children[pinky].position.x,particles.children[pinky].position.y,particles.children[pinky].position.z); console.log(camera.position) }
 }
 
-/**
-* Make the initial particles
-*/
-function make_initial_spheres_CSV() {
-    if ( cache ) { var filename = data_dir + "Samples/" + fname + "dump-"+String(time.cur*time.save_rate).padStart(5,'0') +".csv" }
-    else {         var filename = data_dir + "Samples/" + fname + "dump-"+String(time.cur*time.save_rate).padStart(5,'0') +".csv" + "?_="+ (new Date).getTime(); }
-    console.log(filename)
-    Papa.parse(filename, {
-        download: true,
-        dynamicTyping: true,
-        header: true,
-        complete: function(results) {
-            make_initial_spheres(results.data)
-        }
-    });
-};
+function load_orientation_binary(t,changed_higher_dim_view) {
+    load_orientation(all_rots[t]);
+}
 
-function load_orientation(t,changed_higher_dim_view) {
+function load_orientation_CSV(t,changed_higher_dim_view) {
     if ( cache ) { var filename = data_dir + "Samples/" + fname + "dumpA-"+String(t*time.save_rate).padStart(5,'0') +".csv" }
     else { var filename = data_dir + "Samples/" + fname + "dumpA-"+String(t*time.save_rate).padStart(5,'0') +".csv"+"?_="+ (new Date).getTime() }
     Papa.parse(filename, {
@@ -1600,21 +1636,25 @@ function load_orientation(t,changed_higher_dim_view) {
         cache: cache,
         complete: function(results) {
             spheres = results.data;
-            for (i = 1; i<spheres.length; i++) { // skip header
-                var object = particles.children[i-1];
-                var A = spheres[i];
-                if ( N == 3 ) {
-                    A = A.slice(0,3).concat([0],
-                        A.slice(3,6),[0],
-                        A.slice(6,9),[0,
-                        0,0,0,1]); } // fill empty holes so it is a Matrix4
-                // console.log(A);
-                object.material.uniforms.A.value.fromArray(A);
-                // console.log(object.material.uniforms.x4);
-                // console.log(object.material.uniforms.x4p);
-            }
+            load_orientation(spheres.slice(1));
         }
     });
+}
+
+function load_orientation(spheres) {
+    for (i = 0; i<spheres.length; i++) { // skip header
+        var object = particles.children[i];
+        var A = spheres[i];
+        if ( N == 3 ) {
+            A = A.slice(0,3).concat([0],
+                A.slice(3,6),[0],
+                A.slice(6,9),[0,
+                0,0,0,1]); } // fill empty holes so it is a Matrix4
+        // console.log(A);
+        object.material.uniforms.A.value.fromArray(A);
+        // console.log(object.material.uniforms.x4);
+        // console.log(object.material.uniforms.x4p);
+    }
 }
 
 /**
@@ -1692,198 +1732,206 @@ function update_spheres_CSV(t,changed_higher_dim_view) {
     Papa.parse(filename, {
         download: true,
         dynamicTyping: true,
-        header: true,
+        header: false,
         cache: cache,
         complete: function(results) {
-            spheres = results.data;
-            for (i = 0; i<spheres.length; i++) {
-                var object = particles.children[i];
-                if ( N>3 ) {
-                  x3_unrotated = spheres[i].x3;
-
-                  x0_temp = spheres[i].x0*Math.cos(euler.theta_1) - spheres[i].x3*Math.sin(euler.theta_1);
-                  x3_temp = spheres[i].x0*Math.sin(euler.theta_1) + spheres[i].x3*Math.cos(euler.theta_1);
-
-                  x1_temp = spheres[i].x1*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
-                  x3_temp = spheres[i].x1*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
-
-                  x2_temp = spheres[i].x2*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
-                  x3_temp = spheres[i].x2*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
-
-                  spheres[i].x0 = x0_temp;
-                  spheres[i].x1 = x1_temp;
-                  spheres[i].x2 = x2_temp;
-                  spheres[i].x3 = x3_temp;
-                }
-                if ( N == 1 ) { spheres[i].x1 = 0; };
-                if ( N < 3 ) { spheres[i].x2 = 0; };
-                if (N < 4) {
-                    var R_draw = spheres[i].R;
-                             }
-                else if (N == 4) {
-                    var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                            Math.pow( (world[3].cur - spheres[i].x3), 2)
-                                          );
-
-                    //if ( (world[3].cur >  world[3].max-spheres[i].R ) // NOTE: IMPLEMENT THIS!!
-                             }
-                 else if (N == 5) {
-                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
-                                             Math.pow( (world[4].cur - spheres[i].x4), 2)
-                                         );
-                 }
-                 else if (N == 6) {
-                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
-                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
-                                             Math.pow( (world[5].cur - spheres[i].x5), 2)
-                                         );
-                 }
-                 else if (N == 7) {
-                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
-                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
-                                             Math.pow( (world[5].cur - spheres[i].x5), 2) -
-                                             Math.pow( (world[6].cur - spheres[i].x6), 2)
-                                         );
-                                     }
-                 else if (N == 8) {
-                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
-                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
-                                             Math.pow( (world[5].cur - spheres[i].x5), 2) -
-                                             Math.pow( (world[6].cur - spheres[i].x6), 2) -
-                                             Math.pow( (world[7].cur - spheres[i].x7), 2)
-                                         );
-                                     }
-                 else if (N == 10) {
-                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) -
-                                             Math.pow( (world[3].cur - spheres[i].x3), 2) -
-                                             Math.pow( (world[4].cur - spheres[i].x4), 2) -
-                                             Math.pow( (world[5].cur - spheres[i].x5), 2) -
-                                             Math.pow( (world[6].cur - spheres[i].x6), 2) -
-                                             Math.pow( (world[7].cur - spheres[i].x7), 2) -
-                                             Math.pow( (world[8].cur - spheres[i].x8), 2) -
-                                             Math.pow( (world[9].cur - spheres[i].x9), 2)
-                                         );
-                 }
-                 else if (N == 30) {
-                     var R_draw = Math.sqrt( Math.pow(spheres[i].R,2.) - Math.pow( (world[3].cur - spheres[i].x3), 2) - Math.pow( (world[4].cur - spheres[i].x4), 2) - Math.pow( (world[5].cur - spheres[i].x5), 2) -
-                                             Math.pow( (world[6].cur - spheres[i].x6), 2)   - Math.pow( (world[7].cur - spheres[i].x7), 2)   - Math.pow( (world[8].cur - spheres[i].x8), 2)   - Math.pow( (world[9].cur - spheres[i].x9), 2) -
-                                             Math.pow( (world[10].cur - spheres[i].x10), 2) - Math.pow( (world[11].cur - spheres[i].x11), 2) - Math.pow( (world[12].cur - spheres[i].x12), 2) - Math.pow( (world[13].cur - spheres[i].x13), 2) -
-                                             Math.pow( (world[14].cur - spheres[i].x14), 2) - Math.pow( (world[15].cur - spheres[i].x15), 2) - Math.pow( (world[16].cur - spheres[i].x16), 2) - Math.pow( (world[17].cur - spheres[i].x17), 2) -
-                                             Math.pow( (world[18].cur - spheres[i].x18), 2) - Math.pow( (world[19].cur - spheres[i].x19), 2) - Math.pow( (world[20].cur - spheres[i].x20), 2) - Math.pow( (world[21].cur - spheres[i].x21), 2) -
-                                             Math.pow( (world[22].cur - spheres[i].x22), 2) - Math.pow( (world[23].cur - spheres[i].x23), 2) - Math.pow( (world[24].cur - spheres[i].x24), 2) - Math.pow( (world[25].cur - spheres[i].x25), 2) -
-                                             Math.pow( (world[26].cur - spheres[i].x26), 2) - Math.pow( (world[27].cur - spheres[i].x27), 2) - Math.pow( (world[28].cur - spheres[i].x28), 2) - Math.pow( (world[29].cur - spheres[i].x29), 2)
-                                         );
-                 };
-                if (isNaN(R_draw)) {
-                    object.visible = false;
-                    if ( view_mode === 'D4' || view_mode === 'D5' ) {
-                        // if ( colour_scheme === 'inverted' ) {
-                            wristband1.children[i].material.color = new THREE.Color( 0x777777 );
-                        // }
-                        // else {
-                            // wristband1.children[i].material.color = new THREE.Color( 0x111111 );
-                        // }
-                    }
-                }
-                else {
-                    if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
-                    else {
-                        if ( display_type === 'VR') {
-                            R_draw = R_draw*vr_scale;
-                            object.position.set(spheres[i].x1*vr_scale,spheres[i].x0*vr_scale - human_height,spheres[i].x2*vr_scale);
-                        }
-                        else {
-                            object.position.set(spheres[i].x0,spheres[i].x1,spheres[i].x2);
-                        }
-                        if ( quasicrystal ) { scale = 5; object.scale.set(spheres[i].R/scale,spheres[i].R/scale,spheres[i].R/scale); }
-                        else { object.scale.set(R_draw,R_draw,R_draw); }
-                        object.visible = true;
-                        if ( view_mode === 'velocity' ) {
-                            lut.setMin(0);
-                            lut.setMax(velocity.vmax);
-                            object.material.color = lut.getColor(spheres[i].Vmag);
-                        }
-                        else if ( view_mode === 'rotation_rate' ) {
-                            lut.setMin(0);
-                            lut.setMax(velocity.omegamax);
-                            object.material.color = lut.getColor(spheres[i].Omegamag);
-                        }
-                        else if ( view_mode === 'rotations2' ) {
-                            if ( N > 3 ) {
-                                object.material.uniforms.x4p.value = spheres[i].x3;
-                                object.material.uniforms.x4.value = world[3].cur;
-                            }
-                            else {
-                                object.material.uniforms.x4p.value = 0.0;
-                            }
-                            // object.material.uniforms.xp.value = new THREE.Vector4(spheres[i].x1,spheres[i].x2,spheres[i].x3,spheres[i].x4)
-                            // object.material.uniforms.R.value = R_draw;
-                        }
-                        else if ( view_mode === 'D4' ) {
-                            //lut.setMin(world[3].min);
-                            //lut.setMax(world[3].max);
-                            lut.setMin(world[3].cur-2*r) ;
-                            lut.setMax(world[3].cur+2*r) ;
-                            object.material.color  = lut.getColor(x3_unrotated);
-                            wristband1.children[i].material.color = lut.getColor(x3_unrotated);
-                        }
-                        else if ( view_mode === 'D5' ) {
-                            //lut.setMin(world[4].min);
-                            //lut.setMax(world[4].max);
-                            lut.setMin(world[4].cur-2*r) ;
-                            lut.setMax(world[4].cur+2*r) ;
-                            object.material.color  = lut.getColor(spheres[i].x4);
-                            wristband1.children[i].material.color = lut.getColor(spheres[i].x4);
-                        }
-                    }
-                };
-                if ( !hard_mode ) {
-                    if ( N == 4 && !fname.includes('Spinner')) {
-                        var object2 = wristband1.children[i];
-                        phi = 2.*Math.PI*( world[3].cur - spheres[i].x3 )/(world[3].max - world[3].min) - Math.PI/2.;
-                        x = (R + r)*Math.cos(phi);
-                        y = (R + r)*Math.sin(phi);
-                        z = 0.;
-                        object2.position.set(x,y,z);
-                    };
-
-                    if ( N > 4 && !fname.includes('Spinner') && !hard_mode ) {
-                        var object2 = wristband1.children[i];
-                        phi   = 2.*Math.PI*(world[3].cur - spheres[i].x3)/(world[3].max - world[3].min) - Math.PI/2.;
-                        theta = 2.*Math.PI*(world[4].cur - spheres[i].x4)/(world[4].max - world[4].min) ;
-                        x = (R + r*Math.cos(theta))*Math.cos(phi);
-                        y = (R + r*Math.cos(theta))*Math.sin(phi);
-                        z = r*Math.sin(theta);
-                        object2.position.set(x,y,z);
-                    };
-
-                    if ( N == 6 && !fname.includes('Spinner') ) {
-                        var object3 = wristband2.children[i];
-                        phi = 2.*Math.PI*( world[5].cur - spheres[i].x5 )/(world[5].max - world[5].min) - Math.PI/2.;
-                        x = (R + r)*Math.cos(phi);
-                        y = (R + r)*Math.sin(phi);
-                        z = 0.;
-                        object3.position.set(x,y,z);
-                    };
-
-                    if ( N >= 7 && !fname.includes('Spinner') ) {
-                        var object3 = wristband2.children[i];
-                        phi   = 2.*Math.PI*(world[5].cur - spheres[i].x5)/(world[5].max - world[5].min) - Math.PI/2.;
-                        theta = 2.*Math.PI*(world[6].cur - spheres[i].x6)/(world[6].max - world[6].min) ;
-                        x = (R + r*Math.cos(theta))*Math.cos(phi);
-                        y = (R + r*Math.cos(theta))*Math.sin(phi);
-                        z = r*Math.sin(theta);
-                        object3.position.set(x,y,z);
-                    };
-                }
-            }
+            spheres = results.data.slice(1); // skip header
+            update_spheres(spheres);
         }
     });
 };
+
+function update_spheres_binary(t,changed_higher_dim_view) {
+    update_spheres(all_locs[t])
+}
+
+function update_spheres(spheres) {
+    for (i = 0; i<spheres.length; i++) {
+        var object = particles.children[i];
+        if ( N>3 ) {
+          x3_unrotated = spheres[i][3];
+
+          x0_temp = spheres[i][0]*Math.cos(euler.theta_1) - spheres[i][3]*Math.sin(euler.theta_1);
+          x3_temp = spheres[i][0]*Math.sin(euler.theta_1) + spheres[i][3]*Math.cos(euler.theta_1);
+
+          x1_temp = spheres[i][1]*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
+          x3_temp = spheres[i][1]*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
+
+          x2_temp = spheres[i][2]*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
+          x3_temp = spheres[i][2]*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
+
+          spheres[i][0] = x0_temp;
+          spheres[i][1] = x1_temp;
+          spheres[i][2] = x2_temp;
+          spheres[i][3] = x3_temp;
+        }
+        if ( N == 1 ) { spheres[i][1] = 0; };
+        if ( N < 3 ) { spheres[i][2] = 0; };
+        if (N < 4) {
+            var R_draw = spheres[i][N];
+                     }
+        else if (N == 4) {
+            var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) -
+                                    Math.pow( (world[3].cur - spheres[i][3]), 2)
+                                  );
+
+            //if ( (world[3].cur >  world[3].max-spheres[i][N] ) // NOTE: IMPLEMENT THIS!!
+                     }
+         else if (N == 5) {
+             var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) -
+                                     Math.pow( (world[3].cur - spheres[i][3]), 2) -
+                                     Math.pow( (world[4].cur - spheres[i][4]), 2)
+                                 );
+         }
+         else if (N == 6) {
+             var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) -
+                                     Math.pow( (world[3].cur - spheres[i][3]), 2) -
+                                     Math.pow( (world[4].cur - spheres[i][4]), 2) -
+                                     Math.pow( (world[5].cur - spheres[i][5]), 2)
+                                 );
+         }
+         else if (N == 7) {
+             var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) -
+                                     Math.pow( (world[3].cur - spheres[i][3]), 2) -
+                                     Math.pow( (world[4].cur - spheres[i][4]), 2) -
+                                     Math.pow( (world[5].cur - spheres[i][5]), 2) -
+                                     Math.pow( (world[6].cur - spheres[i][6]), 2)
+                                 );
+                             }
+         else if (N == 8) {
+             var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) -
+                                     Math.pow( (world[3].cur - spheres[i][3]), 2) -
+                                     Math.pow( (world[4].cur - spheres[i][4]), 2) -
+                                     Math.pow( (world[5].cur - spheres[i][5]), 2) -
+                                     Math.pow( (world[6].cur - spheres[i][6]), 2) -
+                                     Math.pow( (world[7].cur - spheres[i][7]), 2)
+                                 );
+                             }
+         else if (N == 10) {
+             var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) -
+                                     Math.pow( (world[3].cur - spheres[i][3]), 2) -
+                                     Math.pow( (world[4].cur - spheres[i][4]), 2) -
+                                     Math.pow( (world[5].cur - spheres[i][5]), 2) -
+                                     Math.pow( (world[6].cur - spheres[i][6]), 2) -
+                                     Math.pow( (world[7].cur - spheres[i][7]), 2) -
+                                     Math.pow( (world[8].cur - spheres[i][8]), 2) -
+                                     Math.pow( (world[9].cur - spheres[i][9]), 2)
+                                 );
+         }
+         else if (N == 30) {
+             var R_draw = Math.sqrt( Math.pow(spheres[i][N],2.) - Math.pow( (world[3].cur - spheres[i][3]), 2) - Math.pow( (world[4].cur - spheres[i][4]), 2) - Math.pow( (world[5].cur - spheres[i][5]), 2) -
+                                     Math.pow( (world[6].cur - spheres[i][6]), 2)   - Math.pow( (world[7].cur - spheres[i][7]), 2)   - Math.pow( (world[8].cur - spheres[i][8]), 2)   - Math.pow( (world[9].cur - spheres[i][9]), 2) -
+                                     Math.pow( (world[10].cur - spheres[i][10]), 2) - Math.pow( (world[11].cur - spheres[i][11]), 2) - Math.pow( (world[12].cur - spheres[i][12]), 2) - Math.pow( (world[13].cur - spheres[i][13]), 2) -
+                                     Math.pow( (world[14].cur - spheres[i][14]), 2) - Math.pow( (world[15].cur - spheres[i][15]), 2) - Math.pow( (world[16].cur - spheres[i][16]), 2) - Math.pow( (world[17].cur - spheres[i][17]), 2) -
+                                     Math.pow( (world[18].cur - spheres[i][18]), 2) - Math.pow( (world[19].cur - spheres[i][19]), 2) - Math.pow( (world[20].cur - spheres[i][20]), 2) - Math.pow( (world[21].cur - spheres[i][21]), 2) -
+                                     Math.pow( (world[22].cur - spheres[i][22]), 2) - Math.pow( (world[23].cur - spheres[i][23]), 2) - Math.pow( (world[24].cur - spheres[i][24]), 2) - Math.pow( (world[25].cur - spheres[i][25]), 2) -
+                                     Math.pow( (world[26].cur - spheres[i][26]), 2) - Math.pow( (world[27].cur - spheres[i][27]), 2) - Math.pow( (world[28].cur - spheres[i][28]), 2) - Math.pow( (world[29].cur - spheres[i][29]), 2)
+                                 );
+         };
+        if (isNaN(R_draw)) {
+            object.visible = false;
+            if ( view_mode === 'D4' || view_mode === 'D5' ) {
+                // if ( colour_scheme === 'inverted' ) {
+                    wristband1.children[i].material.color = new THREE.Color( 0x777777 );
+                // }
+                // else {
+                    // wristband1.children[i].material.color = new THREE.Color( 0x111111 );
+                // }
+            }
+        }
+        else {
+            if ( fname.includes('Submarine') && i==pinky ) { object.visible = false; }
+            else {
+                if ( display_type === 'VR') {
+                    R_draw = R_draw*vr_scale;
+                    object.position.set(spheres[i][1]*vr_scale,spheres[i][0]*vr_scale - human_height,spheres[i][2]*vr_scale);
+                }
+                else {
+                    object.position.set(spheres[i][0],spheres[i][1],spheres[i][2]);
+                }
+                if ( quasicrystal ) { scale = 5; object.scale.set(spheres[i][N]/scale,spheres[i][N]/scale,spheres[i][N]/scale); }
+                else { object.scale.set(R_draw,R_draw,R_draw); }
+                object.visible = true;
+                if ( view_mode === 'velocity' ) {
+                    lut.setMin(0);
+                    lut.setMax(velocity.vmax);
+                    object.material.color = lut.getColor(spheres[i].Vmag);
+                }
+                else if ( view_mode === 'rotation_rate' ) {
+                    lut.setMin(0);
+                    lut.setMax(velocity.omegamax);
+                    object.material.color = lut.getColor(spheres[i].Omegamag);
+                }
+                else if ( view_mode === 'rotations2' ) {
+                    if ( N > 3 ) {
+                        object.material.uniforms.x4p.value = spheres[i][3];
+                        object.material.uniforms.x4.value = world[3].cur;
+                    }
+                    else {
+                        object.material.uniforms.x4p.value = 0.0;
+                    }
+                    // object.material.uniforms.xp.value = new THREE.Vector4(spheres[i][1],spheres[i][2],spheres[i][3],spheres[i][4])
+                    // object.material.uniforms.R.value = R_draw;
+                }
+                else if ( view_mode === 'D4' ) {
+                    //lut.setMin(world[3].min);
+                    //lut.setMax(world[3].max);
+                    lut.setMin(world[3].cur-2*r) ;
+                    lut.setMax(world[3].cur+2*r) ;
+                    object.material.color  = lut.getColor(x3_unrotated);
+                    wristband1.children[i].material.color = lut.getColor(x3_unrotated);
+                }
+                else if ( view_mode === 'D5' ) {
+                    //lut.setMin(world[4].min);
+                    //lut.setMax(world[4].max);
+                    lut.setMin(world[4].cur-2*r) ;
+                    lut.setMax(world[4].cur+2*r) ;
+                    object.material.color  = lut.getColor(spheres[i][4]);
+                    wristband1.children[i].material.color = lut.getColor(spheres[i][4]);
+                }
+            }
+        };
+        if ( !hard_mode ) {
+            if ( N == 4 && !fname.includes('Spinner')) {
+                var object2 = wristband1.children[i];
+                phi = 2.*Math.PI*( world[3].cur - spheres[i][3] )/(world[3].max - world[3].min) - Math.PI/2.;
+                x = (R + r)*Math.cos(phi);
+                y = (R + r)*Math.sin(phi);
+                z = 0.;
+                object2.position.set(x,y,z);
+            };
+
+            if ( N > 4 && !fname.includes('Spinner') && !hard_mode ) {
+                var object2 = wristband1.children[i];
+                phi   = 2.*Math.PI*(world[3].cur - spheres[i][3])/(world[3].max - world[3].min) - Math.PI/2.;
+                theta = 2.*Math.PI*(world[4].cur - spheres[i][4])/(world[4].max - world[4].min) ;
+                x = (R + r*Math.cos(theta))*Math.cos(phi);
+                y = (R + r*Math.cos(theta))*Math.sin(phi);
+                z = r*Math.sin(theta);
+                object2.position.set(x,y,z);
+            };
+
+            if ( N == 6 && !fname.includes('Spinner') ) {
+                var object3 = wristband2.children[i];
+                phi = 2.*Math.PI*( world[5].cur - spheres[i][5] )/(world[5].max - world[5].min) - Math.PI/2.;
+                x = (R + r)*Math.cos(phi);
+                y = (R + r)*Math.sin(phi);
+                z = 0.;
+                object3.position.set(x,y,z);
+            };
+
+            if ( N >= 7 && !fname.includes('Spinner') ) {
+                var object3 = wristband2.children[i];
+                phi   = 2.*Math.PI*(world[5].cur - spheres[i][5])/(world[5].max - world[5].min) - Math.PI/2.;
+                theta = 2.*Math.PI*(world[6].cur - spheres[i][6])/(world[6].max - world[6].min) ;
+                x = (R + r*Math.cos(theta))*Math.cos(phi);
+                y = (R + r*Math.cos(theta))*Math.sin(phi);
+                z = r*Math.sin(theta);
+                object3.position.set(x,y,z);
+            };
+        }
+    }
+}
 
 /**
 * Update camera and renderer if window size changes
@@ -2022,9 +2070,18 @@ function animate() {
     if (N > 3) {
         for (iii=3;iii<N;iii++) {
             if (world[iii].cur != world[iii].prev) {
-                update_spheres_CSV(time.frame,true);
+                if ( urlParams.has('binary') ) {
+                    update_spheres_binary(time.frame,true);
+                }
+                else { update_spheres_CSV(time.frame,true); }
                 if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
-                else if (view_mode === 'rotations2') {load_orientation(time.frame,) ;}
+                else if (view_mode === 'rotations2') {
+                    if ( urlParams.has('binary') ) {
+                        load_orientation_binary(time.frame,); }
+                    else {
+                        load_orientation_CSV(time.frame,);
+                    }
+                }
                 world[iii].prev = world[iii].cur;
             }
         }
@@ -2038,9 +2095,19 @@ function animate() {
     }
     //if ( display_type === 'VR' ) { bg.rotation.x = time.cur/100.; } // rotate the background over time
     if ( time.frame !== time.prev_frame ) {
-        update_spheres_CSV(time.frame,false);
+        if ( urlParams.has('binary') ) {
+            update_spheres_binary(time.frame,true);
+        }
+        else { update_spheres_CSV(time.frame,false); }
         if (view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
-        else if (view_mode === 'rotations2') {load_orientation(time.frame,) ;}
+        else if (view_mode === 'rotations2') {
+            if ( urlParams.has('binary') ) {
+                load_orientation_binary(time.frame,);
+            }
+            else {
+                load_orientation_CSV(time.frame,);
+            }
+        }
         time.prev_frame = time.frame;
     };
     if (time.cur > time.max) { time.cur = 0; }
