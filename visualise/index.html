@@ -87,8 +87,8 @@
                     else {
                         phi2 = acos(x_rotated.z/sqrt(rsqr));
                     }
-                    if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
-                    if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+                    // if ( phi1 == NaN ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    // if ( phi2 == NaN ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
                     if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
 
                     vColor.r = abs(sin(phi0*3.0));
@@ -150,8 +150,8 @@
                     else {
                         phi2 = acos(x_rotated.y/sqrt(rsqr));
                     }
-                    //if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
-                    //if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+                    // if ( phi1 == nan ) { phi1 = acos(sign(x_rotated.x)*x_rotated.x);}
+                    // if ( phi2 == nan ) { phi2 = acos(sign(x_rotated.y)*x_rotated.y);}
 
                     if ( x_rotated.z < 0.0 ) { phi2 = 2.0*pi - phi2; }
 

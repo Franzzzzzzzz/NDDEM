@@ -72,8 +72,8 @@
                     else {
                         phi2 = acos(x_rotated.z/sqrt(rsqr));
                     }
-                    if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
-                    if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+                    // if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    // if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
                     if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
 
                     vColor.r = abs(sin(phi0*3.0));
