@@ -14,13 +14,13 @@ body{
     transform: translate(-50%, -50%);
 }
 .circle{
-    width:20px;
-    height:20px;
+    width:15px;
+    height:15px;
     position: absolute;
     border-radius: 50%;
     /* background-color: #fff; */
     background-color: #e72564;
-    left:60%;
+    left:58%;
     transform-origin: 50%;
     animation: circle .5s alternate infinite ease;
 }
@@ -37,7 +37,7 @@ body{
         transform: scaleX(1.7);
     }
     40%{
-        height:20px;
+        height:15px;
         border-radius: 50%;
         transform: scaleX(1);
     }
@@ -46,12 +46,12 @@ body{
     }
 }
 .circle:nth-child(2){
-    left:70%;
+    left:64%;
     animation-delay: .2s;
 }
 .circle:nth-child(3){
     /* left:auto; */
-    left:80%;
+    left:70%;
     animation-delay: .3s;
 }
 .wrapper{
