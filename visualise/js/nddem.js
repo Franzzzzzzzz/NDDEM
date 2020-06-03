@@ -1495,16 +1495,27 @@ function make_initial_spheres(spheres) {
         var uniforms = {
             N: { value: N },
             N_lines: { value: 5.0 },
-            A: { value: new THREE.Matrix4() },
+            //A: { value: new THREE.Matrix4() },
+            A: {value: []}, // Size N*N
+            xview: {value: []}, //Size N-3
+            xpart: {value: []}, //Size N-3
             x4: { value: 0 },
             x4p: { value: 0 },
             R: { value: 1 },
         };
+        for (ij=0 ; ij<N-3 ; ij++)
+        {
+            uniforms.xview.value[ij] = world[ij].cur ;
+            uniforms.xpart.value[ij] = 0. ; 
+        }
         if ( N > 3 ) { uniforms.x4.value = world[3].cur; }
-        uniforms.A.value.set(1,0,0,0,
-                             0,1,0,0,
-                             0,0,1,0,
-                             0,0,0,1);
+        for (ij=0 ; ij<N*N ; ij++)
+        {
+            if (ij%N == Math.floor(ij/N))
+                uniforms.A.value[ij] = 1 ; 
+            else 
+                uniforms.A.value[ij] = 0 ; 
+        }
         var shaderMaterial = new THREE.ShaderMaterial( {
             uniforms: uniforms,
             vertexShader: document.getElementById( 'vertexshader-'+String(uniforms.N.value)+'D' ).textContent,
@@ -1588,13 +1599,14 @@ function load_orientation(spheres) {
     for (i = 0; i<spheres.length; i++) { // skip header
         var object = particles.children[i];
         var A = spheres[i];
-        if ( N == 3 ) {
+        /*if ( N == 3 ) {
             A = A.slice(0,3).concat([0],
                 A.slice(3,6),[0],
                 A.slice(6,9),[0,
-                0,0,0,1]); } // fill empty holes so it is a Matrix4
-        // console.log(A);
-        object.material.uniforms.A.value.fromArray(A);
+                0,0,0,1]); } */// fill empty holes so it is a Matrix4
+        //console.log(A);
+        //object.material.uniforms.A.value.fromArray(A);
+        object.material.uniforms.A.value = A ; 
         // console.log(object.material.uniforms.x4);
         // console.log(object.material.uniforms.x4p);
     }
@@ -1806,6 +1818,11 @@ function update_spheres(spheres) {
                     object.material.color = lut.getColor(spheres[i].Omegamag);
                 }
                 else if ( view_mode === 'rotations2' ) {
+                    for (j=0 ; j<N-3 ; j++)
+                    {
+                        particles.children[i].material.uniforms.xview.value[j] = world[j+3].cur ; 
+                        particles.children[i].material.uniforms.xpart.value[j] = spheres[i][j+3];
+                    }
                     if ( N > 3 ) {
                         object.material.uniforms.x4p.value = spheres[i][3];
                         object.material.uniforms.x4.value = world[3].cur;
@@ -1813,6 +1830,8 @@ function update_spheres(spheres) {
                     else {
                         object.material.uniforms.x4p.value = 0.0;
                     }
+                    //if (object.material.uniforms.xpart.value[0] != object.material.uniforms.x4p.value)
+                    //{console.log(object.material.uniforms.xpart.value[0]) ; console.log(object.material.uniforms.x4p.value) ; }
                     // object.material.uniforms.xp.value = new THREE.Vector4(spheres[i][1],spheres[i][2],spheres[i][3],spheres[i][4])
                     // object.material.uniforms.R.value = R_draw;
                 }
