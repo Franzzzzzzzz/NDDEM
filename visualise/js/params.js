@@ -122,6 +122,10 @@ function process_params(time) {
         params.no_axes = false;
     }
 
+    params.vr_scale = 0.5; // mapping from DEM units to VR units
+    params.human_height = 0.; // height of the human in m
+
+
     return params;
 }
 

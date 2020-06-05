@@ -75,7 +75,6 @@ async function load_current_spheres(params,time,changed_higher_dim_view) {
 
 }
 
-
 async function load_current_orientation(params,time,changed_higher_dim_view) {
     return all_rots[time.frame];
 }

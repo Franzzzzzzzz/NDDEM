@@ -1,4 +1,5 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
+console.log( 'Using threejs version ' + THREE.REVISION );
 // import { LoaderSupport } from "../node_modules/three/examples/js/loaders/LoaderSupport.js";
 import { OBJLoader } from "../node_modules/three/examples/jsm/loaders/OBJLoader.js";
 // import { MTLLoader } from "../node_modules/three/examples/js/loaders/MTLLoader.js";
@@ -19,8 +20,6 @@ world.ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000, 'snapshot':false} // temporal properties
 var euler = {'theta_1': 0, 'theta_2': 0, 'theta_3': 0}; // rotations in higher dimensions!!!!!!!!!!
 var particles;
-var vr_scale = 0.5; // mapping from DEM units to VR units
-var human_height = 0.; // height of the human in m
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 var bg; // background mesh with texture attached
 var redraw_left = false; // force redrawing of particles from movement in left hand
@@ -172,7 +171,7 @@ function remove_everything() {
             }
         }
         if ( params.display_type === 'anaglyph' ) { effect.dispose(); }
-        renderer.vr.enabled = false;
+        renderer.xr.enabled = false;
         renderer.dispose();
         scene.dispose();
         console.log('Killed everything. Remaining programs:' + renderer.info.programs.length );
@@ -497,8 +496,8 @@ function update_spheres(spheres) {
             if ( params.fname.includes('Submarine') && i==params.pinky ) { object.visible = false; }
             else {
                 if ( params.display_type === 'VR') {
-                    R_draw = R_draw*vr_scale;
-                    object.position.set(spheres[i][1]*vr_scale,spheres[i][0]*vr_scale - human_height,spheres[i][2]*vr_scale);
+                    R_draw = R_draw*params.vr_scale;
+                    object.position.set(spheres[i][1]*params.vr_scale,spheres[i][0]*params.vr_scale - params.human_height,spheres[i][2]*params.vr_scale);
                 }
                 else {
                     object.position.set(spheres[i][0],spheres[i][1],spheres[i][2]);
@@ -629,7 +628,7 @@ function animate() {
     if ( redraw_left ) { update_higher_dims_left(); }
     if ( redraw_right ) { update_higher_dims_right(); }
     if ( params.fname.includes('Uniaxial') ) {
-        if ( params.display_type === 'VR' ) { roof.position.y = (world[0].max - 5. - time.cur/10.)*vr_scale - human_height; }
+        if ( params.display_type === 'VR' ) { roof.position.y = (world[0].max - 5. - time.cur/10.)*params.vr_scale - params.human_height; }
         else { roof.position.x = world[0].max - 5. - time.cur/10.; }
     }
     if (params.N > 3) {

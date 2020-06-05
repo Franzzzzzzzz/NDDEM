@@ -19,10 +19,10 @@ function make_axes(scene,params,world) {
         var axesLabels = new THREE.Group();
         // axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
         if ( params.display_type === 'VR' ) {
-            axesHelper.position.set(0,-human_height,0);
-            axesLabels.position.set(0,-human_height,0);
-            axesHelper.scale.set(vr_scale,vr_scale,vr_scale);
-            axesLabels.scale.set(vr_scale,vr_scale,vr_scale);
+            axesHelper.position.set(0,-params.human_height,0);
+            axesLabels.position.set(0,-params.human_height,0);
+            axesHelper.scale.set(params.vr_scale,params.vr_scale,params.vr_scale);
+            axesLabels.scale.set(params.vr_scale,params.vr_scale,params.vr_scale);
             axesLabels.rotation.z = Math.PI/2;
             axesLabels.rotation.y = Math.PI/2;
             thickness = 0.05; // line thickness
@@ -155,7 +155,7 @@ function make_walls(scene,params,world) {
         var base_plane = new THREE.Mesh( base_plane_geometry, base_plane_material );
         base_plane.rotation.x = -Math.PI/2;
         base_plane.scale.set(10,10,10);
-        base_plane.position.y = -0.1 - human_height;
+        base_plane.position.y = -0.1 - params.human_height;
         scene.add(base_plane);
     }
 
@@ -178,9 +178,9 @@ function make_walls(scene,params,world) {
     if ( world[0].wall ) {
         var floor = new THREE.Mesh( geometry, material );
         if ( params.display_type === 'VR' ) {
-            floor.scale.set((world[2].max - world[2].min)*vr_scale,(world[1].max - world[1].min)*vr_scale,1);
+            floor.scale.set((world[2].max - world[2].min)*params.vr_scale,(world[1].max - world[1].min)*params.vr_scale,1);
             floor.rotation.x = + Math.PI / 2;
-            floor.position.set((world[1].max - world[1].min)/2.*vr_scale,world[0].min*vr_scale-human_height,(world[2].max - world[2].min)*vr_scale/2.);
+            floor.position.set((world[1].max - world[1].min)/2.*params.vr_scale,world[0].min*params.vr_scale-params.human_height,(world[2].max - world[2].min)*params.vr_scale/2.);
             floor.material.side = THREE.DoubleSide;
         }
         else {
@@ -192,9 +192,9 @@ function make_walls(scene,params,world) {
 
         var roof = new THREE.Mesh( geometry, material );
         if ( params.display_type === 'VR' ) {
-            roof.scale.set((world[2].max - world[2].min)*vr_scale,(world[1].max - world[1].min)*vr_scale,1);
+            roof.scale.set((world[2].max - world[2].min)*params.vr_scale,(world[1].max - world[1].min)*params.vr_scale,1);
             roof.rotation.x = - Math.PI / 2;
-            roof.position.set((world[1].max - world[1].min)/2.*vr_scale,world[0].max*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
+            roof.position.set((world[1].max - world[1].min)/2.*params.vr_scale,world[0].max*params.vr_scale-params.human_height,(world[2].max - world[2].min)/2.*params.vr_scale);
             roof.material.side = THREE.DoubleSide;
         }
         else {
@@ -215,9 +215,9 @@ function make_walls(scene,params,world) {
     if ( world[1].wall ) {
         var left_wall = new THREE.Mesh( geometry, material );
         if ( params.display_type === 'VR' ) {
-            left_wall.scale.set((world[2].max - world[2].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+            left_wall.scale.set((world[2].max - world[2].min)*params.vr_scale,(world[0].max - world[0].min)*params.vr_scale,1);
             left_wall.rotation.y = - Math.PI / 2;
-            left_wall.position.set(world[1].min*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
+            left_wall.position.set(world[1].min*params.vr_scale,(world[0].max - world[0].min)/2.*params.vr_scale-params.human_height,(world[2].max - world[2].min)/2.*params.vr_scale);
             left_wall.material.side = THREE.DoubleSide;
         }
         else {
@@ -229,9 +229,9 @@ function make_walls(scene,params,world) {
 
         var right_wall = new THREE.Mesh( geometry, material );
         if ( params.display_type === 'VR' ) {
-            right_wall.scale.set((world[2].max - world[2].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+            right_wall.scale.set((world[2].max - world[2].min)*params.vr_scale,(world[0].max - world[0].min)*params.vr_scale,1);
             right_wall.rotation.y = Math.PI / 2;
-            right_wall.position.set(world[1].max*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,(world[2].max - world[2].min)/2.*vr_scale);
+            right_wall.position.set(world[1].max*params.vr_scale,(world[0].max - world[0].min)/2.*params.vr_scale-params.human_height,(world[2].max - world[2].min)/2.*params.vr_scale);
             right_wall.material.side = THREE.DoubleSide;
         }
         else {
@@ -246,8 +246,8 @@ function make_walls(scene,params,world) {
         if ( world[2].wall ) {
             var front_wall = new THREE.Mesh( geometry, material );
             if ( params.display_type === 'VR' ) {
-                front_wall.scale.set((world[1].max - world[1].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
-                front_wall.position.set((world[1].max - world[1].min)/2.*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,world[2].min*vr_scale);
+                front_wall.scale.set((world[1].max - world[1].min)*params.vr_scale,(world[0].max - world[0].min)*params.vr_scale,1);
+                front_wall.position.set((world[1].max - world[1].min)/2.*params.vr_scale,(world[0].max - world[0].min)/2.*params.vr_scale-params.human_height,world[2].min*params.vr_scale);
                 front_wall.material.side = THREE.DoubleSide;
             }
             else {
@@ -258,9 +258,9 @@ function make_walls(scene,params,world) {
 
             var back_wall = new THREE.Mesh( geometry, material );
             if ( params.display_type === 'VR' ) {
-                back_wall.scale.set((world[1].max - world[1].min)*vr_scale,(world[0].max - world[0].min)*vr_scale,1);
+                back_wall.scale.set((world[1].max - world[1].min)*params.vr_scale,(world[0].max - world[0].min)*params.vr_scale,1);
                 back_wall.rotation.x = Math.PI;
-                back_wall.position.set((world[1].max - world[1].min)/2.*vr_scale,(world[0].max - world[0].min)/2.*vr_scale-human_height,world[2].max*vr_scale);
+                back_wall.position.set((world[1].max - world[1].min)/2.*params.vr_scale,(world[0].max - world[0].min)/2.*params.vr_scale-params.human_height,world[2].max*params.vr_scale);
                 back_wall.material.side = THREE.DoubleSide;
             }
             else {

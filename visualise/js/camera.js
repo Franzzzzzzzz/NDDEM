@@ -2,6 +2,8 @@ import * as THREE from '../node_modules/three/build/three.module.js';
 import { TrackballControls } from '../node_modules/three/examples/jsm/controls/TrackballControls.js';
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import { AnaglyphEffect } from '../node_modules/three/examples/jsm/effects/AnaglyphEffect.js';
+import { VRButton } from '../node_modules/three/examples/jsm/webxr/VRButton.js';
+
 const recorder = new CCapture({
 	verbose: true,
 	display: true,
@@ -97,8 +99,8 @@ function add_renderer(params,container) {
     renderer.setSize( window.innerWidth, window.innerHeight );
     if ( params.shadows ) { renderer.shadowMap.enabled = true; }
     if (params.display_type == "VR") {
-        renderer.vr.enabled = true;
-        container.appendChild( WEBVR.createButton( renderer ) );
+        container.appendChild( VRButton.createButton( renderer ) );
+        renderer.xr.enabled = true;
     };
 
     container.appendChild( renderer.domElement );
