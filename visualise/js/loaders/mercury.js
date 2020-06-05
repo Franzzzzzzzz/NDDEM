@@ -1,5 +1,9 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
 
+async function load_world(params,time,world) {
+
+};
+
 function load_initial_spheres(params,time) {
     if ( params.cache ) { var filename = params.data_dir + "Samples/" + params.fname }
     else { var filename = params.data_dir + "Samples/" + params.fname + "?_="+ (new Date).getTime(); }
@@ -27,4 +31,4 @@ function load_current_orientation(params,time,changed_higher_dim_view) {
 
 };
 
-export { load_initial_spheres, load_current_spheres, load_current_orientation }
+export { load_world, load_initial_spheres, load_current_spheres, load_current_orientation }

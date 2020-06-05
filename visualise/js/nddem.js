@@ -155,95 +155,31 @@ else if ( window.location.hostname.includes('github') ) {
     params.data_dir = 'https://www.benjymarks.com/nddem/';
     params.cache=true; }
 
-let promise = new Promise( function(resolve, reject) {
-    var request = new XMLHttpRequest();
-    if ( params.cache ) { request.open('GET', params.data_dir + "Samples/" + params.fname + "in", true); }
-    else { request.open('GET', params.data_dir + "Samples/" + params.fname + "in?_="+ (new Date).getTime(), true); }
-    request.send(null);
-    request.onreadystatechange = function () {
-        if (request.readyState === 4 && ( request.status === 200 || request.status === 304 ) ) { // fully loaded and ( fresh or cached )
-            // var type = request.getResponseHeader('Content-Type');
-            // if (type.indexOf("text") !== 1) {
-                var lines = request.responseText.split('\n');
-                for (var i=0;i<lines.length;i++) {
-                    // console.log(lines[i])
-                    var line = lines[i].replace(/ {1,}/g," "); // remove multiple spaces
-                    var l = line.split(' ')
-                    if (l[0] == 'dimensions') {
-                        params.N = parseInt(l[1]);
-                        params.num_particles = parseInt(l[2]);
-                        for (var j=0;j<params.N;j++) {
-                            world.push({});
-                            world[j].min = 0.;
-                            world[j].max = 1.;
-                            world[j].cur = 0.5;
-                            world[j].prev = 0.5;
-                            world[j].wall = false;
-                        }
-                    }
-                    else if (l[0] == 'boundary') {
-                        if (l[2] == 'WALL' || l[2] == 'PBC') {
-                            world[l[1]].min = parseFloat(l[3]);
-                            world[l[1]].max = parseFloat(l[4]);
-                            world[l[1]].cur = (world[l[1]].min + world[l[1]].max)/2.;
-                            world[l[1]].prev = world[l[1]].cur;
-                        }
-                        if ( l[2] == 'WALL' ) { world[l[1]].wall = true; }
-                    }
-                    else if (l[0] == 'set') {
-                        if (l[1] == 'T') { time.max = parseInt(l[2]) - 1; }
-                        else if (l[1] === 'tdump') { time.save_rate = parseInt(l[2]) }
-                        else if (l[1] === 'dt') { time.dt_dem = parseFloat(l[2]) }
-                    }
-                    else if (l[0] == 'freeze') { params.pinky = parseInt(l[1]); }
-                }
-                if ( params.N == 1 ) { // just used for setting up cameras etc
-                    world.push({});
-                    world[1].min = 0.;
-                    world[1].max = 0.;
-                    world[1].cur = 0.5;
-                    world[1].prev = 0.5;
-                };
-                if ( params.N < 3 ) { // just used for setting up cameras etc
-                    world.push({});
-                    world[2].min = 0.;
-                    world[2].max = 0.;
-                    world[2].cur = 0.5;
-                    world[2].prev = 0.5;
-                }
-                time.frames_per_second = 1./(time.save_rate*time.dt_dem); // time between DEM frames in seconds
-                time.nt = time.max*time.frames_per_second; // total number of saved frames
-                // build_world();
-                // remove_everything(); // only runs on postMessage receive
-                // animate();
-                resolve('Loaded infile');
-            // }
-        }
-    }
-// }
-});
 
-promise.then(
-    function(result) {
-                       build_world();
-                       remove_everything(); // only runs on postMessage receive
-                       animate();
-                     },
-    function(error) { }
-);
+
+// }
+import(loader_file).then((module) => {
+    console.log(time);
+    LOADER=module;
+    LOADER.load_world(params,time,world).then((output) => {
+        params = output[0];
+        time = output[1];
+        world = output[2];
+        build_world();
+        remove_everything(); // only runs on postMessage receive
+        animate();
+    });
+});
 
 
 /**
 * Initialise the threejs scene, adding everything necessary, such as camera, controls, lighting etc.
 */
 function build_world() {
-    import(loader_file).then((module) => {
-        LOADER=module;
-        var s = LOADER.load_initial_spheres(params,time).then((s) => {
-            make_initial_spheres(s);
-            remove_loading_screen();
-            update_spheres(s);
-        });
+    var s = LOADER.load_initial_spheres(params,time).then((s) => {
+        make_initial_spheres(s);
+        remove_loading_screen();
+        update_spheres(s);
     });
 
     container = document.createElement( 'div' );
@@ -283,29 +219,6 @@ function build_world() {
     // add_controllers();
     if ( params.N > 3 && !params.fname.includes('Spinner') && !params.no_tori) { TORUS.add_torus(scene,params,world,particles); }
 
-    // console.log(load_initial_spheres)
-    // spheres = LOADER.load_initial_spheres(params);
-
-
-    // if ( params.data_type === 'mercury' ) {
-    //     make_initial_spheres_Mercury();
-    // }
-    // else if ( params.data_type === 'liggghts' ) {
-    //     make_initial_spheres_LIGGGHTS();
-    // }
-    // else {
-    //     if ( params.view_mode === 'rotations' ) { make_initial_sphere_texturing(); }
-    //     else {
-    //         if ( params.data_type === 'csv') {
-    //             make_initial_spheres_CSV();
-    //             update_spheres_CSV(0,false);
-    //         }
-    //         else if ( params.data_type === 'binary' ) {
-    //             make_initial_spheres_binary();
-    //         }
-    //     }
-    // }
-    //update_spheres_CSV(0,false);
     GUI.add_gui(params,world,time);
     window.addEventListener( 'resize', function() { CAMERA.on_window_resize(params,scene,renderer); render(params,scene);}, false );
     //if ( params.display_type === 'VR' ) { add_vive_models(); }
@@ -836,24 +749,9 @@ function animate() {
     if (params.N > 3) {
         for (var iii=3;iii<params.N;iii++) {
             if (world[iii].cur != world[iii].prev) {
-                // if ( params.data_type === 'csv' ) { update_spheres_CSV(time.frame,true); }
-                // else if ( params.data_type === 'binary' ) {
-                //     update_spheres_binary(time.frame,true);
-                // }
-                // if (params.view_mode === 'rotations') {update_spheres_texturing(time.frame,) ;}
-                // else if (params.view_mode === 'rotations2') {
-                //     if ( params.data_type === 'csv' ) {
-                //         load_orientation_CSV(time.frame,);
-                //     }
-                //     else if ( params.data_type === 'binary' ) {
-                //         load_orientation_binary(time.frame,);
-                //     }
-                //
-                // }
                 LOADER.load_current_spheres(params,time,true).then((s) => {
                     update_spheres(s);
                 });
-                // })
                 if (params.view_mode === 'rotations2') {
                     LOADER.load_current_orientation(params,time,true).then((s) => {
                         update_orientation(s);
@@ -914,9 +812,6 @@ function render() {
 function remove_loading_screen() {
     const loadingScreen = document.getElementById( 'loading-screen' );
     loadingScreen.classList.add( 'fade-out' );
-
-    // optional: remove loader from DOM via event listener
-    // loadingScreen.addEventListener( 'transitionend', onTransitionEnd );
     loadingScreen.remove();
 }
 function onTransitionEnd( event ) {

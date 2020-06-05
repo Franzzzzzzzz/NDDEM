@@ -2,6 +2,8 @@
 
 var all_locs, all_rots;
 
+import { load_world } from './default.js';
+
 async function load_initial_spheres(params,time) {
     var locfilename = params.data_dir + "Samples/" + params.fname + "loc.bin";
     let promise = new Promise( function(resolve, reject) {
@@ -78,4 +80,4 @@ async function load_current_orientation(params,time,changed_higher_dim_view) {
     return all_rots[time.frame];
 }
 
-export { load_initial_spheres, load_current_spheres, load_current_orientation }
+export { load_world, load_initial_spheres, load_current_spheres, load_current_orientation }
