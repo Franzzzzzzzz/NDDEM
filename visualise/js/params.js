@@ -1,4 +1,4 @@
-function process_params() {
+function process_params(time) {
     const urlParams = new URLSearchParams(window.location.search);
     var params = {};
 
@@ -100,7 +100,7 @@ function process_params() {
     else {
         params.record = false;
     }
-    if ( urlParams.has('t0') ) {
+    if ( urlParams.has('t0') ) { // first timestep to load at
         time.cur = parseFloat(urlParams.get('t0'));
     }
     if ( urlParams.has('texture_path') ) {

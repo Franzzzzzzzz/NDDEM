@@ -11,7 +11,6 @@ import * as AXES from './axes.js';
 import * as TORUS from './torus.js';
 import * as GUI from './gui.js'
 
-var params = PARAMS.process_params();
 
 var container; // main div element
 var scene, renderer; // UI elements
@@ -32,6 +31,9 @@ var winning_texture; // texture to hold 'WINNING' sign for catch_particle mode
 var clock = new THREE.Clock; // global clock
 var lut = new Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var LOADER;
+
+var params = PARAMS.process_params(time);
+
 
 params.root_dir = 'http://localhost:54321/';
 params.data_dir = params.root_dir;
