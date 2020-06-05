@@ -44,7 +44,6 @@ function make_camera(scene,params,world) {
                 camera.focalLength = 3;
             }
             else {
-                console.log('hi')
                 camera = new THREE.PerspectiveCamera(70, aspect, 0.0001, 1000 ); // fov, aspect, near, far
                 camera.position.set(0.5*world[0].max/params.zoom*5,
                                        -world[0].max/params.zoom*5,

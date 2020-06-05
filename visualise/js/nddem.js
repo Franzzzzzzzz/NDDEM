@@ -14,13 +14,10 @@ import * as GUI from './gui.js'
 
 
 var container; // main div element
-var scene, renderer; // UI elements
+var scene, renderer, particles; // UI elements
 var world = []; // properties that describe the domain
 world.ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000, 'snapshot':false} // temporal properties
-var euler = {'theta_1': 0, 'theta_2': 0, 'theta_3': 0}; // rotations in higher dimensions!!!!!!!!!!
-var particles;
-var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 var bg; // background mesh with texture attached
 var redraw_left = false; // force redrawing of particles from movement in left hand
 var redraw_right = false; // force redrawing of particles from movement in right hand
@@ -32,20 +29,6 @@ var lut = new Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and bl
 var LOADER;
 
 var params = PARAMS.process_params(time);
-
-
-params.root_dir = 'http://localhost:54321/';
-params.data_dir = params.root_dir;
-if ( window.location.hostname.includes('benjymarks') ) {
-    params.root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; //window.location.href;
-    params.data_dir = 'https://www.benjymarks.com/nddem/'; //params.root_dir;
-    params.cache = true;
-}
-else if ( window.location.hostname.includes('github') ) {
-    params.root_dir = 'https://franzzzzzzzz.github.io/NDDEM/';
-    params.data_dir = 'https://www.benjymarks.com/nddem/';
-    params.cache=true; }
-
 
 import('./loaders/' + params.data_type + '.js').then((module) => {
     // console.log(time);
@@ -69,6 +52,7 @@ function build_world() {
         make_initial_spheres(s);
         remove_loading_screen();
         update_spheres(s);
+        return s;
     });
 
     container = document.createElement( 'div' );
@@ -108,7 +92,7 @@ function build_world() {
     // add_controllers();
     if ( params.N > 3 && !params.fname.includes('Spinner') && !params.no_tori) { TORUS.add_torus(scene,params,world,particles); }
 
-    GUI.add_gui(params,world,time);
+    GUI.add_gui(params,world,time,LOADER);
     window.addEventListener( 'resize', function() { CAMERA.on_window_resize(params,scene,renderer); render(params,scene);}, false );
     //if ( params.display_type === 'VR' ) { add_vive_models(); }
 }
@@ -404,14 +388,14 @@ function update_spheres(spheres) {
         if ( params.N>3 ) {
           var x3_unrotated = spheres[i][3];
 
-          var x0_temp = spheres[i][0]*Math.cos(euler.theta_1) - spheres[i][3]*Math.sin(euler.theta_1);
-          var x3_temp = spheres[i][0]*Math.sin(euler.theta_1) + spheres[i][3]*Math.cos(euler.theta_1);
+          var x0_temp = spheres[i][0]*Math.cos(params.euler.theta_1) - spheres[i][3]*Math.sin(params.euler.theta_1);
+          var x3_temp = spheres[i][0]*Math.sin(params.euler.theta_1) + spheres[i][3]*Math.cos(params.euler.theta_1);
 
-          var x1_temp = spheres[i][1]*Math.cos(euler.theta_2) - x3_temp*Math.sin(euler.theta_2);
-          var x3_temp = spheres[i][1]*Math.sin(euler.theta_2) + x3_temp*Math.cos(euler.theta_2);
+          var x1_temp = spheres[i][1]*Math.cos(params.euler.theta_2) - x3_temp*Math.sin(params.euler.theta_2);
+          var x3_temp = spheres[i][1]*Math.sin(params.euler.theta_2) + x3_temp*Math.cos(params.euler.theta_2);
 
-          var x2_temp = spheres[i][2]*Math.cos(euler.theta_3) - x3_temp*Math.sin(euler.theta_3);
-          var x3_temp = spheres[i][2]*Math.sin(euler.theta_3) + x3_temp*Math.cos(euler.theta_3);
+          var x2_temp = spheres[i][2]*Math.cos(params.euler.theta_3) - x3_temp*Math.sin(params.euler.theta_3);
+          var x3_temp = spheres[i][2]*Math.sin(params.euler.theta_3) + x3_temp*Math.cos(params.euler.theta_3);
 
           spheres[i][0] = x0_temp;
           spheres[i][1] = x1_temp;
@@ -502,18 +486,18 @@ function update_spheres(spheres) {
                 else {
                     object.position.set(spheres[i][0],spheres[i][1],spheres[i][2]);
                 }
-                if ( params.quasicrystal ) { scale = 5; object.scale.set(spheres[i][params.N]/scale,spheres[i][params.N]/scale,spheres[i][params.N]/scale); }
+                if ( params.quasicrystal ) { var scale = 5; object.scale.set(spheres[i][params.N]/scale,spheres[i][params.N]/scale,spheres[i][params.N]/scale); }
                 else { object.scale.set(R_draw,R_draw,R_draw); }
                 object.visible = true;
                 if ( params.view_mode === 'velocity' ) {
                     lut.setMin(0);
-                    lut.setMax(velocity.vmax);
-                    object.material.color = lut.getColor(spheres[i].Vmag);
+                    lut.setMax(params.velocity.vmax);
+                    object.material.color = lut.getColor(spheres[i][params.N+2]);
                 }
                 else if ( params.view_mode === 'rotation_rate' ) {
                     lut.setMin(0);
-                    lut.setMax(velocity.omegamax);
-                    object.material.color = lut.getColor(spheres[i].Omegamag);
+                    lut.setMax(params.velocity.omegamax);
+                    object.material.color = lut.getColor(spheres[i][params.N+3]);
                 }
                 else if ( params.view_mode === 'rotations2' ) {
                     for (var j=0 ; j<params.N-3 ; j++)
@@ -536,16 +520,16 @@ function update_spheres(spheres) {
                 else if ( params.view_mode === 'D4' ) {
                     //lut.setMin(world[3].min);
                     //lut.setMax(world[3].max);
-                    lut.setMin(world[3].cur-2*r) ;
-                    lut.setMax(world[3].cur+2*r) ;
+                    lut.setMin(world[3].cur-2*TORUS.r) ;
+                    lut.setMax(world[3].cur+2*TORUS.r) ;
                     object.material.color  = lut.getColor(x3_unrotated);
                     TORUS.wristband1.children[i].material.color = lut.getColor(x3_unrotated);
                 }
                 else if ( params.view_mode === 'D5' ) {
                     //lut.setMin(world[4].min);
                     //lut.setMax(world[4].max);
-                    lut.setMin(world[4].cur-2*r) ;
-                    lut.setMax(world[4].cur+2*r) ;
+                    lut.setMin(world[4].cur-2*TORUS.r) ;
+                    lut.setMax(world[4].cur+2*TORUS.r) ;
                     object.material.color  = lut.getColor(spheres[i][4]);
                     TORUS.wristband1.children[i].material.color = lut.getColor(spheres[i][4]);
                 }
@@ -705,3 +689,5 @@ function onTransitionEnd( event ) {
 	element.remove();
 
 }
+
+export {update_spheres};

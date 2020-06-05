@@ -121,9 +121,23 @@ function process_params(time) {
     else {
         params.no_axes = false;
     }
+    params.euler = {'theta_1': 0, 'theta_2': 0, 'theta_3': 0}; // rotations in higher dimensions!!!!!!!!!!
+    params.velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
 
     params.vr_scale = 0.5; // mapping from DEM units to VR units
     params.human_height = 0.; // height of the human in m
+
+    params.root_dir = 'http://localhost:54321/';
+    params.data_dir = params.root_dir;
+    if ( window.location.hostname.includes('benjymarks') ) {
+        params.root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; //window.location.href;
+        params.data_dir = 'https://www.benjymarks.com/nddem/'; //params.root_dir;
+        params.cache = true;
+    }
+    else if ( window.location.hostname.includes('github') ) {
+        params.root_dir = 'https://franzzzzzzzz.github.io/NDDEM/';
+        params.data_dir = 'https://www.benjymarks.com/nddem/';
+        params.cache=true; }
 
 
     return params;

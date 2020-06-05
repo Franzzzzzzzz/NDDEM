@@ -1,9 +1,10 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
+import { update_spheres } from './nddem.js';
 var gui;
 /**
 * Add the non-VR GUI and set all sliders
 */
-function add_gui(params,world,time) {
+function add_gui(params,world,time,LOADER) {
     if ( params.display_type == 'anaglyph' || params.display_type == 'keyboard' ) {
         gui = new dat.GUI();
         //gui.add( ref_dim, 'c').min(0).max(params.N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
@@ -29,15 +30,15 @@ function add_gui(params,world,time) {
             }
         })
         if ( params.quasicrystal ) {
-            gui.add( euler, 'theta_1').name('&theta;<sub>1</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
-            gui.add( euler, 'theta_2').name('&theta;<sub>2</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
-            gui.add( euler, 'theta_3').name('&theta;<sub>3</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( params.euler, 'theta_1').name('&theta;<sub>1</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { LOADER.load_current_spheres(params,time,true).then((s) => { update_spheres( s ); }) });
+            gui.add( params.euler, 'theta_2').name('&theta;<sub>2</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { LOADER.load_current_spheres(params,time,true).then((s) => { update_spheres( s ); }) });
+            gui.add( params.euler, 'theta_3').name('&theta;<sub>3</sub>').min(0).max(2*Math.PI).listen().onChange ( function() { LOADER.load_current_spheres(params,time,true).then((s) => { update_spheres( s ); }) });
         }
         if ( params.view_mode === 'velocity' ) {
-            gui.add( velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( params.velocity, 'vmax').name('Max vel').min(0).max(2).listen().onChange ( function() { LOADER.load_current_spheres(params,time,true).then((s) => { update_spheres( s ); }) });
         }
         if ( params.view_mode === 'rotation_rate' ) {
-            gui.add( velocity, 'omegamax').name('Max rot vel').min(0).max(10).step(0.01).listen().onChange ( function() { update_spheres_CSV(time.frame,false); });
+            gui.add( params.velocity, 'omegamax').name('Max rot vel').min(0).max(10).step(0.01).listen().onChange ( function() { LOADER.load_current_spheres(params,time,true).then((s) => { update_spheres( s ); }) });
         }
         if ( params.record ) {
             gui.add( time, 'snapshot').name('Snapshot').listen().onChange( function(flag) {
