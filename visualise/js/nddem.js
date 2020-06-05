@@ -159,7 +159,7 @@ else if ( window.location.hostname.includes('github') ) {
 
 // }
 import(loader_file).then((module) => {
-    console.log(time);
+    // console.log(time);
     LOADER=module;
     LOADER.load_world(params,time,world).then((output) => {
         params = output[0];
@@ -391,6 +391,12 @@ function make_initial_spheres(spheres) {
             }
             else if ( params.view_mode === 'rotations2' ) {
                 var material = shaderMaterial.clone();
+                if ( params.colour_scheme === 'inverted' ) {
+                    var color = 0xdddddd; // for torus
+                }
+                else {
+                    var color = 0.222222; // for torus
+                }
             }
             else {
                 if ( params.view_mode === 'rotations' ) {
@@ -422,7 +428,7 @@ function make_initial_spheres(spheres) {
             object2.position.set(0.,0.,0.);
             TORUS.wristband1.add(object2);
             if ( params.N > 5 ) {
-                object3 = object2.clone();
+                var object3 = object2.clone();
                 TORUS.wristband2.add(object3);
             }
         }
@@ -434,17 +440,7 @@ function make_initial_spheres(spheres) {
 function update_orientation(spheres) {
     for (var i = 0; i<spheres.length; i++) { // skip header
         var object = particles.children[i];
-        var A = spheres[i];
-        /*if ( params.N == 3 ) {
-            A = A.slice(0,3).concat([0],
-                A.slice(3,6),[0],
-                A.slice(6,9),[0,
-                0,0,0,1]); } */// fill empty holes so it is a Matrix4
-        //console.log(A);
-        //object.material.uniforms.A.value.fromArray(A);
-        object.material.uniforms.A.value = A ;
-        // console.log(object.material.uniforms.x4);
-        // console.log(object.material.uniforms.x4p);
+        object.material.uniforms.A.value = spheres[i] ;
     }
 }
 
