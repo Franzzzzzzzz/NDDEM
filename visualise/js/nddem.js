@@ -27,6 +27,7 @@ var winning_texture; // texture to hold 'WINNING' sign for catch_particle mode
 var clock = new THREE.Clock; // global clock
 var lut = new Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
 var LOADER;
+var NDParticleShader;
 
 var params = PARAMS.process_params(time);
 
@@ -37,9 +38,12 @@ import('./loaders/' + params.data_type + '.js').then((module) => {
         params = output[0];
         time = output[1];
         world = output[2];
-        build_world();
-        remove_everything(); // only runs on postMessage receive
-        animate();
+        import('./shaders/' + params.N + 'DShader.js').then((module) => {
+            NDParticleShader=module.NDDEMShader;
+            build_world();
+            remove_everything(); // only runs on postMessage receive
+            animate();
+        });
     });
 });
 
@@ -218,37 +222,37 @@ function make_initial_spheres(spheres) {
     }
     var pointsGeometry = new THREE.SphereGeometry( 1, Math.max(Math.pow(2,params.quality-2),4), Math.max(Math.pow(2,params.quality-2),4) );
     var scale = 20.; // size of particles on tori
-    if ( params.view_mode === 'rotations2' ) {
-        var uniforms = {
-            N: { value: params.N },
-            N_lines: { value: 5.0 },
-            //A: { value: new THREE.Matrix4() },
-            A: {value: []}, // Size N*N
-            xview: {value: []}, //Size N-3
-            xpart: {value: []}, //Size N-3
-            x4: { value: 0 },
-            x4p: { value: 0 },
-            R: { value: 1 },
-        };
-        for (var ij=0 ; ij<params.N-3 ; ij++)
-        {
-            uniforms.xview.value[ij] = world[ij].cur ;
-            uniforms.xpart.value[ij] = 0. ;
-        }
-        if ( params.N > 3 ) { uniforms.x4.value = world[3].cur; }
-        for (var ij=0 ; ij<params.N*params.N ; ij++)
-        {
-            if (ij%params.N == Math.floor(ij/params.N))
-                uniforms.A.value[ij] = 1 ;
-            else
-                uniforms.A.value[ij] = 0 ;
-        }
-        var shaderMaterial = new THREE.ShaderMaterial( {
-            uniforms: uniforms,
-            vertexShader: document.getElementById( 'vertexshader-'+String(uniforms.N.value)+'D' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentshader' ).textContent
-        } );
-    }
+    // if ( params.view_mode === 'rotations2' ) {
+    //     var uniforms = {
+    //         N: { value: params.N },
+    //         N_lines: { value: 5.0 },
+    //         //A: { value: new THREE.Matrix4() },
+    //         A: {value: []}, // Size N*N
+    //         xview: {value: []}, //Size N-3
+    //         xpart: {value: []}, //Size N-3
+    //         x4: { value: 0 },
+    //         x4p: { value: 0 },
+    //         R: { value: 1 },
+    //     };
+    //     for (var ij=0 ; ij<params.N-3 ; ij++)
+    //     {
+    //         uniforms.xview.value[ij] = world[ij].cur ;
+    //         uniforms.xpart.value[ij] = 0. ;
+    //     }
+    //     if ( params.N > 3 ) { uniforms.x4.value = world[3].cur; }
+    //     for (var ij=0 ; ij<params.N*params.N ; ij++)
+    //     {
+    //         if (ij%params.N == Math.floor(ij/params.N))
+    //             uniforms.A.value[ij] = 1 ;
+    //         else
+    //             uniforms.A.value[ij] = 0 ;
+    //     }
+    //     var NDParticleShader = new THREE.ShaderMaterial( {
+    //         uniforms: uniforms,
+    //         vertexShader: document.getElementById( 'vertexshader-'+String(uniforms.N.value)+'D' ).textContent,
+    //         fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+    //     } );
+    // }
     for (var i = 0; i<spheres.length; i++) {
         if ( params.N < 3 ) {
             var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
@@ -263,7 +267,7 @@ function make_initial_spheres(spheres) {
                 var material = new THREE.MeshPhongMaterial( { color: color } );
             }
             else if ( params.view_mode === 'rotations2' ) {
-                var material = shaderMaterial.clone();
+                var material = NDParticleShader.clone();
                 if ( params.colour_scheme === 'inverted' ) {
                     var color = 0xdddddd; // for torus
                 }
