@@ -5,24 +5,24 @@ import { OBJLoader } from "../node_modules/three/examples/jsm/loaders/OBJLoader.
 import { VRController } from "../js/VRControllerModule.js";
 import { Lut } from "../node_modules/three/examples/jsm/math/Lut.js";
 
+import * as PARAMS from './params.js';
 import * as CAMERA from './camera.js';
 import * as AXES from './axes.js';
 import * as TORUS from './torus.js';
 import * as GUI from './gui.js'
-// var THREE = require('three');
+
+var params = PARAMS.process_params();
+
 var container; // main div element
 var scene, renderer; // UI elements
-var params = {};
-var particles; // groups of objects
 var world = []; // properties that describe the domain
 world.ref_dim = {'c': 1} //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {'cur': 0, 'frame': 0, 'prev_frame': 0, 'min':0, 'max': 99, 'play': false, 'play_rate': 5.0, 'save_rate': 1000, 'snapshot':false} // temporal properties
 var euler = {'theta_1': 0, 'theta_2': 0, 'theta_3': 0}; // rotations in higher dimensions!!!!!!!!!!
-var axeslength, fontsize; // axis properties
+var particles;
 var vr_scale = 0.5; // mapping from DEM units to VR units
 var human_height = 0.; // height of the human in m
 var velocity = {'vmax': 1, 'omegamax': 1} // default GUI options
-var roof; // top boundary
 var bg; // background mesh with texture attached
 var redraw_left = false; // force redrawing of particles from movement in left hand
 var redraw_right = false; // force redrawing of particles from movement in right hand
@@ -31,116 +31,6 @@ var winning = false; // did you win the game?
 var winning_texture; // texture to hold 'WINNING' sign for catch_particle mode
 var clock = new THREE.Clock; // global clock
 var lut = new Lut( "blackbody", 512 ); // options are rainbow, cooltowarm and blackbody
-var arrow_material; // material used for arrows to show dimensions
-const urlParams = new URLSearchParams(window.location.search);
-if ( urlParams.has('fname') ) {
-    params.fname = urlParams.get('fname');
-    if (params.fname.substr(-1) != '/') { params.fname += '/' }; // add trailing slash if required
-}
-else {
-    params.fname = "D4/";
-}
-if ( urlParams.has('display_type') ) {
-    params.display_type = urlParams.get('display_type');
-}
-else {
-    params.display_type = "keyboard";
-}
-if ( urlParams.has('view_mode') ) {
-    params.view_mode = urlParams.get('view_mode');  // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, inverted
-}
-else {
-    params.view_mode = 'normal'
-}
-if ( urlParams.has('autoplay') ) {
-    time.play = urlParams.get('autoplay') === 'true';
-}
-if ( urlParams.has('rate') ) {
-    var rate = urlParams.get('rate');
-    time.play_rate = parseFloat(rate);
-}
-if ( urlParams.has('shadows') ) {
-    params.shadows = true;
-}
-else {
-    params.shadows = false;
-}
-if ( urlParams.has('quality') ) {  // quality flag - 5 is default, 8 is ridiculous
-    params.quality = parseInt(urlParams.get('quality'));
-}
-else {
-    params.quality = 5;
-}
-if ( urlParams.has('zoom') ) {
-    params.zoom = parseFloat(urlParams.get('zoom'));
-}
-else {
-    params.zoom = 20;
-}
-if ( urlParams.has('pinky') ) {
-    params.pinky = parseInt(urlParams.get('pinky'));
-}
-else {
-    params.pinky = 100;
-}
-if ( urlParams.has('cache') ) {
-    params.cache = true;
-}
-else {
-    params.cache = false;
-}
-if ( urlParams.has('hard_mode') ) { // optional flag to not show wristbands if in catch_particle mode
-    params.no_tori = true;
-}
-else {
-    params.no_tori = false;
-}
-if ( urlParams.has('quasicrystal') ) {
-    params.quasicrystal = true;
-}
-else {
-    params.quasicrystal = false;
-}
-if ( urlParams.has('data_type') ) {
-    params.data_type = urlParams.get('data_type');
-}
-else {
-    params.data_type = 'default';
-}
-if ( urlParams.has('colour_scheme') ) {
-    params.colour_scheme = urlParams.get('colour_scheme');
-}
-else {
-    params.colour_scheme = 'dark';
-}
-if ( urlParams.has('rotate_torus') ) {
-    params.rotate_torus = urlParams.get('rotate_torus');
-}
-else {
-    params.rotate_torus = 0;
-}
-if ( urlParams.has('initial_camera_location') ) {
-    params.initial_camera_location = urlParams.get('initial_camera_location');
-}
-if ( urlParams.has('camera_target') ) {
-    params.camera_target = urlParams.get('camera_target');
-}
-if ( urlParams.has('record') ) {
-    params.record = true;
-}
-else {
-    params.record = false;
-}
-if ( urlParams.has('t0') ) {
-    time.cur = parseFloat(urlParams.get('t0'));
-}
-if ( urlParams.has('texture_path') ) {
-    params.texture_dir = urlParams.get('texture_path');
-}
-else {
-    params.texture_dir = 'Textures/';
-}
-var loader_file = './loaders/' + params.data_type + '.js';
 var LOADER;
 
 params.root_dir = 'http://localhost:54321/';
@@ -156,9 +46,7 @@ else if ( window.location.hostname.includes('github') ) {
     params.cache=true; }
 
 
-
-// }
-import(loader_file).then((module) => {
+import('./loaders/' + params.data_type + '.js').then((module) => {
     // console.log(time);
     LOADER=module;
     LOADER.load_world(params,time,world).then((output) => {
@@ -211,8 +99,8 @@ function build_world() {
     }
 
     CAMERA.make_camera(scene,params,world);
-    if ( !urlParams.has('no_walls') ) { AXES.make_walls(scene,params,world); }
-    if ( !urlParams.has('no_axes') && !params.quasicrystal ) { AXES.make_axes(scene,params,world); }
+    if ( !params.no_walls ) { AXES.make_walls(scene,params,world); }
+    if ( !params.no_axes && !params.quasicrystal ) { AXES.make_axes(scene,params,world); }
     make_lights();
     renderer = CAMERA.add_renderer(params,container);
     if ( !params.fname.includes('Submarine') ) { CAMERA.add_controllers(scene,params,world,renderer); }
