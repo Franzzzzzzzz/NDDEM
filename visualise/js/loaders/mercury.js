@@ -61,12 +61,16 @@ async function load_initial_spheres(params,time) {
                     var l = lines[i].split(' ')
                     if (l[0] == params.num_particles) {
                         all_locs.push([]);
+                        if ( all_locs.length == 2 ) {
+                            time.save_rate = l[1];
+                        }
                     }
                     else {
                         all_locs[all_locs.length-1].push([l[0],l[1],l[2],l[6]]);
                     }
 
                 }
+                time.max = all_locs.length - 1;
                 resolve(all_locs);
             }
         }
