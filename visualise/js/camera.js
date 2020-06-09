@@ -304,4 +304,4 @@ function add_controllers(scene,params,world,renderer) {
     };
 }
 
-export { make_camera, add_renderer, on_window_resize, camera, controls, add_controllers }
+export { make_camera, add_renderer, on_window_resize, camera, controls, add_controllers, effect }

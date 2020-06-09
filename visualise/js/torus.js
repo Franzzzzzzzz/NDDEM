@@ -392,4 +392,22 @@ function add_vive_models(scene,params,world) {
       });
 }
 
-export { wristband1, wristband2, R, r, add_torus, add_vive_models, add_right_oculus_model, add_left_oculus_model };
+function delete_everything(params) {
+    if ( params.N > 3 ) {
+        for (var i = wristband1.children.length; i = 0; i--) {
+            var object = controller1.children[i];
+            object.geometry.dispose();
+            object.material.dispose();
+        }
+    };
+    if ( params.N > 5 ) {
+        for (var i = wristband2.children.length; i = 0; i--) {
+            var object = controller1.children[i];
+            object.geometry.dispose();
+            object.material.dispose();
+        }
+    }
+
+}
+
+export { wristband1, wristband2, R, r, add_torus, add_vive_models, add_right_oculus_model, add_left_oculus_model, delete_everything };

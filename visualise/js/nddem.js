@@ -138,27 +138,14 @@ function remove_everything() {
         // console.log(wristband);
         // console.log(wristband1);
         // remove all particles
-        for (i = particles.children.length; i = 0; i--) {
+        for (var i = particles.children.length; i = 0; i--) {
             var object = particles.children[i];
             object.geometry.dispose();
             object.material.dispose();
             if ( params.view_mode === 'rotations' ) { object.texture.dispose(); }
         }
-        if ( params.N > 3 ) {
-            for (i = TORUS.wristband1.children.length; i = 0; i--) {
-                var object = controller1.children[i];
-                object.geometry.dispose();
-                object.material.dispose();
-            }
-        };
-        if ( params.N > 5 ) {
-            for (i = TORUS.wristband2.children.length; i = 0; i--) {
-                var object = controller1.children[i];
-                object.geometry.dispose();
-                object.material.dispose();
-            }
-        }
-        if ( params.display_type === 'anaglyph' ) { effect.dispose(); }
+        TORUS.delete_everything(params);
+        if ( params.display_type === 'anaglyph' ) { CAMERA.effect.dispose(); }
         renderer.xr.enabled = false;
         renderer.dispose();
         scene.dispose();
@@ -171,7 +158,7 @@ function remove_everything() {
 */
 function make_initial_sphere_texturing() {
     var commandstring = "" ;
-    for ( i=3 ; i<params.N ; i++)
+    for ( var i=3 ; i<params.N ; i++)
     {
         commandstring = commandstring + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
         if (i<params.N-1) commandstring += "&" ;
@@ -253,7 +240,7 @@ function make_initial_spheres(spheres) {
     //         fragmentShader: document.getElementById( 'fragmentshader' ).textContent
     //     } );
     // }
-    for (var i = 0; i<spheres.length; i++) {
+    for ( var i = 0; i<spheres.length; i++ ) {
         if ( params.N < 3 ) {
             var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
             var material = new THREE.PointsMaterial( {
@@ -329,7 +316,7 @@ function update_orientation(spheres) {
 function load_textures(t, Viewpoint) {
     if ( particles !== undefined) {
         var loader = new THREE.TextureLoader();
-        for ( ii = 0; ii < particles.children.length - 1; ii++ ) {
+        for ( var ii = 0; ii < particles.children.length - 1; ii++ ) {
             if ( params.cache ) { var filename = params.data_dir + params.texture_dir + "/Texture-" + ii + "-" + Viewpoint+".png" }
             else { var filename = params.data_dir + params.texture_dir + "/Texture-" + ii + "-"+Viewpoint + ".png" + "?_="+ (new Date).getTime() }
             loader.load(filename,
@@ -356,7 +343,7 @@ function update_spheres_texturing (t) {
       if  ( true ) { //TODO Do something better ...
           var commandstring = "" ; var Viewpoint = String(t*time.save_rate).padStart(5,'0')  ;
 
-          for ( i=3 ; i<params.N ; i++)
+          for ( var i=3 ; i<params.N ; i++)
           {
               commandstring = commandstring + "&" + ('x' + (i+1) +'='+ world[i].cur.toFixed(1)) ;
               Viewpoint = Viewpoint + "-" + world[i].cur.toFixed(1) ;
@@ -386,7 +373,7 @@ function update_spheres_texturing (t) {
 }
 
 function update_spheres(spheres) {
-    for (var i = 0; i<spheres.length; i++) {
+    for ( var i = 0; i<spheres.length; i++ ) {
         var object = particles.children[i];
 
         if ( params.N>3 ) {
@@ -665,7 +652,7 @@ function animate() {
 * Do the actual rendering
 */
 function render() {
-    if (params.display_type == "anaglyph") { effect.render( scene, camera ); }
+    if ( params.display_type == "anaglyph" ) { CAMERA.effect.render( scene, CAMERA.camera ); }
     else { renderer.render( scene, CAMERA.camera ); }
     if ( params.record ) {
         recorder.capture(renderer.domElement);
