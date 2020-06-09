@@ -85,7 +85,7 @@ async function load_current_spheres(params,time,changed_higher_dim_view) {
 }
 
 async function load_current_orientation(params,time,changed_higher_dim_view) {
-
+    console.warn('Rotations not implemented for MercuryDPM loader!')
 };
 
 export { load_world, load_initial_spheres, load_current_spheres, load_current_orientation }
