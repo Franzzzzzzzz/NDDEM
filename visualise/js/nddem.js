@@ -240,6 +240,18 @@ function make_initial_spheres(spheres) {
     //         fragmentShader: document.getElementById( 'fragmentshader' ).textContent
     //     } );
     // }
+    if ( params.view_mode === 'size' ) {
+        params.minRadius = 999999;
+        params.maxRadius = 0;
+        for ( var j=0; j<params.num_particles; j++ ) {
+            // console.log(spheres[j][params.N]);
+            if ( spheres[j][params.N] < params.minRadius ) { params.minRadius = spheres[j][params.N]; }
+            if ( spheres[j][params.N] > params.maxRadius ) { params.maxRadius = spheres[j][params.N]; }
+        }
+        // console.log(params.minRadius, params.maxRadius)
+        lut.setMin(params.minRadius);
+        lut.setMax(params.maxRadius);
+    }
     for ( var i = 0; i<spheres.length; i++ ) {
         if ( params.N < 3 ) {
             var color = (( Math.random() + 0.25) / 1.5) * 0xffffff;
@@ -261,6 +273,12 @@ function make_initial_spheres(spheres) {
                 else {
                     var color = 0.222222; // for torus
                 }
+            }
+            else if ( params.view_mode === 'size' ) {
+                // console.log(spheres[i][params.N])
+                var color = lut.getColor(spheres[i][params.N]);
+                var material = new THREE.MeshPhongMaterial( { color: color } );
+                // console.log(color)
             }
             else {
                 if ( params.view_mode === 'rotations' ) {
@@ -523,6 +541,11 @@ function update_spheres(spheres) {
                     lut.setMax(world[4].cur+2*TORUS.r) ;
                     object.material.color  = lut.getColor(spheres[i][4]);
                     TORUS.wristband1.children[i].material.color = lut.getColor(spheres[i][4]);
+                }
+                else if ( params.view_mode === 'size' ) {
+                    // lut.setMin(params.minRadius);
+                    // lut.setMax(params.maxRadius);
+                    // object.material.color = lut.getColor(spheres[i][params.N]);
                 }
             }
         };
