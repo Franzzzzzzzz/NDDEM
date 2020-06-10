@@ -109,6 +109,12 @@ function process_params(time) {
   } else {
     params.no_axes = false;
   }
+  if ( urlParams.has("stats")) {
+      params.stats = true;
+  } else {
+      params.stats = false;
+  }
+
   params.euler = { theta_1: 0, theta_2: 0, theta_3: 0 }; // rotations in higher dimensions!!!!!!!!!!
   params.velocity = { vmax: 1, omegamax: 1 }; // default GUI options
 

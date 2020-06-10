@@ -5,6 +5,7 @@ import { OBJLoader } from "../node_modules/three/examples/jsm/loaders/OBJLoader.
 // import { MTLLoader } from "../node_modules/three/examples/js/loaders/MTLLoader.js";
 import { VRController } from "../js/VRControllerModule.js";
 import { Lut } from "../node_modules/three/examples/jsm/math/Lut.js";
+import Stats from "../node_modules/three/examples/jsm/libs/stats.module.js";
 
 import * as PARAMS from "./params.js";
 import * as CAMERA from "./camera.js";
@@ -13,7 +14,7 @@ import * as TORUS from "./torus.js";
 import * as GUI from "./gui.js";
 
 var container; // main div element
-var scene, renderer, particles; // UI elements
+var scene, renderer, particles, stats; // UI elements
 var world = []; // properties that describe the domain
 world.ref_dim = { c: 1 }; //, 'x': 00, 'y': 1, 'z': 2}; // reference dimensions
 var time = {
@@ -124,6 +125,11 @@ function build_world() {
     },
     false
   );
+
+  if ( params.stats ) {
+      stats = new Stats();
+      document.body.appendChild( stats.dom );
+  }
   //if ( params.display_type === 'VR' ) { add_vive_models(); }
 }
 
@@ -891,6 +897,7 @@ function animate() {
     CAMERA.controls.update();
   }
   renderer.setAnimationLoop(render);
+  if ( params.stats ) { stats.update(); }
 }
 
 /**
