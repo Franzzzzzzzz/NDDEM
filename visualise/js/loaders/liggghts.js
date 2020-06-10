@@ -66,8 +66,6 @@ async function load_initial_spheres(params,time) {
                         all_locs.push( new Array(params.num_particles) );
                         if ( all_locs.length == 1 ) {
                             var m = lines[i+8].split(' ');
-                            // console.log(m.indexOf("x"))
-                            // console.log(m);
                             var x1_index = m.indexOf("x")-2;
                             var x2_index = m.indexOf("y")-2;
                             var x3_index = m.indexOf("z")-2;
