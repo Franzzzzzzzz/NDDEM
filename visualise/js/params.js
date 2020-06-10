@@ -11,12 +11,12 @@ function process_params(time) {
     params.fname = "D4/";
   }
   if (urlParams.has("display_type")) {
-    params.display_type = urlParams.get("display_type");
+    params.display_type = urlParams.get("display_type"); // VR, anaglyph or keyboard (default)
   } else {
     params.display_type = "keyboard";
   }
   if (urlParams.has("view_mode")) {
-    params.view_mode = urlParams.get("view_mode"); // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, inverted
+    params.view_mode = urlParams.get("view_mode"); // options are: undefined (normal), catch_particle, rotations, velocity, rotation_rate, D4, D5, size, rotations, rotations2
   } else {
     params.view_mode = "normal";
   }

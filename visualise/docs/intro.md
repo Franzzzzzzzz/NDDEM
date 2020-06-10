@@ -19,14 +19,14 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 ### Usage
 1. Navigate to the main github directory and run `node server.js` or `python server.py` or `./Texturing/TexturingServer` to start a web server which will be used to serve local files.
 2. Open `visualise/index.html` in chrome or firefox. Supermedium is recommended if you want to use VR.
-3. Visualisation flags can either be hardcoded in `index.html` or can be set via the URL, for example: `index.html?fname=Samples/SpinnerD5/&view_mode=rotations`
+3. Visualisation flags can either be hardcoded in `index.html` or can be set via the URL, for example: `index.html?fname=SpinnerD5&view_mode=rotations2`
 
 ### Flags:
-- `fname`: folder name where data is stored. Trailing slash is optional. Default is `Samples/D4/`
+- `fname`: folder name where data is stored. Trailing slash is optional. Default is `D4/`. All data is assumed to be in the folder `Samples`.
 - `display_type`: `VR`, `keyboard` or `anaglyph`. Default is `keyboard`.
-- `view_mode`: `undefined` (normal and default), `catch_particle`, `rotations`, `rotations2`, `velocity` or `rotation_rate`. `rotations` requires the `TexturingServer` to be running and works in any number of dimensions. `rotations2` can be computed in the browser, and can be used with any server, and does the calculations on the GPU at render time, but only works for `N` = 3 or 4.
+- `view_mode`: `undefined` (normal and default), `catch_particle`, `rotations`, `rotations2`, `velocity`, `D4`, `D5`, `size` or `rotation_rate`. `rotations` requires the `TexturingServer` to be running and works in any number of dimensions. `rotations2` can be computed in the browser, and can be used with any server, and does the calculations on the GPU at render time, but only works for `N` = 3-6.
 - `autoplay`: `true` or `false` to start time marching on load. Default is `false`.
-- `rate`: `float` that sets the speed of time marching. Units are DEM time units\second. Default is `5.0`.
+- `rate`: `float` that sets the speed of time marching. Units are DEM time units per second. Default is `5.0`.
 - `shadows`: `true` or `false` to render shadows. Default is `true`.
 - `quality`: `int` to set quality of rendering. Higher is more compute expensive. Default is `5`.
 - `zoom`: `float` to set how much to zoom in. Default is `20`.
@@ -43,7 +43,8 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 - `initial_camera_location`: three numbers (e.g. `initial_camera_location=1,2,3`) to set the initial camera location if so desired.
 - `camera_target`: three numbers (e.g. `camera_target=1,2,3`) to set what the camera is pointing at if so desired.
 - `t0`: `float` to set the initial timestep to display. Default is `0`.
-- `binary`: if included, this flag loads from binary data instead of csv data. You can convert csv to binary data using the included script `binarise_output.py` in the `scripts` folder.
--
+- `texture_path`: If using the `TexturingServer`, optionally set a different path to look for textures. Helps if you have premade a bunch of textures for some different cases.
+- `data_type`: `default`, `binary`, `mercury` or `liggghts`. If included, this flag loads data from a different data source. You can convert NDDEM csv to binary data using the included script `binarise_output.py` in the `scripts` folder.
+- `stats`: include this flag to show some statistics in the top left corner. If things are running slowly/poorly this can really help!
 
-An example command that works for me, when the TexturingServer is running: `/path/to/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5&display_type=keyboard`
+An example command that works for me, when the TexturingServer is running: `http://localhost:54321/visualise/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5`
