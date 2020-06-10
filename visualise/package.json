@@ -23,5 +23,9 @@
         "pre-commit": "pretty-quick --staged"
       }
     }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 4,
   }
 }
