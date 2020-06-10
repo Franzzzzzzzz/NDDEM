@@ -12,9 +12,10 @@ function make_axes(scene,params,world) {
         else {
             var arrow_colour = 0xdddddd;
         }
-        var axeslength = 5 ; // length of axes vectors
-        var fontsize = 0.5; // font size
-        var thickness = 0.1; // line thickness
+        var ref_length = Math.min(world[0].max - world[0].min,world[1].max - world[1].min,world[2].max - world[2].min);
+        var axeslength = 0.5*ref_length ; // length of axes vectors
+        var fontsize = 0.05*ref_length; // font size
+        var thickness = 0.02*ref_length; // line thickness
         var axesHelper = new THREE.Group();
         var axesLabels = new THREE.Group();
         // axesHelper = new THREE.AxesHelper( axeslength ); // X - red, Y - green, Z - blue
@@ -25,7 +26,7 @@ function make_axes(scene,params,world) {
             axesLabels.scale.set(params.vr_scale,params.vr_scale,params.vr_scale);
             axesLabels.rotation.z = Math.PI/2;
             axesLabels.rotation.y = Math.PI/2;
-            thickness = 0.05; // line thickness
+            thickness = 0.01*ref_length; // line thickness
         }
 
         scene.add( axesHelper );
@@ -104,7 +105,7 @@ function make_axes(scene,params,world) {
     		var textMaterial_x = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
     		var mesh_x = new THREE.Mesh( textGeo_x, arrow_material );
     		mesh_x.position.x = axeslength;// - 1.5*fontsize;
-            mesh_x.position.y = -0.3;
+            mesh_x.position.y = -0.05*ref_length;
             mesh_x.position.z = fontsize/4.;
             mesh_x.rotation.z = Math.PI;
             mesh_x.rotation.y = Math.PI;
@@ -117,7 +118,7 @@ function make_axes(scene,params,world) {
                 var textGeo_y = new THREE.TextGeometry( "x" + world.ref_dim.y, { font: font, size: fontsize, height: fontsize/5., } );
         		var textMaterial_y = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
         		var mesh_y = new THREE.Mesh( textGeo_y, arrow_material );
-                mesh_y.position.x = 0.3;
+                mesh_y.position.x = 0.05*ref_length;
                 mesh_y.position.y = axeslength;//-fontsize*1.5;
                 mesh_y.position.z = fontsize/4.;
                 mesh_y.rotation.z = -Math.PI/2.;
@@ -128,7 +129,7 @@ function make_axes(scene,params,world) {
                 var textGeo_z = new THREE.TextGeometry( "x" + world.ref_dim.z, { font: font, size: fontsize, height: fontsize/5., } );
         		var textMaterial_z = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
         		var mesh_z = new THREE.Mesh( textGeo_z, arrow_material );
-                mesh_z.position.x = 0.3;
+                mesh_z.position.x = 0.05*ref_length;
                 mesh_z.position.y = fontsize/4.;
                 mesh_z.position.z = axeslength + 1.5*fontsize;
                 mesh_z.rotation.z = -Math.PI/2.;
