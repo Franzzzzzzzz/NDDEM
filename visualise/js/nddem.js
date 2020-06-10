@@ -248,7 +248,7 @@ function make_initial_spheres(spheres) {
             if ( spheres[j][params.N] < params.minRadius ) { params.minRadius = spheres[j][params.N]; }
             if ( spheres[j][params.N] > params.maxRadius ) { params.maxRadius = spheres[j][params.N]; }
         }
-        // console.log(params.minRadius, params.maxRadius)
+        console.log(params.minRadius, params.maxRadius)
         lut.setMin(params.minRadius);
         lut.setMax(params.maxRadius);
     }

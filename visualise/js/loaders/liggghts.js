@@ -64,16 +64,25 @@ async function load_initial_spheres(params,time) {
                     var l = lines[i].split(' ')
                     if (lines[i] == 'ITEM: TIMESTEP') {
                         all_locs.push( new Array(params.num_particles) );
+                        if ( all_locs.length == 1 ) {
+                            var m = lines[i+8].split(' ');
+                            // console.log(m.indexOf("x"))
+                            // console.log(m);
+                            var x1_index = m.indexOf("x")-2;
+                            var x2_index = m.indexOf("y")-2;
+                            var x3_index = m.indexOf("z")-2;
+                            var radius_index = m.indexOf("radius")-2;
+                        }
                         if ( all_locs.length == 2 ) {
                             time.save_rate = lines[i+1];
                         }
                         i += 8;
                     }
                     else {
-                        all_locs[all_locs.length-1][l[0]-1] = [parseFloat(l[2]),
-                                                               parseFloat(l[3]),
-                                                               parseFloat(l[4]),
-                                                               parseFloat(l[8])
+                        all_locs[all_locs.length-1][l[0]-1] = [parseFloat(l[x1_index]),
+                                                               parseFloat(l[x2_index]),
+                                                               parseFloat(l[x3_index]),
+                                                               parseFloat(l[radius_index])
                                                               ];
                     }
 
