@@ -35,7 +35,7 @@ async function load_world(params,time,world) {
                 world[2].max = parseFloat(x3[1]);
                 world[2].cur = (world[2].min + world[2].max)/2.;
                 world[2].prev = world[2].cur;
-                console.log(world);
+                // console.log(world);
                 // HACK: STILL NOT FINDING TIME STEP OR NUMBER OF TIME STEPS!!!!
                 time.frames_per_second = 1;
 
@@ -60,21 +60,27 @@ async function load_initial_spheres(params,time) {
             if (request.readyState === 4 && ( request.status === 200 || request.status === 304 ) ) { // fully loaded and ( fresh or cached )
                 all_locs = [];
                 var lines = request.responseText.split('\n');
-                for (var i=0;i<lines.length;i++) {
+                for (var i=0; i<lines.length; i++) {
                     var l = lines[i].split(' ')
                     if (lines[i] == 'ITEM: TIMESTEP') {
-                        all_locs.push([]);
+                        all_locs.push( new Array(params.num_particles) );
+                        // console.log(all_locs);
                         if ( all_locs.length == 2 ) {
                             time.save_rate = lines[i+1];
                         }
                         i += 8;
                     }
                     else {
-                        all_locs[all_locs.length-1].push([l[2],l[3],l[4],l[8]]);
+                        // all_locs[all_locs.length-1].push([l[2],l[3],l[4],l[8]]);
+                        all_locs[all_locs.length-1][l[0]-1] = [parseFloat(l[2]),
+                                                             parseFloat(l[3]),
+                                                             parseFloat(l[4]),
+                                                             parseFloat(l[8])];
+                        // console.log(all_locs[all_locs.length-1][l[0]])
                     }
 
                 }
-                // console.log(all_locs);
+                console.log(all_locs);
                 time.max = all_locs.length - 1;
                 resolve(all_locs);
 
