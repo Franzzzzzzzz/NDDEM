@@ -4,17 +4,6 @@ import { OrbitControls } from "../node_modules/three/examples/jsm/controls/Orbit
 import { AnaglyphEffect } from "../node_modules/three/examples/jsm/effects/AnaglyphEffect.js";
 import { VRButton } from "../node_modules/three/examples/jsm/webxr/VRButton.js";
 
-const recorder = new CCapture({
-  verbose: true,
-  display: true,
-  framerate: 10,
-  quality: 100,
-  format: "png",
-  timeLimit: 100,
-  frameLimit: 0,
-  autoSaveTime: 0,
-});
-
 var camera, controls, effect;
 /**
  * Make the camera and position it
@@ -69,7 +58,7 @@ function make_camera(scene, params, world) {
     }
   }
   if (typeof params.initial_camera_location !== "undefined") {
-    pos = params.initial_camera_location.split(",");
+    var pos = params.initial_camera_location.split(",");
     camera.position.set(
       parseFloat(pos[0]),
       parseFloat(pos[1]),
@@ -84,7 +73,7 @@ function make_camera(scene, params, world) {
  */
 function aim_camera(params, world) {
   if (typeof params.camera_target !== "undefined") {
-    pos = params.camera_target.split(",");
+    var pos = params.camera_target.split(",");
     controls.target0.set(
       parseFloat(pos[0]),
       parseFloat(pos[1]),

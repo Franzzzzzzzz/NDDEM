@@ -4,7 +4,7 @@ var gui;
 /**
  * Add the non-VR GUI and set all sliders
  */
-function add_gui(params, world, time, LOADER) {
+function add_gui(params, world, time, recorder, LOADER) {
   if (params.display_type == "anaglyph" || params.display_type == "keyboard") {
     gui = new dat.GUI();
     //gui.add( ref_dim, 'c').min(0).max(params.N-1).step(1).listen().name('Reference dimension').onChange( function( val ) { make_axes(); }) ;
@@ -119,7 +119,7 @@ function add_gui(params, world, time, LOADER) {
         .listen()
         .onChange(function (flag) {
           if (flag) {
-            params.recorder.start();
+            recorder.start();
           }
         });
     }

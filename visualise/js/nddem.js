@@ -13,6 +13,17 @@ import * as AXES from "./axes.js";
 import * as TORUS from "./torus.js";
 import * as GUI from "./gui.js";
 
+const recorder = new CCapture({
+  verbose: true,
+  display: true,
+  framerate: 10,
+  quality: 100,
+  format: "png",
+  timeLimit: 100,
+  frameLimit: 0,
+  autoSaveTime: 0,
+});
+
 var container; // main div element
 var scene, renderer, particles, stats; // UI elements
 var world = []; // properties that describe the domain
@@ -116,7 +127,7 @@ function build_world() {
     TORUS.add_torus(scene, params, world, particles);
   }
 
-  GUI.add_gui(params, world, time, LOADER);
+  GUI.add_gui(params, world, time, recorder, LOADER);
   window.addEventListener(
     "resize",
     function () {
@@ -341,6 +352,7 @@ function make_initial_spheres(spheres) {
     lut.setMin(params.minRadius);
     lut.setMax(params.maxRadius);
   }
+  // var sphere_mesh_instaced = new THREE.InstancedMesh(geometry, material, params.num_particles); // TODO: TRY THIS OUT TO INCREASE SPEED
   for (var i = 0; i < spheres.length; i++) {
     if (params.N < 3) {
       var color = ((Math.random() + 0.25) / 1.5) * 0xffffff;
@@ -386,6 +398,7 @@ function make_initial_spheres(spheres) {
       }
     }
     var object = new THREE.Mesh(geometry, material);
+
     object.position.set(spheres[i][0], spheres[i][1], spheres[i][2]);
     object.rotation.z = Math.PI / 2;
     // if ( params.fname.includes('Coll') || params.fname.includes('Roll') ) { object.rotation.x = Math.PI/2.; }
@@ -910,6 +923,7 @@ function render() {
     renderer.render(scene, CAMERA.camera);
   }
   if (params.record) {
+    // console.log(CAMERA.recorder)
     recorder.capture(renderer.domElement);
     if (time.snapshot) {
       setTimeout(() => {
