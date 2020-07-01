@@ -1,0 +1,31 @@
+{
+  "name": "NDDEM",
+  "version": "1.0",
+  "license": "GPL3.0",
+  "description": "Visualising hyperspheres in the browser.",
+  "main": "js/nddem.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Franzzzzzzzz/NDDEM"
+  },
+  "dependencies": {
+    "papaparse": "^5.2.0",
+    "three": "^0.117.1"
+  },
+  "devDependencies": {
+    "husky": "^4.2.5",
+    "prettier": "2.0.5",
+    "pretty-quick": "^2.0.1"
+  },
+  "config": {
+    "husky": {
+      "hooks": {
+        "pre-commit": "pretty-quick --staged"
+      }
+    }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 4
+  }
+}

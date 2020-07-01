@@ -1,8 +1,7 @@
+console.warn( "THREE.SkeletonUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author sunag / http://www.sunag.com.br
  */
-
-'use strict';
 
 THREE.SkeletonUtils = {
 
@@ -528,6 +527,58 @@ THREE.SkeletonUtils = {
 
 		return bones;
 
+	},
+
+	clone: function ( source ) {
+
+		var sourceLookup = new Map();
+		var cloneLookup = new Map();
+
+		var clone = source.clone();
+
+		parallelTraverse( source, clone, function ( sourceNode, clonedNode ) {
+
+			sourceLookup.set( clonedNode, sourceNode );
+			cloneLookup.set( sourceNode, clonedNode );
+
+		} );
+
+		clone.traverse( function ( node ) {
+
+			if ( ! node.isSkinnedMesh ) return;
+
+			var clonedMesh = node;
+			var sourceMesh = sourceLookup.get( node );
+			var sourceBones = sourceMesh.skeleton.bones;
+
+			clonedMesh.skeleton = sourceMesh.skeleton.clone();
+			clonedMesh.bindMatrix.copy( sourceMesh.bindMatrix );
+
+			clonedMesh.skeleton.bones = sourceBones.map( function ( bone ) {
+
+				return cloneLookup.get( bone );
+
+			} );
+
+			clonedMesh.bind( clonedMesh.skeleton, clonedMesh.bindMatrix );
+
+		} );
+
+		return clone;
+
 	}
 
 };
+
+
+function parallelTraverse( a, b, callback ) {
+
+	callback( a, b );
+
+	for ( var i = 0; i < a.children.length; i ++ ) {
+
+		parallelTraverse( a.children[ i ], b.children[ i ], callback );
+
+	}
+
+}

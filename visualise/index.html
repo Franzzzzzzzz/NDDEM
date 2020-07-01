@@ -5,8 +5,10 @@
         <link rel='icon' href='resources/favicon.ico' type='image/x-icon'/ >
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
+		<!-- <meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0="> -->
         <link rel="stylesheet" type="text/css" href="loading_screen.css">
+        <link rel="stylesheet"
+         href="https://fonts.googleapis.com/css?family=Montserrat">
         <style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
@@ -20,25 +22,11 @@
 		</style>
 	</head>
 	<body>
-		<script src="node_modules/three/build/three.js"></script>
-        <script src="node_modules/three/examples/js/WebGL.js"></script>
-		<script src="js/WebVR.js"></script>
-		<!-- <script src="node_modules/three/examples/js/vr/WebVR.js"></script> -->
-        <script src="node_modules/three/examples/js/controls/TrackballControls.js"></script>
-        <script src="node_modules/three/examples/js/controls/OrbitControls.js"></script>
-        <script src="node_modules/three/examples/js/effects/AnaglyphEffect.js"></script>
-        <!-- <script src="node_modules/three/examples/js/loaders/VTKLoader.js"></script> -->
-        <script src="node_modules/three/examples/js/loaders/LoaderSupport.js"></script>
-        <script src="node_modules/three/examples/js/loaders/OBJLoader.js"></script>
-		<script src="node_modules/three/examples/js/loaders/MTLLoader.js"></script>
-		<!-- <script src="node_modules/three/examples/js/vr/ViveController.js"></script> -->
-		<script src="js/VRController.js"></script>
         <script src="node_modules/papaparse/papaparse.js"></script>
-        <script src="node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <script src="js/dat.gui.min.custom.js"></script> <!-- changed styling -->
         <!-- <script src="js/datguivr.js"></script> -->
-        <script src="node_modules/three/examples/js/math/Lut.js"></script>
         <script src="js/CCapture.all.min.js"></script>
-        <script type="x-shader/x-vertex" id="vertexshader-3D">
+        <!-- <script type="x-shader/x-vertex" id="vertexshader-3D">
             uniform int N; // number of dimensions in simulation
             uniform float N_lines; // number of lines to render across particle
 			uniform float A[3*3];  // orientation matrix for this particle
@@ -66,7 +54,7 @@
                     x_rotated.x = A[0]*x.x + A[3]*x.y + A[6]*x.z ;
                     x_rotated.y = A[1]*x.x + A[4]*x.y + A[7]*x.z ;
                     x_rotated.z = A[2]*x.x + A[5]*x.y + A[8]*x.z ;
-                    x_rotated.w=0. ;                     
+                    x_rotated.w=0. ;
 
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
                     float rsqr = pow(length(x_rotated),2.0);
@@ -103,8 +91,8 @@
             uniform float N_lines; // number of lines to render across particle
 			uniform float A[4*4];  // orientation matrix for this particle
             uniform float R; // particle radius
-            uniform float xview[1] ; 
-            uniform float xpart[1] ; 
+            uniform float xview[1] ;
+            uniform float xpart[1] ;
 			varying vec3 vColor; // colour at vertex (output)
             varying vec3 vNormal; // normal at vertex (output)
 
@@ -123,7 +111,7 @@
                     x.z = - R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
                     x.x = - R_draw*sin((uv.y-0.5)*pi);
                     x.w = xview[0] - xpart[0];
-                    
+
                     // w,z,y,x
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
                     x_rotated.x = A[0]*x.x + A[4]*x.y + A[ 8]*x.z + A[12]*x.w;
@@ -159,20 +147,20 @@
                     vColor.b = abs(sin(phi2*2.0));
                     vColor = vColor * abs(sin(phi0));
                     vColor = vColor * abs(sin(phi1));
-                    
+
                 }
                 else { vColor.r = 0.0; }
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
 		</script>
-		
+
 		<script type="x-shader/x-vertex" id="vertexshader-5D">
-            #define N 5  
+            #define N 5
             //uniform int N; // number of dimensions in simulation
 			uniform float A[N*N];  // orientation matrix for this particle
             uniform float R; // particle radius
-            uniform float xview[N-3] ; 
-            uniform float xpart[N-3] ; 
+            uniform float xview[N-3] ;
+            uniform float xpart[N-3] ;
 			varying vec3 vColor; // colour at vertex (output)
             varying vec3 vNormal; // normal at vertex (output)
             vec3 colors[4] ; //{0,1,1},{1,0,1}}
@@ -182,22 +170,22 @@
             float x[N];
             float x_rotated[N];
             float phi[N-1];
-        
+
             bool isnan(float val)
             {
             return (val <= 0.0 || 0.0 <= val) ? false : true;
             }
             void main() {
-                colors[0]=vec3(1.,0.,0.) ; 
+                colors[0]=vec3(1.,0.,0.) ;
                 colors[1]=vec3(0.,1.,0.) ;
                 colors[2]=vec3(0.,0.,1.) ;
                 colors[3]=vec3(1.,1.,0.) ;
-            
+
                 vNormal = normal; // for directional lighting
                 const float pi = 3.14159265359;
                 float R_draw; // radius particle will be drawn at
-                float R_draw_squared = R*R ; 
-                for (int i=0 ; i<N-3 ; i++) 
+                float R_draw_squared = R*R ;
+                for (int i=0 ; i<N-3 ; i++)
                     R_draw_squared -= (xview[i] - xpart[i])*(xview[i] - xpart[i]);
                 if ( R_draw_squared > 0.0 ) { // only if visible
                     R_draw = sqrt(R_draw_squared);
@@ -205,73 +193,73 @@
                     x[1] = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
                     x[2] = - R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
                     x[0] = - R_draw*sin((uv.y-0.5)*pi);
-                    
+
                     for (int i=0 ; i<N-3 ; i++)
                         x[i+3] = xview[i] - xpart[i];
-                    
+
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
-                    float rsqr = 0. ; 
+                    float rsqr = 0. ;
                     for (int i=0 ; i<N ; i++)
                     {
-                        x_rotated[i] = 0. ; 
+                        x_rotated[i] = 0. ;
                         for (int j=0 ; j<N ; j++)
                             x_rotated[i] += A[j*N+i]*x[j] ;
                         rsqr += x_rotated[i]*x_rotated[i] ;
                     }
-                    
+
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
-                    tmp[0] = x_rotated[0] ; 
-                    tmp[1] = x_rotated[1] ; 
-                    tmp[2] = x_rotated[2] ; 
-                    for (int i=0 ; i<N-3 ; i++) 
+                    tmp[0] = x_rotated[0] ;
+                    tmp[1] = x_rotated[1] ;
+                    tmp[2] = x_rotated[2] ;
+                    for (int i=0 ; i<N-3 ; i++)
                     {
-                        x_rotated[i] = x_rotated[i+3] ; 
+                        x_rotated[i] = x_rotated[i+3] ;
                     }
                     x_rotated[N-3] = tmp[0];
                     x_rotated[N-2] = tmp[1];
                     x_rotated[N-1] = tmp[2];
-                    
-                    int lastnonzero = 0 ; 
+
+                    int lastnonzero = 0 ;
                     for (int j=N-1 ; j>=0 ; j--)
                     {
-                        if (abs(x_rotated[j])>1e-6) 
-                            break ; 
+                        if (abs(x_rotated[j])>1e-6)
+                            break ;
                         lastnonzero = j ;
                     }
                     /*for (int j=N-1 ; j>=0 && abs(x_rotated[j])<1e-6 ; j--)
                     {
                         lastnonzero = j ;
                     }*/
-                    lastnonzero-- ; 
-                    
+                    lastnonzero-- ;
+
                     for (int i=0 ; i<N-1 ; i++)
                     {
                       if (i>=lastnonzero)
                       {
-                        if (x_rotated[i]<0.) phi[i] = pi ; 
-                        else phi[i] = 0. ; 
+                        if (x_rotated[i]<0.) phi[i] = pi ;
+                        else phi[i] = 0. ;
                       }
-                    
+
                       phi[i] = acos(x_rotated[i]/sqrt(rsqr)) ;
-                      if (isnan(phi[i])) {phi[i]=pi ;} 
-                      rsqr -= x_rotated[i]*x_rotated[i] ;  
+                      if (isnan(phi[i])) {phi[i]=pi ;}
+                      rsqr -= x_rotated[i]*x_rotated[i] ;
                     }
-                    if (x_rotated[N-1]<0.) phi[N-2] = 2.*pi - phi[N-2] ; 
-                    
+                    if (x_rotated[N-1]<0.) phi[N-2] = 2.*pi - phi[N-2] ;
+
                     // Coloring
-                    vColor.r = 0.0;  
-                    vColor.g = 0.0;  
-                    vColor.b = 0.0;  
-                    
+                    vColor.r = 0.0;
+                    vColor.g = 0.0;
+                    vColor.b = 0.0;
+
                     for (int i=0 ; i<N-2 ; i++)
                     {
                         vColor.r += (colors[i][0] * abs(sin(3.*phi[i])))/colorscale[0] ;
                         vColor.g += (colors[i][1] * abs(sin(3.*phi[i])))/colorscale[1] ;
                         vColor.b += (colors[i][2] * abs(sin(3.*phi[i])))/colorscale[2] ;
                     }
-                    vColor.r += (colors[N-2][0] * abs(sin(4.*phi[N-2]/2.)))/colorscale[0] ; 
-                    vColor.g += (colors[N-2][1] * abs(sin(4.*phi[N-2]/2.)))/colorscale[1] ; 
-                    vColor.b += (colors[N-2][2] * abs(sin(4.*phi[N-2]/2.)))/colorscale[2] ; 
+                    vColor.r += (colors[N-2][0] * abs(sin(4.*phi[N-2]/2.)))/colorscale[0] ;
+                    vColor.g += (colors[N-2][1] * abs(sin(4.*phi[N-2]/2.)))/colorscale[1] ;
+                    vColor.b += (colors[N-2][2] * abs(sin(4.*phi[N-2]/2.)))/colorscale[2] ;
                     for (int i=0 ; i<N-2 ; i++)
                     {
                         vColor.r *= abs(sin(phi[i])) ;
@@ -283,16 +271,16 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
 		</script>
-		
-		
-		
+
+
+
 		<script type="x-shader/x-vertex" id="vertexshader-6D">
-            #define N 6 
+            #define N 6
             //uniform int N; // number of dimensions in simulation
 			uniform float A[N*N];  // orientation matrix for this particle
             uniform float R; // particle radius
-            uniform float xview[N-3] ; 
-            uniform float xpart[N-3] ; 
+            uniform float xview[N-3] ;
+            uniform float xpart[N-3] ;
 			varying vec3 vColor; // colour at vertex (output)
             varying vec3 vNormal; // normal at vertex (output)
             vec3 colors[N-1] ; //{0,1,1},{1,0,1}}
@@ -302,23 +290,23 @@
             float x[N];
             float x_rotated[N];
             float phi[N-1];
-        
+
             bool isnan(float val)
             {
             return (val <= 0.0 || 0.0 <= val) ? false : true;
             }
             void main() {
-                colors[0]=vec3(1.,0.,0.) ; 
+                colors[0]=vec3(1.,0.,0.) ;
                 colors[1]=vec3(0.,1.,0.) ;
                 colors[2]=vec3(0.,0.,1.) ;
                 colors[3]=vec3(1.,1.,0.) ;
                 colors[4]=vec3(0.,1.,1.) ;
-            
+
                 vNormal = normal; // for directional lighting
                 const float pi = 3.14159265359;
                 float R_draw; // radius particle will be drawn at
-                float R_draw_squared = R*R ; 
-                for (int i=0 ; i<N-3 ; i++) 
+                float R_draw_squared = R*R ;
+                for (int i=0 ; i<N-3 ; i++)
                     R_draw_squared -= (xview[i] - xpart[i])*(xview[i] - xpart[i]);
                 if ( R_draw_squared > 0.0 ) { // only if visible
                     R_draw = sqrt(R_draw_squared);
@@ -326,73 +314,73 @@
                     x[1] = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
                     x[2] = - R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
                     x[0] = - R_draw*sin((uv.y-0.5)*pi);
-                    
+
                     for (int i=0 ; i<N-3 ; i++)
                         x[i+3] = xview[i] - xpart[i];
-                    
+
                     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
-                    float rsqr = 0. ; 
+                    float rsqr = 0. ;
                     for (int i=0 ; i<N ; i++)
                     {
-                        x_rotated[i] = 0. ; 
+                        x_rotated[i] = 0. ;
                         for (int j=0 ; j<N ; j++)
                             x_rotated[i] += A[j*N+i]*x[j] ;
                         rsqr += x_rotated[i]*x_rotated[i] ;
                     }
-                    
+
                     // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
-                    tmp[0] = x_rotated[0] ; 
-                    tmp[1] = x_rotated[1] ; 
-                    tmp[2] = x_rotated[2] ; 
-                    for (int i=0 ; i<N-3 ; i++) 
+                    tmp[0] = x_rotated[0] ;
+                    tmp[1] = x_rotated[1] ;
+                    tmp[2] = x_rotated[2] ;
+                    for (int i=0 ; i<N-3 ; i++)
                     {
-                        x_rotated[i] = x_rotated[i+3] ; 
+                        x_rotated[i] = x_rotated[i+3] ;
                     }
                     x_rotated[N-3] = tmp[0];
                     x_rotated[N-2] = tmp[1];
                     x_rotated[N-1] = tmp[2];
-                    
-                    int lastnonzero = 0 ; 
+
+                    int lastnonzero = 0 ;
                     for (int j=N-1 ; j>=0 ; j--)
                     {
-                        if (abs(x_rotated[j])>1e-6) 
-                            break ; 
+                        if (abs(x_rotated[j])>1e-6)
+                            break ;
                         lastnonzero = j ;
                     }
                     /*for (int j=N-1 ; j>=0 && abs(x_rotated[j])<1e-6 ; j--)
                     {
                         lastnonzero = j ;
                     }*/
-                    lastnonzero-- ; 
-                    
+                    lastnonzero-- ;
+
                     for (int i=0 ; i<N-1 ; i++)
                     {
                       if (i>=lastnonzero)
                       {
-                        if (x_rotated[i]<0.) phi[i] = pi ; 
-                        else phi[i] = 0. ; 
+                        if (x_rotated[i]<0.) phi[i] = pi ;
+                        else phi[i] = 0. ;
                       }
-                    
+
                       phi[i] = acos(x_rotated[i]/sqrt(rsqr)) ;
-                      if (isnan(phi[i])) {phi[i]=pi ;} 
-                      rsqr -= x_rotated[i]*x_rotated[i] ;  
+                      if (isnan(phi[i])) {phi[i]=pi ;}
+                      rsqr -= x_rotated[i]*x_rotated[i] ;
                     }
-                    if (x_rotated[N-1]<0.) phi[N-2] = 2.*pi - phi[N-2] ; 
-                    
+                    if (x_rotated[N-1]<0.) phi[N-2] = 2.*pi - phi[N-2] ;
+
                     // Coloring
-                    vColor.r = 0.0;  
-                    vColor.g = 0.0;  
-                    vColor.b = 0.0;  
-                    
+                    vColor.r = 0.0;
+                    vColor.g = 0.0;
+                    vColor.b = 0.0;
+
                     for (int i=0 ; i<N-2 ; i++)
                     {
                         vColor.r += (colors[i][0] * abs(sin(3.*phi[i])))/colorscale[0] ;
                         vColor.g += (colors[i][1] * abs(sin(3.*phi[i])))/colorscale[1] ;
                         vColor.b += (colors[i][2] * abs(sin(3.*phi[i])))/colorscale[2] ;
                     }
-                    vColor.r += (colors[N-2][0] * abs(sin(4.*phi[N-2]/2.)))/colorscale[0] ; 
-                    vColor.g += (colors[N-2][1] * abs(sin(4.*phi[N-2]/2.)))/colorscale[1] ; 
-                    vColor.b += (colors[N-2][2] * abs(sin(4.*phi[N-2]/2.)))/colorscale[2] ; 
+                    vColor.r += (colors[N-2][0] * abs(sin(4.*phi[N-2]/2.)))/colorscale[0] ;
+                    vColor.g += (colors[N-2][1] * abs(sin(4.*phi[N-2]/2.)))/colorscale[1] ;
+                    vColor.b += (colors[N-2][2] * abs(sin(4.*phi[N-2]/2.)))/colorscale[2] ;
                     for (int i=0 ; i<N-2 ; i++)
                     {
                         vColor.r *= abs(sin(phi[i])) ;
@@ -404,8 +392,8 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
 		</script>
-		
-		
+
+
 		<script type="x-shader/x-fragment" id="fragmentshader">
             varying vec3 vNormal;
             varying vec3 vColor;
@@ -424,8 +412,8 @@
                 // gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
 
             }
-        </script>
-        <script src="js/nddem.js"></script>
+        </script> -->
+        <script type="module" src="js/nddem.js"></script>
         <section id="loading-screen">
             <div class="wrapper">
                 <span id="loading-text">&nbsp;Loading</span>
