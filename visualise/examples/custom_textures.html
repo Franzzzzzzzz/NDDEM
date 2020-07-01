@@ -18,10 +18,10 @@
 	</head>
 	<body>
 		<script src="../node_modules/three/build/three.js"></script>
-        <script src="../node_modules/three/examples/js/WebGL.js"></script>
-        <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script>
-        <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
-        <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <!-- <script src="../node_modules/three/examples/js/WebGL.js"></script> -->
+        <!-- <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script> -->
+        <!-- <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
+        <script src="../js/dat.gui.min.custom.js"></script>
         <script src="../js/CCapture.all.min.js"></script>
         <script type="x-shader/x-vertex" id="vertexshader-3D">
             uniform int N; // number of dimensions in simulation
@@ -203,9 +203,9 @@
         N_tag.innerHTML = String(N) + "D";
         container.appendChild(N_tag);
 
-        if ( WEBGL.isWebGL2Available() === false ) {
-        	document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
-        }
+        // if ( WEBGL.isWebGL2Available() === false ) {
+        // 	document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+        // }
 
         var root_dir = 'http://localhost:54321/';
         if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}

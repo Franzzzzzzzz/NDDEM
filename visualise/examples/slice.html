@@ -20,10 +20,10 @@
         <div id="container"></div>
         <script src="../js/CCapture.all.min.js"></script>
 		<script src="../node_modules/three/build/three.js"></script>
-        <script src="../node_modules/three/examples/js/WebGL.js"></script>
-        <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script>
-        <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
-        <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <!-- <script src="../node_modules/three/examples/js/WebGL.js"></script> -->
+        <!-- <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script> -->
+        <!-- <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
+        <script src="../js/dat.gui.min.custom.js"></script>
         <script>
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -85,16 +85,16 @@
         renderer.shadowMap.enabled = true;
         container.appendChild( renderer.domElement );
 
-        var background_light = new THREE.AmbientLight( 0xFFFFFF );
+        var background_light = new THREE.AmbientLight( 0x777777 );
         scene.add( background_light );
-        var light = new THREE.PointLight(0xa0a0a0);
+        var light = new THREE.PointLight(0x999999);
         light.position.z = 8
         light.position.x = 5
         scene.add( light );
 
 
-        var sphere_geometry = new THREE.SphereGeometry( 1, 32, 32 );
-        var circle_geometry = new THREE.CircleGeometry( 1, 128 );
+        var sphere_geometry = new THREE.SphereGeometry( 1, 256, 256 );
+        var circle_geometry = new THREE.CircleGeometry( 1, 256 );
         var wall_geometry = new THREE.PlaneBufferGeometry( 1, 1 );
         var material = new THREE.MeshStandardMaterial( { color: 0xeeeeee } );
         var wall_material = new THREE.MeshStandardMaterial( { color: 0xe72564 } );
