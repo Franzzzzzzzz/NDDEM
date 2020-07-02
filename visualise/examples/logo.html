@@ -91,8 +91,14 @@
         if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'https://www.benjymarks.com/nddem/' }
         else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/' }
 
-        init();
-		animate();
+        Ammo().then( function ( AmmoLib ) {
+
+			Ammo = AmmoLib;
+
+			init();
+			animate();
+
+		} );
 
 		function init() {
 			initGraphics();

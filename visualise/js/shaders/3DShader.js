@@ -10,7 +10,7 @@ var uniforms = {
   xpart: { value: [] }, //Size N-3
   x4: { value: 0 },
   x4p: { value: 0 },
-  R: { value: 1 },
+  R: { value: 0.5 },
 };
 
 for (var ij = 0; ij < N - 3; ij++) {

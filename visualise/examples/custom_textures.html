@@ -194,6 +194,7 @@
         <script>
         const urlParams = new URLSearchParams(window.location.search);
         var N = 4;
+        var time = {'play': false };
         var container;
         container = document.createElement( 'div' );
         document.body.appendChild( container );
@@ -225,7 +226,7 @@
         	frameLimit: 0,
         	autoSaveTime: 0
         });
-        var record = false; var quality = 7;
+        var record = false; var quality = 8;
         var slice = {'omega1':0,'omega2':0,'omega3':0,'omega4':0,'omega5':0,'omega6':0,'x4':0}
         if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
         if ( urlParams.has('quality') ) { quality = parseInt(urlParams.get('quality'))}
@@ -262,7 +263,7 @@
             A: { value: new THREE.Matrix4() },
 			x4: { value: 0.0 },
             x4p: { value: 0.0 },
-            R: { value: 1.0 },
+            R: { value: 0.5 },
 		};
         uniforms.A.value.set(1,0,0,0,
                              0,1,0,0,
@@ -307,7 +308,7 @@
             gui.add( slice, 'omega4').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>4</sub>') ;
             gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>5</sub>') ;
             gui.add( slice, 'omega6').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>6</sub>') ;
-            gui.add( slice, 'x4').min(-1).max(1).step(0.01).listen().name('x<sub>4</sub>').onChange( function( ) {
+            gui.add( slice, 'x4').min(-uniforms.R.value).max(uniforms.R.value).step(0.01).listen().name('x<sub>4</sub>').onChange( function( ) {
                 R_squared = Math.pow(uniforms.R.value,2) - Math.pow(uniforms.x4p.value - slice.x4,2);
                 if ( R_squared > 0 ) {
                     sphere.visible = true;
@@ -319,6 +320,18 @@
                 }
             });
         }
+        gui.add(time, "play").name("Play")
+          .onChange(function (flag) {
+            time.play = flag;
+            if (flag && record) {
+              recorder.start();
+              console.log("Recording");
+            } else if ( record ) {
+              recorder.stop();
+              recorder.save();
+              console.log("saving recording");
+            }
+          });
         // if ( N > 4 ) {
             // gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('Omega 5') ;
         // }
@@ -345,32 +358,34 @@
             if ( urlParams.has('controls') ) { controls.update(); }
             var delta = clock.getDelta()
 
-            var O = new THREE.Matrix4();
-            O.set(            0, slice.omega1,-slice.omega2, slice.omega4,
-                  -slice.omega1,            0, slice.omega3,-slice.omega5,
-                   slice.omega2,-slice.omega3,            0, slice.omega6,
-                  -slice.omega4, slice.omega5,-slice.omega6,            0);
+            if ( time.play ) {
+                var O = new THREE.Matrix4();
+                O.set(            0, slice.omega1,-slice.omega2, slice.omega4,
+                      -slice.omega1,            0, slice.omega3,-slice.omega5,
+                       slice.omega2,-slice.omega3,            0, slice.omega6,
+                      -slice.omega4, slice.omega5,-slice.omega6,            0);
 
-            var dA = O.multiply(uniforms.A.value).multiplyScalar(delta).toArray();
-            var Sum = uniforms.A.value.elements.map(function (num, idx) {
-              return num - dA[idx];
-            });
-            uniforms.A.value.elements = Sum;
+                var dA = O.multiply(uniforms.A.value).multiplyScalar(delta).toArray();
+                var Sum = uniforms.A.value.elements.map(function (num, idx) {
+                  return num - dA[idx];
+                });
+                uniforms.A.value.elements = Sum;
 
-            //Orthonormalisation
-            for (i=0 ; i<uniforms.N.value ; i++)
-            {
-                for (j=0 ; j<i ; j++)
+                //Orthonormalisation
+                for (i=0 ; i<uniforms.N.value ; i++)
                 {
-                    for (dd=0, dot=0 ; dd<uniforms.N.value ; dd++)
-                        dot += uniforms.A.value.elements[i*4+dd] * uniforms.A.value.elements[j*4+dd] ;
+                    for (j=0 ; j<i ; j++)
+                    {
+                        for (dd=0, dot=0 ; dd<uniforms.N.value ; dd++)
+                            dot += uniforms.A.value.elements[i*4+dd] * uniforms.A.value.elements[j*4+dd] ;
+                        for (dd=0 ; dd<uniforms.N.value ; dd++)
+                            uniforms.A.value.elements[i*4+dd] -= uniforms.A.value.elements[j*4+dd] * dot ;
+                    }
+                    for (dd=0, norme=0 ; dd<uniforms.N.value ; dd++)
+                        norme += uniforms.A.value.elements[i*4+dd]*uniforms.A.value.elements[i*4+dd] ;
                     for (dd=0 ; dd<uniforms.N.value ; dd++)
-                        uniforms.A.value.elements[i*4+dd] -= uniforms.A.value.elements[j*4+dd] * dot ;
+                        uniforms.A.value.elements[i*4+dd] /= norme ;
                 }
-                for (dd=0, norme=0 ; dd<uniforms.N.value ; dd++)
-                    norme += uniforms.A.value.elements[i*4+dd]*uniforms.A.value.elements[i*4+dd] ;
-                for (dd=0 ; dd<uniforms.N.value ; dd++)
-                    uniforms.A.value.elements[i*4+dd] /= norme ;
             }
             uniforms.x4.value = slice.x4;
 
