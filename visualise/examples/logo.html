@@ -4,6 +4,8 @@
         <meta name="referrer" content="origin">
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet"
+         href="https://fonts.googleapis.com/css?family=Montserrat">
 		<style>
 				body {
 					color: #e72564;
@@ -28,7 +30,7 @@
 	<script src="../node_modules/three/build/three.js"></script>
 	<script src="../node_modules/three/examples/js/libs/ammo.js"></script>
 	<!-- <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
-	<script src="../node_modules/three/examples/js/WebGL.js"></script>
+	<!-- <script src="../node_modules/three/examples/js/WebGL.js"></script> -->
     <script src="../node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
 
     <script type="x-shader/x-vertex" id="vertexshader">
@@ -60,13 +62,6 @@
         	frameLimit: 0,
         	autoSaveTime: 0
         });
-
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-			document.getElementById( 'container' ).innerHTML = "";
-
-		}
 
 		// Graphics variables
 		var container, stats;
