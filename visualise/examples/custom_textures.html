@@ -357,7 +357,7 @@
 		var animate = function () {
             if ( urlParams.has('controls') ) { controls.update(); }
             var delta = clock.getDelta()
-
+            delta = Math.min(0.1,delta); // in case they have gone away from the tab for a while
             if ( time.play ) {
                 var O = new THREE.Matrix4();
                 O.set(            0, slice.omega1,-slice.omega2, slice.omega4,
