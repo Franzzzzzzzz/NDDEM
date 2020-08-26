@@ -366,7 +366,7 @@ function make_initial_spheres(spheres) {
           var color = 0.222222; // for torus
         }
       } else if (params.view_mode === "size") {
-        // console.log(spheres[i][params.N])
+
         var color = lut.getColor(spheres[i][params.N]);
         var material = new THREE.MeshPhongMaterial({ color: color });
         // console.log(color)

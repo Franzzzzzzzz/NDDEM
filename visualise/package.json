@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "papaparse": "^5.2.0",
-    "three": "^0.117.1"
+    "three": "^0.118.1"
   },
   "devDependencies": {
     "husky": "^4.2.5",
@@ -26,6 +26,6 @@
   },
   "prettier": {
     "printWidth": 100,
-    "tabWidth": 4,
+    "tabWidth": 4
   }
 }
