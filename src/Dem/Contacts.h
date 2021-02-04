@@ -22,11 +22,10 @@ template <int d>
 class Contacts
 {
 public:
-    Contacts (Parameters<d> &P) ;
+    Contacts (Parameters<d> &PP) ;
 
     //int N ; ///< Number of particles // These and following should really be const but that's a pain for assignements
-    double dt, Kn, Kt, Mu, Gamman, Gammat ; ///< Same meaning as in Parameters 
-    Parameters<d> *ptrP ; ///< Pointer to the Parameters structure. 
+    Parameters<d> *P ; ///< Pointer to the Parameters structure.
     vector < double > Torquei ; ///< Torque on particle i
     vector < double > Torquej ; ///< Torque on particle j
     vector < double > vrel ; ///< Relative velocity
@@ -44,7 +43,7 @@ public:
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
         {
           if (gh&1)
-            loc[n] += ptrP->Boundaries[n][2] * ((ghd&1)?-1:1) ;
+            loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
         return (particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ) ;
     } ///< Force and torque between an particle and a ghost (moves the ghost and calls particle_particle()
@@ -70,7 +69,7 @@ private:
  * ***************************************************************************************************/
 
 template <int d>
-Contacts<d>::Contacts (Parameters<d> &P) : dt(P.dt), Kn(P.Kn), Kt(P.Kt), Mu(P.Mu), Gamman(P.Gamman), Gammat(P.Gammat), ptrP(&P)
+Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
 {
 
   Torquei.resize(d*(d-1)/2, 0) ;
@@ -105,16 +104,16 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
   //Normal force
-  Fn=cn*(ovlp*Kn) - vn*Gamman ; //TODO
+  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; //TODO
 
   //Tangential force computation: retrieve contact or create new contact
   tspr=Contact.tspr ;
   if (tspr.size()==0) tspr.resize(d,0) ;
 
-  Tools<d>::vAddScaled (tspr, dt, vt) ; //tspr += vt*dt ;
+  Tools<d>::vAddScaled (tspr, P->dt, vt) ; //tspr += vt*dt ;
   Tools<d>::vSubScaled(tspr, Tools<d>::dot(tspr,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
-  Tools<d>::vMul(Ft, tspr, -Kt) ; //Ft=  tspr*(-Kt) ;
-  Coulomb=Mu*Tools<d>::norm(Fn) ;
+  Tools<d>::vMul(Ft, tspr, - P->Kt) ; //Ft=  tspr*(-Kt) ;
+  Coulomb=P->Mu*Tools<d>::norm(Fn) ;
 
   if (Tools<d>::norm(Ft) >= Coulomb)
   {
@@ -123,13 +122,13 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
       Tools<d>::vMul(tvec, Ft, 1/Tools<d>::norm(Ft)) ; //tvec=Ft * (1/Tools<d>::norm(Ft)) ;
       Tools<d>::vMul(Ftc, tvec, Coulomb) ; //Ftc = tvec * Coulomb ;
       Ft=Ftc ;
-      Tools<d>::vMul(tspr, Ftc, -1/Kt) ; //tspr=Ftc*(-1/Kt) ;
+      Tools<d>::vMul(tspr, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
     }
     else
       Tools<d>::setzero(Ft) ;
   }
   else
-      Tools<d>::vSubScaled(Ft, Gammat, vt) ; //Ft -= (vt*Gammat) ;
+      Tools<d>::vSubScaled(Ft, P->Gammat, vt) ; //Ft -= (vt*Gammat) ;
 
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
   Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ; //TODO check the minus sign
@@ -157,17 +156,17 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
   vn = cn * (Tools<d>::dot(vrel, cn)) ;
   vt= vrel - vn ; //vt=self.vrel-vn*cn ; // BUG: from python, must be wrong
-  Fn=cn*(ovlp*Kn) - vn*Gamman ;
+  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ;
 
   //Tangential force computation: retrieve contact or create new contact
   //history=History[make_pair(i,-(2*j+k+1))] ;
   tspr=Contact.tspr ; //history.second ;
   if (tspr.size()==0) tspr.resize(d,0) ;
 
-  tspr += vt*dt ;
+  tspr += vt*P->dt ;
   tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr| Actually does not seem to change anything ...
-  Ft=  tspr*(-Kt) ;
-  Coulomb=Mu*Tools<d>::norm(Fn) ;
+  Ft=  tspr*(- P->Kt) ;
+  Coulomb=P->Mu*Tools<d>::norm(Fn) ;
 
   if (Tools<d>::norm(Ft) > Coulomb)
   {
@@ -176,13 +175,13 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
       tvec=Ft * (1/Tools<d>::norm(Ft)) ;
       Ftc = tvec * Coulomb ;
       Ft=Ftc ;
-      tspr=Ftc*(-1/Kt) ;
+      tspr=Ftc*(-1/ P->Kt) ;
     }
     else
       Tools<d>::setzero(Ft) ;
   }
   else
-     Ft -= (vt*Gammat) ;
+     Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
 
