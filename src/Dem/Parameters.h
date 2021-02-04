@@ -28,12 +28,12 @@ inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a
 inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
 /** \brief Generic class to handle the simulation set up
- * 
+ *
  */
 template <int d>
 class Parameters {
 public :
-    Parameters (int NN): 
+    Parameters (int NN):
         N(5),           //number of particles
         tdump(1),       //dump data every these timesteps
         tinfo(100),
@@ -53,9 +53,9 @@ public :
         wallforcecompute(false)
         {
          reset_ND(NN) ;
-        } ///< Set the default values for all parameters. Calls to setup parameter function should be provided after initialisation of this class. 
+        } ///< Set the default values for all parameters. Calls to setup parameter function should be provided after initialisation of this class.
 
-    void reset_ND (int NN) 
+    void reset_ND (int NN)
     {
      N=NN ; r.resize(N,0.15) ; //particle size
      m.resize(N, 1e-2); // Set the masses directly
@@ -69,16 +69,16 @@ public :
     int N; ///< Number of particles
     int tdump ; ///< Write dump file every this many timesteps
     int tinfo ; ///< Show detail information on scren every this many timesteps
-    double T ; ///< Run until this time (note it is a floating point). 
+    double T ; ///< Run until this time (note it is a floating point).
     double dt ; ///< timestep
     double rho; ///< density
-    double Kn ; ///< Normal spring constant 
+    double Kn ; ///< Normal spring constant
     double Kt ; ///< Tangential spring constant
     double Gamman; ///< Normal dissipation
     double Gammat ; ///< Tangential dissipation
     double Mu ; ///< Fricton
-    double skin ; ///< Skin for use in verlet list \warning Experimental 
-    double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental 
+    double skin ; ///< Skin for use in verlet list \warning Experimental
+    double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental
     vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
     //ExportType dumpkind ;
     //ExportData dumplist ;
@@ -87,24 +87,24 @@ public :
     vector <double> I ; ///< Particule moment of inertia
     vector <double> g ; ///< Gravity vector
     vector <bool> Frozen ; ///< Frozen atom if true
-    vector < vector <double> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}. 
+    vector < vector <double> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}.
     string Directory ; ///< Saving directory
-    bool orientationtracking ; ///< Track orientation? 
-    bool wallforcecompute ; ///< Compute for on the wall? 
+    bool orientationtracking ; ///< Track orientation?
+    bool wallforcecompute ; ///< Compute for on the wall?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
 
-    map<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered. 
+    multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
 
 // Useful functions
     int set_boundaries() ;  ///< Set default boundaries
     //int init_particles(v2d & X, v2d & A) ;
     void perform_PBC(v1d & X, u_int32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
-    void perform_MOVINGWALL() ; ///< Move the boundary wall if moving. 
+    void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.
     int init_mass() ; ///< Initialise particle mass
     int init_inertia() ; ///< Initialise particle moment of inertia
 
-    void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script 
-    void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time. 
+    void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script
+    void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time.
     void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ; ///< Parse input script commands
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ; ///< Not tested. \warning not really tested
     void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; ///< Not implemented
@@ -112,7 +112,7 @@ public :
 
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ; ///< On screen information display
     void quit_cleanly() ; ///< Close opened dump files in the event of an emergency quit (usually a SIGINT signal to the process)
-    void finalise(); ///< Close opened dump files 
+    void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
     int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags, v1d & Z) ; ///< Dump writing functions
 
@@ -275,7 +275,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
 
 // Lambda definitions
  auto discard_line = [&](){char line [5000] ; in.getline(line, 5000) ; } ;
- auto read_event = [&](){float time ; char line [5000] ; in >> time ; in.getline (line, 5000) ; events.insert(make_pair(time,line)) ; printf("[INFO] Registering an event: %s\n", events.begin()->second.c_str()) ;} ;
+ auto read_event = [&](){float time ; char line [5000] ; in >> time ; in.getline (line, 5000) ; events.insert(make_pair(time,line)) ; printf("[INFO] Registering an event: %g -> %s\n", time, line) ;} ;
  auto doauto = [&]() { char line [5000] ; in>>line ;
    if (!strcmp(line, "mass")) init_mass() ;
    else if (!strcmp(line, "rho"))
