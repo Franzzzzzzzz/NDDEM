@@ -423,7 +423,7 @@
 		function render() {
 
 			var deltaTime = clock.getDelta();
-            updateSizes( clock.elapsedTime );
+            updateSizes( clock.elapsedTime, deltaTime );
             moveStars( clock.elapsedTime );
 			updatePhysics( deltaTime );
 
@@ -464,10 +464,11 @@
 			scene.add( stars );
 	}
 
-        function updateSizes( t ) {
+        function updateSizes( t, dt ) {
             if ( earth !== undefined ) {
                 // earth.rotation.x = clock.elapsedTime/10.;
-                earth.rotateOnAxis(  new THREE.Vector3(0, 1, 0), 0.002 ); // axis, angle
+                // earth.rotateOnAxis(  new THREE.Vector3(0, 1, 0), 0.002 ); // axis, angle
+                earth.rotateOnAxis(  new THREE.Vector3(0, 1, 0), dt/10. ); // axis, angle
             };
             // cycle gravity direction
             const theta = Math.cos(t/2.)/2.;
