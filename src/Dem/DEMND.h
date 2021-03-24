@@ -4,7 +4,7 @@
 #include <vector>
 #include <ctime>
 #include <cstring>
-#include <omp.h>
+//#include <omp.h>
 
 #include "Typedefs.h"
 #include "Parameters.h"
@@ -43,13 +43,13 @@ Visualisation [shape=box,style=filled,color="0.9 0.6 0.6"] ;
 
 \section Prog Examples
 \subsection ExDEM DEM Examples
-<pre>./DEMND 5 2006 in</pre>: run the simulation with 5 dimensions, 2006 particles, based on the input file named in. Input file example are included in the source, and all commands are documented in the section Input script below.  
+<pre>./DEMND 5 2006 in</pre>: run the simulation with 5 dimensions, 2006 particles, based on the input file named in. Input file example are included in the source, and all commands are documented in the section Input script below.
 
 \subsection ExCG Coarse-Graining Examples
-<pre>./IONDDEM in </pre>: run the simulation with 5 dimensions, 2006 particles, based on the input file named in. Input file example are included in the source, and all commands are documented in the section Input script below.  
+<pre>./IONDDEM in </pre>: run the simulation with 5 dimensions, 2006 particles, based on the input file named in. Input file example are included in the source, and all commands are documented in the section Input script below.
 
 \subsection ExTexturing Texturing Examples
-<pre>./TexturingServer </pre>: Run the texturing server for calls from the visualisation side. Typical calling URL are available in the Texturing module. 
+<pre>./TexturingServer </pre>: Run the texturing server for calls from the visualisation side. Typical calling URL are available in the Texturing module.
 
 \section InputScript Input script commands
 

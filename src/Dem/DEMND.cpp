@@ -11,7 +11,7 @@
 vector <std::pair<ExportType,ExportData>> * toclean ;
 XMLWriter * xmlout ;
 
-/** \brief Function handling signal reception for clean closing on SIGINT for example. 
+/** \brief Function handling signal reception for clean closing on SIGINT for example.
  */
 void sig_handler (int p)
 {
@@ -23,7 +23,7 @@ void sig_handler (int p)
     std::exit(p) ;
 }
 
-/** \brief Main simulation run. All the simulation is handled by this function. 
+/** \brief Main simulation run. All the simulation is handled by this function.
  */
 template <int d>
 int templatedmain (char * argv[])
@@ -70,10 +70,10 @@ int templatedmain (char * argv[])
  displacement[0]=P.skinsqr*2 ;
  //Contacts C(P) ; //Initialize the Contact class object
  //ContactList CLp, CLw ;
- const char* env_p = std::getenv("OMP_NUM_THREADS") ;
- int numthread = 2 ;
- if (env_p!=nullptr) numthread = atoi (env_p) ;
- omp_set_num_threads(numthread) ;
+ //const char* env_p = std::getenv("OMP_NUM_THREADS") ;
+ int numthread = 1 ;
+ //if (env_p!=nullptr) numthread = atoi (env_p) ;
+ //omp_set_num_threads(numthread) ;
  Multiproc<d> MP(N, numthread, P) ;
 
  clock_t tnow, tprevious ; tprevious=clock() ;
@@ -100,7 +100,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    //----- Velocity Verlet step 1 : compute the new positions
    Benchmark::start_clock("Verlet 1st");
    maxdisp[0] = 0 ; maxdisp[1] = 0 ;
-   #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
+   //#pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
    for (int i=0 ; i<N ; i++)
    {
     double disp, totdisp=0 ;
@@ -147,7 +147,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
      else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
     }
     //Nghosts=Ghosts.size() ;
-  } // END PARALLEL SECTION
+   } // END PARALLEL SECTION
    P.perform_MOVINGWALL() ;
    Benchmark::stop_clock("Verlet 1st");
 
@@ -165,10 +165,10 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    {
      //printf("RECOMPUTE\n");
      // fflush(stdout) ;
-     #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
+     //#pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
      {
-       int ID = omp_get_thread_num();
-       double timebeg = omp_get_wtime();
+       int ID = 0 ; //omp_get_thread_num();
+       //double timebeg = omp_get_wtime();
        ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
        CLp.reset() ; CLw.reset();
@@ -219,7 +219,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
        }
        CLp.finalise() ;
        CLw.finalise() ;
-       MP.timing[ID] += omp_get_wtime()-timebeg;
+       //MP.timing[ID] += omp_get_wtime()-timebeg;
      } //END PARALLEL SECTION
    }
    else // Do not recompute the full contact list, but still compute the contact length and all.
@@ -261,10 +261,10 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    Tools<d>::setzero(Torque);
 
    //Particle - particle contacts
-   #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
+   //#pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
    {
-     int ID = omp_get_thread_num();
-     double timebeg = omp_get_wtime();
+     int ID = 0 ;// omp_get_thread_num();
+     //double timebeg = omp_get_wtime();
      ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
 
      for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
@@ -306,7 +306,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
       if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
      }
-     MP.timing[ID] += omp_get_wtime()-timebeg;
+     //MP.timing[ID] += omp_get_wtime()-timebeg;
    } //END PARALLEL PART
 
    // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
@@ -323,7 +323,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    Benchmark::stop_clock("Forces");
    //---------- Velocity Verlet step 3 : compute the new velocities
    Benchmark::start_clock("Verlet last");
-   #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
+   //#pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
    for (int i=0 ; i<N ; i++)
    {
     //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
@@ -364,14 +364,14 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    if (P.wallforcecompute) MP.delayedwall_clean() ;
 
    // Load balancing on the procs as needed
-   MP.num_time++ ;
+   /*MP.num_time++ ;
    if (MP.num_time>100)
    {
      MP.load_balance() ;
      // Cleaning the load balancing
      MP.num_time = 0 ;
      MP.timing = vector<double>(MP.P,0) ;
-   }
+   }*/
  }
 
 //ProfilerStop() ;
@@ -386,7 +386,7 @@ return 0 ;
 
 
 //===================================================
-/** \brief Calls the appropriate templatedmain() function. Templated function are used to allow compiler optimisation for speed. Only a handful of dimension are compiled on the base code to limit compilation time and memory. If you need dimensions that are not cmpiled by default, have a look at the code it's pretty straightforward to activate the needed dimension. If the compilation failed with low meomry, in particular on older system, head to the code and comment the dimensions which are unused. 
+/** \brief Calls the appropriate templatedmain() function. Templated function are used to allow compiler optimisation for speed. Only a handful of dimension are compiled on the base code to limit compilation time and memory. If you need dimensions that are not cmpiled by default, have a look at the code it's pretty straightforward to activate the needed dimension. If the compilation failed with low meomry, in particular on older system, head to the code and comment the dimensions which are unused.
  */
 int main (int argc, char *argv[])
 {
