@@ -13,6 +13,7 @@
 #include "Typedefs.h"
 #include "Parameters.h"
 
+
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/random.hpp>
 
@@ -55,9 +56,9 @@ public :
  */
 
 /**  \par Matrix storage
- *   <UL> 
+ *   <UL>
  *   <LI> Arbitrary square matrix are stored as linear array, in the order x11, x12, x13 ... x21, x22 ... xdd. They have d^2 components. </LI>
- *   <LI> Skew-symetric matrix only store their top right side, in the order x12, x13, x14 ... x23, x24 ... x(d-1)d. They have d(d-1)/2 components. These are handled using the specific function skewmatvecmult() and similar, and make use of the special variables #MSigns, #MIndexAS and #MASIndex </LI> 
+ *   <LI> Skew-symetric matrix only store their top right side, in the order x12, x13, x14 ... x23, x24 ... x(d-1)d. They have d(d-1)/2 components. These are handled using the specific function skewmatvecmult() and similar, and make use of the special variables #MSigns, #MIndexAS and #MASIndex </LI>
  *   <LI> Symetric matrix are not really needed anywhere, but would store only the top right side + diagonal as a linear array, in the order x11, x12 ... x22, x23, ... xdd. They have d(d+1)/2 components.  </LI>
  *   </UL>
  * */
@@ -67,10 +68,10 @@ class Tools
 public:
 /** @name General functions */
 ///@{
-static void initialise () ; ///< Initialise the member variables, in particular the variables to handle skew-symmetric flattened matrix, cf. the class detailed description. 
-static void clear() ; ///< Get the class ready for a different dimension. 
+static void initialise () ; ///< Initialise the member variables, in particular the variables to handle skew-symmetric flattened matrix, cf. the class detailed description.
+static void clear() ; ///< Get the class ready for a different dimension.
 static bool check_initialised (int dd) {return (dd==d) ; }
-static int sgn (u_int8_t a) {return a & (128) ? -1:1 ; } ///< Sign function
+static int sgn (uint8_t a) {return a & (128) ? -1:1 ; } ///< Sign function
 static int sgn (double a)   {return a<0 ? -1:1 ; } ///< Sign function
 static std::pair <double, double> two_max_element (cv1d & v) ; ///< Return the two largest elements of v
 ///@}
@@ -132,7 +133,7 @@ static void vSubScaled (v1d &res , double v, cv1d &a)          {for (uint i=0 ; 
  *  These vector or matrix operations are working in place, perform multiple operations at once, and are designed to use error correction across multiple calls.
  */
 ///@{
-static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) 
+static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr)
 {
   double Tmp, Previous ;
 
@@ -144,7 +145,7 @@ static void vAddFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr)
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
 } ///< Addition of 3 vectors in-place with error correction (Kahan summation algorithm)
-static void vSubFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr) 
+static void vSubFew (v1d & res, cv1d &a, cv1d &b, v1d & Corr)
 {
   double Tmp, Previous ;
 
@@ -168,7 +169,7 @@ static void vAddOne (v1d & res, cv1d &a, v1d & Corr)
   Corr[i] = (res[i]-Previous)-Tmp ;
   }
 } ///< Addition of 2 vectors in-place with error correction (Kahan summation algorithm)
-static void vSubOne (v1d & res, cv1d &a, v1d & Corr) 
+static void vSubOne (v1d & res, cv1d &a, v1d & Corr)
 {
   double Tmp, Previous ;
 
@@ -192,7 +193,7 @@ static v1d  skewexpand     (cv1d &A) ; ///< Return the skew symetrix matrix M st
 static void skewexpand     (v1d & r, cv1d &A) ; ///< Return the skew symetrix matrix M stored on d(d-1)/2 component as a full flattened matrix with d^2 components in place
 static v1d  matmult (cv1d &A, cv1d &B) ; ///< Multiply 2 matrix together
 static void matmult (v1d &r, cv1d &A, cv1d &B) ; ///< Multiply 2 matrix together in place
-static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ; ///< Multiply a matrix with a vector, in place. 
+static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ; ///< Multiply a matrix with a vector, in place.
 static v1d  wedgeproduct (cv1d &a, cv1d &b) ; ///< Wedge product of vectors
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; ///< Wedge product in-place
 static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } ///< Transposition
@@ -202,9 +203,9 @@ static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i
 /** @name Saving and writing functions */
 ///@{
 static int savetxt(char path[], const v2d & table, char const header[]) ;
-static void savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ; ///< Save the location and a few more informations in a CSV file.
+static void savecsv (char path[], cv2d & X, cv1d &r, const vector <uint32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ; ///< Save the location and a few more informations in a CSV file.
 static void savecsv (char path[], cv2d & A) ; ///< Save the orientation in a CSV file
-static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ; ///< Save as a vtk file. Dimensions higher than 3 are stored as additional scalars. Additional informations can be passed as a vector of #TensorInfos. 
+static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ; ///< Save as a vtk file. Dimensions higher than 3 are stored as additional scalars. Additional informations can be passed as a vector of #TensorInfos.
 
 static int write1D (char path[], v1d table) ;
 static int writeinline(initializer_list< v1d >) ;
@@ -219,8 +220,8 @@ static int getdim (void) {return d;} ///< Return the dimension. \deprecated{Prob
 
 private:
 static vector < vector <int> > MSigns ; ///< For skew symetric matrix. -1 below the diagonal, 0 on the diagonal, +1 above the diagnal
-static vector < vector <int> > MIndexAS ; ///< For skew symmetric matrix, make the correspondance between linear index of a full matrix with the linear index of the skew-symetric storage. 
-static vector < pair <int,int> > MASIndex ; ///< For skew symmetric matrix, make the correspondance between linear index and (row,column) index. 
+static vector < vector <int> > MIndexAS ; ///< For skew symmetric matrix, make the correspondance between linear index of a full matrix with the linear index of the skew-symetric storage.
+static vector < pair <int,int> > MASIndex ; ///< For skew symmetric matrix, make the correspondance between linear index and (row,column) index.
 static vector <FILE *> outs ; ///< Store the output file descriptors.
 } ;
 
@@ -308,7 +309,7 @@ return 0 ;
 
 //=====================================
 template <int d>
-void Tools<d>::savecsv (char path[], cv2d & X, cv1d &r, const vector <u_int32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z )
+void Tools<d>::savecsv (char path[], cv2d & X, cv1d &r, const vector <uint32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z )
 {
  FILE *out ; int dim ;
  out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
@@ -705,7 +706,7 @@ double Tools<d>::hyperspherical_xtophi (cv1d &x, v1d &phi)
 }
 
 template <int d>
-void Tools<d>::hyperspherical_phitox (double r, cv1d &phi, v1d &x) 
+void Tools<d>::hyperspherical_phitox (double r, cv1d &phi, v1d &x)
 {
     x = v1d (d,r) ;
     for (int i=0 ; i<d-1 ; i++)

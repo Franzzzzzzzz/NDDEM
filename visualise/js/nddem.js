@@ -683,6 +683,7 @@ function update_spheres(spheres) {
           );
         } else {
           object.position.set(spheres[i][0], spheres[i][1], spheres[i][2]);
+          // console.log(object.position)
         }
         if (params.quasicrystal) {
           var scale = 5;
@@ -744,6 +745,7 @@ function update_spheres(spheres) {
           // object.material.color = lut.getColor(spheres[i][params.N]);
         }
       }
+      // else { object.mateial.color = '#ff00ff'}
     }
     if (!params.no_tori) {
       if (params.N == 4 && !params.fname.includes("Spinner")) {

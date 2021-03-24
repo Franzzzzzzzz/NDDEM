@@ -98,7 +98,7 @@ public :
 // Useful functions
     int set_boundaries() ;  ///< Set default boundaries
     //int init_particles(v2d & X, v2d & A) ;
-    void perform_PBC(v1d & X, u_int32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
+    void perform_PBC(v1d & X, uint32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
     void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.
     int init_mass() ; ///< Initialise particle mass
     int init_inertia() ; ///< Initialise particle moment of inertia
@@ -114,7 +114,7 @@ public :
     void quit_cleanly() ; ///< Close opened dump files in the event of an emergency quit (usually a SIGINT signal to the process)
     void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
-    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags, v1d & Z) ; ///< Dump writing functions
+    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z) ; ///< Dump writing functions
 
 
 // For Xml Writing
@@ -148,7 +148,7 @@ int Parameters<d>::set_boundaries()
 }
 //----------------------------------------------------
 template <int d>
-void Parameters<d>::perform_PBC (v1d & X, u_int32_t & PBCFlag)
+void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
 {
  for (int j=0 ; j<d ; j++)
  {
@@ -837,7 +837,7 @@ void Parameters<d>::finalise()
 
 //========================================
 template <int d>
-int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<u_int32_t> &PBCFlags, v1d & Z)
+int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z)
 {
   static bool xmlstarted=false ;
 

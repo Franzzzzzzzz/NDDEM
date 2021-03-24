@@ -211,6 +211,10 @@ function make_walls(scene, params, world) {
   // }
   // }
 
+  if ( params.data_type === 'mercury-with-vtk-walls' ) {
+      // scene.add(world.vtk_walls);
+  }
+
   if (world[0].wall) {
     var floor = new THREE.Mesh(geometry, material);
     if (params.display_type === "VR") {

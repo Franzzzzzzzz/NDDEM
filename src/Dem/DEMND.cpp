@@ -5,7 +5,7 @@
 #include "DEMND.h"
 #include <signal.h>
 //#include <gperftools/profiler.h>
-#include "Benchmark.h"
+// #include "Benchmark.h"
 //#define OMP_NUM_THREADS 2
 
 vector <std::pair<ExportType,ExportData>> * toclean ;
@@ -15,7 +15,7 @@ XMLWriter * xmlout ;
  */
 void sig_handler (int p)
 {
-    Benchmark::write_all() ;
+    // Benchmark::write_all() ;
     for (auto v : *toclean)
         if ((v.first == ExportType::XML) || (v.first == ExportType::XMLbase64))
             xmlout->emergencyclose() ;
@@ -51,11 +51,11 @@ int templatedmain (char * argv[])
  std::vector < std::vector <double> > TorqueCorr (N, std::vector <double> (d*(d-1)/2, 0)) ;
  std::vector < double > displacement (N, 0) ; double maxdisp[2] ;
 
- std::vector <u_int32_t> PBCFlags (N, 0) ;
+ std::vector <uint32_t> PBCFlags (N, 0) ;
  std::vector < std::vector <double> > WallForce (2*d, std::vector <double> (d,0)) ;
 
- vector <u_int32_t> Ghost (N, 0) ;
- vector <u_int32_t> Ghost_dir (N, 0) ;
+ vector <uint32_t> Ghost (N, 0) ;
+ vector <uint32_t> Ghost_dir (N, 0) ;
 
  v1d Atmp (d*d, 0) ;
 
@@ -98,7 +98,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    }
 
    //----- Velocity Verlet step 1 : compute the new positions
-   Benchmark::start_clock("Verlet 1st");
+   // Benchmark::start_clock("Verlet 1st");
    maxdisp[0] = 0 ; maxdisp[1] = 0 ;
    //#pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
    for (int i=0 ; i<N ; i++)
@@ -138,7 +138,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 
     // Find ghosts
     Ghost[i]=0 ; Ghost_dir[i]=0 ;
-    u_int32_t mask=1 ;
+    uint32_t mask=1 ;
 
     for (int j=0 ; j<d ; j++, mask<<=1)
     {
@@ -149,12 +149,12 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
     //Nghosts=Ghosts.size() ;
    } // END PARALLEL SECTION
    P.perform_MOVINGWALL() ;
-   Benchmark::stop_clock("Verlet 1st");
+   // Benchmark::stop_clock("Verlet 1st");
 
    //---------- Velocity Verlet step 2 : compute the forces and torques
    // Contact detection (sequential, can be paralelised easily with openmp)
 
-   Benchmark::start_clock("Contacts");
+   // Benchmark::start_clock("Contacts");
 
    bool recompute = true ;
    // Should we recompute the neighbor list?
@@ -251,11 +251,11 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
      }*/
      printf("NOT IMPLEMENTED\n") ;
    }
-   Benchmark::stop_clock("Contacts");
+   // Benchmark::stop_clock("Contacts");
 
    //-------------------------------------------------------------------------------
    // Force and torque computation
-   Benchmark::start_clock("Forces");
+   // Benchmark::start_clock("Forces");
    Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
    Tools<d>::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
    Tools<d>::setzero(Torque);
@@ -320,9 +320,9 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
    }
    MP.delayed_clean() ;
 
-   Benchmark::stop_clock("Forces");
+   // Benchmark::stop_clock("Forces");
    //---------- Velocity Verlet step 3 : compute the new velocities
-   Benchmark::start_clock("Verlet last");
+   // Benchmark::start_clock("Verlet last");
    //#pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
    for (int i=0 ; i<N ; i++)
    {
@@ -335,7 +335,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
     TorqueOld[i]=Torque[i] ;
    } // END OF PARALLEL SECTION
 
-   Benchmark::stop_clock("Verlet last");
+   // Benchmark::stop_clock("Verlet last");
 
    // Check events
    P.check_events(t, X,V,Omega) ;
@@ -377,7 +377,7 @@ printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"Fals
 //ProfilerStop() ;
 //Tools<d>::write1D ("Res.txt", TmpRes) ;
 //Tools<d>::writeinline_close() ;
-Benchmark::write_all();
+// Benchmark::write_all();
 P.finalise() ;
 printf("This is the end ...\n") ;
 fclose(logfile) ;

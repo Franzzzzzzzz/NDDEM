@@ -39,7 +39,7 @@ public:
     {
         vector <double> loc (d, 0) ;
         loc=Xj ;
-        u_int32_t gh=Contact.ghost, ghd=Contact.ghostdir ;
+        uint32_t gh=Contact.ghost, ghd=Contact.ghostdir ;
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
         {
           if (gh&1)
