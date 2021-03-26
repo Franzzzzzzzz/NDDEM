@@ -12,6 +12,340 @@
 #include "ContactList.h"
 #include "Multiproc.h"
 
+extern vector <std::pair<ExportType,ExportData>> * toclean ;
+extern XMLWriter * xmlout ;
+
+template <int d>
+class Simulation {
+public:
+    Parameters<d> P ;
+    int N ; 
+    std::vector < std::vector <double> > X ;
+    std::vector < std::vector <double> > V ;
+    std::vector < std::vector <double> > A ;
+    std::vector < std::vector <double> > Omega ;
+    std::vector < std::vector <double> > F ;
+    std::vector < std::vector <double> > FOld ;
+    std::vector < std::vector <double> > Torque ;
+    std::vector < std::vector <double> > TorqueOld ;
+    std::vector < double > Vmag ;
+    std::vector < double > OmegaMag ;
+    std::vector < double > Z ;
+    std::vector < std::vector <double> > Fcorr ;
+    std::vector < std::vector <double> > TorqueCorr  ;
+    std::vector < double > displacement ; double maxdisp[2] ;
+
+    std::vector <uint32_t> PBCFlags ;
+    std::vector < std::vector <double> > WallForce ;
+
+    vector <uint32_t> Ghost ;
+    vector <uint32_t> Ghost_dir ;
+    v1d Atmp ;
+    
+    int numthread=1 ; 
+    Multiproc<d> MP ; 
+ 
+    double t ; int ti ;
+    double dt ; 
+    clock_t tnow, tprevious ; 
+    
+    //==========================================================
+    Simulation(int NN) {
+        P = Parameters<d>(NN) ;
+        Tools<d>::initialise() ;
+        if (!Tools<d>::check_initialised(d)) printf("ERR: Something terribly wrong happened\n") ;
+        assert(d<(static_cast<int>(sizeof(int))*8-1)) ; //TODO
+        // Array initialisations
+        N=P.N ;
+        X.resize(N, std::vector <double> (d, 0)) ;
+        V.resize(N, std::vector <double> (d, 0)) ;
+        A.resize(N, std::vector <double> (d*d, 0)) ; for (int i=0 ; i<N ; i++) A[i]=Tools<d>::Eye ;
+        Omega.resize(N, std::vector <double> (d*(d-1)/2, 0)) ; //Rotational velocity matrix (antisymetrical)
+        F.resize(N, std::vector <double> (d, 0)) ;
+        FOld.resize(N, std::vector <double> (d, 0)) ;
+        Torque.resize(N, std::vector <double> (d*(d-1)/2, 0)) ;
+        TorqueOld.resize(N, std::vector <double> (d*(d-1)/2, 0)) ;
+
+        Vmag.resize (N,0) ;
+        OmegaMag.resize (N,0) ;
+        Z.resize (N,0) ;
+        Fcorr.resize (N, std::vector <double> (d, 0)) ;
+        TorqueCorr.resize (N, std::vector <double> (d*(d-1)/2, 0)) ;
+        displacement.resize (N, 0) ;
+
+        PBCFlags.resize (N, 0) ;
+        WallForce.resize (2*d, std::vector <double> (d,0)) ;
+
+        Ghost.resize (N, 0) ;
+        Ghost_dir.resize (N, 0) ;
+
+        Atmp.resize (d*d, 0) ;
+
+        // Initial state setup
+        P.set_boundaries() ;
+        //P.init_particles(X, A) ;
+        //if (strcmp(argv[3], "default"))
+        //    P.load_datafile (argv[3], X, V, Omega) ;
+        toclean = &(P.dumps) ;
+        xmlout = P.xmlout ;
+
+        displacement[0]=P.skinsqr*2 ;
+        MP.initialise(N, numthread, P) ;
+
+        dt=P.dt ;
+        t=0 ; ti=0 ; 
+        tprevious=clock() ;
+        printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
+    } ; 
+    //-------------------------------------------------------------------
+    void interpret_command (string in)
+    {
+        P.interpret_command(in, X,V,Omega) ; 
+    }
+    
+    //--------------------------------------------------------------------
+    void step_forward (int nt)
+    {
+      for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
+      {
+        //bool isdumptime = (ti % P.tdump==0) ;
+        //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
+        if (ti%P.tinfo==0)
+        {
+            tnow = clock();
+            printf("\r%10g | %5.2g%% | %d iterations in %10gs | %5d | finish in %10gs",t, t/P.T*100, P.tinfo,
+                    double(tnow - tprevious) / CLOCKS_PER_SEC, ti, ((P.T-t)/(P.tinfo*dt))*(double(tnow - tprevious) / CLOCKS_PER_SEC)) ;
+            //fprintf(logfile, "%d %10g %lu %lu\n", ti, double(tnow - tprevious) / CLOCKS_PER_SEC, MP.CLp[0].v.size(), MP.CLw[0].v.size()) ;
+            fflush(stdout) ;
+            tprevious=tnow ;
+        }
+
+        //----- Velocity Verlet step 1 : compute the new positions
+        maxdisp[0] = 0 ; maxdisp[1] = 0 ;
+        //#pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
+        for (int i=0 ; i<N ; i++)
+        {
+            double disp, totdisp=0 ;
+            for (int dd=0 ; dd<d ; dd++)
+            {
+                disp = V[i][dd]*dt + FOld[i][dd] * (dt * dt / P.m[i] /2.) ;
+                X[i][dd] += disp  ;
+                totdisp += disp*disp ;
+            }
+            displacement[i] += sqrt(totdisp) ;
+            if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; } // ERROR RACE CONDITION ON MAXDISP
+
+            // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
+            if (P.orientationtracking)
+            {
+            v1d tmpO (d*d,0), tmpterm1 (d*d,0) ;
+            Tools<d>::skewexpand(tmpO, Omega[i]) ;
+            Tools<d>::matmult(tmpterm1, tmpO, A[i]) ;
+            for (int dd=0 ; dd<d*d ; dd++)
+                A[i][dd] -= tmpterm1[dd] * dt ;
+            Tools<d>::orthonormalise(A[i]) ;
+            }
+
+            // Boundary conditions ...
+            P.perform_PBC(X[i], PBCFlags[i]) ;
+
+            // Find ghosts
+            Ghost[i]=0 ; Ghost_dir[i]=0 ;
+            uint32_t mask=1 ;
+
+            for (int j=0 ; j<d ; j++, mask<<=1)
+            {
+            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC)) continue ;
+            if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
+            else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+            }
+            //Nghosts=Ghosts.size() ;
+        } // END PARALLEL SECTION
+        P.perform_MOVINGWALL() ;
+        
+        int ID = 0 ; //omp_get_thread_num();
+        //double timebeg = omp_get_wtime();
+        ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
+        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
+        CLp.reset() ; CLw.reset();
+
+        for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+        {
+            tmpcp.setinfo(CLp.default_action());
+            tmpcp.i=i ;
+            for (int j=i+1 ; j<N ; j++) // Regular particles
+            {
+                if (Ghost[j])
+                {
+                    tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+                    CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
+                }
+                else
+                {
+                    sum=0 ;
+                    for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+                    if (sum<P.skinsqr)
+                    {
+                        tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                        CLp.insert(tmpcp) ;
+                    }
+                }
+            }
+
+            tmpcp.setinfo(CLw.default_action());
+            tmpcp.i=i ;
+            for (int j=0 ; j<d ; j++) // Wall contacts
+            {
+                    if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
+
+                    tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+                    if (tmpcp.contactlength<P.skin)
+                    {
+                        tmpcp.j=(2*j+0);
+                        CLw.insert(tmpcp) ;
+                    }
+
+                    tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+                    if (tmpcp.contactlength<P.skin)
+                    {
+                        tmpcp.j=(2*j+1);
+                        CLw.insert(tmpcp) ;
+                    }
+            }
+        }
+        CLp.finalise() ;
+        CLw.finalise() ;
+
+        //-------------------------------------------------------------------------------
+        // Force and torque computation
+        // Benchmark::start_clock("Forces");
+        Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
+        Tools<d>::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
+        Tools<d>::setzero(Torque);
+
+        //Particle - particle contacts
+        //#pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
+        {
+            int ID = 0 ;// omp_get_thread_num();
+            //double timebeg = omp_get_wtime();
+            ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
+
+            for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
+            {
+            if (it->ghost==0)
+            {
+                C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+            }
+            else
+            {
+                C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+            }
+
+            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+            Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+
+            if (MP.ismine(ID,it->j))
+            {
+                Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+                Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+            }
+            else
+                MP.delaying(ID, it->j, C.Act) ;
+
+            //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+            //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+            }
+
+            for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
+            {
+            C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
+            //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
+            //Torque[it->i] += Act.Torquei ;
+
+            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+            Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+
+            if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
+            }
+            //MP.timing[ID] += omp_get_wtime()-timebeg;
+        } //END PARALLEL PART
+
+        // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
+        for (int i=0 ; i<MP.P ; i++)
+        {
+            for (uint j=0 ; j<MP.delayed_size[i] ; j++)
+            {
+            Tools<d>::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
+            Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
+            }
+        }
+        MP.delayed_clean() ;
+
+        // Benchmark::stop_clock("Forces");
+        //---------- Velocity Verlet step 3 : compute the new velocities
+        // Benchmark::start_clock("Verlet last");
+        //#pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
+        for (int i=0 ; i<N ; i++)
+        {
+            //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
+            if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; Tools<d>::setzero(V[i]) ; Tools<d>::setzero(Omega[i]) ; }
+
+            Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
+            Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
+            FOld[i]=F[i] ;
+            TorqueOld[i]=Torque[i] ;
+        } // END OF PARALLEL SECTION
+
+        // Benchmark::stop_clock("Verlet last");
+
+        // Check events
+        P.check_events(t, X,V,Omega) ;
+
+        // Output something at some point I guess
+        if (ti % P.tdump==0)
+        {
+            Tools<d>::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ;
+            P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
+            std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
+
+            if (P.wallforcecompute)
+            {
+            char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+            Tools<d>::setzero(WallForce) ;
+            if (P.wallforcecompute)
+            {
+            for (int i=0 ; i<MP.P ; i++)
+                for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+                    Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
+            }
+            Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
+            }
+        }
+
+        if (P.wallforcecompute) MP.delayedwall_clean() ;
+    }
+  }
+  
+  //-------------------------
+  void finalise ()
+  {
+    P.finalise() ;
+    printf("This is the end ...\n") ;
+    //fclose(logfile) ;
+  }
+    
+    
+} ;
+
+
+
+
+
+
+
+
 
 /** \mainpage
 \section Gen General description

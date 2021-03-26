@@ -8,6 +8,7 @@ src/build/
 package-lock.json
 Samples
 Textures
+bin
 *.stackdump
 __pycache__
 Scripts/MuI_20200210.m*

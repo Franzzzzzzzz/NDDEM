@@ -33,6 +33,7 @@ inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a
 template <int d>
 class Parameters {
 public :
+    Parameters () {Parameters(0) ; }
     Parameters (int NN):
         N(5),           //number of particles
         tdump(1),       //dump data every these timesteps
@@ -106,6 +107,8 @@ public :
     void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script
     void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time.
     void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ; ///< Parse input script commands
+    void interpret_command (string & in, v2d & X, v2d & V, v2d & Omega) ; ///< Parse input script commands
+    
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ; ///< Not tested. \warning not really tested
     void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; ///< Not implemented
     void init_locations (char *line, v2d & X) ; ///< Set particle locations
@@ -256,6 +259,12 @@ std::istream& operator>>(std::istream& in, boost::variant<int&,double&,bool&> v)
   return(in) ;}
 //------------------------------------------------------
 template <int d>
+void Parameters<d>::interpret_command (string &in, v2d & X, v2d & V, v2d & Omega)
+{
+    stringstream B(in) ;
+    return (interpret_command<d>(B, X, V, Omega)) ;  
+}
+template <int d>
 void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
 {
   map <string, boost::variant<int&,double&,bool&>> SetValueMap = {
@@ -394,220 +403,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
 
 
 //================================================================================================================================================
-/*
- else if (!strcmp(line, "auto"))
- {
-   in>>line ;
-   if (!strcmp(line, "mass")) init_mass() ;
-   else if (!strcmp(line, "rho"))
-   {
-     rho= m[0]/Tools<d>::Volume(r[0]) ;
-     printf("[Input] Using first particle mass to set rho: %g [M].[L]^-%d\n", rho, d) ;
-   }
-   else if (!strcmp(line, "inertia")) init_inertia() ;
-   else if (!strcmp(line, "location"))
-   {
-       in >> line ;
-       init_locations(line, X) ;
-       printf("[Input] Set all particle locations\n") ;
-   }
-   else printf("[WARN] Unknown auto command in input script\n") ;
-   printf("[Input] Doing an auto \n") ;
- }
- else
-     printf("[Input] Unknown command in input file |%s|\n", line) ;
 
-*/
-
-
-/*
-template <int d>
-void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
-{
-char line[5000] ; int id ;
-std::vector <double> x (d,0) ; std::vector <double> omeg (d*(d-1)/2,0) ;
-
-in>>line;
-if (line[0]=='#') {in.getline(line, 5000) ; return ; } // The line is a comments
-if (line[0]=='C' && line[1]=='G') {in.getline(line, 5000) ; return ; } //This is a coarse graining command, just keep going...
-
-if (!strcmp(line,"event"))
-{
-  float time ;
-  in >> time ;
-  in.getline (line, 5000) ;
-  //command.str(line) ;
-  events.insert(make_pair(time,line)) ;
-  printf("[INFO] Registering an event: %s\n", events.begin()->second.c_str()) ;
-  return ;
-}
-
-if (!strcmp(line, "boundary"))
-{
-  in>>id ;
-  in>>line ;
-  if (!strcmp(line, "PBC")) Boundaries[id][3]=static_cast<int>(WallType::PBC) ;
-  else if (!strcmp(line, "WALL")) Boundaries[id][3]=static_cast<int>(WallType::WALL) ;
-  else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
-  else printf("[Input] Unknown boundary condition, unchanged.\n") ;
-  in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
-  Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
-  if (Boundaries[id][3]==static_cast<int>(WallType::MOVINGWALL))
-  {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ; }
- printf("[INFO] Changing BC.\n") ;
-}
-else if (!strcmp(line, "location"))
-{
-  in>>id ;
-  for (int i=0 ; i<d ; i++) {in >> x[i] ; printf("%g ", x[i]) ; }
-  X[id]=x ;
-  printf("[INFO] Changing particle location.\n") ;
-}
-else if (!strcmp(line, "dimensions"))
-{
-  int nn; int dd ; in>>dd ; in>>nn ;
-  if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }
-}
-else if (!strcmp(line, "velocity"))
-{
-  in>>id ;
-  for (int i=0 ; i<d ; i++) in >> x[i] ;
-  V[id]=x ;
-  printf("[INFO] Changing particle velocity.\n") ;
-}
-else if (!strcmp(line, "omega"))
-{
-  in>>id ;
-  for (int i=0 ; i<d*(d-1)/2 ; i++) in >> omeg[i] ;
-  Omega[id]=omeg ;
-  printf("[INFO] Changing particle angular velocity.\n") ;
-}
-else if (!strcmp(line, "freeze"))
-{
-  in>>id ;
-  Frozen[id]=true ;
-  printf("[INFO] Freezing particle.\n") ;
-}
-else if (!strcmp(line, "radius"))
-{
-  in>>id ; double radius ; in>>radius ;
-  if (id==-1) for (int i=0 ; i<N ; i++) r[i]=radius ;
-  else r[id]=radius ;
-  printf("[INFO] Set radius of particle.\n") ;
-}
-else if (!strcmp(line, "mass"))
-{
-  in>>id ; double mass ; in>>mass ;
-  if (id==-1) for (int i=0 ; i<N ; i++) m[i]=mass ;
-  else m[id]=mass ;
-  printf("[INFO] Set mass of particle.\n") ;
-}
-else if (!strcmp(line, "gravity"))
-{
-  for (int i=0 ; i<d ; i++) in >> x[i] ;
-  g=x ;
-  printf("[INFO] Changing gravity.\n") ;
-}
-else if (!strcmp(line, "gravityangle"))
-{
-  double intensity, angle ;
-  in >> intensity >> angle ;
-  Tools<d>::setzero(x) ;
-  x[0] = -intensity * cos(angle / 180. * M_PI) ;
-  x[1] = intensity * sin(angle / 180. * M_PI) ;
-  g=x ;
-  //for (auto v: g) printf("%g ", v) ;
-  printf("[INFO] Changing gravity angle in degree between x0 and x1.\n") ;
-}
-else if (!strcmp(line, "set"))
-{
- in>>line ;
- if (!strcmp(line, "Kn")) in>>Kn ;
- else if (!strcmp(line, "Kt")) in>>Kt ;
- else if (!strcmp(line, "GammaN")) in>>Gamman ;
- else if (!strcmp(line, "GammaT")) in>>Gammat ;
- else if (!strcmp(line, "rho")) in>>rho ;
- else if (!strcmp(line, "Mu")) in>>Mu ;
- else if (!strcmp(line, "T")) in>>T ;
- else if (!strcmp(line, "tdump")) in>>tdump ;
- else if (!strcmp(line, "seed")) in>>seed ;
- else if (!strcmp(line, "orientationtracking")) in >> orientationtracking ;
- else if (!strcmp(line, "skin")) {in >> skin ; if (skin<r[0]) {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; } skinsqr=skin*skin ; }
- else if (!strcmp(line, "dumps"))
- {
-   string word ;
-   in>>word ;
-   ExportType dumpkind=ExportType::NONE ;
-   if (word=="CSV") dumpkind = ExportType::CSV ;
-   else if (word=="VTK") dumpkind = ExportType::VTK ;
-   else if (word=="NETCDFF") dumpkind = ExportType::NETCDFF ;
-   else if (word=="XML") dumpkind = ExportType::XML ;
-   else if (word=="XMLbase64") dumpkind = ExportType::XMLbase64 ;
-   else if (word=="CSVA") dumpkind = ExportType::CSVA ;
-   else if (word=="WALLFORCE") {wallforcecompute = true ; goto LABEL_leave ;} //Jumps at the end of the section
-   else {printf("Unknown dump type\n") ; }
-
-   { // New section so g++ doesn't complains about the goto ...
-   in>>word ;
-   if (word != "with") printf("ERR: expecting keyword 'with'\n") ;
-   int nbparam ;
-   ExportData dumplist = ExportData::NONE ;
-   in>>nbparam ;
-   for (int i=0 ; i<nbparam ; i++)
-   {
-     in>>word ;
-     if (word=="Position") dumplist |= ExportData::POSITION ;
-     else if (word =="Velocity") dumplist |= ExportData::VELOCITY ;
-     else if (word =="Omega") dumplist |= ExportData::OMEGA ;
-     else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
-     else if (word =="Orientation")
-     {
-       orientationtracking=true ;
-       dumplist |= ExportData::ORIENTATION ;
-     }
-     else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
-     else printf("Unknown asked data %s\n", word.c_str()) ;
-   }
-
-   dumps.push_back(make_pair(dumpkind,dumplist)) ;
-   }
-   LABEL_leave: ; // Goto label (I know, not beautiful, but makes sense here really)
- }
-
- else if (!strcmp(line, "tinfo")) in>>tinfo ;
- else if (!strcmp(line, "dt")) in>>dt ;
- else printf("[Input] Unknown parameter to set\n") ;
-
- printf("[INFO] Setting a parameter.\n") ;
-}
-else if (!strcmp(line, "auto"))
-{
-  in>>line ;
-  if (!strcmp(line, "mass")) init_mass() ;
-  else if (!strcmp(line, "rho"))
-  {
-    rho= m[0]/Tools<d>::Volume(r[0]) ;
-    printf("[Input] Using first particle mass to set rho: %g [M].[L]^-%d\n", rho, d) ;
-  }
-  else if (!strcmp(line, "inertia")) init_inertia() ;
-  else if (!strcmp(line, "location"))
-  {
-      in >> line ;
-      init_locations(line, X) ;
-      printf("[Input] Set all particle locations\n") ;
-  }
-  else printf("[WARN] Unknown auto command in input script\n") ;
-  printf("[Input] Doing an auto \n") ;
-}
-else if (!strcmp(line, "directory")) ///< Some info
-{
-  in>>Directory ;
-  if (! experimental::filesystem::exists(line)) experimental::filesystem::create_directory(Directory);
-}
-else
-    printf("[Input] Unknown command in input file |%s|\n", line) ;
-}
-*/
 //=====================================
 template <int d>
 void Parameters<d>::remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld)
