@@ -5,21 +5,25 @@
 #include <ctime>
 #include <cstring>
 //#include <omp.h>
+#include <emscripten.h>
 
 #include "Typedefs.h"
 #include "Parameters.h"
 #include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"
+#include <emscripten/bind.h>
 
 extern vector <std::pair<ExportType,ExportData>> * toclean ;
 extern XMLWriter * xmlout ;
+
+using namespace emscripten;
 
 template <int d>
 class Simulation {
 public:
     Parameters<d> P ;
-    int N ; 
+    int N ;
     std::vector < std::vector <double> > X ;
     std::vector < std::vector <double> > V ;
     std::vector < std::vector <double> > A ;
@@ -41,14 +45,14 @@ public:
     vector <uint32_t> Ghost ;
     vector <uint32_t> Ghost_dir ;
     v1d Atmp ;
-    
-    int numthread=1 ; 
-    Multiproc<d> MP ; 
- 
+
+    int numthread=1 ;
+    Multiproc<d> MP ;
+
     double t ; int ti ;
-    double dt ; 
-    clock_t tnow, tprevious ; 
-    
+    double dt ;
+    clock_t tnow, tprevious ;
+
     //==========================================================
     Simulation(int NN) {
         P = Parameters<d>(NN) ;
@@ -93,21 +97,27 @@ public:
         MP.initialise(N, numthread, P) ;
 
         dt=P.dt ;
-        t=0 ; ti=0 ; 
+        t=0 ; ti=0 ;
         tprevious=clock() ;
         printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
-    } ; 
+    }
+    //-------------------------------------------------------------------
+    const std::vector<std::vector<double>> getX() const { return X; }
+    void setX(std::vector < std::vector <double> > X_) { X = X_; }
+    // void setX() {}
     //-------------------------------------------------------------------
     void interpret_command (string in)
     {
-        P.interpret_command(in, X,V,Omega) ; 
+        P.interpret_command(in, X,V,Omega) ;
     }
-    
+
     //--------------------------------------------------------------------
     void step_forward (int nt)
     {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
+        // printf("UP TO TIME: %f\n", t);
+        // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
         //bool isdumptime = (ti % P.tdump==0) ;
         //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
         if (ti%P.tinfo==0)
@@ -162,7 +172,7 @@ public:
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
-        
+
         int ID = 0 ; //omp_get_thread_num();
         //double timebeg = omp_get_wtime();
         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
@@ -327,7 +337,7 @@ public:
         if (P.wallforcecompute) MP.delayedwall_clean() ;
     }
   }
-  
+
   //-------------------------
   void finalise ()
   {
@@ -335,10 +345,24 @@ public:
     printf("This is the end ...\n") ;
     //fclose(logfile) ;
   }
-    
-    
+
+
 } ;
 
+EMSCRIPTEN_BINDINGS(my_class_example) {
+    class_<Simulation<3>>("Simulation")
+        .constructor<int>()
+        .function("interpret_command", &Simulation<3>::interpret_command)
+        .function("step_forward", &Simulation<3>::step_forward)
+        .function("finalise", &Simulation<3>::finalise)
+        // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
+        // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
+        .function("getX", &Simulation<3>::getX)
+        ;
+
+    // register_vector<double>("vector<double>");
+    // register_
+}
 
 
 

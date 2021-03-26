@@ -28,7 +28,8 @@ void sig_handler (int p)
 template <int d>
 int templatedmain (char * argv[])
 {
-    Simulation<3> S(1000) ;
+    // Simulation<3> S(1000) ;
+    printf("Ran the main function!\n") ;
 return 0 ;
 }
 
@@ -72,7 +73,7 @@ int main (int argc, char *argv[])
 //      case 25: templatedmain<25> (argv) ; break ;
      default : printf("DEMND was not compiled with support for dimension %d. Please recompile modifying the main function to support that dimension.\n", dd); std::exit(1) ;
  }
-
+printf("b") ;
 return 0 ;
 }
 

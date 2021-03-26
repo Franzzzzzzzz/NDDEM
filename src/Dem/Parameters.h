@@ -108,7 +108,7 @@ public :
     void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time.
     void interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega) ; ///< Parse input script commands
     void interpret_command (string & in, v2d & X, v2d & V, v2d & Omega) ; ///< Parse input script commands
-    
+
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ; ///< Not tested. \warning not really tested
     void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; ///< Not implemented
     void init_locations (char *line, v2d & X) ; ///< Set particle locations
@@ -262,7 +262,7 @@ template <int d>
 void Parameters<d>::interpret_command (string &in, v2d & X, v2d & V, v2d & Omega)
 {
     stringstream B(in) ;
-    return (interpret_command<d>(B, X, V, Omega)) ;  
+    return (interpret_command(B, X, V, Omega)) ;  
 }
 template <int d>
 void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
