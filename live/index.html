@@ -49,7 +49,7 @@
             var params = {
                 dimensions: 3,
                 L: 4, //system size
-                N: 500,
+                N: 580,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
@@ -194,7 +194,7 @@
                     .name( 'Axial strain').listen()
                     .onChange( function () { update_walls(); } );
                 gui.add ( params, 'gravity').name('Gravity').listen()
-                    .onChange( function() { S.interpret_command("gravity -1 0 0"); });
+                    .onChange( function() { S.interpret_command("gravity 0 0 -1000"); });
                 gui.add ( params, 'paused').name('Paused').listen();
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
