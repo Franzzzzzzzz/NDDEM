@@ -177,7 +177,7 @@
 				gui.width = 300;
 
 				gui.add( params, 'packing_fraction', 0, 1, 0.01 )
-					.name( 'Initial density' );//.listen()
+					.name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
                 gui.add( params, 'volumetric_strain', 0,0.1, 0.001)
                     .name( 'Volumetric strain').listen()
@@ -196,6 +196,8 @@
 			}
 
             function update_walls() {
+                params.packing_fraction = (params.N*4./3.*Math.PI*Math.pow(radius,3))/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8.;
+
                 params.L_cur =  params.L*(1-params.volumetric_strain);
                 params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
                 params.front =  params.L_cur;
