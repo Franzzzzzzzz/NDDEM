@@ -113,6 +113,7 @@ public:
         P.Boundaries[a][2] = loc[1] - loc[0]; // length
     }
 
+    std::vector<std::vector<double>> getWallForce() { return WallForce; }
     //-------------------------------------------------------------------
     void interpret_command (string in)
     {
@@ -369,6 +370,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .function("getX2", &Simulation<3>::getX2)
         .function("getBoundary", &Simulation<3>::getBoundary)
         .function("setBoundary", &Simulation<3>::setBoundary)
+        .function("getWallForce", &Simulation<3>::getWallForce)
         ;
 
 }
