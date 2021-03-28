@@ -39,7 +39,7 @@ public :
         tdump(1),       //dump data every these timesteps
         tinfo(100),
         T(5000),        //number of timesteps
-        dt(1),          //timestep
+        dt(0.0001),          //timestep
         rho(1),         //density (unit [M.L^(-d)]) WARNING UNUSED
         Kn(0.0001) ,    //Hooke stiffness
         Kt(0.00001) ,   //Tangential stiffness
@@ -262,7 +262,7 @@ template <int d>
 void Parameters<d>::interpret_command (string &in, v2d & X, v2d & V, v2d & Omega)
 {
     stringstream B(in) ;
-    return (interpret_command(B, X, V, Omega)) ;  
+    return (interpret_command(B, X, V, Omega)) ;
 }
 template <int d>
 void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)

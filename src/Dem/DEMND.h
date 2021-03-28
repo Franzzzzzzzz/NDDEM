@@ -62,7 +62,7 @@ public:
         // Array initialisations
         N=P.N ;
         X.resize(N, std::vector <double> (d, 0)) ;
-        X[0][0] = 123;
+        // X[0][0] = 123;
         V.resize(N, std::vector <double> (d, 0)) ;
         A.resize(N, std::vector <double> (d*d, 0)) ; for (int i=0 ; i<N ; i++) A[i]=Tools<d>::Eye ;
         Omega.resize(N, std::vector <double> (d*(d-1)/2, 0)) ; //Rotational velocity matrix (antisymetrical)
@@ -105,7 +105,14 @@ public:
     //-------------------------------------------------------------------
     std::vector<std::vector<double>> getX() { return X; }
     void setX(std::vector < std::vector <double> > X_) { X = X_; }
-    // void setX() {}
+
+    std::vector<double> getBoundary(int a) { return P.Boundaries[a]; }
+    void setBoundary(int a, std::vector<double> loc) {
+        P.Boundaries[a][0] = loc[0]; // low value
+        P.Boundaries[a][1] = loc[1]; // high value
+        P.Boundaries[a][2] = loc[1] - loc[0]; // length
+    }
+
     //-------------------------------------------------------------------
     void interpret_command (string in)
     {
@@ -117,7 +124,7 @@ public:
     {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
-        // printf("UP TO TIME: %f\n", t);
+        // printf("UP TO TIME: %f with timestep: %f\n", t, dt);
         // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
         //bool isdumptime = (ti % P.tdump==0) ;
         //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
@@ -359,7 +366,9 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<3>::getX)
-        .function("getX2", &Simulation<3>::getX2)
+        // .function("getX2", &Simulation<3>::getX2)
+        .function("getBoundary", &Simulation<3>::getBoundary)
+        .function("setBoundary", &Simulation<3>::setBoundary)
         ;
 
 }
