@@ -62,6 +62,7 @@ public:
         // Array initialisations
         N=P.N ;
         X.resize(N, std::vector <double> (d, 0)) ;
+        X[0][0] = 123;
         V.resize(N, std::vector <double> (d, 0)) ;
         A.resize(N, std::vector <double> (d*d, 0)) ; for (int i=0 ; i<N ; i++) A[i]=Tools<d>::Eye ;
         Omega.resize(N, std::vector <double> (d*(d-1)/2, 0)) ; //Rotational velocity matrix (antisymetrical)
@@ -102,7 +103,7 @@ public:
         printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
     }
     //-------------------------------------------------------------------
-    const std::vector<std::vector<double>> getX() const { return X; }
+    std::vector<std::vector<double>> getX() { return X; }
     void setX(std::vector < std::vector <double> > X_) { X = X_; }
     // void setX() {}
     //-------------------------------------------------------------------
@@ -358,14 +359,44 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<3>::getX)
+        .function("getX2", &Simulation<3>::getX2)
         ;
 
-    // register_vector<double>("vector<double>");
-    // register_
 }
 
+// EMSCRIPTEN_BINDINGS(stl_wrappers) {
+//     emscripten::register_vector<double>("Vec1DDouble");
+//     emscripten::register_vector<std::vector<double>>("Vec2DDouble");
+// }
 
+namespace emscripten {
+namespace internal {
 
+template <typename T, typename Allocator>
+struct BindingType<std::vector<T, Allocator>> {
+    using ValBinding = BindingType<val>;
+    using WireType = ValBinding::WireType;
+
+    static WireType toWireType(const std::vector<T, Allocator> &vec) {
+        return ValBinding::toWireType(val::array(vec));
+    }
+
+    static std::vector<T, Allocator> fromWireType(WireType value) {
+        return vecFromJSArray<T>(ValBinding::fromWireType(value));
+    }
+};
+
+template <typename T>
+struct TypeID<T,
+              typename std::enable_if_t<std::is_same<
+                  typename Canonicalized<T>::type,
+                  std::vector<typename Canonicalized<T>::type::value_type,
+                              typename Canonicalized<T>::type::allocator_type>>::value>> {
+    static constexpr TYPEID get() { return TypeID<val>::get(); }
+};
+
+}  // namespace internal
+}  // namespace emscripten
 
 
 
