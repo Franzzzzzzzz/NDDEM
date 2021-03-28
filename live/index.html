@@ -17,6 +17,7 @@
         </style>
 	</head>
 	<body>
+        <div id="stats"></div>
         <script async type="text/javascript" src="../bin/DEMND.js"></script>
 
 		<script type="module">
@@ -38,19 +39,20 @@
             let frameRate = 60;
 
             var radius = 0.5;
-            var L;
             const thickness = radius;
 
             var params = {
                 dimensions: 3,
-                L: 3, //system size
-                N: 230,
+                L: 4, //system size
+                N: 500,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
-                // gravity: 1,
+                gravity: false,
                 paused: false,
+                H_cur: 0,
             }
+            params.L_cur = params.L;
             params.packing_fraction = (params.N*4./3.*Math.PI*Math.pow(radius,3))/Math.pow(2*params.L,3);
             params.back = -params.L;
             params.front = params.L;
@@ -158,27 +160,34 @@
 				stats = new Stats();
                 panel = stats.addPanel( new Stats.Panel( 'Pressure', 'white', 'black' ) );
                 stats.showPanel( 3 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-				document.body.appendChild( stats.dom );
+				// document.body.appendChild( stats.dom );
+                var thisParent = document.getElementById("stats");
+                thisParent.appendChild( stats.domElement );
+
+                var statsALL = document.getElementById("stats").querySelectorAll("canvas");
+
+                for(var i=0; i<statsALL.length; i++){
+                    statsALL[i].style.width = "240px";
+                    statsALL[i].style.height = "160px";
+                }
 
                 // gui
 				gui = new GUI();
 
 				gui.width = 300;
 
-				gui.domElement.style.userSelect = 'none';
-
-				// const fl = gui.addFolder( 'Intensity' );
-
 				gui.add( params, 'packing_fraction', 0, 1, 0.01 )
 					.name( 'Initial density' );//.listen()
 					// .onChange( function () { refresh_simulation(); } );
-                gui.add( params, 'volumetric_strain', 0,0.2, 0.001)
+                gui.add( params, 'volumetric_strain', 0,0.1, 0.001)
                     .name( 'Volumetric strain').listen()
                     .onChange( function () { update_walls(); } );
-                gui.add( params, 'axial_strain', 0,0.2, 0.001)
+                gui.add( params, 'axial_strain', 0,0.1, 0.001)
                     .name( 'Axial strain').listen()
                     .onChange( function () { update_walls(); } );
-                gui.add ( params, 'paused').listen();
+                gui.add ( params, 'gravity').name('Gravity').listen()
+                    .onChange( function() { S.interpret_command("gravity -1 0 0"); });
+                gui.add ( params, 'paused').name('Paused').listen();
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
@@ -187,14 +196,14 @@
 			}
 
             function update_walls() {
-                var L_cur = params.L*(1-params.volumetric_strain);
-                var H_cur = L_cur*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
-                params.front = L_cur;
-                params.back = -L_cur;
-                params.left = -L_cur;
-                params.right = L_cur;
-                params.floor = -L_cur + H_cur;
-                params.roof = L_cur - H_cur;
+                params.L_cur =  params.L*(1-params.volumetric_strain);
+                params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
+                params.front =  params.L_cur;
+                params.back  = -params.L_cur;
+                params.left  = -params.L_cur;
+                params.right =  params.L_cur;
+                params.floor = -params.L_cur + params.H_cur;
+                params.roof  =  params.L_cur - params.H_cur;
 
                 S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
                 S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
@@ -205,9 +214,6 @@
                 right.position.y = params.right + thickness/2.;
                 floor.position.z = params.floor - thickness/2.;
                 roof.position.z = params.roof + thickness/2.;
-                // console.log(S.getBoundary(0))
-                // console.log(S.getBoundary(1))
-                // console.log(S.getBoundary(2))
             }
 
 			function animate() {
@@ -216,18 +222,20 @@
                 move_spheres();
 
                 if ( !params.paused ) {
-                    S.step_forward(100);
+                    S.step_forward(20);
+
+                    stats.begin()
+                    var F = S.getWallForce();
+                    var pressure = (-F[0][0] + F[1][0] - F[2][1] + F[3][1] - F[4][2] + F[5][2])/(4.*params.L_cur + 2.*(params.L_cur - params.H_cur));
+                    // var shear =
+                    panel.update(pressure,1e6)
+                    // console.log(F);
+                    stats.end();
+
                 }
 
 
-                stats.begin()
-                var F = S.getWallForce();
-                var pressure = (-F[0][0] + F[1][0] - F[2][1] + F[3][1] - F[4][2] + F[5][2])/6.
-                // var shear =
-                panel.update(pressure,1e6)
-                console.log(F);
 
-                stats.end();
                 // console.log(window.x)
 
 				//
@@ -286,8 +294,6 @@
                 spheres.receiveShadow = true;
                 scene.add( spheres );
 
-                // let x = NDDEMLib.HEAPF64.subarray(pointer, pointer + params.dimensions*params.N);
-                var range = 0.8*(L/2 - radius);
                 for ( let i = 0; i < params.N; i ++ ) {
                     // matrix.setPosition( x[0 + i*3], x[1 + i*3], x[2 + i*3] );
                     spheres.setMatrixAt( i, matrix );
@@ -338,9 +344,9 @@
                 // S.interpret_command("boundary 2 WALL 0 3.4");
                 S.interpret_command("auto location randomdrop");
                 // S.interpret_command("gravity -"+String(params.gravity)+" 0 0");
-                S.interpret_command("gravity -0.9 0.42 0")
 
                 // NONE OF THESE DO ANYTHING YET
+                S.interpret_command("gravity -1 0 0")
                 S.interpret_command("set Kn 2e5");
                 S.interpret_command("set Kt 8e4");
                 S.interpret_command("set GammaN 75");
