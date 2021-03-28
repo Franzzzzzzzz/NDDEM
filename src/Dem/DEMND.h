@@ -329,9 +329,9 @@ public:
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            if (P.wallforcecompute)
-            {
-            char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+            // if (P.wallforcecompute)
+            // {
+            // char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
             Tools<d>::setzero(WallForce) ;
             if (P.wallforcecompute)
             {
@@ -339,8 +339,8 @@ public:
                 for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
                     Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
             }
-            Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            }
+            // Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
+            // }
         }
 
         if (P.wallforcecompute) MP.delayedwall_clean() ;

@@ -27,7 +27,7 @@
 			import Stats from './js/stats.module.js';
             import { GUI } from './js/dat.gui.module.js';
 
-			let camera, scene, renderer, stats;
+			let camera, scene, renderer, stats, panel;
 			let physics, position;
             let gui;
 			let boxes, spheres;
@@ -155,8 +155,10 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				// stats = new Stats();
-				// document.body.appendChild( stats.dom );
+				stats = new Stats();
+                panel = stats.addPanel( new Stats.Panel( 'Pressure', 'white', 'black' ) );
+                stats.showPanel( 3 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+				document.body.appendChild( stats.dom );
 
                 // gui
 				gui = new GUI();
@@ -216,6 +218,16 @@
                 if ( !params.paused ) {
                     S.step_forward(100);
                 }
+
+
+                stats.begin()
+                var F = S.getWallForce();
+                var pressure = (-F[0][0] + F[1][0] - F[2][1] + F[3][1] - F[4][2] + F[5][2])/6.
+                // var shear =
+                panel.update(pressure,1e6)
+                console.log(F);
+
+                stats.end();
                 // console.log(window.x)
 
 				//

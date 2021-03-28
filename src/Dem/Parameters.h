@@ -51,7 +51,7 @@ public :
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
         orientationtracking(false),
-        wallforcecompute(false)
+        wallforcecompute(true)
         {
          reset_ND(NN) ;
         } ///< Set the default values for all parameters. Calls to setup parameter function should be provided after initialisation of this class.
