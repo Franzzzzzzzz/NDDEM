@@ -27,6 +27,10 @@
             // import { NDDEMPhysics } from './js/NDDEMPhysics.js';
 			import Stats from './js/stats.module.js';
             import { GUI } from './js/dat.gui.module.js';
+            import { Lut } from './js/Lut.js'
+
+            var urlParams = new URLSearchParams(window.location.search);
+
 
 			let camera, scene, renderer, stats, panel;
 			let physics, position;
@@ -37,6 +41,7 @@
             let NDDEMLib;
             let pointer;
             let frameRate = 60;
+            let v;
 
             var radius = 0.5;
             const thickness = radius;
@@ -67,6 +72,9 @@
             //     var L = params.N*4./3.*Math.PI*Math.pow(radius,3);
             //     L = Math.pow(solid_volume/params.packing_fraction,1./3.)
             // }
+
+            const lut = new Lut( 'blackbody', 512 );
+
 
             var quality = 5;
 
@@ -285,7 +293,7 @@
             }
 
             function add_spheres() {
-                const material = new THREE.MeshLambertMaterial();
+                const material = new THREE.MeshStandardMaterial();
 
                 const matrix = new THREE.Matrix4();
                 const color = new THREE.Color();
@@ -308,13 +316,25 @@
 
             function move_spheres() {
                 var x = S.getX();
+                if ( urlParams.has('lut') ) {
+                    if ( urlParams.get('lut') === 'velocity' ) {
+                        v = S.getVelocity();
+                    }
+                    spheres.instanceColor.needsUpdate = true;
+
+                }
                 for ( let i = 0; i < params.N; i ++ ) {
                     const matrix = new THREE.Matrix4();
-                    // console.log(x[i])
                     matrix.setPosition( x[i][0], x[i][1], x[i][2] );
                     spheres.setMatrixAt( i, matrix );
+                    if ( urlParams.has('lut') ) {
+                        if ( urlParams.get('lut') === 'velocity' ) {
+                            spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
+                        }
+                    }
                 }
                 spheres.instanceMatrix.needsUpdate = true;
+                // console.log(spheres)
                 // console.log(x)
                 // physics.addMesh( spheres, 1 );
             }

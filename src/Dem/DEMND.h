@@ -114,6 +114,8 @@ public:
     }
 
     std::vector<std::vector<double>> getWallForce() { return WallForce; }
+    std::vector<std::vector<double>> getVelocity() { return V; }
+
     //-------------------------------------------------------------------
     void interpret_command (string in)
     {
@@ -367,6 +369,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<3>::getX)
+        .function("getVelocity", &Simulation<3>::getVelocity)
         // .function("getX2", &Simulation<3>::getX2)
         .function("getBoundary", &Simulation<3>::getBoundary)
         .function("setBoundary", &Simulation<3>::setBoundary)
