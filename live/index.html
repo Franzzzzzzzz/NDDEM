@@ -14,11 +14,19 @@
                 /* font-weight: bold; */
                 position:absolute;
             }
+            #stats {
+                position: absolute;
+                width: 300px;
+                height: 200px;
+                margin: 0;
+                padding: 0;
+            }
         </style>
 	</head>
 	<body>
         <div id="stats"></div>
         <script async type="text/javascript" src="../bin/DEMND.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script type="module">
 
@@ -30,7 +38,7 @@
             import { Lut } from './js/Lut.js'
 
             var urlParams = new URLSearchParams(window.location.search);
-
+            var clock = new THREE.Clock();
 
 			let camera, scene, renderer, stats, panel;
 			let physics, position;
@@ -42,14 +50,20 @@
             let pointer;
             let frameRate = 60;
             let v;
-
+            let pressure = 0;
+            let shear = 0;
+            let density = 0;
+            let pressure_time = [];
+            let shear_time = [];
+            let density_time = [];
             var radius = 0.5;
             const thickness = radius;
+            const material_density = 2700;
 
             var params = {
                 dimensions: 3,
                 L: 4, //system size
-                N: 580,
+                N: 550,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
@@ -165,19 +179,19 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
-                panel = stats.addPanel( new Stats.Panel( 'Pressure', 'white', 'black' ) );
-                stats.showPanel( 3 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-				// document.body.appendChild( stats.dom );
-                var thisParent = document.getElementById("stats");
-                thisParent.appendChild( stats.domElement );
-
-                var statsALL = document.getElementById("stats").querySelectorAll("canvas");
-
-                for(var i=0; i<statsALL.length; i++){
-                    statsALL[i].style.width = "240px";
-                    statsALL[i].style.height = "160px";
-                }
+				// stats = new Stats();
+                // panel = stats.addPanel( new Stats.Panel( 'Pressure', 'white', 'black' ) );
+                // stats.showPanel( 3 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+				// // document.body.appendChild( stats.dom );
+                // var thisParent = document.getElementById("stats");
+                // thisParent.appendChild( stats.domElement );
+                //
+                // var statsALL = document.getElementById("stats").querySelectorAll("canvas");
+                //
+                // for(var i=0; i<statsALL.length; i++){
+                //     statsALL[i].style.width = "240px";
+                //     statsALL[i].style.height = "160px";
+                // }
 
                 // gui
 				gui = new GUI();
@@ -200,7 +214,9 @@
 				controls.target.y = 0.5;
 				controls.update();
 
-				animate();
+                make_graph();
+
+			    animate();
 			}
 
             function update_walls() {
@@ -230,17 +246,32 @@
 
 				requestAnimationFrame( animate );
                 move_spheres();
-
                 if ( !params.paused ) {
+                    if ( clock.getElapsedTime() >= 0.2) {
+                        update_graph();
+                        clock.start();
+                    }
+
                     S.step_forward(5);
 
-                    stats.begin()
                     var F = S.getWallForce();
-                    var pressure = (-F[0][0] + F[1][0] - F[2][1] + F[3][1] - F[4][2] + F[5][2])/(4.*params.L_cur + 2.*(params.L_cur - params.H_cur));
-                    // var shear =
-                    panel.update(pressure,1e6)
-                    // console.log(F);
-                    stats.end();
+                    // pressure = (-F[0][0] + F[1][0] - F[2][1] + F[3][1] - F[4][2] + F[5][2])/(2.*Math.pow(params.L_cur,2) + 4.*(params.L_cur - params.H_cur)*params.L_cur);
+                    let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
+                    let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+
+                    let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
+                    let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
+
+                    pressure = (sigma_11 + sigma_22 + sigma_33)/3.
+                    shear = Math.sqrt((Math.pow(sigma_11 - sigma_22,2) + Math.pow(sigma_22 - sigma_33,2) + Math.pow(sigma_33 - sigma_11,2) + 6*(sigma_12*sigma_12 + sigma_23*sigma_23 + sigma_31*sigma_31))/2.)
+
+                    if ( stats !== undefined ) {
+                        stats.begin()
+                        panel.update(pressure,1e6)
+                        stats.end();
+                    }
 
                 }
 
@@ -366,9 +397,9 @@
                 // S.interpret_command("boundary 2 WALL 0 3.4");
                 S.interpret_command("auto location randomdrop");
                 // S.interpret_command("gravity -"+String(params.gravity)+" 0 0");
+                S.interpret_command("gravity 0 0 0")
 
                 // NONE OF THESE DO ANYTHING YET
-                S.interpret_command("gravity -1 0 0")
                 S.interpret_command("set Kn 2e5");
                 S.interpret_command("set Kt 8e4");
                 S.interpret_command("set GammaN 75");
@@ -376,8 +407,69 @@
                 S.interpret_command("set Mu 0.5");
                 S.interpret_command("set T 150");
                 S.interpret_command("set dt 0.0001");
+                S.finalise_init () ;
+            }
 
+            function update_graph() {
+                // shear = 0;
+                density = params.packing_fraction*material_density;
+                // pressure = Math.random();
+                // shear = Math.random();
+                // density = Math.random();
+                pressure_time.push(pressure);
+                shear_time.push(shear);
+                density_time.push(density);
+                // console.log(shear_time)
+                Plotly.restyle('stats', {
+                    'x': [density_time],
+                    'y': [shear_time],
+                    'z': [pressure_time],
+                });
 
+            }
+
+            function make_graph() {
+                Plotly.newPlot('stats', [{
+                  type: 'scatter3d',
+                  mode: 'lines',
+                  x: [0],
+                  y: [0],
+                  z: [0],
+                  // opacity: 1,
+                  line: {
+                    width: 6,
+                    color: "white",
+                    // reversescale: false
+                  }
+                }], {
+                  height: 300,
+                  width: 400,
+                  xaxis: {
+                    autotick: true,
+                    autorange: true,
+                },
+                  yaxis: {
+                    autotick: true,
+                    autorange: true,
+                },
+                  zaxis: {
+                    autotick: true,
+                    autorange: true,
+                },
+                scene: {
+            		xaxis:{title: 'Density'},
+            		yaxis:{title: 'Shear stress'},
+            		zaxis:{title: 'Pressure'},
+            		},
+                paper_bgcolor: 'rgba(0,0,0,1)',
+                plot_bgcolor: 'rgba(0,0,0,1)',
+                margin: {
+                    t: 5, //top margin
+                    l: 5, //left margin
+                    r: 5, //right margin
+                    b: 5 //bottom margin
+                    }
+                });
             }
 
 		</script>

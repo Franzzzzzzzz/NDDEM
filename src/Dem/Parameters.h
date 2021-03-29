@@ -311,6 +311,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; }
        skinsqr=skin*skin ;
      }
+     printf("Something good should have happened %g \n", dt) ; fflush(stdout) ;
    }
    catch (const std::out_of_range & e) {
      if (!strcmp(line, "dumps"))
@@ -396,7 +397,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  string line ;
  in>>line;
  if (line[0]=='#') {discard_line() ; return  ;}
- try {Lvl0.at(line)() ;}
+ try {Lvl0.at(line)() ; }
  catch (const std::out_of_range & e) { printf("LVL0 command unknown: %s\n", line.c_str()) ; discard_line() ; }
 
 }

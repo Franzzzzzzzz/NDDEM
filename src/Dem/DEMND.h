@@ -88,6 +88,8 @@ public:
 
         // Initial state setup
         P.set_boundaries() ;
+    }
+    void finalise_init () {
         //P.init_particles(X, A) ;
         //if (strcmp(argv[3], "default"))
         //    P.load_datafile (argv[3], X, V, Omega) ;
@@ -127,7 +129,7 @@ public:
     {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
-        // printf("UP TO TIME: %f with timestep: %f\n", t, dt);
+        // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
         // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
         //bool isdumptime = (ti % P.tdump==0) ;
         //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
@@ -363,6 +365,7 @@ public:
 EMSCRIPTEN_BINDINGS(my_class_example) {
     class_<Simulation<3>>("Simulation")
         .constructor<int>()
+        .function("finalise_init", &Simulation<3>::finalise_init)
         .function("interpret_command", &Simulation<3>::interpret_command)
         .function("step_forward", &Simulation<3>::step_forward)
         .function("finalise", &Simulation<3>::finalise)
