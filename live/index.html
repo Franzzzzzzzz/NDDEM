@@ -36,6 +36,7 @@
 			import Stats from './js/stats.module.js';
             import { GUI } from './js/dat.gui.module.js';
             import { Lut } from './js/Lut.js'
+            import { PIDcontroller } from './js/controller.js'
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -60,6 +61,15 @@
             const thickness = radius;
             const material_density = 2700;
 
+            let loading_method = 'strain_controlled';
+            if ( urlParams.has('loading_method') ) {
+                loading_method = urlParams.get('loading_method');
+            }
+            // let loading_method = 'stress_controlled';
+
+            let p_controller = new PIDcontroller(1e-8,1e-7,0);
+            let q_controller = new PIDcontroller(1e-8,1e-7,0);
+
             var params = {
                 dimensions: 3,
                 L: 4, //system size
@@ -70,6 +80,8 @@
                 gravity: false,
                 paused: false,
                 H_cur: 0,
+                pressure_set_pt: 1e4,
+                deviatoric_set_pt: 5e3,
             }
             params.L_cur = params.L;
             params.packing_fraction = (params.N*4./3.*Math.PI*Math.pow(radius,3))/Math.pow(2*params.L,3);
@@ -201,12 +213,22 @@
 				gui.add( params, 'packing_fraction', 0, 1, 0.01 )
 					.name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
-                gui.add( params, 'volumetric_strain', 0,0.1, 0.001)
-                    .name( 'Volumetric strain').listen()
-                    .onChange( function () { update_walls(); } );
-                gui.add( params, 'axial_strain', 0,0.1, 0.001)
-                    .name( 'Axial strain').listen()
-                    .onChange( function () { update_walls(); } );
+                if ( loading_method === 'strain_controlled' ) {
+                    gui.add( params, 'volumetric_strain', 0,0.1, 0.001)
+                        .name( 'Volumetric strain').listen()
+                        .onChange( function () { update_walls(); } );
+                    gui.add( params, 'axial_strain', 0,0.1, 0.001)
+                        .name( 'Axial strain').listen()
+                        .onChange( function () { update_walls(); } );
+                    }
+                else if ( loading_method === 'stress_controlled' ) {
+                    gui.add( params, 'pressure_set_pt', 0,1e6, 1)
+                        .name( 'Pressure set point').listen()
+                        .onChange( function () { update_walls(); } );
+                    gui.add( params, 'deviatoric_set_pt', 0,1e6, 0.001)
+                        .name( 'Deviatoric stress set point').listen()
+                        .onChange( function () { update_walls(); } );
+                    }
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() { S.interpret_command("gravity 0 0 -1000"); });
                 gui.add ( params, 'paused').name('Paused').listen();
@@ -235,24 +257,36 @@
             function update_walls() {
                 params.packing_fraction = (params.N*4./3.*Math.PI*Math.pow(radius,3))/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8.;
 
-                params.L_cur =  params.L*(1-params.volumetric_strain);
-                params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
-                params.front =  params.L_cur;
-                params.back  = -params.L_cur;
-                params.left  = -params.L_cur;
-                params.right =  params.L_cur;
-                params.floor = -params.L_cur + params.H_cur;
-                params.roof  =  params.L_cur - params.H_cur;
+                if ( loading_method == 'strain_controlled') {
 
-                S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
-                S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
-                S.setBoundary(2, [params.floor,params.roof]) ; // Set location of the walls in z
-                back.position.x = params.back - thickness/2.;
-                front.position.x = params.front + thickness/2.;
-                left.position.y = params.left - thickness/2.;
-                right.position.y = params.right + thickness/2.;
-                floor.position.z = params.floor - thickness/2.;
-                roof.position.z = params.roof + thickness/2.;
+                    params.L_cur =  params.L*(1-params.volumetric_strain);
+                    params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
+
+                }
+            else if ( loading_method == 'stress_controlled' ) {
+                let delta_p = p_controller.update(params.pressure_set_pt,pressure); // MISSING A dt!
+                let delta_q = q_controller.update(params.deviatoric_set_pt,shear)
+                // console.log(delta_q)
+                params.L_cur -= delta_p;
+                params.H_cur += delta_q;
+
+            }
+            params.front =  params.L_cur;
+            params.back  = -params.L_cur;
+            params.left  = -params.L_cur;
+            params.right =  params.L_cur;
+            params.floor = -params.L_cur + params.H_cur;
+            params.roof  =  params.L_cur - params.H_cur;
+
+            S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
+            S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
+            S.setBoundary(2, [params.floor,params.roof]) ; // Set location of the walls in z
+            back.position.x = params.back - thickness/2.;
+            front.position.x = params.front + thickness/2.;
+            left.position.y = params.left - thickness/2.;
+            right.position.y = params.right + thickness/2.;
+            floor.position.z = params.floor - thickness/2.;
+            roof.position.z = params.roof + thickness/2.;
             }
 
 			function animate() {
@@ -260,11 +294,14 @@
 				requestAnimationFrame( animate );
                 move_spheres();
                 if ( !params.paused ) {
-                    if ( clock.getElapsedTime() >= 0.2) {
+                    if ( clock.getElapsedTime() >= 0.1) {
                         update_graph();
                         clock.start();
                     }
 
+                    if (loading_method === 'stress_controlled') {
+                        update_walls();
+                    }
                     S.step_forward(5);
 
                     var F = S.getWallForce();
@@ -424,6 +461,8 @@
             }
 
             function update_graph() {
+                var gd = document.getElementById('stats')
+                var camera_opts = gd._fullLayout.scene.camera;
                 // shear = 0;
                 density = params.packing_fraction*material_density;
                 // pressure = Math.random();
@@ -433,11 +472,13 @@
                 shear_time.push(shear);
                 density_time.push(density);
                 // console.log(shear_time)
-                Plotly.restyle('stats', {
+                Plotly.update('stats', {
                     'x': [density_time],
                     'y': [shear_time],
                     'z': [pressure_time],
-                });
+                },
+                camera_opts);
+                // Plotly.relayout('stats',  );
 
             }
 
