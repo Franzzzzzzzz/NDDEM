@@ -214,10 +214,23 @@
 				controls.target.y = 0.5;
 				controls.update();
 
+                window.addEventListener( 'resize', onWindowResize, false );
+
                 make_graph();
 
 			    animate();
 			}
+
+
+
+            function onWindowResize(){
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+            }
 
             function update_walls() {
                 params.packing_fraction = (params.N*4./3.*Math.PI*Math.pow(radius,3))/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8.;
@@ -432,9 +445,9 @@
                 Plotly.newPlot('stats', [{
                   type: 'scatter3d',
                   mode: 'lines',
-                  x: [0],
-                  y: [0],
-                  z: [0],
+                  x: [],
+                  y: [],
+                  z: [],
                   // opacity: 1,
                   line: {
                     width: 6,
