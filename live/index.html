@@ -58,6 +58,7 @@
             let shear_time = [];
             let density_time = [];
             var radius = 0.5;
+            let started = false;
             const thickness = radius;
             const material_density = 2700;
 
@@ -67,8 +68,9 @@
             }
             // let loading_method = 'stress_controlled';
 
-            let p_controller = new PIDcontroller(1e-8,1e-7,0);
-            let q_controller = new PIDcontroller(1e-8,1e-7,0);
+            let p_controller = new PIDcontroller(1e-3,0,0);
+            let q_controller = new PIDcontroller(1e-3,0,0);
+            // let q_controller = new PIDcontroller(0,0,0);
 
             var params = {
                 dimensions: 3,
@@ -81,7 +83,7 @@
                 paused: false,
                 H_cur: 0,
                 pressure_set_pt: 1e4,
-                deviatoric_set_pt: 5e3,
+                deviatoric_set_pt: 0,
             }
             params.L_cur = params.L;
             params.packing_fraction = (params.N*4./3.*Math.PI*Math.pow(radius,3))/Math.pow(2*params.L,3);
@@ -135,7 +137,8 @@
 				dirLight.shadow.camera.zoom = 2;
 				scene.add( dirLight );
 
-                const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
+                // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
+                const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
                 const wall_material = new THREE.MeshLambertMaterial();
                 wall_material.wireframe = true;
                 // const wall_material = new THREE.ShadowMaterial( )
@@ -222,10 +225,10 @@
                         .onChange( function () { update_walls(); } );
                     }
                 else if ( loading_method === 'stress_controlled' ) {
-                    gui.add( params, 'pressure_set_pt', 0,1e6, 1)
+                    gui.add( params, 'pressure_set_pt', 0,1e5, 1)
                         .name( 'Pressure set point').listen()
                         .onChange( function () { update_walls(); } );
-                    gui.add( params, 'deviatoric_set_pt', 0,1e6, 0.001)
+                    gui.add( params, 'deviatoric_set_pt', 0,1e5, 1)
                         .name( 'Deviatoric stress set point').listen()
                         .onChange( function () { update_walls(); } );
                     }
@@ -263,38 +266,52 @@
                     params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
 
                 }
-            else if ( loading_method == 'stress_controlled' ) {
-                let delta_p = p_controller.update(params.pressure_set_pt,pressure); // MISSING A dt!
-                let delta_q = q_controller.update(params.deviatoric_set_pt,shear)
-                // console.log(delta_q)
-                params.L_cur -= delta_p;
-                params.H_cur += delta_q;
+                else if ( loading_method == 'stress_controlled' ) {
+                    let delta_p = p_controller.update(params.pressure_set_pt,pressure); // MISSING A dt!
+                    let delta_q = q_controller.update(params.deviatoric_set_pt,shear)
+                    // console.log(delta_q)
+                    params.L_cur -= delta_p;
+                    params.H_cur += delta_q;
 
-            }
-            params.front =  params.L_cur;
-            params.back  = -params.L_cur;
-            params.left  = -params.L_cur;
-            params.right =  params.L_cur;
-            params.floor = -params.L_cur + params.H_cur;
-            params.roof  =  params.L_cur - params.H_cur;
+                }
+                params.front =  params.L_cur;
+                params.back  = -params.L_cur;
+                params.left  = -params.L_cur;
+                params.right =  params.L_cur;
+                params.floor = -params.L_cur + params.H_cur;
+                params.roof  =  params.L_cur - params.H_cur;
 
-            S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
-            S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
-            S.setBoundary(2, [params.floor,params.roof]) ; // Set location of the walls in z
-            back.position.x = params.back - thickness/2.;
-            front.position.x = params.front + thickness/2.;
-            left.position.y = params.left - thickness/2.;
-            right.position.y = params.right + thickness/2.;
-            floor.position.z = params.floor - thickness/2.;
-            roof.position.z = params.roof + thickness/2.;
+                S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
+                S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
+                S.setBoundary(2, [params.floor,params.roof]) ; // Set location of the walls in z
+                back.position.x = params.back - thickness/2.;
+                front.position.x = params.front + thickness/2.;
+                left.position.y = params.left - thickness/2.;
+                right.position.y = params.right + thickness/2.;
+                floor.position.z = params.floor - thickness/2.;
+                roof.position.z = params.roof + thickness/2.;
+
+                var horiz_walls = [floor,roof];
+                var vert_walls = [left,right,front,back];
+
+                vert_walls.forEach( function(mesh) {
+                    mesh.scale.x = 2*params.L_cur + 2*thickness;
+                    mesh.scale.z = 2*(params.L_cur-params.H_cur) + 2*thickness;
+                });
+
+                horiz_walls.forEach( function(mesh) {
+                    mesh.scale.x = 2*params.L_cur + 2*thickness;
+                    mesh.scale.z = 2*params.L_cur + 2*thickness;
+                });
+
             }
 
 			function animate() {
-
+                if ( clock.getElapsedTime() > 1 ) { started = true; }
 				requestAnimationFrame( animate );
                 move_spheres();
                 if ( !params.paused ) {
-                    if ( clock.getElapsedTime() >= 0.1) {
+                    if ( clock.getElapsedTime() >= 0.05 && started) {
                         update_graph();
                         clock.start();
                     }
@@ -314,8 +331,11 @@
                     let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
                     let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
 
-                    pressure = (sigma_11 + sigma_22 + sigma_33)/3.
-                    shear = Math.sqrt((Math.pow(sigma_11 - sigma_22,2) + Math.pow(sigma_22 - sigma_33,2) + Math.pow(sigma_33 - sigma_11,2) + 6*(sigma_12*sigma_12 + sigma_23*sigma_23 + sigma_31*sigma_31))/2.)
+                    pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
+                    // shear = Math.sqrt((Math.pow(sigma_11 - sigma_22,2) + Math.pow(sigma_22 - sigma_33,2) + Math.pow(sigma_33 - sigma_11,2) + 6*(sigma_12*sigma_12 + sigma_23*sigma_23 + sigma_31*sigma_31))/2.);
+                    shear = sigma_33 - pressure;
+
+                    console.log(pressure,shear)
 
                     if ( stats !== undefined ) {
                         stats.begin()
@@ -491,13 +511,13 @@
                   z: [],
                   // opacity: 1,
                   line: {
-                    width: 6,
+                    width: 2,
                     color: "white",
                     // reversescale: false
                   }
                 }], {
                   height: 300,
-                  width: 400,
+                  width: 500,
                   xaxis: {
                     autotick: true,
                     autorange: true,
@@ -512,8 +532,9 @@
                 },
                 scene: {
             		xaxis:{title: 'Density'},
-            		yaxis:{title: 'Shear stress'},
+            		yaxis:{title: 'Deviatoric stress'},
             		zaxis:{title: 'Pressure'},
+                    aspectmode: 'auto',
             		},
                 paper_bgcolor: 'rgba(0,0,0,1)',
                 plot_bgcolor: 'rgba(0,0,0,1)',
