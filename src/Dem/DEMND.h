@@ -363,7 +363,7 @@ public:
 } ;
 
 EMSCRIPTEN_BINDINGS(my_class_example) {
-    class_<Simulation<3>>("Simulation")
+    class_<Simulation<3>>("Simulation3")
         .constructor<int>()
         .function("finalise_init", &Simulation<3>::finalise_init)
         .function("interpret_command", &Simulation<3>::interpret_command)
@@ -377,6 +377,21 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         .function("getBoundary", &Simulation<3>::getBoundary)
         .function("setBoundary", &Simulation<3>::setBoundary)
         .function("getWallForce", &Simulation<3>::getWallForce)
+        ;
+    class_<Simulation<4>>("Simulation4")
+        .constructor<int>()
+        .function("finalise_init", &Simulation<4>::finalise_init)
+        .function("interpret_command", &Simulation<4>::interpret_command)
+        .function("step_forward", &Simulation<4>::step_forward)
+        .function("finalise", &Simulation<4>::finalise)
+        // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
+        // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
+        .function("getX", &Simulation<4>::getX)
+        .function("getVelocity", &Simulation<4>::getVelocity)
+        // .function("getX2", &Simulation<3>::getX2)
+        .function("getBoundary", &Simulation<4>::getBoundary)
+        .function("setBoundary", &Simulation<4>::setBoundary)
+        .function("getWallForce", &Simulation<4>::getWallForce)
         ;
 
 }

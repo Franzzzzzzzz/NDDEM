@@ -448,6 +448,28 @@ void Parameters<d>::init_locations (char *line, v2d & X)
             if (dd==d) {printf("WARN: cannot affect all particles on the square lattice, not enough space in the simulation box\n") ; break ; }
         }
     }
+    else if (!strcmp(line, "randomsquare"))
+    {
+        auto m = *(std::max_element(r.begin(), r.end())) ;
+        boost::random::mt19937 rng(seed);
+        boost::random::uniform_01<boost::mt19937> rand(rng) ;
+        printf("%g\n", m) ;
+        int dd ;
+        for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
+        for (int i=1 ; i<N ; i++)
+        {
+            X[i]=X[i-1] ;
+            for (dd=0 ; dd<d ; dd++)
+            {
+                X[i][dd] += 2*m ;
+                if (X[i][dd]>Boundaries[dd][1]-m)
+                    X[i][dd] = Boundaries[dd][0]+m + 0.1*m*(rand()-0.5) ;
+                else
+                    break ;
+            }
+            if (dd==d) {printf("WARN: cannot affect all particles on the square lattice, not enough space in the simulation box\n") ; break ; }
+        }
+    }
     else if (!strcmp(line, "randomdrop"))
     {
         boost::random::mt19937 rng(seed);
