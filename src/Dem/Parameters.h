@@ -36,7 +36,7 @@ public :
     Parameters () {Parameters(0) ; }
     Parameters (int NN):
         N(5),           //number of particles
-        tdump(1),       //dump data every these timesteps
+        tdump(100000000),       //dump data every these timesteps
         tinfo(100),
         T(5000),        //number of timesteps
         dt(0.0001),          //timestep
@@ -50,7 +50,7 @@ public :
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
-        orientationtracking(false),
+        orientationtracking(true),
         wallforcecompute(true)
         {
          reset_ND(NN) ;

@@ -30,7 +30,8 @@
 
 		<script type="module">
 
-			import * as THREE from './js/three.module.js';
+			// import * as THREE from './js/three.module.js';
+            import * as THREE from "../visualise/node_modules/three/build/three.module.js";
 			import { OrbitControls } from './js/OrbitControls.js';
             // import { NDDEMPhysics } from './js/NDDEMPhysics.js';
 			import Stats from './js/stats.module.js';
@@ -66,20 +67,19 @@
             let old_time = 0;
             let new_time = 0;
             let counter = 0;
+            let p_controller, q_controller;
+
+
             let loading_method = 'strain_controlled';
             if ( urlParams.has('stress_controlled') ) {
                 loading_method = 'stress_controlled';
             }
             // let loading_method = 'stress_controlled';
 
-            let p_controller = new PIDcontroller(1e-6,1e-5,0);
-            // let q_controller = new PIDcontroller(1e-3,0,0);
-            let q_controller = new PIDcontroller(1e-6,1e-5,0);
-
             var params = {
                 dimension: 3,
                 L: 5, //system size
-                N: 550,
+                N: 500,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
@@ -89,6 +89,15 @@
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
+            }
+
+            if ( params.dimension == 3 ) {
+                p_controller = new PIDcontroller(1e-6,1e-5,0);
+                q_controller = new PIDcontroller(1e-6,1e-5,0);
+            }
+            else {
+                p_controller = new PIDcontroller(1e-8,0,0);
+                q_controller = new PIDcontroller(1e-6,1e-5,0);
             }
 
             particle_volume = 4./3.*Math.PI*Math.pow(radius,3);
@@ -125,7 +134,11 @@
 
             var quality = 5;
 
-			init();
+            var NDParticleShader;
+            import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
+                NDParticleShader = module.NDDEMShader;
+    			init();
+            });
 
 			async function init() {
 
@@ -359,7 +372,7 @@
                     if (loading_method === 'stress_controlled') {
                         update_walls(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
                     }
-                    S.step_forward(1);
+                    S.step_forward(5);
 
                     var F = S.getWallForce();
 
@@ -390,76 +403,105 @@
                 old_time = new_time;
 
 			}
-            function refresh_simulation() {
-                // update_L();
-                // console.log(L)
-                var range = 0.8*(L/2 - radius);
-                for ( let i = 0; i < params.N; i ++ ) {
-                    position.set( range*(2*Math.random() - 1), range*(2*Math.random() - 1), range*(2*Math.random() - 1) );
-    				physics.setMeshPosition( spheres, position, i );
-                }
-                position.set( 0, - L/2 - thickness/2., 0 );
-
-                floor.position.y = - L/2 - thickness/2.;
-                roof.position.y = L/2 + thickness/2.;
-                left.position.z = - L/2 - thickness/2.;
-                right.position.z = L/2 + thickness/2.;
-                back.position.x = L/2 + thickness/2.;
-                front.position.x = -L/2 - thickness/2.;
-                camera.position.set( - 3*L, 0, 0 );
-
-            }
-
-            function remove_spheres() {
-                physics.removeMesh( );
-            }
+            // function refresh_simulation() {
+            //     // update_L();
+            //     // console.log(L)
+            //     var range = 0.8*(L/2 - radius);
+            //     for ( let i = 0; i < params.N; i ++ ) {
+            //         position.set( range*(2*Math.random() - 1), range*(2*Math.random() - 1), range*(2*Math.random() - 1) );
+    		// 		physics.setMeshPosition( spheres, position, i );
+            //     }
+            //     position.set( 0, - L/2 - thickness/2., 0 );
+            //
+            //     floor.position.y = - L/2 - thickness/2.;
+            //     roof.position.y = L/2 + thickness/2.;
+            //     left.position.z = - L/2 - thickness/2.;
+            //     right.position.z = L/2 + thickness/2.;
+            //     back.position.x = L/2 + thickness/2.;
+            //     front.position.x = -L/2 - thickness/2.;
+            //     camera.position.set( - 3*L, 0, 0 );
+            //
+            // }
 
             function add_spheres() {
-                const material = new THREE.MeshStandardMaterial();
+                spheres = new THREE.Group();
+                scene.add(spheres);
+                // const material = new THREE.MeshStandardMaterial();
 
-                const matrix = new THREE.Matrix4();
+
+                // const matrix = new THREE.Matrix4();
                 const color = new THREE.Color();
 
                 const geometrySphere = new THREE.SphereGeometry( radius, Math.pow(2,quality), Math.pow(2,quality) );
-                spheres = new THREE.InstancedMesh( geometrySphere, material, params.N );
-                spheres.castShadow = true;
-                spheres.receiveShadow = true;
-                scene.add( spheres );
+                // const geometrySphere = new THREE.BufferGeometry().fromGeometry(
+                //   new THREE.SphereGeometry(
+                //     1,
+                //     Math.pow(2, params.quality),
+                //     Math.pow(2, params.quality)
+                //   )
+                // );
+                // spheres = new THREE.InstancedMesh( geometrySphere, material, params.N );
+                // spheres.castShadow = true;
+                // spheres.receiveShadow = true;
+                // scene.add( spheres );
 
                 for ( let i = 0; i < params.N; i ++ ) {
-                    spheres.setMatrixAt( i, matrix );
-                    spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
+                    const material = NDParticleShader.clone();
+                    var object = new THREE.Mesh(geometrySphere, material);
+                    object.position.set(0,0,0);
+                    object.rotation.z = Math.PI / 2;
+                    spheres.add(object);
+                    // spheres.setMatrixAt( i, matrix );
+                    // spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
 
                 }
             }
 
             function move_spheres() {
                 var x = S.getX();
+                var orientation = S.getOrientation();
                 if ( urlParams.has('lut') ) {
                     if ( urlParams.get('lut') === 'velocity' ) {
                         v = S.getVelocity();
                     }
-                    spheres.instanceColor.needsUpdate = true;
+                    // spheres.instanceColor.needsUpdate = true;
 
                 }
                 for ( let i = 0; i < params.N; i ++ ) {
-                    const matrix = new THREE.Matrix4();
-                    matrix.setPosition( x[i][0], x[i][1], x[i][2] );
+                    var object = spheres.children[i];
+
+                    // const matrix = new THREE.Matrix4();
+                    // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
                     if ( params.dimension == 4 ) {
                         var D_draw = 2*Math.sqrt(
                           Math.pow(radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
                         );
-                        matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
+                        object.scale.set(D_draw, D_draw, D_draw);
+                        // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
                     }
-                    spheres.setMatrixAt( i, matrix );
+                    // spheres.setMatrixAt( i, matrix );
+                    object.position.set( x[i][0], x[i][1], x[i][2] );
                     if ( urlParams.has('lut') ) {
                         if ( urlParams.get('lut') === 'velocity' ) {
                             spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
                         }
                     }
-
+                    for (var j = 0; j < params.N - 3; j++) {
+                      object.material.uniforms.xview.value[j] =
+                        params.d4_cur;
+                      object.material.uniforms.xpart.value[j] =
+                        x[i][j + 3];
+                    }
+                    object.material.uniforms.A.value = orientation[i];
+                    // if (params.dimension > 3) {
+                    //   object.material.uniforms.x4p.value = x[i][j + 3];
+                    //   object.material.uniforms.x4.value = params.d4_cur;
+                    // } else {
+                    //   object.material.uniforms.x4p.value = 0.0;
+                    // }
                 }
-                spheres.instanceMatrix.needsUpdate = true;
+                // spheres.instanceMatrix.needsUpdate = true;
+                // console.log(orientation[0])
             }
 
             async function NDDEMPhysics() {

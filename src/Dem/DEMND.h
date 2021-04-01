@@ -108,6 +108,8 @@ public:
     std::vector<std::vector<double>> getX() { return X; }
     void setX(std::vector < std::vector <double> > X_) { X = X_; }
 
+    std::vector<std::vector<double>> getOrientation() { return A; }
+
     std::vector<double> getBoundary(int a) { return P.Boundaries[a]; }
     void setBoundary(int a, std::vector<double> loc) {
         P.Boundaries[a][0] = loc[0]; // low value
@@ -372,6 +374,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<3>::getX)
+        .function("getOrientation", &Simulation<3>::getOrientation)
         .function("getVelocity", &Simulation<3>::getVelocity)
         // .function("getX2", &Simulation<3>::getX2)
         .function("getBoundary", &Simulation<3>::getBoundary)
@@ -387,6 +390,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<4>::getX)
+        .function("getOrientation", &Simulation<4>::getOrientation)
         .function("getVelocity", &Simulation<4>::getVelocity)
         // .function("getX2", &Simulation<3>::getX2)
         .function("getBoundary", &Simulation<4>::getBoundary)
