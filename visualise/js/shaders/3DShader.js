@@ -11,6 +11,7 @@ var uniforms = {
   x4: { value: 0 },
   x4p: { value: 0 },
   R: { value: 0.5 },
+  ambient: { value: 1.0 },
 };
 
 for (var ij = 0; ij < N - 3; ij++) {
@@ -33,6 +34,7 @@ var NDDEMShader = new ShaderMaterial({
     "uniform float N_lines;", // number of lines to render across particle
     "uniform float A[3*3];", // orientation matrix for this particle
     "uniform float R;", // particle radius
+
     "varying vec3 vColor;", // colour at vertex (output)
     "varying vec3 vNormal;", // normal at vertex (output)
 
@@ -90,14 +92,16 @@ var NDDEMShader = new ShaderMaterial({
   ].join("\n"),
 
   fragmentShader: [
+    "uniform float ambient;", // brightness of particle
+
     "varying vec3 vNormal;",
     "varying vec3 vColor;",
 
     "void main() {",
 
     // add directional lighting
-    "const float ambient = 1.0;",
-    "vec3 light = vec3( 1.0 );",
+    // "const float ambient = 1.0;",
+    "vec3 light = vec3( ambient );",
     "light = normalize( light );",
     "float directional = max( dot( vNormal, light ), 0.0 );",
     "gl_FragColor = vec4( 0.6*( ambient + directional ) * vColor, 1.0 );", // colours by vertex colour

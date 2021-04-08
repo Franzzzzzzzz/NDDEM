@@ -69,6 +69,12 @@
             let counter = 0;
             let p_controller, q_controller;
 
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            let INTERSECTED = null;
+            let last_intersection = null;
+            let locked_particle = null;
+            let ref_location;
 
             let loading_method = 'strain_controlled';
             if ( urlParams.has('stress_controlled') ) {
@@ -89,15 +95,6 @@
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
-            }
-
-            if ( params.dimension == 3 ) {
-                p_controller = new PIDcontroller(1e-6,1e-5,0);
-                q_controller = new PIDcontroller(1e-6,1e-5,0);
-            }
-            else {
-                p_controller = new PIDcontroller(1e-8,0,0);
-                q_controller = new PIDcontroller(1e-6,1e-5,0);
             }
 
             particle_volume = 4./3.*Math.PI*Math.pow(radius,3);
@@ -131,6 +128,14 @@
 
             const lut = new Lut( 'blackbody', 512 );
 
+            if ( params.dimension == 3 ) {
+                p_controller = new PIDcontroller(1e-6,1e-9,0);
+                q_controller = new PIDcontroller(1e-6,1e-5,0);
+            }
+            // else {
+            //     p_controller = new PIDcontroller(1e-7,1e-6,0);
+            //     q_controller = new PIDcontroller(1e-6,1e-5,0);
+            // }
 
             var quality = 5;
 
@@ -282,6 +287,8 @@
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
+                window.addEventListener( 'mousemove', onMouseMove, false );
+                window.addEventListener( 'keypress', onSelectParticle, false );
 
                 if ( show_stats ) { make_graph(); }
 
@@ -289,6 +296,28 @@
 			    animate();
 			}
 
+            function onMouseMove( event ) {
+
+            	// calculate mouse position in normalized device coordinates
+            	// (-1 to +1) for both components
+
+            	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+            }
+
+            function onSelectParticle( event ) {
+                if ( event.code === 'Space' ) {
+                    if ( locked_particle === null ) {
+                        locked_particle = INTERSECTED;
+                        // console.log(locked_particle);
+                        ref_location = locked_particle.position;
+                    }
+                    else {
+                        locked_particle = null;
+                    }
+                }
+            }
 
 
             function onWindowResize(){
@@ -334,6 +363,9 @@
                 S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
                 S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
                 S.setBoundary(2, [params.floor,params.roof]) ; // Set location of the walls in z
+                for (var j = 0; j < params.dimension - 3; j++) {
+                    S.setBoundary(j + 3, [-params.L_cur,params.L_cur]) ; // Set location of the walls in z
+                }
                 back.position.x = params.back - thickness/2.;
                 front.position.x = params.front + thickness/2.;
                 left.position.y = params.left - thickness/2.;
@@ -360,6 +392,10 @@
                 if ( clock.getElapsedTime() > 1 ) { started = true; }
 				requestAnimationFrame( animate );
                 move_spheres();
+                if ( locked_particle !== null ) {
+                    S.fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
+                }
+
                 if ( !params.paused ) {
                     new_time = clock.getElapsedTime()
 
@@ -380,9 +416,11 @@
                     let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
                     let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
 
-                    let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
-                    let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
+                    // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
+
+                    // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
 
                     pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
                     shear = sigma_33 - pressure;
@@ -395,6 +433,26 @@
                     }
 
                 }
+
+                // update the picking ray with the camera and mouse position
+            	raycaster.setFromCamera( mouse, camera );
+
+
+                const intersects = raycaster.intersectObjects( spheres.children );
+				if ( intersects.length > 0 ) { // if found something
+					if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
+                            if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
+    						INTERSECTED = intersects[ 0 ].object;
+                            INTERSECTED.material.uniforms.ambient.value = 5.0;
+					}
+				}
+                else { // didn't find anything
+					if ( INTERSECTED !== null ) { // there was something before
+                        INTERSECTED.material.uniforms.ambient.value = 1.0;
+                        INTERSECTED = null;
+                    }
+				}
+
 
 				renderer.render( scene, camera );
 
@@ -450,6 +508,7 @@
                     var object = new THREE.Mesh(geometrySphere, material);
                     object.position.set(0,0,0);
                     object.rotation.z = Math.PI / 2;
+                    object.NDDEM_ID = i;
                     spheres.add(object);
                     // spheres.setMatrixAt( i, matrix );
                     // spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );

@@ -107,6 +107,17 @@ public:
     //-------------------------------------------------------------------
     std::vector<std::vector<double>> getX() { return X; }
     void setX(std::vector < std::vector <double> > X_) { X = X_; }
+    void fixParticle(int a, std::vector<double> loc) {
+        X[a][0] = loc[0];
+        X[a][1] = loc[1];
+        X[a][2] = loc[2];
+        V[a][0] = 0;
+        V[a][1] = 0;
+        V[a][2] = 0;
+        for (int i=0; i<(d*(d-1)/2); i++) {
+            Omega[a][i] = 0;
+        }
+    }
 
     std::vector<std::vector<double>> getOrientation() { return A; }
 
@@ -374,6 +385,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<3>::getX)
+        .function("fixParticle", &Simulation<3>::fixParticle)
         .function("getOrientation", &Simulation<3>::getOrientation)
         .function("getVelocity", &Simulation<3>::getVelocity)
         // .function("getX2", &Simulation<3>::getX2)
@@ -390,6 +402,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
         // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
         .function("getX", &Simulation<4>::getX)
+        .function("fixParticle", &Simulation<4>::fixParticle)
         .function("getOrientation", &Simulation<4>::getOrientation)
         .function("getVelocity", &Simulation<4>::getVelocity)
         // .function("getX2", &Simulation<3>::getX2)
