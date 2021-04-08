@@ -71,6 +71,9 @@
 
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
+            let intersection_plane = new THREE.Plane();
+            let camera_direction = new THREE.Vector3();
+
             let INTERSECTED = null;
             let last_intersection = null;
             let locked_particle = null;
@@ -129,8 +132,8 @@
             const lut = new Lut( 'blackbody', 512 );
 
             if ( params.dimension == 3 ) {
-                p_controller = new PIDcontroller(1e-6,1e-9,0);
-                q_controller = new PIDcontroller(1e-6,1e-5,0);
+                p_controller = new PIDcontroller(1e-5,1e-9,0);
+                q_controller = new PIDcontroller(1e-5,1e-9,0);
             }
             // else {
             //     p_controller = new PIDcontroller(1e-7,1e-6,0);
@@ -307,11 +310,17 @@
             }
 
             function onSelectParticle( event ) {
+                // console.log(camera.getWorldDirection() )
                 if ( event.code === 'Space' ) {
                     if ( locked_particle === null ) {
                         locked_particle = INTERSECTED;
                         // console.log(locked_particle);
                         ref_location = locked_particle.position;
+
+                        camera.getWorldDirection( camera_direction ); // update camera direction
+                        // set the plane for the particle to move along to be orthogonal to the camera
+                        intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
+                                                                          locked_particle.position );
                     }
                     else {
                         locked_particle = null;
@@ -393,7 +402,20 @@
 				requestAnimationFrame( animate );
                 move_spheres();
                 if ( locked_particle !== null ) {
+                    // console.log(locked_particle)
+                    // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
+                        // console.log('success!')
+        				// ref_location.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
+        			// }
+                    // ref_location.x = mouse.x;
+                    raycaster.ray.intersectPlane( intersection_plane, ref_location);
+                    ref_location.clamp( new THREE.Vector3(back.position.x,  left.position.y,floor.position.z),
+                                        new THREE.Vector3(front.position.x,right.position.y, roof.position.z) );
+                    // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
+                        // console.log(ref_location.x)
+                        // console.log(back.position.x)
                     S.fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
+                    // }
                 }
 
                 if ( !params.paused ) {

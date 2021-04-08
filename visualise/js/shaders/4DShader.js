@@ -11,6 +11,7 @@ var uniforms = {
   x4: { value: 0 },
   x4p: { value: 0 },
   R: { value: 0.5 },
+  ambient: { value: 1.0 },
 };
 
 for (var ij = 0; ij < N - 3; ij++) {
@@ -94,13 +95,15 @@ var NDDEMShader = new ShaderMaterial({
   ].join("\n"),
 
   fragmentShader: [
+    "uniform float ambient;", // brightness of particle
+
     "varying vec3 vNormal;",
     "varying vec3 vColor;",
 
     "void main() {",
 
     // add directional lighting
-    "const float ambient = 1.0;",
+    // "const float ambient = 1.0;",
     "vec3 light = vec3( 1.0 );",
     "light = normalize( light );",
     "float directional = max( dot( vNormal, light ), 0.0 );",
