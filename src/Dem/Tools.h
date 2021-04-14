@@ -198,6 +198,9 @@ static v1d  wedgeproduct (cv1d &a, cv1d &b) ; ///< Wedge product of vectors
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; ///< Wedge product in-place
 static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } ///< Transposition
 static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } ///< Transpose in-place
+static double det_Gauss(v2d m) ;
+static v2d inv_Gauss(v2d m) ;
+static v1d flatten (v2d a) {v1d res; for (auto v: a) for (auto v2:v) res.push_back(v2) ; return(res) ;}
 ///@}
 
 /** @name Saving and writing functions */
@@ -210,6 +213,18 @@ static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, 
 static int write1D (char path[], v1d table) ;
 static int writeinline(initializer_list< v1d >) ;
 static int writeinline_close(void) ;
+
+static void display (v2d a) {for (auto v: a) {for(auto v2: v) printf("%10.3g ", v2) ; printf("\n") ;} }
+static void display (v1d a) { for (auto v: a) printf("%10.3g ", v) ; printf("\n") ; }
+static void display (v1d a, int n)
+{
+  for (int j=0 ; j<a.size()/n ; j++)
+  {
+    for (int i=0 ; i<n ; i++)
+      printf("%10.3g ", a[j*n+i]) ;
+    printf("\n") ;
+  }
+}
 ///@}
 
 static v1d Eye ; ///< The identity matrix in dimension \<d\>
@@ -717,6 +732,74 @@ void Tools<d>::hyperspherical_phitox (double r, cv1d &phi, v1d &x)
     }
     x[d-1] *= sin(phi[d-2]) ;
 }
+
+//=================================================================================================
+template <int d>
+double Tools<d>::det_Gauss(v2d m)
+{
+  double det = m[0][0] ;
+  for (int i=0 ; i<d-1 ; i++)
+  {
+    for (int j=i+1 ; j<d ; j++)
+    {
+      double scale = m[j][i]/m[i][i];
+      for (int k=0 ; k<d ; k++)
+        m[j][k] = m[j][k]-m[i][k]*scale ;
+    }
+    det *= m[i+1][i+1] ;
+  }
+  //display(m) ;
+  return(det) ;
+}
+//---------------------------------------------------------------------------------------
+template <int d>
+v2d Tools<d>::inv_Gauss(v2d m)
+{
+  auto origin = m ;
+  // Extending m
+  for (int i=0 ; i<d ; i++)
+  {
+    m[i].resize(2*d, 0) ;
+    m[i][d+i]=1 ;
+  }
+  //display(m) ;
+
+  for (int i=0 ; i<d ; i++)
+  {
+    double scale = m[i][i] ;
+    for (int k=i ; k<2*d ; k++)
+      m[i][k]/=scale ;
+
+    for (int j=0 ; j<i ; j++)
+    {
+      double scale = m[j][i] ;
+      for (int k=i ; k<2*d ; k++)
+        m[j][k] -= m[i][k]*scale ;
+    }
+
+    for (int j=i+1 ; j<d ; j++)
+    {
+      double scale = m[j][i];
+      for (int k=0 ; k<2*d ; k++)
+        m[j][k] -= m[i][k]*scale ;
+    }
+
+  }
+  vector <vector<double>> res (d, vector<double>(d)) ;
+  for (int i=0 ; i<d ; i++)
+    for (int j=0 ; j<d ; j++)
+      res[i][j]=m[i][d+j] ;
+
+  //display(m) ;
+
+  /*auto a = flatten(res) ;
+  auto b = flatten(origin) ;
+  auto c = matmult(a,b) ;
+  display (c,d)  ; */
+  return (res) ;
+
+}
+
 
 /*
 Analytical functions for the momentum of inertia (cf mat script)
