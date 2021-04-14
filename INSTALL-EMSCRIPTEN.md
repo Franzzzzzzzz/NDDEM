@@ -2,7 +2,7 @@
 cd ~/code/emsdk/
 source ./emsdk_env.sh
 ./emsdk activate latest
-embuilder build boost_headersw
+embuilder build boost_headers
 embuilder build zlib
 cd ~/code/NDDEM/build
 emcmake cmake ../src
