@@ -34,7 +34,7 @@ int templatedmain (char * argv[])
         S.init_from_file (argv[3]) ;
     S.finalise_init() ;
 
-    S.step_forward() ;
+    S.step_forward_all() ;
 
     S.finalise() ;
 

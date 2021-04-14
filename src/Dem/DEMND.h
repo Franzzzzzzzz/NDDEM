@@ -127,7 +127,7 @@ public:
         P.interpret_command(in, X,V,Omega) ;
     }
     //--------------------------------------------------------------------
-    void step_forward ()
+    void step_forward_all ()
     {
       int nsteps = P.T/dt ;
       step_forward(nsteps) ;
