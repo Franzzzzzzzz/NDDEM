@@ -4,20 +4,25 @@
 #include <vector>
 #include <ctime>
 #include <cstring>
-//#include <omp.h>
-#include <emscripten.h>
+#ifndef NO_OPENMP
+    #include <omp.h>
+#endif
 
 #include "Typedefs.h"
 #include "Parameters.h"
 #include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"
-#include <emscripten/bind.h>
+#ifdef EMSCRIPTEN
+    #include <emscripten.h>
+    #include <emscripten/bind.h>
+    using namespace emscripten;
+#endif
+
 
 extern vector <std::pair<ExportType,ExportData>> * toclean ;
 extern XMLWriter * xmlout ;
 
-using namespace emscripten;
 
 template <int d>
 class Simulation {
@@ -89,14 +94,26 @@ public:
         // Initial state setup
         P.set_boundaries() ;
     }
+    //-------------------------------------------------------------------------
+    void init_from_file (char filename[])
+    {
+      P.load_datafile (filename, X, V, Omega) ;
+    }
+    //-------------------------------------------------------------------------
     void finalise_init () {
-        //P.init_particles(X, A) ;
         //if (strcmp(argv[3], "default"))
         //    P.load_datafile (argv[3], X, V, Omega) ;
         toclean = &(P.dumps) ;
         xmlout = P.xmlout ;
 
         displacement[0]=P.skinsqr*2 ;
+
+        #ifndef NO_OPENMP
+          const char* env_p = std::getenv("OMP_NUM_THREADS") ;
+          if (env_p!=nullptr) numthread = atoi (env_p) ;
+          omp_set_num_threads(numthread) ;
+        #endif
+
         MP.initialise(N, numthread, P) ;
 
         dt=P.dt ;
@@ -105,39 +122,17 @@ public:
         printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
     }
     //-------------------------------------------------------------------
-    std::vector<std::vector<double>> getX() { return X; }
-    void setX(std::vector < std::vector <double> > X_) { X = X_; }
-    void fixParticle(int a, std::vector<double> loc) {
-        X[a][0] = loc[0];
-        X[a][1] = loc[1];
-        X[a][2] = loc[2];
-        V[a][0] = 0;
-        V[a][1] = 0;
-        V[a][2] = 0;
-        for (int i=0; i<(d*(d-1)/2); i++) {
-            Omega[a][i] = 0;
-        }
-    }
-
-    std::vector<std::vector<double>> getOrientation() { return A; }
-
-    std::vector<double> getBoundary(int a) { return P.Boundaries[a]; }
-    void setBoundary(int a, std::vector<double> loc) {
-        P.Boundaries[a][0] = loc[0]; // low value
-        P.Boundaries[a][1] = loc[1]; // high value
-        P.Boundaries[a][2] = loc[1] - loc[0]; // length
-    }
-
-    std::vector<std::vector<double>> getWallForce() { return WallForce; }
-    std::vector<std::vector<double>> getVelocity() { return V; }
-
-    //-------------------------------------------------------------------
     void interpret_command (string in)
     {
         P.interpret_command(in, X,V,Omega) ;
     }
-
     //--------------------------------------------------------------------
+    void step_forward ()
+    {
+      int nsteps = P.T/dt ;
+      step_forward(nsteps) ;
+    }
+    //----
     void step_forward (int nt)
     {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
@@ -158,7 +153,7 @@ public:
 
         //----- Velocity Verlet step 1 : compute the new positions
         maxdisp[0] = 0 ; maxdisp[1] = 0 ;
-        //#pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
+        #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
         for (int i=0 ; i<N ; i++)
         {
             double disp, totdisp=0 ;
@@ -199,14 +194,21 @@ public:
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
 
-        int ID = 0 ; //omp_get_thread_num();
-        //double timebeg = omp_get_wtime();
-        ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
-        cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
-        CLp.reset() ; CLw.reset();
-
-        for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
         {
+         //int ID = 0 ; //OMP TODO
+         #ifdef NO_OPENMP
+         int ID = 0 ;
+         #else
+         int ID = omp_get_thread_num();
+         double timebeg = omp_get_wtime();
+         #endif
+         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
+         cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
+         CLp.reset() ; CLw.reset();
+
+         for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+         {
             tmpcp.setinfo(CLp.default_action());
             tmpcp.i=i ;
             for (int j=i+1 ; j<N ; j++) // Regular particles
@@ -251,19 +253,25 @@ public:
         }
         CLp.finalise() ;
         CLw.finalise() ;
-
+        #ifndef NO_OPENMP
+        MP.timing[ID] += omp_get_wtime()-timebeg;
+        #endif
+      } //END PARALLEL SECTION
         //-------------------------------------------------------------------------------
         // Force and torque computation
-        // Benchmark::start_clock("Forces");
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
         Tools<d>::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
         Tools<d>::setzero(Torque);
 
         //Particle - particle contacts
-        //#pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
         {
-            int ID = 0 ;// omp_get_thread_num();
-            //double timebeg = omp_get_wtime();
+          #ifdef NO_OPENMP
+            int ID = 0 ;
+          #else
+            int ID = omp_get_thread_num();
+            double timebeg = omp_get_wtime();
+          #endif
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
@@ -305,7 +313,9 @@ public:
 
             if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
             }
-            //MP.timing[ID] += omp_get_wtime()-timebeg;
+            #ifndef NO_OPENMP
+            MP.timing[ID] += omp_get_wtime()-timebeg;
+            #endif
         } //END PARALLEL PART
 
         // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
@@ -322,7 +332,7 @@ public:
         // Benchmark::stop_clock("Forces");
         //---------- Velocity Verlet step 3 : compute the new velocities
         // Benchmark::start_clock("Verlet last");
-        //#pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
+        #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
         for (int i=0 ; i<N ; i++)
         {
             //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
@@ -346,21 +356,32 @@ public:
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            // if (P.wallforcecompute)
-            // {
-            // char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
-            Tools<d>::setzero(WallForce) ;
             if (P.wallforcecompute)
             {
-            for (int i=0 ; i<MP.P ; i++)
-                for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
-                    Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
+               char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+               Tools<d>::setzero(WallForce) ;
+
+               for (int i=0 ; i<MP.P ; i++)
+                  for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+                      Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
+
+            Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
             }
-            // Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            // }
         }
 
         if (P.wallforcecompute) MP.delayedwall_clean() ;
+
+        // Load balancing on the procs as needed
+        #ifndef NO_OPENMP
+        MP.num_time++ ;
+        if (MP.num_time>100)
+        {
+          MP.load_balance() ;
+          // Cleaning the load balancing
+          MP.num_time = 0 ;
+          MP.timing = vector<double>(MP.P,0) ;
+        }
+        #endif
     }
   }
 
@@ -372,9 +393,36 @@ public:
     //fclose(logfile) ;
   }
 
+  //-------------------------------------------------------------------
+  std::vector<std::vector<double>> getX() { return X; }
+  void setX(std::vector < std::vector <double> > X_) { X = X_; }
+  void fixParticle(int a, std::vector<double> loc) {
+      X[a][0] = loc[0];
+      X[a][1] = loc[1];
+      X[a][2] = loc[2];
+      V[a][0] = 0;
+      V[a][1] = 0;
+      V[a][2] = 0;
+      for (int i=0; i<(d*(d-1)/2); i++) {
+          Omega[a][i] = 0;
+      }
+  }
+
+  std::vector<std::vector<double>> getOrientation() { return A; }
+
+  std::vector<double> getBoundary(int a) { return P.Boundaries[a]; }
+  void setBoundary(int a, std::vector<double> loc) {
+      P.Boundaries[a][0] = loc[0]; // low value
+      P.Boundaries[a][1] = loc[1]; // high value
+      P.Boundaries[a][2] = loc[1] - loc[0]; // length
+  }
+
+  std::vector<std::vector<double>> getWallForce() { return WallForce; }
+  std::vector<std::vector<double>> getVelocity() { return V; }
 
 } ;
 
+#ifdef EMSCRIPTEN
 EMSCRIPTEN_BINDINGS(my_class_example) {
     class_<Simulation<3>>("Simulation3")
         .constructor<int>()
@@ -446,7 +494,7 @@ struct TypeID<T,
 
 }  // namespace internal
 }  // namespace emscripten
-
+#endif
 
 
 

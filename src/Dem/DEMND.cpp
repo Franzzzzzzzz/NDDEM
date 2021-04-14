@@ -28,8 +28,16 @@ void sig_handler (int p)
 template <int d>
 int templatedmain (char * argv[])
 {
-    // Simulation<3> S(1000) ;
-    printf("Ran the main function!\n") ;
+    int NN=atoi(argv[2]) ;
+    Simulation<d> S(NN) ;
+    if (strcmp(argv[3], "default"))
+        S.init_from_file (argv[3]) ;
+    S.finalise_init() ;
+
+    S.step_forward() ;
+
+    S.finalise() ;
+
 return 0 ;
 }
 
