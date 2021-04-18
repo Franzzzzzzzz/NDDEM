@@ -85,6 +85,7 @@ public:
  void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; ///< \deprecated Measure distance between a ghost and a particle
  void check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
                    int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.
+ void check_facet_dst(const Parameters<d> & P, cv1d &X, int n, cp & contact) ;  ///< Find contact between hyperpyramid and grains
  void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
 
 private:
@@ -170,6 +171,36 @@ void ContactList<d>::check_ghost_dst(uint32_t gst, int n, double partialsum, uin
     }
     check_ghost_dst(gst-1, n, partialsum, mask|(1<<n), P, X1, X2, contact) ;
   }
+}
+
+//----------------------------------------
+template <int d>
+void ContactList<d>::check_facet_dst(const Parameters<d> & P, cv1d &X, int n, cp & contact)
+{
+    // Get the distance along the normal
+    double sum=0 ;
+    for (int k=0 ; k<d ; k++) sum += P.body[n].edges[0][k] * (X[k] - P.body[n].origin[k]) ;
+    sum=fabs(sum) ; 
+    
+    if (-P.skin < sum && sum < P.skin) //Carfull, compared with the previous distance calculations, the distance is not squared, since it is a dot product w/ normal
+    {
+     double sumcoord = 0, coord ;
+     for (int j=1 ; j<d ; j++)
+     {
+         coord=0; 
+         for (int k=0; k<d ; k++)
+            coord += P.body[n].edges[j][k] * (X[k] - P.body[n].origin[k]) ; 
+         if (coord<0 || coord >1) return ; // Not in the simplex, outside on one of the edges
+         sumcoord+=coord ;
+         if (sumcoord > 1 ) return ; // Not in the simplex due to sum coord > 1
+     }
+     
+     // If we end up here, we did got a contact
+     contact.j=n ; contact.contactlength=sum ;
+     insert(contact) ;
+    }
+    
+    
 }
 
 //-----------------------------------

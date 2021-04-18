@@ -32,8 +32,10 @@ public:
 
     void particle_particle (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Force & torque between 2 particles
-    void particle_wall     ( cv1d & Vi, cv1d &Omegai, double ri,
+    void particle_wall     (cv1d & Vi, cv1d &Omegai, double ri,
                                  int j, int orient, cp & Contact) ; ///< Force & torque between a particle and a wall
+    void particle_facet    (cv1d & Vi, cv1d & Omegai, double ri,
+                              cv1d & FacetNormal, cp & Contact) ; 
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
@@ -99,12 +101,12 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   //Relative velocity at contact
   Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
   Tools<d>::vMul(rrj, cn, rj-ovlp/2.) ; // rrj =  cn * (rj-ovlp/2.) ;
-  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - (Vj - Tools<d>::skewmatvecmult(Omegaj, rrj)) ; //TODO
+  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - (Vj - Tools<d>::skewmatvecmult(Omegaj, rrj)) ;
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
   //Normal force
-  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; //TODO
+  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ;
 
   //Tangential force computation: retrieve contact or create new contact
   tspr=Contact.tspr ;
@@ -131,7 +133,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
       Tools<d>::vSubScaled(Ft, P->Gammat, vt) ; //Ft -= (vt*Gammat) ;
 
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
-  Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ; //TODO check the minus sign
+  Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ;
 
   //Update contact history
   //History[make_pair(i,j)]=make_pair (true, tspr) ;
@@ -155,7 +157,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   rri = -cn * (ri-ovlp/2.) ;
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
   vn = cn * (Tools<d>::dot(vrel, cn)) ;
-  vt= vrel - vn ; //vt=self.vrel-vn*cn ; // BUG: from python, must be wrong
+  vt= vrel - vn ; 
   Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ;
 
   //Tangential force computation: retrieve contact or create new contact
@@ -186,6 +188,64 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
 
   //History[make_pair(i,-(2*j+k+1))]=make_pair (true, tspr) ;
+  Contact.tspr=tspr ;
+  Act.set(Fn, Ft, Torquei, Torquej) ;
+  return ;
+}
+
+//---------------------- particle facet contact ----------------------------
+template <int d>
+void Contacts<d>::particle_facet (cv1d & Vi, cv1d & Omegai, double ri,
+                                     cv1d & FacetNormal, cp & Contact)
+{
+  contactlength=Contact.contactlength ;
+  ovlp=ri-contactlength ;
+  if (ovlp<=0) {Act.setzero(d) ; return ;}
+  //printf("%g %g %g %g\n", ri, rj, Xi[2], Xj[2]) ; fflush(stdout) ;
+  cn = FacetNormal ; 
+  if (Tools<d>::sgn(contactlength) == -1)
+  {
+      cn *= -1 ; 
+      contactlength *= -1 ; 
+  }
+
+  //Relative velocity at contact
+  Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
+  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
+  Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
+  Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
+
+  //Normal force
+  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; 
+
+  //Tangential force computation: retrieve contact or create new contact
+  tspr=Contact.tspr ;
+  if (tspr.size()==0) tspr.resize(d,0) ;
+
+  Tools<d>::vAddScaled (tspr, P->dt, vt) ; //tspr += vt*dt ;
+  Tools<d>::vSubScaled(tspr, Tools<d>::dot(tspr,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
+  Tools<d>::vMul(Ft, tspr, - P->Kt) ; //Ft=  tspr*(-Kt) ;
+  Coulomb=P->Mu*Tools<d>::norm(Fn) ;
+
+  if (Tools<d>::norm(Ft) >= Coulomb)
+  {
+    if (Tools<d>::norm(tspr)>0)
+    {
+      Tools<d>::vMul(tvec, Ft, 1/Tools<d>::norm(Ft)) ; //tvec=Ft * (1/Tools<d>::norm(Ft)) ;
+      Tools<d>::vMul(Ftc, tvec, Coulomb) ; //Ftc = tvec * Coulomb ;
+      Ft=Ftc ;
+      Tools<d>::vMul(tspr, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
+    }
+    else
+      Tools<d>::setzero(Ft) ;
+  }
+  else
+      Tools<d>::vSubScaled(Ft, P->Gammat, vt) ; //Ft -= (vt*Gammat) ;
+
+  Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
+
+  //Update contact history
+  //History[make_pair(i,j)]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;
   return ;

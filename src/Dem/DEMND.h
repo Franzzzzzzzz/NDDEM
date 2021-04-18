@@ -203,9 +203,11 @@ public:
          int ID = omp_get_thread_num();
          double timebeg = omp_get_wtime();
          #endif
-         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
-         cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
-         CLp.reset() ; CLw.reset();
+         ContactList<d> & CLp = MP.CLp[ID] ; 
+         ContactList<d> & CLw = MP.CLw[ID] ;
+         ContactList<d> & CLb = MP.CLb[ID] ; 
+         CLp.reset() ; CLw.reset(); CLb.reset() ;
+         cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ; 
 
          for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
          {
@@ -250,9 +252,18 @@ public:
                         CLw.insert(tmpcp) ;
                     }
             }
+            
+            tmpcp.setinfo(CLb.default_action());
+            tmpcp.i=i ;
+            for (size_t j=0 ; j<P.body.size() ; j++) // Facet contacts
+            {
+                CLw.check_facet_dst (P, X[i], j, tmpcp) ; // Contact insertion handled by the subroutine
+            }
+            
         }
         CLp.finalise() ;
         CLw.finalise() ;
+        CLb.finalise() ;
         #ifndef NO_OPENMP
         MP.timing[ID] += omp_get_wtime()-timebeg;
         #endif
@@ -272,7 +283,8 @@ public:
             int ID = omp_get_thread_num();
             double timebeg = omp_get_wtime();
           #endif
-            ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
+            ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactList<d> & CLb = MP.CLb[ID] ;
+            Contacts<d> & C =MP.C[ID] ;
 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
@@ -302,6 +314,7 @@ public:
             //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
 
+            //------
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
             C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
@@ -313,6 +326,15 @@ public:
 
             if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
             }
+            
+            //------
+            for (auto it = CLb.v.begin() ; it!=CLb.v.end(); it++)
+            {
+                C.particle_facet(V[it->i],Omega[it->i],P.r[it->i], P.body[it->j].edges[0], *it) ; 
+                Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+                Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+            }
+            
             #ifndef NO_OPENMP
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif

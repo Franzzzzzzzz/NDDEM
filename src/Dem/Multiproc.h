@@ -33,6 +33,7 @@ public:
     disp_share() ;
     CLp.resize(P,ContactList<d>()) ;
     CLw.resize(P,ContactList<d>()) ;
+    CLb.resize(P,ContactList<d>()) ;
     C.resize(P, Contacts<d>(Param)) ;
     delayed.resize(P) ;
     delayedj.resize(P) ;
@@ -52,6 +53,7 @@ public:
 
   vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
   vector <ContactList<d>> CLw ; ///< ContactList particle-wall for each processor
+  vector <ContactList<d>> CLb ; ///< ContactList particle-body for each processor
   vector <Contacts<d>> C ; ///< Dummy Contacts for independent calculation per processor
   vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=d+1. 
   vector <double> timing ; ///< Used to record the time spent by each thread. 

@@ -85,7 +85,7 @@ static void setzero(v1d & a) {for (uint i=0 ; i<a.size() ; i++) a[i]=0 ; } ///< 
 static v1d flatten (v2d a) {v1d res; for (auto v: a) for (auto v2:v) res.push_back(v2) ; return(res) ;} ///< Flatten a 2D array to a 1D array
 static double norm (const vector <double> & a) {double res=0 ; for (uint i=0 ; i<a.size() ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; } ///< Norm of a vector
 static   void norm (v1d & res, cv2d & a) {for (uint i=0 ; i<a.size() ; i++) res[i] = norm(a[i]) ; } ///< Norm of a 2D-matrix, returns a 1D vector with the norms of the individual vectors
-static void normalize (vector <double> & a) {double res=norm(a) ; for (auto v:a) v/=res ; } ///< Normalise a vector
+static void normalize (vector <double> & a) {double res=norm(a) ; for (auto & v:a) v/=res ; } ///< Normalise a vector
 static double normdiff (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; } ///< Norm of a vector difference \f$|a-b|\f$
 static double normsq (const vector <double> & a) {double res=0 ; for (int i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; } ///< Norm squared
 static double normdiffsq (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (res) ; } ///< Norm squared of a vector difference \f$|a-b|^2\f$
@@ -199,10 +199,12 @@ static void  matvecmult (v1d & res, cv1d &A, cv1d &B) ; ///< Multiply a matrix w
 static v1d  wedgeproduct (cv1d &a, cv1d &b) ; ///< Wedge product of vectors
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; ///< Wedge product in-place
 static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } ///< Transposition
-static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } ///< Transpose in-place
+static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } ///< Transpose in-place for flatten matrix (v1d)
+static void transpose_inplace (v2d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i][j], a[j][i]) ; } ///< Transpose in-place for matrix (v2d)
+static void swap_vector (v1d & a, v1d & b) { for (size_t i=0 ; i<a.size() ; i++) std::swap(a[i], b[i]) ; } ///< Swap 2 vector componentwise
 static double det_Gauss(v2d m) ; ///< Compute a matrix determinant using Gauss elimination method
 static v2d inv_Gauss(v2d m) ; ///< Compute a matrix inverse using Gauss-Johnson elimination method
-void facet_normal(v2d & edges) ; ///< Compute normal for a N-1 hyperpyramid (N-1 manifold)
+static void facet_normal(v2d & edges) ; ///< Compute normal for a N-1 hyperpyramid (N-1 manifold)
 
 ///@}
 
@@ -217,9 +219,9 @@ static int write1D (char path[], v1d table) ;
 static int writeinline(initializer_list< v1d >) ;
 static int writeinline_close(void) ;
 
-static void display (v2d a) {for (auto v: a) {for(auto v2: v) printf("%10.3g ", v2) ; printf("\n") ;} }
-static void display (v1d a) { for (auto v: a) printf("%10.3g ", v) ; printf("\n") ; }
-static void display (v1d a, int n)
+static void display (v2d a, bool sep=false) {for (auto v: a) {for(auto v2: v) printf("%10.3g ", v2) ; printf("\n") ; } if (sep) printf("=========\n"); }
+static void display (v1d a, bool sep=false) { for (auto v: a) printf("%10.3g ", v) ; printf("\n") ; if (sep) printf("=========\n"); }
+static void display (v1d a, int n, bool sep=false)
 {
   for (int j=0 ; j<a.size()/n ; j++)
   {
@@ -227,6 +229,7 @@ static void display (v1d a, int n)
       printf("%10.3g ", a[j*n+i]) ;
     printf("\n") ;
   }
+  if (sep) printf("=========\n");
 }
 ///@}
 
@@ -744,6 +747,7 @@ double Tools<d>::det_Gauss(v2d m)
   int n = m.size() ; 
   for (int i=0 ; i<n-1 ; i++)
   {
+    if (det==0) break ; 
     for (int j=i+1 ; j<n ; j++)
     {
       double scale = m[j][i]/m[i][i];
@@ -760,19 +764,29 @@ template <int d>
 v2d Tools<d>::inv_Gauss(v2d m)
 {
   auto origin = m ;
+  vector<int> swapping (d, 0) ; 
   // Extending m
   for (int i=0 ; i<d ; i++)
   {
     m[i].resize(2*d, 0) ;
     m[i][d+i]=1 ;
   }
-  //display(m) ;
 
   for (int i=0 ; i<d ; i++)
   {
+    if (m[i][i]==0)
+    {
+        int j ; 
+        for (j=i+1 ; j<d && m[j][i]==0 ; j++) ;
+        if (j==d) printf("ERR: cannot invert the matrix\n") ; 
+        swap_vector(m[j],m[i]) ; 
+        swapping[i]=j ; 
+    }
+      
     double scale = m[i][i] ;
-    for (int k=i ; k<2*d ; k++)
-      m[i][k]/=scale ;
+    if (scale !=0)
+      for (int k=i ; k<2*d ; k++)
+        m[i][k]/=scale ;
 
     for (int j=0 ; j<i ; j++)
     {
@@ -787,8 +801,13 @@ v2d Tools<d>::inv_Gauss(v2d m)
       for (int k=0 ; k<2*d ; k++)
         m[j][k] -= m[i][k]*scale ;
     }
-
+    display(m, true) ;
   }
+  
+  for (int i=0 ; i<d ; i++)
+      if (swapping[i]!=0)
+          swap_vector(m[i],m[swapping[i]]) ; 
+  
   vector <vector<double>> res (d, vector<double>(d)) ;
   for (int i=0 ; i<d ; i++)
     for (int j=0 ; j<d ; j++)
@@ -809,15 +828,20 @@ void Tools<d>::facet_normal(v2d & edges)
     v2d submatrix(d-1, v1d(d-1,0)) ; 
     for (int i=1 ; i<d ; i++)
         for (int j=1 ; j<d ; j++)
-            submatrix[i-1, j-1]=edges[j][i] ; //Add a transposition as well
+            submatrix[i-1][j-1]=edges[j][i] ; //Add a transposition as well
     
     for (int i=0 ; i<d; i++)
     {
-        edges[0][i]=det_Gauss(submatrix) ;
-        for (int k=0 ; k<d-1 ; k++)
-            submatrix[i][k]=edges[k][i] ;
+        display(submatrix, true) ;
+        edges[0][i]=det_Gauss(submatrix)*((d-1+i)%2?-1:1) ;
+        if (i<d-1) 
+          for (int k=1 ; k<d ; k++)
+            submatrix[i][k-1]=edges[k][i] ;
     }
+    printf("%g\n", norm(edges[0])) ; 
     normalize(edges[0]) ; 
+    printf("%g\n", norm(edges[0])) ; 
+    
 }
 
 
