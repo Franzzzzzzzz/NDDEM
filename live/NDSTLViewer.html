@@ -14,10 +14,12 @@
             import * as THREE from "../visualise/node_modules/three/build/three.module.js";
 			import { OrbitControls } from './js/OrbitControls.js';
             import { STLLoader } from './js/NDSTLLoader.js';
+            import { GUI } from './js/dat.gui.module.js';
             var urlParams = new URLSearchParams(window.location.search);
 
-			let camera, scene, renderer, controls;
-
+			let camera, scene, renderer, controls, gui;
+            let material, mesh;
+            let params  = {'x4': 0.5}
             init();
 
 			async function init() {
@@ -61,21 +63,36 @@
 
                 window.addEventListener( 'resize', onWindowResize, false );
 
+                gui = new GUI();
+                // gui.width = 300;
+                gui.add( params, 'x4', 0, 1, 0.01 )
+                    .name( 'x4' ).listen()
+                    .onChange( function () { loadSTL(params.x4) } );
+
 			    animate();
 
-                loadSTL();
+                material = new THREE.PointsMaterial( { color: 0xff5533, size: 0.1 } );
+                // material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
+
+                loadSTL(params.x4);
 			}
 
-            function loadSTL() {
+
+            function loadSTL( W ) {
                 const loader = new STLLoader();
-				loader.load( './slotted_disk.stl', function ( geometry ) {
+				loader.load( ['./hypertriangle.stl', W], function ( geometry ) {
 
-					const material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
-					const mesh = new THREE.Mesh( geometry, material );
+                    if ( mesh !== undefined ) { console.log(mesh); scene.remove(mesh) }
 
-					// mesh.position.set( 0, - 0.25, 0.6 );
+                    // render as points
+					mesh = new THREE.Points( geometry, material );
+
+                    // render as mesh
+                    // mesh = new THREE.Mesh( geometry, material );
+                    // // wireframe?
+                    // material.wireframe = true;
+
 					mesh.rotation.set( 0, - Math.PI / 2, 0 );
-					// mesh.scale.set( 0.5, 0.5, 0.5 );
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;

@@ -76,18 +76,20 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: STLLoader,
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load: function ( params, onLoad, onProgress, onError ) {
+        let url = params[0];
+        let W = params[1];
 
 		var scope = this;
 
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( text ) {
+		loader.load( url,  function ( text ) {
 
 			try {
 
-				onLoad( scope.parse( text ) );
+				onLoad( scope.parse( text, W ) );
 
 			} catch ( e ) {
 
@@ -109,7 +111,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	parse: function ( data ) {
+	parse: function ( data, W ) {
 
 		function isBinary( data ) {
 
@@ -271,27 +273,38 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseASCII( data ) {
+		function parseASCII( data, W ) {
+            var N;
 
 			var geometry = new BufferGeometry();
+            var patternDimension = /solid ([0-9]+)/g ;
 			var patternSolid = /solid([\s\S]*?)endsolid/g;
 			var patternFace = /facet([\s\S]*?)endfacet/g;
 			var faceCounter = 0;
 
+            while ( ( result = patternDimension.exec( data ) ) !== null ) {
+                N = parseInt(result[1]);
+                console.log(N)
+            }
+
+
 			var patternFloat = /[\s]+([+-]?(?:\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?)/.source;
-			var patternVertex = new RegExp( 'vertex' + patternFloat + patternFloat + patternFloat, 'g' );
-			var patternNormal = new RegExp( 'normal' + patternFloat + patternFloat + patternFloat, 'g' );
+            var patternFloats = patternFloat.repeat(N);
+			var patternVertex = new RegExp( 'vertex' + patternFloats, 'g' );
+			var patternNormal = new RegExp( 'normal' + patternFloats, 'g' );
 
 			var vertices = [];
 			var normals = [];
 
-			var normal = new Vector3();
+			// var normal = new Vector3(); // oh boy...
 
 			var result;
 
 			var groupCount = 0;
 			var startVertex = 0;
 			var endVertex = 0;
+
+
 
 			while ( ( result = patternSolid.exec( data ) ) !== null ) {
 
@@ -302,45 +315,14 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				while ( ( result = patternFace.exec( solid ) ) !== null ) {
 
 					var vertexCountPerFace = 0;
-					var normalCountPerFace = 0;
 
 					var text = result[ 0 ];
 
-					while ( ( result = patternNormal.exec( text ) ) !== null ) {
-
-						normal.x = parseFloat( result[ 1 ] );
-						normal.y = parseFloat( result[ 2 ] );
-						normal.z = parseFloat( result[ 3 ] );
-						normalCountPerFace ++;
-
-					}
-
 					while ( ( result = patternVertex.exec( text ) ) !== null ) {
-
-						vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
-						normals.push( normal.x, normal.y, normal.z );
-						vertexCountPerFace ++;
-						endVertex ++;
-
+                        for ( var i=1; i<=N; i++ ) {
+                            vertices.push( parseFloat(result[i]) );
+                        }
 					}
-
-					// every face have to own ONE valid normal
-
-					if ( normalCountPerFace !== 1 ) {
-
-						console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
-
-					}
-
-					// each face have to own THREE valid vertices
-
-					if ( vertexCountPerFace !== 3 ) {
-
-						console.error( 'THREE.STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
-
-					}
-
-					faceCounter ++;
 
 				}
 
@@ -351,10 +333,34 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				groupCount ++;
 
 			}
+            let proj_vertices = [];
+            let n_simplices = vertices.length/N;
 
-			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+            // let W = 0.5
+            if ( N == 3 ) {
+                proj_vertices = vertices;
+            }
+            else if ( N == 4 ) {
+                for ( var i=0; i<n_simplices; i++ ) {
+                    for ( var j=i+1; j<n_simplices; j++ ) {
+                        let alpha = (W - vertices[i*N + 3])/(vertices[j*N + 3] - vertices[i*N + 3]);
+                        if ( vertices[i*N + 3] == W && vertices[j*N + 3] == W ) {
+                            // add two points
+                        }
+                        else if ( alpha => 0 && alpha <= 1 ) {
+                            for ( var n=0; n<N; n++ ) {
+                                console.log(vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]));
+                                proj_vertices.push( vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]) );
+                            }
+                        }
+                    }
+                }
+            }
 
+
+			geometry.setAttribute( 'position', new Float32BufferAttribute( proj_vertices, 3 ) );
+            console.log(geometry)
+			// geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 			return geometry;
 
 		}
@@ -394,9 +400,10 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		// start
 
-		var binData = ensureBinary( data );
+        return parseASCII( ensureString( data ), W );
+		// var binData = ensureBinary( data );
 
-		return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );
+		// return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );
 
 	}
 
