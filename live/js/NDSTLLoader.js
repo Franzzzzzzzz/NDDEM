@@ -284,7 +284,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
             while ( ( result = patternDimension.exec( data ) ) !== null ) {
                 N = parseInt(result[1]);
-                console.log(N)
+                // console.log(N)
             }
 
 
@@ -335,37 +335,41 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
             let proj_vertices = [];
             let n_simplices = vertices.length/N;
-
+            let n_vertices = 0;
             // let W = 0.5
             if ( N == 3 ) {
                 proj_vertices = vertices;
             }
             else if ( N == 4 ) {
+
                 for ( var i=0; i<n_simplices; i++ ) {
                     for ( var j=i+1; j<n_simplices; j++ ) {
-                        let alpha = (W - vertices[i*N + 3])/(vertices[j*N + 3] - vertices[i*N + 3]);
-                        if ( vertices[i*N + 3] == W && vertices[j*N + 3] == W ) {
+                        let alpha = (W - vertices[i*N + N-1])/(vertices[j*N + N-1] - vertices[i*N + N-1]);
+                        if ( vertices[i*N + N-1] == W && vertices[j*N + N-1] == W ) {
                             // alpha is not defined, we are coincident with W, add both points
-                            for ( var n=0; n<N; n++ ) {
+                            for ( var n=0; n<3; n++ ) {
                                 proj_vertices.push( vertices[i*N + n] );
                             }
-                            for ( var n=0; n<N; n++ ) {
+                            for ( var n=0; n<3; n++ ) {
                                 proj_vertices.push( vertices[j*N + n] );
                             }
+                            n_vertices++;
+                            n_vertices++;
                         }
-                        else if ( alpha > 0 && alpha < 1 ) {
+                        else if ( alpha > 0 && alpha <= 1 ) {
                             // alpha is in range
-                            for ( var n=0; n<N; n++ ) {
+                            for ( var n=0; n<3; n++ ) {
                                 proj_vertices.push( vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]) );
                             }
+                            n_vertices++;
                         }
                     }
                 }
             }
+            // console.log(proj_vertices.length/3)
 
 
 			geometry.setAttribute( 'position', new Float32BufferAttribute( proj_vertices, 3 ) );
-            console.log(geometry)
 			// geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 			return geometry;
 

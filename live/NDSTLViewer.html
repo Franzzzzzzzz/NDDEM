@@ -15,6 +15,8 @@
 			import { OrbitControls } from './js/OrbitControls.js';
             import { STLLoader } from './js/NDSTLLoader.js';
             import { GUI } from './js/dat.gui.module.js';
+            import { ConvexGeometry } from './js/ConvexGeometry.js';
+
             var urlParams = new URLSearchParams(window.location.search);
 
 			let camera, scene, renderer, controls, gui;
@@ -36,7 +38,7 @@
 					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
-				plane.position.y = - 0.5;
+				plane.position.y = - 0.05;
 				scene.add( plane );
 
 				plane.receiveShadow = true;
@@ -65,14 +67,14 @@
 
                 gui = new GUI();
                 // gui.width = 300;
-                gui.add( params, 'x4', 0, 1, 0.01 )
+                gui.add( params, 'x4', -2, 2, 0.01 )
                     .name( 'x4' ).listen()
                     .onChange( function () { loadSTL(params.x4) } );
 
 			    animate();
 
-                material = new THREE.PointsMaterial( { color: 0xff5533, size: 0.1 } );
-                // material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
+                // material = new THREE.PointsMaterial( { color: 0xff5533, size: 0.1 } );
+                material = new THREE.MeshStandardMaterial( { color: 0xff5533 } );
 
                 loadSTL(params.x4);
 			}
@@ -82,23 +84,38 @@
                 const loader = new STLLoader();
 				loader.load( ['./hypertriangle.stl', W], function ( geometry ) {
 
-                    if ( mesh !== undefined ) { console.log(mesh); scene.remove(mesh) }
+                    if ( mesh !== undefined ) { scene.remove(mesh) }
 
                     // render as points
-					mesh = new THREE.Points( geometry, material );
+					// mesh = new THREE.Points( geometry, material );
 
-                    // const wireframe = new THREE.WireframeGeometry( geometry );
-                    // mesh = new THREE.LineSegments( wireframe );
-                    // mesh.material.depthTest = false;
-                    // mesh.material.opacity = 0.25;
-                    // mesh.material.transparent = true;
+                    // render convex hull
+                    // console.log()
+                    // let points =
+                    let points = [];
+                    for ( var i = 0; i<geometry.attributes.position.array.length/3; i++ ) {
+                        points.push(new THREE.Vector3( geometry.attributes.position.array[3*i],
+                                                       geometry.attributes.position.array[3*i + 1],
+                                                       geometry.attributes.position.array[3*i + 2]
+                                                   ));
+                    }
+                    if ( points.length == 2 ) {
+                        console.log('got a line')
+                        mesh = new THREE.Line( geometry, material );
+                    }
+                    if ( points.length == 3 ) {
+                        mesh = new THREE.Mesh( geometry, material );
+                    }
+                    else if ( points.length > 3 ) {
+                        console.log(points)
+                        let ConvGeometry = new ConvexGeometry( points );
+                        mesh = new THREE.Mesh( ConvGeometry, material );
+                    }
 
-					mesh.rotation.set( 0, - Math.PI / 2, 0 );
 
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
-
-					scene.add( mesh );
+                    if ( points.length > 0 ) { scene.add( mesh ); }
 
 				} );
             }
