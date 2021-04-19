@@ -8,6 +8,7 @@ src/build/
 package-lock.json
 Samples
 Textures
+testing
 bin
 *.stackdump
 __pycache__

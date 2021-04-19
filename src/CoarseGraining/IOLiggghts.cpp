@@ -1,7 +1,7 @@
 #include "IOLiggghts.h"
 
 // Parameters
-#define TORUN 2
+/*#define TORUN 2
 
 #if TORUN==1
 struct Param {
@@ -29,7 +29,7 @@ struct Param {
   string save="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/CG" ;
 } P;
 
-#endif
+#endif*/
 
 //=======================================================
 int main(int argc, char * argv[])
@@ -37,23 +37,29 @@ int main(int argc, char * argv[])
   //Datafile D("/Users/FGuillard/Simulations/MD/PostProcessing/dump.test") ;
   Param P ;
 
-  if (argc==4)
+  if (argc<2) {printf("Expecting a json file as argument\n") ; std::exit(1) ; }
+  
+  std::ifstream i(argv[1]);
+  if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; std::exit(1) ; }
+  json param;
+  try { i >> param; }
+  catch(...) 
   {
-   P.atmdump=argv[1] ;
-   P.cfdump=argv[2] ;
-   P.save=argv[3] ;
+    printf("This is not a legal json file, here is what we already got:\n") ;
+    cout << param ;
   }
-  else if (argc>1)
-    {printf("ERROR: must give either 0 or 3 arguments\n") ; std::exit(1) ; }
-
+  P.from_json(param) ; 
+  
   printf("Initializing\n") ; fflush(stdout) ;
   Datafile D ;
   //D.open("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.test.gz") ;
   //D.opencf("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.forceEnergy.gz") ;
+  
   D.open(P.atmdump) ;
-  D.opencf(P.cfdump) ;
+  if (P.hascf) D.opencf(P.cfdump) ;
 
   int maxT=P.maxT ;
+
   Coarsing C(P.dim, P.boxes, P.boundaries, maxT) ;
   C.set_flags(P.flags) ;
   C.grid_setfields() ;
@@ -64,28 +70,40 @@ int main(int argc, char * argv[])
   {
     printf("Timestep: %d\n", i) ; fflush(stdout) ;
     D.read_full_ts(false) ;
-    printf("\e[1A") ;
   }
 
   for (int i=0 ; i<maxT ; i++)
   {
     printf("Timestep: %d\n", i) ; fflush(stdout) ;
+    
     D.read_full_ts(true) ;
+    
     C.cT++ ;
     D.set_data(C.data) ;
-    C.pass_1() ;
-    C.compute_fluc_vel() ;
-    C.compute_fluc_rot() ;
-    C.pass_2() ;
-    C.pass_3() ;
-    if (i==0) printf("\e[9A\e[0J") ;
-    else printf("\e[13A\e[0J") ;
+    
+    if (P.maxlevel>=1) 
+      C.pass_1() ;
+    
+    if (P.maxlevel>=2)
+    {
+      C.compute_fluc_vel() ;
+      C.compute_fluc_rot() ;
+      C.pass_2() ;
+    }
+    if (P.maxlevel>=3)
+      C.pass_3() ;
+    
+    //if (i==0) printf("\e[9A\e[0J") ;
+    //else printf("\e[13A\e[0J") ;
   }
 
-  C.mean_time() ;
-  C.write_netCDF(P.save) ;
-  //C.write_vtk (P.save) ;
-  //C.write_vtk("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/CG") ;
+  if (P.dotimeavg)
+    C.mean_time() ;
+  
+  if (P.saveformat == "netCDF")   C.write_netCDF(P.save) ;
+  else if (P.saveformat == "vtk") C.write_vtk (P.save) ;
+  else if (P.saveformat == "mat") C.write_matlab(P.save) ; 
+  else printf("Unknown writing format, unfortunately.\n") ; 
 
 }
 
@@ -111,6 +129,35 @@ filt_incf.push(*file_incf);
 incf=new istream (&(filt_incf)) ;
 return 0 ;
 }
+//-----------------------------------------------------------
+vector<vector<double>> Datafile::get_bounds()
+{
+ vector<vector<double>> res(2, vector<double>(3,0)) ;
+ string line ; int nothing ; 
+
+ getline(*in, line) ; //should be ITEM: TIMESTEP
+ getline(*in, line) ;
+ getline(*in, line) ; //should be NUMBER OF SOMETHING
+ getline(*in, line) ;
+
+ getline(*in, line) ; //should be BOX
+ *in >> res[0][0] >> res[1][0] ; 
+ *in >> res[0][1] >> res[1][1] ; 
+ *in >> res[0][2] >> res[1][2] ; 
+ return (res) ; 
+}
+//------------------------------------------------------------
+int Datafile::get_numts()
+{
+ int numts = 0 ; 
+ string line ; 
+ do 
+ { 
+   getline(*in, line) ;
+   if (line == "ITEM: TIMESTEP") numts++ ;    
+ } while (! in->eof()) ; 
+ return numts ; 
+}
 //------------------------------------------------------------
 int Datafile::read_full_ts(bool keep)
 {
@@ -119,7 +166,7 @@ for (int i=0 ; i<datacf.size() ; i++) datacf[i].resize(0) ;
 for (int i=0 ; i<tdata.size() ; i++) tdata[i].resize(0) ;
 tdata.resize(0) ;
 read_next_ts(in, false, keep) ;
-read_next_ts(incf, true, keep) ;
+if (incf != nullptr) read_next_ts(incf, true, keep) ;
 return 0 ;
 }
 //--------------------------------------------------------------
@@ -167,6 +214,8 @@ int Datafile::read_next_ts(istream *is, bool iscf, bool keep)
   if (iscf) do_post_cf() ;
   else do_post_atm() ;
  }
+
+return 0 ; 
 }
 //-------------------------------------------------
 int Datafile:: do_post_atm()
@@ -194,7 +243,7 @@ int Datafile:: do_post_atm()
  N+=nadded ;
 
  const int nvalue = 12 ;
- data.resize(nvalue, v1d (0,0)) ; //Order: mass Imom posxyz velxyz omegaxyz
+ data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz
  vector<string>::iterator it ;
  vector<int> lst ;
  vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz"} ;
@@ -217,10 +266,10 @@ int Datafile:: do_post_atm()
        //if (i==0 || i==1 || i==2 ) cout << termcolor::yellow ;
        //else cout << termcolor::red ;
    }
-  cout << flst[i] << " " ;
+  cout << flst[i] << " " << lst[i] << "\n" ;
   }
  //cout << "\n" << termcolor::reset ;
- if (lst[0]<0 || lst[1]<0 || lst[2]<0) cout << "Reconstruction using Radius=" << Radius << " and density=" << Rho <<".\n";
+ if (lst[0]<0 || lst[1]<0 || lst[2]<0) cout << "Reconstruction using Radius=" << Radius << " and density=" << Rho <<" if needed...\n";
  }
 
  for (i=0 ; i<nvalue ; i++)
@@ -233,10 +282,10 @@ int Datafile:: do_post_atm()
      }
      else
      {
-         if (i==0 || i==1 || i==2) data[i].resize(N,0) ;
+         data[i].resize(N,0) ;
          if (i==0) for (k=0 ; k<N ; k++) data[i][k]=Radius ;
-         if (i==1) for (k=0 ; k<N ; k++) data[i][k]=4/3. * M_PI * Radius * Radius * Radius * Rho ;
-         if (i==2) for (k=0 ; k<N ; k++) data[i][k]=2/5. * data[1][k] * Radius * Radius ;
+         if (i==1) for (k=0 ; k<N ; k++) data[i][k]=4/3. * M_PI * data[0][k] * data[0][k] * data[0][k] * Rho ;
+         if (i==2) for (k=0 ; k<N ; k++) data[i][k]=2/5. * data[1][k] * data[0][k] * data[0][k] ;
      }
  }
 
@@ -323,11 +372,15 @@ int Datafile::set_data(struct Data & D)
     D.vel.resize(3) ; D.vel={&(data[6][0]), &(data[7][0]), &(data[8][0])} ;
     D.omega.resize(3); D.omega={&(data[9][0]), &(data[10][0]), &(data[11][0])} ;
 
-    D.id1=&(datacf[0][0]) ;
-    D.id2=&(datacf[1][0]) ;
-    D.pospq.resize(3) ; D.pospq={&(datacf[2][0]),  &(datacf[3][0]),  &(datacf[4][0])} ;
-    D.lpq.resize (3); D.lpq={&(datacf[5][0]),  &(datacf[6][0]),  &(datacf[7][0])} ;
-    D.fpq.resize (3); D.fpq={&(datacf[8][0]),  &(datacf[9][0]),  &(datacf[10][0])} ;
-    D.mpq.resize (3); D.mpq={&(datacf[11][0]), &(datacf[12][0]), &(datacf[13][0])} ;
-    D.mqp.resize (3); D.mqp={&(datacf[14][0]), &(datacf[15][0]), &(datacf[16][0])} ;
+    if (incf != nullptr)
+    {
+      D.id1=&(datacf[0][0]) ;
+      D.id2=&(datacf[1][0]) ;
+      D.pospq.resize(3) ; D.pospq={&(datacf[2][0]),  &(datacf[3][0]),  &(datacf[4][0])} ;
+      D.lpq.resize (3); D.lpq={&(datacf[5][0]),  &(datacf[6][0]),  &(datacf[7][0])} ;
+      D.fpq.resize (3); D.fpq={&(datacf[8][0]),  &(datacf[9][0]),  &(datacf[10][0])} ;
+      D.mpq.resize (3); D.mpq={&(datacf[11][0]), &(datacf[12][0]), &(datacf[13][0])} ;
+      D.mqp.resize (3); D.mqp={&(datacf[14][0]), &(datacf[15][0]), &(datacf[16][0])} ;
+    }
+return 0 ; 
 }

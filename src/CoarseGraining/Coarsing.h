@@ -121,7 +121,6 @@ public :
         dx.resize(d, 0) ;
         for (int i=0 ; i<d ; i++)
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
-        printf("{%g %g %g %g}", dx[0], dx[1], dx[2], dx[3]) ;
         double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
