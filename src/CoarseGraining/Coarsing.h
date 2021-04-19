@@ -1,7 +1,7 @@
-/** \addtogroup CoarseGraining Coarse-graining 
- * 
- *  This modules handles the coarse graining in any number of dimensions, and has some neat features that are not that common even for 3D coarse graining. 
- * 
+/** \addtogroup CoarseGraining Coarse-graining
+ *
+ *  This modules handles the coarse graining in any number of dimensions, and has some neat features that are not that common even for 3D coarse graining.
+ *
  *  In particular, the following fields can be requested, equation numbering is from Babic, Marijan. "Average balance equations for granular materials." International journal of engineering science 35.5 (1997): 523-548.:<br>
  * "RHO"   "SCALAR"    Eq 36 Density<br>
  *  "I"     "SCALAR"    Eq 65 Moment of Inertia<br>
@@ -22,7 +22,7 @@
  *  "qRK"   "VECTOR"    Eq 73<br>
  *  "zT"    "SCALAR"    Eq 75<br>
  *  "zR"    "SCALAR"    Eq 76<br>
- *  
+ *
  *  @{ */
 
 
@@ -72,8 +72,8 @@ private :
 /// Contains Field informations
 struct Field {
  int flag ; ///< Flag for the given field
- string name ; ///< Name for the given field 
- string type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR 
+ string name ; ///< Name for the given field
+ string type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR
 };
 //-------------------------
 /// Data structure handling point data and contact data
@@ -84,7 +84,7 @@ int N ; ///< Number of particles
 double * mass ; ///< Particle masses
 double *Imom ; ///< Particle moment of inertia
 vector <double *> pos ; ///< Particle positions
-vector <double *> vel ;  ///<Particle velocity 
+vector <double *> vel ;  ///<Particle velocity
 vector <double *> omega ; ///< Particle angular velocity
 
 v2d vel_fluc ; ///< Fluctuating velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
@@ -94,17 +94,17 @@ int Ncf ; ///< Number of contacts
 double * id1 ; ///< Index of first particle in contact
 double * id2 ; ///< Index of the second particle in contact
 vector <double *> pospq ; ///< Location of contact point
-vector <double *> lpq ;  ///< Branch vector of the contact, use compute_lpq() to populate this. 
+vector <double *> lpq ;  ///< Branch vector of the contact, use compute_lpq() to populate this.
 vector <double *> fpq; ///< Force at contact
 vector <double *> mpq; ///< Moment of particle 1 on 2
 vector <double *> mqp ; ///< Moment of particle 2 on 1
 
 // Some useful functions
-int Nnonper=-1 ; ///< Used if additional particles are added as images through the periodic boundary conditions. 
+int Nnonper=-1 ; ///< Used if additional particles are added as images through the periodic boundary conditions.
 int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data structure
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
-int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ; ///< Copy particles through the periodic boundary conditions. Should call clean_periodic_atoms() after the full coarse-graining computation has been performed to clean the added atoms. 
-int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; } ///< Clean periodic atoms. 
+int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ; ///< Copy particles through the periodic boundary conditions. Should call clean_periodic_atoms() after the full coarse-graining computation has been performed to clean the added atoms.
+int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; } ///< Clean periodic atoms.
 } ;
 //------------------------------------------------------
 #include "WindowLibrary.h"
@@ -121,7 +121,7 @@ public :
         dx.resize(d, 0) ;
         for (int i=0 ; i<d ; i++)
           dx[i]=((box[1][i]-box[0][i])/double(npt[i])) ;
-        printf("{%g %g %g %g}", dx[0], dx[1], dx[2], dx[3]) ; 
+        printf("{%g %g %g %g}", dx[0], dx[1], dx[2], dx[3]) ;
         double w= (*std::min_element(dx.begin(),dx.end())*2) ; // w automatically set
         cutoff=2.5*w ; //TODO
         printf("Window and cutoff: %g %g \n", w, cutoff) ;
@@ -167,8 +167,8 @@ public :
     CGPoint * reverseloop (string type) ; ///< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ; ///< Find the closest CG point to a particle
     int find_closest_pq (int id) ; ///< Find the closest CG point to a contact
-    v1d interpolate_vel(int id) { return interpolate_vel_nearest (id) ; } ///< Interpolate the velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation. 
-    v1d interpolate_rot(int id) { return interpolate_rot_nearest (id) ; } ///< Interpolate the angular velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation. 
+    v1d interpolate_vel(int id) { return interpolate_vel_nearest (id) ; } ///< Interpolate the velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
+    v1d interpolate_rot(int id) { return interpolate_rot_nearest (id) ; } ///< Interpolate the angular velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
     v1d interpolate_vel_nearest (int id) ; ///< Nearest neighbor interpolation for the velocity
     v1d interpolate_rot_nearest (int id) ; ///< Nearest neighbor interpolation for the angular velocity
 
@@ -180,7 +180,7 @@ public :
     //double window_int(double r1, double r2) {return window_avg(r1, r2) ; } ///< Overload to avoid integration ...
     //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
     //double Lucy (double r) {static double cst=105./(16*M_PI*w*w*w) ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
-    double normdiff (v1d a, v1d b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; } ; ///< convenience function to to the difference of 2 vectors. 
+    double normdiff (v1d a, v1d b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; } ; ///< convenience function to to the difference of 2 vectors.
     // Coarse graining functions
     int pass_1 () ; ///< Coarse-grain anything based on particles (not contacts) which does not need fluctuating quantities
     int pass_2 () ; ///< Coarse-grain anything based on particles (not contacts) which needs fluctuating quantities (call the compute_fluc_ functions before)
@@ -241,56 +241,3 @@ int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, v
   Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
 return 0 ;
 }
-
-
-
-//==========================================================
-/** \brief Contains the parameters of the simulation & CG 
- */
-struct Param {
-  string dump ;
-  int skipT ;
-  int maxT ;
-  double rho ;
-  vector <string> flags ;
-  vector <int> boxes ;
-  vector <vector <double> > boundaries ;
-  int pbc = 0 ;
-  vector<double> Delta ;
-  vector <double> radius ;
-  string save = "CoarseGrained";
-  double windowsize = 1 ;
-  double cuttoff = 2.5 ;
-
-  void from_file(char path[])
-  {
-    ifstream in ;
-
-    in.open(path) ;
-    if (!in.is_open()) { printf("[Input] file cannot be open\n"); return ;}
-
-    while (! in.eof())
-      parsing(in) ;
-  }
-  void disp()
-  {
-    auto pbcprint = [](int a) {string s ="" ; for (;a>0; a>>=1) s = ((a&1)?"y":"n") + s ; return s ;} ;
-    printf("\n-----\n%s\nSkipping: %d\nFinal time: %d\nDensity: %g\nFlags: ", dump.c_str(), skipT, maxT, rho) ;
-    for (auto v: flags) printf("%s ", v.c_str()) ;
-    printf("\nBoxes: ") ;
-    for (auto v: boxes) printf("%d ", v) ;
-    printf("\nPBCs: %s\nWindowSize: %g\nCut-off: %g\nDeltas: ", pbcprint(pbc).c_str(), windowsize, cuttoff) ;
-    for (auto v: Delta) printf("%g ", v) ;
-    printf("\nBoundaries:") ;
-    for (auto v:boundaries)
-    {
-      printf("\n") ;
-      for (auto w:v)
-        printf("%g ", w);
-    }
-    printf("\n-----\n\n") ; fflush(stdout) ;
-  }
-private:
-  int parsing (istream & in) ;
-} ;
-
