@@ -87,10 +87,11 @@
                     // render as points
 					mesh = new THREE.Points( geometry, material );
 
-                    // render as mesh
-                    // mesh = new THREE.Mesh( geometry, material );
-                    // // wireframe?
-                    // material.wireframe = true;
+                    // const wireframe = new THREE.WireframeGeometry( geometry );
+                    // mesh = new THREE.LineSegments( wireframe );
+                    // mesh.material.depthTest = false;
+                    // mesh.material.opacity = 0.25;
+                    // mesh.material.transparent = true;
 
 					mesh.rotation.set( 0, - Math.PI / 2, 0 );
 

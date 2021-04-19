@@ -345,11 +345,17 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
                     for ( var j=i+1; j<n_simplices; j++ ) {
                         let alpha = (W - vertices[i*N + 3])/(vertices[j*N + 3] - vertices[i*N + 3]);
                         if ( vertices[i*N + 3] == W && vertices[j*N + 3] == W ) {
-                            // add two points
-                        }
-                        else if ( alpha => 0 && alpha <= 1 ) {
+                            // alpha is not defined, we are coincident with W, add both points
                             for ( var n=0; n<N; n++ ) {
-                                console.log(vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]));
+                                proj_vertices.push( vertices[i*N + n] );
+                            }
+                            for ( var n=0; n<N; n++ ) {
+                                proj_vertices.push( vertices[j*N + n] );
+                            }
+                        }
+                        else if ( alpha > 0 && alpha < 1 ) {
+                            // alpha is in range
+                            for ( var n=0; n<N; n++ ) {
                                 proj_vertices.push( vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]) );
                             }
                         }
