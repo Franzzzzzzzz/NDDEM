@@ -1,0 +1,21 @@
+{
+"particles": "dump.test",
+"fields" : ["RHO", "VAVG"] ,
+"boundaries": [[0,0,0],[1,1,1]],
+"time average": true,
+"savefile": "Res",
+"saveformat": "vtk",
+"mapping": {
+  "id1": "c_cout[1]",
+  "id2": "c_cout[2]",
+  "per": "c_cout[3]",
+  "fx": "c_cout[4]",
+  "fy": "c_cout[5]", 
+  "fz": "c_cout[6]", 
+  "mx": "c_cout[7]", 
+  "my": "c_cout[8]",
+  "mz": "c_cout[9]"
+}
+
+
+}

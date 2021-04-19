@@ -43,6 +43,8 @@ public:
     int set_data(struct Data & D) ;
     vector<vector<double>> get_bounds () ; 
     int get_numts () ; 
+    
+    std::map <std::string, std::string> cfmapping ; 
 
 private:
     int read_next_ts(istream *is, bool iscf, bool keep) ;
@@ -66,6 +68,7 @@ public:
   vector <vector <double> > boundaries={{0,0,0},{1,1,1}} ;
   string save="" ;
   string saveformat="" ; 
+  std::map <std::string, std::string> cfmapping ; 
   
   bool hascf = false ; 
   bool dotimeavg = false ; 
@@ -111,6 +114,9 @@ void Param::from_json(json &j)
     
     v = j.find("boxes") ;
     if (v != j.end()) boxes = v->get<decltype(boxes)>();
+    
+    v = j.find("mapping") ;
+    if (v != j.end()) cfmapping= v->get<decltype(cfmapping)>();
     
     v = j.find("boundaries") ;
     if (v != j.end()) {boundaries = v->get<decltype(boundaries)>(); needbounds=false ; }

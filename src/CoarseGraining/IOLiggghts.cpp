@@ -52,6 +52,7 @@ int main(int argc, char * argv[])
   
   printf("Initializing\n") ; fflush(stdout) ;
   Datafile D ;
+  D.cfmapping = P.cfmapping ; 
   //D.open("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.test.gz") ;
   //D.opencf("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.forceEnergy.gz") ;
   
@@ -302,7 +303,24 @@ int Datafile::do_post_cf()
 
  vector<string>::iterator it ;
  vector<int> lst ;
- it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[1]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id1
+ vector<string> tofind = {"id1", "id2", "per", "fx", "fy", "fz", "mx", "my", "mz"} ; 
+ 
+ for (auto name : tofind)
+ {
+   auto mapper=cfmapping.find(name) ;
+   if (mapper != cfmapping.end())
+   {
+       it=std::find(fieldscf.begin(), fieldscf.end(), mapper->second) ; 
+       if ( it != fieldscf.end()) 
+           lst.push_back(it-fieldscf.begin()) ; 
+       else 
+           lst.push_back(-1) ;
+   }
+   else 
+    lst.push_back(-1) ;
+ }
+ 
+ /*it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[1]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id1
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[2]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id2
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[3]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //per
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[4]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //fx
@@ -310,7 +328,7 @@ int Datafile::do_post_cf()
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[6]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //fz
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[7]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //mx
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[8]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //my
- it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[9]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //mz
+ it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[9]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //mz*/
 
  cout << "Assuming all the cf data are here (c_cout[1] to 9)...\n" ; fflush(stdout) ;
 
