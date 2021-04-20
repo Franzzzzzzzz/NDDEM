@@ -75,6 +75,9 @@ public:
   uint8_t maxlevel = 3 ; 
   
   void from_json (json & j) ;
+  string windowstr = ""; 
+  Windows window = Windows::Lucy3D ; 
+  double windowsize ; 
 
 private :
   bool needmaxts = true ; 
@@ -97,6 +100,10 @@ void Param::from_json(json &j)
     v = j.find("saveformat") ; 
     if (v == j.end()) { printf("The key 'saveformat' is required\n") ; std::exit(3) ; }
     else saveformat = v->get<string>();
+    
+    v = j.find("window size") ;
+    if (v != j.end()) windowsize = v->get<double>();
+    else { printf("The key 'window size' is required\n") ; std::exit(3) ; }
     
     v = j.find("forces") ; 
     if (v != j.end()) {cfdump = v->get<string>(); hascf = true ; }
@@ -124,6 +131,9 @@ void Param::from_json(json &j)
     
     v = j.find("time average") ;
     if (v != j.end()) {dotimeavg = v->get<bool>(); }
+    
+    v = j.find("window") ;
+    if (v != j.end()) windowstr = v->get<string>();
     
     post_init() ; 
 }
@@ -179,6 +189,18 @@ void Param::post_init()
         Datafile D ; // Temporary datafile in principle the destructor handles the file closing ...
         D.open(atmdump) ; 
         maxT = D.get_numts() ; 
+    }
+    
+    if (windowstr != "")
+    {
+     if (windowstr=="Rect3D") window=Windows::Rect3D ; 
+     else if ( windowstr=="Rect3DIntersect") window=Windows::Rect3DIntersect ; 
+     else if ( windowstr=="Lucy3D") window=Windows::Lucy3D ; 
+     else if ( windowstr=="Hann3D") window=Windows::Hann3D ; 
+     else if ( windowstr=="RectND") window=Windows::RectND ; 
+     else if ( windowstr=="LucyND") window=Windows::LucyND ; 
+     else if ( windowstr=="LucyND_Periodic") window=Windows::LucyND_Periodic ; 
+     else {printf("Unknown windowing function.\n") ; std::exit(4) ; }
     }
 }
 

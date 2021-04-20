@@ -62,6 +62,7 @@ int main(int argc, char * argv[])
   int maxT=P.maxT ;
 
   Coarsing C(P.dim, P.boxes, P.boundaries, maxT) ;
+  C.setWindow(P.window,P.windowsize) ;
   C.set_flags(P.flags) ;
   C.grid_setfields() ;
 
@@ -383,6 +384,7 @@ return 0 ;
 int Datafile::set_data(struct Data & D)
 {
     D.N=N ; D.Ncf=Ncf ;
+    D.radius=&(data[0][0]) ; 
     D.mass=&(data[1][0]) ;
     D.Imom=&(data[2][0]) ;
 
