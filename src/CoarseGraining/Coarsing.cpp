@@ -64,6 +64,34 @@ FIELDS.push_back({0x040000, "zR"   , "SCALAR"});    //Eq 76
 return 0 ;
 }
 
+//-------------------------------------------------------
+int Coarsing::setWindow (Windows win, double w)
+{
+ switch (win) {
+  case Windows::Rect3D :
+    setWindow<Windows::Rect3D> (w) ;
+    break ;
+  case Windows::Rect3DIntersect :
+    setWindow<Windows::Rect3DIntersect> (w) ;
+    break ;
+  case Windows::Lucy3D :
+    setWindow<Windows::Lucy3D> (w) ;
+    break ;
+  case Windows::Hann3D :
+    setWindow<Windows::Hann3D> (w) ;
+    break ;
+  case Windows::RectND :
+    setWindow<Windows::RectND> (w) ;
+    break ;
+  case Windows::LucyND :
+    setWindow<Windows::LucyND> (w) ;
+    break ;
+  default:
+    printf("Unknown window, check Coarsing::setWindow") ;
+ }
+return 0 ;
+}
+
 //=========================================================
 int Coarsing::grid_generate()
 {

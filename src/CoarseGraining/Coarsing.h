@@ -25,6 +25,8 @@
  *
  *  @{ */
 
+#ifndef COARSING_H
+#define COARSING_H
 
 #include <cstdlib>
 #include <cstdio>
@@ -200,33 +202,7 @@ public :
     int write_matlab (string path, bool squeeze = false) ; ///< Write CG data as Matlab file
 } ;
 
-//-------------------------------------------------------
-int Coarsing::setWindow (Windows win, double w)
-{
- switch (win) {
-  case Windows::Rect3D :
-    setWindow<Windows::Rect3D> (w) ; 
-    break ;
-  case Windows::Rect3DIntersect :
-    setWindow<Windows::Rect3DIntersect> (w) ; 
-    break ;
-  case Windows::Lucy3D :
-    setWindow<Windows::Lucy3D> (w) ; 
-    break ;
-  case Windows::Hann3D :
-    setWindow<Windows::Hann3D> (w) ; 
-    break ;
-  case Windows::RectND :
-    setWindow<Windows::RectND> (w) ; 
-    break ;
-  case Windows::LucyND :
-    setWindow<Windows::LucyND> (w) ; 
-    break ;
-  default:
-    printf("Unknown window, check Coarsing::setWindow") ;    
- }
-return 0 ; 
-}
+
 //-------------------------------------------------------
 template <Windows W>
 int Coarsing::setWindow ()
@@ -259,7 +235,7 @@ int Coarsing::setWindow (double w)
       default:
         printf("Unknown window, check Coarsing::setWindow") ;
   }
-  cutoff = Window->cutoff() ; 
+  cutoff = Window->cutoff() ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
   return 0 ;
 }
@@ -275,3 +251,5 @@ int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, v
   Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
 return 0 ;
 }
+
+#endif

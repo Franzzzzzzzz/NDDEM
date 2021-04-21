@@ -1,0 +1,10 @@
+solid 4
+   facet normal 0.000000e+000 0.000000e+000 -1.000000e+000
+      outer loop
+         vertex 1 1 0 0.5
+         vertex 0 1 0 0.45
+         vertex 0 1 1 0.5
+         vertex 0 0 1 0.51
+      endloop
+   endfacet
+endsolid
