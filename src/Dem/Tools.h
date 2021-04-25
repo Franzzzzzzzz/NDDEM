@@ -744,10 +744,10 @@ template <int d>
 double Tools<d>::det_Gauss(v2d m)
 {
   double det = m[0][0] ;
-  int n = m.size() ; 
+  int n = m.size() ;
   for (int i=0 ; i<n-1 ; i++)
   {
-    if (det==0) break ; 
+    if (det==0) break ;
     for (int j=i+1 ; j<n ; j++)
     {
       double scale = m[j][i]/m[i][i];
@@ -764,7 +764,7 @@ template <int d>
 v2d Tools<d>::inv_Gauss(v2d m)
 {
   auto origin = m ;
-  vector<int> swapping (d, 0) ; 
+  vector<int> swapping (d, 0) ;
   // Extending m
   for (int i=0 ; i<d ; i++)
   {
@@ -776,13 +776,13 @@ v2d Tools<d>::inv_Gauss(v2d m)
   {
     if (m[i][i]==0)
     {
-        int j ; 
+        int j ;
         for (j=i+1 ; j<d && m[j][i]==0 ; j++) ;
-        if (j==d) printf("ERR: cannot invert the matrix\n") ; 
-        swap_vector(m[j],m[i]) ; 
-        swapping[i]=j ; 
+        if (j==d) printf("ERR: cannot invert the matrix\n") ;
+        swap_vector(m[j],m[i]) ;
+        swapping[i]=j ;
     }
-      
+
     double scale = m[i][i] ;
     if (scale !=0)
       for (int k=i ; k<2*d ; k++)
@@ -803,11 +803,7 @@ v2d Tools<d>::inv_Gauss(v2d m)
     }
     display(m, true) ;
   }
-  
-  for (int i=0 ; i<d ; i++)
-      if (swapping[i]!=0)
-          swap_vector(m[i],m[swapping[i]]) ; 
-  
+
   vector <vector<double>> res (d, vector<double>(d)) ;
   for (int i=0 ; i<d ; i++)
     for (int j=0 ; j<d ; j++)
@@ -825,23 +821,23 @@ v2d Tools<d>::inv_Gauss(v2d m)
 template <int d>
 void Tools<d>::facet_normal(v2d & edges)
 {
-    v2d submatrix(d-1, v1d(d-1,0)) ; 
+    v2d submatrix(d-1, v1d(d-1,0)) ;
     for (int i=1 ; i<d ; i++)
         for (int j=1 ; j<d ; j++)
             submatrix[i-1][j-1]=edges[j][i] ; //Add a transposition as well
-    
+
     for (int i=0 ; i<d; i++)
     {
         display(submatrix, true) ;
         edges[0][i]=det_Gauss(submatrix)*((d-1+i)%2?-1:1) ;
-        if (i<d-1) 
+        if (i<d-1)
           for (int k=1 ; k<d ; k++)
             submatrix[i][k-1]=edges[k][i] ;
     }
-    printf("%g\n", norm(edges[0])) ; 
-    normalize(edges[0]) ; 
-    printf("%g\n", norm(edges[0])) ; 
-    
+    printf("%g\n", norm(edges[0])) ;
+    normalize(edges[0]) ;
+    printf("%g\n", norm(edges[0])) ;
+
 }
 
 

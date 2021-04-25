@@ -5,6 +5,7 @@ src/Dem/DEMND
 src/Dem/xml2vtk
 src/Texturing/Texturing
 src/build/
+examples/STLTesting
 package-lock.json
 Samples
 Textures

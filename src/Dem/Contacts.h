@@ -35,7 +35,7 @@ public:
     void particle_wall     (cv1d & Vi, cv1d &Omegai, double ri,
                                  int j, int orient, cp & Contact) ; ///< Force & torque between a particle and a wall
     void particle_facet    (cv1d & Vi, cv1d & Omegai, double ri,
-                              cv1d & FacetNormal, cp & Contact) ; 
+                              cv1d & FacetNormal, cp & Contact) ;
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
@@ -157,7 +157,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   rri = -cn * (ri-ovlp/2.) ;
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
   vn = cn * (Tools<d>::dot(vrel, cn)) ;
-  vt= vrel - vn ; 
+  vt= vrel - vn ;
   Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ;
 
   //Tangential force computation: retrieve contact or create new contact
@@ -200,13 +200,15 @@ void Contacts<d>::particle_facet (cv1d & Vi, cv1d & Omegai, double ri,
 {
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
+  printf("A") ;
   if (ovlp<=0) {Act.setzero(d) ; return ;}
+  printf("B") ; 
   //printf("%g %g %g %g\n", ri, rj, Xi[2], Xj[2]) ; fflush(stdout) ;
-  cn = FacetNormal ; 
+  cn = FacetNormal ;
   if (Tools<d>::sgn(contactlength) == -1)
   {
-      cn *= -1 ; 
-      contactlength *= -1 ; 
+      cn *= -1 ;
+      contactlength *= -1 ;
   }
 
   //Relative velocity at contact
@@ -216,7 +218,7 @@ void Contacts<d>::particle_facet (cv1d & Vi, cv1d & Omegai, double ri,
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
   //Normal force
-  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; 
+  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ;
 
   //Tangential force computation: retrieve contact or create new contact
   tspr=Contact.tspr ;

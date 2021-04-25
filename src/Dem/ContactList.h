@@ -180,27 +180,26 @@ void ContactList<d>::check_facet_dst(const Parameters<d> & P, cv1d &X, int n, cp
     // Get the distance along the normal
     double sum=0 ;
     for (int k=0 ; k<d ; k++) sum += P.body[n].edges[0][k] * (X[k] - P.body[n].origin[k]) ;
-    sum=fabs(sum) ; 
-    
+
     if (-P.skin < sum && sum < P.skin) //Carfull, compared with the previous distance calculations, the distance is not squared, since it is a dot product w/ normal
     {
      double sumcoord = 0, coord ;
      for (int j=1 ; j<d ; j++)
      {
-         coord=0; 
+         coord=0;
          for (int k=0; k<d ; k++)
-            coord += P.body[n].edges[j][k] * (X[k] - P.body[n].origin[k]) ; 
+            coord += P.body[n].edges[j][k] * (X[k] - P.body[n].origin[k]) ;
          if (coord<0 || coord >1) return ; // Not in the simplex, outside on one of the edges
          sumcoord+=coord ;
          if (sumcoord > 1 ) return ; // Not in the simplex due to sum coord > 1
      }
-     
+
      // If we end up here, we did got a contact
      contact.j=n ; contact.contactlength=sum ;
      insert(contact) ;
     }
-    
-    
+
+
 }
 
 //-----------------------------------

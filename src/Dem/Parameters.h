@@ -31,9 +31,9 @@ inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a
  */
 struct Facet {
     Facet(int n) {edges.resize(n,std::vector<double>(n,0)) ; origin.resize(n,0) ; }
-    std::vector<std::vector<double>> edges ; 
+    std::vector<std::vector<double>> edges ;
     std::vector<double> origin ;
-} ; 
+} ;
 
 /** \brief Generic class to handle the simulation set up
  *
@@ -96,7 +96,7 @@ public :
     vector <double> I ; ///< Particule moment of inertia
     vector <double> g ; ///< Gravity vector
     vector <bool> Frozen ; ///< Frozen atom if true
-    vector <Facet> body ; 
+    vector <Facet> body ;
     vector < vector <double> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}.
     string Directory ; ///< Saving directory
     bool orientationtracking ; ///< Track orientation?
@@ -127,7 +127,7 @@ public :
     void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
     int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z) ; ///< Dump writing functions
-    
+
     int read_stl (string path) ;
 
 // For Xml Writing
@@ -321,7 +321,6 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; }
        skinsqr=skin*skin ;
      }
-     printf("Something good should have happened %g \n", dt) ; fflush(stdout) ;
    }
    catch (const std::out_of_range & e) {
      if (!strcmp(line, "dumps"))
@@ -403,10 +402,10 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     printf("[INFO] Changing BC.\n") ;
     } ;
  Lvl0["body"] = [&]() {
-    std::string path ; 
-    in>>path ; 
+    std::string path ;
+    in>>path ;
     read_stl(path) ;
-    } ; 
+    } ;
 
 // Processing
  string line ;
@@ -750,90 +749,74 @@ return 0 ;
 
 //=============================================
 template <int d>
-int Parameters<d>::read_stl (string path) 
+int Parameters<d>::read_stl (string path)
 {
-    std::ifstream in ; 
+    std::ifstream in ;
     in.open(path.c_str(), std::ifstream::in) ;
-    if (!in.is_open()) 
-        printf("ERR: cannot find STL file %s.\n", path.c_str()) ; 
-    
-    string word ; 
-    
-    in>>word ; 
-    if (word != "solid") printf("WARN: not a compliant STL file A\n") ; 
-    in.ignore(1000, '\n') ; 
-    
-    int n=0 ; std::vector <double> origin(d,0) ; 
+    if (!in.is_open())
+        printf("ERR: cannot find STL file %s.\n", path.c_str()) ;
+
+    string word ;
+
+    in>>word ;
+    if (word != "solid") printf("WARN: not a compliant STL file A\n") ;
+    in.ignore(1000, '\n') ;
+
+    int n=0 ; std::vector <double> origin(d,0) ;
     while (! in.eof())
     {
-        in >> word ; 
+        in >> word ;
         if (word== "endsolid") break ;
-        if (word != "facet") printf("WARN: not a compliant STL file B\n") ; 
-        in >> word ; if (word != "normal") printf("WARN: not a compliant STL file C\n") ; 
-        
-        body.push_back(Facet(d)) ; 
-        
+        if (word != "facet") printf("WARN: not a compliant STL file B\n") ;
+        in >> word ; if (word != "normal") printf("WARN: not a compliant STL file C\n") ;
+
+        body.push_back(Facet(d)) ;
+
         double normallength = 0;
         for (int i=0 ; i<d ; i++)
         {
             in>>body[n].edges[0][i] ;
-            normallength += body[n].edges[0][i]*body[n].edges[0][i] ; 
+            normallength += body[n].edges[0][i]*body[n].edges[0][i] ;
         }
-        
+
         in >> word ; if (word != "outer") printf("WARN: not a compliant STL file D\n") ;
         in >> word ; if (word != "loop") printf("WARN: not a compliant STL file E\n") ;
-        
+
         for (int i=0 ; i<d ; i++)
         {
             in >> word ; if (word != "vertex") printf("WARN: not a compliant STL file F\n") ;
             for (int j=0 ; j<d ; j++)
             {
                 if (i==0)
-                    in >> body[n].origin[j] ; 
+                    in >> body[n].origin[j] ;
                 else
                 {
-                    in >> body[n].edges[i][j] ; 
-                    body[n].edges[i][j] -= body[n].origin[i] ;
+                    in >> body[n].edges[i][j] ;
+                    body[n].edges[i][j] -= body[n].origin[j] ;
                 }
             }
-            
+
         }
-        
+
         if (normallength==0) //need to compute the normals
-            Tools<d>::facet_normal(body[n].edges) ; 
-        
+            Tools<d>::facet_normal(body[n].edges) ;
+
         printf("====AAA\n") ;
-        Tools<d>::transpose_inplace(body[n].edges) ; 
+        Tools<d>::transpose_inplace(body[n].edges) ;
         Tools<d>::display(body[n].edges, true) ;
-        body[n].edges=Tools<d>::inv_Gauss(body[n].edges) ; 
+        body[n].edges=Tools<d>::inv_Gauss(body[n].edges) ;
         Tools<d>::display(body[n].edges) ;
         Tools<d>::display(body[n].edges[0]) ;
-        
+
         printf("====BBB\n") ;
         n++ ;
-        
+
         in >> word ; if (word != "endloop") printf("WARN: not a compliant STL file\n") ;
         in >> word ; if (word != "endfacet") printf("WARN: not a compliant STL file\n") ;
     }
-    
+
     in.close() ;
-    return n; 
+    return n;
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
