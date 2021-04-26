@@ -1,36 +1,5 @@
 #include "IOLiggghts.h"
 
-// Parameters
-/*#define TORUN 2
-
-#if TORUN==1
-struct Param {
-  string atmdump="/Users/FGuillard/Simulations/MD/EnergyBalance/005/dump.test.gz" ;
-  string cfdump="/Users/FGuillard/Simulations/MD/EnergyBalance/005/dump.forceEnergy.gz" ;
-  int skipT=0 ;
-  int maxT = 3 ;
-  vector <string> flags = {"RHO", "I", "VAVG", "TC", "TK", "ROT", "MC", "MK", "mC", "EKT", "eKT", "EKR", "eKR", "qTC", "qTK", "qRC", "qRK", "zT", "zR"} ;
-  int dim=3 ;
-  vector <int> boxes= {10,10,14} ;
-  vector <vector <double> > boundaries={{-0.0075,-0.0075,0},{0.0075,0.0075,0.021}} ;
-  string save="/Users/FGuillard/Simulations/MD/EnergyBalance/005/CG" ;
-} P;
-
-#elif TORUN==2
-struct Param {
-  string atmdump="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/dump.testEll006.gz" ;
-  string cfdump="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/dump.forceEll006.gz" ;
-  int skipT=500 ;
-  int maxT = 450 ;
-  vector <string> flags = {"RHO", "VAVG", "TC", "TK",} ;
-  int dim=3 ;
-  vector <int> boxes= {10,10,10} ;
-  vector <vector <double> > boundaries={{-0.015,-0.015,0},{0.015,0.015,0.03}} ;
-  string save="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/CG" ;
-} P;
-
-#endif*/
-
 //=======================================================
 int main(int argc, char * argv[])
 {
@@ -73,13 +42,13 @@ int main(int argc, char * argv[])
 
   for (int i=0 ; i<P.skipT; i++)
   {
-    printf("Timestep: %d\n", i) ; fflush(stdout) ;
+    printf("\rSkipping timestep: %d | ", i) ; fflush(stdout) ;
     D.read_full_ts(false) ;
   }
 
   for (int i=0 ; i<maxT ; i++)
   {
-    printf("Timestep: %d\n", i) ; fflush(stdout) ;
+    printf("\rTimestep: %d |", i) ; fflush(stdout) ;
 
     D.read_full_ts(true) ;
 
@@ -101,6 +70,7 @@ int main(int argc, char * argv[])
     //if (i==0) printf("\e[9A\e[0J") ;
     //else printf("\e[13A\e[0J") ;
   }
+  printf("\n") ; 
 
   if (P.dotimeavg)
     C.mean_time() ;
@@ -109,7 +79,8 @@ int main(int argc, char * argv[])
   else if (P.saveformat == "vtk") C.write_vtk (P.save) ;
   else if (P.saveformat == "mat") C.write_matlab(P.save) ;
   else printf("Unknown writing format, unfortunately.\n") ;
-
+ 
+  printf("\n") ; 
 }
 
 
@@ -245,7 +216,7 @@ int Datafile:: do_post_atm()
    if ( (*j)[idloc] != i)
      printf("ERR shouldn't happen %d %g\n", i, (*j)[idloc]) ;
  }
- printf("%d atom null added\n", nadded) ;
+ printf("%d null atom / %d | ", nadded, N) ;
  N+=nadded ;
 
  const int nvalue = 12 ;
@@ -347,7 +318,12 @@ int Datafile::do_post_cf()
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[8]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //my
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[9]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //mz*/
 
- cout << "Assuming all the cf data are here (c_cout[1] to 9)...\n" ; fflush(stdout) ;
+ static bool messagefirst = true ; 
+ if (messagefirst)
+ {
+   printf("Assuming all the cf data are here (c_cout[1] to 9)...\n") ; fflush(stdout) ;
+   messagefirst=false ; 
+ }
 
  int k ;
  for (j=0, k=0 ; j<Ncf ; j++)
@@ -426,7 +402,7 @@ int Datafile::do_post_cf()
 
      k++ ;
  }
- printf("Removed %d periodic contacts out of %d\n", Ncf-k, Ncf) ;
+ printf("-%d per contacts /%d | ", Ncf-k, Ncf) ;
  Ncf=k ;
 return 0 ;
 }

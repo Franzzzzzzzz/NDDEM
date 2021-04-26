@@ -287,7 +287,7 @@ struct Field * Coarsing::get_field(string nm)
 //===================================================
 int Coarsing::compute_fluc_vel ()
 {
-  printf("Starting vel fluctuation computation [d=%d]\r", d) ; fflush(stdout) ;
+  printf(" -> VelFluct") ; fflush(stdout) ;
   v1d vavg (d,0) ;
   data.vel_fluc.resize(d, std::vector <double> (data.N, 0.0)) ;
 
@@ -305,11 +305,12 @@ int Coarsing::compute_fluc_vel ()
 }
 int Coarsing::compute_fluc_rot ()
 {
-  printf("Starting rot fluctuation computation\r") ; fflush(stdout) ;
+  static bool messagefirst=true ; 
+  printf(" -> RotVelFluct") ; fflush(stdout) ;
   v1d omegaavg (d,0) ;
   data.rot_fluc.resize(d, v1d (data.N, 0)) ;
   int idrot=get_id("ROT") ;
-  if (idrot<0) {printf("WARN: cannot perform fluctuation rotation without ROT set\n") ; }
+  if (idrot<0 && messagefirst) {messagefirst=false ; printf("WARN: cannot perform fluctuation rotation without ROT set\n") ; }
   for (int i=0 ; i<data.N ; i++)
   {
     if (isnan(data.pos[0][i])) continue ;
@@ -349,6 +350,8 @@ int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
 vector<double> totweight(data.N,0) ;
 
+printf(" -> Pass 1") ; fflush(stdout) ;
+
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -377,10 +380,10 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 
-int nbzero = 0 ;
+/*int nbzero = 0 ;
 for (auto v : totweight)
   if (v==0) nbzero++ ;
-printf("%d \n", nbzero) ;fflush(stdout) ;
+printf("%d \n", nbzero) ;fflush(stdout) ; */
 
 // Intermediate pass (cg points)
 bool doEKT=true, doEKR=true ;
@@ -422,7 +425,7 @@ int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ;
 int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ;
 int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;
 int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;
-printf("Starting pass 2...\r") ; fflush(stdout) ;
+printf(" -> Pass 2") ; fflush(stdout) ;
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -454,7 +457,7 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 // Intermediate pass (cg points): devide by rho when needed
-printf("Starting intermediate 2...\r") ; fflush(stdout) ;
+printf(" -> subpass 2") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double tworho ;
@@ -481,7 +484,7 @@ int mCid=get_id("mC") ; if (mCid<0) domC=false ;
 int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ;
 int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ;
 double sum=0 ; int p, q, id ; double rp, rq ; double wpqs, wpqf ;
-printf("Starting pass 3...\r") ; fflush(stdout) ;
+printf(" -> Pass 3") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
@@ -543,7 +546,7 @@ for (i=0 ; i<data.Ncf ; i++)
 }
 
 //Last intermediate pass
-printf("Starting intermediate pass 3...\r") ; fflush(stdout) ;
+printf(" -> subpass 3") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
@@ -719,6 +722,7 @@ int Coarsing::mean_time()
   for (int i=0 ; i<Npt ; i++)
     for (int t=1 ; t<Time ; t++)
     {
+      printf("\rAveraging ... %d", t) ; fflush(stdout) ;
       for (int f=0 ; f<tf ; f++)
         CGP[i].fields[0][f]+=CGP[i].fields[t][f] ;
     }
