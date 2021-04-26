@@ -224,7 +224,8 @@ int Datafile:: do_post_atm()
 {
  int i, k ; v1d nanvec (fields.size(),NAN) ; int nadded=0 ; static bool info=true ;
  auto j= tdata.begin() ;
- sort(tdata.begin(), tdata.end(), [](auto v1, auto v2) {return v1[0] < v2[0] ; }); //WARNING idx 0 should be the particle ID
+ int idloc = std::find(fields.begin(), fields.end(), "id") - fields.begin();
+ sort(tdata.begin(), tdata.end(), [=](auto v1, auto v2) {return v1[idloc] < v2[idloc] ; }); //WARNING idx 0 should be the particle ID
  for (i=0, j=tdata.begin() ; i<N ; i++, j++)
  {
   if (i+1<(*j)[0])
