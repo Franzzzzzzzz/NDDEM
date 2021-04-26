@@ -38,24 +38,24 @@ int main(int argc, char * argv[])
   Param P ;
 
   if (argc<2) {printf("Expecting a json file as argument\n") ; std::exit(1) ; }
-  
+
   std::ifstream i(argv[1]);
   if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; std::exit(1) ; }
   json param;
   try { i >> param; }
-  catch(...) 
+  catch(...)
   {
     printf("This is not a legal json file, here is what we already got:\n") ;
     cout << param ;
   }
-  P.from_json(param) ; 
-  
+  P.from_json(param) ;
+
   printf("Initializing\n") ; fflush(stdout) ;
   Datafile D ;
-  D.cfmapping = P.cfmapping ; 
+  D.cfmapping = P.cfmapping ;
   //D.open("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.test.gz") ;
   //D.opencf("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.forceEnergy.gz") ;
-  
+
   D.open(P.atmdump) ;
   if (P.hascf) D.opencf(P.cfdump) ;
 
@@ -77,15 +77,15 @@ int main(int argc, char * argv[])
   for (int i=0 ; i<maxT ; i++)
   {
     printf("Timestep: %d\n", i) ; fflush(stdout) ;
-    
+
     D.read_full_ts(true) ;
-    
+
     C.cT++ ;
     D.set_data(C.data) ;
-    
-    if (P.maxlevel>=1) 
+
+    if (P.maxlevel>=1)
       C.pass_1() ;
-    
+
     if (P.maxlevel>=2)
     {
       C.compute_fluc_vel() ;
@@ -94,18 +94,18 @@ int main(int argc, char * argv[])
     }
     if (P.maxlevel>=3)
       C.pass_3() ;
-    
+
     //if (i==0) printf("\e[9A\e[0J") ;
     //else printf("\e[13A\e[0J") ;
   }
 
   if (P.dotimeavg)
     C.mean_time() ;
-  
+
   if (P.saveformat == "netCDF")   C.write_netCDF(P.save) ;
   else if (P.saveformat == "vtk") C.write_vtk (P.save) ;
-  else if (P.saveformat == "mat") C.write_matlab(P.save) ; 
-  else printf("Unknown writing format, unfortunately.\n") ; 
+  else if (P.saveformat == "mat") C.write_matlab(P.save) ;
+  else printf("Unknown writing format, unfortunately.\n") ;
 
 }
 
@@ -135,7 +135,7 @@ return 0 ;
 vector<vector<double>> Datafile::get_bounds()
 {
  vector<vector<double>> res(2, vector<double>(3,0)) ;
- string line ; int nothing ; 
+ string line ; int nothing ;
 
  getline(*in, line) ; //should be ITEM: TIMESTEP
  getline(*in, line) ;
@@ -143,22 +143,22 @@ vector<vector<double>> Datafile::get_bounds()
  getline(*in, line) ;
 
  getline(*in, line) ; //should be BOX
- *in >> res[0][0] >> res[1][0] ; 
- *in >> res[0][1] >> res[1][1] ; 
- *in >> res[0][2] >> res[1][2] ; 
- return (res) ; 
+ *in >> res[0][0] >> res[1][0] ;
+ *in >> res[0][1] >> res[1][1] ;
+ *in >> res[0][2] >> res[1][2] ;
+ return (res) ;
 }
 //------------------------------------------------------------
 int Datafile::get_numts()
 {
- int numts = 0 ; 
- string line ; 
- do 
- { 
+ int numts = 0 ;
+ string line ;
+ do
+ {
    getline(*in, line) ;
-   if (line == "ITEM: TIMESTEP") numts++ ;    
- } while (! in->eof()) ; 
- return numts ; 
+   if (line == "ITEM: TIMESTEP") numts++ ;
+ } while (! in->eof()) ;
+ return numts ;
 }
 //------------------------------------------------------------
 int Datafile::read_full_ts(bool keep)
@@ -217,7 +217,7 @@ int Datafile::read_next_ts(istream *is, bool iscf, bool keep)
   else do_post_atm() ;
  }
 
-return 0 ; 
+return 0 ;
 }
 //-------------------------------------------------
 int Datafile:: do_post_atm()
@@ -256,7 +256,7 @@ int Datafile:: do_post_atm()
     else lst.push_back(-1) ;
  }
 
- if (info)
+ /*if (info)
  {
   info=false ;
   //cout << termcolor::green << "Found\t" << termcolor::yellow << "Contructed\t" << termcolor::red << "Missing\n" ;
@@ -272,7 +272,7 @@ int Datafile:: do_post_atm()
   }
  //cout << "\n" << termcolor::reset ;
  if (lst[0]<0 || lst[1]<0 || lst[2]<0) cout << "Reconstruction using Radius=" << Radius << " and density=" << Rho <<" if needed...\n";
- }
+}*/
 
  for (i=0 ; i<nvalue ; i++)
  {
@@ -304,23 +304,23 @@ int Datafile::do_post_cf()
 
  vector<string>::iterator it ;
  vector<int> lst ;
- vector<string> tofind = {"id1", "id2", "per", "fx", "fy", "fz", "mx", "my", "mz"} ; 
- 
+ vector<string> tofind = {"id1", "id2", "per", "fx", "fy", "fz", "mx", "my", "mz"} ;
+
  for (auto name : tofind)
  {
    auto mapper=cfmapping.find(name) ;
    if (mapper != cfmapping.end())
    {
-       it=std::find(fieldscf.begin(), fieldscf.end(), mapper->second) ; 
-       if ( it != fieldscf.end()) 
-           lst.push_back(it-fieldscf.begin()) ; 
-       else 
+       it=std::find(fieldscf.begin(), fieldscf.end(), mapper->second) ;
+       if ( it != fieldscf.end())
+           lst.push_back(it-fieldscf.begin()) ;
+       else
            lst.push_back(-1) ;
    }
-   else 
+   else
     lst.push_back(-1) ;
  }
- 
+
  /*it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[1]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id1
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[2]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id2
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[3]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //per
@@ -384,7 +384,7 @@ return 0 ;
 int Datafile::set_data(struct Data & D)
 {
     D.N=N ; D.Ncf=Ncf ;
-    D.radius=&(data[0][0]) ; 
+    D.radius=&(data[0][0]) ;
     D.mass=&(data[1][0]) ;
     D.Imom=&(data[2][0]) ;
 
@@ -402,5 +402,5 @@ int Datafile::set_data(struct Data & D)
       D.mpq.resize (3); D.mpq={&(datacf[11][0]), &(datacf[12][0]), &(datacf[13][0])} ;
       D.mqp.resize (3); D.mqp={&(datacf[14][0]), &(datacf[15][0]), &(datacf[16][0])} ;
     }
-return 0 ; 
+return 0 ;
 }
