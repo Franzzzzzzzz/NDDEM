@@ -212,7 +212,7 @@ void Param::post_init()
           {
             if (boxes[i]!=1)
               printf("WARN: using more than 1 box in the periodic dimension does not make much sense\n");
-            delta[i] = boundaries[i][1]-boundaries[i][0] ;
+            delta[i] = boundaries[1][i]-boundaries[0][i] ;
           }
         }
       }

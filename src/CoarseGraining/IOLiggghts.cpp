@@ -375,12 +375,12 @@ int Datafile::do_post_cf()
      // Let's handle the PBC now ...
      if (tdata[j][lst[2]]==1)
      {
-       printf("BEFORE: %g %g %g %g %g %g %g\n", datacf[2][k], datacf[3][k], datacf[4][k], datacf[5][k], datacf[6][k], datacf[7][k]) ;
+       bool corrected=false ; 
        for (int i=0 ; i<periodicity.size() ; i++)
        {
          if (periodicity[i])
          {
-           if (fabs(fabs(data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]) - delta[i]) < datacf[5+i][k]) // Going through this PBC decreased the length of lpq
+           if (fabs(fabs(data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]) - delta[i]) < fabs(datacf[5+i][k])) // Going through this PBC decreased the length of lpq
            {
              if (data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]<0) // it is either x1->x1+Delta or x2->x2-Delta
              {
@@ -399,10 +399,12 @@ int Datafile::do_post_cf()
                   datacf[2+i][k]-=delta[i]/2. ;
 
              }
+	   corrected=true ; 
            }
          }
        }
-       printf("AFTER : %g %g %g %g %g %g %g\n", datacf[2][k], datacf[3][k], datacf[4][k], datacf[5][k], datacf[6][k], datacf[7][k]) ;
+       if (corrected==false)
+	 printf("WARN: a contact force traversing the PBC was not corrected.\n") ; 
      }
 
 
