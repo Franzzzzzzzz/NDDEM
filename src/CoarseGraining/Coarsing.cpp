@@ -743,7 +743,7 @@ int Coarsing::write_vtk(string sout)
     fprintf(out, "# vtk DataFile Version 2.0\nSome data\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n", npt[0], npt[1], npt[2], CGP[0].location[0], CGP[0].location[1], CGP[0].location[2], dx[0], dx[1], dx[2]) ;
     fprintf(out, "POINT_DATA %d\n", Npt) ;
 
-    fprintf(out,"SCALARS count float \nLOOKUP_TABLE default \n") ;
+    fprintf(out,"SCALARS count double \nLOOKUP_TABLE default \n") ;
     for (int k=0 ; k<npt[2] ; k++)
      for (int j=0 ; j<npt[1] ; j++)
       for (int i=0 ; i<npt[0] ; i++)
@@ -754,20 +754,20 @@ int Coarsing::write_vtk(string sout)
       if (Fidx[f]<0) continue ;
       switch (Ftype[f])
       {
-        case 1: fprintf(out, "SCALARS %s float \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
+        case 1: fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
                 fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]], i%90==89?'\n':' ') ;
               break ;
-        case 2: fprintf(out, "VECTORS %s float \n", Fname[f].c_str()) ;
+        case 2: fprintf(out, "VECTORS %s double \n", Fname[f].c_str()) ;
              for (int k=0 ; k<npt[2] ; k++)
               for (int j=0 ; j<npt[1] ; j++)
                for (int i=0 ; i<npt[0] ; i++)
                 for (int dd=0 ; dd<d ; dd++)
                   fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
               break ;
-        case 3: fprintf(out, "TENSORS %s float \n", Fname[f].c_str()) ;
+        case 3: fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
