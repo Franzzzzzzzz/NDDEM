@@ -613,7 +613,7 @@ int Data::compute_lpq (int d)
 {
  for (int i=0 ; i<Ncf ; i++)
   for (int dd=0 ; dd<d ; dd++)
-    lpq[dd][i]=pos[dd][int(id1[i])]-pos[dd][int(id2[i])] ; //TODO CHECK THE ORDER
+    lpq[dd][i]=pos[dd][int(id1[i])]-pos[dd][int(id2[i])] ; //ORDER OK
 
  return 0 ;
 }

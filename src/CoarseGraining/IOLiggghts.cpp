@@ -353,9 +353,9 @@ int Datafile::do_post_cf()
 
      if (swap==1) swap=-1 ;
      else swap=1 ;
-     datacf[5][k]=  (data[3][datacf[1][k]] - data[3][datacf[0][k]]) ;      //lpq[0] //WARNING pb through PBC
-     datacf[6][k]=  (data[4][datacf[1][k]] - data[4][datacf[0][k]]) ;      //lpq[1]
-     datacf[7][k]=  (data[5][datacf[1][k]] - data[5][datacf[0][k]]) ;      //lpq[2]
+     datacf[5][k]=  (data[3][datacf[0][k]] - data[3][datacf[1][k]]) ;      //lpq[0] //WARNING pb through PBC
+     datacf[6][k]=  (data[4][datacf[0][k]] - data[4][datacf[1][k]]) ;      //lpq[1]
+     datacf[7][k]=  (data[5][datacf[0][k]] - data[5][datacf[1][k]]) ;      //lpq[2]
 
      datacf[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]
      datacf[9][k]=  swap*tdata[j][lst[4]] ;                                     //f[1]
