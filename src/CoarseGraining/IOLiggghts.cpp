@@ -58,6 +58,9 @@ int main(int argc, char * argv[])
 
   D.open(P.atmdump) ;
   if (P.hascf) D.opencf(P.cfdump) ;
+  D.periodicity=P.periodicity ;
+  D.delta = P.delta ;
+  D.boundaries = P.boundaries ;
 
   int maxT=P.maxT ;
 
@@ -281,7 +284,19 @@ int Datafile:: do_post_atm()
      {
          data[i].resize(N,0) ;
          for (k=0 ; k<N ; k++)
+         {
+           if ((i==3 || i==4 || i==5) && (periodicity[i-3])) // Handle atom outside the simulation due to pbc. Important also for handling contact forces through PBC in the next function ...
+           {
+             if (tdata[k][lst[i]]<boundaries[0][i-3])
+               data[i][k]=tdata[k][lst[i]]+delta[i] ;
+             else if (tdata[k][lst[i]]>boundaries[1][i-3])
+               data[i][k]=tdata[k][lst[i]]-delta[i] ;
+             else
+               data[i][k]=tdata[k][lst[i]] ;
+           }
+           else
              data[i][k]=tdata[k][lst[i]] ;
+         }
      }
      else
      {
@@ -339,7 +354,7 @@ int Datafile::do_post_cf()
  {
 
 
-     if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
+     //if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
 
      if (tdata[j][lst[0]]>tdata[j][lst[1]]) swap=1 ;
      else swap = 0 ;
@@ -347,7 +362,7 @@ int Datafile::do_post_cf()
      datacf[0][k]=tdata[j][lst[swap]]-1 ;                                       //id1
      datacf[1][k]=tdata[j][lst[1-swap]]-1 ;                                     //id2
 
-     datacf[2][k]=  (data[3][datacf[0][k]] + data[3][datacf[1][k]]) /2.0 ;      //pos[0] //WARNING pb through PBC
+     datacf[2][k]=  (data[3][datacf[0][k]] + data[3][datacf[1][k]]) /2.0 ;      //pos[0] //WARNING pb through PBC //WARNING WITH POLYDISPERSITY!!
      datacf[3][k]=  (data[4][datacf[0][k]] + data[4][datacf[1][k]]) /2.0 ;      //pos[1]
      datacf[4][k]=  (data[5][datacf[0][k]] + data[5][datacf[1][k]]) /2.0 ;      //pos[2]
 
@@ -356,6 +371,40 @@ int Datafile::do_post_cf()
      datacf[5][k]=  (data[3][datacf[0][k]] - data[3][datacf[1][k]]) ;      //lpq[0] //WARNING pb through PBC
      datacf[6][k]=  (data[4][datacf[0][k]] - data[4][datacf[1][k]]) ;      //lpq[1]
      datacf[7][k]=  (data[5][datacf[0][k]] - data[5][datacf[1][k]]) ;      //lpq[2]
+
+     // Let's handle the PBC now ...
+     if (tdata[j][lst[2]]==1)
+     {
+       printf("BEFORE: %g %g %g %g %g %g %g\n", datacf[2][k], datacf[3][k], datacf[4][k], datacf[5][k], datacf[6][k], datacf[7][k]) ;
+       for (int i=0 ; i<periodicity.size() ; i++)
+       {
+         if (periodicity[i])
+         {
+           if (fabs(fabs(data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]) - delta[i]) < datacf[5+i][k]) // Going through this PBC decreased the length of lpq
+           {
+             if (data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]<0) // it is either x1->x1+Delta or x2->x2-Delta
+             {
+               datacf[5+i][k] += delta[i]  ;
+               if (datacf[2+i][k]+delta[i]/2. >= boundaries[0][i] && datacf[2+i][k]+delta[i]/2.<= boundaries[1][i])
+                  datacf[2+i][k]+=delta[i]/2. ;
+               else
+                  datacf[2+i][k]-=delta[i]/2. ;
+             }
+             else // it is either x1->x1-Delta or x2->x2+Delta
+             {
+               datacf[5+i][k] -= delta[i]  ;
+               if (datacf[2+i][k]+delta[i]/2. >= boundaries[0][i] && datacf[2+i][k]+delta[i]/2.<= boundaries[1][i])
+                  datacf[2+i][k]+=delta[i]/2. ;
+               else
+                  datacf[2+i][k]-=delta[i]/2. ;
+
+             }
+           }
+         }
+       }
+       printf("AFTER : %g %g %g %g %g %g %g\n", datacf[2][k], datacf[3][k], datacf[4][k], datacf[5][k], datacf[6][k], datacf[7][k]) ;
+     }
+
 
      datacf[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]
      datacf[9][k]=  swap*tdata[j][lst[4]] ;                                     //f[1]
