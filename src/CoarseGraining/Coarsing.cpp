@@ -649,8 +649,8 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
             //for (auto v:location) printf("%g ", v) ; printf("\n"); fflush(stdout) ;
          }
     }
-     else
-     {
+    else
+    {
         if (pbc&1)
         {
             bool keepgoing=true ;
@@ -679,8 +679,8 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
         else // Not a pbc, falling down through dims
             lbd(idx, dim+1, location, pbc>>1, nmodif) ;
 
-     }
-    } ; // end of lambda function
+    }
+   } ; // end of lambda function
 
     v1d locbase(d,0) ;
     for (int i=0 ; i<N ; i++)
