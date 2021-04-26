@@ -772,7 +772,7 @@ int Coarsing::write_vtk(string sout)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
                 for (int dd=0 ; dd<d*d ; dd++)
-                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%10==9&&dd==d*d-1)?'\n':' ') ;
+                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
               break ;
         default: printf("ERR: this should never happen. \n") ;
       }
