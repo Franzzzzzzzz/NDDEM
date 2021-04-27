@@ -70,7 +70,7 @@ public:
   vector <int> boxes= {3,3,3} ;
   vector <vector <double> > boundaries={{0,0,0},{1,1,1}} ;
   string save="" ;
-  string saveformat="" ;
+  vector<string> saveformat ;
   std::map <std::string, std::string> cfmapping ;
 
   bool hascf = false ;
@@ -104,7 +104,11 @@ void Param::from_json(json &j)
 
     v = j.find("saveformat") ;
     if (v == j.end()) { printf("The key 'saveformat' is required\n") ; std::exit(3) ; }
-    else saveformat = v->get<string>();
+    else
+    {
+      try {saveformat = v->get<vector<string>>();}
+      catch(...) {string a = v->get<string>(); saveformat.push_back(a) ; }
+    }
 
     v = j.find("window size") ;
     if (v != j.end()) windowsize = v->get<double>();

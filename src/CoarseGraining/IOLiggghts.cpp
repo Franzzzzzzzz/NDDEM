@@ -51,7 +51,6 @@ int main(int argc, char * argv[])
     printf("\rTimestep: %d |", i) ; fflush(stdout) ;
 
     D.read_full_ts(true) ;
-
     C.cT++ ;
     D.set_data(C.data) ;
 
@@ -70,17 +69,17 @@ int main(int argc, char * argv[])
     //if (i==0) printf("\e[9A\e[0J") ;
     //else printf("\e[13A\e[0J") ;
   }
-  printf("\n") ; 
+  printf("\n") ;
 
   if (P.dotimeavg)
     C.mean_time() ;
 
-  if (P.saveformat == "netCDF")   C.write_netCDF(P.save) ;
+  /*if (P.saveformat == "netCDF")   C.write_netCDF(P.save) ;
   else if (P.saveformat == "vtk") C.write_vtk (P.save) ;
   else if (P.saveformat == "mat") C.write_matlab(P.save) ;
-  else printf("Unknown writing format, unfortunately.\n") ;
- 
-  printf("\n") ; 
+  else printf("Unknown writing format, unfortunately.\n") ;*/
+
+  printf("\n") ;
 }
 
 
@@ -150,6 +149,7 @@ int Datafile::read_next_ts(istream *is, bool iscf, bool keep)
 {
  string line, word ; char blank ; int NN, nid ;
  double val ;
+
  getline(*is, line) ; //should be ITEM: TIMESTEP
  *is >> curts >> blank ;
  getline(*is, line) ; //should be NUMBER OF SOMETHING
@@ -200,6 +200,7 @@ int Datafile:: do_post_atm()
  auto j= tdata.begin() ;
  int idloc = std::find(fields.begin(), fields.end(), "id") - fields.begin();
  sort(tdata.begin(), tdata.end(), [=](auto v1, auto v2) {return v1[idloc] < v2[idloc] ; }); //WARNING idx 0 should be the particle ID
+
  for (i=0, j=tdata.begin() ; i<N ; i++, j++)
  {
   if (i+1<(*j)[idloc])
@@ -231,6 +232,7 @@ int Datafile:: do_post_atm()
     else lst.push_back(-1) ;
  }
 
+
  /*if (info)
  {
   info=false ;
@@ -249,6 +251,7 @@ int Datafile:: do_post_atm()
  if (lst[0]<0 || lst[1]<0 || lst[2]<0) cout << "Reconstruction using Radius=" << Radius << " and density=" << Rho <<" if needed...\n";
 }*/
 
+
  for (i=0 ; i<nvalue ; i++)
  {
      if (lst[i]>=0)
@@ -256,7 +259,7 @@ int Datafile:: do_post_atm()
          data[i].resize(N,0) ;
          for (k=0 ; k<N ; k++)
          {
-           if ((i==3 || i==4 || i==5) && (periodicity[i-3])) // Handle atom outside the simulation due to pbc. Important also for handling contact forces through PBC in the next function ...
+           if (periodicity.size()>0 && (i==3 || i==4 || i==5) && (periodicity[i-3])) // Handle atom outside the simulation due to pbc. Important also for handling contact forces through PBC in the next function ...
            {
              if (tdata[k][lst[i]]<boundaries[0][i-3])
                data[i][k]=tdata[k][lst[i]]+delta[i] ;
@@ -318,11 +321,11 @@ int Datafile::do_post_cf()
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[8]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //my
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[9]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //mz*/
 
- static bool messagefirst = true ; 
+ static bool messagefirst = true ;
  if (messagefirst)
  {
    printf("Assuming all the cf data are here (c_cout[1] to 9)...\n") ; fflush(stdout) ;
-   messagefirst=false ; 
+   messagefirst=false ;
  }
 
  int k ;
@@ -351,7 +354,7 @@ int Datafile::do_post_cf()
      // Let's handle the PBC now ...
      if (tdata[j][lst[2]]==1)
      {
-       bool corrected=false ; 
+       bool corrected=false ;
        for (int i=0 ; i<periodicity.size() ; i++)
        {
          if (periodicity[i])
@@ -375,12 +378,12 @@ int Datafile::do_post_cf()
                   datacf[2+i][k]-=delta[i]/2. ;
 
              }
-	   corrected=true ; 
+	   corrected=true ;
            }
          }
        }
        if (corrected==false)
-	 printf("WARN: a contact force traversing the PBC was not corrected.\n") ; 
+	 printf("WARN: a contact force traversing the PBC was not corrected.\n") ;
      }
 
 
