@@ -20,7 +20,13 @@ public :
     void set (v1d a, v1d b, v1d c, v1d d) {Fn=a ; Ft=b ; Torquei=c ; Torquej=d ; }
     void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
 } ;
-
+/** \brief Action on a specific particle for a specific duration
+ * */
+class SpecificAction: public Action {
+public :
+    int id ; 
+    int duration ;
+} ;
 
 // ------------------------------------ Contact properties class -------------------------------------------
 /** \brief Contact properties class.
