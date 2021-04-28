@@ -40,7 +40,6 @@ var ConvexGeometry = function ( points ) {
 
 			vertices.push( point.x, point.y, point.z );
 			normals.push( face.normal.x, face.normal.y, face.normal.z );
-
 			edge = edge.next;
 
 		} while ( edge !== face.edge );

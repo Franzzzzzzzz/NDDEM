@@ -21,7 +21,7 @@ var ConvexHull = ( function () {
 
 	function ConvexHull() {
 
-		this.tolerance = - 1;
+		this.tolerance = -1;
 
 		this.faces = []; // the generated faces of the convex hull
 		this.newFaces = []; // this array holds the faces that are generated within a single iteration

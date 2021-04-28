@@ -5,40 +5,49 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <style>
-			body { margin: 0; }
-			canvas { width: 100%; height: 100% }
+			body { margin: 0}
         </style>
 	</head>
 	<body>
 		<script type="module">
             import * as THREE from "../visualise/node_modules/three/build/three.module.js";
 			import { OrbitControls } from './js/OrbitControls.js';
-            import { STLLoader } from './js/NDSTLLoader.js';
+            import { NDSTLLoader } from './js/NDSTLLoader.js';
             import { GUI } from './js/dat.gui.module.js';
             import { ConvexGeometry } from './js/ConvexGeometry.js';
+            import { VertexNormalsHelper } from './js/VertexNormalsHelper.js';
 
             var urlParams = new URLSearchParams(window.location.search);
 
 			let camera, scene, renderer, controls, gui;
-            let material, mesh;
-            let params  = {'x4': 0.5}
+            let material;
+            let meshes = new THREE.Group();
+            let params  = {'x4': 0,
+                          }
+            let STLFilename;
+            let NDsolids;
+
+            if ( urlParams.has('fname') ) { STLFilename = urlParams.get('fname'); }
+            else { STLFilename = './hypertriangle.stl'; }
+
             init();
 
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 2, 0., 2. );
+				camera.position.set( 15, 0., 15. );
+                camera.up.set( 0., 0., 1. );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x666666 );
+				scene.background = new THREE.Color( 0x222222 );
 
                 // Ground
 				const plane = new THREE.Mesh(
-					new THREE.PlaneGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+					new THREE.CircleGeometry( 200, 128 ),
+					new THREE.MeshStandardMaterial( { color: 0x999999 } )
 				);
-				plane.rotation.x = - Math.PI / 2;
-				plane.position.y = - 0.05;
+				// plane.rotation.x = - Math.PI / 2;
+				plane.position.z = - 0.01;
 				scene.add( plane );
 
 				plane.receiveShadow = true;
@@ -48,10 +57,9 @@
 				hemiLight.intensity = 0.35;
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight();
-				dirLight.position.set( 5, 5, 5 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.zoom = 2;
+				const dirLight = new THREE.PointLight();
+				dirLight.position.set( 10, 2, 10 );
+                dirLight.castShadow = true;
 				scene.add( dirLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -63,61 +71,176 @@
 
                 controls = new OrbitControls( camera, renderer.domElement );
 
+                window.addEventListener('keydown', handleKeyboard);
                 window.addEventListener( 'resize', onWindowResize, false );
 
                 gui = new GUI();
                 // gui.width = 300;
                 gui.add( params, 'x4', -2, 2, 0.01 )
-                    .name( 'x4' ).listen()
-                    .onChange( function () { loadSTL(params.x4) } );
+                    .name( 'x4 (w/s)' ).listen()
+                    .onChange( function () { renderSTL() } );
 
 			    animate();
 
                 // material = new THREE.PointsMaterial( { color: 0xff5533, size: 0.1 } );
-                material = new THREE.MeshStandardMaterial( { color: 0xff5533 } );
+                material = new THREE.MeshPhongMaterial( { color: 0x00aa00 } );
+                material.side = THREE.DoubleSide;
+                // material.wireframe = true;
 
-                loadSTL(params.x4);
+                loadSTL();
 			}
 
+            function pushUnique(arr, new_entry) {
+                let added = false;
+                let found = false;
+                let tol = 1e-6;
+                if ( arr.length === 0 ) { // add first entry
+                    // new_entry.forEach((item, i) => {
+                    //     arr.push(item)
+                    // });
+                    arr.push( new_entry[0], new_entry[1], new_entry[2] );
+                    added = true;
+                }
+                else {
+                    for ( var i=0; i<arr.length/3; i++ ) {
+                        if ( Math.abs( arr[i*3]   - new_entry[0] ) < tol &&
+                             Math.abs( arr[i*3+1] - new_entry[1] ) < tol &&
+                             Math.abs( arr[i*3+2] - new_entry[2] ) < tol) {
+                            found = true;
+                        }
+                    }
+                    if ( found === false ) {
+                        arr.push ( new_entry[0], new_entry[1], new_entry[2] );
+                        added = true;
+                    }
+                }
+                return added
+            }
 
-            function loadSTL( W ) {
-                const loader = new STLLoader();
-				loader.load( ['./hypertriangle.stl', W], function ( geometry ) {
+            function calculateNormal(points) {
+                // p0, p1, p2 = points;
+                // x0, y0, z0 = p0
+                // x1, y1, z1 = p1
+                // x2, y2, z2 = p2
+                let ux = points[1][0]-points[0][0];
+                let uy = points[1][1]-points[0][1];
+                let uz = points[1][2]-points[0][2];
+                let vx = points[2][0]-points[0][0];
+                let vy = points[2][1]-points[0][1];
+                let vz = points[2][2]-points[0][2];
 
-                    if ( mesh !== undefined ) { scene.remove(mesh) }
+                // ux, uy, uz = u = [x1-x0, y1-y0, z1-z0] #first vector
+                // vx, vy, vz = v = [x2-x0, y2-y0, z2-z0] #sec vector
 
-                    // render as points
-					// mesh = new THREE.Points( geometry, material );
+                let u_cross_v = [uy*vz-uz*vy, uz*vx-ux*vz, ux*vy-uy*vx] //cross product
+                return u_cross_v;
+            }
 
-                    // render convex hull
-                    // console.log()
-                    // let points =
+
+
+            function renderSTL( ) {
+                if ( meshes !== undefined ) { scene.remove( meshes ); meshes = new THREE.Group(); }
+                var vertices, normals;
+                var N = NDsolids[0][0][0].length; // get dimension from vertex length
+
+                NDsolids.forEach((solid, i) => {
+                    var geometry = new THREE.BufferGeometry();
+                    vertices = [];
+                    normals = [];
+                    let tol = 1e-6;
+                    let added, alpha;
+                    solid.forEach((facet, j) => {
+                        var normal = calculateNormal(facet);
+                        facet.forEach((vertex, k) => {
+                            if ( N == 3 ) {
+                                added = pushUnique(vertices, vertex);
+                                if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                             }
+                            else if ( N == 4 ) {
+                                // loop through all other vertices in facet
+                                for (var l=k+1; l<N; l++) {
+                                    alpha = (params.x4 - vertex[N-1])/(facet[l][N-1] - vertex[N-1]);
+                                    // console.log(vertex[N-1], params.x4)
+                                    if ( Math.abs(vertex[N-1] - params.x4) < tol && Math.abs(facet[l][N-1] - params.x4) < tol ) {
+                                        // alpha is not defined, we are coincident with W, add both points
+                                        added = pushUnique(vertices, vertex);
+                                        if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                                        added = pushUnique(vertices, facet[l]);
+                                        if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                                    }
+                                    else if ( alpha >= 0 && alpha <= 1 ) { // alpha is in range
+                                        let sliced_vertex = [];
+                                        for ( var n=0; n<3; n++ ) {
+                                            sliced_vertex.push( vertex[n] + alpha*(facet[l][n] - vertex[n]) );
+                                        }
+                                        added = pushUnique(vertices, sliced_vertex);
+                                        if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+                    geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+
                     let points = [];
-                    for ( var i = 0; i<geometry.attributes.position.array.length/3; i++ ) {
-                        points.push(new THREE.Vector3( geometry.attributes.position.array[3*i],
-                                                       geometry.attributes.position.array[3*i + 1],
-                                                       geometry.attributes.position.array[3*i + 2]
-                                                   ));
-                    }
-                    if ( points.length == 2 ) {
-                        console.log('got a line')
-                        mesh = new THREE.Line( geometry, material );
-                    }
-                    if ( points.length == 3 ) {
-                        mesh = new THREE.Mesh( geometry, material );
-                    }
-                    else if ( points.length > 3 ) {
-                        console.log(points)
-                        let ConvGeometry = new ConvexGeometry( points );
-                        mesh = new THREE.Mesh( ConvGeometry, material );
-                    }
+                    for ( let i=0; i<vertices.length/3; i++ ) { points.push( new THREE.Vector3( vertices[i*3] + Math.random()*1e-6,
+                                                                                                vertices[i*3+1] + Math.random()*1e-6,
+                                                                                                vertices[i*3+2] + Math.random()*1e-6
+                                                                                             ) ) };
+                    console.log(points)
+                    // points.sort((a, b) => (a.x > b.x) ? 1 : (a.x === b.x) ? ((a.y > b.y) ? 1 : -1) : -1 );
+                    console.log(points)
+
+                    if ( points.length > 3 ) { geometry = new ConvexGeometry( points ); }
+                    var this_mesh = new THREE.Mesh( geometry, material );
+                    meshes.add(this_mesh);
+                });
+
+                meshes.castShadow = true;
+                meshes.receiveShadow = true;
+
+                // // if ( points.length == 2 ) {
+                // //     console.log('got a line')
+                // //     mesh = new THREE.Line( geometry, material );
+                // // }
+                // // else if ( points.length == 3 ) {
+                //
+                // geometries.forEach( geometry => {
+                //     console.log(geometry.attributes.position)
+                //     var this_mesh = new THREE.Mesh( geometry, material );
+                //     this_mesh.castShadow = true;
+                //     this_mesh.receiveShadow = true;
+                //     meshes.add(this_mesh);
+                // });
+
+                // }
+                // else if ( points.length > 3 ) {
+                //     // console.log(points)
+                //     let ConvGeometry = new ConvexGeometry( points );
+                //     mesh = new THREE.Mesh( ConvGeometry, material );
+                // }
+
+                // const helper = new VertexNormalsHelper( mesh, 0.2 ); // object, size, color, linewidth
+                // scene.add( helper );
 
 
-					mesh.castShadow = true;
-					mesh.receiveShadow = true;
-                    if ( points.length > 0 ) { scene.add( mesh ); }
+                if ( NDsolids.length > 0 ) { scene.add( meshes );  }
+            }
 
-				} );
+            function loadSTL( ) {
+
+                const loader = new NDSTLLoader();
+				loader.load( [ STLFilename ], function ( solids ) {
+                    NDsolids = solids;
+                    renderSTL();
+				} )
+            }
+
+            function handleKeyboard(e) {
+              if ( e.key === "w" ) { params.x4 += 0.01; renderSTL(); }
+              if ( e.key === "s" ) { params.x4 -= 0.01; renderSTL(); }
             }
 
             function onWindowResize(){

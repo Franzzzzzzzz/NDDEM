@@ -17,7 +17,7 @@
  *  ASCII decoding assumes file is UTF-8.
  *
  * Usage:
- *  var loader = new STLLoader();
+ *  var loader = new NDSTLLoader();
  *  loader.load( './models/stl/slotted_disk.stl', function ( geometry ) {
  *    scene.add( new THREE.Mesh( geometry ) );
  *  });
@@ -66,15 +66,15 @@ import {
 } from "./three.module.js";
 
 
-var STLLoader = function ( manager ) {
+var NDSTLLoader = function ( manager ) {
 
 	Loader.call( this, manager );
 
 };
 
-STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-	constructor: STLLoader,
+	constructor: NDSTLLoader,
 
 	load: function ( params, onLoad, onProgress, onError ) {
         let url = params[0];
@@ -89,7 +89,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				onLoad( scope.parse( text, W ) );
+				onLoad( scope.parse( text ) );
 
 			} catch ( e ) {
 
@@ -111,7 +111,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	parse: function ( data, W ) {
+	parse: function ( data ) {
 
 		function isBinary( data ) {
 
@@ -273,105 +273,48 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseASCII( data, W ) {
+		function parseASCII( data ) {
             var N;
 
-			var geometry = new BufferGeometry();
             var patternDimension = /solid ([0-9]+)/g ;
 			var patternSolid = /solid([\s\S]*?)endsolid/g;
 			var patternFace = /facet([\s\S]*?)endfacet/g;
-			var faceCounter = 0;
 
             while ( ( result = patternDimension.exec( data ) ) !== null ) {
                 N = parseInt(result[1]);
-                // console.log(N)
             }
-
 
 			var patternFloat = /[\s]+([+-]?(?:\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?)/.source;
             var patternFloats = patternFloat.repeat(N);
 			var patternVertex = new RegExp( 'vertex' + patternFloats, 'g' );
 			var patternNormal = new RegExp( 'normal' + patternFloats, 'g' );
 
-			var vertices = [];
-			var normals = [];
-
-			// var normal = new Vector3(); // oh boy...
-
 			var result;
 
-			var groupCount = 0;
-			var startVertex = 0;
-			var endVertex = 0;
+            var solids = [];
 
+			while ( ( result = patternSolid.exec( data ) ) !== null ) { // for each solid
 
+				var solid_text = result[ 0 ];
+                var solid = [];
 
-			while ( ( result = patternSolid.exec( data ) ) !== null ) {
+				while ( ( result = patternFace.exec( solid_text ) ) !== null ) { // for each facet
 
-				startVertex = endVertex;
-
-				var solid = result[ 0 ];
-
-				while ( ( result = patternFace.exec( solid ) ) !== null ) {
-
-					var vertexCountPerFace = 0;
-
-					var text = result[ 0 ];
-
-					while ( ( result = patternVertex.exec( text ) ) !== null ) {
+                    var facet_text = result[ 0 ];
+                    var facet = [];
+					while ( ( result = patternVertex.exec( facet_text ) ) !== null ) {  // get the N vertices
+                        var vertex = [];
                         for ( var i=1; i<=N; i++ ) {
-                            vertices.push( parseFloat(result[i]) );
+                            vertex.push( parseFloat(result[i]) );
                         }
+                        facet.push(vertex);
 					}
+                    solid.push(facet);
 
 				}
-
-				var start = startVertex;
-				var count = endVertex - startVertex;
-
-				geometry.addGroup( start, count, groupCount );
-				groupCount ++;
-
+                solids.push(solid);
 			}
-            let proj_vertices = [];
-            let n_simplices = vertices.length/N;
-            let n_vertices = 0;
-            // let W = 0.5
-            if ( N == 3 ) {
-                proj_vertices = vertices;
-            }
-            else if ( N == 4 ) {
-
-                for ( var i=0; i<n_simplices; i++ ) {
-                    for ( var j=i+1; j<n_simplices; j++ ) {
-                        let alpha = (W - vertices[i*N + N-1])/(vertices[j*N + N-1] - vertices[i*N + N-1]);
-                        if ( vertices[i*N + N-1] == W && vertices[j*N + N-1] == W ) {
-                            // alpha is not defined, we are coincident with W, add both points
-                            for ( var n=0; n<3; n++ ) {
-                                proj_vertices.push( vertices[i*N + n] );
-                            }
-                            for ( var n=0; n<3; n++ ) {
-                                proj_vertices.push( vertices[j*N + n] );
-                            }
-                            n_vertices++;
-                            n_vertices++;
-                        }
-                        else if ( alpha > 0 && alpha <= 1 ) {
-                            // alpha is in range
-                            for ( var n=0; n<3; n++ ) {
-                                proj_vertices.push( vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]) );
-                            }
-                            n_vertices++;
-                        }
-                    }
-                }
-            }
-            // console.log(proj_vertices.length/3)
-
-
-			geometry.setAttribute( 'position', new Float32BufferAttribute( proj_vertices, 3 ) );
-			// geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			return geometry;
+			return solids;
 
 		}
 
@@ -410,7 +353,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		// start
 
-        return parseASCII( ensureString( data ), W );
+        return parseASCII( ensureString( data ) );
 		// var binData = ensureBinary( data );
 
 		// return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );
@@ -419,4 +362,4 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 } );
 
-export { STLLoader };
+export { NDSTLLoader };
