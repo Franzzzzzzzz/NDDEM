@@ -64,6 +64,34 @@ FIELDS.push_back({0x040000, "zR"   , "SCALAR"});    //Eq 76
 return 0 ;
 }
 
+//-------------------------------------------------------
+int Coarsing::setWindow (Windows win, double w)
+{
+ switch (win) {
+  case Windows::Rect3D :
+    setWindow<Windows::Rect3D> (w) ;
+    break ;
+  case Windows::Rect3DIntersect :
+    setWindow<Windows::Rect3DIntersect> (w) ;
+    break ;
+  case Windows::Lucy3D :
+    setWindow<Windows::Lucy3D> (w) ;
+    break ;
+  case Windows::Hann3D :
+    setWindow<Windows::Hann3D> (w) ;
+    break ;
+  case Windows::RectND :
+    setWindow<Windows::RectND> (w) ;
+    break ;
+  case Windows::LucyND :
+    setWindow<Windows::LucyND> (w) ;
+    break ;
+  default:
+    printf("Unknown window, check Coarsing::setWindow") ;
+ }
+return 0 ;
+}
+
 //=========================================================
 int Coarsing::grid_generate()
 {
@@ -259,7 +287,7 @@ struct Field * Coarsing::get_field(string nm)
 //===================================================
 int Coarsing::compute_fluc_vel ()
 {
-  printf("Starting vel fluctuation computation [d=%d]\r", d) ; fflush(stdout) ;
+  printf(" -> VelFluct") ; fflush(stdout) ;
   v1d vavg (d,0) ;
   data.vel_fluc.resize(d, std::vector <double> (data.N, 0.0)) ;
 
@@ -277,11 +305,12 @@ int Coarsing::compute_fluc_vel ()
 }
 int Coarsing::compute_fluc_rot ()
 {
-  printf("Starting rot fluctuation computation\r") ; fflush(stdout) ;
+  static bool messagefirst=true ; 
+  printf(" -> RotVelFluct") ; fflush(stdout) ;
   v1d omegaavg (d,0) ;
   data.rot_fluc.resize(d, v1d (data.N, 0)) ;
   int idrot=get_id("ROT") ;
-  if (idrot<0) {printf("WARN: cannot perform fluctuation rotation without ROT set\n") ; }
+  if (idrot<0 && messagefirst) {messagefirst=false ; printf("WARN: cannot perform fluctuation rotation without ROT set\n") ; }
   for (int i=0 ; i<data.N ; i++)
   {
     if (isnan(data.pos[0][i])) continue ;
@@ -321,6 +350,8 @@ int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
 vector<double> totweight(data.N,0) ;
 
+printf(" -> Pass 1") ; fflush(stdout) ;
+
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -349,10 +380,10 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 
-int nbzero = 0 ;
+/*int nbzero = 0 ;
 for (auto v : totweight)
   if (v==0) nbzero++ ;
-printf("%d \n", nbzero) ;fflush(stdout) ;
+printf("%d \n", nbzero) ;fflush(stdout) ; */
 
 // Intermediate pass (cg points)
 bool doEKT=true, doEKR=true ;
@@ -394,7 +425,7 @@ int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ;
 int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ;
 int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;
 int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;
-printf("Starting pass 2...\r") ; fflush(stdout) ;
+printf(" -> Pass 2") ; fflush(stdout) ;
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -426,7 +457,7 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 // Intermediate pass (cg points): devide by rho when needed
-printf("Starting intermediate 2...\r") ; fflush(stdout) ;
+printf(" -> subpass 2") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double tworho ;
@@ -453,7 +484,7 @@ int mCid=get_id("mC") ; if (mCid<0) domC=false ;
 int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ;
 int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ;
 double sum=0 ; int p, q, id ; double rp, rq ; double wpqs, wpqf ;
-printf("Starting pass 3...\r") ; fflush(stdout) ;
+printf(" -> Pass 3") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
@@ -515,7 +546,7 @@ for (i=0 ; i<data.Ncf ; i++)
 }
 
 //Last intermediate pass
-printf("Starting intermediate pass 3...\r") ; fflush(stdout) ;
+printf(" -> subpass 3") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
@@ -585,7 +616,7 @@ int Data::compute_lpq (int d)
 {
  for (int i=0 ; i<Ncf ; i++)
   for (int dd=0 ; dd<d ; dd++)
-    lpq[dd][i]=pos[dd][int(id1[i])]-pos[dd][int(id2[i])] ; //TODO CHECK THE ORDER
+    lpq[dd][i]=pos[dd][int(id1[i])]-pos[dd][int(id2[i])] ; //ORDER OK
 
  return 0 ;
 }
@@ -621,8 +652,8 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
             //for (auto v:location) printf("%g ", v) ; printf("\n"); fflush(stdout) ;
          }
     }
-     else
-     {
+    else
+    {
         if (pbc&1)
         {
             bool keepgoing=true ;
@@ -651,8 +682,8 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
         else // Not a pbc, falling down through dims
             lbd(idx, dim+1, location, pbc>>1, nmodif) ;
 
-     }
-    } ; // end of lambda function
+    }
+   } ; // end of lambda function
 
     v1d locbase(d,0) ;
     for (int i=0 ; i<N ; i++)
@@ -691,6 +722,7 @@ int Coarsing::mean_time()
   for (int i=0 ; i<Npt ; i++)
     for (int t=1 ; t<Time ; t++)
     {
+      printf("\rAveraging ... %d", t) ; fflush(stdout) ;
       for (int f=0 ; f<tf ; f++)
         CGP[i].fields[0][f]+=CGP[i].fields[t][f] ;
     }
@@ -715,7 +747,7 @@ int Coarsing::write_vtk(string sout)
     fprintf(out, "# vtk DataFile Version 2.0\nSome data\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n", npt[0], npt[1], npt[2], CGP[0].location[0], CGP[0].location[1], CGP[0].location[2], dx[0], dx[1], dx[2]) ;
     fprintf(out, "POINT_DATA %d\n", Npt) ;
 
-    fprintf(out,"SCALARS count float \nLOOKUP_TABLE default \n") ;
+    fprintf(out,"SCALARS count double \nLOOKUP_TABLE default \n") ;
     for (int k=0 ; k<npt[2] ; k++)
      for (int j=0 ; j<npt[1] ; j++)
       for (int i=0 ; i<npt[0] ; i++)
@@ -726,25 +758,25 @@ int Coarsing::write_vtk(string sout)
       if (Fidx[f]<0) continue ;
       switch (Ftype[f])
       {
-        case 1: fprintf(out, "SCALARS %s float \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
+        case 1: fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
                 fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]], i%90==89?'\n':' ') ;
               break ;
-        case 2: fprintf(out, "VECTORS %s float \n", Fname[f].c_str()) ;
+        case 2: fprintf(out, "VECTORS %s double \n", Fname[f].c_str()) ;
              for (int k=0 ; k<npt[2] ; k++)
               for (int j=0 ; j<npt[1] ; j++)
                for (int i=0 ; i<npt[0] ; i++)
                 for (int dd=0 ; dd<d ; dd++)
                   fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
               break ;
-        case 3: fprintf(out, "TENSORS %s float \n", Fname[f].c_str()) ;
+        case 3: fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
                 for (int dd=0 ; dd<d*d ; dd++)
-                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%10==9&&dd==d*d-1)?'\n':' ') ;
+                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
               break ;
         default: printf("ERR: this should never happen. \n") ;
       }

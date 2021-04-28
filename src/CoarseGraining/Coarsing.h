@@ -25,6 +25,8 @@
  *
  *  @{ */
 
+#ifndef COARSING_H
+#define COARSING_H
 
 #include <cstdlib>
 #include <cstdio>
@@ -81,6 +83,7 @@ struct Data {
 public:
     Data () : mass(NULL), Imom(NULL), id1(NULL), id2(NULL) {}
 int N ; ///< Number of particles
+double * radius; ///<Particle radius
 double * mass ; ///< Particle masses
 double *Imom ; ///< Particle moment of inertia
 vector <double *> pos ; ///< Particle positions
@@ -155,6 +158,7 @@ public :
 
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
+    int setWindow (Windows win, double w) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
     template <Windows W> int setWindow (double w) ; ///< Set the windowing function
     template <Windows W> int setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function
@@ -198,6 +202,7 @@ public :
     int write_matlab (string path, bool squeeze = false) ; ///< Write CG data as Matlab file
 } ;
 
+
 //-------------------------------------------------------
 template <Windows W>
 int Coarsing::setWindow ()
@@ -207,32 +212,38 @@ int Coarsing::setWindow ()
 template <Windows W>
 int Coarsing::setWindow (double w)
 {
-  static_assert(W != Windows::LibLucyND_Periodic) ;
-  cutoff=2.5*w ; //TODO
-  printf("Window and cutoff: %g %g \n", w, cutoff) ;
+  static_assert(W != Windows::LucyND_Periodic) ;
   switch (W) {
-      case Windows::LibRect3D :
-        Window=new LibRect3D () ;
+      case Windows::Rect3D :
+         Window=new LibRect3D (&data, w, d) ;
         break ;
-      case Windows::LibLucy3D :
+      case Windows::Rect3DIntersect :
+        Window=new LibRect3DIntersect (&data, w, d) ;
+        break ;
+      case Windows::Lucy3D :
         Window=new LibLucy3D (&data, w, d) ;
         break ;
-      case Windows::LibRectND :
+      case Windows::Hann3D :
+        Window=new LibHann3D (&data, w, d) ;
+        break ;
+      case Windows::RectND :
         Window=new LibRectND (&data, w, d) ;
         break ;
-      case Windows::LibLucyND :
+      case Windows::LucyND :
         Window=new LibLucyND (&data, w, d) ;
         break ;
       default:
         printf("Unknown window, check Coarsing::setWindow") ;
   }
+  cutoff = Window->cutoff() ;
+  printf("Window and cutoff: %g %g \n", w, cutoff) ;
   return 0 ;
 }
 //-------------------------------------------------------
 template <Windows W>
 int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas)
 {
-  static_assert(W == Windows::LibLucyND_Periodic) ;
+  static_assert(W == Windows::LucyND_Periodic) ;
   //cutoff=2.5*w ; //TODO
   cutoff = cuttoff ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
@@ -240,3 +251,5 @@ int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, v
   Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
 return 0 ;
 }
+
+#endif

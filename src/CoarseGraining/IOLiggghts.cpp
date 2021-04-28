@@ -1,36 +1,5 @@
 #include "IOLiggghts.h"
 
-// Parameters
-/*#define TORUN 2
-
-#if TORUN==1
-struct Param {
-  string atmdump="/Users/FGuillard/Simulations/MD/EnergyBalance/005/dump.test.gz" ;
-  string cfdump="/Users/FGuillard/Simulations/MD/EnergyBalance/005/dump.forceEnergy.gz" ;
-  int skipT=0 ;
-  int maxT = 3 ;
-  vector <string> flags = {"RHO", "I", "VAVG", "TC", "TK", "ROT", "MC", "MK", "mC", "EKT", "eKT", "EKR", "eKR", "qTC", "qTK", "qRC", "qRK", "zT", "zR"} ;
-  int dim=3 ;
-  vector <int> boxes= {10,10,14} ;
-  vector <vector <double> > boundaries={{-0.0075,-0.0075,0},{0.0075,0.0075,0.021}} ;
-  string save="/Users/FGuillard/Simulations/MD/EnergyBalance/005/CG" ;
-} P;
-
-#elif TORUN==2
-struct Param {
-  string atmdump="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/dump.testEll006.gz" ;
-  string cfdump="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/dump.forceEll006.gz" ;
-  int skipT=500 ;
-  int maxT = 450 ;
-  vector <string> flags = {"RHO", "VAVG", "TC", "TK",} ;
-  int dim=3 ;
-  vector <int> boxes= {10,10,10} ;
-  vector <vector <double> > boundaries={{-0.015,-0.015,0},{0.015,0.015,0.03}} ;
-  string save="/Users/FGuillard/Simulations/MD/Ellipsoids/Proper/Stresses/CG" ;
-} P;
-
-#endif*/
-
 //=======================================================
 int main(int argc, char * argv[])
 {
@@ -38,30 +7,34 @@ int main(int argc, char * argv[])
   Param P ;
 
   if (argc<2) {printf("Expecting a json file as argument\n") ; std::exit(1) ; }
-  
+
   std::ifstream i(argv[1]);
   if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; std::exit(1) ; }
   json param;
   try { i >> param; }
-  catch(...) 
+  catch(...)
   {
     printf("This is not a legal json file, here is what we already got:\n") ;
     cout << param ;
   }
-  P.from_json(param) ; 
-  
+  P.from_json(param) ;
+
   printf("Initializing\n") ; fflush(stdout) ;
   Datafile D ;
-  D.cfmapping = P.cfmapping ; 
+  D.cfmapping = P.cfmapping ;
   //D.open("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.test.gz") ;
   //D.opencf("/home/franz/Desktop/PostDoc_Local/EnergyBalance/002/dump.forceEnergy.gz") ;
-  
+
   D.open(P.atmdump) ;
   if (P.hascf) D.opencf(P.cfdump) ;
+  D.periodicity=P.periodicity ;
+  D.delta = P.delta ;
+  D.boundaries = P.boundaries ;
 
   int maxT=P.maxT ;
 
   Coarsing C(P.dim, P.boxes, P.boundaries, maxT) ;
+  C.setWindow(P.window,P.windowsize) ;
   C.set_flags(P.flags) ;
   C.grid_setfields() ;
 
@@ -69,22 +42,21 @@ int main(int argc, char * argv[])
 
   for (int i=0 ; i<P.skipT; i++)
   {
-    printf("Timestep: %d\n", i) ; fflush(stdout) ;
+    printf("\rSkipping timestep: %d | ", i) ; fflush(stdout) ;
     D.read_full_ts(false) ;
   }
 
   for (int i=0 ; i<maxT ; i++)
   {
-    printf("Timestep: %d\n", i) ; fflush(stdout) ;
-    
+    printf("\rTimestep: %d |", i) ; fflush(stdout) ;
+
     D.read_full_ts(true) ;
-    
     C.cT++ ;
     D.set_data(C.data) ;
-    
-    if (P.maxlevel>=1) 
+
+    if (P.maxlevel>=1)
       C.pass_1() ;
-    
+
     if (P.maxlevel>=2)
     {
       C.compute_fluc_vel() ;
@@ -93,19 +65,21 @@ int main(int argc, char * argv[])
     }
     if (P.maxlevel>=3)
       C.pass_3() ;
-    
+
     //if (i==0) printf("\e[9A\e[0J") ;
     //else printf("\e[13A\e[0J") ;
   }
+  printf("\n") ;
 
   if (P.dotimeavg)
     C.mean_time() ;
-  
-  if (P.saveformat == "netCDF")   C.write_netCDF(P.save) ;
-  else if (P.saveformat == "vtk") C.write_vtk (P.save) ;
-  else if (P.saveformat == "mat") C.write_matlab(P.save) ; 
-  else printf("Unknown writing format, unfortunately.\n") ; 
 
+  if (std::find(P.saveformat.begin(), P.saveformat.end(), "netCDF")!=P.saveformat.end())   C.write_netCDF(P.save) ;
+  if (std::find(P.saveformat.begin(), P.saveformat.end(), "vtk")!=P.saveformat.end()) C.write_vtk (P.save) ;
+  if (std::find(P.saveformat.begin(), P.saveformat.end(), "mat")!=P.saveformat.end()) C.write_matlab(P.save) ;
+  ///else printf("Unknown writing format, unfortunately.\n") ;
+
+  printf("\n") ;
 }
 
 
@@ -134,7 +108,7 @@ return 0 ;
 vector<vector<double>> Datafile::get_bounds()
 {
  vector<vector<double>> res(2, vector<double>(3,0)) ;
- string line ; int nothing ; 
+ string line ; int nothing ;
 
  getline(*in, line) ; //should be ITEM: TIMESTEP
  getline(*in, line) ;
@@ -142,22 +116,22 @@ vector<vector<double>> Datafile::get_bounds()
  getline(*in, line) ;
 
  getline(*in, line) ; //should be BOX
- *in >> res[0][0] >> res[1][0] ; 
- *in >> res[0][1] >> res[1][1] ; 
- *in >> res[0][2] >> res[1][2] ; 
- return (res) ; 
+ *in >> res[0][0] >> res[1][0] ;
+ *in >> res[0][1] >> res[1][1] ;
+ *in >> res[0][2] >> res[1][2] ;
+ return (res) ;
 }
 //------------------------------------------------------------
 int Datafile::get_numts()
 {
- int numts = 0 ; 
- string line ; 
- do 
- { 
+ int numts = 0 ;
+ string line ;
+ do
+ {
    getline(*in, line) ;
-   if (line == "ITEM: TIMESTEP") numts++ ;    
- } while (! in->eof()) ; 
- return numts ; 
+   if (line == "ITEM: TIMESTEP") numts++ ;
+ } while (! in->eof()) ;
+ return numts ;
 }
 //------------------------------------------------------------
 int Datafile::read_full_ts(bool keep)
@@ -175,6 +149,7 @@ int Datafile::read_next_ts(istream *is, bool iscf, bool keep)
 {
  string line, word ; char blank ; int NN, nid ;
  double val ;
+
  getline(*is, line) ; //should be ITEM: TIMESTEP
  *is >> curts >> blank ;
  getline(*is, line) ; //should be NUMBER OF SOMETHING
@@ -216,31 +191,33 @@ int Datafile::read_next_ts(istream *is, bool iscf, bool keep)
   else do_post_atm() ;
  }
 
-return 0 ; 
+return 0 ;
 }
 //-------------------------------------------------
 int Datafile:: do_post_atm()
 {
  int i, k ; v1d nanvec (fields.size(),NAN) ; int nadded=0 ; static bool info=true ;
  auto j= tdata.begin() ;
- sort(tdata.begin(), tdata.end(), [](auto v1, auto v2) {return v1[0] < v2[0] ; }); //WARNING idx 0 should be the particle ID
+ int idloc = std::find(fields.begin(), fields.end(), "id") - fields.begin();
+ sort(tdata.begin(), tdata.end(), [=](auto v1, auto v2) {return v1[idloc] < v2[idloc] ; }); //WARNING idx 0 should be the particle ID
+
  for (i=0, j=tdata.begin() ; i<N ; i++, j++)
  {
-  if (i+1<(*j)[0])
+  if (i+1<(*j)[idloc])
   {
     j=tdata.insert(j, nanvec) ;
-    (*j)[0]=i+1 ;
+    (*j)[idloc]=i+1 ;
     nadded++ ;
   }
  }
 
  for (i=0,j=tdata.begin() ; j<tdata.end() ; j++,i++)
  {
-   (*j)[0]-- ;
-   if ( (*j)[0] != i)
-     printf("ERR shouldn't happen %d %g\n", i, (*j)[0]) ;
+   (*j)[idloc]-- ;
+   if ( (*j)[idloc] != i)
+     printf("ERR shouldn't happen %d %g\n", i, (*j)[idloc]) ;
  }
- printf("%d atom null added\n", nadded) ;
+ printf("%d null atom / %d | ", nadded, N) ;
  N+=nadded ;
 
  const int nvalue = 12 ;
@@ -255,7 +232,8 @@ int Datafile:: do_post_atm()
     else lst.push_back(-1) ;
  }
 
- if (info)
+
+ /*if (info)
  {
   info=false ;
   //cout << termcolor::green << "Found\t" << termcolor::yellow << "Contructed\t" << termcolor::red << "Missing\n" ;
@@ -271,7 +249,8 @@ int Datafile:: do_post_atm()
   }
  //cout << "\n" << termcolor::reset ;
  if (lst[0]<0 || lst[1]<0 || lst[2]<0) cout << "Reconstruction using Radius=" << Radius << " and density=" << Rho <<" if needed...\n";
- }
+}*/
+
 
  for (i=0 ; i<nvalue ; i++)
  {
@@ -279,7 +258,19 @@ int Datafile:: do_post_atm()
      {
          data[i].resize(N,0) ;
          for (k=0 ; k<N ; k++)
+         {
+           if (periodicity.size()>0 && (i==3 || i==4 || i==5) && (periodicity[i-3])) // Handle atom outside the simulation due to pbc. Important also for handling contact forces through PBC in the next function ...
+           {
+             if (tdata[k][lst[i]]<boundaries[0][i-3])
+               data[i][k]=tdata[k][lst[i]]+delta[i] ;
+             else if (tdata[k][lst[i]]>boundaries[1][i-3])
+               data[i][k]=tdata[k][lst[i]]-delta[i] ;
+             else
+               data[i][k]=tdata[k][lst[i]] ;
+           }
+           else
              data[i][k]=tdata[k][lst[i]] ;
+         }
      }
      else
      {
@@ -303,23 +294,23 @@ int Datafile::do_post_cf()
 
  vector<string>::iterator it ;
  vector<int> lst ;
- vector<string> tofind = {"id1", "id2", "per", "fx", "fy", "fz", "mx", "my", "mz"} ; 
- 
+ vector<string> tofind = {"id1", "id2", "per", "fx", "fy", "fz", "mx", "my", "mz"} ;
+
  for (auto name : tofind)
  {
    auto mapper=cfmapping.find(name) ;
    if (mapper != cfmapping.end())
    {
-       it=std::find(fieldscf.begin(), fieldscf.end(), mapper->second) ; 
-       if ( it != fieldscf.end()) 
-           lst.push_back(it-fieldscf.begin()) ; 
-       else 
+       it=std::find(fieldscf.begin(), fieldscf.end(), mapper->second) ;
+       if ( it != fieldscf.end())
+           lst.push_back(it-fieldscf.begin()) ;
+       else
            lst.push_back(-1) ;
    }
-   else 
+   else
     lst.push_back(-1) ;
  }
- 
+
  /*it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[1]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id1
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[2]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //id2
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[3]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //per
@@ -330,14 +321,19 @@ int Datafile::do_post_cf()
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[8]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //my
  it=std::find(fieldscf.begin(), fieldscf.end(), "c_cout[9]") ; if ( it != fieldscf.end()) lst.push_back(it-fieldscf.begin()) ; else lst.push_back(-1) ; //mz*/
 
- cout << "Assuming all the cf data are here (c_cout[1] to 9)...\n" ; fflush(stdout) ;
+ static bool messagefirst = true ;
+ if (messagefirst)
+ {
+   printf("Assuming all the cf data are here (c_cout[1] to 9)...\n") ; fflush(stdout) ;
+   messagefirst=false ;
+ }
 
  int k ;
  for (j=0, k=0 ; j<Ncf ; j++)
  {
 
 
-     if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
+     //if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
 
      if (tdata[j][lst[0]]>tdata[j][lst[1]]) swap=1 ;
      else swap = 0 ;
@@ -345,15 +341,51 @@ int Datafile::do_post_cf()
      datacf[0][k]=tdata[j][lst[swap]]-1 ;                                       //id1
      datacf[1][k]=tdata[j][lst[1-swap]]-1 ;                                     //id2
 
-     datacf[2][k]=  (data[3][datacf[0][k]] + data[3][datacf[1][k]]) /2.0 ;      //pos[0] //WARNING pb through PBC
+     datacf[2][k]=  (data[3][datacf[0][k]] + data[3][datacf[1][k]]) /2.0 ;      //pos[0] //WARNING pb through PBC //WARNING WITH POLYDISPERSITY!!
      datacf[3][k]=  (data[4][datacf[0][k]] + data[4][datacf[1][k]]) /2.0 ;      //pos[1]
      datacf[4][k]=  (data[5][datacf[0][k]] + data[5][datacf[1][k]]) /2.0 ;      //pos[2]
 
      if (swap==1) swap=-1 ;
      else swap=1 ;
-     datacf[5][k]=  (data[3][datacf[1][k]] - data[3][datacf[0][k]]) ;      //lpq[0] //WARNING pb through PBC
-     datacf[6][k]=  (data[4][datacf[1][k]] - data[4][datacf[0][k]]) ;      //lpq[1]
-     datacf[7][k]=  (data[5][datacf[1][k]] - data[5][datacf[0][k]]) ;      //lpq[2]
+     datacf[5][k]=  (data[3][datacf[0][k]] - data[3][datacf[1][k]]) ;      //lpq[0] //WARNING pb through PBC
+     datacf[6][k]=  (data[4][datacf[0][k]] - data[4][datacf[1][k]]) ;      //lpq[1]
+     datacf[7][k]=  (data[5][datacf[0][k]] - data[5][datacf[1][k]]) ;      //lpq[2]
+
+     // Let's handle the PBC now ...
+     if (tdata[j][lst[2]]==1)
+     {
+       bool corrected=false ;
+       for (int i=0 ; i<periodicity.size() ; i++)
+       {
+         if (periodicity[i])
+         {
+           if (fabs(fabs(data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]) - delta[i]) < fabs(datacf[5+i][k])) // Going through this PBC decreased the length of lpq
+           {
+             if (data[3+i][datacf[0][k]] - data[3+i][datacf[1][k]]<0) // it is either x1->x1+Delta or x2->x2-Delta
+             {
+               datacf[5+i][k] += delta[i]  ;
+               if (datacf[2+i][k]+delta[i]/2. >= boundaries[0][i] && datacf[2+i][k]+delta[i]/2.<= boundaries[1][i])
+                  datacf[2+i][k]+=delta[i]/2. ;
+               else
+                  datacf[2+i][k]-=delta[i]/2. ;
+             }
+             else // it is either x1->x1-Delta or x2->x2+Delta
+             {
+               datacf[5+i][k] -= delta[i]  ;
+               if (datacf[2+i][k]+delta[i]/2. >= boundaries[0][i] && datacf[2+i][k]+delta[i]/2.<= boundaries[1][i])
+                  datacf[2+i][k]+=delta[i]/2. ;
+               else
+                  datacf[2+i][k]-=delta[i]/2. ;
+
+             }
+	   corrected=true ;
+           }
+         }
+       }
+       if (corrected==false)
+	 printf("WARN: a contact force traversing the PBC was not corrected.\n") ;
+     }
+
 
      datacf[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]
      datacf[9][k]=  swap*tdata[j][lst[4]] ;                                     //f[1]
@@ -373,7 +405,7 @@ int Datafile::do_post_cf()
 
      k++ ;
  }
- printf("Removed %d periodic contacts out of %d\n", Ncf-k, Ncf) ;
+ printf("-%d per contacts /%d | ", Ncf-k, Ncf) ;
  Ncf=k ;
 return 0 ;
 }
@@ -383,6 +415,7 @@ return 0 ;
 int Datafile::set_data(struct Data & D)
 {
     D.N=N ; D.Ncf=Ncf ;
+    D.radius=&(data[0][0]) ;
     D.mass=&(data[1][0]) ;
     D.Imom=&(data[2][0]) ;
 
@@ -400,5 +433,5 @@ int Datafile::set_data(struct Data & D)
       D.mpq.resize (3); D.mpq={&(datacf[11][0]), &(datacf[12][0]), &(datacf[13][0])} ;
       D.mqp.resize (3); D.mqp={&(datacf[14][0]), &(datacf[15][0]), &(datacf[16][0])} ;
     }
-return 0 ; 
+return 0 ;
 }
