@@ -176,38 +176,38 @@ def make_3D_pool_table():
 
 def make_4D_pool_table():
     N = 4 # dimension
-    L1 = 4
-    L2 = 3
+    L1 = 20
+    L2 = 10
     L3 = 1 # this is the direction of gravity
-    L4 = 0.1
+    L4 = 10
 
     bottom_wall = d4cube(zero_dim=2)
     bottom_wall.scale([L1,L2,1,L4])
-    bottom_wall.translate([0,0,0,0])
+    bottom_wall.translate([0,0,-L3,0])
 
     left_wall = d4cube(zero_dim=1)
     left_wall.scale([L1,1,L3,L4])
-    left_wall.translate([0,-L2,L3,0])
+    left_wall.translate([0,-L2,0,0])
 
     right_wall = d4cube(zero_dim=1)
     right_wall.scale([L1,1,L3,L4])
-    right_wall.translate([0,L2,L3,0])
+    right_wall.translate([0,L2,0,0])
 
     front_wall = d4cube(zero_dim=0)
     front_wall.scale([1,L2,L3,L4])
-    front_wall.translate([L1,0,L3,0])
+    front_wall.translate([L1,0,0,0])
 
     back_wall = d4cube(zero_dim=0)
     back_wall.scale([1,L2,L3,L4])
-    back_wall.translate([-L1,0,L3,0])
+    back_wall.translate([-L1,0,0,0])
 
     d4wall_a = d4cube(zero_dim=3)
     d4wall_a.scale([L1,L2,L3,1])
-    d4wall_a.translate([0,0,L3,-L4])
+    d4wall_a.translate([0,0,0,-L4])
 
     d4wall_b = d4cube(zero_dim=3)
     d4wall_b.scale([L1,L2,L3,1])
-    d4wall_b.translate([0,0,L3, L4])
+    d4wall_b.translate([0,0,0, L4])
 
     solids = [bottom_wall.data,left_wall.data,right_wall.data,front_wall.data,back_wall.data,d4wall_a.data,d4wall_b.data]
     return N,solids

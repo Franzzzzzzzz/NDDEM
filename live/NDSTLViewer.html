@@ -12,9 +12,8 @@
 		<script type="module">
             import * as THREE from "../visualise/node_modules/three/build/three.module.js";
 			import { OrbitControls } from './js/OrbitControls.js';
-            import { NDSTLLoader } from './js/NDSTLLoader.js';
+            import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
             import { GUI } from './js/dat.gui.module.js';
-            import { ConvexGeometry } from './js/ConvexGeometry.js';
             import { VertexNormalsHelper } from './js/VertexNormalsHelper.js';
 
             var urlParams = new URLSearchParams(window.location.search);
@@ -78,169 +77,47 @@
                 // gui.width = 300;
                 gui.add( params, 'x4', -2, 2, 0.01 )
                     .name( 'x4 (w/s)' ).listen()
-                    .onChange( function () { renderSTL() } );
+                    .onChange( function () { meshes = renderSTL( meshes, NDsolids, scene, material, params.x4 ) } );
 
 			    animate();
 
-                // material = new THREE.PointsMaterial( { color: 0xff5533, size: 0.1 } );
-                material = new THREE.MeshPhongMaterial( { color: 0x00aa00 } );
+                const texture = new THREE.TextureLoader().load(
+                    // "textures/felt.jpg"
+                    "https://threejsfundamentals.org/threejs/resources/images/wall.jpg"
+                );
+                // texture.wrapS = THREE.RepeatWrapping;
+                // texture.wrapT = THREE.RepeatWrapping;
+                // texture.repeat.set( 0.001, 1 );
+
+                material = new THREE.MeshStandardMaterial( {
+                    // color: 0x00ff00,
+                    map: texture
+                } );
                 material.side = THREE.DoubleSide;
-                // material.wireframe = true;
+
+
 
                 loadSTL();
 			}
-
-            function pushUnique(arr, new_entry) {
-                let added = false;
-                let found = false;
-                let tol = 1e-6;
-                if ( arr.length === 0 ) { // add first entry
-                    // new_entry.forEach((item, i) => {
-                    //     arr.push(item)
-                    // });
-                    arr.push( new_entry[0], new_entry[1], new_entry[2] );
-                    added = true;
-                }
-                else {
-                    for ( var i=0; i<arr.length/3; i++ ) {
-                        if ( Math.abs( arr[i*3]   - new_entry[0] ) < tol &&
-                             Math.abs( arr[i*3+1] - new_entry[1] ) < tol &&
-                             Math.abs( arr[i*3+2] - new_entry[2] ) < tol) {
-                            found = true;
-                        }
-                    }
-                    if ( found === false ) {
-                        arr.push ( new_entry[0], new_entry[1], new_entry[2] );
-                        added = true;
-                    }
-                }
-                return added
-            }
-
-            function calculateNormal(points) {
-                // p0, p1, p2 = points;
-                // x0, y0, z0 = p0
-                // x1, y1, z1 = p1
-                // x2, y2, z2 = p2
-                let ux = points[1][0]-points[0][0];
-                let uy = points[1][1]-points[0][1];
-                let uz = points[1][2]-points[0][2];
-                let vx = points[2][0]-points[0][0];
-                let vy = points[2][1]-points[0][1];
-                let vz = points[2][2]-points[0][2];
-
-                // ux, uy, uz = u = [x1-x0, y1-y0, z1-z0] #first vector
-                // vx, vy, vz = v = [x2-x0, y2-y0, z2-z0] #sec vector
-
-                let u_cross_v = [uy*vz-uz*vy, uz*vx-ux*vz, ux*vy-uy*vx] //cross product
-                return u_cross_v;
-            }
-
-
-
-            function renderSTL( ) {
-                if ( meshes !== undefined ) { scene.remove( meshes ); meshes = new THREE.Group(); }
-                var vertices, normals;
-                var N = NDsolids[0][0][0].length; // get dimension from vertex length
-
-                NDsolids.forEach((solid, i) => {
-                    var geometry = new THREE.BufferGeometry();
-                    vertices = [];
-                    normals = [];
-                    let tol = 1e-6;
-                    let added, alpha;
-                    solid.forEach((facet, j) => {
-                        var normal = calculateNormal(facet);
-                        facet.forEach((vertex, k) => {
-                            if ( N == 3 ) {
-                                added = pushUnique(vertices, vertex);
-                                if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
-                             }
-                            else if ( N == 4 ) {
-                                // loop through all other vertices in facet
-                                for (var l=k+1; l<N; l++) {
-                                    alpha = (params.x4 - vertex[N-1])/(facet[l][N-1] - vertex[N-1]);
-                                    // console.log(vertex[N-1], params.x4)
-                                    if ( Math.abs(vertex[N-1] - params.x4) < tol && Math.abs(facet[l][N-1] - params.x4) < tol ) {
-                                        // alpha is not defined, we are coincident with W, add both points
-                                        added = pushUnique(vertices, vertex);
-                                        if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
-                                        added = pushUnique(vertices, facet[l]);
-                                        if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
-                                    }
-                                    else if ( alpha >= 0 && alpha <= 1 ) { // alpha is in range
-                                        let sliced_vertex = [];
-                                        for ( var n=0; n<3; n++ ) {
-                                            sliced_vertex.push( vertex[n] + alpha*(facet[l][n] - vertex[n]) );
-                                        }
-                                        added = pushUnique(vertices, sliced_vertex);
-                                        if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
-                                    }
-                                }
-                            }
-                        });
-                    });
-
-                    geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-                    geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-
-                    let points = [];
-                    for ( let i=0; i<vertices.length/3; i++ ) { points.push( new THREE.Vector3( vertices[i*3] + Math.random()*1e-6,
-                                                                                                vertices[i*3+1] + Math.random()*1e-6,
-                                                                                                vertices[i*3+2] + Math.random()*1e-6
-                                                                                             ) ) };
-                    console.log(points)
-                    // points.sort((a, b) => (a.x > b.x) ? 1 : (a.x === b.x) ? ((a.y > b.y) ? 1 : -1) : -1 );
-                    console.log(points)
-
-                    if ( points.length > 3 ) { geometry = new ConvexGeometry( points ); }
-                    var this_mesh = new THREE.Mesh( geometry, material );
-                    meshes.add(this_mesh);
-                });
-
-                meshes.castShadow = true;
-                meshes.receiveShadow = true;
-
-                // // if ( points.length == 2 ) {
-                // //     console.log('got a line')
-                // //     mesh = new THREE.Line( geometry, material );
-                // // }
-                // // else if ( points.length == 3 ) {
-                //
-                // geometries.forEach( geometry => {
-                //     console.log(geometry.attributes.position)
-                //     var this_mesh = new THREE.Mesh( geometry, material );
-                //     this_mesh.castShadow = true;
-                //     this_mesh.receiveShadow = true;
-                //     meshes.add(this_mesh);
-                // });
-
-                // }
-                // else if ( points.length > 3 ) {
-                //     // console.log(points)
-                //     let ConvGeometry = new ConvexGeometry( points );
-                //     mesh = new THREE.Mesh( ConvGeometry, material );
-                // }
-
-                // const helper = new VertexNormalsHelper( mesh, 0.2 ); // object, size, color, linewidth
-                // scene.add( helper );
-
-
-                if ( NDsolids.length > 0 ) { scene.add( meshes );  }
-            }
 
             function loadSTL( ) {
 
                 const loader = new NDSTLLoader();
 				loader.load( [ STLFilename ], function ( solids ) {
                     NDsolids = solids;
-                    renderSTL();
+                    meshes = renderSTL(meshes, NDsolids, scene, material, params.x4);
 				} )
             }
 
             function handleKeyboard(e) {
-              if ( e.key === "w" ) { params.x4 += 0.01; renderSTL(); }
-              if ( e.key === "s" ) { params.x4 -= 0.01; renderSTL(); }
+              if ( e.key === "w" ) {
+                  params.x4 += 0.01;
+                  meshes = renderSTL( meshes, NDsolids, scene, material, params.x4 );
+              }
+              if ( e.key === "s" ) {
+                  params.x4 -= 0.01;
+                  meshes = renderSTL( meshes, NDsolids, scene, material, params.x4 );
+              }
             }
 
             function onWindowResize(){

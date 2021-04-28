@@ -82,65 +82,23 @@
             let locked_particle = null;
             let ref_location;
 
-            let loading_method = 'strain_controlled';
-            if ( urlParams.has('stress_controlled') ) {
-                loading_method = 'stress_controlled';
-            }
-
             var params = {
-                dimension: 3,
-                L: 5, //system size
-                N: 50,
+                dimension: 4,
+                L1: 20,
+                L2: 10,
+                L3: 1, // this is the direction of gravity
+                L4: 10,
+                N: 1,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
-                gravity: false,
+                gravity: true,
                 paused: false,
                 H_cur: 0,
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
             }
-
-            particle_volume = 4./3.*Math.PI*Math.pow(radius,3);
-            if ( urlParams.has('dimension') ) {
-                params.dimension = parseInt(urlParams.get('dimension'));
-            }
-            if ( params.dimension === 4) {
-                params.L = 2.5;
-                particle_volume = Math.PI*Math.PI*Math.pow(radius,4)/2.;
-            }
-            if ( urlParams.has('no_stats') ) {
-                show_stats = false;
-            }
-
-
-            params.L_cur = params.L;
-            params.packing_fraction = params.N*particle_volume/Math.pow(2*params.L,3);
-            params.back = -params.L;
-            params.front = params.L;
-            params.left = -params.L;
-            params.right = params.L;
-            params.floor = -params.L;
-            params.roof = params.L;
-
-            // update_L();
-            //
-            // function update_L() {
-            //     var L = params.N*4./3.*Math.PI*Math.pow(radius,3);
-            //     L = Math.pow(solid_volume/params.packing_fraction,1./3.)
-            // }
-
-            const lut = new Lut( 'blackbody', 512 );
-
-            if ( params.dimension == 3 ) {
-                p_controller = new PIDcontroller(1e-6,1e-9,0);
-                q_controller = new PIDcontroller(1e-6,1e-9,0);
-            }
-            // else {
-            //     p_controller = new PIDcontroller(1e-7,1e-6,0);
-            //     q_controller = new PIDcontroller(1e-6,1e-5,0);
-            // }
 
             var quality = 5;
 
@@ -156,85 +114,30 @@
                 // physics.main(params.dimensions, params.N, inputfile)
 				position = new THREE.Vector3();
 
-				//
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );
+				camera.position.set( 2*params.L1, 2*params.L2, 2*params.L3 );
                 camera.up.set(0, 0, 1);
 				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x666666 );
 
-                // const axesHelper = new THREE.AxesHelper( 5 );
-                // scene.add( axesHelper );
-
 				const hemiLight = new THREE.HemisphereLight();
 				hemiLight.intensity = 0.35;
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight();
-				dirLight.position.set( 5, 5, 5 );
+				dirLight.position.set( 0, 0, 5 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.zoom = 2;
 				scene.add( dirLight );
 
-                // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
-                const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
-                const wall_material = new THREE.MeshLambertMaterial();
-                wall_material.wireframe = true;
-                // const wall_material = new THREE.ShadowMaterial( )
-
-				left = new THREE.Mesh( wall_geometry, wall_material );
-				left.position.y = - params.L - thickness/2.;
-				// floor.receiveShadow = true;
-				scene.add( left );
-				// physics.addMesh( floor );
-
-                right = new THREE.Mesh( wall_geometry, wall_material );
-                right.position.y = params.L + thickness/2.;
-                // top.receiveShadow = true;
-                scene.add( right );
-                // physics.addMesh( roof );
-
-                floor = new THREE.Mesh( wall_geometry, wall_material );
-                floor.rotation.x = Math.PI/2.;
-				floor.position.z = - params.L - thickness/2.;
-				// left.receiveShadow = true;
-				scene.add( floor );
-				// physics.addMesh( left );
-
-                roof = new THREE.Mesh( wall_geometry, wall_material );
-                roof.rotation.x = Math.PI/2.;
-				roof.position.z = params.L + thickness/2.;
-				// right.receiveShadow = true;
-				scene.add( roof );
-				// physics.addMesh( right );
-
-                front = new THREE.Mesh( wall_geometry, wall_material );
-                front.rotation.z = Math.PI/2.;
-                front.position.x = params.L + thickness/2.;
-                // back.receiveShadow = true;
-                scene.add( front );
-                // physics.addMesh( back );
-
-                back = new THREE.Mesh( wall_geometry, wall_material );
-                back.rotation.z = Math.PI/2.;
-                back.position.x = -params.L - thickness/2.;
-                // front.receiveShadow = true;
-                scene.add( back );
-                // physics.addMesh( front );
-
 				add_spheres();
 
-                if ( urlParams.has('stl') ) {
-                    STLFilename = './stls/4d-pool.stl';
-                    material = new THREE.MeshPhongMaterial( { color: 0x00aa00 } );
-                    material.side = THREE.DoubleSide;
-                    loadSTL();
-                }
-
-				//
+                STLFilename = './stls/4d-pool.stl';
+                material = new THREE.MeshPhongMaterial( { color: 0x00aa00 } );
+                material.side = THREE.DoubleSide;
+                loadSTL();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -243,54 +146,18 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				// stats = new Stats();
-                // panel = stats.addPanel( new Stats.Panel( 'Pressure', 'white', 'black' ) );
-                // stats.showPanel( 3 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-				// // document.body.appendChild( stats.dom );
-                // var thisParent = document.getElementById("stats");
-                // thisParent.appendChild( stats.domElement );
-                //
-                // var statsALL = document.getElementById("stats").querySelectorAll("canvas");
-                //
-                // for(var i=0; i<statsALL.length; i++){
-                //     statsALL[i].style.width = "240px";
-                //     statsALL[i].style.height = "160px";
-                // }
-
                 // gui
 				gui = new GUI();
 
 				gui.width = 300;
 
-				gui.add( params, 'packing_fraction', 0, 1, 0.01 )
-					.name( 'Solids fraction' ).listen();
-					// .onChange( function () { refresh_simulation(); } );
-                if ( loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'volumetric_strain', 0,0.1, 0.001)
-                        .name( 'Volumetric strain').listen()
-                        .onChange( function () { update_walls(); } );
-                    gui.add( params, 'axial_strain', 0,0.1, 0.001)
-                        .name( 'Axial strain').listen()
-                        .onChange( function () { update_walls(); } );
-                    }
-                else if ( loading_method === 'stress_controlled' ) {
-                    gui.add( params, 'pressure_set_pt', 0,1e5, 1)
-                        .name( 'Pressure set point').listen()
-                        .onChange( function () { update_walls(); } );
-                    gui.add( params, 'deviatoric_set_pt', 0,1e5, 1)
-                        .name( 'Deviatoric stress set point').listen()
-                        .onChange( function () { update_walls(); } );
-                    }
-                if ( params.dimension == 4 ) {
-                    gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
-                        .name( 'D4 location').listen()
-                        // .onChange( function () { update_walls(); } );
-                        .onChange( function () {
-                            if ( urlParams.has('stl') ) {
-                                meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
-                            }
-                        });
-                }
+                gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001)
+                    .name( 'D4 location').listen()
+                    .onChange( function () {
+                        if ( urlParams.has('stl') ) {
+                            meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                        }
+                    });
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
@@ -307,9 +174,6 @@
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'keypress', onSelectParticle, false );
 
-                if ( show_stats ) { make_graph(); }
-
-                update_walls();
 			    animate();
 			}
 
@@ -340,6 +204,14 @@
                         locked_particle = null;
                     }
                 }
+                else if ( event.key === "w" ) {
+                    params.d4_cur += 0.05;
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                }
+                else if ( event.key === "s" ) {
+                    params.d4_cur -= 0.05;
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                }
             }
 
 
@@ -349,65 +221,6 @@
                 camera.updateProjectionMatrix();
 
                 renderer.setSize( window.innerWidth, window.innerHeight );
-
-            }
-
-            function update_walls(dt=0.001) {
-                // console.log(dt)
-                if ( params.dimension == 3 ) {
-                    params.packing_fraction = (params.N*particle_volume)/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8.;
-                }
-                else if ( params.dimension == 4) {
-                    params.packing_fraction = (params.N*particle_volume)/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8./params.L_cur;
-                }
-
-
-                if ( loading_method == 'strain_controlled') {
-
-                    params.L_cur =  params.L*(1-params.volumetric_strain);
-                    params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
-
-                }
-                else if ( loading_method == 'stress_controlled' ) {
-                    let delta_p = p_controller.update(params.pressure_set_pt,pressure,dt);
-                    let delta_q = q_controller.update(params.deviatoric_set_pt,shear,dt)
-                    // console.log(pressure)
-                    params.L_cur -= delta_p;
-                    params.H_cur += delta_q;
-
-                }
-                params.front =  params.L_cur;
-                params.back  = -params.L_cur;
-                params.left  = -params.L_cur;
-                params.right =  params.L_cur;
-                params.floor = -params.L_cur + params.H_cur;
-                params.roof  =  params.L_cur - params.H_cur;
-
-                S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
-                S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
-                S.setBoundary(2, [params.floor,params.roof]) ; // Set location of the walls in z
-                for (var j = 0; j < params.dimension - 3; j++) {
-                    S.setBoundary(j + 3, [-params.L_cur,params.L_cur]) ; // Set location of the walls in z
-                }
-                back.position.x = params.back - thickness/2.;
-                front.position.x = params.front + thickness/2.;
-                left.position.y = params.left - thickness/2.;
-                right.position.y = params.right + thickness/2.;
-                floor.position.z = params.floor - thickness/2.;
-                roof.position.z = params.roof + thickness/2.;
-
-                var horiz_walls = [floor,roof];
-                var vert_walls = [left,right,front,back];
-
-                vert_walls.forEach( function(mesh) {
-                    mesh.scale.x = 2*params.L_cur + 2*thickness;
-                    mesh.scale.z = 2*(params.L_cur-params.H_cur) + 2*thickness;
-                });
-
-                horiz_walls.forEach( function(mesh) {
-                    mesh.scale.x = 2*params.L_cur + 2*thickness;
-                    mesh.scale.z = 2*params.L_cur + 2*thickness;
-                });
 
             }
 
@@ -423,8 +236,8 @@
         			// }
                     // ref_location.x = mouse.x;
                     raycaster.ray.intersectPlane( intersection_plane, ref_location);
-                    ref_location.clamp( new THREE.Vector3(back.position.x,  left.position.y,floor.position.z),
-                                        new THREE.Vector3(front.position.x,right.position.y, roof.position.z) );
+                    ref_location.clamp( new THREE.Vector3(-params.L1, -params.L2,0),
+                                        new THREE.Vector3( params.L1,  params.L2,0) );
                     // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
                         // console.log(ref_location.x)
                         // console.log(back.position.x)
@@ -433,41 +246,7 @@
                 }
 
                 if ( !params.paused ) {
-                    new_time = clock.getElapsedTime()
-
-                        if ( show_stats && started ) {
-                            // counter = counter + 1;
-                            // if ( counter == 5 ) { update_graph(); counter = 0; }
-                            update_graph();
-                    }
-
-                    if (loading_method === 'stress_controlled') {
-                        update_walls(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
-                    }
                     S.step_forward(5);
-
-                    var F = S.getWallForce();
-
-                    let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
-                    let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-
-                    // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
-                    // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
-
-                    // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
-
-                    pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
-                    shear = sigma_33 - pressure;
-                    // if ( isNaN(pressure) ) { pressure = 0; }
-
-                    if ( stats !== undefined ) {
-                        stats.begin()
-                        panel.update(pressure,1e6)
-                        stats.end();
-                    }
-
                 }
 
                 // update the picking ray with the camera and mouse position
@@ -628,22 +407,15 @@
                     S.interpret_command("auto rho");
                     S.interpret_command("auto inertia");
 
-                    S.interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
-                    if ( params.dimension == 3 ) {
-                        S.interpret_command("gravity 0 0 0")
-                    }
-                    if ( params.dimension == 4 ) {
-                        S.interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
-                        S.interpret_command("gravity 0 0 0 -10")
-                    }
-                    // S.interpret_command("auto location randomsquare");
-                    S.interpret_command("auto location randomdrop");
+                    S.interpret_command("boundary 0 WALL -"+String(params.L1)+" "+String(params.L1));
+                    S.interpret_command("boundary 1 WALL -"+String(params.L2)+" "+String(params.L2));
+                    S.interpret_command("boundary 2 WALL -"+String(params.L3)+" "+String(params.L3));
+                    S.interpret_command("boundary 3 WALL -"+String(params.L4)+" "+String(params.L4));
+                    S.interpret_command("gravity 0 0 -1000 0")
+                    // S.interpret_command("auto location randomdrop");
 
+                    S.interpret_command("location 0 0 0 -0.5 0");
 
-
-                    // NONE OF THESE DO ANYTHING YET
                     S.interpret_command("set Kn 2e5");
                     S.interpret_command("set Kt 8e4");
                     S.interpret_command("set GammaN 75");
@@ -653,73 +425,6 @@
                     S.interpret_command("set dt 0.0001");
                     S.finalise_init () ;
                 }
-            }
-
-            function update_graph() {
-                var gd = document.getElementById('stats')
-                var camera_opts = gd._fullLayout.scene.camera;
-                // shear = 0;
-                density = params.packing_fraction*material_density;
-                // pressure = Math.random();
-                // shear = Math.random();
-                // density = Math.random();
-                pressure_time.push(pressure);
-                shear_time.push(shear);
-                density_time.push(density);
-                // console.log(shear_time)
-                Plotly.update('stats', {
-                    'x': [density_time],
-                    'y': [shear_time],
-                    'z': [pressure_time],
-                },
-                camera_opts);
-                // Plotly.relayout('stats',  );
-
-            }
-
-            function make_graph() {
-                Plotly.newPlot('stats', [{
-                  type: 'scatter3d',
-                  mode: 'lines',
-                  x: [],
-                  y: [],
-                  z: [],
-                  // opacity: 1,
-                  line: {
-                    width: 2,
-                    color: "white",
-                    // reversescale: false
-                  }
-                }], {
-                  height: 300,
-                  width: 500,
-                  xaxis: {
-                    autotick: true,
-                    autorange: true,
-                },
-                  yaxis: {
-                    autotick: true,
-                    autorange: true,
-                },
-                  zaxis: {
-                    autotick: true,
-                    autorange: true,
-                },
-                scene: {
-            		xaxis:{title: 'Density'},
-            		yaxis:{title: 'Deviatoric stress'},
-            		zaxis:{title: 'Pressure'},
-                    aspectmode: 'auto',
-            		},
-                paper_bgcolor: 'rgba(0,0,0,1)',
-                plot_bgcolor: 'rgba(0,0,0,1)',
-                margin: {
-                    t: 5, //top margin
-                    l: 5, //left margin
-                    r: 5, //right margin
-                    b: 5 //bottom margin
-                    }
-                });
             }
 
             function loadSTL( ) {

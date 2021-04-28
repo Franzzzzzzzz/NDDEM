@@ -12,6 +12,7 @@ var uniforms = {
   x4p: { value: 0 },
   R: { value: 0.5 },
   ambient: { value: 1.0 },
+  banding: { value: 1.0 }
 };
 
 for (var ij = 0; ij < N - 3; ij++) {
@@ -36,6 +37,7 @@ var NDDEMShader = new ShaderMaterial({
     "uniform float R;", // particle radius
     "uniform float xview[1] ;",
     "uniform float xpart[1] ;",
+    "uniform float banding ;",
     "varying vec3 vColor;", // colour at vertex (output)
     "varying vec3 vNormal;", // normal at vertex (output)
 
@@ -82,9 +84,9 @@ var NDDEMShader = new ShaderMaterial({
     // if ( phi2 == NaN ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
     "if ( x_rotated.z < 0.0 ) { phi2 = 2.0*pi - phi2; }",
 
-    "vColor.r = abs(sin(phi0*3.0));",
-    "vColor.g = abs(sin(phi1*3.0));",
-    "vColor.b = abs(sin(phi2*2.0));",
+    "vColor.r = abs(sin(phi0*1.0*banding));",
+    "vColor.g = abs(sin(phi1*1.0*banding));",
+    "vColor.b = abs(sin(phi2*1.0*banding));",
     "vColor = vColor * abs(sin(phi0));",
     "vColor = vColor * abs(sin(phi1));",
     "}",

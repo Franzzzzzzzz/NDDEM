@@ -62,9 +62,12 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils,
-	Vector3
+	Vector3,
+    Mesh,
+    Group
 } from "./three.module.js";
 
+import { ConvexGeometry } from './ConvexGeometry.js';
 
 var NDSTLLoader = function ( manager ) {
 
@@ -362,4 +365,106 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 } );
 
-export { NDSTLLoader };
+function pushUnique(arr, new_entry) {
+    let added = false;
+    let found = false;
+    let tol = 1e-6;
+    if ( arr.length === 0 ) { // add first entry
+        arr.push( new_entry[0], new_entry[1], new_entry[2] );
+        added = true;
+    }
+    else {
+        for ( var i=0; i<arr.length/3; i++ ) {
+            if ( Math.abs( arr[i*3]   - new_entry[0] ) < tol &&
+                 Math.abs( arr[i*3+1] - new_entry[1] ) < tol &&
+                 Math.abs( arr[i*3+2] - new_entry[2] ) < tol) {
+                found = true;
+            }
+        }
+        if ( found === false ) {
+            arr.push ( new_entry[0], new_entry[1], new_entry[2] );
+            added = true;
+        }
+    }
+    return added
+}
+
+function calculateNormal(points) {
+    let ux = points[1][0]-points[0][0];
+    let uy = points[1][1]-points[0][1];
+    let uz = points[1][2]-points[0][2];
+    let vx = points[2][0]-points[0][0];
+    let vy = points[2][1]-points[0][1];
+    let vz = points[2][2]-points[0][2];
+
+    let u_cross_v = [uy*vz-uz*vy, uz*vx-ux*vz, ux*vy-uy*vx] //cross product
+    return u_cross_v;
+}
+
+
+
+function renderSTL( meshes, NDsolids, scene, material, x4 ) {
+    if ( meshes !== undefined ) { scene.remove( meshes ); meshes = new Group(); }
+    var vertices, normals;
+    var N = NDsolids[0][0][0].length; // get dimension from vertex length
+
+    NDsolids.forEach((solid, i) => {
+        var geometry = new BufferGeometry();
+        vertices = [];
+        normals = [];
+        let tol = 1e-6;
+        let added, alpha;
+        solid.forEach((facet, j) => {
+            var normal = calculateNormal(facet);
+            facet.forEach((vertex, k) => {
+                if ( N == 3 ) {
+                    added = pushUnique(vertices, vertex);
+                    if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                 }
+                else if ( N == 4 ) {
+                    // loop through all other vertices in facet
+                    for (var l=k+1; l<N; l++) {
+                        alpha = (x4 - vertex[N-1])/(facet[l][N-1] - vertex[N-1]);
+                        if ( Math.abs(vertex[N-1] - x4) < tol && Math.abs(facet[l][N-1] - x4) < tol ) {
+                            // alpha is not defined, we are coincident with x4, add both points
+                            added = pushUnique(vertices, vertex);
+                            if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                            added = pushUnique(vertices, facet[l]);
+                            if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                        }
+                        else if ( alpha >= 0 && alpha <= 1 ) { // alpha is in range
+                            let sliced_vertex = [];
+                            for ( var n=0; n<3; n++ ) {
+                                sliced_vertex.push( vertex[n] + alpha*(facet[l][n] - vertex[n]) );
+                            }
+                            added = pushUnique(vertices, sliced_vertex);
+                            if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                        }
+                    }
+                }
+            });
+        });
+
+        geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+        geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+
+        let points = [];
+        for ( let i=0; i<vertices.length/3; i++ ) { points.push( new Vector3( vertices[i*3]   + Math.random()*1e-6,
+                                                                              vertices[i*3+1] + Math.random()*1e-6,
+                                                                              vertices[i*3+2] + Math.random()*1e-6
+                                                                             ) ) };
+
+        if ( points.length > 3 ) { geometry = new ConvexGeometry( points ); }
+        var this_mesh = new Mesh( geometry, material );
+        meshes.add(this_mesh);
+    });
+
+    meshes.castShadow = true;
+    meshes.receiveShadow = true;
+
+    if ( NDsolids.length > 0 ) { scene.add( meshes );  }
+    // console.log(meshes)
+    return meshes
+}
+
+export { NDSTLLoader, renderSTL };
