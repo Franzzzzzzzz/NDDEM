@@ -19,32 +19,32 @@
     using namespace emscripten;
 #endif
 
-/** \weakgroup API 
+/** \weakgroup API
  * These functions are useful for external access, for interactive runs. This is the basic flow of API calls to run an interactive simulation:
  * \dot
 digraph C {
 rankdir="LR";
-Input -> interpret_command ; 
-Input [label="Simulation<d>"] ; 
+Input -> interpret_command ;
+Input [label="Simulation<d>"] ;
 interpret_command -> interpret_command [dir=back] ;
-interpret_command -> finalise_init ; 
+interpret_command -> finalise_init ;
 finalise_init -> step_forward ;
-step_forward -> step_forward [dir=back] ; 
-step_forward -> setX ; 
+step_forward -> step_forward [dir=back] ;
+step_forward -> setX ;
 setX -> step_forward ;
-step_forward -> externalforce ; 
-externalforce -> step_forward ; 
-step_forward -> finalise ; 
+step_forward -> externalforce ;
+externalforce -> step_forward ;
+step_forward -> finalise ;
 {rank=same ; step_forward ; setX ; externalforce ;}
 }
 \enddot
- * 
+ *
  */
-    
+
 /** \addtogroup DEM Discrete Element Simulations
  * This module handles the Discrete Element Simulations.
  *  @{ */
-    
+
 extern vector <std::pair<ExportType,ExportData>> * toclean ;
 extern XMLWriter * xmlout ;
 
@@ -69,8 +69,8 @@ public:
     std::vector < std::vector <double> > TorqueCorr  ;
     std::vector < double > displacement ; double maxdisp[2] ;
 
-    std::vector <SpecificAction> ExternalAction ; 
-    
+    std::vector <SpecificAction> ExternalAction ;
+
     std::vector <uint32_t> PBCFlags ;
     std::vector < std::vector <double> > WallForce ;
 
@@ -131,7 +131,7 @@ public:
     //-------------------------------------------------------------------------
     /** \brief Tell NDDEM that the simulations are now initialised and we can start running.
      * \warning It is important to remember to call this function in interactive run!
-     * \ingroup API 
+     * \ingroup API
     */
     void finalise_init () {
         //if (strcmp(argv[3], "default"))
@@ -154,10 +154,10 @@ public:
         tprevious=clock() ;
         printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
     }
-    //-------------------------------------------------------------------    
+    //-------------------------------------------------------------------
     /** \brief Interpret individual script command from string
      * \param in Input command string
-     * \ingroup API 
+     * \ingroup API
     */
     void interpret_command (string in)
     {
@@ -173,9 +173,9 @@ public:
       step_forward(nsteps) ;
     }
     //----
-    /** \brief Advance the simulation for nt steps (actual duration nt*dt). 
+    /** \brief Advance the simulation for nt steps (actual duration nt*dt).
      * \param nt number of timestep to advance
-     * \ingroup API 
+     * \ingroup API
     */
     void step_forward (int nt)
     {
@@ -306,17 +306,17 @@ public:
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
         Tools<d>::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
         Tools<d>::setzero(Torque);
-        
+
         for (auto it = ExternalAction.begin() ; it<ExternalAction.end() ; /*KEEP EMPTY*/ )
-        { 
+        {
             Tools<d>::vAddFew(F[it->id], it->Fn, it->Ft, Fcorr[it->id]) ;
             Tools<d>::vAddOne(Torque[it->id], it->Torquei, TorqueCorr[it->id]) ;
-            
-            it->duration -- ; 
+
+            it->duration -- ;
             if (it->duration<=0)
-                ExternalAction.erase(it) ; 
+                ExternalAction.erase(it) ;
             else
-                it++ ; 
+                it++ ;
         }
 
         //Particle - particle contacts
@@ -442,8 +442,8 @@ public:
   }
 
   //-------------------------
-  /** \brief Settles the simulation, closing open files etc. 
-    * \ingroup API 
+  /** \brief Settles the simulation, closing open files etc.
+    * \ingroup API
     */
   void finalise ()
   {
@@ -455,15 +455,15 @@ public:
   //-------------------------------------------------------------------
   /** \brief Expose the array of locations. \ingroup API */
   std::vector<std::vector<double>> getX() { return X; }
-  
+
   /** \brief Expose the array of velocities. \ingroup API */
   std::vector<std::vector<double>> getVelocity() { return V; }
-  
+
   /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }
-  
+
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
-  void fixParticle(int a, std::vector<double> loc) {
+  void fixParticle(int a, v1d loc) {
       X[a][0] = loc[0];
       X[a][1] = loc[1];
       X[a][2] = loc[2];
@@ -474,6 +474,10 @@ public:
           Omega[a][i] = 0;
       }
   }
+
+  /** \brief Expose the current time. \ingroup API */
+  double getTime() { return t; }
+
 
   /** \brief Expose the array of orientation. \ingroup API */
   std::vector<std::vector<double>> getOrientation() { return A; }
@@ -488,13 +492,14 @@ public:
 
   /** \brief Expose the array of wall forces. \ingroup API */
   std::vector<std::vector<double>> getWallForce() { return WallForce; }
-  
+
   /** \brief Set an additional external force on a particle for a certain duration. \param id particle id \param duration number of timesteps to apply the force for \param force force vector to apply \ingroup API */
-  void externalforce (int id, int duration, v1d force)
+  void setExternalForce (int id, int duration, v1d force)
   {
-      ExternalAction.resize(ExternalAction.size()) ;
-      ExternalAction[ExternalAction.size()-1].id = id ; 
-      ExternalAction[ExternalAction.size()-1].id = duration ;
+      printf("\nSetting the force: %g %g %g %g\n", force[0],force[1],force[2],force[3]);
+      ExternalAction.resize(ExternalAction.size()+1) ;
+      ExternalAction[ExternalAction.size()-1].id = id ;
+      ExternalAction[ExternalAction.size()-1].duration = duration ;
       ExternalAction[ExternalAction.size()-1].set(force, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
   }
 

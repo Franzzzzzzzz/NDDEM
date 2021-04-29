@@ -12,7 +12,7 @@ var uniforms = {
   x4p: { value: 0 },
   R: { value: 0.5 },
   ambient: { value: 1.0 },
-  banding: { value: 1.0 }
+  banding: { value: 3.0 }
 };
 
 for (var ij = 0; ij < N - 3; ij++) {

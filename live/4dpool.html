@@ -59,11 +59,9 @@
             let pressure_time = [];
             let shear_time = [];
             let density_time = [];
-            var radius = 0.5;
             let particle_volume;
             let started = false;
             let show_stats = true;
-            const thickness = radius;
             const material_density = 2700;
             let old_time = 0;
             let new_time = 0;
@@ -83,12 +81,13 @@
             let ref_location;
 
             var params = {
+                radius: 0.05,
                 dimension: 4,
-                L1: 20,
-                L2: 10,
-                L3: 1, // this is the direction of gravity
-                L4: 10,
-                N: 1,
+                L1: 2,
+                L2: 1,
+                L3: 0.1, // this is the direction of gravity
+                L4: 1,
+                pyramid_size: 5,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
@@ -98,7 +97,10 @@
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
+                dt: 0.0005
             }
+
+            params.N = get_num_particles(params.pyramid_size);
 
             var quality = 5;
 
@@ -135,7 +137,14 @@
 				add_spheres();
 
                 STLFilename = './stls/4d-pool.stl';
-                material = new THREE.MeshPhongMaterial( { color: 0x00aa00 } );
+                const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
+                    // t.encoding = THREE.sRGBEncoding;
+                    t.mapping = THREE.EquirectangularReflectionMapping;
+                } );
+                material = new THREE.MeshPhongMaterial( {
+                    color: 0x00aa00,
+                    // map: texture,
+                } );
                 material.side = THREE.DoubleSide;
                 loadSTL();
 
@@ -189,6 +198,13 @@
 
             function onSelectParticle( event ) {
                 // console.log(camera.getWorldDirection() )
+                if ( event.key === 'Enter' ) {
+                    // console.log('hit!')
+                    var work = 1.
+                    var force = work/params.dt;
+                    S.setExternalForce(0, 1, [-force,0.0,0.,0.]);
+
+                }
                 if ( event.code === 'Space' ) {
                     if ( locked_particle === null ) {
                         locked_particle = INTERSECTED;
@@ -205,11 +221,11 @@
                     }
                 }
                 else if ( event.key === "w" ) {
-                    params.d4_cur += 0.05;
+                    params.d4_cur += 0.1*params.radius;
                     meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                 }
                 else if ( event.key === "s" ) {
-                    params.d4_cur -= 0.05;
+                    params.d4_cur -= 0.1*params.radius;
                     meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                 }
             }
@@ -246,27 +262,28 @@
                 }
 
                 if ( !params.paused ) {
-                    S.step_forward(5);
+                    S.step_forward(20);
                 }
 
+                // console.log(S.getTime())
                 // update the picking ray with the camera and mouse position
             	raycaster.setFromCamera( mouse, camera );
 
 
-                const intersects = raycaster.intersectObjects( spheres.children );
-				if ( intersects.length > 0 ) { // if found something
-					if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
-                            if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
-    						INTERSECTED = intersects[ 0 ].object;
-                            INTERSECTED.material.uniforms.ambient.value = 5.0;
-					}
-				}
-                else { // didn't find anything
-					if ( INTERSECTED !== null ) { // there was something before
-                        INTERSECTED.material.uniforms.ambient.value = 1.0;
-                        INTERSECTED = null;
-                    }
-				}
+                // const intersects = raycaster.intersectObjects( spheres.children );
+				// if ( intersects.length > 0 ) { // if found something
+				// 	if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
+                //             if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
+    			// 			INTERSECTED = intersects[ 0 ].object;
+                //             INTERSECTED.material.uniforms.ambient.value = 5.0;
+				// 	}
+				// }
+                // else { // didn't find anything
+				// 	if ( INTERSECTED !== null ) { // there was something before
+                //         INTERSECTED.material.uniforms.ambient.value = 1.0;
+                //         INTERSECTED = null;
+                //     }
+				// }
 
 
 				renderer.render( scene, camera );
@@ -305,7 +322,7 @@
                 // const matrix = new THREE.Matrix4();
                 const color = new THREE.Color();
 
-                const geometrySphere = new THREE.SphereGeometry( radius, Math.pow(2,quality), Math.pow(2,quality) );
+                const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
                 // const geometrySphere = new THREE.BufferGeometry().fromGeometry(
                 //   new THREE.SphereGeometry(
                 //     1,
@@ -324,11 +341,17 @@
                     object.position.set(0,0,0);
                     object.rotation.z = Math.PI / 2;
                     object.NDDEM_ID = i;
+                    object.castShadow = true;
+                    object.material.uniforms.R.value = params.radius;
                     spheres.add(object);
+
                     // spheres.setMatrixAt( i, matrix );
                     // spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
 
                 }
+                // display white ball
+                spheres.children[0].material.uniforms.banding.value = 1.;
+                spheres.children[0].material.uniforms.ambient.value = 5.;
             }
 
             function move_spheres() {
@@ -348,7 +371,7 @@
                     // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
                     if ( params.dimension == 4 ) {
                         var D_draw = 2*Math.sqrt(
-                          Math.pow(radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
+                          Math.pow(params.radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
                         );
                         object.scale.set(D_draw, D_draw, D_draw);
                         // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
@@ -402,8 +425,8 @@
 
                 function finish_setup() {
                     S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-                    S.interpret_command("radius -1 0.5");
-                    S.interpret_command("mass -1 1");
+                    S.interpret_command("radius -1 " + String(params.radius));
+                    S.interpret_command("mass -1 0.1");
                     S.interpret_command("auto rho");
                     S.interpret_command("auto inertia");
 
@@ -411,18 +434,36 @@
                     S.interpret_command("boundary 1 WALL -"+String(params.L2)+" "+String(params.L2));
                     S.interpret_command("boundary 2 WALL -"+String(params.L3)+" "+String(params.L3));
                     S.interpret_command("boundary 3 WALL -"+String(params.L4)+" "+String(params.L4));
-                    S.interpret_command("gravity 0 0 -1000 0")
+                    S.interpret_command("gravity 0 0 -10 0")
                     // S.interpret_command("auto location randomdrop");
 
-                    S.interpret_command("location 0 0 0 -0.5 0");
+                    let n = 1;
+                    let offset = params.L1/2;
 
+                    S.interpret_command("location " + String(0) + " " + String(offset) + " " + String(0) + " " + String(-params.L3+params.radius) + " " + String(0)); // first ball is the white ball
+
+                    for ( var k=0; k<params.pyramid_size; k++ ) {
+                        let cur_pyramid_length = params.pyramid_size - k;
+                        let w = k*1.825*params.radius;
+                        for ( var i=0; i<cur_pyramid_length; i++ ) {
+                            for ( var j=0; j<cur_pyramid_length - i; j++) {
+                                let x = i*1.82*params.radius - cur_pyramid_length*params.radius + params.radius - offset;
+                                let y = j*2.01*params.radius - (cur_pyramid_length-i)*params.radius + params.radius;// - i%2*radius;
+                                // console.log(x,y);
+                                S.interpret_command("location " + String(n) + " " + String(x) + " " + String(y) + " " + String(-params.L3+params.radius) + " " + String(w));
+                                n++;
+                                if ( k > 0 ) { S.interpret_command("location " + String(n) + " " + String(x) + " " + String(y) + " " + String(-params.L3+params.radius) + " " + String(-w)); n++;}
+
+                            }
+                        }
+                    }
                     S.interpret_command("set Kn 2e5");
                     S.interpret_command("set Kt 8e4");
                     S.interpret_command("set GammaN 75");
                     S.interpret_command("set GammaT 75");
                     S.interpret_command("set Mu 0.5");
                     S.interpret_command("set T 150");
-                    S.interpret_command("set dt 0.0001");
+                    S.interpret_command("set dt " + String(params.dt));
                     S.finalise_init () ;
                 }
             }
@@ -434,6 +475,17 @@
                     NDsolids = solids;
                     meshes = renderSTL(meshes, NDsolids, scene, material, params.d4_cur);
 				} )
+            }
+
+            function get_num_particles(L) {
+                let N = 0;
+                let i = 1;
+                for (var n=L; n>0; n--) {
+                    // console.log(n,i,i*n)
+                    N += i*n;
+                    i += 2;
+                }
+                return N+1; // adding the white ball
             }
 
 		</script>

@@ -184,7 +184,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
      Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
-
+  Torquei-= Omegai*0.00005 ; // damping 
   //History[make_pair(i,-(2*j+k+1))]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;

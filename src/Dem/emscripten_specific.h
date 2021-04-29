@@ -15,7 +15,8 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         .function("getBoundary", &Simulation<3>::getBoundary)
         .function("setBoundary", &Simulation<3>::setBoundary)
         .function("getWallForce", &Simulation<3>::getWallForce)
-        .function("externalforce", &Simulation<3>::externalforce)
+        .function("setExternalForce", &Simulation<3>::setExternalForce)
+        .function("getTime", &Simulation<3>::getTime)
         ;
     class_<Simulation<4>>("Simulation4")
         .constructor<int>()
@@ -33,7 +34,8 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         .function("getBoundary", &Simulation<4>::getBoundary)
         .function("setBoundary", &Simulation<4>::setBoundary)
         .function("getWallForce", &Simulation<4>::getWallForce)
-        .function("externalforce", &Simulation<4>::externalforce)
+        .function("setExternalForce", &Simulation<4>::setExternalForce)
+        .function("getTime", &Simulation<4>::getTime)
         ;
 }
 

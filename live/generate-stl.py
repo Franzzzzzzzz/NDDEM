@@ -176,10 +176,10 @@ def make_3D_pool_table():
 
 def make_4D_pool_table():
     N = 4 # dimension
-    L1 = 20
-    L2 = 10
-    L3 = 1 # this is the direction of gravity
-    L4 = 10
+    L1 = 2
+    L2 = 1
+    L3 = 0.1 # this is the direction of gravity
+    L4 = 1
 
     bottom_wall = d4cube(zero_dim=2)
     bottom_wall.scale([L1,L2,1,L4])
