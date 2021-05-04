@@ -456,6 +456,8 @@ function renderSTL( meshes, NDsolids, scene, material, x4 ) {
 
         if ( points.length > 3 ) { geometry = new ConvexGeometry( points ); }
         var this_mesh = new Mesh( geometry, material );
+        this_mesh.castShadow = true;
+        this_mesh.receiveShadow = true;
         meshes.add(this_mesh);
     });
 

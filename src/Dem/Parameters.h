@@ -46,6 +46,8 @@ public :
         Gamman(0.0001), //Normal damping
         Gammat(0),      //Tangential damping
         Mu(0.5),        // Friction coefficient
+        Mu_wall(0.5),        // Wall friction coefficient
+        damping(0.0),
         skin(1.0), skinsqr(1.0),      // Skin size (for verlet list optimisation)
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
@@ -78,6 +80,8 @@ public :
     double Gamman; ///< Normal dissipation
     double Gammat ; ///< Tangential dissipation
     double Mu ; ///< Fricton
+    double Mu_wall; //< Wall friction
+    double damping; //< Artificial rolling damping
     double skin ; ///< Skin for use in verlet list \warning Experimental
     double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental
     vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
@@ -274,6 +278,8 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      {"GammaT",Gammat},
      {"rho",rho},
      {"Mu",Mu},
+     {"Mu_wall",Mu_wall},
+     {"damping",damping},
      {"T",T},
      {"tdump",tdump},
      {"orientationtracking",orientationtracking},

@@ -39,6 +39,7 @@
             import { Lut } from './js/Lut.js'
             import { PIDcontroller } from './js/PIDcontroller.js'
             import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
+            import { PoolTableShader } from './js/PoolTableShader.js';
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -131,27 +132,33 @@
 				const dirLight = new THREE.DirectionalLight();
 				dirLight.position.set( 0, 0, 5 );
 				dirLight.castShadow = true;
-				dirLight.shadow.camera.zoom = 2;
+                dirLight.shadow.mapSize.width = 2*1024;
+                dirLight.shadow.mapSize.height = 2*1024;
+				// dirLight.shadow.camera.zoom = 2;
 				scene.add( dirLight );
 
 				add_spheres();
 
                 STLFilename = './stls/4d-pool.stl';
-                const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
+                // const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
                     // t.encoding = THREE.sRGBEncoding;
-                    t.mapping = THREE.EquirectangularReflectionMapping;
-                } );
-                material = new THREE.MeshPhongMaterial( {
+                    // t.mapping = THREE.EquirectangularReflectionMapping;
+                // } );
+                material = new THREE.MeshStandardMaterial( {
                     color: 0x00aa00,
+                    metalness: 1,
+                    roughness: 1,
                     // map: texture,
                 } );
-                material.side = THREE.DoubleSide;
+
+                // material = PoolTableShader;
                 loadSTL();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
@@ -195,9 +202,7 @@
                     // console.log(spheres.children[0].position)
                     var direction = new THREE.Vector3();
                     direction.copy(spheres.children[0].position);
-                    console.log(direction)
                     direction.sub(camera.position);
-                    console.log(direction)
                     var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y);
                     var dx = direction.x/l;
                     var dy = direction.y/l;
@@ -205,6 +210,7 @@
 
                 }
                 if ( event.code === 'Space' ) {
+                    event.preventDefault(); // stop page from skipping downwards
                     params.track_white_ball = !params.track_white_ball;
                     // if ( locked_particle === null ) {
                     //     locked_particle = INTERSECTED;
@@ -317,7 +323,8 @@
 
                 for ( let i = 0; i < params.N; i ++ ) {
                     if ( i == 0 ) {
-                        const material = new THREE.MeshStandardMaterial( { color: 0xaaaaaa });
+                        var material = new THREE.MeshStandardMaterial( {
+                            color: 0x0aaaaaa });
                     }
                     else {
                         var material = NDParticleShader.clone();
@@ -329,6 +336,7 @@
                     object.rotation.z = Math.PI / 2;
                     object.NDDEM_ID = i;
                     object.castShadow = true;
+                    object.receiveShadow = true;
                     spheres.add(object);
                 }
 
@@ -452,7 +460,9 @@
                     S.interpret_command("set Kt 8e4");
                     S.interpret_command("set GammaN 75");
                     S.interpret_command("set GammaT 75");
-                    S.interpret_command("set Mu 0.5");
+                    S.interpret_command("set Mu 0.1");
+                    S.interpret_command("set Mu_wall 0.5");
+                    S.interpret_command("set damping 0.001");
                     S.interpret_command("set T 150");
                     S.interpret_command("set dt " + String(params.dt));
                     S.finalise_init () ;
