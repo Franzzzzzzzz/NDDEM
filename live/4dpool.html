@@ -161,7 +161,7 @@
 				gui.width = 400;
 
                 gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
-                gui.add( params, 'strength', 0,2, 0.001).name( 'Strength').listen();
+                gui.add( params, 'strength', 0,2, 0.001).name( 'Strength (a/d)').listen();
                 gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = -params.L3;
@@ -230,8 +230,11 @@
                     params.d4_cur -= 0.1*params.radius;
                     meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                 }
-                else if ( event.key === "r" ) {
-
+                else if ( event.key === "a" ) {
+                    params.strength -= 0.01;
+                }
+                else if ( event.key === "d" ) {
+                    params.strength += 0.01;
                 }
             }
 
