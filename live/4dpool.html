@@ -175,7 +175,9 @@
 				gui.width = 400;
 
                 gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
-                gui.add( params, 'strength', 0,2, 0.001).name( 'Strength (a/d)').listen();
+                gui.add( params, 'strength', 0,2, 0.001).name( 'Strength (a/d)').listen().onChange(() => {
+                    ray.scale.y = 2*params.strength;
+                });
                 gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = -params.L3;
