@@ -97,12 +97,14 @@
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
-                dt: 0.0005
+                dt: 0.0005,
+                track_white_ball: true,
+                strength: 1,
             }
 
             params.N = get_num_particles(params.pyramid_size);
 
-            var quality = 5;
+            var quality = 7;
 
             var NDParticleShader;
             import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
@@ -113,13 +115,11 @@
 			async function init() {
 
 				physics = await NDDEMPhysics();
-                // physics.main(params.dimensions, params.N, inputfile)
 				position = new THREE.Vector3();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 2*params.L1, 2*params.L2, 2*params.L3 );
+				camera.position.set( 2*params.L1, 0, 2*params.L1 );
                 camera.up.set(0, 0, 1);
-				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x666666 );
@@ -158,25 +158,13 @@
                 // gui
 				gui = new GUI();
 
-				gui.width = 300;
+				gui.width = 400;
 
-                gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001)
-                    .name( 'D4 location').listen()
-                    .onChange( function () {
-                        if ( urlParams.has('stl') ) {
-                            meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
-                        }
-                    });
-                gui.add ( params, 'gravity').name('Gravity').listen()
-                    .onChange( function() {
-                        if ( params.gravity === true ) {
-                            S.interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
-                        else {
-                            S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
-                        });
-                gui.add ( params, 'paused').name('Paused').listen();
+                gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
+                gui.add( params, 'strength', 0,2, 0.001).name( 'Strength').listen();
+                gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = 0.5;
+				controls.target.y = -params.L3;
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
@@ -200,33 +188,50 @@
                 // console.log(camera.getWorldDirection() )
                 if ( event.key === 'Enter' ) {
                     // console.log('hit!')
-                    var work = 1.
+                    var work = params.strength;
                     var force = work/params.dt;
-                    S.setExternalForce(0, 1, [-force,0.0,0.,0.]);
+                    // var direction = camera.rotation;
+                    // console.log(camera.position);
+                    // console.log(spheres.children[0].position)
+                    var direction = new THREE.Vector3();
+                    direction.copy(spheres.children[0].position);
+                    console.log(direction)
+                    direction.sub(camera.position);
+                    console.log(direction)
+                    var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y);
+                    var dx = direction.x/l;
+                    var dy = direction.y/l;
+                    S.setExternalForce(0, 1, [force*dx,force*dy,0.,0.]);
 
                 }
                 if ( event.code === 'Space' ) {
-                    if ( locked_particle === null ) {
-                        locked_particle = INTERSECTED;
-                        // console.log(locked_particle);
-                        ref_location = locked_particle.position;
-
-                        camera.getWorldDirection( camera_direction ); // update camera direction
-                        // set the plane for the particle to move along to be orthogonal to the camera
-                        intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
-                                                                          locked_particle.position );
-                    }
-                    else {
-                        locked_particle = null;
-                    }
+                    params.track_white_ball = !params.track_white_ball;
+                    // if ( locked_particle === null ) {
+                    //     locked_particle = INTERSECTED;
+                    //     // console.log(locked_particle);
+                    //     ref_location = locked_particle.position;
+                    //
+                    //     camera.getWorldDirection( camera_direction ); // update camera direction
+                    //     // set the plane for the particle to move along to be orthogonal to the camera
+                    //     intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
+                    //                                                       locked_particle.position );
+                    // }
+                    // else {
+                    //     locked_particle = null;
+                    // }
                 }
                 else if ( event.key === "w" ) {
+                    params.track_white_ball = false;
                     params.d4_cur += 0.1*params.radius;
                     meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                 }
                 else if ( event.key === "s" ) {
+                    params.track_white_ball = false;
                     params.d4_cur -= 0.1*params.radius;
                     meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                }
+                else if ( event.key === "r" ) {
+
                 }
             }
 
@@ -265,6 +270,13 @@
                     S.step_forward(20);
                 }
 
+                if ( params.track_white_ball ) {
+                    if ( NDsolids !== undefined ) {
+                        var x = S.getX();
+                        params.d4_cur = x[0][3];
+                        meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    }
+                }
                 // console.log(S.getTime())
                 // update the picking ray with the camera and mouse position
             	raycaster.setFromCamera( mouse, camera );
@@ -293,65 +305,39 @@
                 old_time = new_time;
 
 			}
-            // function refresh_simulation() {
-            //     // update_L();
-            //     // console.log(L)
-            //     var range = 0.8*(L/2 - radius);
-            //     for ( let i = 0; i < params.N; i ++ ) {
-            //         position.set( range*(2*Math.random() - 1), range*(2*Math.random() - 1), range*(2*Math.random() - 1) );
-    		// 		physics.setMeshPosition( spheres, position, i );
-            //     }
-            //     position.set( 0, - L/2 - thickness/2., 0 );
-            //
-            //     floor.position.y = - L/2 - thickness/2.;
-            //     roof.position.y = L/2 + thickness/2.;
-            //     left.position.z = - L/2 - thickness/2.;
-            //     right.position.z = L/2 + thickness/2.;
-            //     back.position.x = L/2 + thickness/2.;
-            //     front.position.x = -L/2 - thickness/2.;
-            //     camera.position.set( - 3*L, 0, 0 );
-            //
-            // }
 
             function add_spheres() {
                 spheres = new THREE.Group();
                 scene.add(spheres);
-                // const material = new THREE.MeshStandardMaterial();
-
-
-                // const matrix = new THREE.Matrix4();
-                const color = new THREE.Color();
 
                 const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
-                // const geometrySphere = new THREE.BufferGeometry().fromGeometry(
-                //   new THREE.SphereGeometry(
-                //     1,
-                //     Math.pow(2, params.quality),
-                //     Math.pow(2, params.quality)
-                //   )
-                // );
-                // spheres = new THREE.InstancedMesh( geometrySphere, material, params.N );
-                // spheres.castShadow = true;
-                // spheres.receiveShadow = true;
-                // scene.add( spheres );
 
                 for ( let i = 0; i < params.N; i ++ ) {
-                    const material = NDParticleShader.clone();
+                    if ( i == 0 ) {
+                        const material = new THREE.MeshStandardMaterial( { color: 0xaaaaaa });
+                    }
+                    else {
+                        var material = NDParticleShader.clone();
+                        material.uniforms.R.value = params.radius;
+                        material.uniforms.banding.value = 1 + 2*(i%3);
+                    }
                     var object = new THREE.Mesh(geometrySphere, material);
                     object.position.set(0,0,0);
                     object.rotation.z = Math.PI / 2;
                     object.NDDEM_ID = i;
                     object.castShadow = true;
-                    object.material.uniforms.R.value = params.radius;
                     spheres.add(object);
-
-                    // spheres.setMatrixAt( i, matrix );
-                    // spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
-
                 }
+
                 // display white ball
-                spheres.children[0].material.uniforms.banding.value = 1.;
-                spheres.children[0].material.uniforms.ambient.value = 5.;
+                // spheres.children[0].material.uniforms.banding.value = 1.;
+                // spheres.children[0].material.uniforms.ambient.value = 5.;
+
+                // display black ball
+                spheres.children[11].material.uniforms.banding.value = 0.;
+                spheres.children[11].material.uniforms.ambient.value = 1.;
+
+
             }
 
             function move_spheres() {
@@ -383,13 +369,15 @@
                             spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
                         }
                     }
-                    for (var j = 0; j < params.N - 3; j++) {
-                      object.material.uniforms.xview.value[j] =
-                        params.d4_cur;
-                      object.material.uniforms.xpart.value[j] =
-                        x[i][j + 3];
+                    if ( i > 0 ) {
+                        for (var j = 1; j < params.N - 3; j++) {
+                          object.material.uniforms.xview.value[j] =
+                            params.d4_cur;
+                          object.material.uniforms.xpart.value[j] =
+                            x[i][j + 3];
+                        }
+                        object.material.uniforms.A.value = orientation[i];
                     }
-                    object.material.uniforms.A.value = orientation[i];
                     // if (params.dimension > 3) {
                     //   object.material.uniforms.x4p.value = x[i][j + 3];
                     //   object.material.uniforms.x4.value = params.d4_cur;
@@ -440,7 +428,7 @@
                     let n = 1;
                     let offset = params.L1/2;
 
-                    S.interpret_command("location " + String(0) + " " + String(offset) + " " + String(0) + " " + String(-params.L3+params.radius) + " " + String(0)); // first ball is the white ball
+                    S.interpret_command("location " + String(0) + " " + String(offset) + " " + String(0) + " " + String(-params.L3+params.radius) + " " + String(0.001*(Math.random()-0.5))); // first ball is the white ball
 
                     for ( var k=0; k<params.pyramid_size; k++ ) {
                         let cur_pyramid_length = params.pyramid_size - k;
