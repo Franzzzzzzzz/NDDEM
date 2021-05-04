@@ -70,11 +70,12 @@
             let p_controller, q_controller;
             let NDsolids, material, STLFilename;
             let meshes = new THREE.Group();
-
-            const raycaster = new THREE.Raycaster();
+            var direction = new THREE.Vector3();
+            var raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
             let intersection_plane = new THREE.Plane();
             let camera_direction = new THREE.Vector3();
+            let ray;
 
             let INTERSECTED = null;
             let last_intersection = null;
@@ -134,8 +135,15 @@
 				dirLight.castShadow = true;
                 dirLight.shadow.mapSize.width = 2*1024;
                 dirLight.shadow.mapSize.height = 2*1024;
-				// dirLight.shadow.camera.zoom = 2;
 				scene.add( dirLight );
+
+                ray = new THREE.Line(
+                    new THREE.BufferGeometry().setFromPoints([
+                        new THREE.Vector3(0,-3,0),
+                        new THREE.Vector3(0,0,0),
+                    ]),
+                    new THREE.LineBasicMaterial( { color: 0xffffff })
+                );
 
 				add_spheres();
 
@@ -151,7 +159,6 @@
                     // map: texture,
                 } );
 
-                // material = PoolTableShader;
                 loadSTL();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -197,16 +204,7 @@
                     // console.log('hit!')
                     var work = params.strength;
                     var force = work/params.dt;
-                    // var direction = camera.rotation;
-                    // console.log(camera.position);
-                    // console.log(spheres.children[0].position)
-                    var direction = new THREE.Vector3();
-                    direction.copy(spheres.children[0].position);
-                    direction.sub(camera.position);
-                    var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y);
-                    var dx = direction.x/l;
-                    var dy = direction.y/l;
-                    S.setExternalForce(0, 1, [force*dx,force*dy,0.,0.]);
+                    S.setExternalForce(0, 1, [force*direction.x,force*direction.y,0.,0.]);
 
                 }
                 if ( event.code === 'Space' ) {
@@ -258,6 +256,16 @@
                 if ( clock.getElapsedTime() > 1 ) { started = true; }
 				requestAnimationFrame( animate );
                 move_spheres();
+
+                direction.copy(spheres.children[0].position);
+                direction.sub(camera.position);
+                var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y);
+                direction.x /= l;
+                direction.y /= l;
+                direction.z = 0;
+
+                ray.rotation.z = Math.atan2(direction.y,direction.x);
+
                 if ( locked_particle !== null ) {
                     // console.log(locked_particle)
                     // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
@@ -286,13 +294,13 @@
                         meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                     }
                 }
-                // console.log(S.getTime())
-                // update the picking ray with the camera and mouse position
-            	raycaster.setFromCamera( mouse, camera );
 
+                // ray.position.set
 
                 // const intersects = raycaster.intersectObjects( spheres.children );
+                // console.log(intersects)
 				// if ( intersects.length > 0 ) { // if found something
+                    // console.log(intersects)
 				// 	if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
                 //             if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
     			// 			INTERSECTED = intersects[ 0 ].object;
@@ -348,6 +356,7 @@
                 spheres.children[11].material.uniforms.banding.value = 0.;
                 spheres.children[11].material.uniforms.ambient.value = 1.;
 
+                spheres.children[0].add(ray); // add line
 
             }
 
