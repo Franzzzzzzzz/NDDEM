@@ -17,7 +17,7 @@
  *  ASCII decoding assumes file is UTF-8.
  *
  * Usage:
- *  var loader = new STLLoader();
+ *  var loader = new NDSTLLoader();
  *  loader.load( './models/stl/slotted_disk.stl', function ( geometry ) {
  *    scene.add( new THREE.Mesh( geometry ) );
  *  });
@@ -62,19 +62,22 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils,
-	Vector3
+	Vector3,
+    Mesh,
+    Group
 } from "./three.module.js";
 
+import { ConvexGeometry } from './ConvexGeometry.js';
 
-var STLLoader = function ( manager ) {
+var NDSTLLoader = function ( manager ) {
 
 	Loader.call( this, manager );
 
 };
 
-STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-	constructor: STLLoader,
+	constructor: NDSTLLoader,
 
 	load: function ( params, onLoad, onProgress, onError ) {
         let url = params[0];
@@ -89,7 +92,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				onLoad( scope.parse( text, W ) );
+				onLoad( scope.parse( text ) );
 
 			} catch ( e ) {
 
@@ -111,7 +114,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	parse: function ( data, W ) {
+	parse: function ( data ) {
 
 		function isBinary( data ) {
 
@@ -273,105 +276,48 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseASCII( data, W ) {
+		function parseASCII( data ) {
             var N;
 
-			var geometry = new BufferGeometry();
             var patternDimension = /solid ([0-9]+)/g ;
 			var patternSolid = /solid([\s\S]*?)endsolid/g;
 			var patternFace = /facet([\s\S]*?)endfacet/g;
-			var faceCounter = 0;
 
             while ( ( result = patternDimension.exec( data ) ) !== null ) {
                 N = parseInt(result[1]);
-                // console.log(N)
             }
-
 
 			var patternFloat = /[\s]+([+-]?(?:\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?)/.source;
             var patternFloats = patternFloat.repeat(N);
 			var patternVertex = new RegExp( 'vertex' + patternFloats, 'g' );
 			var patternNormal = new RegExp( 'normal' + patternFloats, 'g' );
 
-			var vertices = [];
-			var normals = [];
-
-			// var normal = new Vector3(); // oh boy...
-
 			var result;
 
-			var groupCount = 0;
-			var startVertex = 0;
-			var endVertex = 0;
+            var solids = [];
 
+			while ( ( result = patternSolid.exec( data ) ) !== null ) { // for each solid
 
+				var solid_text = result[ 0 ];
+                var solid = [];
 
-			while ( ( result = patternSolid.exec( data ) ) !== null ) {
+				while ( ( result = patternFace.exec( solid_text ) ) !== null ) { // for each facet
 
-				startVertex = endVertex;
-
-				var solid = result[ 0 ];
-
-				while ( ( result = patternFace.exec( solid ) ) !== null ) {
-
-					var vertexCountPerFace = 0;
-
-					var text = result[ 0 ];
-
-					while ( ( result = patternVertex.exec( text ) ) !== null ) {
+                    var facet_text = result[ 0 ];
+                    var facet = [];
+					while ( ( result = patternVertex.exec( facet_text ) ) !== null ) {  // get the N vertices
+                        var vertex = [];
                         for ( var i=1; i<=N; i++ ) {
-                            vertices.push( parseFloat(result[i]) );
+                            vertex.push( parseFloat(result[i]) );
                         }
+                        facet.push(vertex);
 					}
+                    solid.push(facet);
 
 				}
-
-				var start = startVertex;
-				var count = endVertex - startVertex;
-
-				geometry.addGroup( start, count, groupCount );
-				groupCount ++;
-
+                solids.push(solid);
 			}
-            let proj_vertices = [];
-            let n_simplices = vertices.length/N;
-            let n_vertices = 0;
-            // let W = 0.5
-            if ( N == 3 ) {
-                proj_vertices = vertices;
-            }
-            else if ( N == 4 ) {
-
-                for ( var i=0; i<n_simplices; i++ ) {
-                    for ( var j=i+1; j<n_simplices; j++ ) {
-                        let alpha = (W - vertices[i*N + N-1])/(vertices[j*N + N-1] - vertices[i*N + N-1]);
-                        if ( vertices[i*N + N-1] == W && vertices[j*N + N-1] == W ) {
-                            // alpha is not defined, we are coincident with W, add both points
-                            for ( var n=0; n<3; n++ ) {
-                                proj_vertices.push( vertices[i*N + n] );
-                            }
-                            for ( var n=0; n<3; n++ ) {
-                                proj_vertices.push( vertices[j*N + n] );
-                            }
-                            n_vertices++;
-                            n_vertices++;
-                        }
-                        else if ( alpha > 0 && alpha <= 1 ) {
-                            // alpha is in range
-                            for ( var n=0; n<3; n++ ) {
-                                proj_vertices.push( vertices[i*N + n] + alpha*(vertices[j*N + n] - vertices[i*N + n]) );
-                            }
-                            n_vertices++;
-                        }
-                    }
-                }
-            }
-            // console.log(proj_vertices.length/3)
-
-
-			geometry.setAttribute( 'position', new Float32BufferAttribute( proj_vertices, 3 ) );
-			// geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			return geometry;
+			return solids;
 
 		}
 
@@ -410,7 +356,7 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		// start
 
-        return parseASCII( ensureString( data ), W );
+        return parseASCII( ensureString( data ) );
 		// var binData = ensureBinary( data );
 
 		// return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );
@@ -419,4 +365,108 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 } );
 
-export { STLLoader };
+function pushUnique(arr, new_entry) {
+    let added = false;
+    let found = false;
+    let tol = 1e-6;
+    if ( arr.length === 0 ) { // add first entry
+        arr.push( new_entry[0], new_entry[1], new_entry[2] );
+        added = true;
+    }
+    else {
+        for ( var i=0; i<arr.length/3; i++ ) {
+            if ( Math.abs( arr[i*3]   - new_entry[0] ) < tol &&
+                 Math.abs( arr[i*3+1] - new_entry[1] ) < tol &&
+                 Math.abs( arr[i*3+2] - new_entry[2] ) < tol) {
+                found = true;
+            }
+        }
+        if ( found === false ) {
+            arr.push ( new_entry[0], new_entry[1], new_entry[2] );
+            added = true;
+        }
+    }
+    return added
+}
+
+function calculateNormal(points) {
+    let ux = points[1][0]-points[0][0];
+    let uy = points[1][1]-points[0][1];
+    let uz = points[1][2]-points[0][2];
+    let vx = points[2][0]-points[0][0];
+    let vy = points[2][1]-points[0][1];
+    let vz = points[2][2]-points[0][2];
+
+    let u_cross_v = [uy*vz-uz*vy, uz*vx-ux*vz, ux*vy-uy*vx] //cross product
+    return u_cross_v;
+}
+
+
+
+function renderSTL( meshes, NDsolids, scene, material, x4 ) {
+    if ( meshes !== undefined ) { scene.remove( meshes ); meshes = new Group(); }
+    var vertices, normals;
+    var N = NDsolids[0][0][0].length; // get dimension from vertex length
+
+    NDsolids.forEach((solid, i) => {
+        var geometry = new BufferGeometry();
+        vertices = [];
+        normals = [];
+        let tol = 1e-6;
+        let added, alpha;
+        solid.forEach((facet, j) => {
+            var normal = calculateNormal(facet);
+            facet.forEach((vertex, k) => {
+                if ( N == 3 ) {
+                    added = pushUnique(vertices, vertex);
+                    if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                 }
+                else if ( N == 4 ) {
+                    // loop through all other vertices in facet
+                    for (var l=k+1; l<N; l++) {
+                        alpha = (x4 - vertex[N-1])/(facet[l][N-1] - vertex[N-1]);
+                        if ( Math.abs(vertex[N-1] - x4) < tol && Math.abs(facet[l][N-1] - x4) < tol ) {
+                            // alpha is not defined, we are coincident with x4, add both points
+                            added = pushUnique(vertices, vertex);
+                            if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                            added = pushUnique(vertices, facet[l]);
+                            if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                        }
+                        else if ( alpha >= 0 && alpha <= 1 ) { // alpha is in range
+                            let sliced_vertex = [];
+                            for ( var n=0; n<3; n++ ) {
+                                sliced_vertex.push( vertex[n] + alpha*(facet[l][n] - vertex[n]) );
+                            }
+                            added = pushUnique(vertices, sliced_vertex);
+                            if ( added ) { normals.push( normal[0], normal[1], normal[2]); }
+                        }
+                    }
+                }
+            });
+        });
+
+        geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+        geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+
+        let points = [];
+        for ( let i=0; i<vertices.length/3; i++ ) { points.push( new Vector3( vertices[i*3]   + Math.random()*1e-6,
+                                                                              vertices[i*3+1] + Math.random()*1e-6,
+                                                                              vertices[i*3+2] + Math.random()*1e-6
+                                                                             ) ) };
+
+        if ( points.length > 3 ) { geometry = new ConvexGeometry( points ); }
+        var this_mesh = new Mesh( geometry, material );
+        this_mesh.castShadow = true;
+        this_mesh.receiveShadow = true;
+        meshes.add(this_mesh);
+    });
+
+    meshes.castShadow = true;
+    meshes.receiveShadow = true;
+
+    if ( NDsolids.length > 0 ) { scene.add( meshes );  }
+    // console.log(meshes)
+    return meshes
+}
+
+export { NDSTLLoader, renderSTL };

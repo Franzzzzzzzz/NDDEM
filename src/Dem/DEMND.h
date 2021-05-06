@@ -19,6 +19,31 @@
     using namespace emscripten;
 #endif
 
+/** \weakgroup API
+ * These functions are useful for external access, for interactive runs. This is the basic flow of API calls to run an interactive simulation:
+ * \dot
+digraph C {
+rankdir="LR";
+Input -> interpret_command ;
+Input [label="Simulation<d>"] ;
+interpret_command -> interpret_command [dir=back] ;
+interpret_command -> finalise_init ;
+finalise_init -> step_forward ;
+step_forward -> step_forward [dir=back] ;
+step_forward -> setX ;
+setX -> step_forward ;
+step_forward -> externalforce ;
+externalforce -> step_forward ;
+step_forward -> finalise ;
+{rank=same ; step_forward ; setX ; externalforce ;}
+}
+\enddot
+ *
+ */
+
+/** \addtogroup DEM Discrete Element Simulations
+ * This module handles the Discrete Element Simulations.
+ *  @{ */
 
 extern vector <std::pair<ExportType,ExportData>> * toclean ;
 extern XMLWriter * xmlout ;
@@ -43,6 +68,8 @@ public:
     std::vector < std::vector <double> > Fcorr ;
     std::vector < std::vector <double> > TorqueCorr  ;
     std::vector < double > displacement ; double maxdisp[2] ;
+
+    std::vector <SpecificAction> ExternalAction ;
 
     std::vector <uint32_t> PBCFlags ;
     std::vector < std::vector <double> > WallForce ;
@@ -95,11 +122,17 @@ public:
         P.set_boundaries() ;
     }
     //-------------------------------------------------------------------------
+    /** \brief Initialise the simulation from a file
+    */
     void init_from_file (char filename[])
     {
       P.load_datafile (filename, X, V, Omega) ;
     }
     //-------------------------------------------------------------------------
+    /** \brief Tell NDDEM that the simulations are now initialised and we can start running.
+     * \warning It is important to remember to call this function in interactive run!
+     * \ingroup API
+    */
     void finalise_init () {
         //if (strcmp(argv[3], "default"))
         //    P.load_datafile (argv[3], X, V, Omega) ;
@@ -122,17 +155,28 @@ public:
         printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
     }
     //-------------------------------------------------------------------
+    /** \brief Interpret individual script command from string
+     * \param in Input command string
+     * \ingroup API
+    */
     void interpret_command (string in)
     {
         P.interpret_command(in, X,V,Omega) ;
     }
     //--------------------------------------------------------------------
+    /** \brief Run the whole simulation as defined in the input script
+     * \param nt number of timestep to advance
+    */
     void step_forward_all ()
     {
       int nsteps = P.T/dt ;
       step_forward(nsteps) ;
     }
     //----
+    /** \brief Advance the simulation for nt steps (actual duration nt*dt).
+     * \param nt number of timestep to advance
+     * \ingroup API
+    */
     void step_forward (int nt)
     {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
@@ -263,6 +307,18 @@ public:
         Tools<d>::setgravity(F, P.g, P.m); // Actually set gravity is effectively also doing the setzero
         Tools<d>::setzero(Torque);
 
+        for (auto it = ExternalAction.begin() ; it<ExternalAction.end() ; /*KEEP EMPTY*/ )
+        {
+            Tools<d>::vAddFew(F[it->id], it->Fn, it->Ft, Fcorr[it->id]) ;
+            Tools<d>::vAddOne(Torque[it->id], it->Torquei, TorqueCorr[it->id]) ;
+
+            it->duration -- ;
+            if (it->duration<=0)
+                ExternalAction.erase(it) ;
+            else
+                it++ ;
+        }
+
         //Particle - particle contacts
         #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
         {
@@ -386,6 +442,9 @@ public:
   }
 
   //-------------------------
+  /** \brief Settles the simulation, closing open files etc.
+    * \ingroup API
+    */
   void finalise ()
   {
     P.finalise() ;
@@ -394,9 +453,17 @@ public:
   }
 
   //-------------------------------------------------------------------
+  /** \brief Expose the array of locations. \ingroup API */
   std::vector<std::vector<double>> getX() { return X; }
+
+  /** \brief Expose the array of velocities. \ingroup API */
+  std::vector<std::vector<double>> getVelocity() { return V; }
+
+  /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }
-  void fixParticle(int a, std::vector<double> loc) {
+
+  /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
+  void fixParticle(int a, v1d loc) {
       X[a][0] = loc[0];
       X[a][1] = loc[1];
       X[a][2] = loc[2];
@@ -408,8 +475,14 @@ public:
       }
   }
 
+  /** \brief Expose the current time. \ingroup API */
+  double getTime() { return t; }
+
+
+  /** \brief Expose the array of orientation. \ingroup API */
   std::vector<std::vector<double>> getOrientation() { return A; }
 
+  /** \brief Expose the array of boundaries. \ingroup API */
   std::vector<double> getBoundary(int a) { return P.Boundaries[a]; }
   void setBoundary(int a, std::vector<double> loc) {
       P.Boundaries[a][0] = loc[0]; // low value
@@ -417,86 +490,26 @@ public:
       P.Boundaries[a][2] = loc[1] - loc[0]; // length
   }
 
+  /** \brief Expose the array of wall forces. \ingroup API */
   std::vector<std::vector<double>> getWallForce() { return WallForce; }
-  std::vector<std::vector<double>> getVelocity() { return V; }
+
+  /** \brief Set an additional external force on a particle for a certain duration. \param id particle id \param duration number of timesteps to apply the force for \param force force vector to apply \ingroup API */
+  void setExternalForce (int id, int duration, v1d force)
+  {
+      printf("\nSetting the force: %g %g %g %g\n", force[0],force[1],force[2],force[3]);
+      ExternalAction.resize(ExternalAction.size()+1) ;
+      ExternalAction[ExternalAction.size()-1].id = id ;
+      ExternalAction[ExternalAction.size()-1].duration = duration ;
+      ExternalAction[ExternalAction.size()-1].set(force, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
+  }
 
 } ;
 
 #ifdef EMSCRIPTEN
-EMSCRIPTEN_BINDINGS(my_class_example) {
-    class_<Simulation<3>>("Simulation3")
-        .constructor<int>()
-        .function("finalise_init", &Simulation<3>::finalise_init)
-        .function("interpret_command", &Simulation<3>::interpret_command)
-        .function("step_forward", &Simulation<3>::step_forward)
-        .function("finalise", &Simulation<3>::finalise)
-        // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
-        // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
-        .function("getX", &Simulation<3>::getX)
-        .function("fixParticle", &Simulation<3>::fixParticle)
-        .function("getOrientation", &Simulation<3>::getOrientation)
-        .function("getVelocity", &Simulation<3>::getVelocity)
-        // .function("getX2", &Simulation<3>::getX2)
-        .function("getBoundary", &Simulation<3>::getBoundary)
-        .function("setBoundary", &Simulation<3>::setBoundary)
-        .function("getWallForce", &Simulation<3>::getWallForce)
-        ;
-    class_<Simulation<4>>("Simulation4")
-        .constructor<int>()
-        .function("finalise_init", &Simulation<4>::finalise_init)
-        .function("interpret_command", &Simulation<4>::interpret_command)
-        .function("step_forward", &Simulation<4>::step_forward)
-        .function("finalise", &Simulation<4>::finalise)
-        // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
-        // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
-        .function("getX", &Simulation<4>::getX)
-        .function("fixParticle", &Simulation<4>::fixParticle)
-        .function("getOrientation", &Simulation<4>::getOrientation)
-        .function("getVelocity", &Simulation<4>::getVelocity)
-        // .function("getX2", &Simulation<3>::getX2)
-        .function("getBoundary", &Simulation<4>::getBoundary)
-        .function("setBoundary", &Simulation<4>::setBoundary)
-        .function("getWallForce", &Simulation<4>::getWallForce)
-        ;
-
-}
-
-// EMSCRIPTEN_BINDINGS(stl_wrappers) {
-//     emscripten::register_vector<double>("Vec1DDouble");
-//     emscripten::register_vector<std::vector<double>>("Vec2DDouble");
-// }
-
-namespace emscripten {
-namespace internal {
-
-template <typename T, typename Allocator>
-struct BindingType<std::vector<T, Allocator>> {
-    using ValBinding = BindingType<val>;
-    using WireType = ValBinding::WireType;
-
-    static WireType toWireType(const std::vector<T, Allocator> &vec) {
-        return ValBinding::toWireType(val::array(vec));
-    }
-
-    static std::vector<T, Allocator> fromWireType(WireType value) {
-        return vecFromJSArray<T>(ValBinding::fromWireType(value));
-    }
-};
-
-template <typename T>
-struct TypeID<T,
-              typename std::enable_if_t<std::is_same<
-                  typename Canonicalized<T>::type,
-                  std::vector<typename Canonicalized<T>::type::value_type,
-                              typename Canonicalized<T>::type::allocator_type>>::value>> {
-    static constexpr TYPEID get() { return TypeID<val>::get(); }
-};
-
-}  // namespace internal
-}  // namespace emscripten
+#include "emscripten_specific.h"
 #endif
 
-
+/** @} */
 
 
 /** \mainpage

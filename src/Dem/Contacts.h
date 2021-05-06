@@ -166,7 +166,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   tspr += vt*P->dt ;
   tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr| Actually does not seem to change anything ...
   Ft=  tspr*(- P->Kt) ;
-  Coulomb=P->Mu*Tools<d>::norm(Fn) ;
+  Coulomb=P->Mu_wall*Tools<d>::norm(Fn) ;
 
   if (Tools<d>::norm(Ft) > Coulomb)
   {
@@ -184,7 +184,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
      Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
-
+  Torquei-= Omegai*P->damping ; // damping
   //History[make_pair(i,-(2*j+k+1))]=make_pair (true, tspr) ;
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;

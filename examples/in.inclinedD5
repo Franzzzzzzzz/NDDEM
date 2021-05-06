@@ -1,5 +1,6 @@
 # Incline plane flow
-directory /home/franz/Dropbox/DEM_ND/Samples/D5
+#directory /home/franz/Dropbox/DEM_ND/Samples/D5
+directory Output
 dimensions 5 1445
 
 #set adimensional

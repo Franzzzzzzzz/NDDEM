@@ -10,7 +10,7 @@ emmake make DEMND -s USE_BOOST_HEADERS=1 -s USE_ZLIB=1
 
 # Using homebrew
 brew install homebrew
-/opt/homebrew/Cellar/emscripten/2.0.15/libexec/embuilder build boost_headers
-/opt/homebrew/Cellar/emscripten/2.0.15/libexec/embuilder build zlib
-/opt/homebrew/Cellar/emscripten/2.0.15/libexec/bin/emcmake cmake ../src
-/opt/homebrew/Cellar/emscripten/2.0.15/libexec/bin/emmake make DEMND -s USE_BOOST_HEADERS=1 -s USE_ZLIB=1
+/opt/homebrew/Cellar/emscripten/2.0.18/libexec/embuilder build boost_headers
+/opt/homebrew/Cellar/emscripten/2.0.18/libexec/embuilder build zlib
+/opt/homebrew/Cellar/emscripten/2.0.18/libexec/bin/emcmake cmake ../src
+/opt/homebrew/Cellar/emscripten/2.0.18/libexec/bin/emmake make DEMND -s USE_BOOST_HEADERS=1 -s USE_ZLIB=1

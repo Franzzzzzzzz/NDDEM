@@ -38,6 +38,7 @@
             import { GUI } from './js/dat.gui.module.js';
             import { Lut } from './js/Lut.js'
             import { PIDcontroller } from './js/PIDcontroller.js'
+            import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -68,6 +69,8 @@
             let new_time = 0;
             let counter = 0;
             let p_controller, q_controller;
+            let NDsolids, material, STLFilename;
+            let meshes = new THREE.Group();
 
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
@@ -83,12 +86,11 @@
             if ( urlParams.has('stress_controlled') ) {
                 loading_method = 'stress_controlled';
             }
-            // let loading_method = 'stress_controlled';
 
             var params = {
                 dimension: 3,
                 L: 5, //system size
-                N: 500,
+                N: 200,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
@@ -132,8 +134,8 @@
             const lut = new Lut( 'blackbody', 512 );
 
             if ( params.dimension == 3 ) {
-                p_controller = new PIDcontroller(1e-5,1e-9,0);
-                q_controller = new PIDcontroller(1e-5,1e-9,0);
+                p_controller = new PIDcontroller(1e-6,1e-9,0);
+                q_controller = new PIDcontroller(1e-6,1e-9,0);
             }
             // else {
             //     p_controller = new PIDcontroller(1e-7,1e-6,0);
@@ -225,6 +227,13 @@
 
 				add_spheres();
 
+                if ( urlParams.has('stl') ) {
+                    STLFilename = './stls/4d-pool.stl';
+                    material = new THREE.MeshPhongMaterial( { color: 0x00aa00 } );
+                    material.side = THREE.DoubleSide;
+                    loadSTL();
+                }
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -274,8 +283,13 @@
                     }
                 if ( params.dimension == 4 ) {
                     gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
-                        .name( 'D4 location').listen();
+                        .name( 'D4 location').listen()
                         // .onChange( function () { update_walls(); } );
+                        .onChange( function () {
+                            if ( urlParams.has('stl') ) {
+                                meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                            }
+                        });
                 }
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
@@ -622,7 +636,7 @@
                     }
                     if ( params.dimension == 4 ) {
                         S.interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
-                        S.interpret_command("gravity 0 0 0 0")
+                        S.interpret_command("gravity 0 0 0 -10")
                     }
                     // S.interpret_command("auto location randomsquare");
                     S.interpret_command("auto location randomdrop");
@@ -706,6 +720,15 @@
                     b: 5 //bottom margin
                     }
                 });
+            }
+
+            function loadSTL( ) {
+
+                const loader = new NDSTLLoader();
+				loader.load( [ STLFilename ], function ( solids ) {
+                    NDsolids = solids;
+                    meshes = renderSTL(meshes, NDsolids, scene, material, params.d4_cur);
+				} )
             }
 
 		</script>
