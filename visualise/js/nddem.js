@@ -49,6 +49,7 @@ var clock = new THREE.Clock(); // global clock
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 var LOADER;
 var NDParticleShader;
+var texture_path ;
 
 var params = PARAMS.process_params(time);
 
@@ -244,12 +245,14 @@ function make_initial_sphere_texturing() {
       params.N +
       "&path=" +
       params.fname +
-      "&texturepath=../../" +
+      "&texturepath=../" +
       params.texture_dir +
       "&resolution=" +
       params.quality,
     true
   );
+  console.log(request)
+  console.log("HELLO")
   request.send(null);
 
   request.onload = function () {

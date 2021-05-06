@@ -107,7 +107,7 @@ class LibLucyND_Periodic : public LibLucyND
     : LibLucyND(D,ww,dd-__builtin_popcount(periodic))
   {
     maskperiodic = 0 ;
-    for (int i =0 ; i<boxes.size() ; i++)
+    for (size_t i =0 ; i<boxes.size() ; i++)
       if ((periodic&(1<<i)) && boxes[i]==1)
       {
         maskperiodic |= (1<<i) ;

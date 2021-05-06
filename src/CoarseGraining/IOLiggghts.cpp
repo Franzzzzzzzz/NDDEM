@@ -34,9 +34,11 @@ int main(int argc, char * argv[])
   int maxT=P.maxT ;
 
   Coarsing C(P.dim, P.boxes, P.boundaries, maxT) ;
+  for (auto i : P.extrafields)
+    C.add_extra_field(i.name, i.order, i.type) ;
   C.setWindow(P.window,P.windowsize) ;
   C.set_flags(P.flags) ;
-  C.grid_setfields() ;
+  auto extrafieldmap = C.grid_setfields() ;
 
   C.cT=-1 ;
 
@@ -52,7 +54,7 @@ int main(int argc, char * argv[])
 
     D.read_full_ts(true) ;
     C.cT++ ;
-    D.set_data(C.data) ;
+    D.set_data(C.data, extrafieldmap) ;
 
     if (P.maxlevel>=1)
       C.pass_1() ;
@@ -108,7 +110,7 @@ return 0 ;
 vector<vector<double>> Datafile::get_bounds()
 {
  vector<vector<double>> res(2, vector<double>(3,0)) ;
- string line ; int nothing ;
+ string line ;
 
  getline(*in, line) ; //should be ITEM: TIMESTEP
  getline(*in, line) ;
@@ -136,9 +138,9 @@ int Datafile::get_numts()
 //------------------------------------------------------------
 int Datafile::read_full_ts(bool keep)
 {
-for (int i=0 ; i<data.size() ; i++) data[i].resize(0) ;
-for (int i=0 ; i<datacf.size() ; i++) datacf[i].resize(0) ;
-for (int i=0 ; i<tdata.size() ; i++) tdata[i].resize(0) ;
+for (size_t i=0 ; i<data.size() ; i++) data[i].resize(0) ;
+for (size_t i=0 ; i<datacf.size() ; i++) datacf[i].resize(0) ;
+for (size_t i=0 ; i<tdata.size() ; i++) tdata[i].resize(0) ;
 tdata.resize(0) ;
 read_next_ts(in, false, keep) ;
 if (incf != nullptr) read_next_ts(incf, true, keep) ;
@@ -148,7 +150,6 @@ return 0 ;
 int Datafile::read_next_ts(istream *is, bool iscf, bool keep)
 {
  string line, word ; char blank ; int NN, nid ;
- double val ;
 
  getline(*is, line) ; //should be ITEM: TIMESTEP
  *is >> curts >> blank ;
@@ -196,7 +197,7 @@ return 0 ;
 //-------------------------------------------------
 int Datafile:: do_post_atm()
 {
- int i, k ; v1d nanvec (fields.size(),NAN) ; int nadded=0 ; static bool info=true ;
+ int i, k ; v1d nanvec (fields.size(),NAN) ; int nadded=0 ;
  auto j= tdata.begin() ;
  int idloc = std::find(fields.begin(), fields.end(), "id") - fields.begin();
  sort(tdata.begin(), tdata.end(), [=](auto v1, auto v2) {return v1[idloc] < v2[idloc] ; }); //WARNING idx 0 should be the particle ID
@@ -220,12 +221,12 @@ int Datafile:: do_post_atm()
  printf("%d null atom / %d | ", nadded, N) ;
  N+=nadded ;
 
- const int nvalue = 12 ;
+ const int nvalue = 13 ;
  data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz
  vector<string>::iterator it ;
  vector<int> lst ;
- vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz"} ;
- for (i=0 ; i<flst.size() ; i++)
+ vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz","type"} ;
+ for (size_t i=0 ; i<flst.size() ; i++)
  {
     it=std::find(fields.begin(), fields.end(), flst[i] ) ;
     if ( it != fields.end()) lst.push_back(it-fields.begin()) ;
@@ -268,6 +269,10 @@ int Datafile:: do_post_atm()
              else
                data[i][k]=tdata[k][lst[i]] ;
            }
+           else if (i==12)
+           {
+             data[i][k]=tdata[k][lst[i]]-1 ;
+           }
            else
              data[i][k]=tdata[k][lst[i]] ;
          }
@@ -286,11 +291,10 @@ int Datafile:: do_post_atm()
 //-------------------------------------------------
 int Datafile::do_post_cf()
 {
- const int nvalue=17 ; static bool info=true ; int swap ;
- int i, j ;
+ const int nvalue=17 ; int swap ;
 
  datacf.resize(nvalue, vector <double> (0)) ;
- for (i=0 ; i<nvalue ; i++) datacf[i].resize(Ncf,0) ;
+ for (int i=0 ; i<nvalue ; i++) datacf[i].resize(Ncf,0) ;
 
  vector<string>::iterator it ;
  vector<int> lst ;
@@ -328,8 +332,8 @@ int Datafile::do_post_cf()
    messagefirst=false ;
  }
 
- int k ;
- for (j=0, k=0 ; j<Ncf ; j++)
+ int k=0 ;
+ for (int j=0, k=0 ; j<Ncf ; j++)
  {
 
 
@@ -355,7 +359,7 @@ int Datafile::do_post_cf()
      if (tdata[j][lst[2]]==1)
      {
        bool corrected=false ;
-       for (int i=0 ; i<periodicity.size() ; i++)
+       for (size_t i=0 ; i<periodicity.size() ; i++)
        {
          if (periodicity[i])
          {
@@ -386,22 +390,21 @@ int Datafile::do_post_cf()
 	 printf("WARN: a contact force traversing the PBC was not corrected.\n") ;
      }
 
-
-     datacf[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]
-     datacf[9][k]=  swap*tdata[j][lst[4]] ;                                     //f[1]
-     datacf[10][k]= swap*tdata[j][lst[5]] ;                                     //f[2]
+     if (lst[3]>=-1) datacf[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]
+     if (lst[4]>=-1) datacf[9][k]=  swap*tdata[j][lst[4]] ;                                     //f[1]
+     if (lst[5]>=-1) datacf[10][k]= swap*tdata[j][lst[5]] ;                                     //f[2]
 
      //printf("%g\n", datacf[5][k]*datacf[8][k]+datacf[6][k]*datacf[9][k]+datacf[7][k]*datacf[10][k]) ;
      //std::exit() ;
 
      if (swap==-1) swap=1 ;
      else swap=0 ;
-     datacf[11][k]= tdata[j][lst[6]]*data[0][datacf[swap][k]]  ;           //mpq
-     datacf[12][k]= tdata[j][lst[7]]*data[0][datacf[swap][k]]  ;
-     datacf[13][k]= tdata[j][lst[8]]*data[0][datacf[swap][k]]  ;
-     datacf[14][k]= tdata[j][lst[6]]*data[0][datacf[1-swap][k]] ;          //mqp
-     datacf[15][k]= tdata[j][lst[7]]*data[0][datacf[1-swap][k]]  ;
-     datacf[16][k]= tdata[j][lst[8]]*data[0][datacf[1-swap][k]]  ;
+     if (lst[11]>=-1) datacf[11][k]= tdata[j][lst[6]]*data[0][datacf[swap][k]]  ;           //mpq
+     if (lst[12]>=-1) datacf[12][k]= tdata[j][lst[7]]*data[0][datacf[swap][k]]  ;
+     if (lst[13]>=-1) datacf[13][k]= tdata[j][lst[8]]*data[0][datacf[swap][k]]  ;
+     if (lst[14]>=-1) datacf[14][k]= tdata[j][lst[6]]*data[0][datacf[1-swap][k]] ;          //mqp
+     if (lst[15]>=-1) datacf[15][k]= tdata[j][lst[7]]*data[0][datacf[1-swap][k]]  ;
+     if (lst[16]>=-1) datacf[16][k]= tdata[j][lst[8]]*data[0][datacf[1-swap][k]]  ;
 
      k++ ;
  }
@@ -412,7 +415,7 @@ return 0 ;
 
 
 //==================================
-int Datafile::set_data(struct Data & D)
+int Datafile::set_data(struct Data & D, std::map<string,size_t> extrafieldmap)
 {
     D.N=N ; D.Ncf=Ncf ;
     D.radius=&(data[0][0]) ;
@@ -433,5 +436,14 @@ int Datafile::set_data(struct Data & D)
       D.mpq.resize (3); D.mpq={&(datacf[11][0]), &(datacf[12][0]), &(datacf[13][0])} ;
       D.mqp.resize (3); D.mqp={&(datacf[14][0]), &(datacf[15][0]), &(datacf[16][0])} ;
     }
+
+    for (auto &v: extrafieldmap)
+    {
+      if (D.extra.size() < v.second)
+        D.extra.resize(v.second) ;
+      printf("////%ld\n", v.second) ; fflush(stdout) ;
+      D.extra[v.second] = &(data[12][0]) ;
+    }
+
 return 0 ;
 }

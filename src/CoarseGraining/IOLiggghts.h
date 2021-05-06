@@ -35,12 +35,13 @@ public:
 
     vector <string> fields, fieldscf ;
     v2d data, tdata, datacf ;
+    v1d dataextra ;
 
     // Functions
     int open(string path) ;
     int opencf(string path) ;
     int read_full_ts(bool keep) ;
-    int set_data(struct Data & D) ;
+    int set_data(struct Data & D, std::map<string,size_t> extrafieldmap) ;
     vector<vector<double>> get_bounds () ;
     vector <vector <double> > boundaries ;
     vector<bool> periodicity ;
@@ -83,6 +84,13 @@ public:
   double windowsize ;
   vector<bool> periodicity ;
   vector<double>delta ;
+
+  struct ExtaField {
+    string name  ;
+    TensorOrder order ;
+    FieldType type ;
+  } ;
+  vector<ExtaField> extrafields ;
 
 private :
   bool needmaxts = true ;
@@ -147,13 +155,38 @@ void Param::from_json(json &j)
     v = j.find("periodicity") ;
     if (v != j.end()) periodicity = v->get<decltype(periodicity)>();
 
+    v = j.find("extra fields") ;
+    if (v != j.end())
+    {
+      auto v2=j["extra fields"] ;
+      extrafields.resize(v2.size()) ;
+      printf("ADDING\n") ; fflush(stdout) ;
+      for (size_t i=0 ; i<v2.size() ; i++)
+      {
+        extrafields[i].name = v2[i]["name"] ;
+        extrafields[i].order = static_cast<TensorOrder>(v2[i]["tensor order"].get<int>()) ;
+
+        if (v2[i]["type"]=="Particle")
+          extrafields[i].type=FieldType::Particle ;
+        else if (v2[i]["type"]=="Contact")
+          extrafields[i].type=FieldType::Contact ;
+        else if (v2[i]["type"]=="Fluctuation")
+          extrafields[i].type=FieldType::Fluctuation ;
+        else
+          printf("ERR: unknown extrafields type\n") ;
+
+        printf("Again %d\n", extrafields[i].type) ; fflush(stdout) ;
+      }
+    }
+
+
     post_init() ;
 }
 
 //-------------------------------
 void Param::post_init()
 {
-    if (boundaries.size() != 2 || boundaries[0].size() != dim || boundaries[1].size() != dim )
+    if (boundaries.size() != 2 || boundaries[0].size() != static_cast<size_t>(dim) || boundaries[1].size() != static_cast<size_t>(dim) )
     { printf("Inconsistent boundaries\n") ; std::exit(3) ; }
 
     if (!hascf && (

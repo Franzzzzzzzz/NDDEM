@@ -41,27 +41,41 @@
 //========================================================
 int Coarsing::set_field_struct()
 {
-// Set the FIELD structure
-FIELDS.push_back({0x000001, "RHO"  , "SCALAR"});    //Eq 36 Density
-FIELDS.push_back({0x000002, "I"    , "SCALAR"});    //Eq 65 Moment of Inertia
-FIELDS.push_back({0x000004, "VAVG" , "VECTOR"});    //Eq 38 Average Velocity
-FIELDS.push_back({0x000008, "TC"   , "TENSOR"});    //Eq 63 Contact stress
-FIELDS.push_back({0x000010, "TK"   , "TENSOR"});    //Eq 62 Kinetic stress
-FIELDS.push_back({0x000020, "ROT"  , "VECTOR"});    //Eq 64 Internal spin density
-FIELDS.push_back({0x000040, "MC"   , "TENSOR"});    //Eq 67 Contact couple stress tensor
-FIELDS.push_back({0x000080, "MK"   , "TENSOR"});    //Eq 66 Kinetic couple stress tensor
-FIELDS.push_back({0x000100, "mC"   , "VECTOR"});    //Eq 68 spin supply from contacts
-FIELDS.push_back({0x000200, "EKT"  , "SCALAR"});    // VAVG^2/2 Kinetic energy density of average velocity
-FIELDS.push_back({0x000400, "eKT"  , "SCALAR"});    //Eq 69 Kinetic energy density of fluctuating motion
-FIELDS.push_back({0x000800, "EKR"  , "SCALAR"});    // (W.K.W)/2, kin energy of avg rotational motion, W angular velocity vector, K moment of inertia tensor
-FIELDS.push_back({0x001000, "eKR"  , "SCALAR"});    //Eq 70 Kin energy of fluctuating rotational motion
-FIELDS.push_back({0x002000, "qTC"  , "VECTOR"});    //Eq 72
-FIELDS.push_back({0x004000, "qTK"  , "VECTOR"});    //Eq 71
-FIELDS.push_back({0x008000, "qRC"  , "VECTOR"});    //Eq 74
-FIELDS.push_back({0x010000, "qRK"  , "VECTOR"});    //Eq 73
-FIELDS.push_back({0x020000, "zT"   , "SCALAR"});    //Eq 75
-FIELDS.push_back({0x040000, "zR"   , "SCALAR"});    //Eq 76
+/* Set the FIELD structure.
+ * ids 0x00hhhhhhhh are code defined
+ * idx 0x01hhhhhhhh are particle base (pass 1) user defined field
+ * idx 0x02hhhhhhhh are fluctuation base (pass 2) user defined fields
+ * idx 0x04hhhhhhhh are contact base (pass 3) user defined fields
+ */
+FIELDS.push_back({0x000001, "RHO"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 36 Density
+FIELDS.push_back({0x000002, "I"    , TensorOrder::SCALAR, FieldType::Defined});    //Eq 65 Moment of Inertia
+FIELDS.push_back({0x000004, "VAVG" , TensorOrder::VECTOR, FieldType::Defined});    //Eq 38 Average Velocity
+FIELDS.push_back({0x000008, "TC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 63 Contact stress
+FIELDS.push_back({0x000010, "TK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 62 Kinetic stress
+FIELDS.push_back({0x000020, "ROT"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 64 Internal spin density
+FIELDS.push_back({0x000040, "MC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 67 Contact couple stress tensor
+FIELDS.push_back({0x000080, "MK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 66 Kinetic couple stress tensor
+FIELDS.push_back({0x000100, "mC"   , TensorOrder::VECTOR, FieldType::Defined});    //Eq 68 spin supply from contacts
+FIELDS.push_back({0x000200, "EKT"  , TensorOrder::SCALAR, FieldType::Defined});    // VAVG^2/2 Kinetic energy density of average velocity
+FIELDS.push_back({0x000400, "eKT"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 69 Kinetic energy density of fluctuating motion
+FIELDS.push_back({0x000800, "EKR"  , TensorOrder::SCALAR, FieldType::Defined});    // (W.K.W)/2, kin energy of avg rotational motion, W angular velocity vector, K moment of inertia tensor
+FIELDS.push_back({0x001000, "eKR"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 70 Kin energy of fluctuating rotational motion
+FIELDS.push_back({0x002000, "qTC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 72
+FIELDS.push_back({0x004000, "qTK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 71
+FIELDS.push_back({0x008000, "qRC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 74
+FIELDS.push_back({0x010000, "qRK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 73
+FIELDS.push_back({0x020000, "zT"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 75
+FIELDS.push_back({0x040000, "zR"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 76
 return 0 ;
+}
+//----------------------------------------------------------
+int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
+{
+  int tmp = FIELDS.back().flag<<1 ;
+  if (order!=TensorOrder::SCALAR || type !=FieldType::Particle)
+    printf("WARN only TensorOrder::SCALAR and FieldType::Particle is currently supported for coarse-graining\n") ;
+  FIELDS.push_back({tmp, name, order, type});
+  return tmp;
 }
 
 //-------------------------------------------------------
@@ -95,7 +109,7 @@ return 0 ;
 //=========================================================
 int Coarsing::grid_generate()
 {
-    int i, j ; int check ;
+    int i; int check ;
     v1d location ;
     location.resize(d,0) ;
     nptcum.resize(d,1) ;
@@ -158,54 +172,61 @@ return 0 ;
 }
 
 //--------------------------------
-int  Coarsing::grid_setfields()
+std::map<std::string, size_t> Coarsing::grid_setfields()
 {
-    v1d tmp=grid_getfields() ;
+    vector<FieldType> tmp=grid_getfields() ;
+    std::map<std::string, size_t> extrafields ;
+
+    for (size_t i=0 ; i<tmp.size() ; i++)
+      if (tmp[i]!=FieldType::Defined)
+        extrafields[Fname[i]] = i ;
+
     for (int i=0 ; i<Npt ; i++)
-        CGP[i].fields.resize(Time, tmp) ;
-    return 0 ;
+        CGP[i].fields.resize(Time, vector<double>(tmp.size(),0)) ;
+
+    return extrafields ;
 }
 //--------------------------------
-v1d Coarsing::grid_getfields()
+vector<FieldType> Coarsing::grid_getfields()
 {
-v1d res ;
+vector<FieldType> res ;
 
 auto fl=flags ;
 int n=0 ;
-for (int i=0 ; i<FIELDS.size() ; i++)
+for (size_t i=0 ; i<FIELDS.size() ; i++)
 {
     if (fl&1)
     {
-        if (FIELDS[i].type.compare("SCALAR")==0)
+        if (FIELDS[i].type== TensorOrder::SCALAR)
         {
             Fields.push_back(FIELDS[i].name) ;
-            res.push_back(0) ;
+            res.push_back(FIELDS[i].ftype) ;
             Fidx.push_back(n) ;
-            Ftype.push_back(1) ;
+            Ftype.push_back(TensorOrder::SCALAR) ;
             Fname.push_back(FIELDS[i].name) ;
             n++ ;
         }
-        else if (FIELDS[i].type.compare("VECTOR")==0)
+        else if (FIELDS[i].type==TensorOrder::VECTOR)
         {
             for (int dd=0 ; dd<d ; dd++)
             {
              Fields.push_back(FIELDS[i].name+std::to_string(dd)) ;
-             res.push_back(0) ;
+             res.push_back(FIELDS[i].ftype) ;
             }
             Fidx.push_back(n) ;
-            Ftype.push_back(2) ;
+            Ftype.push_back(TensorOrder::VECTOR) ;
             Fname.push_back(FIELDS[i].name) ;
             n+=d ;
         }
-        else if (FIELDS[i].type.compare("TENSOR")==0)
+        else if (FIELDS[i].type==TensorOrder::TENSOR)
         {
             for (int dd=0 ; dd<d*d ; dd++)
             {
              Fields.push_back(FIELDS[i].name+std::to_string(dd/d)+"x"+std::to_string(dd%d)) ;
-             res.push_back(0) ;
+             res.push_back(FIELDS[i].ftype) ;
             }
             Fidx.push_back(n) ;
-            Ftype.push_back(3) ;
+            Ftype.push_back(TensorOrder::TENSOR) ;
             Fname.push_back(FIELDS[i].name) ;
             n+= d*d ;
         }
@@ -213,7 +234,7 @@ for (int i=0 ; i<FIELDS.size() ; i++)
     else
     {
         Fidx.push_back(-1) ;
-        Ftype.push_back(-1) ;
+        Ftype.push_back(TensorOrder::NONE) ;
         Fname.push_back("") ;
     }
 
@@ -305,7 +326,7 @@ int Coarsing::compute_fluc_vel ()
 }
 int Coarsing::compute_fluc_rot ()
 {
-  static bool messagefirst=true ; 
+  static bool messagefirst=true ;
   printf(" -> RotVelFluct") ; fflush(stdout) ;
   v1d omegaavg (d,0) ;
   data.rot_fluc.resize(d, v1d (data.N, 0)) ;
@@ -345,6 +366,20 @@ int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;}
 int Iid = get_id("I") ; if (Iid<0) doI=false ;
 int velid=get_id("VAVG"); if (velid<0)  dovel=false ;
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
+
+vector<int> extraid ;
+for (auto &v: FIELDS)
+{
+  if (v.ftype == FieldType::Particle)
+  {
+    printf("\nExtraFieldFound %d\n", get_id(v.name)) ; fflush(stdout) ;
+    extraid.push_back(get_id(v.name)) ;
+    if (extraid.back()<0)
+      extraid.pop_back() ;
+  }
+}
+bool doextra = (extraid.size()>0)?true:false ;
+
 //printf("Starting pass 1...\r") ; fflush(stdout) ;
 
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
@@ -377,7 +412,17 @@ for (i=0 ; i<data.N ; i++)
      if (doomega)
        for (dd=0 ; dd<d ; dd++)
          *(CGf+omegaid+dd) += wp * dm * dom[dd] * dI ;
+     if (doextra)
+       for (auto v: extraid)
+       {
+         printf("%ld %d A\n", data.extra.size(),  i) ; fflush(stdout) ;
+         printf("%ld %d %X ",data.extra.size(), v, data.extra[v]) ; fflush(stdout) ;
+          *(CGf+v) += wp * dm * data.extra[v][i] ;
+          printf("B\n") ; fflush(stdout) ;
+        }
  }
+ printf("GGG\n") ; fflush(stdout) ;
+
 }
 
 /*int nbzero = 0 ;
@@ -409,6 +454,9 @@ for (i=0 ; i<Npt ; i++)
         CGP[i].fields[cT][EKRid] +=  CGP[i].fields[cT][omegaid+dd]*CGP[i].fields[cT][omegaid+dd] * Imom ;
       CGP[i].fields[cT][EKRid] /= 2.0 ;
     }
+    if (doextra && rho!=0)
+      for (auto v:extraid)
+        CGP[i].fields[cT][v] /= rho ;
 }
 return 0 ;
 }
@@ -566,7 +614,7 @@ int Data::random_test (int NN, int NNcf, int d, v2d box )
 const double meanrad=0.00075, rho=2500 ;
 boost::mt19937 rng ;
 boost::uniform_01<boost::mt19937> rand(rng) ;
-double rad, tmp1, tmp2, tmp3 ; int tmp ;
+double rad; int tmp ;
 
 N=NN ;
 mass=(double*)malloc(N*sizeof(double)) ;
@@ -628,7 +676,7 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
     int newN=0 ;
 
     auto isinside = [&bounds,d](v1d loc){for(int j=0 ; j<d ; j++) if (loc[j]<bounds[0][j] || loc[j]>bounds[1][j]) return false ; return true ; } ;
-    auto push_back = [=](v2d v, double * a) {v.push_back(v1d(d,0)) ; for (int i=0 ; i<d ; i++) (*(v.end()-1))[i]=*(a+i) ; } ;
+    //auto push_back = [=](v2d v, double * a) {v.push_back(v1d(d,0)) ; for (int i=0 ; i<d ; i++) (*(v.end()-1))[i]=*(a+i) ; } ;
 
     std::function <void(int,int,v1d,int,int)> lbd ;
     lbd = [&](int idx, int dim, v1d location, int pbc, int nmodif)
@@ -753,31 +801,31 @@ int Coarsing::write_vtk(string sout)
       for (int i=0 ; i<npt[0] ; i++)
        fprintf(out, "%g ", CGP[i*npt[1]*npt[2]+j*npt[2]+k].phi) ;
 
-    for (int f=0 ; f<Fidx.size() ; f++)
+    for (size_t f=0 ; f<Fidx.size() ; f++)
     {
       if (Fidx[f]<0) continue ;
       switch (Ftype[f])
       {
-        case 1: fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
+        case TensorOrder::SCALAR : fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
-                fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]], i%90==89?'\n':' ') ;
-              break ;
-        case 2: fprintf(out, "VECTORS %s double \n", Fname[f].c_str()) ;
+               fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]], i%90==89?'\n':' ') ;
+            break ;
+        case TensorOrder::VECTOR : fprintf(out, "VECTORS %s double \n", Fname[f].c_str()) ;
              for (int k=0 ; k<npt[2] ; k++)
               for (int j=0 ; j<npt[1] ; j++)
                for (int i=0 ; i<npt[0] ; i++)
                 for (int dd=0 ; dd<d ; dd++)
                   fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
-              break ;
-        case 3: fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
+             break ;
+        case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
-                for (int dd=0 ; dd<d*d ; dd++)
-                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
-              break ;
+               for (int dd=0 ; dd<d*d ; dd++)
+                fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
+            break ;
         default: printf("ERR: this should never happen. \n") ;
       }
       fprintf(out, "\n\n") ;
@@ -799,27 +847,27 @@ int Coarsing::write_matlab (string path, bool squeeze)
   for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
   dimensions[dimtime] = Time ;
 
-  for (int f=0 ; f<Fidx.size() ; f++)
+  for (size_t f=0 ; f<Fidx.size() ; f++)
   {
     if (Fidx[f]<0) continue ;
 
     // Data are goind fast to slow in MATLAB ... so probably need some rewrite ...
     switch (Ftype[f])
     {
-      case 1: dimensions[0]=dimensions[1]=1 ;  //Scalar
+      case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
               outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
             break ;
-      case 2: dimensions[0]=d ; dimensions[1]=1 ; // Vector
+      case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
               outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d ; j++)
                           outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
             break ;
-      case 3: dimensions[0]=dimensions[1]=d ; //Tensor
+      case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d*d ; j++)
@@ -892,7 +940,7 @@ int Coarsing ::write_NrrdIO (string path)
     nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMax, nrrdmax.data());
     nrrdAxisInfoSet_nva(nval, nrrdAxisInfoSpacing, nrrdspacing.data());
 
-    for (int f=0 ; f<Fidx.size() ; f++)
+    for (size_t f=0 ; f<Fidx.size() ; f++)
     {
       if (Fidx[f]<0) continue ;
 
@@ -900,20 +948,20 @@ int Coarsing ::write_NrrdIO (string path)
     // Data are goind fast to slow in NrrdIO ... so probably need some rewrite ...
       switch (Ftype[f])
       {
-        case 1: dimensions[0]=dimensions[1]=1 ;  //Scalar
+        case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
                 outdata=(double *) malloc(sizeof(double) * 1 * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
               break ;
-        case 2: dimensions[0]=d ; dimensions[1]=1 ; // Vector
+        case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
                 outdata=(double *) malloc(sizeof(double) * d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d ; j++)
                             outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
               break ;
-        case 3: dimensions[0]=dimensions[1]=d ; //Tensor
+        case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d*d ; j++)

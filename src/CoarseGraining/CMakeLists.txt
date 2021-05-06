@@ -6,5 +6,5 @@ target_link_libraries(CoarseGraining PUBLIC -g -lz -lm -lNrrdIO -lstdc++fs)
 
 add_executable(CoarseGraining_Liggghts EXCLUDE_FROM_ALL IOLiggghts.cpp Coarsing.cpp zlib.cpp gzip.cpp)
 set_property(TARGET CoarseGraining_Liggghts PROPERTY CXX_STANDARD 14)
-target_compile_options(CoarseGraining_Liggghts PUBLIC -g -DNRRDIO ${Matlab_Macro})
-target_link_libraries(CoarseGraining_Liggghts PUBLIC -g -lz -lm -lNrrdIO -lstdc++fs)
+target_compile_options(CoarseGraining_Liggghts PUBLIC -g -DNRRDIO ${Matlab_Macro} -Wall)
+target_link_libraries(CoarseGraining_Liggghts PUBLIC -g -lz -lm -lNrrdIO -lstdc++fs -Wall)

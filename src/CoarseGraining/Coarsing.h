@@ -36,6 +36,7 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include <boost/math/special_functions/factorials.hpp>
+#include <map>
 
 #ifdef NETCDF
 #include <netcdf.h>
@@ -52,6 +53,9 @@
 using namespace std ;
 
 double Volume (int d , double R) ; ///< Compute a sphere volume in dimension D
+
+enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2} ;
+enum FieldType {Defined, Particle, Fluctuation, Contact} ;
 
 //=========================================================
 /** \brief Data computed for a single coarse graining point */
@@ -75,7 +79,8 @@ private :
 struct Field {
  int flag ; ///< Flag for the given field
  string name ; ///< Name for the given field
- string type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR
+ TensorOrder type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR
+ FieldType ftype ;
 };
 //-------------------------
 /// Data structure handling point data and contact data
@@ -102,6 +107,9 @@ vector <double *> fpq; ///< Force at contact
 vector <double *> mpq; ///< Moment of particle 1 on 2
 vector <double *> mqp ; ///< Moment of particle 2 on 1
 
+// Exta fields if needed
+vector <double *> extra ;
+
 // Some useful functions
 int Nnonper=-1 ; ///< Used if additional particles are added as images through the periodic boundary conditions.
 int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data structure
@@ -118,7 +126,7 @@ int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_at
 class Coarsing
 {
 public :
-    Coarsing (int dd, v1i nnpt, v2d bbox, int T) : flags(0), cT(0)
+    Coarsing (int dd, v1i nnpt, v2d bbox, int T) : cT(0), flags(0)
     {
         d=dd ; npt=nnpt ; box=bbox ; Time=T ;
         dx.resize(d, 0) ;
@@ -140,7 +148,7 @@ public :
     int Time; ///<Total timesteps
     int cT ; ///< Current timestep
     double cutoff ; ///< CG width, and cutoff
-    vector <class CGPoint> CGP ; ///< List of Coarse Graining points
+    vector <CGPoint> CGP ; ///< List of Coarse Graining points
     vector <int> npt; ///< Number of points per dimension
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; ///< Distances between CG points
@@ -150,7 +158,8 @@ public :
     // Fields variable and function
     unsigned int flags ; ///< Flags deciding which fields to coarse-grain
     vector <string> Fields, Fname ; ///< Flagged field names
-    vector <int> Fidx, Ftype ; ///< Where the fields is referenced in the fields vector in the CGPoint. -1 if not flagged
+    vector <int> Fidx ;  ///< Where the fields is referenced in the fields vector in the CGPoint. -1 if not flagged
+    vector <TensorOrder> Ftype ; ///< Flagged field types
     vector <struct Field > FIELDS ; ///< All allowed fields (initialized in grid_getfields)
     int get_id(string nm) ; ///< Find field ID from field name
     struct Field * get_field(string nm) ; ///< Find Field from name
@@ -158,14 +167,15 @@ public :
 
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
+    int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
     int setWindow (Windows win, double w) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
     template <Windows W> int setWindow (double w) ; ///< Set the windowing function
     template <Windows W> int setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function
     int grid_generate() ; ///< Generate the coarse-graining grid
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
-    int grid_setfields() ; ///< Set the fields at each CG point
-    v1d grid_getfields() ; ///< Extract fields from each CG point
+    std::map<std::string, size_t> grid_setfields() ; ///< Set the fields at each CG point
+    vector<FieldType> grid_getfields() ; ///< Extract fields from each CG point
     v2d get_bounds() ; ///< Extract the simulation boundaries
     CGPoint * reverseloop (string type) ; ///< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ; ///< Find the closest CG point to a particle

@@ -1,5 +1,5 @@
 /** \addtogroup Texturing Texturing server
- * This module handles the Texturing of higher dimensional rotating hyperspheres. It is designed to produced 2D textures that can be wrapped around spheres for visualisations. 
+ * This module handles the Texturing of higher dimensional rotating hyperspheres. It is designed to produced 2D textures that can be wrapped around spheres for visualisations.
  *  @{ */
 
 #include "Server.h"
@@ -19,9 +19,9 @@ boost::random::uniform_01<boost::mt19937> Tools::rand(rng) ;*/
 map<string,string> parse_url (string & url) ; ///< \deprecated Do not use
 template <int d>
 void runthread_MasterRender (Texturing<d> * T) {T->MasterRender() ; } ///< Function to call Texturing::MasterRender()
-std::thread MasterRenderThread ; 
+std::thread MasterRenderThread ;
 std::mutex LockRender ;
-bool blenderrender=false ; 
+bool blenderrender=false ;
 
 Texturing<3> Texturing3 ;
 Texturing<4> Texturing4 ;
@@ -37,28 +37,28 @@ int curd = -1 ;
 
 /** \brief Starts the server and handles the dispatching of the various commands. Default port is 54321
  *  \details URL Commands:
- *  \details /load : load the data. Should always be called first. 
+ *  \details /load : load the data. Should always be called first.
  *  \details /render : renders the current timestep and location, and may also cache some additional ts and locations
  *  \details /forcerender : DEPRECATED
  *  \details /vtkcolormap : export the colormap in vtk format
- *  \details /nrrdcolormap : export the colormap in nrrd format 
+ *  \details /nrrdcolormap : export the colormap in nrrd format
  *  \details /vtkmap : export the textures as vtk surfaces through the colormap instead of plane textures.
  */
 int main(int argc, char * argv[])
 {
     using namespace httplib;
-    
+
     if (argc>1)
         if (!strcmp(argv[1], "blender"))
-            blenderrender = true ; 
-        
+            blenderrender = true ;
+
     if (blenderrender)
-        printf("Rendering in blender compatible format\n") ; 
+        printf("Rendering in blender compatible format\n") ;
     else
-        printf("The texturing server now defaults to render textures for Threejs mapping. Use the blender command line option to render in Blender compatible textures.\n") ; 
-        
+        printf("The texturing server now defaults to render textures for Threejs mapping. Use the blender command line option to render in Blender compatible textures.\n") ;
+
     Server svr;
-    
+
     #ifdef TEXTURINGPATH
       svr.set_base_dir(TEXTURINGPATH "/..");
     #else
@@ -122,7 +122,7 @@ int main(int argc, char * argv[])
         }
         else
         {
-            printf("S") ;
+            printf("S%d", curd) ;
 
             switch (curd)
             {
@@ -130,43 +130,43 @@ int main(int argc, char * argv[])
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<3>, &Texturing3) ;
                     while (!Texturing3.isrendered()) ;
-                    break ; 
+                    break ;
             case 4: Texturing4.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<4>, &Texturing4) ;
                     while (!Texturing4.isrendered()) ;
-                    break ; 
+                    break ;
             case 5: Texturing5.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<5>, &Texturing5) ;
                     while (!Texturing5.isrendered()) ;
-                    break ; 
+                    break ;
             case 6: Texturing6.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<6>, &Texturing6) ;
                     while (!Texturing6.isrendered()) ;
-                    break ;   
+                    break ;
             case 7: Texturing7.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<7>, &Texturing7) ;
                     while (!Texturing7.isrendered()) ;
-                    break ;  
+                    break ;
             case 8: Texturing8.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<8>, &Texturing8) ;
                     while (!Texturing8.isrendered()) ;
-                    break ;  
+                    break ;
             case 9: Texturing9.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<9>, &Texturing9) ;
                     while (!Texturing9.isrendered()) ;
-                    break ;   
+                    break ;
             case 10:Texturing10.SetNewViewPoint(req.params) ;
                     if (MasterRenderThread.joinable()) MasterRenderThread.join() ;
                     MasterRenderThread = std::thread(runthread_MasterRender<10>, &Texturing10) ;
                     while (!Texturing10.isrendered()) ;
-                    break ; 
-            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
+                    break ;
+            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ;
             }
 
             printf("R") ; fflush(stdout) ;
@@ -186,7 +186,7 @@ int main(int argc, char * argv[])
     svr.Get(R"(/vtkcolormap)", [&](const Request& req, Response& res) {
         switch (curd)
         {
-            case 3: Texturing3.write_colormap_vtk_base() ; break ; 
+            case 3: Texturing3.write_colormap_vtk_base() ; break ;
             case 4: Texturing4.write_colormap_vtk_base() ; break ;
             case 5: Texturing5.write_colormap_vtk_base() ; break ;
             case 6: Texturing6.write_colormap_vtk_base() ; break ;
@@ -194,22 +194,22 @@ int main(int argc, char * argv[])
             case 8: Texturing8.write_colormap_vtk_base() ; break ;
             case 9: Texturing9.write_colormap_vtk_base() ; break ;
             case 10: Texturing10.write_colormap_vtk_base() ; break ;
-            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
+            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ;
         }
     });
 
     svr.Get(R"(/nrrdcolormap)", [&](const Request& req, Response& res) {
         switch (curd)
         {
-            case 3: Texturing3.write_colormap_nrrd_base (req.params) ; break ; 
-            case 4: Texturing4.write_colormap_nrrd_base (req.params) ; break ; 
-            case 5: Texturing5.write_colormap_nrrd_base (req.params) ; break ; 
-            case 6: Texturing6.write_colormap_nrrd_base (req.params) ; break ; 
-            case 7: Texturing7.write_colormap_nrrd_base (req.params) ; break ; 
-            case 8: Texturing8.write_colormap_nrrd_base (req.params) ; break ; 
-            case 9: Texturing9.write_colormap_nrrd_base (req.params) ; break ; 
-            case 10: Texturing10.write_colormap_nrrd_base (req.params) ; break ; 
-            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
+            case 3: Texturing3.write_colormap_nrrd_base (req.params) ; break ;
+            case 4: Texturing4.write_colormap_nrrd_base (req.params) ; break ;
+            case 5: Texturing5.write_colormap_nrrd_base (req.params) ; break ;
+            case 6: Texturing6.write_colormap_nrrd_base (req.params) ; break ;
+            case 7: Texturing7.write_colormap_nrrd_base (req.params) ; break ;
+            case 8: Texturing8.write_colormap_nrrd_base (req.params) ; break ;
+            case 9: Texturing9.write_colormap_nrrd_base (req.params) ; break ;
+            case 10: Texturing10.write_colormap_nrrd_base (req.params) ; break ;
+            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ;
         }
         printf("NRRD colormap done\n") ;
     });
@@ -217,22 +217,22 @@ int main(int argc, char * argv[])
     svr.Get(R"(/vtkmap)", [&](const Request& req, Response& res) {
         switch (curd)
         {
-            case 3: Texturing3.write_vtkmap(req.params) ; break ; 
-            case 4: Texturing4.write_vtkmap(req.params) ; break ; 
-            case 5: Texturing5.write_vtkmap(req.params) ; break ; 
-            case 6: Texturing6.write_vtkmap(req.params) ; break ; 
-            case 7: Texturing7.write_vtkmap(req.params) ; break ; 
-            case 8: Texturing8.write_vtkmap(req.params) ; break ; 
-            case 9: Texturing9.write_vtkmap(req.params) ; break ; 
-            case 10: Texturing10.write_vtkmap(req.params) ; break ; 
-            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ; 
+            case 3: Texturing3.write_vtkmap(req.params) ; break ;
+            case 4: Texturing4.write_vtkmap(req.params) ; break ;
+            case 5: Texturing5.write_vtkmap(req.params) ; break ;
+            case 6: Texturing6.write_vtkmap(req.params) ; break ;
+            case 7: Texturing7.write_vtkmap(req.params) ; break ;
+            case 8: Texturing8.write_vtkmap(req.params) ; break ;
+            case 9: Texturing9.write_vtkmap(req.params) ; break ;
+            case 10: Texturing10.write_vtkmap(req.params) ; break ;
+            default : printf("ERR: Not an available texturing dimension (%d)\n", curd) ; break ;
         }
 
     });
 
 
     svr.listen("localhost", 54321);
-} 
+}
 
 //=======================================================
 map<string,string> parse_url (string & url) // Unused
