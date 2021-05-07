@@ -177,9 +177,11 @@ std::map<std::string, size_t> Coarsing::grid_setfields()
     vector<FieldType> tmp=grid_getfields() ;
     std::map<std::string, size_t> extrafields ;
 
+    printf("Approximate memory required: %ld MB\n", Npt*tmp.size()*Time*sizeof(double)/1024/1024) ; fflush(stdout) ;
+
     for (size_t i=0 ; i<tmp.size() ; i++)
       if (tmp[i]!=FieldType::Defined)
-        extrafields[Fname[i]] = i ;
+        extrafields[Fields[i]] = i ;
 
     for (int i=0 ; i<Npt ; i++)
         CGP[i].fields.resize(Time, vector<double>(tmp.size(),0)) ;
@@ -285,6 +287,25 @@ int Coarsing::find_closest_pq(int id)
  }
  return res ;
 }
+
+
+//*******************************************
+/*int Coarsing::find_closest(int id)
+{
+ int res=0,idtmp=0 ;
+ vector<int> loc (d,0) ;
+ for (int dd=0 ; dd<d ; dd++)
+ {
+   idtmp=floor((data.pos[dd][id]-box[0][dd])/dx[dd]) ;
+   if (idtmp<0) idtmp=0 ;
+   if (idtmp>=npt[dd]) idtmp=npt[dd]-1 ;
+   res += idtmp*nptcum[dd] ;
+ }
+ return res ;
+}*/
+//********************************************
+
+
 //----------------------------------------
 int Coarsing::get_id(string nm)
 {
@@ -306,7 +327,7 @@ struct Field * Coarsing::get_field(string nm)
 }
 
 //===================================================
-int Coarsing::compute_fluc_vel ()
+int Coarsing::compute_fluc_vel (bool usetimeavg)
 {
   printf(" -> VelFluct") ; fflush(stdout) ;
   v1d vavg (d,0) ;
@@ -318,13 +339,15 @@ int Coarsing::compute_fluc_vel ()
   for (int i=0 ; i<data.N ; i++)
   {
     if (isnan(data.pos[0][i])) continue ;
-    vavg=interpolate_vel (i) ;
+    vavg=interpolate_vel (i, usetimeavg) ;
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;
   }
+  hasvelfluct = true ;
   return 0 ;
 }
-int Coarsing::compute_fluc_rot ()
+//-----
+int Coarsing::compute_fluc_rot (bool usetimeavg)
 {
   static bool messagefirst=true ;
   printf(" -> RotVelFluct") ; fflush(stdout) ;
@@ -335,25 +358,42 @@ int Coarsing::compute_fluc_rot ()
   for (int i=0 ; i<data.N ; i++)
   {
     if (isnan(data.pos[0][i])) continue ;
-    omegaavg=interpolate_rot (i) ;
+    omegaavg=interpolate_rot (i, usetimeavg) ;
     for (int dd=0 ; dd<d ; dd++)
       data.rot_fluc[dd][i]=data.omega[dd][i]-omegaavg[dd] ;
   }
+  hasrotfluct = true ;
   return 0 ;
 }
-
-v1d Coarsing::interpolate_vel_nearest (int id)
+//-----
+v1d Coarsing::interpolate_vel_nearest (int id, bool usetimeavg)
 {
   const static int idvel=get_id("VAVG") ; int idcg=find_closest(id) ; v1d res ;
-  for (int i=0 ; i<d ; i++) res.push_back(CGP[idcg].fields[cT][idvel+i]) ;
+
+  for (int i=0 ; i<d ; i++)
+  {
+    if (usetimeavg)
+    {
+      res.push_back((*CGPtemp)[idcg].fields[0][idvel+i]) ;
+    }
+    else
+      res.push_back(CGP[idcg].fields[cT][idvel+i]) ;
+  }
   return res ;
 }
-v1d Coarsing::interpolate_rot_nearest (int id)
+//-----
+v1d Coarsing::interpolate_rot_nearest (int id, bool usetimeavg)
 {
   const static int idrot=get_id("ROT") ; int idcg=find_closest(id) ; v1d res ;
-  for (int i=0 ; i<d ; i++) res.push_back(CGP[idcg].fields[cT][idrot+i]) ;
+  for (int i=0 ; i<d ; i++)
+  {
+    if (usetimeavg)
+      res.push_back((*CGPtemp)[idcg].fields[0][idrot+i]) ;
+    else
+      res.push_back(CGP[idcg].fields[cT][idrot+i]) ;
+  }
   return res ;
-}
+ }
 
 
 //================================= BEGINNING OF THE INTERESTING PART ================================
@@ -372,7 +412,6 @@ for (auto &v: FIELDS)
 {
   if (v.ftype == FieldType::Particle)
   {
-    printf("\nExtraFieldFound %d\n", get_id(v.name)) ; fflush(stdout) ;
     extraid.push_back(get_id(v.name)) ;
     if (extraid.back()<0)
       extraid.pop_back() ;
@@ -414,14 +453,8 @@ for (i=0 ; i<data.N ; i++)
          *(CGf+omegaid+dd) += wp * dm * dom[dd] * dI ;
      if (doextra)
        for (auto v: extraid)
-       {
-         printf("%ld %d A\n", data.extra.size(),  i) ; fflush(stdout) ;
-         printf("%ld %d %X ",data.extra.size(), v, data.extra[v]) ; fflush(stdout) ;
           *(CGf+v) += wp * dm * data.extra[v][i] ;
-          printf("B\n") ; fflush(stdout) ;
-        }
  }
- printf("GGG\n") ; fflush(stdout) ;
 
 }
 
@@ -462,7 +495,7 @@ return 0 ;
 }
 
 //================ PASS 2 : "TK", "MK", "eKT", "eKR", "qTK", "qRK"==============================
-int Coarsing::pass_2()
+int Coarsing::pass_2(bool usetimeavg)
 {
 int i, dd ; double velfluc, rotfluc ; int id ; double wp ;
 bool doeKT=true , doeKR=true, doqTK=true, doqRK=true, doTK=true, doMK=true ;
@@ -473,14 +506,27 @@ int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ;
 int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ;
 int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;
 int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;
+
+if (!hasvelfluct && (doeKT || doTK || doMK || doqTK || doqRK))
+  {
+    printf("Velocity fluctuations are needed for some fields but not computed\n") ; fflush(stdout) ;
+    doeKT = doTK = doMK = doqTK = doqRK = false ;
+  }
+if (!hasrotfluct && (doeKR||doMK||doqRK))
+  {
+    printf("Rotational velocity fluctuations are needed for some fields but not computed\n") ; fflush(stdout) ;
+    doeKR = doMK = doqRK = false ;
+  }
+
 printf(" -> Pass 2") ; fflush(stdout) ;
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
 
  id=find_closest(i) ;
- for (dd=0, velfluc=0 ; dd<d ; dd++) velfluc+=data.vel_fluc[dd][i]*data.vel_fluc[dd][i] ;
- for (dd=0, rotfluc=0 ; dd<d ; dd++) rotfluc+=data.rot_fluc[dd][i]*data.rot_fluc[dd][i] ;
+ velfluc = rotfluc = 0 ;
+ if (hasvelfluct) for (dd=0, velfluc=0 ; dd<d ; dd++) velfluc += data.vel_fluc[dd][i]*data.vel_fluc[dd][i] ;
+ if (hasrotfluct) for (dd=0, rotfluc=0 ; dd<d ; dd++) rotfluc += data.rot_fluc[dd][i]*data.rot_fluc[dd][i] ;
 
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
@@ -509,9 +555,14 @@ printf(" -> subpass 2") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double tworho ;
-    tworho = 2*CGP[i].fields[cT][rhoid] ;
+    if (usetimeavg)
+      tworho = 2*(*CGPtemp)[i].fields[0][rhoid] ;
+    else
+      tworho = 2*CGP[i].fields[cT][rhoid] ;
+    if (tworho==0) continue ;
 
-    if (doeKT && tworho!=0) CGP[i].fields[cT][eKTid] /= tworho ;
+
+    //if (doeKT && tworho!=0) CGP[i].fields[cT][eKTid] /= tworho ;
     if (doeKR && tworho!=0) CGP[i].fields[cT][eKRid] /= tworho ;
     if (doqTK) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qTKid+dd] *= (-0.5) ;
     if (doqRK) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qRKid+dd] *= (-0.5) ;
@@ -764,23 +815,40 @@ return 0 ;
 }
 
 //====================================================
-int Coarsing::mean_time()
+int Coarsing::mean_time(bool temporary)
 {
-  int tf=CGP[0].fields[0].size() ;
+  if (temporary)
+  {
+    //if (CGPtemp != nullptr) delete(CGPtemp) ; actually no can't do that ....
+    CGPtemp = new vector<CGPoint> ;
+    for (size_t i=0 ; i<CGP.size() ; i++)
+    {
+      CGPtemp->push_back (CGPoint(CGP[i].d, CGP[i].location)) ;
+      CGPtemp->back().fields.push_back(CGP[i].fields[0]) ;
+      CGPtemp->back().natom = CGP[i].natom ;
+      CGPtemp->back().phi = CGP[i].phi ;
+      CGPtemp->back().neighbors = CGP[i].neighbors ;
+    }
+  }
+  else
+    CGPtemp = &CGP ;
+
+  int tf=(*CGPtemp)[0].fields[0].size() ;
   for (int i=0 ; i<Npt ; i++)
     for (int t=1 ; t<Time ; t++)
     {
       printf("\rAveraging ... %d", t) ; fflush(stdout) ;
       for (int f=0 ; f<tf ; f++)
-        CGP[i].fields[0][f]+=CGP[i].fields[t][f] ;
+        (*CGPtemp)[i].fields[0][f]+=CGP[i].fields[t][f] ;
     }
   for (int i=0 ; i<Npt ; i++)
     for (int f=0 ; f<tf ; f++)
     {
-        CGP[i].fields[0][f] /= Time;
+        (*CGPtemp)[i].fields[0][f] /= Time;
         //CGP[i].fields.resize(1) ;
     }
-  Time=1 ;
+
+  if (!temporary) Time=1 ;
   return 0 ;
 }
 //--------------------------------------------

@@ -59,18 +59,52 @@ int main(int argc, char * argv[])
     if (P.maxlevel>=1)
       C.pass_1() ;
 
-    if (P.maxlevel>=2)
+    /*if (P.maxlevel>=2)
     {
       C.compute_fluc_vel() ;
-      C.compute_fluc_rot() ;
+      //C.compute_fluc_rot() ;
+      C.pass_2() ;
+    }
+    if (P.maxlevel>=3)
+      C.pass_3() ;*/
+
+  }
+
+  C.mean_time(true) ;
+  D.close() ;
+  if (P.hascf) D.closecf() ;
+  D.open(P.atmdump) ;
+  if (P.hascf) D.opencf(P.cfdump) ;
+
+  C.cT=-1 ;
+  for (int i=0 ; i<P.skipT; i++)
+  {
+    printf("\rSkipping timestep: %d | ", i) ; fflush(stdout) ;
+    D.read_full_ts(false) ;
+  }
+
+  for (int i=0 ; i<maxT ; i++)
+  {
+    printf("\rTimestep: %d |", i) ; fflush(stdout) ;
+
+    D.read_full_ts(true) ;
+    C.cT++ ;
+    D.set_data(C.data, extrafieldmap) ;
+
+    //if (P.maxlevel>=1)
+    //  C.pass_1() ;
+
+    if (P.maxlevel>=2)
+    {
+      C.compute_fluc_vel(true) ;
+      //C.compute_fluc_rot() ;
       C.pass_2() ;
     }
     if (P.maxlevel>=3)
       C.pass_3() ;
 
-    //if (i==0) printf("\e[9A\e[0J") ;
-    //else printf("\e[13A\e[0J") ;
   }
+
   printf("\n") ;
 
   if (P.dotimeavg)
@@ -105,6 +139,24 @@ if (path.find(".gz")!=string::npos)
 filt_incf.push(*file_incf);
 incf=new istream (&(filt_incf)) ;
 return 0 ;
+}
+int Datafile::close()
+{
+  file_in->close() ;
+  delete(file_in) ;
+  filt_in.reset() ;
+  delete(in) ;
+  in=file_in=nullptr;
+  return 0 ;
+}
+int Datafile::closecf()
+{
+  file_incf->close() ;
+  delete(file_incf) ;
+  filt_incf.reset() ;
+  delete(incf);
+  incf=file_incf=nullptr ;
+  return 0 ;
 }
 //-----------------------------------------------------------
 vector<vector<double>> Datafile::get_bounds()
@@ -218,7 +270,7 @@ int Datafile:: do_post_atm()
    if ( (*j)[idloc] != i)
      printf("ERR shouldn't happen %d %g\n", i, (*j)[idloc]) ;
  }
- printf("%d null atom / %d | ", nadded, N) ;
+ printf(" %d null atom / %d | ", nadded, N) ;
  N+=nadded ;
 
  const int nvalue = 13 ;
@@ -399,16 +451,16 @@ int Datafile::do_post_cf()
 
      if (swap==-1) swap=1 ;
      else swap=0 ;
-     if (lst[11]>=-1) datacf[11][k]= tdata[j][lst[6]]*data[0][datacf[swap][k]]  ;           //mpq
-     if (lst[12]>=-1) datacf[12][k]= tdata[j][lst[7]]*data[0][datacf[swap][k]]  ;
-     if (lst[13]>=-1) datacf[13][k]= tdata[j][lst[8]]*data[0][datacf[swap][k]]  ;
-     if (lst[14]>=-1) datacf[14][k]= tdata[j][lst[6]]*data[0][datacf[1-swap][k]] ;          //mqp
-     if (lst[15]>=-1) datacf[15][k]= tdata[j][lst[7]]*data[0][datacf[1-swap][k]]  ;
-     if (lst[16]>=-1) datacf[16][k]= tdata[j][lst[8]]*data[0][datacf[1-swap][k]]  ;
+     if (lst[6]>-1) datacf[11][k]= tdata[j][lst[6]]*data[0][datacf[swap][k]]  ;           //mpq
+     if (lst[7]>-1) datacf[12][k]= tdata[j][lst[7]]*data[0][datacf[swap][k]]  ;
+     if (lst[8]>-1) datacf[13][k]= tdata[j][lst[8]]*data[0][datacf[swap][k]]  ;
+     if (lst[6]>-1) datacf[14][k]= tdata[j][lst[6]]*data[0][datacf[1-swap][k]] ;          //mqp
+     if (lst[7]>-1) datacf[15][k]= tdata[j][lst[7]]*data[0][datacf[1-swap][k]]  ;
+     if (lst[8]>-1) datacf[16][k]= tdata[j][lst[8]]*data[0][datacf[1-swap][k]]  ;
 
      k++ ;
  }
- printf("-%d per contacts /%d | ", Ncf-k, Ncf) ;
+ //printf("-%d per contacts /%d | ", Ncf-k, Ncf) ;
  Ncf=k ;
 return 0 ;
 }
@@ -439,9 +491,8 @@ int Datafile::set_data(struct Data & D, std::map<string,size_t> extrafieldmap)
 
     for (auto &v: extrafieldmap)
     {
-      if (D.extra.size() < v.second)
-        D.extra.resize(v.second) ;
-      printf("////%ld\n", v.second) ; fflush(stdout) ;
+      if (D.extra.size() < v.second+1)
+        D.extra.resize(v.second+1) ;
       D.extra[v.second] = &(data[12][0]) ;
     }
 

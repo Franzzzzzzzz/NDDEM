@@ -68,10 +68,8 @@ public :
     v1d location ;  ///< Location of the coarse graining point
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
-    double natom ; ///< Number of weights participating at the spatial average
-    double phi ; ///< Volume fraction (well, maybe density actually) at the CG point
-
-private :
+    double natom = 0; ///< Number of weights participating at the spatial average
+    double phi = 0 ; ///< Volume fraction (well, maybe density actually) at the CG point
     int d ; ///< Dimension
 } ;
 //-------------------------
@@ -149,11 +147,13 @@ public :
     int cT ; ///< Current timestep
     double cutoff ; ///< CG width, and cutoff
     vector <CGPoint> CGP ; ///< List of Coarse Graining points
+    vector <CGPoint> * CGPtemp = nullptr ; ///< Temporary cgpoint list that can store temporal averages if needed
     vector <int> npt; ///< Number of points per dimension
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; ///< Distances between CG points
     v2d box ; ///< CG point location
     LibBase * Window ; ///> Pointer to the averaging window
+
 
     // Fields variable and function
     unsigned int flags ; ///< Flags deciding which fields to coarse-grain
@@ -180,10 +180,10 @@ public :
     CGPoint * reverseloop (string type) ; ///< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ; ///< Find the closest CG point to a particle
     int find_closest_pq (int id) ; ///< Find the closest CG point to a contact
-    v1d interpolate_vel(int id) { return interpolate_vel_nearest (id) ; } ///< Interpolate the velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
-    v1d interpolate_rot(int id) { return interpolate_rot_nearest (id) ; } ///< Interpolate the angular velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
-    v1d interpolate_vel_nearest (int id) ; ///< Nearest neighbor interpolation for the velocity
-    v1d interpolate_rot_nearest (int id) ; ///< Nearest neighbor interpolation for the angular velocity
+    v1d interpolate_vel(int id, bool usetimeavg=false) { return interpolate_vel_nearest (id, usetimeavg) ; } ///< Interpolate the velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
+    v1d interpolate_rot(int id, bool usetimeavg=false) { return interpolate_rot_nearest (id, usetimeavg) ; } ///< Interpolate the angular velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
+    v1d interpolate_vel_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the velocity
+    v1d interpolate_rot_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the angular velocity
 
     int idx_FastFirst2SlowFirst (int n) ; ///< Change array traversing order
 
@@ -196,16 +196,18 @@ public :
     double normdiff (v1d a, v1d b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (sqrt(res)) ; } ; ///< convenience function to to the difference of 2 vectors.
     // Coarse graining functions
     int pass_1 () ; ///< Coarse-grain anything based on particles (not contacts) which does not need fluctuating quantities
-    int pass_2 () ; ///< Coarse-grain anything based on particles (not contacts) which needs fluctuating quantities (call the compute_fluc_ functions before)
+    int pass_2 (bool usetimeavg=false) ; ///< Coarse-grain anything based on particles (not contacts) which needs fluctuating quantities (call the compute_fluc_ functions before)
     int pass_3 () ; ///< Coarse-grain anything based on contact informations.
+    int compute_fluc_vel (bool usetimeavg=false) ; ///< Velocity fluctuation computation
+    int compute_fluc_rot (bool usetimeavg=false) ; ///< Angular velocity fluctuation computation
+    bool hasvelfluct=false, hasrotfluct=false ;
 
     // Data handling functions
-    int compute_fluc_vel () ; ///< Velocity fluctuation computation
-    int compute_fluc_rot () ; ///< Angular velocity fluctuation computation
+
     struct Data data ; ///< Data storage
 
     // Time and output handling
-    int mean_time() ; ///< Perform a time average of the coarse-grained data
+    int mean_time(bool temporary=false) ; ///< Perform a time average of the coarse-grained data
     int write_vtk(string sout) ; ///< Write CG data as VTK
     int write_netCDF (string sout) ; ///< \deprecated Write CG data as netCDF
     int write_NrrdIO (string path) ; ///< Write CG data as NrrdIO file format

@@ -40,6 +40,8 @@ public:
     // Functions
     int open(string path) ;
     int opencf(string path) ;
+    int close() ;
+    int closecf() ;
     int read_full_ts(bool keep) ;
     int set_data(struct Data & D, std::map<string,size_t> extrafieldmap) ;
     vector<vector<double>> get_bounds () ;
@@ -160,7 +162,6 @@ void Param::from_json(json &j)
     {
       auto v2=j["extra fields"] ;
       extrafields.resize(v2.size()) ;
-      printf("ADDING\n") ; fflush(stdout) ;
       for (size_t i=0 ; i<v2.size() ; i++)
       {
         extrafields[i].name = v2[i]["name"] ;
