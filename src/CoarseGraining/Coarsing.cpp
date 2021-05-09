@@ -519,7 +519,7 @@ int EKRid=get_id("EKR") ; if (EKRid<0) doEKR=false ;
 //printf("Starting intermediate pass 1...\r") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
-    double rho, Imom ;
+    double rho, Imom=0 ;
     rho = CGP[i].fields[cT][rhoid] ;
     if (doI && rho!=0) {CGP[i].fields[cT][Iid] /= rho ; Imom=CGP[i].fields[cT][Iid] ; }
     if (dovel && rho!=0)   for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][velid+dd] /= rho ;
@@ -631,19 +631,19 @@ int MCid=get_id("MC") ; if (MCid<0) doMC=false ;
 int mCid=get_id("mC") ; if (mCid<0) domC=false ;
 int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ;
 int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ;
-double sum=0 ; int p, q, id ; double rp, rq ; double wpqs, wpqf ;
-printf(" -> Pass 3") ; fflush(stdout) ;
+double sum=0 ; int p, q, id ; //double rp, rq ; double wpqs, wpqf ;
+printf(" -> Pass 3 ") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
  p=data.id1[i] ; q=data.id2[i] ; if (q<=p) printf("ERR: contacts should be ordered so that p<q\n") ;
- //printf("%d ", i) ;
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
-  rp=Window->distance(p, CGP[*j].location) ;
+  /*rp=Window->distance(p, CGP[*j].location) ;
   rq=Window->distance(q, CGP[*j].location) ;
   wpqs = Window->window_avg (rp, rq) ;
-  wpqf = Window->window_int (rp, rq) ;
+  wpqf = Window->window_int (rp, rq) ;*/
+  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location) ; 
   //printf("%g %g %g", rp, rq, wpqf) ;
   if (dozT)
   {
@@ -1079,13 +1079,15 @@ int Coarsing ::write_NrrdIO (string path)
                             outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
               break ;
         case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
+                outdata=(double *) malloc(sizeof(double) * d*d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d*d ; j++)
                             outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
-                outdata=(double *) malloc(sizeof(double) * d*d * Npt * Time) ;
               break ;
-        default: printf("ERR: this should never happen. \n") ;
+        default: 
+            outdata=nullptr ;
+            printf("ERR: this should never happen. \n") ;
       }
 
       nrrdWrap_nva(nval, outdata, nrrdTypeDouble, d+3, dimensions.data());

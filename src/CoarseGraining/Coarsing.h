@@ -236,6 +236,9 @@ int Coarsing::setWindow (double w)
       case Windows::Lucy3D :
         Window=new LibLucy3D (&data, w, d) ;
         break ;
+      case Windows::Lucy3DFancyInt :
+        Window=new LibLucy3DFancyInt (&data, w, d) ;
+        break ;
       case Windows::Hann3D :
         Window=new LibHann3D (&data, w, d) ;
         break ;

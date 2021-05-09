@@ -274,6 +274,7 @@ void Param::post_init()
      else if ( windowstr=="RectND") window=Windows::RectND ;
      else if ( windowstr=="LucyND") window=Windows::LucyND ;
      else if ( windowstr=="LucyND_Periodic") window=Windows::LucyND_Periodic ;
+     else if ( windowstr=="Lucy3DFancyInt") window=Windows::Lucy3DFancyInt; 
      else {printf("Unknown windowing function.\n") ; std::exit(4) ; }
     }
 }

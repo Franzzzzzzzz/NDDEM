@@ -1,5 +1,5 @@
 
-enum class Windows {Rect3D, Rect3DIntersect, Lucy3D, Hann3D, RectND, LucyND, LucyND_Periodic} ;
+enum class Windows {Rect3D, Rect3DIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic} ;
 
 /** \brief A window base class that needs to be specialised to a specific CG window
  */
@@ -12,6 +12,13 @@ public:
     double w, d ;
 
     virtual double window (double) = 0 ;  //Purely virtual, need to be defined in derived classes
+    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc) {
+        double rp=distance(p, loc) ;
+        double rq=distance(q, loc) ;
+        double wpqs = window_avg (rp, rq) ;
+        double wpqf = window_int (rp, rq) ;
+        return (make_pair(wpqs, wpqf)) ; 
+    }
     virtual double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     virtual double window_avg (double r1, double r2) {return (0.5*(window(r1)+window(r2))) ; }
     virtual double distance (int id, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ; return sqrt(res) ; } ///< function for mixed particle id / vector informations.
@@ -21,11 +28,45 @@ public:
 class LibLucy3D : public LibBase {
 public :
     LibLucy3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
+    LibLucy3D() {} ; 
     double Lucy (double r) {static double cst=105./(16*M_PI*w*w*w) ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
     double window(double r) {return (Lucy(r)) ;}
     double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
 };
+//--------------------
+class LibLucy3DFancyInt : public LibLucy3D {
+public :
+    LibLucy3DFancyInt(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
+    double distance (int id, v1d loc) {if (toggle) loc2=loc ; else loc1=loc ; idboth = id ; toggle=!toggle ; return(LibLucy3D::distance(id,loc)) ;} 
+    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
+    {
+      double res = 0 ; 
+      double prev, cur, first ; 
+      v1d lpq = loc2 ; for (int i=0 ; i<d ;i++) lpq[i] -= loc1[i] ; 
+      double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
+      
+      first=prev=Lucy(LibLucy3D::distance(idboth,loc1)) ;
+      for (int i=0 ; i<5 ; i++)
+      {
+        for (int j=0; j<d ; j++)
+            loc1[j] += (1./Nsteps) * lpq[j] ; 
+        cur=Lucy(LibLucy3D::distance(idboth,loc1)) ; 
+        res += (cur+prev)/2.*length ; 
+        prev=cur ; 
+      }
+      //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
+      return (make_pair(window_avg(first,cur),res)) ;  
+    }
+private:
+    bool toggle = false ; 
+    v1d loc1, loc2 ; 
+    int idboth ;
+    int Nsteps = 10 ; 
+};
+
+
+
 //---------------------
 class LibRect3D : public LibBase {
 public:

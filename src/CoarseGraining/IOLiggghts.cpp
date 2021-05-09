@@ -71,11 +71,8 @@ int main(int argc, char * argv[])
   }
 
   C.mean_time(true) ;
-  printf("A\n") ; fflush(stdout)  ; 
   D.reopen(P.atmdump) ;
-  printf("B\n") ; fflush(stdout)  ;
   if (P.hascf) D.reopencf(P.cfdump) ;
-  printf("C\n") ; fflush(stdout)  ;
 
   C.cT=-1 ;
   for (int i=0 ; i<P.skipT; i++)
@@ -390,7 +387,7 @@ int Datafile::do_post_cf()
  }
 
  int k=0 ;
- for (int j=0, k=0 ; j<Ncf ; j++)
+ for (int j=0 ; j<Ncf ; j++)
  {
 
 
@@ -439,7 +436,7 @@ int Datafile::do_post_cf()
                   datacf[2+i][k]-=delta[i]/2. ;
 
              }
-	   corrected=true ;
+           corrected=true ;
            }
          }
        }
@@ -465,7 +462,7 @@ int Datafile::do_post_cf()
 
      k++ ;
  }
- //printf("-%d per contacts /%d | ", Ncf-k, Ncf) ;
+ printf("-%d per contacts /%d | ", Ncf-k, Ncf) ;
  Ncf=k ;
 return 0 ;
 }
