@@ -1,5 +1,5 @@
 #include "IOLiggghts.h"
-
+#include<unistd.h>
 //=======================================================
 int main(int argc, char * argv[])
 {
@@ -71,10 +71,11 @@ int main(int argc, char * argv[])
   }
 
   C.mean_time(true) ;
-  D.close() ;
-  if (P.hascf) D.closecf() ;
-  D.open(P.atmdump) ;
-  if (P.hascf) D.opencf(P.cfdump) ;
+  printf("A\n") ; fflush(stdout)  ; 
+  D.reopen(P.atmdump) ;
+  printf("B\n") ; fflush(stdout)  ;
+  if (P.hascf) D.reopencf(P.cfdump) ;
+  printf("C\n") ; fflush(stdout)  ;
 
   C.cT=-1 ;
   for (int i=0 ; i<P.skipT; i++)
@@ -130,6 +131,17 @@ filt_in.push(*file_in);
 in=new istream (&(filt_in)) ;
 return 0 ;
 }
+int Datafile::reopen(string path)
+{
+file_in->close() ; file_in=nullptr;
+file_in= new ifstream(path, ios_base::in | ios_base::binary);
+if (!file_in->is_open()) {printf("ERR: cannot open file %s\n", path.c_str()) ; return 1;}
+if (path.find(".gz")!=string::npos)
+  filt_in2.push(boost::iostreams::gzip_decompressor()) ;
+filt_in2.push(*file_in);
+in=new istream (&(filt_in2)) ;
+return 0 ;
+}
 int Datafile::opencf(string path)
 {
 file_incf= new ifstream(path, ios_base::in | ios_base::binary);
@@ -140,23 +152,16 @@ filt_incf.push(*file_incf);
 incf=new istream (&(filt_incf)) ;
 return 0 ;
 }
-int Datafile::close()
+int Datafile::reopencf(string path)
 {
-  file_in->close() ;
-  delete(file_in) ;
-  filt_in.reset() ;
-  delete(in) ;
-  in=file_in=nullptr;
-  return 0 ;
-}
-int Datafile::closecf()
-{
-  file_incf->close() ;
-  delete(file_incf) ;
-  filt_incf.reset() ;
-  delete(incf);
-  incf=file_incf=nullptr ;
-  return 0 ;
+file_incf->close() ; file_incf=nullptr ;
+file_incf= new ifstream(path, ios_base::in | ios_base::binary);
+if (!file_incf->is_open()) {printf("ERR: cannot open file %s\n", path.c_str()) ; return 1;}
+if (path.find(".gz")!=string::npos)
+  filt_incf2.push(boost::iostreams::gzip_decompressor()) ;
+filt_incf2.push(*file_incf);
+incf=new istream (&(filt_incf2)) ;
+return 0 ;
 }
 //-----------------------------------------------------------
 vector<vector<double>> Datafile::get_bounds()

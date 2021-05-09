@@ -39,9 +39,9 @@ public:
 
     // Functions
     int open(string path) ;
+    int reopen(string path) ;
     int opencf(string path) ;
-    int close() ;
-    int closecf() ;
+    int reopencf(string path) ;
     int read_full_ts(bool keep) ;
     int set_data(struct Data & D, std::map<string,size_t> extrafieldmap) ;
     vector<vector<double>> get_bounds () ;
@@ -57,7 +57,9 @@ private:
     int do_post_atm() ;
     int do_post_cf() ;
     boost::iostreams::filtering_streambuf<boost::iostreams::input> filt_in;
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> filt_in2;
     boost::iostreams::filtering_streambuf<boost::iostreams::input> filt_incf;
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> filt_incf2;
     ifstream * file_in = nullptr , *file_incf = nullptr  ;
 } ;
 

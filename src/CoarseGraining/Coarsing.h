@@ -184,6 +184,7 @@ public :
     v1d interpolate_rot(int id, bool usetimeavg=false) { return interpolate_rot_nearest (id, usetimeavg) ; } ///< Interpolate the angular velocity \todo Use something better to interpolate velocity than the nearest neighbor interpolation.
     v1d interpolate_vel_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the velocity
     v1d interpolate_rot_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the angular velocity
+    v1d interpolate_vel_trilinear (int id, bool usetimeavg) ; ///< Tri-linear interpolation (only implemented in 3D, probably not too hard to implement in ND but annoying ...)
 
     int idx_FastFirst2SlowFirst (int n) ; ///< Change array traversing order
 

@@ -1,43 +1,5 @@
 #include "Coarsing.h"
 
-
-// int main ()
-// {
-//  v2d b ; b.resize(2,std::vector <double> (3,0)) ;
-//  b[1][0]=b[1][1]=b[1][2]=1 ;
-//  v1i n ; n.push_back(3) ; n.push_back(4) ; n.push_back(5) ;
-//  Coarsing C(3, n, b, 0.05, 100) ;
-//
-//  C.data.random_test(20,30,3,C.box) ;
-//
-//  C.flags=0 ;
-//  for (int i=0 ; i<C.FIELDS.size() ; i++)
-//      C.flags = (C.flags | C.FIELDS[i].flag)  ;
-//
-//  printf("%X\n", C.flags) ; fflush(stdout) ;
-//
-//  C.grid_setfields() ;
-//  C.pass_1() ;
-//  C.compute_fluc_vel() ;
-//  C.compute_fluc_rot() ;
-//  C.pass_2() ;
-//  C.pass_3() ;
-//  C.write_vtk("Test") ;
-//
-//  //std::exit(0) ;
-//  /*for (int i=0 ; i<C.Npt ; i++)
-//  {
-//      printf("%d %g %g %g %g\n", i, C.CGP[i].location[0], C.CGP[i].location[1], C.CGP[i].location[2], C.CGP[i].location[3]) ;
-//      for (int j=0 ; j<C.CGP[i].neighbors.size() ; j++)
-//          printf("%d ", C.CGP[i].neighbors[j]) ;
-//      printf("\n") ;
-//  }*/
-//
-//
-// }
-
-
-
 //========================================================
 int Coarsing::set_field_struct()
 {
@@ -335,14 +297,16 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
 
   int idvel=get_id("VAVG") ;
   if (idvel<0) {printf("WARN: cannot perform fluctuation velocity without VAVG set\n") ; }
-
   for (int i=0 ; i<data.N ; i++)
   {
     if (isnan(data.pos[0][i])) continue ;
-    vavg=interpolate_vel (i, usetimeavg) ;
+    auto vavg2 = interpolate_vel (i, usetimeavg) ;
+    vavg = interpolate_vel_trilinear(i,usetimeavg) ; 
+    //printf("%g %g | %g %g | %g %g\n", vavg[0], vavg2[0], vavg[1], vavg2[1], vavg[2], vavg2[2]) ; 
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;
   }
+  
   hasvelfluct = true ;
   return 0 ;
 }
@@ -393,8 +357,93 @@ v1d Coarsing::interpolate_rot_nearest (int id, bool usetimeavg)
       res.push_back(CGP[idcg].fields[cT][idrot+i]) ;
   }
   return res ;
- }
+}
+//--------
+v1d Coarsing::interpolate_vel_trilinear (int id, bool usetimeavg)
+{
+assert(d==3) ; 
+int pts[8][3] ;
+double Qs[4*3]={0,0,0,0,0,0,0,0,0,0,0,0} ; 
+double x; 
+    
+const static int idvel=get_id("VAVG") ;
+  
+auto clip = [&](int a, int maxd){if (a<0) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (a) ; } ; 
+  
+x=clip(floor((data.pos[0][id]-CGP[0].location[0])/dx[0]), npt[0]) ;
+for (int i=0 ; i<4 ; i++) pts[i][0]=x; 
+x=clip(ceil((data.pos[0][id]-CGP[0].location[0])/dx[0]), npt[0]) ;
+for (int i=4 ; i<8 ; i++) pts[i][0]=x; 
+x=clip(floor((data.pos[1][id]-CGP[0].location[1])/dx[1]), npt[1]) ;
+pts[0][1]=pts[1][1]=pts[4][1]=pts[5][1]=x; 
+x=clip(ceil((data.pos[1][id]-CGP[0].location[1])/dx[1]), npt[1]) ;
+pts[2][1]=pts[3][1]=pts[6][1]=pts[7][1]=x; 
+x=clip(floor((data.pos[2][id]-CGP[0].location[2])/dx[2]), npt[2]) ;
+for (int i=0 ; i<8 ; i+=2) pts[i][2]=x; 
+x=clip(ceil((data.pos[2][id]-CGP[0].location[2])/dx[2]), npt[2]) ;
+for (int i=1 ; i<8 ; i+=2) pts[i][2]=x; 
 
+
+for (int i=0; i<8 ; i++) pts[i][0] = (nptcum[0]*pts[i][0]+nptcum[1]*pts[i][1]+nptcum[2]*pts[i][2]) ; // Variable reuse ... ...
+//printf("| %d %d %d %d %d {%d} %d %d %g |", pts[0][0], pts[1][0], pts[2][0], pts[3][0], pts[4][0], pts[5][0], pts[6][0], pts[7][0], (*CGPtemp)[pts[5][0]].fields[0][idvel]) ; fflush(stdout) ; 
+
+for (int i=0; i<8 ; i++)
+    for (int j=0 ; j<3 ; j++)
+        Qs[j*4] += 1/8. * ((*CGPtemp)[pts[i][0]].fields[0][idvel+j]) ; 
+//printf("%g %g %g|", Qs[0], Qs[4], Qs[8]) ; 
+for (int i=0; i<4 ; i++)
+  if (pts[0+i][0]!=pts[4+i][0])
+      for (int j=0; j<3 ; j++)
+      {
+       if (usetimeavg)
+       {
+        Qs[i+4*j] = ( data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * (*CGPtemp)[pts[0+i][0]].fields[0][idvel+j]
+                   +(-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * (*CGPtemp)[pts[4+i][0]].fields[0][idvel+j] ;
+                   
+        if ((data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) <0 || (-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0])<0)
+        {
+         printf("XXX %g %g %g %d %d\n", data.pos[0][id], CGP[pts[0+i][0]].location[0], CGP[pts[4+i][0]].location[0], pts[0+i][0], pts[4+i][0]) ; 
+        }
+   
+       }
+       else
+        Qs[i+4*j] = ( data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * CGP[pts[0+i][0]].fields[cT][idvel+j]
+                   +(-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * CGP[pts[4+i][0]].fields[cT][idvel+j] ; 
+      }
+  else
+      for (int j=0; j<3 ; j++)
+        Qs[i+4*j] = CGP[pts[0+i][0]].fields[cT][idvel+j] ; 
+
+for (int i=0; i<4 ; i+=2)
+  if (pts[0+i][0]!=pts[1+i][0])
+      for (int j=0; j<3 ; j++)
+      {
+        Qs[i/2+4*j] = ( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[0+i+4*j]
+                     +(-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[1+i+4*j]; 
+      
+        if (( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) <0 ||
+            (-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2])<0)
+        {
+         printf("ZZZ %g %g %g %d %d\n", data.pos[2][id], CGP[pts[0+i][0]].location[2], CGP[pts[1+i][0]].location[2], pts[1+i][0], pts[0+i][0]) ; 
+        }
+      }
+  else
+      for (int j=0; j<3 ; j++)
+        Qs[i/2+4*j] = Qs[0+i+4*j] ; 
+
+if (pts[0][0]!=pts[2][0])
+    for (int j=0; j<3 ; j++)
+    {
+        Qs[4*j] = ( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1]) * Qs[0+4*j]
+                 +(-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1]) * Qs[1+4*j];
+                 
+        if (( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<0 || (-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<0)
+         printf("YY %g %g %g %d %d\n", data.pos[1][id], CGP[pts[0][0]].location[1], CGP[pts[2][0]].location[1], pts[2][0], pts[0][0]) ; 
+    }
+//else nothing to do, the value are already at the right location ...        
+vector<double> res = {Qs[0], Qs[4], Qs[8]} ;
+return (res);
+}
 
 //================================= BEGINNING OF THE INTERESTING PART ================================
 //================ PASS 1 : "RHO", "VAVG", "ROT", "EKT", "EKR"==============================
