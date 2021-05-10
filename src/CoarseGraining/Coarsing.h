@@ -85,7 +85,7 @@ struct Field {
 struct Data {
 public:
     Data () : mass(NULL), Imom(NULL), id1(NULL), id2(NULL) {}
-int N ; ///< Number of particles
+int N = 0 ; ///< Number of particles
 double * radius; ///<Particle radius
 double * mass ; ///< Particle masses
 double *Imom ; ///< Particle moment of inertia

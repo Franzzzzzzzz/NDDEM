@@ -177,8 +177,6 @@ void Param::from_json(json &j)
           extrafields[i].type=FieldType::Fluctuation ;
         else
           printf("ERR: unknown extrafields type\n") ;
-
-        printf("Again %d\n", extrafields[i].type) ; fflush(stdout) ;
       }
     }
 

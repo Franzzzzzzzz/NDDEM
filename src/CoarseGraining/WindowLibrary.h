@@ -64,31 +64,9 @@ public :
       //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
       return (make_pair(window_avg(first,cur),res)) ;
     }
-    
     double distance (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ; }
-    /*std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
-    {
-      double res = 0 ; 
-      double prev, cur, first ; 
-      v1d lpq = loc2 ; for (int i=0 ; i<d ;i++) lpq[i] -= loc1[i] ; 
-      double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
-      
-      first=prev=Lucy(LibLucy3D::distance(idboth,loc1)) ;
-      for (int i=0 ; i<5 ; i++)
-      {
-        for (int j=0; j<d ; j++)
-            loc1[j] += (1./Nsteps) * lpq[j] ; 
-        cur=Lucy(LibLucy3D::distance(idboth,loc1)) ; 
-        res += (cur+prev)/2.*length ; 
-        prev=cur ; 
-      }
-      //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
-      return (make_pair(window_avg(first,cur),res)) ;  
-    }*/
+    void set_integrationsteps (int steps) {if (steps<1) printf("Less than 1 step is not meaningful.") ; if (steps>1000) printf("You've chosen a very large number of integration steps, you may want to reconsider") ; Nsteps=steps ; }
 private:
-    /*bool toggle = false ; 
-    v1d loc1, loc2 ; 
-    int idboth ;*/
     int Nsteps = 10 ; 
 };
 
@@ -137,12 +115,58 @@ public:
     }
     double cutoff (void) {
         double maxr=0 ;
+        if (data->N==0) return 2*w ; 
         for (int i=0 ; i<data -> N ; i++)
             if (maxr<data->radius[i])
                 maxr=data->radius[i] ;
         return maxr+w ;
     }
     double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
+    double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
+    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc) 
+    {
+        double rp=LibBase::distance(p, loc) ;
+        double rq=LibBase::distance(q, loc) ;
+        double wpqs = window_avg (rp, rq) ;
+        double wpqf = 0 ;
+        
+        v1d locp (d,0) ;
+        v1d lpq(d,0) ; 
+        double normp=0, normlpq=0 ; 
+        double b = 0 ; 
+        for (int i=0 ; i<d ;i++) 
+        {
+          lpq[i] = data->pos[i][q] - data->pos[i][p] ;
+          locp[i] = data->pos[i][p]-loc[i] ;
+          normp += locp[i]*locp[i] ; 
+          normlpq += lpq[i]*lpq[i] ;
+          b += locp[i]*lpq[i] ; 
+        } 
+        b*=2 ;
+        
+        double Delta = b*b-4*normlpq*(normp-w*w) ; 
+        if (Delta<=0) 
+            wpqs = 0 ; 
+        else
+        {
+            double alpha1 = (-b - sqrt(Delta))/(2*normlpq) ; 
+            double alpha2 = (-b + sqrt(Delta))/(2*normlpq) ;
+            
+            if (alpha1<0 && alpha2>0 && alpha2<1)
+                wpqf = cst * alpha2 ; 
+            else if (alpha1<0 && alpha2>1)
+                wpqf = cst ; 
+            else if (alpha1>0 && alpha1<1 && alpha2>1)
+                wpqf = cst * (1-alpha1) ; 
+            else if (alpha1>0 && alpha1<1 && alpha2>0 && alpha2<1) //this is a VERY small window ... ...
+                wpqf = cst*(alpha2-alpha1) ;
+            else 
+                wpqf = 0 ;
+            
+        }
+        return (make_pair(wpqs,wpqf)) ;
+    }
+    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
 };
 //---------------------
 class LibHann3D : public LibBase {
