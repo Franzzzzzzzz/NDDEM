@@ -1,8 +1,8 @@
 link_directories(${CMAKE_BINARY_DIR}/NrrdIO-1.11.0-src)
 add_executable(CoarseGraining IONDDEM.cpp Coarsing.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp)
 set_property(TARGET CoarseGraining PROPERTY CXX_STANDARD 17)
-target_compile_options(CoarseGraining PUBLIC -g -DNRRDIO ${Matlab_Macro})
-target_link_libraries(CoarseGraining PUBLIC -g -lz -lm -lNrrdIO -lstdc++fs)
+target_compile_options(CoarseGraining PUBLIC -O3 -g -DNRRDIO ${Matlab_Macro})
+target_link_libraries(CoarseGraining PUBLIC -O3 -g -lz -lm -lNrrdIO -lstdc++fs)
 
 add_executable(CoarseGraining_Liggghts EXCLUDE_FROM_ALL IOLiggghts.cpp Coarsing.cpp zlib.cpp gzip.cpp)
 set_property(TARGET CoarseGraining_Liggghts PROPERTY CXX_STANDARD 17)

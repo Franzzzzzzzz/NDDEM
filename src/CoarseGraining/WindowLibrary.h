@@ -31,15 +31,42 @@ public :
     LibLucy3D() {} ; 
     double Lucy (double r) {static double cst=105./(16*M_PI*w*w*w) ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
     double window(double r) {return (Lucy(r)) ;}
-    double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
-    double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
+    //double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
+    //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
 };
 //--------------------
 class LibLucy3DFancyInt : public LibLucy3D {
 public :
     LibLucy3DFancyInt(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-    double distance (int id, v1d loc) {if (toggle) loc2=loc ; else loc1=loc ; idboth = id ; toggle=!toggle ; return(LibLucy3D::distance(id,loc)) ;} 
-    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
+    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc) 
+    {
+      double res = 0 ; 
+      double prev, cur, first ; 
+      v1d locp (d,0) ;
+      v1d lpq(d,0) ; 
+      for (int i=0 ; i<d ;i++) 
+      {
+        lpq[i] = data->pos[i][q] - data->pos[i][p] ;
+        locp[i] = data->pos[i][p] ; 
+      }
+        
+      double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
+      
+      first=prev=Lucy(LibLucy3D::distance(p,locp)) ;
+      for (int i=0 ; i<Nsteps ; i++)
+      {
+        for (int j=0; j<d ; j++)
+            locp[j] += (1./Nsteps) * lpq[j] ; 
+        cur=Lucy(distance(locp,loc)) ; 
+        res += (cur+prev)/2.*length ; 
+        prev=cur ; 
+      }
+      //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
+      return (make_pair(window_avg(first,cur),res)) ;
+    }
+    
+    double distance (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ; }
+    /*std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
     {
       double res = 0 ; 
       double prev, cur, first ; 
@@ -57,11 +84,11 @@ public :
       }
       //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
       return (make_pair(window_avg(first,cur),res)) ;  
-    }
+    }*/
 private:
-    bool toggle = false ; 
+    /*bool toggle = false ; 
     v1d loc1, loc2 ; 
-    int idboth ;
+    int idboth ;*/
     int Nsteps = 10 ; 
 };
 
