@@ -985,11 +985,11 @@ int Coarsing::write_matlab (string path, bool squeeze)
                           outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
             break ;
       case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
+              outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d*d ; j++)
                           outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
-              outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
             break ;
       default: printf("ERR: this should never happen. \n") ;
     }

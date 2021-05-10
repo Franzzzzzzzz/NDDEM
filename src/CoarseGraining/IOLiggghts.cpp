@@ -110,7 +110,7 @@ int main(int argc, char * argv[])
 
   if (std::find(P.saveformat.begin(), P.saveformat.end(), "netCDF")!=P.saveformat.end())   C.write_netCDF(P.save) ;
   if (std::find(P.saveformat.begin(), P.saveformat.end(), "vtk")!=P.saveformat.end()) C.write_vtk (P.save) ;
-  if (std::find(P.saveformat.begin(), P.saveformat.end(), "mat")!=P.saveformat.end()) C.write_matlab(P.save) ;
+  if (std::find(P.saveformat.begin(), P.saveformat.end(), "mat")!=P.saveformat.end()) C.write_matlab(P.save, true) ;
   ///else printf("Unknown writing format, unfortunately.\n") ;
 
   printf("\n") ;
