@@ -1003,6 +1003,20 @@ int Coarsing::write_matlab (string path, bool squeeze)
     matPutVariable(pmat, Fname[f].c_str(), pm);
     mxFree(outdata) ;
   }
+  
+  // Let's put the location array there as well
+  dimensions[0]=d ; dimensions[1] = 1 ; dimensions.pop_back() ; 
+  auto tmpdim = dimensions ; 
+  if (squeeze) tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
+  mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
+  outdata=(double *) mxMalloc(sizeof(double) * d * Npt) ;
+  for (int i=0 ; i<Npt ; i++)
+    for (int j=0 ; j<d ; j++)
+      outdata[i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].location[j];
+  mxSetData (pm, outdata) ;
+  matPutVariable(pmat, "GridLocation", pm);
+  mxFree(outdata) ;
+  
   matClose(pmat) ;
 #else
   printf("Matlab writing not implemented") ;
