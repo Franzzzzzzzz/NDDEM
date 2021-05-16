@@ -36,6 +36,7 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include <boost/math/special_functions/factorials.hpp>
+#include <boost/crc.hpp>
 #include <map>
 
 #ifdef NETCDF
@@ -75,7 +76,7 @@ public :
 //-------------------------
 /// Contains Field informations
 struct Field {
- int flag ; ///< Flag for the given field
+ uint64_t flag ; ///< Flag for the given field
  string name ; ///< Name for the given field
  TensorOrder type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR
  FieldType ftype ;
@@ -199,6 +200,7 @@ public :
     int pass_1 () ; ///< Coarse-grain anything based on particles (not contacts) which does not need fluctuating quantities
     int pass_2 (bool usetimeavg=false) ; ///< Coarse-grain anything based on particles (not contacts) which needs fluctuating quantities (call the compute_fluc_ functions before)
     int pass_3 () ; ///< Coarse-grain anything based on contact informations.
+    int pass_4 () ;
     int compute_fluc_vel (bool usetimeavg=false) ; ///< Velocity fluctuation computation
     int compute_fluc_rot (bool usetimeavg=false) ; ///< Angular velocity fluctuation computation
     bool hasvelfluct=false, hasrotfluct=false ;
@@ -213,6 +215,9 @@ public :
     int write_netCDF (string sout) ; ///< \deprecated Write CG data as netCDF
     int write_NrrdIO (string path) ; ///< Write CG data as NrrdIO file format
     int write_matlab (string path, bool squeeze = false) ; ///< Write CG data as Matlab file
+    int write_numpy (string path, bool squeeze = false) ; ///< Write CG data as numpy files (.npy) ;
+    int write_numpy_npy (string path, bool squeeze) ;
+    std::pair<size_t, uint8_t*> write_numpy_buffer (int id, bool squeeze) ;
 } ;
 
 

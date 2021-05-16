@@ -9,31 +9,43 @@ int Coarsing::set_field_struct()
  * idx 0x02hhhhhhhh are fluctuation base (pass 2) user defined fields
  * idx 0x04hhhhhhhh are contact base (pass 3) user defined fields
  */
-FIELDS.push_back({0x000001, "RHO"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 36 Density
-FIELDS.push_back({0x000002, "I"    , TensorOrder::SCALAR, FieldType::Defined});    //Eq 65 Moment of Inertia
-FIELDS.push_back({0x000004, "VAVG" , TensorOrder::VECTOR, FieldType::Defined});    //Eq 38 Average Velocity
-FIELDS.push_back({0x000008, "TC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 63 Contact stress
-FIELDS.push_back({0x000010, "TK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 62 Kinetic stress
-FIELDS.push_back({0x000020, "ROT"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 64 Internal spin density
-FIELDS.push_back({0x000040, "MC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 67 Contact couple stress tensor
-FIELDS.push_back({0x000080, "MK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 66 Kinetic couple stress tensor
-FIELDS.push_back({0x000100, "mC"   , TensorOrder::VECTOR, FieldType::Defined});    //Eq 68 spin supply from contacts
-FIELDS.push_back({0x000200, "EKT"  , TensorOrder::SCALAR, FieldType::Defined});    // VAVG^2/2 Kinetic energy density of average velocity
-FIELDS.push_back({0x000400, "eKT"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 69 Kinetic energy density of fluctuating motion
-FIELDS.push_back({0x000800, "EKR"  , TensorOrder::SCALAR, FieldType::Defined});    // (W.K.W)/2, kin energy of avg rotational motion, W angular velocity vector, K moment of inertia tensor
-FIELDS.push_back({0x001000, "eKR"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 70 Kin energy of fluctuating rotational motion
-FIELDS.push_back({0x002000, "qTC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 72
-FIELDS.push_back({0x004000, "qTK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 71
-FIELDS.push_back({0x008000, "qRC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 74
-FIELDS.push_back({0x010000, "qRK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 73
-FIELDS.push_back({0x020000, "zT"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 75
-FIELDS.push_back({0x040000, "zR"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 76
+FIELDS.push_back({1, "RHO"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 36 Density
+FIELDS.push_back({FIELDS.back().flag<<1, "I"    , TensorOrder::SCALAR, FieldType::Defined});    //Eq 65 Moment of Inertia
+FIELDS.push_back({FIELDS.back().flag<<1, "VAVG" , TensorOrder::VECTOR, FieldType::Defined});    //Eq 38 Average Velocity
+FIELDS.push_back({FIELDS.back().flag<<1, "TC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 63 Contact stress
+FIELDS.push_back({FIELDS.back().flag<<1, "TK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 62 Kinetic stress
+FIELDS.push_back({FIELDS.back().flag<<1, "ROT"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 64 Internal spin density
+FIELDS.push_back({FIELDS.back().flag<<1, "MC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 67 Contact couple stress tensor
+FIELDS.push_back({FIELDS.back().flag<<1, "MK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 66 Kinetic couple stress tensor
+FIELDS.push_back({FIELDS.back().flag<<1, "mC"   , TensorOrder::VECTOR, FieldType::Defined});    //Eq 68 spin supply from contacts
+FIELDS.push_back({FIELDS.back().flag<<1, "EKT"  , TensorOrder::SCALAR, FieldType::Defined});    // VAVG^2/2 Kinetic energy density of average velocity
+FIELDS.push_back({FIELDS.back().flag<<1, "eKT"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 69 Kinetic energy density of fluctuating motion
+FIELDS.push_back({FIELDS.back().flag<<1, "EKR"  , TensorOrder::SCALAR, FieldType::Defined});    // (W.K.W)/2, kin energy of avg rotational motion, W angular velocity vector, K moment of inertia tensor
+FIELDS.push_back({FIELDS.back().flag<<1, "eKR"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 70 Kin energy of fluctuating rotational motion
+FIELDS.push_back({FIELDS.back().flag<<1, "qTC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 72
+FIELDS.push_back({FIELDS.back().flag<<1, "qTK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 71
+FIELDS.push_back({FIELDS.back().flag<<1, "qRC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 74
+FIELDS.push_back({FIELDS.back().flag<<1, "qRK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 73
+FIELDS.push_back({FIELDS.back().flag<<1, "zT"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 75
+FIELDS.push_back({FIELDS.back().flag<<1, "zR"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 76
+
+// Post processing fields
+FIELDS.push_back({FIELDS.back().flag<<1, "TotalStress" ,     TensorOrder::TENSOR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "Pressure" ,        TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "KineticPressure" , TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "ShearStress" ,     TensorOrder::SCALAR, FieldType::Defined});
+
+FIELDS.push_back({FIELDS.back().flag<<1, "StrainRate",           TensorOrder::TENSOR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::SCALAR, FieldType::Defined});
+
 return 0 ;
 }
 //----------------------------------------------------------
 int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 {
-  int tmp = FIELDS.back().flag<<1 ;
+  uint64_t tmp = FIELDS.back().flag<<1 ;
   if (order!=TensorOrder::SCALAR || type !=FieldType::Particle)
     printf("WARN only TensorOrder::SCALAR and FieldType::Particle is currently supported for coarse-graining\n") ;
   FIELDS.push_back({tmp, name, order, type});
@@ -82,6 +94,10 @@ int Coarsing::grid_generate()
         location[i]=box[0][i]+dx[i]/2. ;
         //printf("%g %g %g|", box[0][i], box[1][i], dx[i]) ;
     }
+    
+    /*for (auto v : nptcum)
+        printf("-%d-", v) ; 
+    printf("\n") ; fflush(stdout) ; */
     for (i=0,check=0 ; i<Npt ; i++)
     {
         CGP.push_back(CGPoint(d, location)) ; check++ ;
@@ -707,6 +723,118 @@ for (i=0 ; i<Npt ; i++)
 return 0 ;
 }
 
+//======================== PASS 4: post-processing of some fields ==================
+int Coarsing::pass_4()
+{
+bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true; 
+    
+int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
+int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
+int Pkid=get_id("KineticPressure") ; if (Pkid<0) doPk=false ;
+int Tauid=get_id("ShearStress") ;    if (Tauid<0) doTau=false ;
+int TCid=get_id("TC") ; int TKid=get_id("TK") ;
+
+int Gamdotid=get_id("StrainRate") ;            if (Gamdotid<0) doGamdot=false ;
+int Gamvdotid=get_id("VolumetricStrainRate") ; if (Gamvdotid<0) doGamvdot=false ;
+int Gamtauid=get_id("ShearStrainRate") ;       if (Gamtauid<0) doGamtau=false ;
+int Omegaid=get_id("RotationalVelocity") ;     if (Omegaid<0) doOmega=false ;
+int VAVGid=get_id("VAVG") ;
+vector <double> gradient ; 
+if (doGamdot || doGamvdot || doGamtau || doOmega) gradient.resize(d*d,0) ; 
+if ((doGamdot || doGamvdot || doGamtau || doOmega) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }
+
+printf(" -> Pass 4 ") ; fflush(stdout) ;
+
+for (int i=0 ; i< Npt ; i++)
+{
+    if (doSig) 
+        for (int dd=0 ; dd<d*d ; dd++) 
+            CGP[i].fields[cT][Sigid+dd] = CGP[i].fields[cT][TCid+dd] + CGP[i].fields[cT][TKid+dd] ;
+    if (doP)
+    {
+        CGP[i].fields[cT][Pid] = 0 ; 
+        for (int dd=0 ; dd<d ; dd++) 
+            CGP[i].fields[cT][Pid] += (CGP[i].fields[cT][TCid+dd*d+dd] + CGP[i].fields[cT][TKid+dd*d+dd]) ; 
+        CGP[i].fields[cT][Pid] *= (1./d) ;
+    }
+    if (doPk)
+    {
+        CGP[i].fields[cT][Pkid] = 0 ; 
+        for (int dd=0 ; dd<d ; dd++) 
+            CGP[i].fields[cT][Pkid] += CGP[i].fields[cT][TKid+dd*d+dd] ; 
+        CGP[i].fields[cT][Pkid] *= (1./d) ;
+                                        
+    }
+    if (doTau)
+    {
+        double pressure = 0 ; 
+        for (int dd=0 ; dd<d ; dd++) 
+            pressure += (CGP[i].fields[cT][TCid+dd*d+dd] + CGP[i].fields[cT][TKid+dd*d+dd]) ; 
+        pressure *= (1./d) ;
+    
+        CGP[i].fields[cT][Tauid] = 0 ;
+        for (int j=0 ; j<d*d ; j++)
+            CGP[i].fields[cT][Tauid] = (CGP[i].fields[cT][TCid+j] + CGP[i].fields[cT][TKid+j] - ((j/d==j%d)?1:0)*pressure)*(CGP[i].fields[cT][TCid+j] + CGP[i].fields[cT][TKid+j] - ((j/d==j%d)?1:0)*pressure) ; 
+        CGP[i].fields[cT][Tauid]=sqrt(CGP[i].fields[cT][Tauid]) ; 
+    }
+    
+    if (doGamdot || doGamvdot || doGamtau || doOmega)
+    {
+     vector <double> gradient (d*d,0) ; 
+     for (int k=0 ; k<d ; k++)
+         for (int l=0 ; l<d ; l++)
+         {
+          if (npt[l]==1) // Cannot compute gradient with a single cell
+              gradient[k*d+l] = 0 ; 
+          else if ((i/nptcum[l]) % npt[l] == 0 ) //forward difference
+              gradient[k*d+l] = (CGP[i+nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ; 
+          else if ((i/nptcum[l]) % npt[l] == (npt[l]-1)) //central difference
+              gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ; 
+          else // backward difference
+              gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i+nptcum[l]].fields[cT][VAVGid+k])/(2*dx[l]) ; 
+         }
+     for (int k=0 ; k<d ; k++)
+         for (int l=0 ; l<d ; l++)
+             if (l!=k)
+             {
+                gradient[k*d+l] = 0.5*(gradient[k*d+l] + gradient[l*d+k]);
+                gradient[l*d+k] = gradient[k*d+l] ; 
+             }
+    
+     if (doGamdot)
+        for (int dd=0 ; dd<d*d ; dd++) 
+             CGP[i].fields[cT][Gamdotid+dd] = gradient[dd] ; 
+     
+     if (doGamvdot)
+     {
+        CGP[i].fields[cT][Gamvdotid] = 0;
+        for (int dd=0 ; dd<d ; dd++) 
+            CGP[i].fields[cT][Gamvdotid] += gradient[dd*d+dd] ;  
+        CGP[i].fields[cT][Gamvdotid] *= (1./d) ; 
+     }
+     
+     if (doGamtau)
+     {
+        double volumetric = 0;
+        for (int dd=0 ; dd<d ; dd++) 
+            volumetric += gradient[dd*d+dd] ;  
+        volumetric *= (1./d) ; 
+        
+        CGP[i].fields[cT][Gamtauid] = 0 ; 
+        for (int dd=0 ; dd<d*d ; dd++) 
+            CGP[i].fields[cT][Gamtauid] = (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ; 
+        CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ; 
+     }
+    
+        
+    }
+    
+}
+    
+    
+return 0 ;
+}
+
 //=================================================================
 // Data conversion tools
 int Data::random_test (int NN, int NNcf, int d, v2d box )
@@ -900,7 +1028,7 @@ int Coarsing::mean_time(bool temporary)
   if (!temporary) Time=1 ;
   return 0 ;
 }
-//--------------------------------------------
+//=================================== Writing functions ========================
 int Coarsing::write_vtk(string sout)
 {
   FILE *out ;
@@ -955,7 +1083,7 @@ return 0 ;
 int Coarsing::write_matlab (string path, bool squeeze)
 {
 #ifdef MATLAB
-  double * outdata ;
+  double * outdata = nullptr ;
   MATFile *pmat;
   pmat = matOpen((path+".mat").c_str(), "w");
 
@@ -1023,6 +1151,186 @@ int Coarsing::write_matlab (string path, bool squeeze)
 #endif
 return 0 ;
 }
+//----------------------------------------------------
+int Coarsing::write_numpy (string path, bool squeeze)
+{
+  auto outpath = path + ".npz" ; 
+  FILE * out = fopen(outpath.c_str(), "wb") ;
+  if (out ==nullptr) 
+  {
+    printf("ERR: cannot create file %s.\n", outpath.c_str()) ; 
+    std::exit(1) ; 
+  }
+  auto write_short = [&](uint16_t a) { fwrite (&a, 2, 1, out) ; } ;
+  auto write_int = [&](uint32_t a) { fwrite (&a, 4, 1, out) ; } ;
+  auto write_long = [&](uint64_t a) { fwrite (&a, 8, 1, out) ; } ;
+  auto getcrc = [&] (uint8_t * buf, int len) { boost::crc_32_type result; result.process_bytes(buf, len); return result.checksum();} ;
+  uint8_t *centraldir=nullptr, *centraldirbeg=nullptr ;  
+  
+  uint16_t nfiles = 0 ; 
+  for (size_t f=0 ; f<Fidx.size() ; f++)
+  {
+    if (Fidx[f]<0) continue ;
+    nfiles++ ; 
+    
+    uint32_t offset = ftell(out) ; 
+    fwrite ("\x50\x4b\x03\x04", 1, 4, out) ;
+    write_short(20) ;
+    write_short(0) ; // Flags
+    write_short(0) ; // No compression
+    write_short(0) ;
+    write_short(0) ;
+  
+    auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ; 
+    auto crc = getcrc(outarray, numbytes) ; 
+    write_int(crc) ; //CRC
+    write_int(numbytes) ; 
+    write_int(numbytes) ;
+    write_short(Fname[f].length() + 4) ;
+    write_short(20) ;
+    fwrite (Fname[f].data(), 1, Fname[f].length(), out) ; 
+    fwrite (".npy", 1, 4, out);
+  
+    // Not too sure why we need the extended field but ok ...
+    write_short(1) ;
+    write_short(16) ;
+    write_long(numbytes) ;
+    write_long(numbytes) ;
+   
+    fwrite (outarray, 1, numbytes, out) ; 
+    free(outarray) ;
+    
+    // Preparing the central directory
+    if (centraldir == nullptr)
+    {
+        centraldir = static_cast<uint8_t*> (malloc(46+Fname[f].length()+4)) ; 
+        centraldirbeg = centraldir ;
+    }
+    else
+    {
+        int off = centraldir-centraldirbeg ; 
+        centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+Fname[f].length()+4)); 
+        centraldir = centraldirbeg + off ; 
+    }
+    memcpy(centraldir, "\x50\x4b\x01\x02", 4) ; centraldir+=4 ; 
+    *centraldir = 0x14 ; centraldir++ ; 
+    *centraldir = 0x03 ; centraldir++ ; 
+    *centraldir = 0x14 ; centraldir++ ; 
+    *centraldir = 0x00 ; centraldir++ ; 
+    uint64_t tmpl = 0 ; 
+    memcpy(centraldir, &tmpl, 8) ; centraldir +=8 ; 
+    memcpy(centraldir, &crc, 4) ; centraldir +=4 ; //CRC TODO
+    memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
+    memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
+    uint16_t tmps = Fname[f].length() + 4 ; 
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    tmps=0 ; 
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    *centraldir = 0x80 ; centraldir ++ ;
+    *centraldir = 0x01 ; centraldir ++ ;
+    
+    memcpy(centraldir, &offset, 4) ; centraldir +=4 ; // OFFSET
+    memcpy(centraldir, Fname[f].data(), Fname[f].length()) ; centraldir += Fname[f].length() ; 
+    memcpy(centraldir, ".npy", 4) ; centraldir += 4 ; 
+  }
+  
+  int off = centraldir-centraldirbeg ; 
+  centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+22)); 
+  centraldir = centraldirbeg + off ; 
+  
+  uint32_t centraldirsize = centraldir-centraldirbeg ; 
+  uint32_t offset = ftell(out) ; 
+  memcpy(centraldir, "\x50\x4b\x05\x06", 4) ; centraldir+=4 ; 
+  uint16_t tmps=0 ; 
+  memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+  memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+  memcpy(centraldir, &nfiles, 2) ; centraldir +=2 ;
+  memcpy(centraldir, &nfiles, 2) ; centraldir +=2 ;
+  memcpy(centraldir, &centraldirsize, 4) ; centraldir+=4 ;
+  memcpy(centraldir, &offset, 4) ; centraldir+=4 ;
+  memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+  
+  fwrite(centraldirbeg, 1, centraldir-centraldirbeg, out) ;  
+
+  fclose(out); 
+
+  return 0 ; 
+}
+//-------
+int Coarsing::write_numpy_npy (string path, bool squeeze)
+{
+ for (size_t f=0 ; f<Fidx.size() ; f++)
+ {
+   if (Fidx[f]<0) continue ;
+   
+   auto outpath = path + "-" + Fname[f] + ".npy" ; 
+   FILE * out = fopen(outpath.c_str(), "wb") ;
+   if (out ==nullptr) 
+   {
+    printf("ERR: cannot create file %s.\n", outpath.c_str()) ; 
+    std::exit(1) ; 
+   }
+   
+   auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ; 
+   fwrite (outarray, 1, numbytes, out) ; 
+   free(outarray) ; 
+   fclose(out) ; 
+ }
+return 0 ; 
+}
+//---------
+std::pair<size_t, uint8_t*> Coarsing::write_numpy_buffer (int id, bool squeeze) 
+{
+uint8_t *outarray;
+size_t numbytes = 0 ; 
+int dimtime=d+2 ;
+vector <long unsigned int> dimensions (3+d, 0) ; // This type to please matlab
+for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
+dimensions[dimtime] = Time ;
+    
+switch (Ftype[id])
+{
+    case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ; 
+    case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ; 
+    case TensorOrder::TENSOR : dimensions[0]=d ; dimensions[1]=d ; break ;
+    default: printf("ERR: this should never happen. (wrong TensorOrder...)\n") ; 
+}
+    
+auto tmpdim = dimensions ;
+if (squeeze) tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
+
+std::string header = "{'descr': '<f8', 'fortran_order': False, 'shape': (" ; 
+for (size_t i=0 ; i<tmpdim.size() ; i++) 
+{
+    header += std::to_string(tmpdim[i]) ; 
+    header += ","; 
+}
+header += "), }" ; 
+int padding = ceil((header.length() + 6 + 4)/64.)*64 ;
+padding = padding - (header.length() + 6 + 4)-1 ; 
+header += std::string (padding, ' ');
+header += "\n" ; 
+
+outarray = static_cast<uint8_t*> (malloc (6+2+2+header.length() + dimensions[0]*dimensions[1]*Npt*Time*8)) ; 
+memcpy(outarray, "\x93NUMPY", 6) ;
+outarray[6] = 1 ; outarray[7]=0 ; 
+outarray[8] = header.length()&0xff ; outarray[9]=(header.length()>>8)&0xff ;
+memcpy (outarray+10, header.data(), header.length()) ;
+numbytes = 10 + header.length() ; 
+for (long unsigned int k=0 ; k<dimensions[0] ; k++)
+    for (long unsigned int j=0 ; j<dimensions[1] ; j++)
+        for (int i=0 ; i<Npt ; i++)
+            for (int t=0 ; t<Time ; t++, numbytes += 8)
+                memcpy(outarray+numbytes, &(CGP[i].fields[t][Fidx[id]+j*d+k]), 8) ;
+            
+return (std::make_pair(numbytes, outarray)) ; 
+}
+
 
 //--------------------------------------------------------
 int Coarsing ::write_NrrdIO (string path)
@@ -1117,8 +1425,6 @@ int Coarsing ::write_NrrdIO (string path)
 #endif
 return 0 ;
 }
-
-
 //------------------------------------------
 int Coarsing::write_netCDF (string sout)
 {

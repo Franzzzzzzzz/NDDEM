@@ -223,6 +223,15 @@ void Param::post_init()
         std::find(flags.begin(), flags.end(), "zR"   ) != flags.end())
     maxlevel = 3 ;
 
+    if (std::find(flags.begin(), flags.end(), "TotalStress"   ) != flags.end() ||
+        std::find(flags.begin(), flags.end(), "Pressure"   ) != flags.end() ||
+        std::find(flags.begin(), flags.end(), "KineticPressure"   ) != flags.end() ||
+        std::find(flags.begin(), flags.end(), "ShearStress"  ) != flags.end() ||
+        std::find(flags.begin(), flags.end(), "StrainRate"  ) != flags.end() ||
+        std::find(flags.begin(), flags.end(), "VolumetricStrainRate"   ) != flags.end() ||
+        std::find(flags.begin(), flags.end(), "ShearStrainRate"   ) != flags.end())
+    maxlevel = 4 ;
+    
     if (needbounds)
     {
         Datafile D ; // Temporary datafile in principle the destructor handles the file closing ...
