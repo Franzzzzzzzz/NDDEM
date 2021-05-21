@@ -20,7 +20,7 @@
 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
-enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32} ; ///< Flags for export data control
+enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64} ; ///< Flags for export data control
 enum class WallType {PBC=0, WALL=1, MOVINGWALL=2} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
@@ -60,7 +60,7 @@ public :
 
     void reset_ND (int NN)
     {
-     N=NN ; r.resize(N,0.15) ; //particle size
+     N=NN ; r.resize(N,0.5) ; //particle size
      m.resize(N, 1e-2); // Set the masses directly
      I.resize(N,1) ; //Momentum of inertia (particles are sphere)
      g.resize(d,0) ; // Initialise gravity
@@ -116,6 +116,7 @@ public :
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ; ///< Not tested. \warning not really tested
     void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; ///< Not implemented
     void init_locations (char *line, v2d & X) ; ///< Set particle locations
+    void init_radii (char line[], v1d & r) ;  ///< Set particle radii
 
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ; ///< On screen information display
     void quit_cleanly() ; ///< Close opened dump files in the event of an emergency quit (usually a SIGINT signal to the process)
@@ -301,9 +302,20 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
    else if (!strcmp(line, "inertia")) init_inertia() ;
    else if (!strcmp(line, "location"))
    {
-       in >> line ;
-       init_locations(line, X) ;
-       printf("[INFO] Set all particle locations\n") ;
+     in >> line ;
+     init_locations(line, X) ;
+     printf("[INFO] Set all particle locations\n") ;
+   }
+   else if (!strcmp(line, "radius"))
+   {
+     in.getline(line, 5000) ;
+     init_radii(line, r) ;
+     printf("[INFO] Set all particle radii\n") ;
+   }
+   else if (!strcmp(line, "skin"))
+   {
+     skin = 2 * *std::max_element(r.begin(), r.end()) ;
+     skinsqr = skin*skin ;
    }
    else printf("[WARN] Unknown auto command in input script\n") ;
    printf("[INFO] Doing an auto \n") ;
@@ -313,11 +325,12 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      in >> SetValueMap.at(line) ;
      if (!strcmp(line, "skin"))
      {
-       if (skin<r[0])
-         {skin=r[0] ; printf("The skin cannot be smaller than the radius") ; }
+       double maxradius = *std::max_element(r.begin(), r.end()) ;
+
+       if (skin<maxradius)
+         {skin=2*maxradius ; printf("The skin cannot be smaller than the radius") ; }
        skinsqr=skin*skin ;
      }
-     printf("Something good should have happened %g \n", dt) ; fflush(stdout) ;
    }
    catch (const std::out_of_range & e) {
      if (!strcmp(line, "dumps"))
@@ -353,6 +366,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
            dumplist |= ExportData::ORIENTATION ;
          }
          else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
+         else if (word =="Radius") dumplist |= ExportData::RADIUS ;
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
 
@@ -424,13 +438,13 @@ void Parameters<d>::remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & O
     Frozen.erase(Frozen.begin()+idx) ;
     N-- ;
 }
-
+//--------------------
 template <int d>
 void Parameters<d>::add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/)
 {
     printf("add_particle NOT IMPLEMENTED YET\n") ;
 }
-
+//----------------
 template <int d>
 void Parameters<d>::init_locations (char *line, v2d & X)
 {
@@ -587,6 +601,33 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     else
         printf("ERR: undefined initial location function.\n") ;
 }
+//-----------------------------
+template <int d>
+void Parameters<d>::init_radii (char line[], v1d & r)
+{
+  std::istringstream s(line) ;
+  std::string word ;
+  double minr, maxr, fraction ;
+  boost::random::mt19937 rng(seed);
+  boost::random::uniform_01<boost::mt19937> rand(rng) ;
+
+  s >> word ;
+  printf("[%s]\n", word.c_str()) ;
+  if (word == "uniform")
+  {
+    s >> minr ; s >> maxr ;
+    for (auto & v : r) v = rand()*(maxr-minr)+minr ;
+  }
+  else if (word == "bidisperse")
+  {
+    s >> minr ; s >> maxr ;
+    s >> fraction ;
+    for (auto & v : r) v = (rand()<fraction?minr:maxr) ;
+  }
+  else
+    printf("WARN: unknown radius distribution automatic creation. Nothing done ...\n") ;
+}
+
 
 //======================================
 template <int d>
@@ -689,6 +730,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         if (v.second & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ;
         if (v.second & ExportData::OMEGAMAG)  {tmp.push_back(OmegaMag) ; val.push_back({"OmegaMag", TensorType::SCALAR, &tmp}) ;}
         if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
+        if (v.second & ExportData::RADIUS) {tmp.push_back(r) ; val.push_back({"RADIUS", TensorType::SCALAR, &tmp}) ;}
         if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; val.push_back({"Coordination", TensorType::SCALAR, &tmp}) ;  }
         Tools<d>::savevtk(path, N, Boundaries, X, r, val) ;
     }

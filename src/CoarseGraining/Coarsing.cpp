@@ -41,7 +41,7 @@ FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SC
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::SCALAR, FieldType::Defined});
 
 return 0 ;
-}
+} //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
 //----------------------------------------------------------
 int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 {
@@ -94,9 +94,9 @@ int Coarsing::grid_generate()
         location[i]=box[0][i]+dx[i]/2. ;
         //printf("%g %g %g|", box[0][i], box[1][i], dx[i]) ;
     }
-    
+
     /*for (auto v : nptcum)
-        printf("-%d-", v) ; 
+        printf("-%d-", v) ;
     printf("\n") ; fflush(stdout) ; */
     for (i=0,check=0 ; i<Npt ; i++)
     {
@@ -317,12 +317,12 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
   {
     if (isnan(data.pos[0][i])) continue ;
     auto vavg2 = interpolate_vel (i, usetimeavg) ;
-    vavg = interpolate_vel_trilinear(i,usetimeavg) ; 
-    //printf("%g %g | %g %g | %g %g\n", vavg[0], vavg2[0], vavg[1], vavg2[1], vavg[2], vavg2[2]) ; 
+    vavg = interpolate_vel_trilinear(i,usetimeavg) ;
+    //printf("%g %g | %g %g | %g %g\n", vavg[0], vavg2[0], vavg[1], vavg2[1], vavg[2], vavg2[2]) ;
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;
   }
-  
+
   hasvelfluct = true ;
   return 0 ;
 }
@@ -377,36 +377,36 @@ v1d Coarsing::interpolate_rot_nearest (int id, bool usetimeavg)
 //--------
 v1d Coarsing::interpolate_vel_trilinear (int id, bool usetimeavg)
 {
-assert(d==3) ; 
+assert(d==3) ;
 int pts[8][3] ;
-double Qs[4*3]={0,0,0,0,0,0,0,0,0,0,0,0} ; 
-double x; 
-    
+double Qs[4*3]={0,0,0,0,0,0,0,0,0,0,0,0} ;
+double x;
+
 const static int idvel=get_id("VAVG") ;
-  
-auto clip = [&](int a, int maxd){if (a<0) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (a) ; } ; 
-  
+
+auto clip = [&](int a, int maxd){if (a<0) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (a) ; } ;
+
 x=clip(floor((data.pos[0][id]-CGP[0].location[0])/dx[0]), npt[0]) ;
-for (int i=0 ; i<4 ; i++) pts[i][0]=x; 
+for (int i=0 ; i<4 ; i++) pts[i][0]=x;
 x=clip(ceil((data.pos[0][id]-CGP[0].location[0])/dx[0]), npt[0]) ;
-for (int i=4 ; i<8 ; i++) pts[i][0]=x; 
+for (int i=4 ; i<8 ; i++) pts[i][0]=x;
 x=clip(floor((data.pos[1][id]-CGP[0].location[1])/dx[1]), npt[1]) ;
-pts[0][1]=pts[1][1]=pts[4][1]=pts[5][1]=x; 
+pts[0][1]=pts[1][1]=pts[4][1]=pts[5][1]=x;
 x=clip(ceil((data.pos[1][id]-CGP[0].location[1])/dx[1]), npt[1]) ;
-pts[2][1]=pts[3][1]=pts[6][1]=pts[7][1]=x; 
+pts[2][1]=pts[3][1]=pts[6][1]=pts[7][1]=x;
 x=clip(floor((data.pos[2][id]-CGP[0].location[2])/dx[2]), npt[2]) ;
-for (int i=0 ; i<8 ; i+=2) pts[i][2]=x; 
+for (int i=0 ; i<8 ; i+=2) pts[i][2]=x;
 x=clip(ceil((data.pos[2][id]-CGP[0].location[2])/dx[2]), npt[2]) ;
-for (int i=1 ; i<8 ; i+=2) pts[i][2]=x; 
+for (int i=1 ; i<8 ; i+=2) pts[i][2]=x;
 
 
 for (int i=0; i<8 ; i++) pts[i][0] = (nptcum[0]*pts[i][0]+nptcum[1]*pts[i][1]+nptcum[2]*pts[i][2]) ; // Variable reuse ... ...
-//printf("| %d %d %d %d %d {%d} %d %d %g |", pts[0][0], pts[1][0], pts[2][0], pts[3][0], pts[4][0], pts[5][0], pts[6][0], pts[7][0], (*CGPtemp)[pts[5][0]].fields[0][idvel]) ; fflush(stdout) ; 
+//printf("| %d %d %d %d %d {%d} %d %d %g |", pts[0][0], pts[1][0], pts[2][0], pts[3][0], pts[4][0], pts[5][0], pts[6][0], pts[7][0], (*CGPtemp)[pts[5][0]].fields[0][idvel]) ; fflush(stdout) ;
 
 for (int i=0; i<8 ; i++)
     for (int j=0 ; j<3 ; j++)
-        Qs[j*4] += 1/8. * ((*CGPtemp)[pts[i][0]].fields[0][idvel+j]) ; 
-//printf("%g %g %g|", Qs[0], Qs[4], Qs[8]) ; 
+        Qs[j*4] += 1/8. * ((*CGPtemp)[pts[i][0]].fields[0][idvel+j]) ;
+//printf("%g %g %g|", Qs[0], Qs[4], Qs[8]) ;
 for (int i=0; i<4 ; i++)
   if (pts[0+i][0]!=pts[4+i][0])
       for (int j=0; j<3 ; j++)
@@ -415,48 +415,48 @@ for (int i=0; i<4 ; i++)
        {
         Qs[i+4*j] = ( data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * (*CGPtemp)[pts[0+i][0]].fields[0][idvel+j]
                    +(-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * (*CGPtemp)[pts[4+i][0]].fields[0][idvel+j] ;
-                   
+
         if ((data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) <0 || (-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0])<0)
         {
-         printf("XXX %g %g %g %d %d\n", data.pos[0][id], CGP[pts[0+i][0]].location[0], CGP[pts[4+i][0]].location[0], pts[0+i][0], pts[4+i][0]) ; 
+         printf("XXX %g %g %g %d %d\n", data.pos[0][id], CGP[pts[0+i][0]].location[0], CGP[pts[4+i][0]].location[0], pts[0+i][0], pts[4+i][0]) ;
         }
-   
+
        }
        else
         Qs[i+4*j] = ( data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * CGP[pts[0+i][0]].fields[cT][idvel+j]
-                   +(-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * CGP[pts[4+i][0]].fields[cT][idvel+j] ; 
+                   +(-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * CGP[pts[4+i][0]].fields[cT][idvel+j] ;
       }
   else
       for (int j=0; j<3 ; j++)
-        Qs[i+4*j] = CGP[pts[0+i][0]].fields[cT][idvel+j] ; 
+        Qs[i+4*j] = CGP[pts[0+i][0]].fields[cT][idvel+j] ;
 
 for (int i=0; i<4 ; i+=2)
   if (pts[0+i][0]!=pts[1+i][0])
       for (int j=0; j<3 ; j++)
       {
         Qs[i/2+4*j] = ( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[0+i+4*j]
-                     +(-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[1+i+4*j]; 
-      
+                     +(-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[1+i+4*j];
+
         if (( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) <0 ||
             (-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2])<0)
         {
-         printf("ZZZ %g %g %g %d %d\n", data.pos[2][id], CGP[pts[0+i][0]].location[2], CGP[pts[1+i][0]].location[2], pts[1+i][0], pts[0+i][0]) ; 
+         printf("ZZZ %g %g %g %d %d\n", data.pos[2][id], CGP[pts[0+i][0]].location[2], CGP[pts[1+i][0]].location[2], pts[1+i][0], pts[0+i][0]) ;
         }
       }
   else
       for (int j=0; j<3 ; j++)
-        Qs[i/2+4*j] = Qs[0+i+4*j] ; 
+        Qs[i/2+4*j] = Qs[0+i+4*j] ;
 
 if (pts[0][0]!=pts[2][0])
     for (int j=0; j<3 ; j++)
     {
         Qs[4*j] = ( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1]) * Qs[0+4*j]
                  +(-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1]) * Qs[1+4*j];
-                 
+
         if (( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<0 || (-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<0)
-         printf("YY %g %g %g %d %d\n", data.pos[1][id], CGP[pts[0][0]].location[1], CGP[pts[2][0]].location[1], pts[2][0], pts[0][0]) ; 
+         printf("YY %g %g %g %d %d\n", data.pos[1][id], CGP[pts[0][0]].location[1], CGP[pts[2][0]].location[1], pts[2][0], pts[0][0]) ;
     }
-//else nothing to do, the value are already at the right location ...        
+//else nothing to do, the value are already at the right location ...
 vector<double> res = {Qs[0], Qs[4], Qs[8]} ;
 return (res);
 }
@@ -659,7 +659,7 @@ for (i=0 ; i<data.Ncf ; i++)
   rq=Window->distance(q, CGP[*j].location) ;
   wpqs = Window->window_avg (rp, rq) ;
   wpqf = Window->window_int (rp, rq) ;*/
-  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location) ; 
+  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location) ;
   //printf("%g %g %g", rp, rq, wpqf) ;
   if (dozT)
   {
@@ -726,8 +726,8 @@ return 0 ;
 //======================== PASS 4: post-processing of some fields ==================
 int Coarsing::pass_4()
 {
-bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true; 
-    
+bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true;
+
 int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
 int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
 int Pkid=get_id("KineticPressure") ; if (Pkid<0) doPk=false ;
@@ -739,99 +739,99 @@ int Gamvdotid=get_id("VolumetricStrainRate") ; if (Gamvdotid<0) doGamvdot=false 
 int Gamtauid=get_id("ShearStrainRate") ;       if (Gamtauid<0) doGamtau=false ;
 int Omegaid=get_id("RotationalVelocity") ;     if (Omegaid<0) doOmega=false ;
 int VAVGid=get_id("VAVG") ;
-vector <double> gradient ; 
-if (doGamdot || doGamvdot || doGamtau || doOmega) gradient.resize(d*d,0) ; 
+vector <double> gradient ;
+if (doGamdot || doGamvdot || doGamtau || doOmega) gradient.resize(d*d,0) ;
 if ((doGamdot || doGamvdot || doGamtau || doOmega) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }
 
 printf(" -> Pass 4 ") ; fflush(stdout) ;
 
 for (int i=0 ; i< Npt ; i++)
 {
-    if (doSig) 
-        for (int dd=0 ; dd<d*d ; dd++) 
+    if (doSig)
+        for (int dd=0 ; dd<d*d ; dd++)
             CGP[i].fields[cT][Sigid+dd] = CGP[i].fields[cT][TCid+dd] + CGP[i].fields[cT][TKid+dd] ;
     if (doP)
     {
-        CGP[i].fields[cT][Pid] = 0 ; 
-        for (int dd=0 ; dd<d ; dd++) 
-            CGP[i].fields[cT][Pid] += (CGP[i].fields[cT][TCid+dd*d+dd] + CGP[i].fields[cT][TKid+dd*d+dd]) ; 
+        CGP[i].fields[cT][Pid] = 0 ;
+        for (int dd=0 ; dd<d ; dd++)
+            CGP[i].fields[cT][Pid] += (CGP[i].fields[cT][TCid+dd*d+dd] + CGP[i].fields[cT][TKid+dd*d+dd]) ;
         CGP[i].fields[cT][Pid] *= (1./d) ;
     }
     if (doPk)
     {
-        CGP[i].fields[cT][Pkid] = 0 ; 
-        for (int dd=0 ; dd<d ; dd++) 
-            CGP[i].fields[cT][Pkid] += CGP[i].fields[cT][TKid+dd*d+dd] ; 
+        CGP[i].fields[cT][Pkid] = 0 ;
+        for (int dd=0 ; dd<d ; dd++)
+            CGP[i].fields[cT][Pkid] += CGP[i].fields[cT][TKid+dd*d+dd] ;
         CGP[i].fields[cT][Pkid] *= (1./d) ;
-                                        
+
     }
     if (doTau)
     {
-        double pressure = 0 ; 
-        for (int dd=0 ; dd<d ; dd++) 
-            pressure += (CGP[i].fields[cT][TCid+dd*d+dd] + CGP[i].fields[cT][TKid+dd*d+dd]) ; 
+        double pressure = 0 ;
+        for (int dd=0 ; dd<d ; dd++)
+            pressure += (CGP[i].fields[cT][TCid+dd*d+dd] + CGP[i].fields[cT][TKid+dd*d+dd]) ;
         pressure *= (1./d) ;
-    
+
         CGP[i].fields[cT][Tauid] = 0 ;
         for (int j=0 ; j<d*d ; j++)
-            CGP[i].fields[cT][Tauid] = (CGP[i].fields[cT][TCid+j] + CGP[i].fields[cT][TKid+j] - ((j/d==j%d)?1:0)*pressure)*(CGP[i].fields[cT][TCid+j] + CGP[i].fields[cT][TKid+j] - ((j/d==j%d)?1:0)*pressure) ; 
-        CGP[i].fields[cT][Tauid]=sqrt(CGP[i].fields[cT][Tauid]) ; 
+            CGP[i].fields[cT][Tauid] = (CGP[i].fields[cT][TCid+j] + CGP[i].fields[cT][TKid+j] - ((j/d==j%d)?1:0)*pressure)*(CGP[i].fields[cT][TCid+j] + CGP[i].fields[cT][TKid+j] - ((j/d==j%d)?1:0)*pressure) ;
+        CGP[i].fields[cT][Tauid]=sqrt(CGP[i].fields[cT][Tauid]) ;
     }
-    
+
     if (doGamdot || doGamvdot || doGamtau || doOmega)
     {
-     vector <double> gradient (d*d,0) ; 
+     vector <double> gradient (d*d,0) ;
      for (int k=0 ; k<d ; k++)
          for (int l=0 ; l<d ; l++)
          {
           if (npt[l]==1) // Cannot compute gradient with a single cell
-              gradient[k*d+l] = 0 ; 
+              gradient[k*d+l] = 0 ;
           else if ((i/nptcum[l]) % npt[l] == 0 ) //forward difference
-              gradient[k*d+l] = (CGP[i+nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ; 
+              gradient[k*d+l] = (CGP[i+nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ;
           else if ((i/nptcum[l]) % npt[l] == (npt[l]-1)) //central difference
-              gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ; 
+              gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ;
           else // backward difference
-              gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i+nptcum[l]].fields[cT][VAVGid+k])/(2*dx[l]) ; 
+              gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i+nptcum[l]].fields[cT][VAVGid+k])/(2*dx[l]) ;
          }
      for (int k=0 ; k<d ; k++)
          for (int l=0 ; l<d ; l++)
              if (l!=k)
              {
                 gradient[k*d+l] = 0.5*(gradient[k*d+l] + gradient[l*d+k]);
-                gradient[l*d+k] = gradient[k*d+l] ; 
+                gradient[l*d+k] = gradient[k*d+l] ;
              }
-    
+
      if (doGamdot)
-        for (int dd=0 ; dd<d*d ; dd++) 
-             CGP[i].fields[cT][Gamdotid+dd] = gradient[dd] ; 
-     
+        for (int dd=0 ; dd<d*d ; dd++)
+             CGP[i].fields[cT][Gamdotid+dd] = gradient[dd] ;
+
      if (doGamvdot)
      {
         CGP[i].fields[cT][Gamvdotid] = 0;
-        for (int dd=0 ; dd<d ; dd++) 
-            CGP[i].fields[cT][Gamvdotid] += gradient[dd*d+dd] ;  
-        CGP[i].fields[cT][Gamvdotid] *= (1./d) ; 
+        for (int dd=0 ; dd<d ; dd++)
+            CGP[i].fields[cT][Gamvdotid] += gradient[dd*d+dd] ;
+        CGP[i].fields[cT][Gamvdotid] *= (1./d) ;
      }
-     
+
      if (doGamtau)
      {
         double volumetric = 0;
-        for (int dd=0 ; dd<d ; dd++) 
-            volumetric += gradient[dd*d+dd] ;  
-        volumetric *= (1./d) ; 
-        
-        CGP[i].fields[cT][Gamtauid] = 0 ; 
-        for (int dd=0 ; dd<d*d ; dd++) 
-            CGP[i].fields[cT][Gamtauid] = (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ; 
-        CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ; 
+        for (int dd=0 ; dd<d ; dd++)
+            volumetric += gradient[dd*d+dd] ;
+        volumetric *= (1./d) ;
+
+        CGP[i].fields[cT][Gamtauid] = 0 ;
+        for (int dd=0 ; dd<d*d ; dd++)
+            CGP[i].fields[cT][Gamtauid] = (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ;
+        CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ;
      }
-    
-        
+
+
     }
-    
+
 }
-    
-    
+
+
 return 0 ;
 }
 
@@ -1045,6 +1045,7 @@ int Coarsing::write_vtk(string sout)
      for (int j=0 ; j<npt[1] ; j++)
       for (int i=0 ; i<npt[0] ; i++)
        fprintf(out, "%g ", CGP[i*npt[1]*npt[2]+j*npt[2]+k].phi) ;
+    fprintf(out,"\n\n") ; 
 
     for (size_t f=0 ; f<Fidx.size() ; f++)
     {
@@ -1131,10 +1132,10 @@ int Coarsing::write_matlab (string path, bool squeeze)
     matPutVariable(pmat, Fname[f].c_str(), pm);
     mxFree(outdata) ;
   }
-  
+
   // Let's put the location array there as well
-  dimensions[0]=d ; dimensions[1] = 1 ; dimensions.pop_back() ; 
-  auto tmpdim = dimensions ; 
+  dimensions[0]=d ; dimensions[1] = 1 ; dimensions.pop_back() ;
+  auto tmpdim = dimensions ;
   if (squeeze) tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
   mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
   outdata=(double *) mxMalloc(sizeof(double) * d * Npt) ;
@@ -1144,7 +1145,7 @@ int Coarsing::write_matlab (string path, bool squeeze)
   mxSetData (pm, outdata) ;
   matPutVariable(pmat, "GridLocation", pm);
   mxFree(outdata) ;
-  
+
   matClose(pmat) ;
 #else
   printf("Matlab writing not implemented") ;
@@ -1154,99 +1155,99 @@ return 0 ;
 //----------------------------------------------------
 int Coarsing::write_numpy (string path, bool squeeze)
 {
-  auto outpath = path + ".npz" ; 
+  auto outpath = path + ".npz" ;
   FILE * out = fopen(outpath.c_str(), "wb") ;
-  if (out ==nullptr) 
+  if (out ==nullptr)
   {
-    printf("ERR: cannot create file %s.\n", outpath.c_str()) ; 
-    std::exit(1) ; 
+    printf("ERR: cannot create file %s.\n", outpath.c_str()) ;
+    std::exit(1) ;
   }
   auto write_short = [&](uint16_t a) { fwrite (&a, 2, 1, out) ; } ;
   auto write_int = [&](uint32_t a) { fwrite (&a, 4, 1, out) ; } ;
   auto write_long = [&](uint64_t a) { fwrite (&a, 8, 1, out) ; } ;
   auto getcrc = [&] (uint8_t * buf, int len) { boost::crc_32_type result; result.process_bytes(buf, len); return result.checksum();} ;
-  uint8_t *centraldir=nullptr, *centraldirbeg=nullptr ;  
-  
-  uint16_t nfiles = 0 ; 
+  uint8_t *centraldir=nullptr, *centraldirbeg=nullptr ;
+
+  uint16_t nfiles = 0 ;
   for (size_t f=0 ; f<Fidx.size() ; f++)
   {
     if (Fidx[f]<0) continue ;
-    nfiles++ ; 
-    
-    uint32_t offset = ftell(out) ; 
+    nfiles++ ;
+
+    uint32_t offset = ftell(out) ;
     fwrite ("\x50\x4b\x03\x04", 1, 4, out) ;
     write_short(20) ;
     write_short(0) ; // Flags
     write_short(0) ; // No compression
     write_short(0) ;
     write_short(0) ;
-  
-    auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ; 
-    auto crc = getcrc(outarray, numbytes) ; 
+
+    auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ;
+    auto crc = getcrc(outarray, numbytes) ;
     write_int(crc) ; //CRC
-    write_int(numbytes) ; 
+    write_int(numbytes) ;
     write_int(numbytes) ;
     write_short(Fname[f].length() + 4) ;
     write_short(20) ;
-    fwrite (Fname[f].data(), 1, Fname[f].length(), out) ; 
+    fwrite (Fname[f].data(), 1, Fname[f].length(), out) ;
     fwrite (".npy", 1, 4, out);
-  
+
     // Not too sure why we need the extended field but ok ...
     write_short(1) ;
     write_short(16) ;
     write_long(numbytes) ;
     write_long(numbytes) ;
-   
-    fwrite (outarray, 1, numbytes, out) ; 
+
+    fwrite (outarray, 1, numbytes, out) ;
     free(outarray) ;
-    
+
     // Preparing the central directory
     if (centraldir == nullptr)
     {
-        centraldir = static_cast<uint8_t*> (malloc(46+Fname[f].length()+4)) ; 
+        centraldir = static_cast<uint8_t*> (malloc(46+Fname[f].length()+4)) ;
         centraldirbeg = centraldir ;
     }
     else
     {
-        int off = centraldir-centraldirbeg ; 
-        centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+Fname[f].length()+4)); 
-        centraldir = centraldirbeg + off ; 
+        int off = centraldir-centraldirbeg ;
+        centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+Fname[f].length()+4));
+        centraldir = centraldirbeg + off ;
     }
-    memcpy(centraldir, "\x50\x4b\x01\x02", 4) ; centraldir+=4 ; 
-    *centraldir = 0x14 ; centraldir++ ; 
-    *centraldir = 0x03 ; centraldir++ ; 
-    *centraldir = 0x14 ; centraldir++ ; 
-    *centraldir = 0x00 ; centraldir++ ; 
-    uint64_t tmpl = 0 ; 
-    memcpy(centraldir, &tmpl, 8) ; centraldir +=8 ; 
+    memcpy(centraldir, "\x50\x4b\x01\x02", 4) ; centraldir+=4 ;
+    *centraldir = 0x14 ; centraldir++ ;
+    *centraldir = 0x03 ; centraldir++ ;
+    *centraldir = 0x14 ; centraldir++ ;
+    *centraldir = 0x00 ; centraldir++ ;
+    uint64_t tmpl = 0 ;
+    memcpy(centraldir, &tmpl, 8) ; centraldir +=8 ;
     memcpy(centraldir, &crc, 4) ; centraldir +=4 ; //CRC TODO
     memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
     memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
-    uint16_t tmps = Fname[f].length() + 4 ; 
+    uint16_t tmps = Fname[f].length() + 4 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
-    tmps=0 ; 
-    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
-    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    tmps=0 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
-    
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+    memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
+
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
     *centraldir = 0x80 ; centraldir ++ ;
     *centraldir = 0x01 ; centraldir ++ ;
-    
+
     memcpy(centraldir, &offset, 4) ; centraldir +=4 ; // OFFSET
-    memcpy(centraldir, Fname[f].data(), Fname[f].length()) ; centraldir += Fname[f].length() ; 
-    memcpy(centraldir, ".npy", 4) ; centraldir += 4 ; 
+    memcpy(centraldir, Fname[f].data(), Fname[f].length()) ; centraldir += Fname[f].length() ;
+    memcpy(centraldir, ".npy", 4) ; centraldir += 4 ;
   }
-  
-  int off = centraldir-centraldirbeg ; 
-  centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+22)); 
-  centraldir = centraldirbeg + off ; 
-  
-  uint32_t centraldirsize = centraldir-centraldirbeg ; 
-  uint32_t offset = ftell(out) ; 
-  memcpy(centraldir, "\x50\x4b\x05\x06", 4) ; centraldir+=4 ; 
-  uint16_t tmps=0 ; 
+
+  int off = centraldir-centraldirbeg ;
+  centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+22));
+  centraldir = centraldirbeg + off ;
+
+  uint32_t centraldirsize = centraldir-centraldirbeg ;
+  uint32_t offset = ftell(out) ;
+  memcpy(centraldir, "\x50\x4b\x05\x06", 4) ; centraldir+=4 ;
+  uint16_t tmps=0 ;
   memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
   memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
   memcpy(centraldir, &nfiles, 2) ; centraldir +=2 ;
@@ -1254,12 +1255,12 @@ int Coarsing::write_numpy (string path, bool squeeze)
   memcpy(centraldir, &centraldirsize, 4) ; centraldir+=4 ;
   memcpy(centraldir, &offset, 4) ; centraldir+=4 ;
   memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
-  
-  fwrite(centraldirbeg, 1, centraldir-centraldirbeg, out) ;  
 
-  fclose(out); 
+  fwrite(centraldirbeg, 1, centraldir-centraldirbeg, out) ;
 
-  return 0 ; 
+  fclose(out);
+
+  return 0 ;
 }
 //-------
 int Coarsing::write_numpy_npy (string path, bool squeeze)
@@ -1267,68 +1268,68 @@ int Coarsing::write_numpy_npy (string path, bool squeeze)
  for (size_t f=0 ; f<Fidx.size() ; f++)
  {
    if (Fidx[f]<0) continue ;
-   
-   auto outpath = path + "-" + Fname[f] + ".npy" ; 
+
+   auto outpath = path + "-" + Fname[f] + ".npy" ;
    FILE * out = fopen(outpath.c_str(), "wb") ;
-   if (out ==nullptr) 
+   if (out ==nullptr)
    {
-    printf("ERR: cannot create file %s.\n", outpath.c_str()) ; 
-    std::exit(1) ; 
+    printf("ERR: cannot create file %s.\n", outpath.c_str()) ;
+    std::exit(1) ;
    }
-   
-   auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ; 
-   fwrite (outarray, 1, numbytes, out) ; 
-   free(outarray) ; 
-   fclose(out) ; 
+
+   auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ;
+   fwrite (outarray, 1, numbytes, out) ;
+   free(outarray) ;
+   fclose(out) ;
  }
-return 0 ; 
+return 0 ;
 }
 //---------
-std::pair<size_t, uint8_t*> Coarsing::write_numpy_buffer (int id, bool squeeze) 
+std::pair<size_t, uint8_t*> Coarsing::write_numpy_buffer (int id, bool squeeze)
 {
 uint8_t *outarray;
-size_t numbytes = 0 ; 
+size_t numbytes = 0 ;
 int dimtime=d+2 ;
 vector <long unsigned int> dimensions (3+d, 0) ; // This type to please matlab
 for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
 dimensions[dimtime] = Time ;
-    
+
 switch (Ftype[id])
 {
-    case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ; 
-    case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ; 
+    case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ;
+    case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ;
     case TensorOrder::TENSOR : dimensions[0]=d ; dimensions[1]=d ; break ;
-    default: printf("ERR: this should never happen. (wrong TensorOrder...)\n") ; 
+    default: printf("ERR: this should never happen. (wrong TensorOrder...)\n") ;
 }
-    
+
 auto tmpdim = dimensions ;
 if (squeeze) tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
 
-std::string header = "{'descr': '<f8', 'fortran_order': False, 'shape': (" ; 
-for (size_t i=0 ; i<tmpdim.size() ; i++) 
+std::string header = "{'descr': '<f8', 'fortran_order': False, 'shape': (" ;
+for (size_t i=0 ; i<tmpdim.size() ; i++)
 {
-    header += std::to_string(tmpdim[i]) ; 
-    header += ","; 
+    header += std::to_string(tmpdim[i]) ;
+    header += ",";
 }
-header += "), }" ; 
+header += "), }" ;
 int padding = ceil((header.length() + 6 + 4)/64.)*64 ;
-padding = padding - (header.length() + 6 + 4)-1 ; 
+padding = padding - (header.length() + 6 + 4)-1 ;
 header += std::string (padding, ' ');
-header += "\n" ; 
+header += "\n" ;
 
-outarray = static_cast<uint8_t*> (malloc (6+2+2+header.length() + dimensions[0]*dimensions[1]*Npt*Time*8)) ; 
+outarray = static_cast<uint8_t*> (malloc (6+2+2+header.length() + dimensions[0]*dimensions[1]*Npt*Time*8)) ;
 memcpy(outarray, "\x93NUMPY", 6) ;
-outarray[6] = 1 ; outarray[7]=0 ; 
+outarray[6] = 1 ; outarray[7]=0 ;
 outarray[8] = header.length()&0xff ; outarray[9]=(header.length()>>8)&0xff ;
 memcpy (outarray+10, header.data(), header.length()) ;
-numbytes = 10 + header.length() ; 
+numbytes = 10 + header.length() ;
 for (long unsigned int k=0 ; k<dimensions[0] ; k++)
     for (long unsigned int j=0 ; j<dimensions[1] ; j++)
         for (int i=0 ; i<Npt ; i++)
             for (int t=0 ; t<Time ; t++, numbytes += 8)
                 memcpy(outarray+numbytes, &(CGP[i].fields[t][Fidx[id]+j*d+k]), 8) ;
-            
-return (std::make_pair(numbytes, outarray)) ; 
+
+return (std::make_pair(numbytes, outarray)) ;
 }
 
 
@@ -1407,7 +1408,7 @@ int Coarsing ::write_NrrdIO (string path)
                         for (int j=0 ; j<d*d ; j++)
                             outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
               break ;
-        default: 
+        default:
             outdata=nullptr ;
             printf("ERR: this should never happen. \n") ;
       }
