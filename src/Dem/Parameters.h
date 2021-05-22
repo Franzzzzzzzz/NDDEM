@@ -21,7 +21,7 @@
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
 enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64} ; ///< Flags for export data control
-enum class WallType {PBC=0, WALL=1, MOVINGWALL=2} ; ///< Wall types
+enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
@@ -401,17 +401,27 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     g[1] = intensity * sin(angle / 180. * M_PI) ;
     printf("[INFO] Changing gravity angle in degree between x0 and x1.\n") ;
     } ;
- Lvl0["boundary"] = [&](){int id ; in>>id ; char line [5000] ; in>>line ;
+ Lvl0["boundary"] = [&](){size_t id ; in>>id ; 
+    if (id>=Boundaries.size()) {Boundaries.resize(id+1) ; Boundaries[id].resize(4,0) ; }
+    char line [5000] ; in>>line ;
     if (!strcmp(line, "PBC")) Boundaries[id][3]=static_cast<int>(WallType::PBC) ;
     else if (!strcmp(line, "WALL")) Boundaries[id][3]=static_cast<int>(WallType::WALL) ;
     else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
+    else if (!strcmp(line, "SPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::SPHERE) ; Boundaries[id].resize(4+d,0) ; }
     else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
     in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
     Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
-    if (Boundaries[id][3]==static_cast<int>(WallType::MOVINGWALL))
-       {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ; }
+    if  (Boundaries[id][3] == static_cast<int>(WallType::MOVINGWALL))
+    {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ;}
+    else if (Boundaries[id][3] == static_cast<int>(WallType::SPHERE) )
+    {
+            Boundaries[id][4]=Boundaries[id][1] ; 
+            Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
+            for (int i=1 ; i<d; i++) 
+                in>>Boundaries[id][4+i] ; 
+    }
     printf("[INFO] Changing BC.\n") ;
-    } ;
+   };
 
 // Processing
  string line ;

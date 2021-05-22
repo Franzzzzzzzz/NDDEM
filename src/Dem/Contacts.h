@@ -33,7 +33,7 @@ public:
     void particle_particle (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Force & torque between 2 particles
     void particle_wall     ( cv1d & Vi, cv1d &Omegai, double ri,
-                                 int j, int orient, cp & Contact) ; ///< Force & torque between a particle and a wall
+                             cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
@@ -143,13 +143,12 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 //---------------------- particle wall contact ----------------------------
 template <int d>
 void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
-                               int j, int orient, cp & Contact)
+                                  cv1d & cn, cp & Contact)
+                                  //int j, int orient, cp & Contact)
 {
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
   if (ovlp<=0) {Act.setzero(d) ; return ;}
-  Tools<d>::unitvec(cn, j) ;
-  cn=cn*(-orient) ; // l give the orientation (+1 or -1)
 
   //Relative velocity at contact
   rri = -cn * (ri-ovlp/2.) ;

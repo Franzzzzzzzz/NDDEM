@@ -276,22 +276,41 @@ public:
 
             tmpcp.setinfo(CLw.default_action());
             tmpcp.i=i ;
-            for (int j=0 ; j<d ; j++) // Wall contacts
+            for (size_t j=0 ; j<P.Boundaries.size() ; j++) // Wall contacts
             {
                     if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
 
-                    tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
-                    if (tmpcp.contactlength<P.skin)
+                    if (P.Boundaries[j][3]==static_cast<int>(WallType::WALL) || P.Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
                     {
-                        tmpcp.j=(2*j+0);
-                        CLw.insert(tmpcp) ;
-                    }
+                        tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+                        if (tmpcp.contactlength<P.skin)
+                        {
+                            tmpcp.j=(2*j+0);
+                            CLw.insert(tmpcp) ;
+                        }
 
-                    tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
-                    if (tmpcp.contactlength<P.skin)
+                        tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+                        if (tmpcp.contactlength<P.skin)
+                        {
+                            tmpcp.j=(2*j+1);
+                            CLw.insert(tmpcp) ;
+                        }
+                    }
+                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE))
                     {
-                        tmpcp.j=(2*j+1);
-                        CLw.insert(tmpcp) ;
+                        tmpcp.contactlength=0 ; 
+                        for (int dd=0 ; dd<d ; dd++)
+                            tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ; 
+                        
+                        if (tmpcp.contactlength < (P.Boundaries[j][0] + P.r[i])*(P.Boundaries[j][0] + P.r[i]) &&
+                            tmpcp.contactlength > (P.Boundaries[j][0] - P.r[i])*(P.Boundaries[j][0] - P.r[i]))
+                        {
+                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j][0] ; 
+                            if (tmpcp.contactlength < 0) tmpcp.j=2*j;
+                            else tmpcp.j=2*j+1 ;
+                            tmpcp.contactlength = fabs(tmpcp.contactlength) ;
+                            CLw.insert(tmpcp) ;
+                        }
                     }
             }
         }
@@ -329,6 +348,7 @@ public:
             double timebeg = omp_get_wtime();
           #endif
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
+            v1d tmpcn (d,0) ;
 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
@@ -360,14 +380,28 @@ public:
 
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
-            C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], it->j/2, (it->j%2==0)?-1:1, *it) ;
-            //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
-            //Torque[it->i] += Act.Torquei ;
+                if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::SPHERE))
+                {
+                    for (int dd = 0 ; dd<d ; dd++)
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ; 
+                    tmpcn/=Tools<d>::norm(tmpcn) ;
+                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
+                }
+                else
+                {
+                    
+                    Tools<d>::unitvec(tmpcn, it->j/2) ;
+                    tmpcn=tmpcn*(-((it->j%2==0)?-1:1)) ; // l give the orientation (+1 or -1) 
+                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
+                }
+                
+                //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
+                //Torque[it->i] += Act.Torquei ;
 
-            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-            Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+                Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+                Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-            if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
+                if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
             }
             #ifndef NO_OPENMP
             MP.timing[ID] += omp_get_wtime()-timebeg;
@@ -412,7 +446,7 @@ public:
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            if (P.wallforcecompute)
+            /*if (P.wallforcecompute)
             {
                char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
                Tools<d>::setzero(WallForce) ;
@@ -422,7 +456,7 @@ public:
                       Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
 
             Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            }
+            }*/
         }
 
         if (P.wallforcecompute) MP.delayedwall_clean() ;
