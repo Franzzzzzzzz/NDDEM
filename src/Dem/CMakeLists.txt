@@ -1,5 +1,5 @@
 add_executable(DEMND DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp)
-set_property(TARGET DEMND PROPERTY CXX_STANDARD 14)
+set_property(TARGET DEMND PROPERTY CXX_STANDARD 17)
 if(EMSCRIPTEN)
  target_compile_options(DEMND PUBLIC -DNO_OPENMP -g -O3 -Wall -Wextra)
  target_link_libraries(DEMND PUBLIC -DNO_OPENMP -g -O3 -lm -Wall -Wextra)

@@ -107,6 +107,11 @@ public :
     void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.
     int init_mass() ; ///< Initialise particle mass
     int init_inertia() ; ///< Initialise particle moment of inertia
+    
+    void do_nothing (double time __attribute__((unused))) {return;} 
+    double grav_intensity = 10, grav_omega=1 ; int grav_rotdim[2]={0,1} ; 
+    void do_gravityrotate (double time) {g[grav_rotdim[0]]=grav_intensity*cos(time*grav_omega); g[grav_rotdim[1]]=grav_intensity*sin(time*grav_omega); return;}  
+    void (Parameters::*update_gravity) (double time) = &Parameters::do_nothing ; 
 
     void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script
     void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time.
@@ -401,6 +406,12 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     g[1] = intensity * sin(angle / 180. * M_PI) ;
     printf("[INFO] Changing gravity angle in degree between x0 and x1.\n") ;
     } ;
+ Lvl0["gravityrotate"] = [&] () {
+     update_gravity =&Parameters::do_gravityrotate;
+     Tools<d>::setzero(g) ;
+     in >> grav_intensity >> grav_omega >> grav_rotdim[0] >> grav_rotdim[1] ;
+     printf("[INFO] Setting up a rotating gravity\n") ;
+    } ;
  Lvl0["boundary"] = [&](){size_t id ; in>>id ; 
     if (id>=Boundaries.size()) {Boundaries.resize(id+1) ; Boundaries[id].resize(4,0) ; }
     char line [5000] ; in>>line ;
@@ -458,6 +469,8 @@ void Parameters<d>::add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d 
 template <int d>
 void Parameters<d>::init_locations (char *line, v2d & X)
 {
+    boost::random::mt19937 rng(seed);
+    boost::random::uniform_01<boost::mt19937> rand(rng) ;
     if (!strcmp(line, "square"))
     {
         auto m = *(std::max_element(r.begin(), r.end())) ;
@@ -481,8 +494,6 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     else if (!strcmp(line, "randomsquare"))
     {
         auto m = *(std::max_element(r.begin(), r.end())) ;
-        boost::random::mt19937 rng(seed);
-        boost::random::uniform_01<boost::mt19937> rand(rng) ;
         printf("%g\n", m) ;
         int dd ;
         for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
@@ -502,8 +513,6 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "randomdrop"))
     {
-        boost::random::mt19937 rng(seed);
-        boost::random::uniform_01<boost::mt19937> rand(rng) ;
 
         for (int i=0 ; i<N ; i++)
         {
@@ -517,10 +526,26 @@ void Parameters<d>::init_locations (char *line, v2d & X)
         }
 
     }
+    else if (!strcmp(line, "insphere"))
+    {
+        printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
+        
+        for (int i=0 ; i<N ; i++)
+        {
+         double dst=0 ;
+         printf(".") ; fflush(stdout);
+         do {
+            dst=0 ; 
+            for(int dd=0 ; dd < d ; dd++)
+            {
+              X[i][dd] = (rand()*Boundaries[d][0]*2-Boundaries[d][0]) + Boundaries[d][4+dd] ;
+              dst += (Boundaries[d][4+dd]-X[i][dd])*(Boundaries[d][4+dd]-X[i][dd]) ; 
+            }
+         } while ( sqrt(dst) > Boundaries[d][0]-r[i]) ; 
+        }
+    }
     else if (!strcmp(line, "roughinclineplane"))
     {
-      boost::random::mt19937 rng(seed);
-      boost::random::uniform_01<boost::mt19937> rand(rng) ;
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ;
@@ -545,8 +570,6 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "roughinclineplane2"))
     {
-      boost::random::mt19937 rng(seed);
-      boost::random::uniform_01<boost::mt19937> rand(rng) ;
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ; int ddd ;

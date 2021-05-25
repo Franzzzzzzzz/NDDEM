@@ -234,10 +234,12 @@ public:
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
             else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
+            
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
-
+        std::invoke (P.update_gravity, &P, t) ; 
+        
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
         {
          //int ID = 0 ; //OMP TODO
