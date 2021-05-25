@@ -22,21 +22,21 @@ async function load_world(params, time, world) {
         params.N = 3; // HACK: ASSUMED!!!
         var first_row = results.data[0][0].split(" ");
         // console.log(first_row);
-        params.num_particles = first_row[0];
+        params.num_particles = parseInt(first_row[0]);
         // console.log(params.num_particles);
         world.push({});
-        world[0].min = first_row[2];
-        world[0].max = first_row[5];
+        world[0].min = parseFloat(first_row[2]);
+        world[0].max = parseFloat(first_row[5]);
         world[0].cur = (world[0].min + world[0].max) / 2;
         world[0].prev = world[0].cur;
         world.push({});
-        world[1].min = first_row[3];
-        world[1].max = first_row[6];
+        world[1].min = parseFloat(first_row[3]);
+        world[1].max = parseFloat(first_row[6]);
         world[1].cur = (world[1].min + world[1].max) / 2;
         world[1].prev = world[1].cur;
         world.push({});
-        world[2].min = first_row[4];
-        world[2].max = first_row[7];
+        world[2].min = parseFloat(first_row[4]);
+        world[2].max = parseFloat(first_row[7]);
         world[2].cur = (world[2].min + world[2].max) / 2;
         world[2].prev = world[2].cur;
 

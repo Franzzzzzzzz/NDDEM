@@ -59,11 +59,12 @@
             let pressure_time = [];
             let shear_time = [];
             let density_time = [];
-            var radius = 0.5;
+            // var radius = 0.5;
+            let radii;
             let particle_volume;
             let started = false;
             let show_stats = true;
-            const thickness = radius;
+            // const thickness = radius;
             const material_density = 2700;
             let old_time = 0;
             let new_time = 0;
@@ -89,8 +90,8 @@
 
             var params = {
                 dimension: 3,
-                L: 5, //system size
-                N: 200,
+                L: 4.5, //system size
+                N: 500,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
                 volumetric_strain: 0,
@@ -100,15 +101,22 @@
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
+                r_max: 0.5,
+                r_min: 0.25,
+                freq: 0.05,
             }
 
-            particle_volume = 4./3.*Math.PI*Math.pow(radius,3);
+            params.average_radius = (params.r_min + params.r_max)/2.;
+            let thickness = params.average_radius;
+
+            particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
             if ( urlParams.has('dimension') ) {
                 params.dimension = parseInt(urlParams.get('dimension'));
             }
             if ( params.dimension === 4) {
                 params.L = 2.5;
-                particle_volume = Math.PI*Math.PI*Math.pow(radius,4)/2.;
+                params.N = 300
+                particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
             }
             if ( urlParams.has('no_stats') ) {
                 show_stats = false;
@@ -371,7 +379,7 @@
                 else if ( loading_method == 'stress_controlled' ) {
                     let delta_p = p_controller.update(params.pressure_set_pt,pressure,dt);
                     let delta_q = q_controller.update(params.deviatoric_set_pt,shear,dt)
-                    // console.log(pressure)
+                    console.log(pressure)
                     params.L_cur -= delta_p;
                     params.H_cur += delta_q;
 
@@ -444,6 +452,8 @@
                     if (loading_method === 'stress_controlled') {
                         update_walls(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
                     }
+                    // console.log("gravity "+1000*Math.sin(2*Math.PI*params.freq*new_time)+" "+1000*Math.cos(2*Math.PI*params.freq*new_time)+" 0 0")
+                    S.interpret_command("gravity "+1000*Math.sin(2*Math.PI*params.freq*new_time)+" "+1000*Math.cos(2*Math.PI*params.freq*new_time)+" 0 0")
                     S.step_forward(5);
 
                     var F = S.getWallForce();
@@ -518,6 +528,7 @@
             // }
 
             function add_spheres() {
+                radii = S.getRadii();
                 spheres = new THREE.Group();
                 scene.add(spheres);
                 // const material = new THREE.MeshStandardMaterial();
@@ -526,7 +537,7 @@
                 // const matrix = new THREE.Matrix4();
                 const color = new THREE.Color();
 
-                const geometrySphere = new THREE.SphereGeometry( radius, Math.pow(2,quality), Math.pow(2,quality) );
+                const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
                 // const geometrySphere = new THREE.BufferGeometry().fromGeometry(
                 //   new THREE.SphereGeometry(
                 //     1,
@@ -569,7 +580,7 @@
                     // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
                     if ( params.dimension == 4 ) {
                         var D_draw = 2*Math.sqrt(
-                          Math.pow(radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
+                          Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
                         );
                         object.scale.set(D_draw, D_draw, D_draw);
                         // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
@@ -626,22 +637,45 @@
                     S.interpret_command("radius -1 0.5");
                     S.interpret_command("mass -1 1");
                     S.interpret_command("auto rho");
+                    S.interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+                    S.interpret_command("auto mass");
                     S.interpret_command("auto inertia");
 
-                    S.interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
+                    S.interpret_command("boundary 0 WALL -"+2*String(params.L)+" "+2*String(params.L));
+                    S.interpret_command("boundary 1 WALL -"+2*String(params.L)+" "+2*String(params.L));
+                    S.interpret_command("boundary 2 WALL -"+2*String(params.L)+" "+2*String(params.L));
                     if ( params.dimension == 3 ) {
                         S.interpret_command("gravity 0 0 0")
                     }
                     if ( params.dimension == 4 ) {
-                        S.interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
+                        S.interpret_command("boundary 3 WALL -"+2*String(params.L)+" "+2*String(params.L));
                         S.interpret_command("gravity 0 0 0 -10")
                     }
+
+                    S.interpret_command("boundary 4 SPHERE "+String(params.L)+" 0 0 0 0"); // add a sphere!
+
                     // S.interpret_command("auto location randomsquare");
-                    S.interpret_command("auto location randomdrop");
-
-
+                    // S.interpret_command("auto location randomdrop");
+                    let n = 0; // number of particles inserted
+                    for ( var i=-params.L + params.r_max; i<params.L-params.r_max; i++ ) {
+                        for ( var j=-params.L + params.r_max; j<params.L-params.r_max; j++ ) {
+                            for ( var k=-params.L + params.r_max; k<params.L-params.r_max; k++ ) {
+                                for ( var l=-params.L + params.r_max; l<params.L-params.r_max; l++ ) {
+                                    if ( n < params.N ) {
+                                        if ( i*i + j*j + k*k + l*l < (params.L-params.r_max)*(params.L-params.r_max) ) {
+                                            S.interpret_command("location " + String(n) + " " +
+                                                String(i+0.001*(Math.random()-0.5)*params.r_max) + " " +
+                                                String(j+0.001*(Math.random()-0.5)*params.r_max) + " " +
+                                                String(k+0.001*(Math.random()-0.5)*params.r_max) + " " +
+                                                String(l+0.001*(Math.random()-0.5)*params.r_max));
+                                            n++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    console.log(n)
 
                     // NONE OF THESE DO ANYTHING YET
                     S.interpret_command("set Kn 2e5");
@@ -651,6 +685,7 @@
                     S.interpret_command("set Mu 0.5");
                     S.interpret_command("set T 150");
                     S.interpret_command("set dt 0.0001");
+                    S.interpret_command("auto skin");
                     S.finalise_init () ;
                 }
             }

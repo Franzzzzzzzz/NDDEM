@@ -88,7 +88,7 @@
                 L1: 2,
                 L2: 1,
                 L3: 0.1, // this is the direction of gravity
-                L4: 1,
+                L4: 0.5,
                 pyramid_size: 5,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
@@ -444,7 +444,8 @@
                     S.interpret_command("boundary 1 WALL -"+String(params.L2)+" "+String(params.L2));
                     S.interpret_command("boundary 2 WALL -"+String(params.L3)+" "+String(params.L3));
                     S.interpret_command("boundary 3 WALL -"+String(params.L4)+" "+String(params.L4));
-                    S.interpret_command("gravity 0 0 -10 0")
+                    // S.interpret_command("body " + STLFilename);
+                    S.interpret_command("gravity 0 0 -10 0");
                     // S.interpret_command("auto location randomdrop");
 
                     let n = 1;
@@ -476,6 +477,7 @@
                     S.interpret_command("set damping 0.001");
                     S.interpret_command("set T 150");
                     S.interpret_command("set dt " + String(params.dt));
+                    S.interpret_command("auto skin");
                     S.finalise_init () ;
                 }
             }

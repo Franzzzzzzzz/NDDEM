@@ -456,6 +456,9 @@ public:
   /** \brief Expose the array of locations. \ingroup API */
   std::vector<std::vector<double>> getX() { return X; }
 
+  /** \brief Expose the array of radii. \ingroup API */
+  std::vector<double> getRadii() { return P.r; }
+
   /** \brief Expose the array of velocities. \ingroup API */
   std::vector<std::vector<double>> getVelocity() { return V; }
 
