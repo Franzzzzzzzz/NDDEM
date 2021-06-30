@@ -234,12 +234,12 @@ public:
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
             else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
-            
+
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
-        std::invoke (P.update_gravity, &P, t) ; 
-        
+        std::invoke (P.update_gravity, &P, t) ;
+
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
         {
          //int ID = 0 ; //OMP TODO
@@ -300,14 +300,14 @@ public:
                     }
                     else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE))
                     {
-                        tmpcp.contactlength=0 ; 
+                        tmpcp.contactlength=0 ;
                         for (int dd=0 ; dd<d ; dd++)
-                            tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ; 
-                        
+                            tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ;
+
                         if (tmpcp.contactlength < (P.Boundaries[j][0] + P.r[i])*(P.Boundaries[j][0] + P.r[i]) &&
                             tmpcp.contactlength > (P.Boundaries[j][0] - P.r[i])*(P.Boundaries[j][0] - P.r[i]))
                         {
-                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j][0] ; 
+                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j][0] ;
                             if (tmpcp.contactlength < 0) tmpcp.j=2*j;
                             else tmpcp.j=2*j+1 ;
                             tmpcp.contactlength = fabs(tmpcp.contactlength) ;
@@ -385,18 +385,18 @@ public:
                 if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::SPHERE))
                 {
                     for (int dd = 0 ; dd<d ; dd++)
-                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ; 
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
                 }
                 else
                 {
-                    
+
                     Tools<d>::unitvec(tmpcn, it->j/2) ;
-                    tmpcn=tmpcn*(-((it->j%2==0)?-1:1)) ; // l give the orientation (+1 or -1) 
+                    tmpcn=tmpcn*(-((it->j%2==0)?-1:1)) ; // l give the orientation (+1 or -1)
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
                 }
-                
+
                 //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;
                 //Torque[it->i] += Act.Torquei ;
 
@@ -448,17 +448,17 @@ public:
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            /*if (P.wallforcecompute)
-            {
-               char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
-               Tools<d>::setzero(WallForce) ;
+            // if (P.wallforcecompute)
+            // {
+               // char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+               // Tools<d>::setzero(WallForce) ;
 
-               for (int i=0 ; i<MP.P ; i++)
-                  for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
-                      Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
+               // for (int i=0 ; i<MP.P ; i++)
+                  // for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+                      // Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
 
-            Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            }*/
+            // Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
+            // }
         }
 
         if (P.wallforcecompute) MP.delayedwall_clean() ;
