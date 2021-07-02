@@ -876,7 +876,7 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE =  Dem/gzip.cpp Dem/gzip.hpp Dem/Test.c Dem/Test.cpp
-EXCLUDE += CoarseGraining/gzip.cpp CoarseGraining/gzip.hpp ../CoarseGraining/zlib.cpp CoarseGraining/termcolor.hpp
+EXCLUDE += CoarseGraining/json.hpp CoarseGraining/gzip.cpp CoarseGraining/gzip.hpp CoarseGraining/zlib.cpp CoarseGraining/termcolor.hpp
 EXCLUDE += Texturing/Test.cpp Texturing/TinyPngOut.cpp Texturing/TinyPngOut.hpp
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or

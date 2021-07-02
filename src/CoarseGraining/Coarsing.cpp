@@ -38,7 +38,8 @@ FIELDS.push_back({FIELDS.back().flag<<1, "ShearStress" ,     TensorOrder::SCALAR
 FIELDS.push_back({FIELDS.back().flag<<1, "StrainRate",           TensorOrder::TENSOR, FieldType::Defined});
 FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SCALAR, FieldType::Defined});
 FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VECTOR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined});
 
 return 0 ;
 } //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
@@ -726,7 +727,7 @@ return 0 ;
 //======================== PASS 4: post-processing of some fields ==================
 int Coarsing::pass_4()
 {
-bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true;
+bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true;
 
 int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
 int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
@@ -738,10 +739,11 @@ int Gamdotid=get_id("StrainRate") ;            if (Gamdotid<0) doGamdot=false ;
 int Gamvdotid=get_id("VolumetricStrainRate") ; if (Gamvdotid<0) doGamvdot=false ;
 int Gamtauid=get_id("ShearStrainRate") ;       if (Gamtauid<0) doGamtau=false ;
 int Omegaid=get_id("RotationalVelocity") ;     if (Omegaid<0) doOmega=false ;
+int OmegaMagid=get_id("RotationalVelocityMag");if (OmegaMagid<0) doOmegaMag=false ;  
 int VAVGid=get_id("VAVG") ;
 vector <double> gradient ;
-if (doGamdot || doGamvdot || doGamtau || doOmega) gradient.resize(d*d,0) ;
-if ((doGamdot || doGamvdot || doGamtau || doOmega) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }
+if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) gradient.resize(d*d,0) ;
+if ((doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }
 
 printf(" -> Pass 4 ") ; fflush(stdout) ;
 
@@ -778,7 +780,7 @@ for (int i=0 ; i< Npt ; i++)
         CGP[i].fields[cT][Tauid]=sqrt(CGP[i].fields[cT][Tauid]) ;
     }
 
-    if (doGamdot || doGamvdot || doGamtau || doOmega)
+    if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag)
     {
      vector <double> gradient (d*d,0) ;
      for (int k=0 ; k<d ; k++)
@@ -824,6 +826,23 @@ for (int i=0 ; i< Npt ; i++)
         for (int dd=0 ; dd<d*d ; dd++)
             CGP[i].fields[cT][Gamtauid] = (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ;
         CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ;
+     }
+     
+     if (doOmega)
+     {
+         assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
+         CGP[i].fields[cT][Omegaid+0] = 0.5*(gradient[2*d+1] - gradient[1*d+2]) ; 
+         CGP[i].fields[cT][Omegaid+1] = 0.5*(gradient[0*d+2] - gradient[2*d+0]) ; 
+         CGP[i].fields[cT][Omegaid+2] = 0.5*(gradient[1*d+0] - gradient[0*d+1]) ; 
+     }
+     
+     if (doOmegaMag)
+     {
+         assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
+         CGP[i].fields[cT][OmegaMagid]  = (0.5*(gradient[2*d+1] - gradient[1*d+2])*0.5*(gradient[2*d+1] - gradient[1*d+2])) ; 
+         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[0*d+2] - gradient[2*d+0])*0.5*(gradient[0*d+2] - gradient[2*d+0])) ; 
+         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[1*d+0] - gradient[0*d+1])*0.5*(gradient[1*d+0] - gradient[0*d+1])) ;
+         CGP[i].fields[cT][OmegaMagid]=sqrt(CGP[i].fields[cT][OmegaMagid]) ; 
      }
 
 
