@@ -783,6 +783,7 @@ for (int i=0 ; i< Npt ; i++)
     if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag)
     {
      vector <double> gradient (d*d,0) ;
+     // Computing the velocity gradient
      for (int k=0 ; k<d ; k++)
          for (int l=0 ; l<d ; l++)
          {
@@ -795,6 +796,26 @@ for (int i=0 ; i< Npt ; i++)
           else // backward difference
               gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i+nptcum[l]].fields[cT][VAVGid+k])/(2*dx[l]) ;
          }
+    
+     // Antisymetric part of the velocity gradient
+     if (doOmega)
+     {
+         assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
+         CGP[i].fields[cT][Omegaid+0] = 0.5*(gradient[2*d+1] - gradient[1*d+2]) ; 
+         CGP[i].fields[cT][Omegaid+1] = 0.5*(gradient[0*d+2] - gradient[2*d+0]) ; 
+         CGP[i].fields[cT][Omegaid+2] = 0.5*(gradient[1*d+0] - gradient[0*d+1]) ; 
+     }
+     
+     if (doOmegaMag)
+     {
+         assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
+         CGP[i].fields[cT][OmegaMagid]  = (0.5*(gradient[2*d+1] - gradient[1*d+2])*0.5*(gradient[2*d+1] - gradient[1*d+2])) ; 
+         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[0*d+2] - gradient[2*d+0])*0.5*(gradient[0*d+2] - gradient[2*d+0])) ; 
+         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[1*d+0] - gradient[0*d+1])*0.5*(gradient[1*d+0] - gradient[0*d+1])) ;
+         CGP[i].fields[cT][OmegaMagid]=sqrt(CGP[i].fields[cT][OmegaMagid]) ; 
+     }    
+     
+     // Symetric part of the velocity gradient
      for (int k=0 ; k<d ; k++)
          for (int l=0 ; l<d ; l++)
              if (l!=k)
@@ -827,24 +848,6 @@ for (int i=0 ; i< Npt ; i++)
             CGP[i].fields[cT][Gamtauid] = (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ;
         CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ;
      }
-     
-     if (doOmega)
-     {
-         assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
-         CGP[i].fields[cT][Omegaid+0] = 0.5*(gradient[2*d+1] - gradient[1*d+2]) ; 
-         CGP[i].fields[cT][Omegaid+1] = 0.5*(gradient[0*d+2] - gradient[2*d+0]) ; 
-         CGP[i].fields[cT][Omegaid+2] = 0.5*(gradient[1*d+0] - gradient[0*d+1]) ; 
-     }
-     
-     if (doOmegaMag)
-     {
-         assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
-         CGP[i].fields[cT][OmegaMagid]  = (0.5*(gradient[2*d+1] - gradient[1*d+2])*0.5*(gradient[2*d+1] - gradient[1*d+2])) ; 
-         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[0*d+2] - gradient[2*d+0])*0.5*(gradient[0*d+2] - gradient[2*d+0])) ; 
-         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[1*d+0] - gradient[0*d+1])*0.5*(gradient[1*d+0] - gradient[0*d+1])) ;
-         CGP[i].fields[cT][OmegaMagid]=sqrt(CGP[i].fields[cT][OmegaMagid]) ; 
-     }
-
 
     }
 
