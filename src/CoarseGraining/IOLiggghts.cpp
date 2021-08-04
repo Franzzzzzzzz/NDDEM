@@ -36,7 +36,10 @@ int main(int argc, char * argv[])
   Coarsing C(P.dim, P.boxes, P.boundaries, maxT) ;
   for (auto i : P.extrafields)
     C.add_extra_field(i.name, i.order, i.type) ;
-  C.setWindow(P.window,P.windowsize) ;
+  if (P.window == Windows::LucyND_Periodic)      
+    C.setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta) ; 
+  else
+    C.setWindow(P.window,P.windowsize) ;
   C.set_flags(P.flags) ;
   auto extrafieldmap = C.grid_setfields() ;
 
@@ -448,7 +451,7 @@ int Datafile::do_post_cf()
          }
        }
        if (corrected==false)
-	 printf("WARN: a contact force traversing the PBC was not corrected.\n") ;
+            printf("- WARN: a contact force traversing the PBC was not corrected. - ") ;
      }
 
      if (lst[3]>=-1) datacf[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]

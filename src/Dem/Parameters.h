@@ -16,17 +16,20 @@
 #include "Typedefs.h"
 #include "Xml.h"
 #include "Tools.h"
+//
 #include <boost/random.hpp>
 
 using namespace std ;
-enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32} ;
-enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64} ; ///< Flags for export data control
+enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
+enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64, IDS=128, FN=256, FT=512, TORQUE=1024} ; ///< Flags for export data control
 enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
+template <int d>
+class Multiproc ; 
 /** \brief Generic class to handle the simulation set up
  *
  */
@@ -96,6 +99,7 @@ public :
     string Directory ; ///< Saving directory
     bool orientationtracking ; ///< Track orientation?
     bool wallforcecompute ; ///< Compute for on the wall?
+    bool contactforcedump ; ///< Extract the forces between grains as well? 
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
 
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
@@ -127,7 +131,71 @@ public :
     void quit_cleanly() ; ///< Close opened dump files in the event of an emergency quit (usually a SIGINT signal to the process)
     void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
-    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z) ; ///< Dump writing functions
+    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP) ; ///< Dump writing functions
+    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X) 
+    {
+     if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
+     if (outflags & ExportData::POSITION)
+     {
+         for (int dd = 0 ; dd<d ; dd++)
+             fprintf(out, "x%d_i, ", dd) ;
+         for (int dd = 0 ; dd<d ; dd++)
+             fprintf(out, "x%d_j, ", dd) ;
+     }
+     if (outflags & ExportData::FN)
+         for (int dd = 0 ; dd<d ; dd++)
+             fprintf(out, "Fn%d_i, ", dd) ;
+     if (outflags & ExportData::FT)
+         for (int dd = 0 ; dd<d ; dd++)
+             fprintf(out, "Ft%d_i, ", dd) ;
+     if (outflags & ExportData::TORQUE)
+     {
+         for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
+         {
+             auto val = Tools<d>::MASIndex[dd] ; 
+             fprintf(out, "Torque%d:%d_i, ", val.first, val.second) ;
+         }
+         for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
+         {
+             auto val =  Tools<d>::MASIndex[dd] ; 
+             fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
+         }
+     }
+     fseek (out, -2, SEEK_CUR) ; 
+     fprintf(out, "\n") ; 
+     
+     for (auto & CLp : MP.CLp)
+     {
+         for (auto & contact: CLp.v)
+         {
+             if (outflags & ExportData::IDS)
+                fprintf(out, "%d %d ", contact.i, contact.j) ; 
+             if (outflags & ExportData::POSITION)
+             {
+                 for (auto dd : X[contact.i])
+                  fprintf(out, "%g ", dd) ; 
+                 for (auto dd : X[contact.j])
+                  fprintf(out, "%g ", dd) ; 
+             }
+             if (outflags & ExportData::FN)
+                for (auto dd : contact.infos->Fn)
+                  fprintf(out, "%g ", dd) ; 
+             if (outflags & ExportData::FT)
+                for (auto dd : contact.infos->Ft)
+                  fprintf(out, "%g ", dd) ; 
+                 
+             if (outflags & ExportData::TORQUE)
+             {
+                for (auto dd : contact.infos->Torquei)
+                  fprintf(out, "%g ", dd) ; 
+                for (auto dd : contact.infos->Torquej)
+                  fprintf(out, "%g ", dd) ; 
+             }
+             fprintf(out, "\n") ; 
+         }
+     }
+     return 0 ; 
+    }
 
 
 // For Xml Writing
@@ -349,6 +417,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
        else if (word=="XML") dumpkind = ExportType::XML ;
        else if (word=="XMLbase64") dumpkind = ExportType::XMLbase64 ;
        else if (word=="CSVA") dumpkind = ExportType::CSVA ;
+       else if (word=="CONTACTFORCES") {dumpkind = ExportType::CSVCONTACT ; contactforcedump = true ; }
        else if (word=="WALLFORCE") {wallforcecompute = true ; goto LABEL_leave ;} //Jumps at the end of the section
        else {printf("Unknown dump type\n") ; }
 
@@ -372,6 +441,10 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          }
          else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
          else if (word =="Radius") dumplist |= ExportData::RADIUS ;
+         else if (word =="Ids") dumplist |= ExportData::IDS ; 
+         else if (word =="Fn") dumplist |= ExportData::FN ; 
+         else if (word =="Ft") dumplist |= ExportData::FT ; 
+         else if (word =="Torque") dumplist |= ExportData::TORQUE ; 
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
 
@@ -736,7 +809,7 @@ void Parameters<d>::finalise()
 
 //========================================
 template <int d>
-int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z)
+int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP)
 {
   static bool xmlstarted=false ;
 
@@ -752,6 +825,16 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         char path[500] ; sprintf(path, "%s/dumpA-%05d.csv", Directory.c_str(), ti) ;
         Tools<d>::savecsv(path, A) ;
       }
+    }
+    
+    
+    if (v.first == ExportType::CSVCONTACT)
+    {
+     char path[500] ; sprintf(path, "%s/dumpcontactforce-%05d.csv", Directory.c_str(), ti) ;
+     FILE * out = fopen(path, "w") ; 
+     if (out == NULL) {printf("[ERR] Cannot open file for contact force writing.\n") ; fflush(stdout) ; return 1 ; }
+     savecsvcontact(out, v.second, MP, X) ; 
+     fclose(out) ; 
     }
 
     if (v.first == ExportType::VTK)
@@ -810,6 +893,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
       if (v.second & ExportData::COORDINATION) xmlout->writeArray("Orientation", &Z, ArrayType::particles, EncodingType::base64);
       xmlout->stopTS();
     }
+    
   }
 return 0 ;
 }

@@ -198,6 +198,7 @@ class LibLucyND_Periodic : public LibLucyND
   LibLucyND_Periodic(struct Data * D, double ww, double dd, int periodic, vector<int>boxes, vector<double> deltas)
     : LibLucyND(D,ww,dd-__builtin_popcount(periodic))
   {
+    printf("%g ", scale) ; 
     maskperiodic = 0 ;
     for (size_t i =0 ; i<boxes.size() ; i++)
       if ((periodic&(1<<i)) && boxes[i]==1)
@@ -205,7 +206,7 @@ class LibLucyND_Periodic : public LibLucyND
         maskperiodic |= (1<<i) ;
         scale /= deltas[i] ;
       }
-    printf("NB: do not use periodic_atoms with LibLucyND_Periodic!\n") ;
+    printf("NB: do not use periodic_atoms with LibLucyND_Periodic! %g \n", scale) ;
   }
 
   double distance (int id, v1d loc) override

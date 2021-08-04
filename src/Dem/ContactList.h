@@ -59,7 +59,15 @@ public:
 
  Action & getinfo () {return *infos ; } ///< Returning stored information \warning Poorly tested
  //void setinfo (Action & a) {if (!infos) infos = new Action ; *infos=a ; }
- void setinfo (Action * a) {infos=a ; } ///< Set information for contact force dump to file. \warning Poorly tested.
+ void setinfo (Action * a) {infos=a ; } ///< Set information for contact force.
+ void saveinfo (Action & a) {
+     if (!owninfos)
+     {
+         infos = new Action ; 
+         owninfos = true ; 
+     }
+     *infos = a ; 
+ } ///< Save information regarding the contact forces for later write down. 
 
  int i ;  ///< Index of contacting particle.
  int j ; ///< Index of second contacting particle or wall. If this is a wall contact, j=2*walldimension + (0 or 1 if it is the low wall or high wall)

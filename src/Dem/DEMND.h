@@ -341,7 +341,7 @@ public:
         }
 
         //Particle - particle contacts
-        #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) //shared(stdout)
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout)
         {
           #ifdef NO_OPENMP
             int ID = 0 ;
@@ -365,6 +365,9 @@ public:
                                     X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
             }
 
+            if (P.contactforcedump && (ti % P.tdump==0))
+                it->saveinfo(C.Act) ; 
+            
             Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
             Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
@@ -445,20 +448,20 @@ public:
         if (ti % P.tdump==0)
         {
             Tools<d>::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ;
-            P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z) ;
+            P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z, MP) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            // if (P.wallforcecompute)
-            // {
-               // char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
-               // Tools<d>::setzero(WallForce) ;
+            if (P.wallforcecompute)
+            {
+              char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+              Tools<d>::setzero(WallForce) ;
 
-               // for (int i=0 ; i<MP.P ; i++)
-                  // for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
-                      // Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
+              for (int i=0 ; i<MP.P ; i++)
+                for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+                  Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
 
-            // Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            // }
+            Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
+            }
         }
 
         if (P.wallforcecompute) MP.delayedwall_clean() ;

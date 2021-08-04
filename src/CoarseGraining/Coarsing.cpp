@@ -54,7 +54,7 @@ int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 }
 
 //-------------------------------------------------------
-int Coarsing::setWindow (Windows win, double w)
+int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas)
 {
  switch (win) {
   case Windows::Rect3D :
@@ -75,8 +75,11 @@ int Coarsing::setWindow (Windows win, double w)
   case Windows::LucyND :
     setWindow<Windows::LucyND> (w) ;
     break ;
+  case Windows::LucyND_Periodic:
+    setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ; 
+    break ;
   default:
-    printf("Unknown window, check Coarsing::setWindow") ;
+    printf("Unknown window, check Coarsing::setWindow\n") ;
  }
 return 0 ;
 }
@@ -317,8 +320,9 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
   for (int i=0 ; i<data.N ; i++)
   {
     if (isnan(data.pos[0][i])) continue ;
-    auto vavg2 = interpolate_vel (i, usetimeavg) ;
+    //auto vavg = interpolate_vel (i, usetimeavg) ;
     vavg = interpolate_vel_trilinear(i,usetimeavg) ;
+    //vavg = interpolate_vel_nearest(i,usetimeavg) ;
     //printf("%g %g | %g %g | %g %g\n", vavg[0], vavg2[0], vavg[1], vavg2[1], vavg[2], vavg2[2]) ;
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;

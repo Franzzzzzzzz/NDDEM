@@ -218,11 +218,13 @@ static boost::random::uniform_01<boost::mt19937> rand ; ///< Returns a random nu
 
 static int getdim (void) {return d;} ///< Return the dimension. \deprecated{Probably deprecated: essentially so that the NetCDF class has access to d.}
 
+static vector < pair <int,int> > MASIndex ; ///< For skew symmetric matrix, make the correspondance between linear index and (row,column) index.
+
 private:
 static vector < vector <int> > MSigns ; ///< For skew symetric matrix. -1 below the diagonal, 0 on the diagonal, +1 above the diagnal
 static vector < vector <int> > MIndexAS ; ///< For skew symmetric matrix, make the correspondance between linear index of a full matrix with the linear index of the skew-symetric storage.
-static vector < pair <int,int> > MASIndex ; ///< For skew symmetric matrix, make the correspondance between linear index and (row,column) index.
 static vector <FILE *> outs ; ///< Store the output file descriptors.
+
 } ;
 
 // Static member definitions ---------------------------------------------------

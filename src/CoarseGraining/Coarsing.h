@@ -169,10 +169,10 @@ public :
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
     int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
-    int setWindow (Windows win, double w) ; ///< Set the windowing function, calling the templated version
+    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
     template <Windows W> int setWindow (double w) ; ///< Set the windowing function
-    template <Windows W> int setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function
+    template <Windows W> int setWindow (double w, vector<bool> per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function for the LibLucyND_Periodic (special one...)
     int grid_generate() ; ///< Generate the coarse-graining grid
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
     std::map<std::string, size_t> grid_setfields() ; ///< Set the fields at each CG point
@@ -262,14 +262,18 @@ int Coarsing::setWindow (double w)
 }
 //-------------------------------------------------------
 template <Windows W>
-int Coarsing::setWindow (double w, double cuttoff, int per, vector<int> boxes, vector<double> deltas)
+int Coarsing::setWindow (double w, vector<bool> per, vector<int> boxes, vector<double> deltas)
 {
   static_assert(W == Windows::LucyND_Periodic) ;
-  //cutoff=2.5*w ; //TODO
-  cutoff = cuttoff ;
+  cutoff = Window->cutoff() ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
+  
+  int p = 0 ;
+  for (size_t i=0 ; i<per.size() ; i++)
+    if (per[i])
+        p |= (1<<i) ; 
 
-  Window = new LibLucyND_Periodic (&data,w,d,per,boxes,deltas) ;
+  Window = new LibLucyND_Periodic (&data,w,d,p,boxes,deltas) ;
 return 0 ;
 }
 
