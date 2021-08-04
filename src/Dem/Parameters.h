@@ -21,7 +21,7 @@
 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
-enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64, IDS=128, FN=256, FT=512, TORQUE=1024} ; ///< Flags for export data control
+enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64, IDS=128, FN=256, FT=512, TORQUE=1024, GHOSTMASK=2048, GHOSTDIR=4096} ; ///< Flags for export data control
 enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
@@ -161,6 +161,11 @@ public :
              fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
          }
      }
+     if (outflags & ExportData::GHOSTMASK)
+        fprintf(out, "GhostMask, ") ;
+     if (outflags & ExportData::GHOSTDIR)
+        fprintf(out, "GhostDir, ") ;
+     
      fseek (out, -2, SEEK_CUR) ; 
      fprintf(out, "\n") ; 
      
@@ -191,6 +196,12 @@ public :
                 for (auto dd : contact.infos->Torquej)
                   fprintf(out, "%g ", dd) ; 
              }
+             
+             if (outflags & ExportData::GHOSTMASK)
+                 fprintf(out, "%d ", contact.ghost) ;
+             if (outflags & ExportData::GHOSTDIR)
+                 fprintf(out, "%d ", contact.ghostdir) ;
+             
              fprintf(out, "\n") ; 
          }
      }
