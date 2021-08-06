@@ -14,12 +14,13 @@ auto skin
 boundary 0 WALL  0 20
 boundary 1 WALL  0 20
 boundary 2 WALL  0 20
-boundary 3 SPHERE 5 10 10 10
+#boundary 3 SPHERE 5 10 10 10
+boundary 3 ROTATINGSPHERE 5 10 10 10 0.0001 0 0
 #boundary 3 PBC  0 3.4
 
 auto location insphere
 
-gravityrotate 10 1 0 1
+gravity 10 1 0 0
 set Kn 2e5
 set Kt 8e4
 set GammaN 75

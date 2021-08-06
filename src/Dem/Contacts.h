@@ -30,10 +30,12 @@ public:
     vector < double > Torquej ; ///< Torque on particle j
     vector < double > vrel ; ///< Relative velocity
 
-    void particle_particle (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Force & torque between 2 particles
-    void particle_wall     ( cv1d & Vi, cv1d &Omegai, double ri,
-                             cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
+    void particle_particle   ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
+                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Force & torque between 2 particles
+    void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri,
+                               cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
+    void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri,
+                               cv1d & cn, cv1d & Vj, cp & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
@@ -183,12 +185,64 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
      Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
-  Torquei-= Omegai*P->damping ; // damping
-  //History[make_pair(i,-(2*j+k+1))]=make_pair (true, tspr) ;
+  
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;
   return ;
 }
+
+//---------------------- particle particle contact ----------------------------
+template <int d>
+void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, double ri,
+                                       cv1d & cn, cv1d & Vj, cp & Contact)
+{
+  contactlength=Contact.contactlength ;
+
+  ovlp=ri-contactlength ;
+  if (ovlp<=0) {Act.setzero(d) ; return ;}
+
+  //Relative velocity at contact
+  Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
+  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ; 
+  Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
+  Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
+
+  //Normal force
+  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; //TODO
+
+  //Tangential force computation: retrieve contact or create new contact
+  tspr=Contact.tspr ;
+  if (tspr.size()==0) tspr.resize(d,0) ;
+
+  Tools<d>::vAddScaled (tspr, P->dt, vt) ; //tspr += vt*dt ;
+  Tools<d>::vSubScaled(tspr, Tools<d>::dot(tspr,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
+  Tools<d>::vMul(Ft, tspr, - P->Kt) ; //Ft=  tspr*(-Kt) ;
+  Coulomb=P->Mu_wall*Tools<d>::norm(Fn) ;
+
+  if (Tools<d>::norm(Ft) >= Coulomb)
+  {
+    if (Tools<d>::norm(tspr)>0)
+    {
+      Tools<d>::vMul(tvec, Ft, 1/Tools<d>::norm(Ft)) ; //tvec=Ft * (1/Tools<d>::norm(Ft)) ;
+      Tools<d>::vMul(Ftc, tvec, Coulomb) ; //Ftc = tvec * Coulomb ;
+      Ft=Ftc ;
+      Tools<d>::vMul(tspr, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
+    }
+    else
+      Tools<d>::setzero(Ft) ;
+  }
+  else
+      Tools<d>::vSubScaled(Ft, P->Gammat, vt) ; //Ft -= (vt*Gammat) ;
+
+  Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
+
+  Contact.tspr=tspr ;
+  Act.set(Fn, Ft, Torquei, Torquej) ;
+  return ;
+}
+
+
+
 
 #endif
 /** @} */

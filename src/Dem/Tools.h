@@ -30,7 +30,9 @@ v1f operator+ (v1f a, cv1f &b)   ;
 v1d operator- (v1d a, double b) ;
 v1d operator- (v1d a, cv1d &b)   ;
 v1f operator- (v1f a, cv1f &b)   ;
-v1d operator- (v1d a)           ;
+v1d operator- (v1d a, const double * b) ;
+v1d operator- (const double * a, v1d b) ;
+v1d operator- (v1d a) ; 
 v1d operator/ (v1d a, double b) ;
 v1d & operator-= (v1d & a, cv1d &b) ;
 v1d & operator*= (v1d & a, double b);
@@ -93,6 +95,25 @@ static double skewnormsq (cv1d & a) {double res=0 ; for (int i=0 ; i<d*(d-1)/2 ;
 static double dot (cv1d & a, cv1d & b) {double res=0; for (int i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; } ///< Dot product
 static v1f vsqrt (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=sqrt(a[i]) ; return b ; } ///<Component-wise square root
 static v1f vsq (cv1f & a) {v1f b=a ; for (uint i=0 ; i<a.size() ; i++) b[i]=a[i]*a[i] ; return b ; } ///< Component-wise squaring
+
+static void surfacevelocity (v1d &res, cv1d &p, double * com, double * vel_com, double * omega_com)
+{
+ if (vel_com == nullptr && omega_com == nullptr)
+ {
+     res.resize(d) ; setzero(res) ; 
+ }
+ else if (omega_com == nullptr)
+     for (int dd=0 ; dd<d ; dd++)
+         res[dd] = vel_com[dd] ;
+ else if (vel_com == nullptr)
+     skewmatvecmult(res, omega_com, p-com) ;
+ else
+ {
+     skewmatvecmult(res, omega_com, p-com) ;
+     for (int dd=0 ; dd<d ; dd++)
+        res[dd] = vel_com[dd] - res[dd] ;  
+ }
+}
 
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; } ///< Set the gravity. \f$\vec a_i = m_i * \vec g \f$
 static v1d randomize_vec (cv1d v) ; ///< Produce a random vector
@@ -186,7 +207,9 @@ static void vSubOne (v1d & res, cv1d &a, v1d & Corr)
 /** @name Matrix operations, usually operating on flattened matrices, cf. the description for more information on matrix storage */
 ///@{
 static v1d  skewmatvecmult (cv1d & M, cv1d &v) ; ///< Multiply the skew symetric matrix M with vector v
+static v1d  skewmatvecmult (const double * M, cv1d &v) ; ///< Multiply the skew symetric matrix M with vector v
 static void skewmatvecmult (v1d & r, cv1d & M, cv1d &v) ; ///< Multiply the skew symetric matrix M with vector v in place
+static void skewmatvecmult (v1d & r, const double * M, cv1d &v) ; ///< Multiply the skew symetric matrix M with vector v in place (overload)
 static v1d  skewmatsquare  (cv1d &A) ;///< Square the skew symetric matrix M
 static void skewmatsquare  (v1d &r, cv1d &A) ; ///< Square the skew symetric matrix M in place
 static v1d  skewexpand     (cv1d &A) ; ///< Return the skew symetrix matrix M stored on d(d-1)/2 component as a full flattened matrix with d^2 components
@@ -495,9 +518,35 @@ v1d Tools<d>::skewmatvecmult (cv1d & M, cv1d & v)
  }
  return res ;
 }
+template <int d>
+v1d Tools<d>::skewmatvecmult (const double * M, cv1d & v)
+{
+ v1d res (d,0) ;
+ for (int i=0 ; i<d ; i++)
+ {
+     for (int j=0 ; j<d ; j++)
+     {
+         if (j==i) continue ;
+         res[i]+= MSigns[i][j]*M[MIndexAS[i][j]]*v[j] ;
+     }
+ }
+ return res ;
+}
 //------------------------------------
 template <int d>
 void Tools<d>::skewmatvecmult (v1d & r, cv1d & M, cv1d & v)
+{
+ for (int i=0 ; i<d ; i++)
+ {
+     for (int j=0 ; j<d ; j++)
+     {
+         if (j==i) continue ;
+         r[i]+= MSigns[i][j]*M[MIndexAS[i][j]]*v[j] ;
+     }
+ }
+}
+template <int d>
+void Tools<d>::skewmatvecmult (v1d & r, const double * M, cv1d & v)
 {
  for (int i=0 ; i<d ; i++)
  {

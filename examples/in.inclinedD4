@@ -1,5 +1,6 @@
 # Incline plane flow
-directory /home/franz/Dropbox/DEM_ND/Samples/D4
+#directory /home/franz/Dropbox/DEM_ND/Samples/D4
+directory Output
 dimensions 4 425
 
 #set adimensional
@@ -23,10 +24,11 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 500
+set T 50
 set dt 0.0001
-set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps XML with 4 Position Velocity Omega Coordination
 set dumps CSV with 1 Orientation
+det dumps VTK with 0
 #set dumps CONTACTFORCES with 4 Ids Fn Ft Torque
 set tdump 1000
 event 20 gravity -0.9 0.42 0 0

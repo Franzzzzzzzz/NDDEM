@@ -298,7 +298,7 @@ public:
                             CLw.insert(tmpcp) ;
                         }
                     }
-                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE))
+                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE) || P.Boundaries[j][3]==static_cast<int>(WallType::ROTATINGSPHERE))
                     {
                         tmpcp.contactlength=0 ;
                         for (int dd=0 ; dd<d ; dd++)
@@ -350,7 +350,7 @@ public:
             double timebeg = omp_get_wtime();
           #endif
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
-            v1d tmpcn (d,0) ;
+            v1d tmpcn (d,0) ; v1d tmpvel (d,0) ; 
 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
@@ -391,6 +391,14 @@ public:
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
+                }
+                else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ROTATINGSPHERE))
+                {
+                    for (int dd = 0 ; dd<d ; dd++)
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
+                    tmpcn/=Tools<d>::norm(tmpcn) ;
+                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;  
+                    C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], tmpcn, tmpvel, *it) ;
                 }
                 else
                 {
@@ -451,7 +459,7 @@ public:
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z, MP) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            if (P.wallforcecompute)
+            /*if (P.wallforcecompute)
             {
               char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
               Tools<d>::setzero(WallForce) ;
@@ -461,7 +469,7 @@ public:
                   Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
 
             Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            }
+            }*/
         }
 
         if (P.wallforcecompute) MP.delayedwall_clean() ;
@@ -593,6 +601,10 @@ Visualisation [shape=box,style=filled,color="0.9 0.6 0.6"] ;
 <pre>./TexturingServer </pre>: Run the texturing server for calls from the visualisation side. Typical calling URL are available in the Texturing module.
 
 \section InputScript Input script commands
-
+\subsection Walltypes Wall types
+<pre> boundary dim PBC low high </pre> Periodic boundary condition between the boundaries at low and high.<br>
+<pre> boundary dim WALL low high </pre> Static walls at boundaries low and high (normal of the wall along the dimension dim). <br>
+<pre> boundary dim MOVINGWALL low high vel_low vel_high </pre> Walls moving along their normals<br>
+<pre> boundary n SPHERE radius x1 x2 ... xn </pre> Define a sherical wall. n should be higher than the dimension (walls or pbs should be defined in the other dimensions). (xi) is the location of the sphere centre.  
 
 */
