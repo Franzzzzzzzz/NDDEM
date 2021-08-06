@@ -223,6 +223,7 @@ public:
 
             // Boundary conditions ...
             P.perform_PBC(X[i], PBCFlags[i]) ;
+            P.perform_PBC_LE (X[i], V[i], PBCFlags[i]) ;
 
             // Find ghosts
             Ghost[i]=0 ; Ghost_dir[i]=0 ;
@@ -230,7 +231,7 @@ public:
 
             for (int j=0 ; j<d ; j++, mask<<=1)
             {
-            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC)) continue ;
+            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
             else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
@@ -280,7 +281,7 @@ public:
             tmpcp.i=i ;
             for (size_t j=0 ; j<P.Boundaries.size() ; j++) // Wall contacts
             {
-                    if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
+                    if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC) || P.Boundaries[j][3]==static_cast<int>(WallType::PBC_LE)) continue ;
 
                     if (P.Boundaries[j][3]==static_cast<int>(WallType::WALL) || P.Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
                     {
