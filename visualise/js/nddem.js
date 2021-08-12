@@ -575,12 +575,12 @@ function update_spheres(spheres) {
       spheres[i][2] = x2_temp;
       spheres[i][3] = x3_temp;
     }
-    if (params.N == 1) {
-      spheres[i][1] = 0;
-    }
-    if (params.N < 3) {
-      spheres[i][2] = 0;
-    }
+    // if (params.N == 1) {
+    //   spheres[i][1] = 0;
+    // }
+    // if (params.N < 3) {
+    //   spheres[i][2] = 0;
+    // }
     if (params.N < 4) {
       var R_draw = spheres[i][params.N];
     } else if (params.N == 4) {

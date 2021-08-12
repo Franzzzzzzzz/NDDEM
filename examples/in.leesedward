@@ -1,6 +1,6 @@
 # Incline plane flow
 directory Output
-dimensions 3 125
+dimensions 3 145
 
 # The order is quite important here: 1/set the density base on a particle of mass 1 and diameter 1. 2/update everyone radius 3/update the mass and inertia based on the previously defined rho and radius.
 radius -1 0.5
@@ -26,8 +26,9 @@ set Mu 0.5
 set T 500
 set dt 0.0001
 #set dumps XML with 4 Position Velocity Omega Coordination
-#set dumps CSV with 1 Orientation
-set dumps VTK with 0 
+set dumps CSV with 1 Orientation
+#set dumps VTK with 0
+set dumps CONTACTFORCES with 4 Ids Position Fn Ft
 set tdump 10000
 
 EOF
