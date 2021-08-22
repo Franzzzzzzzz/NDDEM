@@ -39,13 +39,13 @@ public:
     void particle_ghost (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
-        v1d * velg = const_cast<v1d *>(&Vj) ; 
-        loc=Xj ; 
+        v1d * velg = const_cast<v1d *>(&Vj) ;
+        loc=Xj ;
         uint32_t gh=Contact.ghost, ghd=Contact.ghostdir ;
         if ( (gh & 1) && P->Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
         {
-            velg = &vel ; 
-            vel = Vj ; 
+            velg = &vel ;
+            vel = Vj ;
             vel[1] += ((ghd&1)?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2];
         }
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
@@ -53,7 +53,7 @@ public:
           if (gh&1)
             loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
-        
+
         return (particle_particle (Xi, Vi, Omegai, ri, loc, *velg, Omegaj, rj, Contact) ) ;
     } ///< Force and torque between an particle and a ghost (moves the ghost and calls particle_particle()
 
@@ -63,7 +63,7 @@ private:
   /** Temporary variables for internal use, to avoid reallocation at each call */
   double contactlength, ovlp, dotvrelcn, Coulomb, tsprn, tsprcn ;
   vector <double> cn, rri, rrj, vn, vt, Fn, Ft, tvec, Ftc, tspr, tsprc ;
-  
+
   vector <double> loc = vector<double>(d, 0) ;
   vector <double> vel = vector<double>(d, 0) ;
 } ;
@@ -194,7 +194,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
      Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
-  
+
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;
   return ;
@@ -212,7 +212,7 @@ void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, doub
 
   //Relative velocity at contact
   Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
-  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ; 
+  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ;
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
