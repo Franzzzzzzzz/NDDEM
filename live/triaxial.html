@@ -328,8 +328,8 @@
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
-                window.addEventListener( 'mousemove', onMouseMove, false );
-                window.addEventListener( 'keypress', onSelectParticle, false );
+                container.addEventListener( 'mousemove', onMouseMove, false );
+                container.addEventListener( 'keypress', onSelectParticle, false );
 
                 if ( show_stats ) { make_graph(); }
 
@@ -492,11 +492,11 @@
                     // console.log(F[0])
                     // if ( isNaN(pressure) ) { pressure = 0; }
 
-                    if ( stats !== undefined ) {
-                        stats.begin()
-                        panel.update(pressure,1e6)
-                        stats.end();
-                    }
+                    // if ( stats !== undefined ) {
+                    //     stats.begin()
+                    //     panel.update(pressure,1e6)
+                    //     stats.end();
+                    // }
 
                 }
 
@@ -693,33 +693,17 @@
             }
 
             function update_graph() {
-                // var gd = document.getElementById('stats')
-                // var camera_opts = gd._fullLayout.scene.camera;
-                // shear = 0;
                 density = params.packing_fraction*material_density;
-                // pressure = Math.random();
-                // shear = Math.random();
-                // density = Math.random();
-                if ( pressure_time[-1] !== pressure ) {
-                    pressure_time.push(pressure);
-                    shear_time.push(shear);
-                    density_time.push(density);
-                    // console.log(shear_time)
-                //     Plotly.update('stats', {
-                //         'x': [density_time],
-                //         'y': [shear_time],
-                //         'z': [pressure_time],
-                //     },
-                // )
-                    // camera_opts);
-                    // Plotly.relayout('stats',  );
+                pressure_time.push(pressure);
+                shear_time.push(shear);
+                density_time.push(density);
+
+                if ( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) {
                     Plotly.extendTraces('stats', {
                         'x': [[density]],
                         'y': [[shear]],
                         'z': [[pressure]],
-                    }, [0]
-                    )
-
+                    }, [0])
                 }
             }
 
