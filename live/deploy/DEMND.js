@@ -1293,10 +1293,10 @@ function isFileURI(filename) {
 }
 
 // end include: URIUtils.js
-  var wasmBinaryFile = 'DEMND.wasm';
-  if (!isDataURI(wasmBinaryFile)) {
-    wasmBinaryFile = locateFile(wasmBinaryFile);
-  }
+var wasmBinaryFile = 'DEMND.wasm';
+if (!isDataURI(wasmBinaryFile)) {
+  wasmBinaryFile = locateFile(wasmBinaryFile);
+}
 
 function getBinary(file) {
   try {

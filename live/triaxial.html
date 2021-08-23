@@ -6,25 +6,34 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <style>
 			body { margin: 0; }
-			canvas { width: 100%; height: 100% }
-            #N_tag {
-                color: white;
-                padding: 24px;
-                font: 48px Montserrat;
-                /* font-weight: bold; */
-                position:absolute;
+			/* canvas { width: 100%; height: 100% } */
+            .flex-container {
+                display: flex;
+                flex-direction: row;
             }
             #stats {
-                position: absolute;
+                width: 50%;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+                /* position: absolute;
                 width: 300px;
                 height: 200px;
                 margin: 0;
-                padding: 0;
+                padding: 0; */
+            }
+            #canvas {
+                width: 50%;
+                height: 100%;
+                /* background-color: #FFF; */
             }
         </style>
 	</head>
 	<body>
-        <div id="stats"></div>
+        <div class="flex-container">
+            <div id="stats"></div>
+            <div id="canvas"></div>
+        </div>
         <script async type="text/javascript" src="./deploy/DEMND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -87,6 +96,10 @@
             if ( urlParams.has('stress_controlled') ) {
                 loading_method = 'stress_controlled';
             }
+
+            let graph_fraction = 0.5;
+            document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
+            document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
 
             var params = {
                 dimension: 3,
@@ -166,13 +179,13 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
 				camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );
                 camera.up.set(0, 0, 1);
 				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x666666 );
+				scene.background = new THREE.Color( 0x111 );
 
                 // const axesHelper = new THREE.AxesHelper( 5 );
                 // scene.add( axesHelper );
@@ -246,10 +259,13 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				document.body.appendChild( renderer.domElement );
+
+                var container = document.getElementById( 'canvas' );
+                // document.body.appendChild( container );
+                container.appendChild( renderer.domElement );
 
 				// stats = new Stats();
                 // panel = stats.addPanel( new Stats.Panel( 'Pressure', 'white', 'black' ) );
@@ -270,14 +286,14 @@
 
 				gui.width = 300;
 
-				gui.add( params, 'packing_fraction', 0, 1, 0.01 )
-					.name( 'Solids fraction' ).listen();
+				// gui.add( params, 'packing_fraction', 0, 1, 0.01 )
+					// .name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
                 if ( loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'volumetric_strain', 0,0.1, 0.001)
+                    gui.add( params, 'volumetric_strain', 0,0.2, 0.001)
                         .name( 'Volumetric strain').listen()
                         .onChange( function () { update_walls(); } );
-                    gui.add( params, 'axial_strain', 0,0.1, 0.001)
+                    gui.add( params, 'axial_strain', 0,0.2, 0.001)
                         .name( 'Axial strain').listen()
                         .onChange( function () { update_walls(); } );
                     }
@@ -307,7 +323,7 @@
                             S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'paused').name('Paused').listen();
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, container );
 				controls.target.y = 0.5;
 				controls.update();
 
@@ -325,8 +341,7 @@
 
             	// calculate mouse position in normalized device coordinates
             	// (-1 to +1) for both components
-
-            	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            	mouse.x = ( (event.clientX - window.innerWidth*graph_fraction) / window.innerWidth*(1-graph_fraction) ) * 8 - 1;
             	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
             }
@@ -353,10 +368,16 @@
 
             function onWindowResize(){
 
-                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.aspect = window.innerWidth*(1-graph_fraction) / window.innerHeight;
                 camera.updateProjectionMatrix();
 
-                renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+
+                var update = {
+                    width: window.innerWidth*graph_fraction,
+                    height: window.innerHeight
+                    };
+                Plotly.relayout('stats', update);
 
             }
 
@@ -379,7 +400,7 @@
                 else if ( loading_method == 'stress_controlled' ) {
                     let delta_p = p_controller.update(params.pressure_set_pt,pressure,dt);
                     let delta_q = q_controller.update(params.deviatoric_set_pt,shear,dt)
-                    console.log(pressure)
+                    // console.log(pressure)
                     params.L_cur -= delta_p;
                     params.H_cur += delta_q;
 
@@ -468,7 +489,7 @@
 
                     pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
                     shear = sigma_33 - pressure;
-                    console.log(F)
+                    // console.log(F[0])
                     // if ( isNaN(pressure) ) { pressure = 0; }
 
                     if ( stats !== undefined ) {
@@ -665,76 +686,94 @@
                     S.interpret_command("set Mu 0.5");
                     S.interpret_command("set T 150");
                     S.interpret_command("set dt 0.0001");
+                    S.interpret_command("set tdump 10"); // how often to calculate wall forces
                     S.interpret_command("auto skin");
                     S.finalise_init () ;
                 }
             }
 
             function update_graph() {
-                var gd = document.getElementById('stats')
-                var camera_opts = gd._fullLayout.scene.camera;
+                // var gd = document.getElementById('stats')
+                // var camera_opts = gd._fullLayout.scene.camera;
                 // shear = 0;
                 density = params.packing_fraction*material_density;
                 // pressure = Math.random();
                 // shear = Math.random();
                 // density = Math.random();
-                pressure_time.push(pressure);
-                shear_time.push(shear);
-                density_time.push(density);
-                // console.log(shear_time)
-                Plotly.update('stats', {
-                    'x': [density_time],
-                    'y': [shear_time],
-                    'z': [pressure_time],
-                },
-                camera_opts);
-                // Plotly.relayout('stats',  );
+                if ( pressure_time[-1] !== pressure ) {
+                    pressure_time.push(pressure);
+                    shear_time.push(shear);
+                    density_time.push(density);
+                    // console.log(shear_time)
+                //     Plotly.update('stats', {
+                //         'x': [density_time],
+                //         'y': [shear_time],
+                //         'z': [pressure_time],
+                //     },
+                // )
+                    // camera_opts);
+                    // Plotly.relayout('stats',  );
+                    Plotly.extendTraces('stats', {
+                        'x': [[density]],
+                        'y': [[shear]],
+                        'z': [[pressure]],
+                    }, [0]
+                    )
 
+                }
             }
 
             function make_graph() {
-                Plotly.newPlot('stats', [{
-                  type: 'scatter3d',
-                  mode: 'lines',
-                  x: [],
-                  y: [],
-                  z: [],
-                  // opacity: 1,
-                  line: {
-                    width: 2,
-                    color: "white",
-                    // reversescale: false
-                  }
-                }], {
-                  height: 300,
-                  width: 500,
-                  xaxis: {
-                    autotick: true,
-                    autorange: true,
-                },
-                  yaxis: {
-                    autotick: true,
-                    autorange: true,
-                },
-                  zaxis: {
-                    autotick: true,
-                    autorange: true,
-                },
-                scene: {
-            		xaxis:{title: 'Density'},
-            		yaxis:{title: 'Deviatoric stress'},
-            		zaxis:{title: 'Pressure'},
-                    aspectmode: 'auto',
-            		},
-                paper_bgcolor: 'rgba(0,0,0,1)',
-                plot_bgcolor: 'rgba(0,0,0,1)',
-                margin: {
-                    t: 5, //top margin
-                    l: 5, //left margin
-                    r: 5, //right margin
-                    b: 5 //bottom margin
-                    }
-                });
+                var data = [{
+                              type: 'scatter3d',
+                              mode: 'lines',
+                              x: [],
+                              y: [],
+                              z: [],
+                              // opacity: 1,
+                              line: {
+                                width: 5,
+                                color: "black",
+                                // reversescale: false
+                              }
+                            }]
+                var layout = {
+                                  // height: 300,
+                                  // width: 500,
+                                  xaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                },
+                                  yaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                },
+                                  zaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                },
+                                scene: {
+                            		xaxis:{title: 'Density (kg/m<sup>3</sup>)'},
+                            		yaxis:{title: 'Deviatoric stress (Pa)'},
+                            		zaxis:{title: 'Pressure (Pa)'},
+                                    aspectmode: 'auto',
+                            		},
+                                // paper_bgcolor: 'rgba(0,0,0,1)',
+                                // plot_bgcolor: 'rgba(0,0,0,1)',
+                                // margin: {
+                                //     t: 5, //top margin
+                                //     l: 5, //left margin
+                                //     r: 5, //right margin
+                                //     b: 5 //bottom margin
+                                //     }
+                                }
+                Plotly.newPlot('stats', data, layout);
             }
 
             function loadSTL( ) {
