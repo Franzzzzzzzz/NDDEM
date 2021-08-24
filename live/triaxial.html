@@ -165,7 +165,7 @@
 
             if ( params.dimension == 3 ) {
                 p_controller = new PIDcontroller(1e-6,1e-9,0);
-                q_controller = new PIDcontroller(1e-6,1e-9,0);
+                q_controller = new PIDcontroller(1e-7,1e-9,0);
             }
             // else {
             //     p_controller = new PIDcontroller(1e-7,1e-6,0);
@@ -305,6 +305,9 @@
                     gui.add( params, 'axial_strain', 0,0.2, 0.001)
                         .name( 'Axial strain').listen()
                         .onChange( function () { update_walls(); } );
+                    gui.add ( params, 'constant_volume')
+                        .name('Constant volume').listen()
+                        .onChange( function() { update_walls(); });
                     }
                 else if ( loading_method === 'stress_controlled' ) {
                     gui.add( params, 'pressure_set_pt', 0,1e5, 1)
@@ -324,10 +327,7 @@
                             }
                         });
                 }
-                gui.add ( params, 'constant_volume').name('Constant volume').listen()
-                    .onChange( function() {
-                        update_walls();
-                    });
+
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
@@ -721,13 +721,13 @@
                 shear_time.push(shear);
                 density_time.push(density);
 
-                if ( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) {
+                // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
                     Plotly.extendTraces('stats', {
                         'x': [[density]],
                         'y': [[shear]],
                         'z': [[pressure]],
                     }, [0])
-                }
+                // }
             }
 
             function make_graph() {
