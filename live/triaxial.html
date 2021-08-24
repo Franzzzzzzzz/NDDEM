@@ -27,6 +27,13 @@
                 height: 100%;
                 /* background-color: #FFF; */
             }
+
+            .dg .c {
+                width: 40% !important;
+            }
+            .dg .property-name {
+                width: 60% !important;
+            }
         </style>
 	</head>
 	<body>
@@ -106,11 +113,13 @@
                 L: 4, //system size
                 N: 500,
                 // packing_fraction: 0.5,
+                constant_volume: true,
                 axial_strain: 0,
                 volumetric_strain: 0,
                 gravity: false,
                 paused: false,
                 H_cur: 0,
+                W_cur: 0,
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
@@ -283,7 +292,7 @@
 
                 // gui
 				gui = new GUI();
-
+                console.log(gui)
 				gui.width = 300;
 
 				// gui.add( params, 'packing_fraction', 0, 1, 0.01 )
@@ -315,6 +324,10 @@
                             }
                         });
                 }
+                gui.add ( params, 'constant_volume').name('Constant volume').listen()
+                    .onChange( function() {
+                        update_walls();
+                    });
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
@@ -322,7 +335,7 @@
                         else {
                             S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
-                gui.add ( params, 'paused').name('Paused').listen();
+                gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
 				const controls = new OrbitControls( camera, container );
 				controls.target.y = 0.5;
 				controls.update();
@@ -392,9 +405,19 @@
 
 
                 if ( loading_method == 'strain_controlled') {
+                    if ( params.constant_volume ) {
+                        params.L_cur = params.L*(1-params.volumetric_strain);
+                        params.H_cur = params.L*params.axial_strain;
+                        params.W_cur = -( -Math.sqrt(params.L*params.L*params.L*(params.L-params.H_cur)) - params.H_cur*params.L + params.L*params.L ) / ( params.H_cur - params.L );
+                        console.log(params.L_cur, params.H_cur, params.W_cur);
 
-                    params.L_cur =  params.L*(1-params.volumetric_strain);
-                    params.H_cur =  params.L*params.axial_strain; // TODO: THIS FORMULA IS WRONG!!!!!
+                    }
+                    else {
+                        params.L_cur =  params.L*(1-params.volumetric_strain);
+                        params.H_cur =  params.L*params.axial_strain;
+                        params.W_cur = 0;
+                    }
+
 
                 }
                 else if ( loading_method == 'stress_controlled' ) {
@@ -405,10 +428,10 @@
                     params.H_cur += delta_q;
 
                 }
-                params.front =  params.L_cur;
-                params.back  = -params.L_cur;
-                params.left  = -params.L_cur;
-                params.right =  params.L_cur;
+                params.front =  params.L_cur - params.W_cur;
+                params.back  = -params.L_cur + params.W_cur;
+                params.left  = -params.L_cur + params.W_cur;
+                params.right =  params.L_cur - params.W_cur;
                 params.floor = -params.L_cur + params.H_cur;
                 params.roof  =  params.L_cur - params.H_cur;
 
