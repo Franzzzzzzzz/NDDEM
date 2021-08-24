@@ -29,10 +29,10 @@
             }
 
             .dg .c {
-                width: 40% !important;
+                width: 45% !important;
             }
             .dg .property-name {
-                width: 60% !important;
+                width: 55% !important;
             }
         </style>
 	</head>
@@ -292,8 +292,8 @@
 
                 // gui
 				gui = new GUI();
-                console.log(gui)
-				gui.width = 300;
+                // console.log(gui)
+				gui.width = 320;
 
 				// gui.add( params, 'packing_fraction', 0, 1, 0.01 )
 					// .name( 'Solids fraction' ).listen();
@@ -302,7 +302,7 @@
                     gui.add( params, 'volumetric_strain', 0,0.2, 0.001)
                         .name( 'Volumetric strain').listen()
                         .onChange( function () { update_walls(); } );
-                    gui.add( params, 'axial_strain', 0,0.2, 0.001)
+                    gui.add( params, 'axial_strain', -0.2,0.2, 0.001)
                         .name( 'Axial strain').listen()
                         .onChange( function () { update_walls(); } );
                     gui.add ( params, 'constant_volume')
