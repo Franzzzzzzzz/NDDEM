@@ -126,6 +126,7 @@
                 r_max: 0.5,
                 r_min: 0.45,
                 freq: 0.05,
+                new_line: false,
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -336,6 +337,21 @@
                             S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
+                gui.add ( params, 'new_line').name('New loading path').listen()
+                    .onChange( () => {
+                        params.axial_strain = 0;
+                        params.volumetric_strain = 0;
+                        update_walls();
+                        var data = [{
+                                      type: 'scatter3d',
+                                      mode: 'lines',
+                                      x: [], y: [], z: [],
+                                      line: { width: 5 },
+                                      // name: 'Load path'
+                                    }]
+                        Plotly.addTraces('stats', data);
+                        params.new_line = false;
+                    });
 				const controls = new OrbitControls( camera, container );
 				controls.target.y = 0.5;
 				controls.update();
@@ -726,7 +742,7 @@
                         'x': [[density]],
                         'y': [[shear]],
                         'z': [[pressure]],
-                    }, [0])
+                    }, [-1])
                 // }
             }
 
@@ -773,12 +789,17 @@
                             		},
                                 // paper_bgcolor: 'rgba(0,0,0,1)',
                                 // plot_bgcolor: 'rgba(0,0,0,1)',
-                                // margin: {
-                                //     t: 5, //top margin
-                                //     l: 5, //left margin
-                                //     r: 5, //right margin
-                                //     b: 5 //bottom margin
-                                //     }
+                                margin: {
+                                    t: 20, //top margin
+                                    l: 20, //left margin
+                                    r: 20, //right margin
+                                    b: 20 //bottom margin
+                                },
+                                legend: {
+                                    x: 1,
+                                    xanchor: 'right',
+                                    y: 1
+                                  }
                                 }
                 Plotly.newPlot('stats', data, layout);
             }
