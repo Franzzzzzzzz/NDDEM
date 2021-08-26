@@ -434,21 +434,15 @@
             }
 
             function update_walls(dt=0.001) {
-                // console.log(dt)
-                if ( params.dimension == 3 ) {
-                    params.packing_fraction = (params.N*particle_volume)/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8.;
-                }
-                else if ( params.dimension == 4) {
-                    params.packing_fraction = (params.N*particle_volume)/params.L_cur/params.L_cur/(params.L_cur - params.H_cur)/8./params.L_cur;
-                }
-
+                params.packing_fraction = (params.N*particle_volume)/Math.pow(params.L_cur-params.W_cur,params.dimension-1)/(params.L_cur - params.H_cur)/Math.pow(2,params.dimension);
+                console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
                 if ( loading_method == 'strain_controlled') {
                     if ( params.constant_volume ) {
                         params.L_cur = params.L*(1-params.volumetric_strain);
                         params.H_cur = params.L*params.axial_strain;
                         params.W_cur = -( -Math.sqrt(params.L*params.L*params.L*(params.L-params.H_cur)) - params.H_cur*params.L + params.L*params.L ) / ( params.H_cur - params.L );
-                        console.log(params.L_cur, params.H_cur, params.W_cur);
+                        // console.log(params.L_cur, params.H_cur, params.W_cur);
 
                     }
                     else {
