@@ -495,6 +495,9 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["radius"]   = [&](){int id ; double radius ; in>>id>>radius ; if(id==-1) r = v1d(N,radius) ; else r[id]=radius ; printf("[INFO] Set radius of particle.\n") ;} ;
  Lvl0["mass"]     = [&](){int id ; double mass ;   in>>id>>mass   ; if(id==-1) m = v1d(N,mass  ) ; else r[id]=mass   ; printf("[INFO] Set mass of particle.\n") ;} ;
  Lvl0["gravity"]  = [&](){for (int i=0 ; i<d ; i++) {in >> g[i] ;} printf("[INFO] Changing gravity.\n") ; } ;
+ /*Lvl0["removebulkvel"] = [&](){v1d bulkvel(d,0) ; for (int i=0 ; i<N ; i++) for (int dd=0 ; dd<N ; dd++) bulkvel[dd] += V[i][dd] ; 
+                                                  for (int dd=0 ; dd<N ; dd++) bulkvel[dd]/=N ; 
+                                                  for (int i=0 ; i<N ; i++) for (int dd=0 ; dd<N ; dd++) V[i][dd] -= bulkvel[dd] ; }*/
  Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
     Tools<d>::setzero(g) ;
     g[0] = -intensity * cos(angle / 180. * M_PI) ;
@@ -515,7 +518,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
     else if (!strcmp(line, "SPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::SPHERE) ; Boundaries[id].resize(4+d,0) ; }
     else if (!strcmp(line, "ROTATINGSPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::ROTATINGSPHERE) ; Boundaries[id].resize(4+d+d*(d-1)/2,0) ; }
-    else if (!strcmp(line, "PBCLE")) {assert((id==0)) ; Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(4+1,0) ; }
+    else if (!strcmp(line, "PBCLE")) {/*assert((id==0)) ; */Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(4+1,0) ; }
     else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
     in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
     Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
@@ -624,7 +627,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
         {
          for(int dd=0 ; dd < d ; dd++)
          {
-           if (Boundaries[dd][3]==0)
+           if (Boundaries[dd][3]==static_cast<int>(WallType::PBC) || Boundaries[dd][3]==static_cast<int>(WallType::PBC_LE))
              X[i][dd] = rand()*Boundaries[dd][2] + Boundaries[dd][0] ;
            else
              X[i][dd] = rand()*(Boundaries[dd][2]-2*r[i]) + Boundaries[dd][0] + r[i] ;

@@ -179,6 +179,10 @@ public:
     */
     void step_forward (int nt)
     {
+        //TESTING
+      for( auto & v: X)
+          std::swap(v[0], v[1]) ; 
+        
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
         // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
@@ -228,12 +232,12 @@ public:
             // Find ghosts
             Ghost[i]=0 ; Ghost_dir[i]=0 ;
             uint32_t mask=1 ;
-
+            
             for (int j=0 ; j<d ; j++, mask<<=1)
             {
             if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
-            else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+            else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ; }
             }
 
             //Nghosts=Ghosts.size() ;
@@ -352,36 +356,58 @@ public:
           #endif
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ; 
-
+         
+            // TESTING
+            FILE * tmpfic = nullptr ; 
+            if (ti % P.tdump==0)
+            {
+                char blabla[1000] ; 
+                sprintf(blabla, "Output/Ghosts-%d.txt", ti) ;  
+                tmpfic = fopen(blabla, "w") ; 
+            }
+            // END TESTING
+         
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
-            if (it->ghost==0)
-            {
-                C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
-            }
-            else
-            {
-                C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
-            }
+                #ifdef LEESEDWARD // Need to handle the crossing state 
+                if (it->crossing_state != 0)
+                    it->perform_crossing (PBCFlags[it->i], PBCFlags[it->j]) ;
+                #endif
+                if (it->ghost==0)
+                {
+                    C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                            X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+                }
+                else
+                {
+                    C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it, tmpfic) ;
+                }
 
-            if (P.contactforcedump && (ti % P.tdump==0))
-                it->saveinfo(C.Act) ; 
-            
-            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-            Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+                if (P.contactforcedump && (ti % P.tdump==0))
+                    it->saveinfo(C.Act) ; 
+                
+                #ifndef LEESEDWARD
+                Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+                #else 
+                Tools<d>::vAddFew(F[it->i], C.Act.Fn_i, C.Act.Ft_i, Fcorr[it->i]) ;
+                #endif
+                Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-            if (MP.ismine(ID,it->j))
-            {
-                Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
-                Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
-            }
-            else
-                MP.delaying(ID, it->j, C.Act) ;
+                if (MP.ismine(ID,it->j))
+                {
+                    #ifndef LEESEDWARD
+                    Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+                    #else 
+                    Tools<d>::vAddFew(F[it->j], C.Act.Fn_j, C.Act.Ft_j, Fcorr[it->j]) ;
+                    #endif
+                    Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+                }
+                else
+                    MP.delaying(ID, it->j, C.Act) ;
 
-            //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-            //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+                //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+                //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
 
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
@@ -420,6 +446,8 @@ public:
             #ifndef NO_OPENMP
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif
+            
+            if (tmpfic != nullptr) fclose(tmpfic) ; 
         } //END PARALLEL PART
 
         // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
@@ -427,7 +455,11 @@ public:
         {
             for (uint j=0 ; j<MP.delayed_size[i] ; j++)
             {
+            #ifndef LEESEDWARD
             Tools<d>::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
+            #else 
+            Tools<d>::vAddFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn_j, MP.delayed[i][j].Ft_j, Fcorr[MP.delayedj[i][j]]) ;
+            #endif
             Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
             }
         }
