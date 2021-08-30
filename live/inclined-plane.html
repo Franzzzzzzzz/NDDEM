@@ -123,15 +123,12 @@
 				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );
+				camera.position.set( params.L, 0, 4*params.L );
                 camera.up.set(1, 0, 0);
-				camera.lookAt( 0, 0, 0 );
+				camera.lookAt( params.L, params.L, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111 );
-
-                // const axesHelper = new THREE.AxesHelper( 5 );
-                // scene.add( axesHelper );
 
 				const hemiLight = new THREE.HemisphereLight();
 				hemiLight.intensity = 0.35;
@@ -184,9 +181,11 @@
                         });
                 }
 
-                gui.add ( params, 'theta', 0, 90, 0.01).name('Slope angle').listen()
+                gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg)').listen()
                     .onChange( function() {
-                        S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3))
+                        S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3));
+                        camera.up.set(Math.cos(params.theta*Math.PI/180.), -Math.sin(params.theta*Math.PI/180.), 0);
+                        controls.update();
                     });
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
