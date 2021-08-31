@@ -54,7 +54,7 @@
 			let physics, position;
             let gui;
 			let spheres;
-            let back;
+            let floor;
             let S;
             let NDDEMLib;
             let pointer;
@@ -123,9 +123,8 @@
 				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
-				camera.position.set( params.L, 0, 4*params.L );
+				camera.position.set( 1*params.L, 0, 5*params.L );
                 camera.up.set(1, 0, 0);
-				camera.lookAt( params.L, params.L, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111 );
@@ -146,18 +145,14 @@
                 wall_material.wireframe = true;
                 // const wall_material = new THREE.ShadowMaterial( )
 
-                back = new THREE.Mesh( wall_geometry, wall_material );
-                back.rotation.z = Math.PI/2.;
-                back.position.x = -params.L - thickness/2.;// + params.r_min + params.r_max;
-                back.scale.x = 2*params.L + 2*thickness;
-                back.scale.z = 2*params.L + 2*thickness;
-                // front.receiveShadow = true;
-                scene.add( back );
-                // physics.addMesh( front );
+                floor = new THREE.Mesh( wall_geometry, wall_material );
+                floor.rotation.z = Math.PI/2.;
+                // floor.position.x = -params.L - thickness/2.;// + params.r_min + params.r_max;
+                floor.scale.x = 2*params.L + 2*thickness;
+                floor.scale.z = 2*params.L + 2*thickness;
+                scene.add( floor );
 
 				add_spheres();
-
-				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -201,7 +196,9 @@
                         params.new_line = false;
                     });
 				const controls = new OrbitControls( camera, container );
-				controls.target.y = 0.5;
+				controls.target.x = 1*params.L;
+                controls.target.y = 0;
+                controls.target.z = 0;
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
@@ -320,7 +317,7 @@
                     S.interpret_command("auto mass");
                     S.interpret_command("auto inertia");
 
-                    S.interpret_command("boundary 0 PBC -"+String(params.L)+" "+String(params.L));
+                    S.interpret_command("boundary 0 PBC 0 "+String(50*params.L));
                     S.interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
                     S.interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
                     if ( params.dimension == 4 ) {
