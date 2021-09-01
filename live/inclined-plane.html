@@ -50,7 +50,7 @@
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
 
-			let camera, scene, renderer, stats, panel;
+			let camera, scene, renderer, stats, panel, controls;
 			let physics, position;
             let gui;
 			let spheres;
@@ -176,12 +176,8 @@
                         });
                 }
 
-                gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg)').listen()
-                    .onChange( function() {
-                        S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3));
-                        camera.up.set(Math.cos(params.theta*Math.PI/180.), Math.sin(params.theta*Math.PI/180.), 0);
-                        controls.update();
-                    });
+                gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg) (W/S)').listen()
+                    .onChange( () => update_slope_angle() );
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {
@@ -195,16 +191,36 @@
                         Plotly.addTraces('stats', data);
                         params.new_line = false;
                     });
-				const controls = new OrbitControls( camera, container );
+				controls = new OrbitControls( camera, container );
 				controls.target.x = 1*params.L;
                 controls.target.y = 0;
                 controls.target.z = 0;
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
+                window.addEventListener( 'keypress', checkKeys, false );
+
 
 			    animate();
 			}
+
+            function update_slope_angle() {
+                S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3));
+                camera.up.set(Math.cos(params.theta*Math.PI/180.), Math.sin(params.theta*Math.PI/180.), 0);
+                if ( controls !== undefined) { controls.update(); }
+                console.log(params.theta)
+            }
+
+            function checkKeys( event ) {
+                if ( event.code === 'KeyW' ) {
+                    params.theta += 0.1;
+                    update_slope_angle();
+                    }
+                if ( event.code === 'KeyS' ) {
+                    params.theta -= 0.1;
+                    update_slope_angle();
+                    }
+            }
 
             function onWindowResize(){
 
