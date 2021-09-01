@@ -75,7 +75,7 @@
 
             var params = {
                 dimension: 3,
-                L: 4, //system size
+                L: 3.7, //system size
                 N: 500,
                 // packing_fraction: 0.5,
                 constant_volume: true,
@@ -85,7 +85,7 @@
                 g_mag: 1e3,
                 theta: 0, // slope angle in DEGREES
                 d4_cur:0,
-                r_max: 0.5,
+                r_max: 0.55,
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
@@ -178,8 +178,8 @@
 
                 gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg)').listen()
                     .onChange( function() {
-                        S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3));
-                        camera.up.set(Math.cos(params.theta*Math.PI/180.), -Math.sin(params.theta*Math.PI/180.), 0);
+                        S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3));
+                        camera.up.set(Math.cos(params.theta*Math.PI/180.), Math.sin(params.theta*Math.PI/180.), 0);
                         controls.update();
                     });
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
@@ -317,13 +317,13 @@
                     S.interpret_command("auto mass");
                     S.interpret_command("auto inertia");
 
-                    S.interpret_command("boundary 0 PBC 0 "+String(50*params.L));
+                    S.interpret_command("boundary 0 WALL 0 "+String(50*params.L));
                     S.interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
+                    S.interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
                     if ( params.dimension == 4 ) {
                         S.interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
                     }
-                    S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3))
+                    S.interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3))
 
                     S.interpret_command("auto location roughinclineplane");
 
