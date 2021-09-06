@@ -66,16 +66,19 @@ public:
     void particle_leesedwardghost (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri,
                                                 cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double DeltaLE, cp & Contact) ; ///< Handle the case when a contact crosses a Lees-Edward boundary condition 
     #endif
+
     Action Act ; ///< Resulting Action
 
 private:
   /** Temporary variables for internal use, to avoid reallocation at each call */
+  
   double contactlength, ovlp, dotvrelcn, Coulomb  ;
   vector <double> cn, rri, rrj, vn, vt, Fn, Ft, tvec, Ftc, tspr ;
   #ifdef LEESEDWARD
   double Coulomb_i, Coulomb_j ; 
   vector <double> vnLE, vtLE, Fn_i, Fn_j, Ft_i, Ft_j, tspr_i, tspr_j ; 
   #endif
+
   vector <double> loc = vector<double>(d, 0) ;
   vector <double> vel = vector<double>(d, 0) ;
 } ;
@@ -215,7 +218,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
      Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
-  
+
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;
   return ;
@@ -233,7 +236,7 @@ void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, doub
 
   //Relative velocity at contact
   Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
-  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ; 
+  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ;
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 

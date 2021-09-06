@@ -241,6 +241,8 @@
                         .name( 'D4 location').listen()
                         // .onChange( function () { update_walls(); } );
                         .onChange( function () {
+                            var s = 2*Math.sqrt(params.L*params.L/4 - params.d4_cur*params.d4_cur/4)/params.L;
+                            boundary.scale.set(s,s,s);
                             if ( urlParams.has('stl') ) {
                                 meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                             }

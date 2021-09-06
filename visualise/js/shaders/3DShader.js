@@ -28,6 +28,7 @@ for (var ij = 0; ij < N * N; ij++) {
 
 var NDDEMShader = new ShaderMaterial({
   uniforms: uniforms,
+  // lights: true,
 
   vertexShader: [
     "uniform int N;", // number of dimensions in simulation
@@ -100,15 +101,14 @@ var NDDEMShader = new ShaderMaterial({
     "void main() {",
 
     // add directional lighting
-    // "const float ambient = 1.0;",
     "vec3 light = vec3( ambient );",
     "light = normalize( light );",
     "float directional = max( dot( vNormal, light ), 0.0 );",
     "gl_FragColor = vec4( 0.6*( ambient + directional ) * vColor, 1.0 );", // colours by vertex colour
 
     // no directional lighting
-    // const float ambient = 1.0;
-    // gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
+    // "const float ambient = 1.0;",
+    // "gl_FragColor = vec4( ( ambient ) * vColor, 1.0 );", // colours by vertex colour
 
     "}",
   ].join("\n"),
