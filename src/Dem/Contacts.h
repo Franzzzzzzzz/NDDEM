@@ -50,11 +50,12 @@ public:
         //TESTING
         double DeltaLE = ((Contact.ghostdir&1)?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ; 
         if (tmpfile != nullptr)
-            fprintf(tmpfile, "%g %g %g %g %g %d\n", loc[0], loc[1], Vj[0], Vj[1]+((Contact.ghost & 1)?1:0)*DeltaLE, rj, Contact.ghost) ; 
+            fprintf(tmpfile, "%g %g %g %g %g %d\n", loc[0], ((Contact.ghost & 1)?1:1)*loc[1], Vj[0], Vj[1]+((Contact.ghost & 1)?1:0)*DeltaLE, rj, Contact.ghost) ; 
         #ifdef LEESEDWARD
         if ( (Contact.ghost & 1) && P->Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
         {
             double DeltaLE = ((Contact.ghostdir&1)?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ; 
+            //loc[1] = -loc[1] ;
             return particle_leesedwardghost (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, DeltaLE, Contact) ;
         }
         else
@@ -300,8 +301,8 @@ void Contacts<d>::particle_leesedwardghost (cv1d & Xi, cv1d & Vi, cv1d & Omegai,
   
   //Normal force
   Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; //TODO
-  Fn_i =  Fn /*- vnLE*P->Gamman*/ ; 
-  Fn_j = -Fn /*- vnLE*P->Gamman*/ ; 
+  Fn_i =  Fn - vnLE*P->Gamman ; 
+  Fn_j = -Fn - vnLE*P->Gamman ; 
 
   //Tangential force computation: retrieve contact or create new contact
   tspr_i=Contact.tspr_i ;
@@ -310,12 +311,12 @@ void Contacts<d>::particle_leesedwardghost (cv1d & Xi, cv1d & Vi, cv1d & Omegai,
   if (tspr_j.size()==0) tspr_j.resize(d,0) ;
   
   Tools<d>::vAddScaled (tspr_i, P->dt,  vt+vtLE) ; //tspradd_compile_definitions( += vt*dt ;
-  Tools<d>::vAddScaled (tspr_j, P->dt, -vt/*+vtLE*/) ; //tspr += vt*dt ;
+  Tools<d>::vAddScaled (tspr_j, P->dt, -vt+vtLE) ; //tspr += vt*dt ;
   Tools<d>::vSubScaled (tspr_i, Tools<d>::dot(tspr_i,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
   Tools<d>::vSubScaled (tspr_j, Tools<d>::dot(tspr_j,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
   
   Tools<d>::vMul(Ft_i, tspr_i, - P->Kt) ; //Ft=  tspr*(-Kt) ;
-  Tools<d>::vMul(Ft_j, tspr_i, P->Kt) ; //Ft=  tspr*(-Kt) ;
+  Tools<d>::vMul(Ft_j, tspr_j, - P->Kt) ; //Ft=  tspr*(-Kt) ;
   Coulomb_i=P->Mu*Tools<d>::norm(Fn_i) ;
   Coulomb_j=P->Mu*Tools<d>::norm(Fn_j) ;
   
@@ -332,23 +333,23 @@ void Contacts<d>::particle_leesedwardghost (cv1d & Xi, cv1d & Vi, cv1d & Omegai,
       Tools<d>::setzero(Ft_i) ;
   }
   else
-      Tools<d>::vSubScaled(Ft_i, P->Gammat, vt/*+vtLE*/) ; //Ft -= (vt*Gammat) ;
+      Tools<d>::vSubScaled(Ft_i, P->Gammat, vt+vtLE) ; //Ft -= (vt*Gammat) ;
   
   // same for j, changing what's needed
   if (Tools<d>::norm(Ft_j) >= Coulomb_j)
   {
-      if (Tools<d>::norm(tspr_i)>0)
+      if (Tools<d>::norm(tspr_j)>0)
       {
       Tools<d>::vMul(tvec, Ft_j, 1/Tools<d>::norm(Ft_j)) ; //tvec=Ft * (1/Tools<d>::norm(Ft)) ;
       Tools<d>::vMul(Ftc, tvec, Coulomb_j) ; //Ftc = tvec * Coulomb ;
-      Ft_j=-Ftc ;
-      //Tools<d>::vMul(tspr_i, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
+      Ft_j=Ftc ;
+      Tools<d>::vMul(tspr_j, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
       }
       else
         Tools<d>::setzero(Ft_j) ;
   }
   else
-      Tools<d>::vSubScaled(Ft_j, P->Gammat, -vt/*+vtLE*/) ; //Ft -= (vt*Gammat) ;
+      Tools<d>::vSubScaled(Ft_j, P->Gammat, -vt+vtLE) ; //Ft -= (vt*Gammat) ;
 
   Tools<d>::wedgeproduct(Torquei, rri, Ft_i) ;
   Tools<d>::wedgeproduct(Torquej, rrj, Ft_j) ; //TODO check the minus sign
