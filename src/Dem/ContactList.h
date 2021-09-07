@@ -18,15 +18,7 @@ class Action {
 public :
     vector <double> Fn, Ft, Torquei, Torquej ;
     void set (v1d a, v1d b, v1d c, v1d d) {Fn=a ; Ft=b ; Torquei=c ; Torquej=d ; }
-    
-    #ifdef LEESEDWARD
-    vector <double> Fn_i, Ft_i ; 
-    vector <double> Fn_j, Ft_j ; 
-    void set (v1d a, v1d b, v1d c, v1d d, v1d e, v1d f) {Fn_i=a ; Ft_i=b ; Fn_j=c; Ft_j=d; Torquei=e ; Torquej=f ;}
-    void setzero (int d) {Fn=(v1d(d,0)) ; Ft=Fn ; Fn_j=Fn; Ft_j=Ft; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
-    #else
     void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
-    #endif
 } ;
 /** \brief Action on a specific particle for a specific duration
  * */
@@ -50,12 +42,7 @@ public :
 class cp
 {
 public:
- cp (int ii, int jj, int d, double ctlength, Action * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){
-     #ifdef LEESEDWARD
-     tspr_i = vector <double> (d, 0) ;
-     tspr_j = vector <double> (d, 0) ; 
-     #endif
-     } ///< New contact creation
+ cp (int ii, int jj, int d, double ctlength, Action * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} ///< New contact creation
  ~cp () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
  cp & operator= (const cp & c)
  {
@@ -67,10 +54,6 @@ public:
      tspr=c.tspr ;
      contactlength=c.contactlength ;
      infos=c.infos ;
-     #ifdef LEESEDWARD
-     tspr_i = c.tspr_i ; 
-     tspr_j = c.tspr_j ; 
-     #endif
      return *this ;
  } ///< Affect contact.
 
@@ -85,41 +68,16 @@ public:
      }
      *infos = a ; 
  } ///< Save information regarding the contact forces for later write down. 
- 
+
  int i ;  ///< Index of contacting particle.
  int j ; ///< Index of second contacting particle or wall. If this is a wall contact, j=2*walldimension + (0 or 1 if it is the low wall or high wall)
  double contactlength ; ///< Length of the contact
  //int8_t isghost ;        // LIMIT d<128
  uint32_t ghost ; ///< Contain ghost information about ghost contact, cf detailed description
  uint32_t ghostdir ; ///< Contain ghost information about ghost direction, cf detailed description
- char crossing_state = 0 ; ///< Used primarily for LE: handle the transition between particle-ghost contact to/from particle-particle contact.
  vector <double> tspr; ///< Vector of tangential contact history
  Action * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested.
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
- 
- #ifdef LEESEDWARD
- vector<double> tspr_i, tspr_j ; 
- int perform_crossing (uint32_t flagsi, uint32_t flagsj)
- {
-     if (crossing_state == +1) // A ghost-contact gets resolved to contact-contact
-     {
-        if      ( (flagsi & 1) && ~(flagsj & 1)) // i has crossed -> contact j was the correct one
-           tspr = tspr_j ; 
-        else if (~(flagsi & 1) &&  (flagsj & 1)) // j has crossed -> contact i was the correct one
-           tspr = tspr_i ;
-        else if ( (flagsi & 1) &&  (flagsj & 1))
-           printf("WARN: Both particle involved in a contact have crossed the LE PBC, this is not good !!!\n") ; 
-        else
-           printf("ERR: Particles didn't actually crossed the LE PBC while they should have. This is bad %X %X!!\n", flagsi, flagsj) ; 
-     }
-     else if (crossing_state == -1) 
-     {
-         tspr_i = tspr ; 
-         tspr_j = tspr ; 
-     }
- return 0 ; 
- }
- #endif 
 } ;
 
 // ------------------------------------ Contact List class -------------------------------------------
@@ -173,15 +131,6 @@ int ContactList<d>::insert(const cp &a)
         if ((*it)==a)
         {
             it->contactlength=a.contactlength ;
-            #ifdef LEESEDWARD
-            if ((it->ghost & 1) != (a.ghost & 1))
-            {
-                it->crossing_state = (it->ghost & 1)-(a.ghost & 1) ; // -1: new ghost, +1 : new non-ghost
-                //printf("{%X %X %d}", it->ghost, a.ghost, it->crossing_state) ; 
-            }
-            else 
-                it->crossing_state = 0 ;
-            #endif
             it->ghost=a.ghost ;
             it->ghostdir=a.ghostdir ;
             it++ ;
@@ -202,7 +151,7 @@ void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1,
         sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ;
         if (gst & 1)
         {
-            double Delta= ((tmpcp.ghostdir&(1<<dd))?-1:1) * P.Boundaries[dd][2] ;
+            double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
             if (sumspawn<P.skinsqr)
                 check_ghost (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;

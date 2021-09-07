@@ -153,7 +153,6 @@ public:
         t=0 ; ti=0 ;
         tprevious=clock() ;
         printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
-        printf("[INFO] Wall force computation is %s\n", P.wallforcecompute?"True":"False") ;
     }
     //-------------------------------------------------------------------
     /** \brief Interpret individual script command from string
@@ -180,10 +179,6 @@ public:
     */
     void step_forward (int nt)
     {
-        //TESTING
-      for( auto & v: X)
-          std::swap(v[0], v[1]) ; 
-        
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
         // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
@@ -228,17 +223,16 @@ public:
 
             // Boundary conditions ...
             P.perform_PBC(X[i], PBCFlags[i]) ;
-            P.perform_PBC_LE (X[i], V[i], PBCFlags[i]) ;
 
             // Find ghosts
             Ghost[i]=0 ; Ghost_dir[i]=0 ;
             uint32_t mask=1 ;
-            
+
             for (int j=0 ; j<d ; j++, mask<<=1)
             {
-            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
+            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC)) continue ;
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
-            else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ; }
+            else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
 
             //Nghosts=Ghosts.size() ;
@@ -286,7 +280,7 @@ public:
             tmpcp.i=i ;
             for (size_t j=0 ; j<P.Boundaries.size() ; j++) // Wall contacts
             {
-                    if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC) || P.Boundaries[j][3]==static_cast<int>(WallType::PBC_LE)) continue ;
+                    if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
 
                     if (P.Boundaries[j][3]==static_cast<int>(WallType::WALL) || P.Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
                     {
@@ -357,58 +351,36 @@ public:
           #endif
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ; 
-         
-            // TESTING
-            FILE * tmpfic = nullptr ; 
-            if (ti % P.tdump==0)
-            {
-                char blabla[1000] ; 
-                sprintf(blabla, "Output/Ghosts-%d.txt", ti) ;  
-                tmpfic = fopen(blabla, "w") ; 
-            }
-            // END TESTING
-         
+
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
-                #ifdef LEESEDWARD // Need to handle the crossing state 
-                if (it->crossing_state != 0)
-                    it->perform_crossing (PBCFlags[it->i], PBCFlags[it->j]) ;
-                #endif
-                if (it->ghost==0)
-                {
-                    C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                            X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
-                }
-                else
-                {
-                    C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it, tmpfic) ;
-                }
+            if (it->ghost==0)
+            {
+                C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+            }
+            else
+            {
+                C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+            }
 
-                if (P.contactforcedump && (ti % P.tdump==0))
-                    it->saveinfo(C.Act) ; 
-                
-                #ifndef LEESEDWARD
-                Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-                #else 
-                Tools<d>::vAddFew(F[it->i], C.Act.Fn_i, C.Act.Ft_i, Fcorr[it->i]) ;
-                #endif
-                Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+            if (P.contactforcedump && (ti % P.tdump==0))
+                it->saveinfo(C.Act) ; 
+            
+            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+            Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-                if (MP.ismine(ID,it->j))
-                {
-                    #ifndef LEESEDWARD
-                    Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
-                    #else 
-                    Tools<d>::vAddFew(F[it->j], C.Act.Fn_j, C.Act.Ft_j, Fcorr[it->j]) ;
-                    #endif
-                    Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
-                }
-                else
-                    MP.delaying(ID, it->j, C.Act) ;
+            if (MP.ismine(ID,it->j))
+            {
+                Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+                Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+            }
+            else
+                MP.delaying(ID, it->j, C.Act) ;
 
-                //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-                //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+            //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+            //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
 
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
@@ -425,7 +397,7 @@ public:
                     for (int dd = 0 ; dd<d ; dd++)
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
-                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;
+                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;  
                     C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], tmpcn, tmpvel, *it) ;
                 }
                 else
@@ -447,8 +419,6 @@ public:
             #ifndef NO_OPENMP
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif
-            
-            if (tmpfic != nullptr) fclose(tmpfic) ; 
         } //END PARALLEL PART
 
         // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
@@ -456,11 +426,7 @@ public:
         {
             for (uint j=0 ; j<MP.delayed_size[i] ; j++)
             {
-            #ifndef LEESEDWARD
             Tools<d>::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
-            #else 
-            Tools<d>::vAddFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn_j, MP.delayed[i][j].Ft_j, Fcorr[MP.delayedj[i][j]]) ;
-            #endif
             Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
             }
         }
@@ -489,35 +455,24 @@ public:
         // Output something at some point I guess
         if (ti % P.tdump==0)
         {
-            Tools<d>::setzero(Z) ;
-            for (auto &v: MP.CLp)
-            {
-                v.coordinance(Z);
-            }
+            Tools<d>::setzero(Z) ; for (auto &v: MP.CLp) v.coordinance(Z) ;
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z, MP) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            if (P.wallforcecompute)
+            /*if (P.wallforcecompute)
             {
-                // char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
-                Tools<d>::setzero(WallForce) ;
+              char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
+              Tools<d>::setzero(WallForce) ;
 
-                for (int i=0 ; i<MP.P ; i++)
-                {
-                    for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
-                    {
-                        Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
-                    }
-                }
+              for (int i=0 ; i<MP.P ; i++)
+                for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+                  Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
 
-                // Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            }
+            Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
+            }*/
         }
 
-        if (P.wallforcecompute)
-        {
-            MP.delayedwall_clean() ;
-        }
+        if (P.wallforcecompute) MP.delayedwall_clean() ;
 
         // Load balancing on the procs as needed
         #ifndef NO_OPENMP
@@ -650,6 +605,6 @@ Visualisation [shape=box,style=filled,color="0.9 0.6 0.6"] ;
 <pre> boundary dim PBC low high </pre> Periodic boundary condition between the boundaries at low and high.<br>
 <pre> boundary dim WALL low high </pre> Static walls at boundaries low and high (normal of the wall along the dimension dim). <br>
 <pre> boundary dim MOVINGWALL low high vel_low vel_high </pre> Walls moving along their normals<br>
-<pre> boundary n SPHERE radius x1 x2 ... xn </pre> Define a sherical wall. n should be higher than the dimension (walls or pbs should be defined in the other dimensions). (xi) is the location of the sphere centre.
+<pre> boundary n SPHERE radius x1 x2 ... xn </pre> Define a sherical wall. n should be higher than the dimension (walls or pbs should be defined in the other dimensions). (xi) is the location of the sphere centre.  
 
 */

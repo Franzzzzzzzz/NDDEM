@@ -5,6 +5,9 @@ src/Dem/DEMND
 src/Dem/xml2vtk
 src/Texturing/Texturing
 src/build/
+cggui/node_modules
+examples/Output
+build
 package-lock.json
 Samples
 Textures

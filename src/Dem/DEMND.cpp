@@ -54,11 +54,11 @@ int main (int argc, char *argv[])
 
  switch (dd)
  {
- //    case  1: templatedmain<1> (argv) ; break ;
+     case  1: templatedmain<1> (argv) ; break ;
      case  2: templatedmain<2> (argv) ; break ;
      case  3: templatedmain<3> (argv) ; break ;
- //    case  4: templatedmain<4> (argv) ; break ;
- //    case  5: templatedmain<5> (argv) ; break ;
+     case  4: templatedmain<4> (argv) ; break ;
+     case  5: templatedmain<5> (argv) ; break ;
 //     case  6: templatedmain<6> (argv) ; break ;
 //     case  7: templatedmain<7> (argv) ; break ;
 //     case  8: templatedmain<8> (argv) ; break ;
