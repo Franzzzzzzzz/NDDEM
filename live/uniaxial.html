@@ -68,7 +68,7 @@
             let NDDEMLib;
             let pointer;
             let frameRate = 60;
-            let v;
+            let v, omegaMag;
             let pressure = 0;
             let vertical_stress = 0;
             let shear = 0;
@@ -318,8 +318,7 @@
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
-                container.addEventListener( 'mousemove', onMouseMove, false );
-                window.addEventListener( 'keypress', onSelectParticle, false );
+                window.addEventListener( 'keypress', onKeyPress, false );
 
                 if ( show_stats ) { make_graph(); }
 
@@ -327,16 +326,7 @@
 			    animate();
 			}
 
-            function onMouseMove( event ) {
-
-            	// calculate mouse position in normalized device coordinates
-            	// (-1 to +1) for both components
-            	mouse.x = ( (event.clientX - window.innerWidth*graph_fraction) / window.innerWidth*(1-graph_fraction) ) * 8 - 1;
-            	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-            }
-
-            function onSelectParticle( event ) {
+            function onKeyPress( event ) {
                 if ( event.code === 'KeyW' ) {
                     if ( loading_method === 'strain_controlled' && params.vertical_strain < 0.3 ) { params.vertical_strain += params.loading_rate; }
                     else { params.pressure_set_pt *= 1 + params.loading_rate; }
@@ -347,21 +337,6 @@
                     else { params.pressure_set_pt /= 1 + params.loading_rate; }
                     update_walls();
                     }
-                if ( event.code === 'Space' ) {
-                    if ( locked_particle === null ) {
-                        locked_particle = INTERSECTED;
-                        // console.log(locked_particle);
-                        ref_location = locked_particle.position;
-
-                        camera.getWorldDirection( camera_direction ); // update camera direction
-                        // set the plane for the particle to move along to be orthogonal to the camera
-                        intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
-                                                                          locked_particle.position );
-                    }
-                    else {
-                        locked_particle = null;
-                    }
-                }
             }
 
 
@@ -424,22 +399,6 @@
                 if ( clock.getElapsedTime() > 1 ) { started = true; }
 				requestAnimationFrame( animate );
                 move_spheres();
-                if ( locked_particle !== null ) {
-                    // console.log(locked_particle)
-                    // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
-                        // console.log('success!')
-        				// ref_location.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-        			// }
-                    // ref_location.x = mouse.x;
-                    raycaster.ray.intersectPlane( intersection_plane, ref_location);
-                    ref_location.clamp( new THREE.Vector3(back.position.x,  left.position.y,floor.position.z),
-                                        new THREE.Vector3(front.position.x,right.position.y, roof.position.z) );
-                    // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
-                        // console.log(ref_location.x)
-                        // console.log(back.position.x)
-                    S.fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
-                    // }
-                }
 
                 if ( !params.paused ) {
                     new_time = clock.getElapsedTime()
@@ -480,29 +439,7 @@
 
                 }
 
-                // update the picking ray with the camera and mouse position
-            	raycaster.setFromCamera( mouse, camera );
-
-
-                const intersects = raycaster.intersectObjects( spheres.children );
-				if ( intersects.length > 0 ) { // if found something
-					if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
-                            if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
-    						INTERSECTED = intersects[ 0 ].object;
-                            INTERSECTED.material.uniforms.ambient.value = 5.0;
-					}
-				}
-                else { // didn't find anything
-					if ( INTERSECTED !== null ) { // there was something before
-                        INTERSECTED.material.uniforms.ambient.value = 1.0;
-                        INTERSECTED = null;
-                    }
-				}
-
-
 				renderer.render( scene, camera );
-
-				if ( stats !== undefined ) { stats.update(); }
 
                 old_time = new_time;
 
@@ -570,6 +507,12 @@
                     if ( urlParams.get('lut') === 'velocity' ) {
                         v = S.getVelocity();
                     }
+                    else if ( urlParams.get('lut') === 'rotation' ) {
+                        omegaMag = S.getRotationRate();
+                    }
+                    else if ( urlParams.get('lut') === 'force' ) {
+                        forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
+                    }
                     // spheres.instanceColor.needsUpdate = true;
 
                 }
@@ -593,8 +536,16 @@
                     object.position.set( x[i][0], x[i][1], x[i][2] );
                     if ( urlParams.has('lut') ) {
                         if ( urlParams.get('lut') === 'velocity' ) {
-                            spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
+                            object.material.uniforms.ambient.value = 1.0 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
                         }
+                        if ( urlParams.get('lut') === 'rotation' ) {
+                            // console.log(omegaMag[i])
+                            object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
+                        }
+                        // if ( urlParams.get('lut') === 'force' ) {
+                            // console.log(omegaMag[i])
+                            // object.material.uniforms.ambient.value = 0.5 + 0.1*forceMag[i];
+                        // }
                     }
                     for (var j = 0; j < params.N - 3; j++) {
                       object.material.uniforms.xview.value[j] =
