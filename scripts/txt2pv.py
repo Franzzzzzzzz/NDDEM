@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import glob
 
-filelist = glob.glob('Ghosts-*.txt')
+filelist = glob.glob('Ghost-*.txt')
 
 for i in filelist :
     
@@ -22,4 +22,6 @@ for i in filelist :
         y= np.ascontiguousarray(X[:,1]) ;
         vx= np.ascontiguousarray(X[:,2]) ;
         vy= np.ascontiguousarray(X[:,3]) ;
-    pointsToVTK(i[0:-4], x, y, z, data = {"vx":vx,"vy":vy, 'radius': r})
+        typ= np.ascontiguousarray(X[:,5]) ;
+        ids= np.ascontiguousarray(X[:,6]) ;
+    pointsToVTK(i[0:-4], x, y, z, data = {"vx":vx,"vy":vy, 'radius': r, 'type': typ, 'ids': ids})

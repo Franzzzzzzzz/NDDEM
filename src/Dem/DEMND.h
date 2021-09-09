@@ -223,22 +223,37 @@ public:
 
             // Boundary conditions ...
             P.perform_PBC(X[i], PBCFlags[i]) ;
+            P.perform_PBCLE(X[i], V[i], PBCFlags[i]) ;  
 
-            // Find ghosts
+            // Find ghosts 
             Ghost[i]=0 ; Ghost_dir[i]=0 ;
             uint32_t mask=1 ;
 
             for (int j=0 ; j<d ; j++, mask<<=1)
             {
-            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC)) continue ;
+            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
             else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+            }
+            
+            if (P.Boundaries[0][3] == static_cast<int>(WallType::PBC_LE) && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
+            {
+                mask = (1<<30) ; // WARNING dim 30 will be used for LEPBC!!
+                double tmpyloc = X[i][1] + (Ghost_dir[i]&1?-1:1)*P.Boundaries[0][5] ; 
+                if (tmpyloc > P.Boundaries[1][1]) tmpyloc -= P.Boundaries[1][2] ;
+                if (tmpyloc < P.Boundaries[1][0]) tmpyloc += P.Boundaries[1][2] ;
+                if      (tmpyloc <= P.Boundaries[1][0] + P.skin) {Ghost[i] |= mask ; }
+                else if (tmpyloc >= P.Boundaries[1][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+                
             }
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
+        P.perform_PBCLE_move() ; 
         std::invoke (P.update_gravity, &P, t) ;
+        
+        //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ; 
 
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
         {
@@ -262,7 +277,10 @@ public:
                 if (Ghost[j])
                 {
                     tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                    CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
+                    if (P.Boundaries[0][3]!=static_cast<int>(WallType::PBC_LE))
+                        CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
+                    else
+                        CLp.check_ghost_LE (Ghost[j], P, X[i], X[j], tmpcp) ;
                 }
                 else
                 {
@@ -352,6 +370,15 @@ public:
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ; 
 
+            // TESTING
+            FILE * logghosts=nullptr ; 
+            if (ti % P.tdump==0)
+            {
+                char name[500] ; 
+                sprintf(name, "Output/Ghost-%d.txt",ti) ;  
+                logghosts = fopen(name, "w") ; 
+            }
+                
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
             if (it->ghost==0)
@@ -361,19 +388,19 @@ public:
             }
             else
             {
-                C.particle_ghost(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+                C.particle_ghost_LE(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it, logghosts) ;
             }
 
             if (P.contactforcedump && (ti % P.tdump==0))
                 it->saveinfo(C.Act) ; 
             
-            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+            Tools<d>::vAddFew(F[it->i], C.Act.Fni, C.Act.Fti, Fcorr[it->i]) ;
             Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
             if (MP.ismine(ID,it->j))
             {
-                Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+                Tools<d>::vAddFew(F[it->j], C.Act.Fnj, C.Act.Ftj, Fcorr[it->j]) ;
                 Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
             }
             else
@@ -382,6 +409,10 @@ public:
             //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
             //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
+            
+            // TESTING
+            if (logghosts != nullptr)
+                fclose(logghosts) ; 
 
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
@@ -426,7 +457,7 @@ public:
         {
             for (uint j=0 ; j<MP.delayed_size[i] ; j++)
             {
-            Tools<d>::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
+            Tools<d>::vAddFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fnj, MP.delayed[i][j].Ftj, Fcorr[MP.delayedj[i][j]]) ;
             Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
             }
         }

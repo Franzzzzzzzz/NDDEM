@@ -22,7 +22,7 @@
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
 enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64, IDS=128, FN=256, FT=512, TORQUE=1024, GHOSTMASK=2048, GHOSTDIR=4096} ; ///< Flags for export data control
-enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4} ; ///< Wall types
+enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4, PBC_LE=5} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
@@ -108,6 +108,9 @@ public :
     int set_boundaries() ;  ///< Set default boundaries
     //int init_particles(v2d & X, v2d & A) ;
     void perform_PBC(v1d & X, uint32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
+    void perform_PBCLE_move() ; 
+    void perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag) ; 
+
     void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.
     int init_mass() ; ///< Initialise particle mass
     int init_inertia() ; ///< Initialise particle moment of inertia
@@ -250,6 +253,40 @@ void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
     else if (X[j]>Boundaries[j][1]) {X[j] -= Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
    }
  }
+}
+//----------------------------------------------------
+template <int d>
+void Parameters<d>::perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag)
+{
+    if (Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
+    {
+        if      (X[0]<Boundaries[0][0]) 
+        {
+            X[0] += Boundaries[0][2] ; PBCFlag |= 1 ;
+            X[1] += Boundaries[0][5] ; 
+            V[1] += Boundaries[0][2]*Boundaries[0][4] ; ;
+        }
+        else if (X[0]>Boundaries[0][1]) 
+        {
+            X[0] -= Boundaries[0][2] ; PBCFlag |= 1 ;
+            X[1] -= Boundaries[0][5] ; 
+            V[1] -= Boundaries[0][2]*Boundaries[0][4] ; ;
+        }
+
+        if ( X[1]<Boundaries[1][0]) {X[1]+=Boundaries[1][2] ; PBCFlag |= 2 ; }
+        if ( X[1]>Boundaries[1][1]) {X[1]-=Boundaries[1][2] ; PBCFlag |= 2 ; }
+    }
+}
+//----------------------------------------------------
+template <int d>
+void Parameters<d>::perform_PBCLE_move ()
+{
+    if (Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
+    {
+        Boundaries[0][5] += dt*Boundaries[0][4]*Boundaries[0][2] ; 
+        if (Boundaries[0][5]>Boundaries[1][1]) 
+            Boundaries[0][5] -= Boundaries[1][2] ; 
+    }
 }
 //----------------------------------------------------
 template <int d>
@@ -504,6 +541,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
     else if (!strcmp(line, "SPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::SPHERE) ; Boundaries[id].resize(4+d,0) ; }
     else if (!strcmp(line, "ROTATINGSPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::ROTATINGSPHERE) ; Boundaries[id].resize(4+d+d*(d-1)/2,0) ; }
+    else if (!strcmp(line, "PBCLE")) {Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(6,0) ; }
     else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
     in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
     Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
@@ -522,6 +560,12 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
             Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
             for (int i=1 ; i<d; i++) in>>Boundaries[id][4+i] ; 
             for (int i=0; i<d*(d-1)/2 ; i++) in >> Boundaries[id][4+d+i] ; 
+    }
+    else if (Boundaries[id][3] == static_cast<int>(WallType::PBC_LE))
+    {
+        assert((id==0)) ;
+        in >> Boundaries[id][4] ;
+        Boundaries[id][5] = 0 ; 
     }
     printf("[INFO] Changing BC.\n") ;
    };
@@ -867,6 +911,12 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
         if (v.second & ExportData::RADIUS) {tmp.push_back(r) ; val.push_back({"RADIUS", TensorType::SCALAR, &tmp}) ;}
         if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; val.push_back({"Coordination", TensorType::SCALAR, &tmp}) ;  }
+        if (v.second & ExportData::IDS) {
+            vector<double> tmpid (N, 0) ; 
+            for (int i=0 ; i<N ; i++) 
+                tmpid[i]=i ; 
+            tmp.push_back(tmpid) ; val.push_back({"Id", TensorType::SCALAR, &tmp}) ;  
+        }
         Tools<d>::savevtk(path, N, Boundaries, X, r, val) ;
     }
 
