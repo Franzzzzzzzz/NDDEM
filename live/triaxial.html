@@ -127,6 +127,9 @@
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
+                loading_rate: 0.001,
+                max_volumetric_strain: 0.2,
+                max_axial_strain: 0.2,
                 lut: 'None',
             }
 
@@ -301,12 +304,13 @@
 					// .name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
                 if ( loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'volumetric_strain', 0,0.2, 0.001)
+                    gui.add( params, 'volumetric_strain', 0, params.max_volumetric_strain, 0.001)
                         .name( 'Volumetric strain (W/S)').listen()
                         .onChange( function () { update_walls(); } );
-                    gui.add( params, 'axial_strain', -0.2,0.2, 0.001)
+                    gui.add( params, 'axial_strain', -params.max_axial_strain,params.max_axial_strain, 0.001)
                         .name( 'Axial strain (A/D)').listen()
                         .onChange( function () { update_walls(); } );
+                    gui.add( params, 'loading_rate', 0.0001, 0.01, 0.0001).name( 'Loading rate' );
                     gui.add ( params, 'constant_volume')
                         .name('Constant volume').listen()
                         .onChange( function() { update_walls(); });
@@ -380,25 +384,25 @@
 
             function onSelectParticle( event ) {
                 if ( event.code === 'KeyW' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.volumetric_strain += 0.001; }
-                    else { params.pressure_set_pt *= 1.001; }
+                    if ( loading_method === 'strain_controlled' && params.volumetric_strain < params.max_volumetric_strain) { params.volumetric_strain += params.loading_rate; }
+                    else { params.pressure_set_pt *= 1 + params.loading_rate; }
                     update_walls();
                     }
                 if ( event.code === 'KeyS' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.volumetric_strain -= 0.001; }
-                    else { params.pressure_set_pt /= 1.001; }
+                    if ( loading_method === 'strain_controlled' && params.volumetric_strain > 0 ) { params.volumetric_strain -= params.loading_rate; }
+                    else { params.pressure_set_pt /= 1 + params.loading_rate; }
                     update_walls();
                     }
                 if ( event.code === 'KeyD' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.axial_strain += 0.001; }
+                    if ( loading_method === 'strain_controlled' && params.axial_strain < params.max_axial_strain ) { params.axial_strain += params.loading_rate; }
                     // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = 1; }
-                    else { params.deviatoric_set_pt += 0.001*params.pressure_set_pt; }
+                    else { params.deviatoric_set_pt += params.loading_rate*params.pressure_set_pt; }
                     update_walls();
                     }
-                if ( event.code === 'KeyA' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.axial_strain -= 0.001; }
+                if ( event.code === 'KeyA' && params.axial_strain > -params.max_axial_strain ) {
+                    if ( loading_method === 'strain_controlled' ) { params.axial_strain -= params.loading_rate; }
                     // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = -1; }
-                    else { params.deviatoric_set_pt -= 0.001*params.pressure_set_pt; }
+                    else { params.deviatoric_set_pt -= params.loading_rate*params.pressure_set_pt; }
                     update_walls();
                     }
                 if ( event.code === 'Space' ) {

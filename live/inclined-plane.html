@@ -176,9 +176,9 @@
                             }
                         });
                 }
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
                 gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg) (W/S)').listen()
                     .onChange( () => update_slope_angle() );
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {

@@ -125,6 +125,7 @@
                 freq: 0.05,
                 new_line: false,
                 loading_rate: 0.001,
+                max_vertical_strain: 0.3,
                 lut: 'None',
             }
 
@@ -265,7 +266,7 @@
 					// .name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
                 if ( loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'vertical_strain', 0, 0.3, 0.001)
+                    gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
                         .name( 'Vertical strain (W/S)').listen()
                         .onChange( function () { update_walls(); } );
                     gui.add( params, 'loading_rate', 0.0001, 0.01, 0.0001).name( 'Loading rate' );
@@ -329,7 +330,7 @@
 
             function onKeyPress( event ) {
                 if ( event.code === 'KeyW' ) {
-                    if ( loading_method === 'strain_controlled' && params.vertical_strain < 0.3 ) { params.vertical_strain += params.loading_rate; }
+                    if ( loading_method === 'strain_controlled' && params.vertical_strain < params.max_vertical_strain ) { params.vertical_strain += params.loading_rate; }
                     else { params.pressure_set_pt *= 1 + params.loading_rate; }
                     update_walls();
                     }
