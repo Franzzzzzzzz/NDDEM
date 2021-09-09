@@ -58,7 +58,7 @@
             let S;
             let NDDEMLib;
             let pointer;
-            let v;
+            let v, omegaMag;
             let radii;
             let particle_volume;
             let NDsolids, material, STLFilename;
@@ -89,6 +89,7 @@
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
+                lut: 'None',
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -175,7 +176,7 @@
                             }
                         });
                 }
-
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
                 gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg) (W/S)').listen()
                     .onChange( () => update_slope_angle() );
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
@@ -269,11 +270,16 @@
             function move_spheres() {
                 var x = S.getX();
                 var orientation = S.getOrientation();
-                if ( urlParams.has('lut') ) {
-                    if ( urlParams.get('lut') === 'velocity' ) {
-                        v = S.getVelocity();
-                    }
+                if ( params.lut === 'Velocity' ) {
+                    v = S.getVelocity();
                 }
+                else if ( params.lut === 'Rotation Rate' ) {
+                    omegaMag = S.getRotationRate();
+                }
+                else if ( params.lut === 'Force' ) {
+                    forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
+                }
+
                 for ( let i = 0; i < params.N; i ++ ) {
                     var object = spheres.children[i];
                     if ( params.dimension == 3 ) {
@@ -287,10 +293,12 @@
                         object.scale.set(D_draw, D_draw, D_draw);
                     }
                     object.position.set( x[i][0], x[i][1], x[i][2] );
-                    if ( urlParams.has('lut') ) {
-                        if ( urlParams.get('lut') === 'velocity' ) {
-                            spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
-                        }
+                    if ( params.lut === 'Velocity' ) {
+                        object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
+                    }
+                    if ( params.lut === 'Rotation' ) {
+                        // console.log(omegaMag[i])
+                        object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
                     }
                     for (var j = 0; j < params.N - 3; j++) {
                       object.material.uniforms.xview.value[j] =
