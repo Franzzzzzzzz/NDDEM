@@ -73,6 +73,7 @@
             let vertical_stress = 0;
             let shear = 0;
             let density = 0;
+            let vertical_stress_smooth = 0;
             let pressure_time = [];
             let shear_time = [];
             let density_time = [];
@@ -114,7 +115,7 @@
                 L: 4, //system size
                 N: 600,
                 vertical_strain: 0,
-                gravity: false,
+                gravity: true,
                 paused: false,
                 H_cur: 0,
                 pressure_set_pt: 1e4,
@@ -124,7 +125,7 @@
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
-                loading_rate: 0.001,
+                loading_rate: 0.0001,
                 max_vertical_strain: 0.3,
                 lut: 'None',
             }
@@ -269,7 +270,7 @@
                     gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
                         .name( 'Vertical strain (W/S)').listen()
                         .onChange( function () { update_walls(); } );
-                    gui.add( params, 'loading_rate', 0.0001, 0.01, 0.0001).name( 'Loading rate' );
+                    gui.add( params, 'loading_rate', 0.00001, 0.001, 0.00001).name( 'Loading rate' );
                     }
                 else if ( loading_method === 'stress_controlled' ) {
                     gui.add( params, 'pressure_set_pt', 0,1e5, 1)
@@ -427,7 +428,8 @@
                     // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
 
                     // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
-                    vertical_stress = sigma_33;
+                    // vertical_stress = sigma_33;
+                    vertical_stress = F[5][2]/params.L/params.L/4.;
                     // pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
                     // shear = sigma_33 - pressure;
                     // console.log(F[0])
@@ -596,13 +598,10 @@
                     S.interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
                     S.interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
                     S.interpret_command("boundary 2 WALL 0 "+String(2*params.L));
-                    if ( params.dimension == 3 ) {
-                        S.interpret_command("gravity 0 0 0")
-                    }
-                    if ( params.dimension == 4 ) {
-                        S.interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
-                        S.interpret_command("gravity 0 0 0 -10")
-                    }
+                    if ( params.gravity === true ) {
+                        S.interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                    else {
+                        S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
 
                     // S.interpret_command("auto location randomsquare");
                     S.interpret_command("auto location randomdrop");
@@ -621,17 +620,17 @@
             }
 
             function update_graph() {
-                density = params.packing_fraction*material_density;
+                // density = params.packing_fraction*material_density;
+                vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
                 // console.log(params.packing_fraction)
-                // pressure_time.push(pressure);
                 // shear_time.push(shear);
                 // density_time.push(density);
 
                 // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
                     Plotly.extendTraces('stats', {
-                        'x': [[density]],
+                        'x': [[params.vertical_strain*params.L]],
                         // 'y': [[shear]],
-                        'y': [[vertical_stress]],
+                        'y': [[vertical_stress_smooth]],
                     }, [-1])
                 // }
             }
@@ -657,7 +656,8 @@
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
-                                    title: 'Density (kg/m<sup>3</sup>)'
+                                    // title: 'Density (kg/m<sup>3</sup>)'
+                                    title: 'Vertical displacement (mm)'
                                 },
                                   yaxis: {
                                     // linecolor: 'white',
