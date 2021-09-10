@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Uniaxial NDDEM</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <style>
+			body { margin: 0; }
+			/* canvas { width: 100%; height: 100% } */
+            .flex-container {
+                display: flex;
+                flex-direction: row;
+            }
+            #stats {
+                width: 50%;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+                /* position: absolute;
+                width: 300px;
+                height: 200px;
+                margin: 0;
+                padding: 0; */
+            }
+            #canvas {
+                width: 50%;
+                height: 100%;
+                /* background-color: #FFF; */
+            }
+
+            .dg .c {
+                width: 45% !important;
+            }
+            .dg .property-name {
+                width: 55% !important;
+            }
+        </style>
+	</head>
+	<body>
+        <div class="flex-container">
+            <div id="stats"></div>
+            <div id="canvas"></div>
+        </div>
+        <script async type="text/javascript" src="./deploy/DEMND.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+		<script type="module">
+
+			// import * as THREE from './js/three.module.js';
+            import * as THREE from "../visualise/node_modules/three/build/three.module.js";
+			import { OrbitControls } from './js/OrbitControls.js';
+            // import { NDDEMPhysics } from './js/NDDEMPhysics.js';
+			import Stats from './js/stats.module.js';
+            import { GUI } from './js/dat.gui.module.js';
+            import { Lut } from './js/Lut.js'
+            import { PIDcontroller } from './js/PIDcontroller.js'
+            import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var clock = new THREE.Clock();
+
+			let camera, scene, renderer, stats, panel;
+			let physics, position;
+            let gui;
+			let boxes, spheres;
+            let floor, roof, left, right, front, back;
+            let S;
+            let NDDEMLib;
+            let pointer;
+            let frameRate = 60;
+            let v, omegaMag;
+            let pressure = 0;
+            let vertical_stress = 0;
+            let shear = 0;
+            let density = 0;
+            let vertical_stress_smooth = 0;
+            let pressure_time = [];
+            let shear_time = [];
+            let density_time = [];
+            // var radius = 0.5;
+            let radii;
+            let particle_volume;
+            let started = false;
+            let show_stats = true;
+            // const thickness = radius;
+            const material_density = 2700;
+            let old_time = 0;
+            let new_time = 0;
+            let counter = 0;
+            let p_controller, q_controller;
+            let NDsolids, material, STLFilename;
+            let meshes = new THREE.Group();
+
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            let intersection_plane = new THREE.Plane();
+            let camera_direction = new THREE.Vector3();
+
+            let INTERSECTED = null;
+            let last_intersection = null;
+            let locked_particle = null;
+            let ref_location;
+
+            let loading_method = 'strain_controlled';
+            if ( urlParams.has('stress_controlled') ) {
+                loading_method = 'stress_controlled';
+            }
+
+            let graph_fraction = 0.5;
+            document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
+            document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
+
+            var params = {
+                dimension: 3,
+                L: 4, //system size
+                N: 600,
+                vertical_strain: 0,
+                gravity: true,
+                paused: false,
+                H_cur: 0,
+                pressure_set_pt: 1e4,
+                deviatoric_set_pt: 0,
+                d4_cur:0,
+                r_max: 0.5,
+                r_min: 0.45,
+                freq: 0.05,
+                new_line: false,
+                loading_rate: 0.0001,
+                max_vertical_strain: 0.3,
+                lut: 'None',
+            }
+
+            params.average_radius = (params.r_min + params.r_max)/2.;
+            let thickness = params.average_radius;
+
+            particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+            if ( urlParams.has('dimension') ) {
+                params.dimension = parseInt(urlParams.get('dimension'));
+            }
+            if ( params.dimension === 4) {
+                params.L = 2.5;
+                params.N = 300
+                particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+            }
+            if ( urlParams.has('no_stats') ) {
+                show_stats = false;
+            }
+
+
+            params.L_cur = params.L;
+            params.packing_fraction = params.N*particle_volume/Math.pow(2*params.L,3);
+            params.back = -params.L;
+            params.front = params.L;
+            params.left = -params.L;
+            params.right = params.L;
+            params.floor = 0;
+            params.roof = params.L;
+
+            const lut = new Lut( 'blackbody', 512 );
+
+            if ( params.dimension == 3 ) {
+                p_controller = new PIDcontroller(1e-6,1e-9,0);
+                q_controller = new PIDcontroller(1e-6,1e-9,0);
+            }
+            // else {
+            //     p_controller = new PIDcontroller(1e-7,1e-6,0);
+            //     q_controller = new PIDcontroller(1e-6,1e-5,0);
+            // }
+
+            var quality = 5;
+
+            var NDParticleShader;
+            import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
+                NDParticleShader = module.NDDEMShader;
+    			init();
+            });
+
+			async function init() {
+
+				physics = await NDDEMPhysics();
+				position = new THREE.Vector3();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 3*params.L, 3*params.L, 2.5*params.L );
+                camera.up.set(0, 0, 1);
+				camera.lookAt( 0, 0, params.L );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111 );
+
+				const hemiLight = new THREE.HemisphereLight();
+				hemiLight.intensity = 0.35;
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 5, 5, 5 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.zoom = 2;
+				scene.add( dirLight );
+
+                const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
+                const wall_material = new THREE.MeshLambertMaterial();
+                wall_material.wireframe = true;
+                // const wall_material = new THREE.ShadowMaterial( )
+
+				left = new THREE.Mesh( wall_geometry, wall_material );
+				left.position.y = - params.L - thickness/2.;
+                left.position.z = params.L;
+				// floor.receiveShadow = true;
+				scene.add( left );
+				// physics.addMesh( floor );
+
+                right = new THREE.Mesh( wall_geometry, wall_material );
+                right.position.y = params.L + thickness/2.;
+                right.position.z = params.L;
+                // top.receiveShadow = true;
+                scene.add( right );
+                // physics.addMesh( roof );
+
+                floor = new THREE.Mesh( wall_geometry, wall_material );
+                floor.rotation.x = Math.PI/2.;
+				floor.position.z = - thickness/2.;
+				// left.receiveShadow = true;
+				scene.add( floor );
+				// physics.addMesh( left );
+
+                roof = new THREE.Mesh( wall_geometry, wall_material );
+                roof.rotation.x = Math.PI/2.;
+				roof.position.z = params.L + thickness/2.;
+				// right.receiveShadow = true;
+				scene.add( roof );
+				// physics.addMesh( right );
+
+                front = new THREE.Mesh( wall_geometry, wall_material );
+                front.rotation.z = Math.PI/2.;
+                front.position.x = params.L + thickness/2.;
+                front.position.z = params.L;
+                // back.receiveShadow = true;
+                scene.add( front );
+                // physics.addMesh( back );
+
+                back = new THREE.Mesh( wall_geometry, wall_material );
+                back.rotation.z = Math.PI/2.;
+                back.position.x = -params.L - thickness/2.;
+                back.position.z = params.L;
+                // front.receiveShadow = true;
+                scene.add( back );
+                // physics.addMesh( front );
+                update_walls();
+
+				add_spheres();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+                var container = document.getElementById( 'canvas' );
+                container.appendChild( renderer.domElement );
+
+                // gui
+				gui = new GUI();
+				gui.width = 320;
+
+				// gui.add( params, 'packing_fraction', 0, 1, 0.01 )
+					// .name( 'Solids fraction' ).listen();
+					// .onChange( function () { refresh_simulation(); } );
+                if ( loading_method === 'strain_controlled' ) {
+                    gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
+                        .name( 'Vertical strain (W/S)').listen()
+                        .onChange( function () { update_walls(); } );
+                    gui.add( params, 'loading_rate', 0.00001, 0.001, 0.00001).name( 'Loading rate' );
+                    }
+                else if ( loading_method === 'stress_controlled' ) {
+                    gui.add( params, 'pressure_set_pt', 0,1e5, 1)
+                        .name( 'Pressure set point (W/S)').listen()
+                        .onChange( function () { update_walls(); } );
+                    gui.add( params, 'deviatoric_set_pt', -1e5,1e5, 1)
+                        .name( 'Deviatoric stress set point (A/D)').listen()
+                        .onChange( function () { update_walls(); } );
+                    }
+                if ( params.dimension == 4 ) {
+                    gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+                        .name( 'D4 location').listen()
+                        // .onChange( function () { update_walls(); } );
+                        .onChange( function () {
+                            if ( urlParams.has('stl') ) {
+                                meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                            }
+                        });
+                }
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
+                gui.add ( params, 'gravity').name('Gravity').listen()
+                    .onChange( function() {
+                        if ( params.gravity === true ) {
+                            S.interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                        else {
+                            S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
+                        });
+                gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
+                gui.add ( params, 'new_line').name('New loading path').listen()
+                    .onChange( () => {
+                        // params.vertical_strain = 0;
+                        // params.pressure_set_pt = 10000;
+                        // params.deviatoric_set_pt = 0;
+                        update_walls();
+                        var data = [{
+                                      type: 'scatter',
+                                      mode: 'lines',
+                                      x: [], y: [],
+                                      line: { width: 5 },
+                                      // name: 'Load path'
+                                    }]
+                        Plotly.addTraces('stats', data);
+                        params.new_line = false;
+                    });
+				const controls = new OrbitControls( camera, container );
+				controls.target.y = 0.5;
+                controls.target.z = params.L;
+				controls.update();
+
+                window.addEventListener( 'resize', onWindowResize, false );
+                window.addEventListener( 'keypress', onKeyPress, false );
+
+                if ( show_stats ) { make_graph(); }
+
+                update_walls();
+			    animate();
+			}
+
+            function onKeyPress( event ) {
+                if ( event.code === 'KeyW' ) {
+                    if ( loading_method === 'strain_controlled' && params.vertical_strain < params.max_vertical_strain ) { params.vertical_strain += params.loading_rate; }
+                    else { params.pressure_set_pt *= 1 + params.loading_rate; }
+                    update_walls();
+                    }
+                if ( event.code === 'KeyS' ) {
+                    if ( loading_method === 'strain_controlled' && params.vertical_strain > 0 ) { params.vertical_strain -= params.loading_rate; }
+                    else { params.pressure_set_pt /= 1 + params.loading_rate; }
+                    update_walls();
+                    }
+            }
+
+
+            function onWindowResize(){
+
+                camera.aspect = window.innerWidth*(1-graph_fraction) / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+
+                var update = {
+                    width: window.innerWidth*graph_fraction,
+                    height: window.innerHeight
+                    };
+                Plotly.relayout('stats', update);
+
+            }
+
+            function update_walls(dt=0.001) {
+                params.packing_fraction = (params.N*particle_volume)/Math.pow(params.L,params.dimension-1)/(params.L_cur)/Math.pow(2,params.dimension)*2;
+                // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
+
+                params.L_cur = 2*params.L*(1-params.vertical_strain);
+                // params.front =  params.L_cur - params.W_cur;
+                // params.back  = -params.L_cur + params.W_cur;
+                // params.left  = -params.L_cur + params.W_cur;
+                // params.right =  params.L_cur - params.W_cur;
+                // params.floor = -params.L_cur + params.H_cur;
+                params.roof  =  params.L_cur;// - params.H_cur;
+
+                // S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
+                // S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
+                S.setBoundary(2, [0,params.roof]) ; // Set location of the walls in z
+                // for (var j = 0; j < params.dimension - 3; j++) {
+                    // S.setBoundary(j + 3, [-params.L_cur,params.L_cur]) ; // Set location of the walls in z
+                // }
+                // back.position.x = params.back - thickness/2.;
+                // front.position.x = params.front + thickness/2.;
+                // left.position.y = params.left - thickness/2.;
+                // right.position.y = params.right + thickness/2.;
+                // floor.position.z = params.floor - thickness/2.;
+                roof.position.z = params.roof + thickness/2.;
+
+                var horiz_walls = [floor,roof];
+                var vert_walls = [left,right,front,back];
+
+                vert_walls.forEach( function(mesh) {
+                    mesh.scale.x = 2*params.L + 2*thickness;
+                    mesh.scale.z = 2*(params.L) + 2*thickness;
+                });
+
+                horiz_walls.forEach( function(mesh) {
+                    mesh.scale.x = 2*params.L + 2*thickness;
+                    mesh.scale.z = 2*params.L + 2*thickness;
+                });
+
+            }
+
+			function animate() {
+                if ( clock.getElapsedTime() > 3 ) { started = true; }
+				requestAnimationFrame( animate );
+                move_spheres();
+
+                if ( !params.paused ) {
+                    new_time = clock.getElapsedTime()
+
+                        if ( show_stats && started ) {
+                            // counter = counter + 1;
+                            // if ( counter == 5 ) { update_graph(); counter = 0; }
+                            update_graph();
+                    }
+
+                    if (loading_method === 'stress_controlled') {
+                        update_walls(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
+                    }
+                    S.step_forward(5);
+
+                    var F = S.getWallForce();
+
+                    let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
+                    let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+
+                    // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
+                    // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
+
+                    // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
+                    // vertical_stress = sigma_33;
+                    vertical_stress = F[5][2]/params.L/params.L/4.;
+                    // pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
+                    // shear = sigma_33 - pressure;
+                    // console.log(F[0])
+                    // if ( isNaN(pressure) ) { pressure = 0; }
+
+                    // if ( stats !== undefined ) {
+                    //     stats.begin()
+                    //     panel.update(pressure,1e6)
+                    //     stats.end();
+                    // }
+
+                }
+
+				renderer.render( scene, camera );
+
+                old_time = new_time;
+
+			}
+            // function refresh_simulation() {
+            //     // update_L();
+            //     // console.log(L)
+            //     var range = 0.8*(L/2 - radius);
+            //     for ( let i = 0; i < params.N; i ++ ) {
+            //         position.set( range*(2*Math.random() - 1), range*(2*Math.random() - 1), range*(2*Math.random() - 1) );
+    		// 		physics.setMeshPosition( spheres, position, i );
+            //     }
+            //     position.set( 0, - L/2 - thickness/2., 0 );
+            //
+            //     floor.position.y = - L/2 - thickness/2.;
+            //     roof.position.y = L/2 + thickness/2.;
+            //     left.position.z = - L/2 - thickness/2.;
+            //     right.position.z = L/2 + thickness/2.;
+            //     back.position.x = L/2 + thickness/2.;
+            //     front.position.x = -L/2 - thickness/2.;
+            //     camera.position.set( - 3*L, 0, 0 );
+            //
+            // }
+
+            function add_spheres() {
+                radii = S.getRadii();
+                spheres = new THREE.Group();
+                scene.add(spheres);
+                // const material = new THREE.MeshStandardMaterial();
+
+
+                // const matrix = new THREE.Matrix4();
+                const color = new THREE.Color();
+
+                const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
+                // const geometrySphere = new THREE.BufferGeometry().fromGeometry(
+                //   new THREE.SphereGeometry(
+                //     1,
+                //     Math.pow(2, params.quality),
+                //     Math.pow(2, params.quality)
+                //   )
+                // );
+                // spheres = new THREE.InstancedMesh( geometrySphere, material, params.N );
+                // spheres.castShadow = true;
+                // spheres.receiveShadow = true;
+                // scene.add( spheres );
+
+                for ( let i = 0; i < params.N; i ++ ) {
+                    const material = NDParticleShader.clone();
+                    var object = new THREE.Mesh(geometrySphere, material);
+                    object.position.set(0,0,0);
+                    object.rotation.z = Math.PI / 2;
+                    object.NDDEM_ID = i;
+                    spheres.add(object);
+                    // spheres.setMatrixAt( i, matrix );
+                    // spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
+
+                }
+            }
+
+            function move_spheres() {
+                var x = S.getX();
+                var orientation = S.getOrientation();
+                if ( params.lut === 'Velocity' ) {
+                    v = S.getVelocity();
+                }
+                else if ( params.lut === 'Rotation Rate' ) {
+                    omegaMag = S.getRotationRate();
+                }
+                else if ( params.lut === 'Force' ) {
+                    forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
+                }
+                    // spheres.instanceColor.needsUpdate = true;
+                for ( let i = 0; i < params.N; i ++ ) {
+                    var object = spheres.children[i];
+
+                    // const matrix = new THREE.Matrix4();
+                    // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
+                    if ( params.dimension == 3 ) {
+                        var D_draw = 2*radii[i];
+                        object.scale.set(D_draw, D_draw, D_draw);
+                    }
+                    else if ( params.dimension == 4 ) {
+                        var D_draw = 2*Math.sqrt(
+                          Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
+                        );
+                        object.scale.set(D_draw, D_draw, D_draw);
+                        // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
+                    }
+                    // spheres.setMatrixAt( i, matrix );
+                    object.position.set( x[i][0], x[i][1], x[i][2] );
+                    if ( params.lut === 'Velocity' ) {
+                        object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
+                    }
+                    if ( params.lut === 'Rotation Rate' ) {
+                        // console.log(omegaMag[i])
+                        object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
+                    }
+                    // if ( params.lut === 'force' ) {
+                        // console.log(omegaMag[i])
+                        // object.material.uniforms.ambient.value = 0.5 + 0.1*forceMag[i];
+                    // }
+                    for (var j = 0; j < params.N - 3; j++) {
+                      object.material.uniforms.xview.value[j] =
+                        params.d4_cur;
+                      object.material.uniforms.xpart.value[j] =
+                        x[i][j + 3];
+                    }
+                    object.material.uniforms.A.value = orientation[i];
+                    // if (params.dimension > 3) {
+                    //   object.material.uniforms.x4p.value = x[i][j + 3];
+                    //   object.material.uniforms.x4.value = params.d4_cur;
+                    // } else {
+                    //   object.material.uniforms.x4p.value = 0.0;
+                    // }
+                }
+                // spheres.instanceMatrix.needsUpdate = true;
+                // console.log(orientation[0])
+            }
+
+            async function NDDEMPhysics() {
+
+            	if ( 'DEMND' in window === false ) {
+
+            		console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
+            		return;
+
+            	}
+
+            	NDDEMLib = await DEMND(); // eslint-disable-line no-undef
+
+                if ( params.dimension == 3 ) {
+                    S = await new NDDEMLib.Simulation3 (params.N);
+                    finish_setup();
+                }
+                else if ( params.dimension == 4 ) {
+                    S = await new NDDEMLib.Simulation4 (params.N);
+                    finish_setup();
+                }
+
+
+
+                function finish_setup() {
+                    S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+                    S.interpret_command("radius -1 0.5");
+                    S.interpret_command("mass -1 1");
+                    S.interpret_command("auto rho");
+                    S.interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+                    S.interpret_command("auto mass");
+                    S.interpret_command("auto inertia");
+
+                    S.interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
+                    S.interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
+                    S.interpret_command("boundary 2 WALL 0 "+String(2*params.L));
+                    if ( params.gravity === true ) {
+                        S.interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                    else {
+                        S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
+
+                    // S.interpret_command("auto location randomsquare");
+                    S.interpret_command("auto location randomdrop");
+
+                    S.interpret_command("set Kn 2e5");
+                    S.interpret_command("set Kt 8e4");
+                    S.interpret_command("set GammaN 75");
+                    S.interpret_command("set GammaT 75");
+                    S.interpret_command("set Mu 0.5");
+                    S.interpret_command("set T 150");
+                    S.interpret_command("set dt 0.0001");
+                    S.interpret_command("set tdump 10"); // how often to calculate wall forces
+                    S.interpret_command("auto skin");
+                    S.finalise_init () ;
+                }
+            }
+
+            function update_graph() {
+                // density = params.packing_fraction*material_density;
+                vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
+                // console.log(params.packing_fraction)
+                // shear_time.push(shear);
+                // density_time.push(density);
+
+                // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
+                    Plotly.extendTraces('stats', {
+                        'x': [[params.vertical_strain*params.L]],
+                        // 'y': [[shear]],
+                        'y': [[vertical_stress_smooth]],
+                    }, [-1])
+                // }
+            }
+
+            function make_graph() {
+                var data = [{
+                              type: 'scatter',
+                              mode: 'lines',
+                              x: [],
+                              y: [],
+                              // opacity: 1,
+                              line: {
+                                width: 5,
+                                color: "black",
+                                // reversescale: false
+                              }
+                            }]
+                var layout = {
+                                  // height: 300,
+                                  // width: 500,
+                                  xaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                    // title: 'Density (kg/m<sup>3</sup>)'
+                                    title: 'Vertical displacement (mm)'
+                                },
+                                  yaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                    title: 'Vertical stress (Pa)'
+                                },
+                                legend: {
+                                    x: 1,
+                                    xanchor: 'right',
+                                    y: 1
+                                  }
+                                }
+                Plotly.newPlot('stats', data, layout);
+            }
+
+            function loadSTL( ) {
+
+                const loader = new NDSTLLoader();
+				loader.load( [ STLFilename ], function ( solids ) {
+                    NDsolids = solids;
+                    meshes = renderSTL(meshes, NDsolids, scene, material, params.d4_cur);
+				} )
+            }
+
+		</script>
+	</body>
+</html>

@@ -538,6 +538,12 @@ public:
   /** \brief Expose the array of velocities. \ingroup API */
   std::vector<std::vector<double>> getVelocity() { return V; }
 
+  /** \brief Expose the array of orientation rate. \ingroup API */
+  std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
+
+  // /** \brief Expose the array of orientation rate. \ingroup API */
+  // std::vector<std::vector<double>> getParticleStress() { return OmegaMag; }
+
   /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }
 

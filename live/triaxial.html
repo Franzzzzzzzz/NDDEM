@@ -68,7 +68,7 @@
             let NDDEMLib;
             let pointer;
             let frameRate = 60;
-            let v;
+            let v, omegaMag;
             let pressure = 0;
             let shear = 0;
             let density = 0;
@@ -127,6 +127,10 @@
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
+                loading_rate: 0.001,
+                max_volumetric_strain: 0.2,
+                max_axial_strain: 0.2,
+                lut: 'None',
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -300,12 +304,13 @@
 					// .name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
                 if ( loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'volumetric_strain', 0,0.2, 0.001)
+                    gui.add( params, 'volumetric_strain', 0, params.max_volumetric_strain, 0.001)
                         .name( 'Volumetric strain (W/S)').listen()
                         .onChange( function () { update_walls(); } );
-                    gui.add( params, 'axial_strain', -0.2,0.2, 0.001)
+                    gui.add( params, 'axial_strain', -params.max_axial_strain,params.max_axial_strain, 0.001)
                         .name( 'Axial strain (A/D)').listen()
                         .onChange( function () { update_walls(); } );
+                    gui.add( params, 'loading_rate', 0.0001, 0.01, 0.0001).name( 'Loading rate' );
                     gui.add ( params, 'constant_volume')
                         .name('Constant volume').listen()
                         .onChange( function() { update_walls(); });
@@ -328,7 +333,7 @@
                             }
                         });
                 }
-
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
@@ -379,25 +384,25 @@
 
             function onSelectParticle( event ) {
                 if ( event.code === 'KeyW' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.volumetric_strain += 0.001; }
-                    else { params.pressure_set_pt *= 1.001; }
+                    if ( loading_method === 'strain_controlled' && params.volumetric_strain < params.max_volumetric_strain) { params.volumetric_strain += params.loading_rate; }
+                    else { params.pressure_set_pt *= 1 + params.loading_rate; }
                     update_walls();
                     }
                 if ( event.code === 'KeyS' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.volumetric_strain -= 0.001; }
-                    else { params.pressure_set_pt /= 1.001; }
+                    if ( loading_method === 'strain_controlled' && params.volumetric_strain > 0 ) { params.volumetric_strain -= params.loading_rate; }
+                    else { params.pressure_set_pt /= 1 + params.loading_rate; }
                     update_walls();
                     }
                 if ( event.code === 'KeyD' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.axial_strain += 0.001; }
+                    if ( loading_method === 'strain_controlled' && params.axial_strain < params.max_axial_strain ) { params.axial_strain += params.loading_rate; }
                     // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = 1; }
-                    else { params.deviatoric_set_pt += 0.001*params.pressure_set_pt; }
+                    else { params.deviatoric_set_pt += params.loading_rate*params.pressure_set_pt; }
                     update_walls();
                     }
-                if ( event.code === 'KeyA' ) {
-                    if ( loading_method === 'strain_controlled' ) { params.axial_strain -= 0.001; }
+                if ( event.code === 'KeyA' && params.axial_strain > -params.max_axial_strain ) {
+                    if ( loading_method === 'strain_controlled' ) { params.axial_strain -= params.loading_rate; }
                     // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = -1; }
-                    else { params.deviatoric_set_pt -= 0.001*params.pressure_set_pt; }
+                    else { params.deviatoric_set_pt -= params.loading_rate*params.pressure_set_pt; }
                     update_walls();
                     }
                 if ( event.code === 'Space' ) {
@@ -497,7 +502,7 @@
             }
 
 			function animate() {
-                if ( clock.getElapsedTime() > 1 ) { started = true; }
+                if ( clock.getElapsedTime() > 3 ) { started = true; }
 				requestAnimationFrame( animate );
                 move_spheres();
                 if ( locked_particle !== null ) {
@@ -642,12 +647,14 @@
             function move_spheres() {
                 var x = S.getX();
                 var orientation = S.getOrientation();
-                if ( urlParams.has('lut') ) {
-                    if ( urlParams.get('lut') === 'velocity' ) {
-                        v = S.getVelocity();
-                    }
-                    // spheres.instanceColor.needsUpdate = true;
-
+                if ( params.lut === 'Velocity' ) {
+                    v = S.getVelocity();
+                }
+                else if ( params.lut === 'Rotation Rate' ) {
+                    omegaMag = S.getRotationRate();
+                }
+                else if ( params.lut === 'Force' ) {
+                    forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
                 }
                 for ( let i = 0; i < params.N; i ++ ) {
                     var object = spheres.children[i];
@@ -667,10 +674,12 @@
                     }
                     // spheres.setMatrixAt( i, matrix );
                     object.position.set( x[i][0], x[i][1], x[i][2] );
-                    if ( urlParams.has('lut') ) {
-                        if ( urlParams.get('lut') === 'velocity' ) {
-                            spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
-                        }
+                    if ( params.lut === 'Velocity' ) {
+                        object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
+                    }
+                    if ( params.lut === 'Rotation Rate' ) {
+                        // console.log(omegaMag[i])
+                        object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
                     }
                     for (var j = 0; j < params.N - 3; j++) {
                       object.material.uniforms.xview.value[j] =
