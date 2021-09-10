@@ -296,7 +296,7 @@
                     if ( params.lut === 'Velocity' ) {
                         object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
                     }
-                    if ( params.lut === 'Rotation' ) {
+                    if ( params.lut === 'Rotation Rate' ) {
                         // console.log(omegaMag[i])
                         object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
                     }
