@@ -28,7 +28,7 @@ set T 50
 set dt 0.0001
 #set dumps XML with 4 Position Velocity Omega Coordination
 set dumps CSV with 1 Orientation
-det dumps VTK with 0
+set dumps VTK with 0
 #set dumps CONTACTFORCES with 4 Ids Fn Ft Torque
 set tdump 1000
 event 20 gravity -0.9 0.42 0 0

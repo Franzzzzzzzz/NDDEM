@@ -1,6 +1,6 @@
 # Incline plane flow
 directory Output
-dimensions 2 30
+dimensions 4 2500
 
 # The order is quite important here: 1/set the density base on a particle of mass 1 and diameter 1. 2/update everyone radius 3/update the mass and inertia based on the previously defined rho and radius.
 radius -1 0.5
@@ -11,8 +11,10 @@ auto mass
 auto inertia
 auto skin
 
-boundary 0 PBC   -2.5 2.5
-boundary 1 PBC   -3 3
+boundary 0 PBC   0 10
+boundary 1 PBC   0 10
+boundary 2 PBC   0 5
+boundary 3 PBC   0 5
 #boundary 2 PBC   0 15
 #boundary 2 PBC   0 4
 
@@ -31,9 +33,9 @@ set dt 0.0001
 #set dumps CSV with 1 Orientation
 set dumps VTK with 2 Velocity Ids
 set tdump 1000
-event 0.9998 set tdump 1000
+#event 0.9998 set tdump 1000
 #event 0.9999 freeze -1
-event 1 boundary 0 PBCLE -2.5 2.5 1
+event 1 boundary 0 PBCLE 0 10 1
 
 
 EOF

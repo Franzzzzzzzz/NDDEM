@@ -8,6 +8,31 @@
 // #include "Benchmark.h"
 //#define OMP_NUM_THREADS 2
 
+// Preprocessing command to compile only enough dimensions as needed. 
+#include <boost/preprocessor/arithmetic/inc.hpp>
+#include <boost/preprocessor/comparison/not_equal.hpp>
+#include <boost/preprocessor/repetition/for.hpp>
+#include <boost/preprocessor/tuple/elem.hpp>
+
+#ifndef MAXDIM 
+#define MAXDIM 4
+#endif
+#define PRED(r, state) \
+   BOOST_PP_NOT_EQUAL( \
+      BOOST_PP_TUPLE_ELEM(2, 0, state), \
+      BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(2, 1, state)) \
+   ) \
+   /**/
+#define OP(r, state) \
+   ( \
+      BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(2, 0, state)), \
+      BOOST_PP_TUPLE_ELEM(2, 1, state) \
+   ) \
+   /**/
+#define MACRO(r, state) \
+    case BOOST_PP_TUPLE_ELEM(2, 0, state): templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state)>(argv);break;
+
+//===================================================================================================
 vector <std::pair<ExportType,ExportData>> * toclean ;
 XMLWriter * xmlout ;
 
@@ -54,8 +79,9 @@ int main (int argc, char *argv[])
 
  switch (dd)
  {
+     BOOST_PP_FOR((1, MAXDIM), PRED, OP, MACRO)
 //     case  1: templatedmain<1> (argv) ; break ;
-     case  2: templatedmain<2> (argv) ; break ;
+//     case  2: templatedmain<2> (argv) ; break ;
 //     case  3: templatedmain<3> (argv) ; break ;
 //     case  4: templatedmain<4> (argv) ; break ;
 //     case  5: templatedmain<5> (argv) ; break ;

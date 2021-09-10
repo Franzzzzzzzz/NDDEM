@@ -277,10 +277,8 @@ public:
                 if (Ghost[j])
                 {
                     tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                    if (P.Boundaries[0][3]!=static_cast<int>(WallType::PBC_LE))
-                        CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
-                    else
-                        CLp.check_ghost_LE (Ghost[j], P, X[i], X[j], tmpcp) ;
+                    //CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
+                    (CLp.*CLp.check_ghost) (Ghost[j], P, X[i], X[j], tmpcp, 0,0,0) ;
                 }
                 else
                 {
@@ -371,13 +369,13 @@ public:
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ; 
 
             // TESTING
-            FILE * logghosts=nullptr ; 
+            /*FILE * logghosts=nullptr ; 
             if (ti % P.tdump==0)
             {
                 char name[500] ; 
                 sprintf(name, "Output/Ghost-%d.txt",ti) ;  
                 logghosts = fopen(name, "w") ; 
-            }
+            }*/
                 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
@@ -388,19 +386,19 @@ public:
             }
             else
             {
-                C.particle_ghost_LE(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it, logghosts) ;
+                (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i],
+                                       X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it);//, logghosts) ;
             }
 
             if (P.contactforcedump && (ti % P.tdump==0))
                 it->saveinfo(C.Act) ; 
             
-            Tools<d>::vAddFew(F[it->i], C.Act.Fni, C.Act.Fti, Fcorr[it->i]) ;
+            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
             Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
             if (MP.ismine(ID,it->j))
             {
-                Tools<d>::vAddFew(F[it->j], C.Act.Fnj, C.Act.Ftj, Fcorr[it->j]) ;
+                Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
                 Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
             }
             else
@@ -411,8 +409,8 @@ public:
             }
             
             // TESTING
-            if (logghosts != nullptr)
-                fclose(logghosts) ; 
+            /*if (logghosts != nullptr)
+                fclose(logghosts) ; */
 
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
@@ -457,7 +455,7 @@ public:
         {
             for (uint j=0 ; j<MP.delayed_size[i] ; j++)
             {
-            Tools<d>::vAddFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fnj, MP.delayed[i][j].Ftj, Fcorr[MP.delayedj[i][j]]) ;
+            Tools<d>::vSubFew(F[MP.delayedj[i][j]], MP.delayed[i][j].Fn, MP.delayed[i][j].Ft, Fcorr[MP.delayedj[i][j]]) ;
             Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
             }
         }

@@ -16,11 +16,11 @@
  * */
 class Action {
 public :
-    vector <double> Fn, Ft, Fni, Fnj, Fti, Ftj, Torquei, Torquej ;
+    vector <double> Fn, Ft, Torquei, Torquej ;
     void set (v1d a, v1d b, v1d c, v1d d) {Fn=a ; Ft=b ; Torquei=c ; Torquej=d ; }
     void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
-    void set_fwd (v1d a, v1d b, v1d c) {Fni=a; Fti=b; Torquei=c ;}
-    void set_rev (v1d a, v1d b, v1d c) {Fnj=a; Ftj=b; Torquej=c ;}
+    //void set_fwd (v1d a, v1d b, v1d c) {Fni=a; Fti=b; Torquei=c ;}
+    //  void set_rev (v1d a, v1d b, v1d c) {Fnj=a; Ftj=b; Torquej=c ;}
 } ;
 /** \brief Action on a specific particle for a specific duration
  * */
@@ -54,8 +54,6 @@ public:
      ghost=c.ghost ;
      ghostdir=c.ghostdir ;
      tspr=c.tspr ;
-     tspr_fwd=c.tspr_fwd ;
-     tspr_rev=c.tspr_rev ;
      contactlength=c.contactlength ;
      infos=c.infos ;
      return *this ;
@@ -78,19 +76,19 @@ public:
  double contactlength ; ///< Length of the contact
  uint32_t ghost ; ///< Contain ghost information about ghost contact, cf detailed description
  uint32_t ghostdir ; ///< Contain ghost information about ghost direction, cf detailed description
- vector <double> tspr, tspr_fwd, tspr_rev; ///< Vector of tangential contact history
+ vector <double> tspr ; ///< Vector of tangential contact history
  Action * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested.
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
 } ;
 
-// ------------------------------------ Contact List class -------------------------------------------
+// ------------------------------------ Contact List class ----------check_ghost_LE---------------------------------
 /** \brief Handles lists of contacts
  */
 template <int d>
 class ContactList
 {
 public:
- ContactList () {}
+ ContactList () {check_ghost=&ContactList::check_ghost_LE;}
  void reset() {it = v.begin() ;}  ///< Go to the contact list beginning
  int insert(const cp& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which open.
@@ -100,9 +98,10 @@ public:
 
  //void check_ghost    (uint32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
  void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; ///< \deprecated Measure distance between a ghost and a particle
- void check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+ void check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
                    int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.
- void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp) ;
+ void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
+ void (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, cp &,int startd, double partialsum, bitdim mask) ;
  void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
 
 private:
@@ -146,7 +145,7 @@ int ContactList<d>::insert(const cp &a)
 
 //-----------------------------------Fastest version so far ...
 template <int d>
-void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
                                  int startd, double partialsum, bitdim mask)
 {
     double sum=partialsum ;
@@ -159,7 +158,7 @@ void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1,
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
             //printf("/%g %g %g %g %g %g %g/", partialsum, sumspawn, X1[0], X1[1], X2[0], X2[1], Delta ) ; 
             if (sumspawn<P.skinsqr)
-                check_ghost (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
+                check_ghost_regular (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
         }
         partialsum = sum ;
     }
@@ -174,24 +173,25 @@ void ContactList<d>::check_ghost (bitdim gst, const Parameters<d> & P, cv1d &X1,
 
 //--------------------------------------------------------------------
 template <int d>
-void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp)
+void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+                                     [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
     if (P.Boundaries[0][3] != static_cast<int>(WallType::PBC_LE))
-            check_ghost(gst, P, X1, X2, tmpcp) ; 
+            check_ghost_regular(gst, P, X1, X2, tmpcp) ; 
     else
     {
      if ((gst & 1)==0) 
      {
          double partialsum = (X1[0]-X2[0]) * (X1[0]-X2[0]) ;
          assert (((gst>>30 & 1) ==0)) ; 
-         check_ghost(gst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ; 
+         check_ghost_regular(gst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ; 
      }
      else //There is an image through the LE
      {
          //1 : case without taking that image
          double partialsum = (X1[0]-X2[0]) * (X1[0]-X2[0]) ;
          bitdim newgst = gst ; newgst &= (~(1<<30)) ; 
-         check_ghost(newgst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ; 
+         check_ghost_regular(newgst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ; 
          
          //2: now is the hard case: we take the image path
          double Delta= (tmpcp.ghostdir&1?-1:1) * P.Boundaries[0][2] ;
@@ -207,7 +207,7 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
          if (tmpX2[1] > P.Boundaries[1][1]) tmpX2[1] -= P.Boundaries[1][2] ;
          if (tmpX2[1] < P.Boundaries[1][0]) tmpX2[1] += P.Boundaries[1][2] ;
          //printf("{%g %g %X %X", tmpX2[0], tmpX2[1], newgst>>1, tmpcp.ghostdir) ; 
-         check_ghost(newgst>>1, P, X1, tmpX2, tmpcp, 1, partialsum, 1) ;
+         check_ghost_regular(newgst>>1, P, X1, tmpX2, tmpcp, 1, partialsum, 1) ;
          //printf("}") ; 
      }
     }
