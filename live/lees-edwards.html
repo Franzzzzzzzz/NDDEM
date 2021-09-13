@@ -1,35 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>NDDEM Lees Edwards shear</title>
+		<title>NDDEM Lees Edwards Shear</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-        <style>
-			body { margin: 0; }
-            .flex-container {
-                display: flex;
-                flex-direction: row;
-            }
-            #stats {
-                width: 50%;
-                height: 100vh;
-                margin: 0;
-                padding: 0;
-            }
-            #canvas {
-                width: 50%;
-                height: 100%;
-            }
-
-            .dg .c {
-                width: 45% !important;
-            }
-            .dg .property-name {
-                width: 55% !important;
-            }
-        </style>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 	</head>
 	<body>
+        <div id="scigem_tag">
+            Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
+        </div>
         <div class="flex-container">
             <div id="stats"></div>
             <div id="canvas"></div>
