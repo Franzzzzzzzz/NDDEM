@@ -223,9 +223,9 @@ public:
 
             // Boundary conditions ...
             P.perform_PBC(X[i], PBCFlags[i]) ;
-            P.perform_PBCLE(X[i], V[i], PBCFlags[i]) ;  
+            P.perform_PBCLE(X[i], V[i], PBCFlags[i]) ;
 
-            // Find ghosts 
+            // Find ghosts
             Ghost[i]=0 ; Ghost_dir[i]=0 ;
             uint32_t mask=1 ;
 
@@ -235,25 +235,25 @@ public:
             if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
             else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
-            
+
             if (P.Boundaries[0][3] == static_cast<int>(WallType::PBC_LE) && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
             {
                 mask = (1<<30) ; // WARNING dim 30 will be used for LEPBC!!
-                double tmpyloc = X[i][1] + (Ghost_dir[i]&1?-1:1)*P.Boundaries[0][5] ; 
+                double tmpyloc = X[i][1] + (Ghost_dir[i]&1?-1:1)*P.Boundaries[0][5] ;
                 if (tmpyloc > P.Boundaries[1][1]) tmpyloc -= P.Boundaries[1][2] ;
                 if (tmpyloc < P.Boundaries[1][0]) tmpyloc += P.Boundaries[1][2] ;
                 if      (tmpyloc <= P.Boundaries[1][0] + P.skin) {Ghost[i] |= mask ; }
                 else if (tmpyloc >= P.Boundaries[1][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
-                
+
             }
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
-        P.perform_PBCLE_move() ; 
+        P.perform_PBCLE_move() ;
         std::invoke (P.update_gravity, &P, t) ;
-        
-        //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ; 
+
+        //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
         {
@@ -366,17 +366,17 @@ public:
             double timebeg = omp_get_wtime();
           #endif
             ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
-            v1d tmpcn (d,0) ; v1d tmpvel (d,0) ; 
+            v1d tmpcn (d,0) ; v1d tmpvel (d,0) ;
 
             // TESTING
-            /*FILE * logghosts=nullptr ; 
+            /*FILE * logghosts=nullptr ;
             if (ti % P.tdump==0)
             {
-                char name[500] ; 
-                sprintf(name, "Output/Ghost-%d.txt",ti) ;  
-                logghosts = fopen(name, "w") ; 
+                char name[500] ;
+                sprintf(name, "Output/Ghost-%d.txt",ti) ;
+                logghosts = fopen(name, "w") ;
             }*/
-                
+
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
             if (it->ghost==0)
@@ -391,8 +391,8 @@ public:
             }
 
             if (P.contactforcedump && (ti % P.tdump==0))
-                it->saveinfo(C.Act) ; 
-            
+                it->saveinfo(C.Act) ;
+
             Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
             Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
@@ -407,7 +407,7 @@ public:
             //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
             //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
-            
+
             // TESTING
             /*if (logghosts != nullptr)
                 fclose(logghosts) ; */
@@ -426,7 +426,7 @@ public:
                     for (int dd = 0 ; dd<d ; dd++)
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
-                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;  
+                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;
                     C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], tmpcn, tmpvel, *it) ;
                 }
                 else
@@ -573,6 +573,9 @@ public:
       P.Boundaries[a][0] = loc[0]; // low value
       P.Boundaries[a][1] = loc[1]; // high value
       P.Boundaries[a][2] = loc[1] - loc[0]; // length
+      if ( P.Boundaries[a][3] == static_cast<int>(WallType::PBC_LE) ) {
+          P.Boundaries[a][4] = loc[2];
+      }
   }
 
   /** \brief Expose the array of wall forces. \ingroup API */
@@ -640,6 +643,6 @@ Visualisation [shape=box,style=filled,color="0.9 0.6 0.6"] ;
 <pre> boundary dim PBC low high </pre> Periodic boundary condition between the boundaries at low and high.<br>
 <pre> boundary dim WALL low high </pre> Static walls at boundaries low and high (normal of the wall along the dimension dim). <br>
 <pre> boundary dim MOVINGWALL low high vel_low vel_high </pre> Walls moving along their normals<br>
-<pre> boundary n SPHERE radius x1 x2 ... xn </pre> Define a sherical wall. n should be higher than the dimension (walls or pbs should be defined in the other dimensions). (xi) is the location of the sphere centre.  
+<pre> boundary n SPHERE radius x1 x2 ... xn </pre> Define a sherical wall. n should be higher than the dimension (walls or pbs should be defined in the other dimensions). (xi) is the location of the sphere centre.
 
 */

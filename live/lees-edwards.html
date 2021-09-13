@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>NDDEM Lees Edwards shear</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <style>
+			body { margin: 0; }
+            .flex-container {
+                display: flex;
+                flex-direction: row;
+            }
+            #stats {
+                width: 50%;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+            }
+            #canvas {
+                width: 50%;
+                height: 100%;
+            }
+
+            .dg .c {
+                width: 45% !important;
+            }
+            .dg .property-name {
+                width: 55% !important;
+            }
+        </style>
+	</head>
+	<body>
+        <div class="flex-container">
+            <div id="stats"></div>
+            <div id="canvas"></div>
+        </div>
+        <script async type="text/javascript" src="./deploy/DEMND.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+		<script type="module">
+
+            import * as THREE from "../visualise/node_modules/three/build/three.module.js";
+			import { OrbitControls } from './js/OrbitControls.js';
+			import Stats from './js/stats.module.js';
+            import { GUI } from './js/dat.gui.module.js';
+            import { Lut } from './js/Lut.js'
+            import { PIDcontroller } from './js/PIDcontroller.js'
+            import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var clock = new THREE.Clock();
+
+			let camera, scene, renderer, stats, panel, controls;
+			let physics, position;
+            let gui;
+			let spheres;
+            let floor;
+            let S;
+            let NDDEMLib;
+            let pointer;
+            let v, omegaMag;
+            let radii;
+            let particle_volume;
+            let NDsolids, material, STLFilename;
+            let meshes = new THREE.Group();
+
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            let intersection_plane = new THREE.Plane();
+            let camera_direction = new THREE.Vector3();
+
+            let graph_fraction = 0.5;
+            document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
+            document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
+
+            var params = {
+                dimension: 3,
+                L: 3.7, //system size
+                N: 500,
+                // packing_fraction: 0.5,
+                constant_volume: true,
+                axial_strain: 0,
+                volumetric_strain: 0,
+                paused: false,
+                g_mag: 1e3,
+                theta: 0, // slope angle in DEGREES
+                d4_cur:0,
+                r_max: 0.55,
+                r_min: 0.45,
+                freq: 0.05,
+                new_line: false,
+                shear_rate: 10,
+                lut: 'None',
+            }
+
+            params.average_radius = (params.r_min + params.r_max)/2.;
+            let thickness = params.average_radius;
+
+            particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+            if ( urlParams.has('dimension') ) {
+                params.dimension = parseInt(urlParams.get('dimension'));
+            }
+            if ( params.dimension === 4) {
+                params.L = 2.5;
+                params.N = 300
+                particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+            }
+
+            const lut = new Lut( 'blackbody', 512 );
+
+            var quality = 5;
+
+            var NDParticleShader;
+            import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
+                NDParticleShader = module.NDDEMShader;
+    			init();
+            });
+
+			async function init() {
+
+				physics = await NDDEMPhysics();
+                // physics.main(params.dimensions, params.N, inputfile)
+				position = new THREE.Vector3();
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 0, 0, 5*params.L );
+                camera.up.set(1, 0, 0);
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111 );
+
+				const hemiLight = new THREE.HemisphereLight();
+				hemiLight.intensity = 0.35;
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 5, 5, 5 );
+				dirLight.castShadow = true;
+				scene.add( dirLight );
+
+                // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
+                // const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
+                // const wall_material = new THREE.MeshLambertMaterial();
+                // wall_material.wireframe = true;
+                // const wall_material = new THREE.ShadowMaterial( )
+
+                // floor = new THREE.Mesh( wall_geometry, wall_material );
+                // floor.rotation.z = Math.PI/2.;
+                // // floor.position.x = -params.L - thickness/2.;// + params.r_min + params.r_max;
+                // floor.scale.x = 2*params.L + 2*thickness;
+                // floor.scale.z = 2*params.L + 2*thickness;
+                // scene.add( floor );
+
+				add_spheres();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+                var container = document.getElementById( 'canvas' );
+                container.appendChild( renderer.domElement );
+
+				gui = new GUI();
+				gui.width = 320;
+
+                if ( params.dimension == 4 ) {
+                    gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+                        .name( 'D4 location').listen()
+                        .onChange( function () {
+                            if ( urlParams.has('stl') ) {
+                                meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                            }
+                        });
+                }
+                gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (??) (W/S)').listen()
+                    .onChange( () => update_shear_rate() );
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
+                gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
+                gui.add ( params, 'new_line').name('New loading path').listen()
+                    .onChange( () => {
+                        var data = [{
+                                      type: 'scatter3d',
+                                      mode: 'lines',
+                                      x: [], y: [], z: [],
+                                      line: { width: 5 },
+                                      // name: 'Load path'
+                                    }]
+                        Plotly.addTraces('stats', data);
+                        params.new_line = false;
+                    });
+				controls = new OrbitControls( camera, container );
+				controls.update();
+
+                window.addEventListener( 'resize', onWindowResize, false );
+                window.addEventListener( 'keypress', checkKeys, false );
+
+
+			    animate();
+			}
+
+            function update_shear_rate() {
+                S.setBoundary(0, [-params.L,params.L,params.shear_rate]);
+                // console.warn('NEED TO IMPLEMENT PBCLE UPDATING ON C++ SIDE')
+            }
+
+            function checkKeys( event ) {
+                if ( event.code === 'KeyW' ) {
+                    params.shear_rate += 0.1;
+                    update_shear_rate();
+                    }
+                if ( event.code === 'KeyS' ) {
+                    params.shear_rate -= 0.1;
+                    update_shear_rate();
+                    }
+            }
+
+            function onWindowResize(){
+
+                camera.aspect = window.innerWidth*(1-graph_fraction) / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+
+                var update = {
+                    width: window.innerWidth*graph_fraction,
+                    height: window.innerHeight
+                    };
+                Plotly.relayout('stats', update);
+
+            }
+
+			function animate() {
+				requestAnimationFrame( animate );
+                move_spheres();
+                if ( !params.paused ) {
+                    S.step_forward(5);
+                }
+				renderer.render( scene, camera );
+			}
+
+
+            function add_spheres() {
+                radii = S.getRadii();
+                spheres = new THREE.Group();
+                scene.add(spheres);
+
+                const color = new THREE.Color();
+
+                const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
+
+                for ( let i = 0; i < params.N; i ++ ) {
+                    const material = NDParticleShader.clone();
+                    var object = new THREE.Mesh(geometrySphere, material);
+                    object.position.set(0,0,0);
+                    object.rotation.z = Math.PI / 2;
+                    object.NDDEM_ID = i;
+                    spheres.add(object);
+                }
+            }
+
+            function move_spheres() {
+                var x = S.getX();
+                var orientation = S.getOrientation();
+                if ( params.lut === 'Velocity' ) {
+                    v = S.getVelocity();
+                }
+                else if ( params.lut === 'Rotation Rate' ) {
+                    omegaMag = S.getRotationRate();
+                }
+                else if ( params.lut === 'Force' ) {
+                    forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
+                }
+
+                for ( let i = 0; i < params.N; i ++ ) {
+                    var object = spheres.children[i];
+                    if ( params.dimension == 3 ) {
+                        var D_draw = 2*radii[i];
+                        object.scale.set(D_draw, D_draw, D_draw);
+                    }
+                    else if ( params.dimension == 4 ) {
+                        var D_draw = 2*Math.sqrt(
+                          Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
+                        );
+                        object.scale.set(D_draw, D_draw, D_draw);
+                    }
+                    object.position.set( x[i][0], x[i][1], x[i][2] );
+                    if ( params.lut === 'Velocity' ) {
+                        object.material.uniforms.ambient.value = 0.5 + 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
+                    }
+                    if ( params.lut === 'Rotation Rate' ) {
+                        // console.log(omegaMag[i])
+                        object.material.uniforms.ambient.value = 0.5 + 0.01*omegaMag[i];
+                    }
+                    for (var j = 0; j < params.N - 3; j++) {
+                      object.material.uniforms.xview.value[j] =
+                        params.d4_cur;
+                      object.material.uniforms.xpart.value[j] =
+                        x[i][j + 3];
+                    }
+                    object.material.uniforms.A.value = orientation[i];
+                }
+            }
+
+            async function NDDEMPhysics() {
+
+            	if ( 'DEMND' in window === false ) {
+
+            		console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
+            		return;
+
+            	}
+
+            	NDDEMLib = await DEMND(); // eslint-disable-line no-undef
+
+                if ( params.dimension == 3 ) {
+                    S = await new NDDEMLib.Simulation3 (params.N);
+                    finish_setup();
+                }
+                else if ( params.dimension == 4 ) {
+                    S = await new NDDEMLib.Simulation4 (params.N);
+                    finish_setup();
+                }
+
+
+
+                function finish_setup() {
+                    S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+                    S.interpret_command("radius -1 0.5");
+                    S.interpret_command("mass -1 1");
+                    S.interpret_command("auto rho");
+                    S.interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+                    S.interpret_command("auto mass");
+                    S.interpret_command("auto inertia");
+
+                    S.interpret_command("boundary 0 PBCLE -"+String(params.L)+" "+String(params.L)+" "+String(params.shear_rate));
+                    S.interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
+                    S.interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
+                    if ( params.dimension == 4 ) {
+                        S.interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
+                    }
+                    S.interpret_command("gravity 0 0 " + "0 ".repeat(params.dimension - 3))
+
+                    S.interpret_command("auto location randomdrop");
+
+                    S.interpret_command("set Kn 2e5");
+                    S.interpret_command("set Kt 8e4");
+                    S.interpret_command("set GammaN 75");
+                    S.interpret_command("set GammaT 75");
+                    S.interpret_command("set Mu 0.5");
+                    S.interpret_command("set T 150");
+                    S.interpret_command("set dt 0.0001");
+                    S.interpret_command("set tdump 10"); // how often to calculate wall forces
+                    S.interpret_command("auto skin");
+                    S.finalise_init () ;
+                }
+            }
+
+            function update_graph() {
+                density = params.packing_fraction*material_density;
+                // pressure_time.push(pressure);
+                // shear_time.push(shear);
+                // density_time.push(density);
+
+                    Plotly.extendTraces('stats', {
+                        'x': [[density]],
+                        'y': [[shear]],
+                        'z': [[pressure]],
+                    }, [-1])
+                // }
+            }
+
+            function make_graph() {
+                var data = [{
+                              type: 'scatter3d',
+                              mode: 'lines',
+                              x: [],
+                              y: [],
+                              z: [],
+                              // opacity: 1,
+                              line: {
+                                width: 5,
+                                color: "black",
+                                // reversescale: false
+                              }
+                            }]
+                var layout = {
+                                  // height: 300,
+                                  // width: 500,
+                                  xaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                },
+                                  yaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                },
+                                  zaxis: {
+                                    // linecolor: 'white',
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                },
+                                scene: {
+                            		xaxis:{title: 'Density (kg/m<sup>3</sup>)'},
+                            		yaxis:{title: 'Deviatoric stress (Pa)'},
+                            		zaxis:{title: 'Pressure (Pa)'},
+                                    aspectmode: 'auto',
+                            		},
+                                // paper_bgcolor: 'rgba(0,0,0,1)',
+                                // plot_bgcolor: 'rgba(0,0,0,1)',
+                                margin: {
+                                    t: 20, //top margin
+                                    l: 20, //left margin
+                                    r: 20, //right margin
+                                    b: 20 //bottom margin
+                                },
+                                legend: {
+                                    x: 1,
+                                    xanchor: 'right',
+                                    y: 1
+                                  }
+                                }
+                Plotly.newPlot('stats', data, layout);
+            }
+
+		</script>
+	</body>
+</html>
