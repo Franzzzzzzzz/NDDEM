@@ -161,7 +161,15 @@
                 }
                 gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (??) (W/S)').listen()
                     .onChange( () => update_shear_rate() );
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by');
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
+                    .onChange( () => {
+                        if ( params.lut === 'None' ) {
+                            for ( let i = 0; i < params.N; i ++ ) {
+                                var object = spheres.children[i];
+                                object.material.uniforms.ambient.value = 1;
+                            }
+                        }
+                    });
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {

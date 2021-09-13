@@ -266,7 +266,15 @@
                             }
                         });
                 }
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')
+                    .onChange( () => {
+                        if ( params.lut === 'None' ) {
+                            for ( let i = 0; i < params.N; i ++ ) {
+                                var object = spheres.children[i];
+                                object.material.uniforms.ambient.value = 1;
+                            }
+                        }
+                    });
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
