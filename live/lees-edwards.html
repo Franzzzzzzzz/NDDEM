@@ -161,7 +161,7 @@
                 }
                 gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (??) (W/S)').listen()
                     .onChange( () => update_shear_rate() );
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by');
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by');
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {
@@ -248,7 +248,7 @@
             function move_spheres() {
                 var x = S.getX();
                 var orientation = S.getOrientation();
-                if ( params.lut === 'Velocity' ) {
+                if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
                     v = S.getVelocity();
                 }
                 else if ( params.lut === 'Rotation Rate' ) {
@@ -273,6 +273,10 @@
                     object.position.set( x[i][0], x[i][1], x[i][2] );
                     if ( params.lut === 'Velocity' ) {
                         object.material.uniforms.ambient.value = 0.5 + 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
+                    }
+                    if ( params.lut === 'Fluct Velocity' ) {
+                        object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1] - params.shear_rate*x[i][0],2) + Math.pow(v[i][2],2) );
+                        // object.material.uniforms.ambient.value = params.shear_rate*x[i][0];
                     }
                     if ( params.lut === 'Rotation Rate' ) {
                         // console.log(omegaMag[i])
