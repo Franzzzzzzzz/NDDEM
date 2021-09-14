@@ -38,6 +38,10 @@ body {
     left:5pt;
     font-size: 14pt;
     z-index: 99;
+    color: #aaa;
+}
+#download_tag:hover {
+    color: #777;
 }
 
 a {

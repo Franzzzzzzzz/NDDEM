@@ -341,7 +341,7 @@
                                       mode: 'lines',
                                       x: [], y: [], z: [],
                                       line: { width: 5 },
-                                      // name: 'Load path'
+                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
                                     }]
                         Plotly.addTraces('stats', data);
                         params.new_line = false;
@@ -427,7 +427,7 @@
 
             function update_walls(dt=0.001) {
                 params.packing_fraction = (params.N*particle_volume)/Math.pow(params.L_cur-params.W_cur,params.dimension-1)/(params.L_cur - params.H_cur)/Math.pow(2,params.dimension);
-                console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
+                // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
                 if ( loading_method == 'strain_controlled') {
                     if ( params.constant_volume ) {
@@ -760,6 +760,7 @@
                               x: [],
                               y: [],
                               z: [],
+                              name: 'Load path 1',
                               // opacity: 1,
                               line: {
                                 width: 5,

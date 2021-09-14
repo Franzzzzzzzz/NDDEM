@@ -297,7 +297,7 @@
                                       mode: 'lines',
                                       x: [], y: [],
                                       line: { width: 5 },
-                                      // name: 'Load path'
+                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
                                     }]
                         Plotly.addTraces('stats', data);
                         params.new_line = false;
@@ -635,6 +635,7 @@
                               mode: 'lines',
                               x: [],
                               y: [],
+                              name: 'Load path 1',
                               // opacity: 1,
                               line: {
                                 width: 5,
