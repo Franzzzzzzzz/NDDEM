@@ -15,9 +15,10 @@
         <div id="scigem_tag">
             Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
-        <a href="#" id="download_tag" title="Download data as a csv file" class="material-icons">file_download</a>
         <div class="flex-container">
-            <div id="stats"></div>
+            <div id="stats">
+                <a href="#" id="download_tag" title="Download data as a csv file" class="material-icons hidden">file_download</a>
+            </div>
             <div id="canvas"></div>
         </div>
         <script async type="text/javascript" src="./deploy/DEMND.js"></script>
@@ -277,7 +278,7 @@
                 // gui
 				gui = new GUI();
                 // console.log(gui)
-				gui.width = 320;
+				gui.width = 350;
 
 				// gui.add( params, 'packing_fraction', 0, 1, 0.01 )
 					// .name( 'Solids fraction' ).listen();
@@ -813,6 +814,16 @@
             }
 
             document.getElementById ("download_tag").addEventListener ("click", download_data, false);
+            document.getElementById ("stats").addEventListener ("mouseenter",
+                () => {
+                    document.getElementById("download_tag").classList.remove("hidden")
+                    document.getElementById("download_tag").classList.add("visible")
+            }, false);
+            document.getElementById ("stats").addEventListener ("mouseleave",
+                () => {
+                    document.getElementById("download_tag").classList.add("hidden")
+                    document.getElementById("download_tag").classList.remove("visible")
+            }, false);
 
             function download_data() {
                 let gd = document.getElementById('stats')

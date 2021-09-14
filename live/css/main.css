@@ -38,7 +38,7 @@ body {
     left:5pt;
     font-size: 14pt;
     z-index: 99;
-    color: #aaa;
+    color: #bbb;
 }
 #download_tag:hover {
     color: #777;
@@ -48,4 +48,15 @@ a {
     font-weight: bolder;
     text-decoration: none;
     color: black;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.25s linear;
+}
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 0.25s, opacity 0.25s linear;
 }
