@@ -15,7 +15,7 @@
         <div id="scigem_tag">
             Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
-        <div id="download_tag"><a href="#" class="material-icons">file_download</a></div>
+        <a href="#" id="download_tag" title="Download data as a csv file" class="material-icons">file_download</a>
         <div class="flex-container">
             <div id="stats"></div>
             <div id="canvas"></div>
@@ -676,8 +676,16 @@
 
             function download_data() {
                 let gd = document.getElementById('stats')
-                let d = gd.data.filter(trace => trace.visible === true)
-                console.log(d)
+                let data = gd.data;
+                let header = 'Vertical displacement (mm),Vertical Stress (Pa)\n';
+                let csv = '';
+                data.forEach( trace => {
+                    csv = csv + header + trace.x.map((el, i) => [el, trace.y[i]].join(",")).join('\n') + '\n'
+                    });
+                var link = document.getElementById("download_tag");
+                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
+                // console.log(link)
+
 
                 // var csv = elev.map(function(d){
                 //                             return d.x.toString()+','+d.y.toString()

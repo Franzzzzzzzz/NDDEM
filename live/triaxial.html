@@ -8,11 +8,14 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 	</head>
 	<body>
         <div id="scigem_tag">
             Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
+        <a href="#" id="download_tag" title="Download data as a csv file" class="material-icons">file_download</a>
         <div class="flex-container">
             <div id="stats"></div>
             <div id="canvas"></div>
@@ -808,15 +811,19 @@
                 Plotly.newPlot('stats', data, layout);
             }
 
-            function loadSTL( ) {
+            document.getElementById ("download_tag").addEventListener ("click", download_data, false);
 
-                const loader = new NDSTLLoader();
-				loader.load( [ STLFilename ], function ( solids ) {
-                    NDsolids = solids;
-                    meshes = renderSTL(meshes, NDsolids, scene, material, params.d4_cur);
-				} )
+            function download_data() {
+                let gd = document.getElementById('stats')
+                let data = gd.data;
+                let header = 'Density (kg/m3),Deviatoric stress (Pa),Pressure (Pa)\n';
+                let csv = '';
+                data.forEach( trace => {
+                    csv = csv + header + trace.x.map((el, i) => [el, trace.y[i],trace.z[i]].join(",")).join('\n') + '\n'
+                    });
+                var link = document.getElementById("download_tag");
+                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
             }
-
 		</script>
 	</body>
 </html>
