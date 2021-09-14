@@ -29,7 +29,7 @@ inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a
 inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
 template <int d>
-class Multiproc ; 
+class Multiproc ;
 /** \brief Generic class to handle the simulation set up
  *
  */
@@ -56,7 +56,9 @@ public :
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
         orientationtracking(true),
-        wallforcecompute(true)
+        wallforcecompute(false),
+        wallforcerequested(false),
+        wallforcecomputed(false)
         {
          reset_ND(NN) ;
         } ///< Set the default values for all parameters. Calls to setup parameter function should be provided after initialisation of this class.
@@ -99,7 +101,9 @@ public :
     string Directory ; ///< Saving directory
     bool orientationtracking ; ///< Track orientation?
     bool wallforcecompute ; ///< Compute for on the wall?
-    bool contactforcedump ; ///< Extract the forces between grains as well? 
+    bool wallforcerequested ; ///< Compute for on the wall?
+    bool wallforcecomputed ; ///< Compute for on the wall?
+    bool contactforcedump ; ///< Extract the forces between grains as well?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
 
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
@@ -108,17 +112,17 @@ public :
     int set_boundaries() ;  ///< Set default boundaries
     //int init_particles(v2d & X, v2d & A) ;
     void perform_PBC(v1d & X, uint32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
-    void perform_PBCLE_move() ; 
-    void perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag) ; 
+    void perform_PBCLE_move() ;
+    void perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag) ;
 
     void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.
     int init_mass() ; ///< Initialise particle mass
     int init_inertia() ; ///< Initialise particle moment of inertia
-    
-    void do_nothing (double time __attribute__((unused))) {return;} 
-    double grav_intensity = 10, grav_omega=1 ; int grav_rotdim[2]={0,1} ; 
-    void do_gravityrotate (double time) {g[grav_rotdim[0]]=grav_intensity*cos(time*grav_omega); g[grav_rotdim[1]]=grav_intensity*sin(time*grav_omega); return;}  
-    void (Parameters::*update_gravity) (double time) = &Parameters::do_nothing ; 
+
+    void do_nothing (double time __attribute__((unused))) {return;}
+    double grav_intensity = 10, grav_omega=1 ; int grav_rotdim[2]={0,1} ;
+    void do_gravityrotate (double time) {g[grav_rotdim[0]]=grav_intensity*cos(time*grav_omega); g[grav_rotdim[1]]=grav_intensity*sin(time*grav_omega); return;}
+    void (Parameters::*update_gravity) (double time) = &Parameters::do_nothing ;
 
     void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script
     void check_events(float time, v2d & X, v2d & V, v2d & Omega) ; ///< Verify if an event triggers at the current time time.
@@ -135,7 +139,7 @@ public :
     void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
     int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP) ; ///< Dump writing functions
-    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X) 
+    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
     {
      if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
      if (outflags & ExportData::POSITION)
@@ -155,12 +159,12 @@ public :
      {
          for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
          {
-             auto val = Tools<d>::MASIndex[dd] ; 
+             auto val = Tools<d>::MASIndex[dd] ;
              fprintf(out, "Torque%d:%d_i, ", val.first, val.second) ;
          }
          for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
          {
-             auto val =  Tools<d>::MASIndex[dd] ; 
+             auto val =  Tools<d>::MASIndex[dd] ;
              fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
          }
      }
@@ -168,47 +172,47 @@ public :
         fprintf(out, "GhostMask, ") ;
      if (outflags & ExportData::GHOSTDIR)
         fprintf(out, "GhostDir, ") ;
-     
-     fseek (out, -2, SEEK_CUR) ; 
-     fprintf(out, "\n") ; 
-     
+
+     fseek (out, -2, SEEK_CUR) ;
+     fprintf(out, "\n") ;
+
      for (auto & CLp : MP.CLp)
      {
          for (auto & contact: CLp.v)
          {
              if (outflags & ExportData::IDS)
-                fprintf(out, "%d %d ", contact.i, contact.j) ; 
+                fprintf(out, "%d %d ", contact.i, contact.j) ;
              if (outflags & ExportData::POSITION)
              {
                  for (auto dd : X[contact.i])
-                  fprintf(out, "%g ", dd) ; 
+                  fprintf(out, "%g ", dd) ;
                  for (auto dd : X[contact.j])
-                  fprintf(out, "%g ", dd) ; 
+                  fprintf(out, "%g ", dd) ;
              }
              if (outflags & ExportData::FN)
                 for (auto dd : contact.infos->Fn)
-                  fprintf(out, "%g ", dd) ; 
+                  fprintf(out, "%g ", dd) ;
              if (outflags & ExportData::FT)
                 for (auto dd : contact.infos->Ft)
-                  fprintf(out, "%g ", dd) ; 
-                 
+                  fprintf(out, "%g ", dd) ;
+
              if (outflags & ExportData::TORQUE)
              {
                 for (auto dd : contact.infos->Torquei)
-                  fprintf(out, "%g ", dd) ; 
+                  fprintf(out, "%g ", dd) ;
                 for (auto dd : contact.infos->Torquej)
-                  fprintf(out, "%g ", dd) ; 
+                  fprintf(out, "%g ", dd) ;
              }
-             
+
              if (outflags & ExportData::GHOSTMASK)
                  fprintf(out, "%d ", contact.ghost) ;
              if (outflags & ExportData::GHOSTDIR)
                  fprintf(out, "%d ", contact.ghostdir) ;
-             
-             fprintf(out, "\n") ; 
+
+             fprintf(out, "\n") ;
          }
      }
-     return 0 ; 
+     return 0 ;
     }
 
 
@@ -260,16 +264,16 @@ void Parameters<d>::perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag)
 {
     if (Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
     {
-        if      (X[0]<Boundaries[0][0]) 
+        if      (X[0]<Boundaries[0][0])
         {
             X[0] += Boundaries[0][2] ; PBCFlag |= 1 ;
-            X[1] += Boundaries[0][5] ; 
+            X[1] += Boundaries[0][5] ;
             V[1] += Boundaries[0][2]*Boundaries[0][4] ; ;
         }
-        else if (X[0]>Boundaries[0][1]) 
+        else if (X[0]>Boundaries[0][1])
         {
             X[0] -= Boundaries[0][2] ; PBCFlag |= 1 ;
-            X[1] -= Boundaries[0][5] ; 
+            X[1] -= Boundaries[0][5] ;
             V[1] -= Boundaries[0][2]*Boundaries[0][4] ; ;
         }
 
@@ -283,9 +287,9 @@ void Parameters<d>::perform_PBCLE_move ()
 {
     if (Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
     {
-        Boundaries[0][5] += dt*Boundaries[0][4]*Boundaries[0][2] ; 
-        if (Boundaries[0][5]>Boundaries[1][1]) 
-            Boundaries[0][5] -= Boundaries[1][2] ; 
+        Boundaries[0][5] += dt*Boundaries[0][4]*Boundaries[0][2] ;
+        if (Boundaries[0][5]>Boundaries[1][1])
+            Boundaries[0][5] -= Boundaries[1][2] ;
     }
 }
 //----------------------------------------------------
@@ -489,10 +493,10 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          }
          else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
          else if (word =="Radius") dumplist |= ExportData::RADIUS ;
-         else if (word =="Ids") dumplist |= ExportData::IDS ; 
-         else if (word =="Fn") dumplist |= ExportData::FN ; 
-         else if (word =="Ft") dumplist |= ExportData::FT ; 
-         else if (word =="Torque") dumplist |= ExportData::TORQUE ; 
+         else if (word =="Ids") dumplist |= ExportData::IDS ;
+         else if (word =="Fn") dumplist |= ExportData::FN ;
+         else if (word =="Ft") dumplist |= ExportData::FT ;
+         else if (word =="Torque") dumplist |= ExportData::TORQUE ;
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
 
@@ -533,7 +537,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      in >> grav_intensity >> grav_omega >> grav_rotdim[0] >> grav_rotdim[1] ;
      printf("[INFO] Setting up a rotating gravity\n") ;
     } ;
- Lvl0["boundary"] = [&](){size_t id ; in>>id ; 
+ Lvl0["boundary"] = [&](){size_t id ; in>>id ;
     if (id>=Boundaries.size()) {Boundaries.resize(id+1) ; Boundaries[id].resize(4,0) ; }
     char line [5000] ; in>>line ;
     if (!strcmp(line, "PBC")) Boundaries[id][3]=static_cast<int>(WallType::PBC) ;
@@ -549,23 +553,23 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ;}
     else if (Boundaries[id][3] == static_cast<int>(WallType::SPHERE) )
     {
-            Boundaries[id][4]=Boundaries[id][1] ; 
+            Boundaries[id][4]=Boundaries[id][1] ;
             Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
             for (int i=1 ; i<d; i++) // dim 0 has already been read and put in [4]
-                in>>Boundaries[id][4+i] ; 
+                in>>Boundaries[id][4+i] ;
     }
     else if (Boundaries[id][3] == static_cast<int>(WallType::ROTATINGSPHERE) )
     {
             Boundaries[id][4]=Boundaries[id][1] ;
             Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
-            for (int i=1 ; i<d; i++) in>>Boundaries[id][4+i] ; 
-            for (int i=0; i<d*(d-1)/2 ; i++) in >> Boundaries[id][4+d+i] ; 
+            for (int i=1 ; i<d; i++) in>>Boundaries[id][4+i] ;
+            for (int i=0; i<d*(d-1)/2 ; i++) in >> Boundaries[id][4+d+i] ;
     }
     else if (Boundaries[id][3] == static_cast<int>(WallType::PBC_LE))
     {
         assert((id==0)) ;
         in >> Boundaries[id][4] ;
-        Boundaries[id][5] = 0 ; 
+        Boundaries[id][5] = 0 ;
     }
     printf("[INFO] Changing BC.\n") ;
    };
@@ -665,19 +669,19 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     else if (!strcmp(line, "insphere"))
     {
         printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
-        
+
         for (int i=0 ; i<N ; i++)
         {
          double dst=0 ;
          printf(".") ; fflush(stdout);
          do {
-            dst=0 ; 
+            dst=0 ;
             for(int dd=0 ; dd < d ; dd++)
             {
               X[i][dd] = (rand()*Boundaries[d][0]*2-Boundaries[d][0]) + Boundaries[d][4+dd] ;
-              dst += (Boundaries[d][4+dd]-X[i][dd])*(Boundaries[d][4+dd]-X[i][dd]) ; 
+              dst += (Boundaries[d][4+dd]-X[i][dd])*(Boundaries[d][4+dd]-X[i][dd]) ;
             }
-         } while ( sqrt(dst) > Boundaries[d][0]-r[i]) ; 
+         } while ( sqrt(dst) > Boundaries[d][0]-r[i]) ;
         }
     }
     else if (!strcmp(line, "roughinclineplane"))
@@ -889,15 +893,15 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         Tools<d>::savecsv(path, A) ;
       }
     }
-    
-    
+
+
     if (v.first == ExportType::CSVCONTACT)
     {
      char path[500] ; sprintf(path, "%s/dumpcontactforce-%05d.csv", Directory.c_str(), ti) ;
-     FILE * out = fopen(path, "w") ; 
+     FILE * out = fopen(path, "w") ;
      if (out == NULL) {printf("[ERR] Cannot open file for contact force writing.\n") ; fflush(stdout) ; return 1 ; }
-     savecsvcontact(out, v.second, MP, X) ; 
-     fclose(out) ; 
+     savecsvcontact(out, v.second, MP, X) ;
+     fclose(out) ;
     }
 
     if (v.first == ExportType::VTK)
@@ -912,10 +916,10 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         if (v.second & ExportData::RADIUS) {tmp.push_back(r) ; val.push_back({"RADIUS", TensorType::SCALAR, &tmp}) ;}
         if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; val.push_back({"Coordination", TensorType::SCALAR, &tmp}) ;  }
         if (v.second & ExportData::IDS) {
-            vector<double> tmpid (N, 0) ; 
-            for (int i=0 ; i<N ; i++) 
-                tmpid[i]=i ; 
-            tmp.push_back(tmpid) ; val.push_back({"Id", TensorType::SCALAR, &tmp}) ;  
+            vector<double> tmpid (N, 0) ;
+            for (int i=0 ; i<N ; i++)
+                tmpid[i]=i ;
+            tmp.push_back(tmpid) ; val.push_back({"Id", TensorType::SCALAR, &tmp}) ;
         }
         Tools<d>::savevtk(path, N, Boundaries, X, r, val) ;
     }
@@ -962,7 +966,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
       if (v.second & ExportData::COORDINATION) xmlout->writeArray("Orientation", &Z, ArrayType::particles, EncodingType::base64);
       xmlout->stopTS();
     }
-    
+
   }
 return 0 ;
 }

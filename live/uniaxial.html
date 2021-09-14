@@ -8,11 +8,14 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 	</head>
 	<body>
         <div id="scigem_tag">
             Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
+        <div id="download_tag"><a href="#" class="material-icons">file_download</a></div>
         <div class="flex-container">
             <div id="stats"></div>
             <div id="canvas"></div>
@@ -403,6 +406,7 @@
 
                     var F = S.getWallForce();
 
+
                     // let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
                     // let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
                     // let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
@@ -413,7 +417,13 @@
 
                     // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
                     // vertical_stress = sigma_33;
-                    vertical_stress = F[5][2]/params.L/params.L/4.;
+                    // console.log(F.length)
+                    if ( F.length > 1 ) { // returns an empty array if hasn't calculated yet
+                        vertical_stress = F[5][2]/params.L/params.L/4.;
+                        // console.log(vertical_stress)
+                    }
+
+                    // console.log(F)
                     // pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
                     // shear = sigma_33 - pressure;
                     // console.log(F[0])
@@ -606,7 +616,7 @@
             function update_graph() {
                 // density = params.packing_fraction*material_density;
                 vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
-                // console.log(params.packing_fraction)
+                // console.log(vertical_stress)
                 // shear_time.push(shear);
                 // density_time.push(density);
 
@@ -662,13 +672,21 @@
                 Plotly.newPlot('stats', data, layout);
             }
 
-            function loadSTL( ) {
+            document.getElementById ("download_tag").addEventListener ("click", download_data, false);
 
-                const loader = new NDSTLLoader();
-				loader.load( [ STLFilename ], function ( solids ) {
-                    NDsolids = solids;
-                    meshes = renderSTL(meshes, NDsolids, scene, material, params.d4_cur);
-				} )
+            function download_data() {
+                let gd = document.getElementById('stats')
+                let d = gd.data.filter(trace => trace.visible === true)
+                console.log(d)
+
+                // var csv = elev.map(function(d){
+                //                             return d.x.toString()+','+d.y.toString()
+                //                         }).join('\n');
+                // console.log(csv);
+                //
+                // var link = document.getElementById("download");
+                // link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,Distance (m),Elevation (m)\n"+csv));
+                // console.log(link) ;
             }
 
 		</script>

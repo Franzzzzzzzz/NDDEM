@@ -73,6 +73,7 @@ public:
 
     std::vector <uint32_t> PBCFlags ;
     std::vector < std::vector <double> > WallForce ;
+    std::vector<std::vector<double>> empty_array ;
 
     vector <uint32_t> Ghost ;
     vector <uint32_t> Ghost_dir ;
@@ -112,6 +113,7 @@ public:
 
         PBCFlags.resize (N, 0) ;
         WallForce.resize (2*d, std::vector <double> (d,0)) ;
+        empty_array.resize(1, std::vector <double> (1, 0)) ;
 
         Ghost.resize (N, 0) ;
         Ghost_dir.resize (N, 0) ;
@@ -443,7 +445,7 @@ public:
                 Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
                 Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-                if (P.wallforcecompute) MP.delayingwall(ID, it->j, C.Act) ;
+                if ( P.wallforcecompute || ( P.wallforcerequested && !P.wallforcecomputed ) ) MP.delayingwall(ID, it->j, C.Act) ;
             }
             #ifndef NO_OPENMP
             MP.timing[ID] += omp_get_wtime()-timebeg;
@@ -481,6 +483,15 @@ public:
         // Check events
         P.check_events(t, X,V,Omega) ;
 
+        if ( P.wallforcerequested && !P.wallforcecomputed )
+        {
+          P.wallforcecomputed = true;
+          Tools<d>::setzero(WallForce) ;
+          for (int i=0 ; i<MP.P ; i++)
+            for (uint j=0 ; j<MP.delayedwall_size[i] ; j++)
+              Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
+        }
+
         // Output something at some point I guess
         if (ti % P.tdump==0)
         {
@@ -488,7 +499,7 @@ public:
             P.dumphandling (ti, t, X, V, Vmag, A, Omega, OmegaMag, PBCFlags, Z, MP) ;
             std::fill(PBCFlags.begin(), PBCFlags.end(), 0);
 
-            /*if (P.wallforcecompute)
+            if (P.wallforcecompute)
             {
               char path[5000] ; sprintf(path, "%s/LogWallForce-%05d.txt", P.Directory.c_str(), ti) ;
               Tools<d>::setzero(WallForce) ;
@@ -498,10 +509,10 @@ public:
                   Tools<d>::vSubFew(WallForce[MP.delayedwallj[i][j]], MP.delayedwall[i][j].Fn, MP.delayedwall[i][j].Ft) ;
 
             Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
-            }*/
+            }
         }
 
-        if (P.wallforcecompute) MP.delayedwall_clean() ;
+        if (P.wallforcecompute || P.wallforcecomputed) MP.delayedwall_clean() ;
 
         // Load balancing on the procs as needed
         #ifndef NO_OPENMP
@@ -579,7 +590,18 @@ public:
   }
 
   /** \brief Expose the array of wall forces. \ingroup API */
-  std::vector<std::vector<double>> getWallForce() { return WallForce; }
+  std::vector<std::vector<double>> getWallForce() {
+      // std::cout<<P.wallforcerequested<<" "<<P.wallforcecomputed<<std::endl;
+      P.wallforcerequested = true;
+      if ( P.wallforcecomputed ) {
+          P.wallforcerequested = false;
+          P.wallforcecomputed = false;
+          return WallForce;
+      }
+      else {
+        return empty_array ;
+      }
+   }
 
   /** \brief Set an additional external force on a particle for a certain duration. \param id particle id \param duration number of timesteps to apply the force for \param force force vector to apply \ingroup API */
   void setExternalForce (int id, int duration, v1d force)

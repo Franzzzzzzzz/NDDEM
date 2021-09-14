@@ -522,26 +522,20 @@
 
                     var F = S.getWallForce();
 
-                    let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
-                    let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+                    if ( F.length > 1 ) { // returns an empty array if hasn't calculated yet
+                        let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
+                        let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
+                        let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
 
-                    // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
-                    // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
+                        // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
+                        // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
+                        // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
 
-                    // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
+                        // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
 
-                    pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
-                    shear = sigma_33 - pressure;
-                    // console.log(F[0])
-                    // if ( isNaN(pressure) ) { pressure = 0; }
-
-                    // if ( stats !== undefined ) {
-                    //     stats.begin()
-                    //     panel.update(pressure,1e6)
-                    //     stats.end();
-                    // }
+                        pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
+                        shear = sigma_33 - pressure;
+                    }
 
                 }
 

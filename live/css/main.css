@@ -32,6 +32,14 @@ body {
     font-size: 8pt;
     z-index: 99;
 }
+#download_tag {
+    position:absolute;
+    top:5pt;
+    left:5pt;
+    font-size: 8pt;
+    z-index: 99;
+}
+
 a {
     font-weight: bolder;
     text-decoration: none;
