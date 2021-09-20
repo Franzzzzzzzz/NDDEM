@@ -21,7 +21,7 @@
 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
-enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64, IDS=128, FN=256, FT=512, TORQUE=1024, GHOSTMASK=2048, GHOSTDIR=4096} ; ///< Flags for export data control
+enum class ExportData {NONE=0, POSITION=1, VELOCITY=2, OMEGA=4, OMEGAMAG=8, ORIENTATION=16, COORDINATION=32, RADIUS=64, IDS=128, FN=256, FT=512, TORQUE=1024, GHOSTMASK=2048, GHOSTDIR=4096, BRANCHVECTOR=8192} ; ///< Flags for export data control
 enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4, PBC_LE=5} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
@@ -168,6 +168,11 @@ public :
              fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
          }
      }
+     if (outflags & ExportData::BRANCHVECTOR)
+     {
+         for (int dd = 0 ; dd<d ; dd++)
+             fprintf(out, "lij%d, ", dd) ;
+     }
      if (outflags & ExportData::GHOSTMASK)
         fprintf(out, "GhostMask, ") ;
      if (outflags & ExportData::GHOSTDIR)
@@ -208,8 +213,38 @@ public :
                  fprintf(out, "%d ", contact.ghost) ;
              if (outflags & ExportData::GHOSTDIR)
                  fprintf(out, "%d ", contact.ghostdir) ;
-
-             fprintf(out, "\n") ;
+             
+             if (outflags & ExportData::BRANCHVECTOR)
+             {
+                 vector <double> loc (d, 0) ; 
+                if ( Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (contact.ghost & 1)==0)
+                {
+                    loc=X[contact.j] ;
+                    uint32_t gh=contact.ghost, ghd=contact.ghostdir ;
+                    for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
+                        if (gh&1)
+                            loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
+                }
+                else
+                {
+                    uint32_t gh=contact.ghost, ghd=contact.ghostdir ; // Handle pbc in first dim
+                    loc=X[contact.j] ;
+                    loc[0] += Boundaries[0][2] * ((ghd&1)?-1:1) ;
+                    loc[1] += (ghd&1?-1:1)*Boundaries[0][5] ; 
+                    double additionaldelta = 0 ;
+                    if (loc[1] > Boundaries[1][1]) {additionaldelta = -Boundaries[1][2] ;}
+                    if (loc[1] < Boundaries[1][0]) {additionaldelta =  Boundaries[1][2] ;}
+                    loc[1] += additionaldelta ; 
+                    
+                    gh>>=1 ; ghd>>=1 ; 
+                    for (int n=1 ; gh>0 ; gh>>=1, ghd>>=1, n++)
+                        if (gh&1)
+                            loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
+                }
+                for (int dd = 0 ; dd<d ; dd++)
+                    fprintf(out, "%g ", X[contact.i][dd]-loc[dd]) ; 
+            }
+         fprintf(out, "\n") ;
          }
      }
      return 0 ;
@@ -497,6 +532,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          else if (word =="Fn") dumplist |= ExportData::FN ;
          else if (word =="Ft") dumplist |= ExportData::FT ;
          else if (word =="Torque") dumplist |= ExportData::TORQUE ;
+         else if (word =="Branch") dumplist |= ExportData::BRANCHVECTOR ; 
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
 
