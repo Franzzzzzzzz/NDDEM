@@ -4,8 +4,12 @@
 		<title>NDDEM in the browser</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
         <style>
-			body { margin: 0; }
+			body { margin: 0;
+            font-family: Montserrat; }
 			canvas { width: 100%; height: 100% }
             #N_tag {
                 color: white;
@@ -21,10 +25,22 @@
                 margin: 0;
                 padding: 0;
             }
+            #hit_me {
+                font-weight: bold;
+                position:absolute;
+                bottom:5pt;
+                left:5pt;
+                font-size: 14pt;
+                z-index: 99;
+                color: #fff;
+            }
+            #hit_me:active {
+                color: #777;
+            }
         </style>
 	</head>
 	<body>
-        <div id="stats"></div>
+        <div id="hit_me">Hit!</div>
         <script async type="text/javascript" src="./deploy/DEMND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -183,6 +199,16 @@
 				controls.target.y = -params.L3;
 				controls.update();
 
+                const isMobile = navigator.userAgentData.mobile; //resolves true/false
+                if ( isMobile ) {
+                    document.getElementById("hit_me").hidden = false;
+                    document.getElementById ("hit_me").addEventListener ("click", hit_white_ball, false);
+                }
+                else {
+                    document.getElementById('hit_me').hidden = true;
+                    // document.getElementById ("hit_me").addEventListener ("click", hit_white_ball, false);
+                }
+
                 window.addEventListener( 'resize', onWindowResize, false );
                 window.addEventListener( 'mousemove', onMouseMove, false );
                 window.addEventListener( 'keypress', onSelectParticle, false );
@@ -199,14 +225,17 @@
             	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
             }
+            function hit_white_ball() {
+                var work = params.strength;
+                var force = work/params.dt;
+                S.setExternalForce(0, 1, [force*direction.x,force*direction.y,0.,0.]);
+            }
 
             function onSelectParticle( event ) {
                 // console.log(camera.getWorldDirection() )
                 if ( event.key === 'Enter' ) {
                     // console.log('hit!')
-                    var work = params.strength;
-                    var force = work/params.dt;
-                    S.setExternalForce(0, 1, [force*direction.x,force*direction.y,0.,0.]);
+                    hit_white_ball();
 
                 }
                 if ( event.code === 'Space' ) {
@@ -318,9 +347,6 @@
 
 
 				renderer.render( scene, camera );
-
-				if ( stats !== undefined ) { stats.update(); }
-
                 old_time = new_time;
 
 			}
