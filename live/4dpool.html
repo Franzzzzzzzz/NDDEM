@@ -38,13 +38,27 @@
                 z-index: 99;
                 color: #fff;
             }
+            #web_instructions {
+                font-weight: bold;
+                position:absolute;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                bottom: 5pt;
+                text-align: center;
+                font-size: 14pt;
+                z-index: 99;
+                color: #fff;
+            }
             #hit_me:active {
                 color: #777;
             }
         </style>
 	</head>
 	<body>
-        <div id="hit_me">Hit!</div>
+        <div id="hit_me">Shoot</div>
+        <div id="web_instructions">Press Enter to shoot.</div>
         <script async type="text/javascript" src="./deploy/DEMND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -206,13 +220,16 @@
                 isMobile = navigator.userAgentData.mobile; //resolves true/false
                 if ( isMobile ) {
                     document.getElementById("hit_me").hidden = false;
+                    document.getElementById("web_instructions").hidden = true;
                     document.getElementById("hit_me").addEventListener ("click", hit_white_ball, false);
                     gui.width = window.innerWidth - 30;
                 }
                 else {
                     document.getElementById('hit_me').hidden = true;
+                    document.getElementById("web_instructions").hidden = false;
                     // document.getElementById ("hit_me").addEventListener ("click", hit_white_ball, false);
                     // gui.width = window.innerWidth - 30;
+
                 }
 
                 window.addEventListener( 'resize', onWindowResize, false );
