@@ -28,8 +28,12 @@
             #hit_me {
                 font-weight: bold;
                 position:absolute;
-                bottom:5pt;
-                left:5pt;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                bottom: 5pt;
+                text-align: center;
                 font-size: 14pt;
                 z-index: 99;
                 color: #fff;
@@ -92,6 +96,7 @@
             let intersection_plane = new THREE.Plane();
             let camera_direction = new THREE.Vector3();
             let ray;
+            let isMobile;
 
             let INTERSECTED = null;
             let last_intersection = null;
@@ -187,7 +192,6 @@
 
                 // gui
 				gui = new GUI();
-
 				gui.width = 400;
 
                 gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
@@ -199,14 +203,16 @@
 				controls.target.y = -params.L3;
 				controls.update();
 
-                const isMobile = navigator.userAgentData.mobile; //resolves true/false
+                isMobile = navigator.userAgentData.mobile; //resolves true/false
                 if ( isMobile ) {
                     document.getElementById("hit_me").hidden = false;
-                    document.getElementById ("hit_me").addEventListener ("click", hit_white_ball, false);
+                    document.getElementById("hit_me").addEventListener ("click", hit_white_ball, false);
+                    gui.width = window.innerWidth - 30;
                 }
                 else {
                     document.getElementById('hit_me').hidden = true;
                     // document.getElementById ("hit_me").addEventListener ("click", hit_white_ball, false);
+                    gui.width = window.innerWidth - 30;
                 }
 
                 window.addEventListener( 'resize', onWindowResize, false );
@@ -280,6 +286,10 @@
                 camera.updateProjectionMatrix();
 
                 renderer.setSize( window.innerWidth, window.innerHeight );
+
+                if ( isMobile ) {
+                    gui.width = window.innerWidth - 30;
+                }
 
             }
 
