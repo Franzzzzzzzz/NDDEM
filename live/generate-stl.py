@@ -174,7 +174,7 @@ def make_3D_pool_table():
     solids = [bottom_wall,left_wall,right_wall,front_wall,back_wall]
     return N,solids
 
-def make_4D_pool_table():
+def make_4D_pool_table_no_holes():
     N = 4 # dimension
     L1 = 2
     L2 = 1
@@ -212,6 +212,57 @@ def make_4D_pool_table():
     solids = [bottom_wall.data,left_wall.data,right_wall.data,front_wall.data,back_wall.data,d4wall_a.data,d4wall_b.data]
     return N,solids
 
+def make_4D_pool_table():
+    N = 4 # dimension
+    L1 = 2
+    L2 = 1
+    L3 = 0.1 # this is the direction of gravity
+    L4 = 0.5
+    pocket_size = 0.25
+    n_bottom_walls = 20
+    bottom_walls = []
+    for i in range(n_bottom_walls):
+        theta = i*np.pi/2/(n_bottom_walls-1) # angle along arc of pocket
+        L1_cur = L1 - pocket_size*np.sin(theta)
+        L2_cur = L2 - pocket_size*np.cos(theta)
+        bottom_wall = d4cube(zero_dim=2)
+        bottom_wall.scale([L1_cur,L2_cur,1,L4])
+        bottom_wall.translate([0,0,-L3,0])
+        bottom_walls.append(bottom_wall.data)
+
+    bottom_wall_b = d4cube(zero_dim=2)
+    bottom_wall_b.scale([L1-pocket_size,L2,1,L4])
+    bottom_wall_b.translate([0,0,-L3,0])
+
+    left_wall = d4cube(zero_dim=1)
+    left_wall.scale([L1,1,L3,L4])
+    left_wall.translate([0,-L2,0,0])
+
+    right_wall = d4cube(zero_dim=1)
+    right_wall.scale([L1,1,L3,L4])
+    right_wall.translate([0,L2,0,0])
+
+    front_wall = d4cube(zero_dim=0)
+    front_wall.scale([1,L2,L3,L4])
+    front_wall.translate([L1,0,0,0])
+
+    back_wall = d4cube(zero_dim=0)
+    back_wall.scale([1,L2,L3,L4])
+    back_wall.translate([-L1,0,0,0])
+
+    d4wall_a = d4cube(zero_dim=3)
+    d4wall_a.scale([L1,L2,L3,1])
+    d4wall_a.translate([0,0,0,-L4])
+
+    d4wall_b = d4cube(zero_dim=3)
+    d4wall_b.scale([L1,L2,L3,1])
+    d4wall_b.translate([0,0,0, L4])
+
+    solids = bottom_walls + [left_wall.data,right_wall.data,front_wall.data,back_wall.data,d4wall_a.data,d4wall_b.data]
+    return N,solids
+
+N, solids = make_4D_pool_table_no_holes()
+write_stl('stls/4d-pool-no-holes.stl',N,solids)
 N, solids = make_4D_pool_table()
 write_stl('stls/4d-pool.stl',N,solids)
 N, solids = make_3D_pool_table()

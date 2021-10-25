@@ -474,6 +474,7 @@ public:
 
             Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
             Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
+            Tools<d>::vSubScaled(Omega[i], P.damping*P.dt, Omega[i]) ; // BENJY - add damping to Omega
             FOld[i]=F[i] ;
             TorqueOld[i]=Torque[i] ;
         } // END OF PARALLEL SECTION
@@ -569,6 +570,11 @@ public:
       for (int i=0; i<(d*(d-1)/2); i++) {
           Omega[a][i] = 0;
       }
+  }
+
+  /** \brief Freeze a single particle \ingroup API */
+  void setFrozen(int a) {
+      P.Frozen[a] = true;
   }
 
   /** \brief Expose the current time. \ingroup API */

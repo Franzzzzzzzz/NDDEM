@@ -38,7 +38,7 @@ public:
                                cv1d & cn, cv1d & Vj, cp & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
     void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
-    
+
     void particle_ghost_regular (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                                  cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
     {
@@ -53,21 +53,21 @@ public:
         return (particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ) ;
     } ///< Calculate the particle to regular (non Lees-Edward) ghost contact
 
-    
-    
+
+
     void particle_ghost_LE (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) /*, FILE * debug = nullptr*/
     {
-        vector <double> loc (d, 0) ; 
+        vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ;
-        
+
         if ( P->Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (Contact.ghost & 1)==0)
         {
             loc=Xj ;
-            compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ; 
-            particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ; 
+            compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ;
+            particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ;
             //if (debug != nullptr)
-            // fprintf(debug, "%g %g %g %g %g 0 %d\n", loc[0], loc[1], Vj[0], Vj[1], rj, Contact.j) ; 
+            // fprintf(debug, "%g %g %g %g %g 0 %d\n", loc[0], loc[1], Vj[0], Vj[1], rj, Contact.j) ;
         }
         else
         {
@@ -75,39 +75,39 @@ public:
          vector <double> vel (d, 0) ; vel=Vj ;
          loc=Xj ;
          loc[0] += P->Boundaries[0][2] * ((ghd&1)?-1:1) ;
-         loc[1] += (ghd&1?-1:1)*P->Boundaries[0][5] ; 
+         loc[1] += (ghd&1?-1:1)*P->Boundaries[0][5] ;
          double additionaldelta = 0 ;
          if (loc[1] > P->Boundaries[1][1]) {additionaldelta = -P->Boundaries[1][2] ;}
          if (loc[1] < P->Boundaries[1][0]) {additionaldelta =  P->Boundaries[1][2] ;}
-         loc[1] += additionaldelta ; 
-         vel[1] += (ghd&1?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ; 
-         
-         gh>>=1 ; ghd>>=1 ; 
-         compute_normalpbcloc (loc, 1, gh, ghd) ; 
-         particle_particle (Xi, Vi, Omegai, ri, loc, vel, Omegaj, rj, Contact) ; 
+         loc[1] += additionaldelta ;
+         vel[1] += (ghd&1?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ;
+
+         gh>>=1 ; ghd>>=1 ;
+         compute_normalpbcloc (loc, 1, gh, ghd) ;
+         particle_particle (Xi, Vi, Omegai, ri, loc, vel, Omegaj, rj, Contact) ;
          //if (debug != nullptr)
-         //    fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], rj, n, Contact.j) ; 
-         
+         //    fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], rj, n, Contact.j) ;
+
         // And then backward ... ... ... but actually not needed yay!
          /*gh=Contact.ghost;
-         ghd=~Contact.ghostdir ; 
-         loc = Xi ; 
+         ghd=~Contact.ghostdir ;
+         loc = Xi ;
          vel=Vi ;
          loc[0] += P->Boundaries[0][2] * ((ghd&1)?-1:1) ;
-         loc[1] += (ghd&1?-1:1)*P->Boundaries[0][5] ; 
-         loc[1] -= additionaldelta ; 
-         vel[1] += (ghd&1?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ; 
-         
-         gh>>=1 ; ghd>>=1 ; 
-         compute_normalpbcloc (loc, 1, gh, ghd) ; 
-         particle_particle (Xj, Vj, Omegaj, rj, loc, vel, Omegai, ri, Contact, ContactCalculation::REVERSE) ; 
+         loc[1] += (ghd&1?-1:1)*P->Boundaries[0][5] ;
+         loc[1] -= additionaldelta ;
+         vel[1] += (ghd&1?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ;
+
+         gh>>=1 ; ghd>>=1 ;
+         compute_normalpbcloc (loc, 1, gh, ghd) ;
+         particle_particle (Xj, Vj, Omegaj, rj, loc, vel, Omegai, ri, Contact, ContactCalculation::REVERSE) ;
          if (debug != nullptr)
-             fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], ri, -n, Contact.i) ; 
-         n++ ; 
+             fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], ri, -n, Contact.i) ;
+         n++ ;
          printf("%g %g %g %g | %g %g %g %g\n", Act.Fni[0], Act.Fnj[0], Act.Fti[0], Act.Ftj[0],  Act.Fni[1], Act.Fnj[1], Act.Fti[1], Act.Ftj[1]) ; */
         }
     } ///< Calculate the particle to (potentially) Lees-Edward ghost contact
-    
+
     void compute_normalpbcloc (v1d & loc, int startn, uint32_t gh, uint32_t ghd)
     {
         for (int n=startn ; gh>0 ; gh>>=1, ghd>>=1, n++)
@@ -116,7 +116,7 @@ public:
             loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
     }///< Move ghosts through the regular periodic boundary conditions (non Lees-Edward).
-    
+
     Action Act ; ///< Resulting Action
 
 private:
@@ -148,8 +148,8 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
   rri.resize(d,0) ; rrj.resize(d,0) ; vn.resize(d,0) ; vt.resize(d,0) ;
   Fn.resize(d,0) ; Ft.resize(d,0) ; tvec.resize(d,0) ; Ftc.resize(d,0) ;
   tspr.resize(d,0) ; tsprc.resize(d,0) ;
-  
-  particle_ghost = &Contacts::particle_ghost_LE ; 
+
+  particle_ghost = &Contacts::particle_ghost_LE ;
 
 }
 
@@ -188,9 +188,9 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
     tspr=Contact.tspr_rev ;
     if (tspr.size()==0) tspr.resize(d,0) ;
   }*/
-  tspr=Contact.tspr ; 
+  tspr=Contact.tspr ;
   if (tspr.size()==0) tspr.resize(d,0) ;
-  
+
   Tools<d>::vAddScaled (tspr, P->dt, vt) ; //tspr += vt*dt ;
   Tools<d>::vSubScaled(tspr, Tools<d>::dot(tspr,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
   Tools<d>::vMul(Ft, tspr, - P->Kt) ; //Ft=  tspr*(-Kt) ;
@@ -218,20 +218,20 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   //History[make_pair(i,j)]=make_pair (true, tspr) ;
   /*switch (ContactCalc) {
       case BOTH :
-          Contact.tspr_rev = -tspr ; 
+          Contact.tspr_rev = -tspr ;
           Act.set_rev(-Fn, -Ft, Torquej) ; //Fallthrough
       case FORWARD:
-          Contact.tspr_fwd = tspr ; 
-          Act.set_fwd(Fn, Ft, Torquei) ; 
-          break ; 
+          Contact.tspr_fwd = tspr ;
+          Act.set_fwd(Fn, Ft, Torquei) ;
+          break ;
       case REVERSE:
-          Contact.tspr_rev = tspr ; 
-          Act.set_rev(Fn, Ft, Torquej) ; 
-          break ; 
+          Contact.tspr_rev = tspr ;
+          Act.set_rev(Fn, Ft, Torquej) ;
+          break ;
   } */
-  Contact.tspr=tspr ; 
+  Contact.tspr=tspr ;
   //Act.set_rev(-Fn, -Ft, Torquej) ;
-  //Act.set_fwd(Fn, Ft, Torquei) ; 
+  //Act.set_fwd(Fn, Ft, Torquei) ;
   Act.set(Fn, Ft, Torquei, Torquej) ;
   return ;
 }
@@ -279,7 +279,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
      Ft -= (vt*P->Gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
-  
+
   Contact.tspr=tspr ;
   Act.set(Fn, Ft, Torquei, Torquej) ;
   return ;
@@ -297,7 +297,7 @@ void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, doub
 
   //Relative velocity at contact
   Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
-  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ; 
+  vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ;
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 

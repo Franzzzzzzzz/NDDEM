@@ -55,6 +55,15 @@
                 color: #777;
             }
         </style>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-GQE06JN33T"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-GQE06JN33T');
+        </script>
 	</head>
 	<body>
         <div id="hit_me">Shoot</div>
@@ -124,6 +133,7 @@
                 L2: 1,
                 L3: 0.1, // this is the direction of gravity
                 L4: 0.5,
+                pocket_size: 0.05,
                 pyramid_size: 5,
                 // packing_fraction: 0.5,
                 axial_strain: 0,
@@ -142,6 +152,7 @@
             params.N = get_num_particles(params.pyramid_size);
 
             var quality = 7;
+            let sunk_balls = [];
 
             var NDParticleShader;
             import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
@@ -154,7 +165,7 @@
 				physics = await NDDEMPhysics();
 				position = new THREE.Vector3();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 1000 );
 				camera.position.set( 2*params.L1, 0, 2*params.L1 );
                 camera.up.set(0, 0, 1);
 
@@ -415,6 +426,17 @@
 
             }
 
+            function in_pocket(x) {
+                if ( x[2] < -params.L3+params.radius-params.pocket_size ) {
+                    console.log('fallen off table (hopefully out of a hole)')
+                    return true;
+                    // return false;
+                }
+                else {
+                    return false
+                }
+            }
+
             function move_spheres() {
                 var x = S.getX();
                 var orientation = S.getOrientation();
@@ -427,6 +449,14 @@
                 }
                 for ( let i = 0; i < params.N; i ++ ) {
                     var object = spheres.children[i];
+                    if ( object.visible ) {
+                        if ( in_pocket(x[i]) ) {
+                            object.visible = false;
+                            sunk_balls.push(i)
+                            S.fixParticle(i, [1.1*params.L, sunk_balls.length, 0, 0])
+                            S.setFrozen(i);
+                        }
+                    }
 
                     // const matrix = new THREE.Matrix4();
                     // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
@@ -527,7 +557,7 @@
                     S.interpret_command("set GammaT 75");
                     S.interpret_command("set Mu 0.1");
                     S.interpret_command("set Mu_wall 0.5");
-                    S.interpret_command("set damping 0.001");
+                    S.interpret_command("set damping 5");
                     S.interpret_command("set T 150");
                     S.interpret_command("set dt " + String(params.dt));
                     S.interpret_command("auto skin");
