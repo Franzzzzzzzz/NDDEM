@@ -57,20 +57,25 @@ double Volume (int d , double R) ; ///< Compute a sphere volume in dimension D
 
 enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2} ;
 enum FieldType {Defined, Particle, Fluctuation, Contact} ;
+enum AverageType {None, Final, Intermediate, Both} ; 
+enum Pass {Pass1=1, Pass2=2, Pass3=4, Pass4=8, Pass5=16, 
+           VelFluct=256, RotFluct=512} ; 
+           
+inline Pass operator|(Pass a, Pass b){return static_cast<Pass>(static_cast<int>(a) | static_cast<int>(b));}
+//inline Pass operator|=(Pass a, const Pass b){return static_cast<Pass>(static_cast<int>(a) | static_cast<int>(b));} // Not working for some reason
+inline bool operator& (Pass a, Pass b) { return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
 //=========================================================
 /** \brief Data computed for a single coarse graining point */
 class CGPoint
 {
 public :
-    CGPoint(int dd, v1d loc): natom(0), phi(0) {d=dd ; location=loc ; }
+    CGPoint(int dd, v1d loc) {d=dd ; location=loc ; }
 
     v2d fields ;    ///< 1st dimension is time, second are fields
     v1d location ;  ///< Location of the coarse graining point
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
-    double natom = 0; ///< Number of weights participating at the spatial average
-    double phi = 0 ; ///< Volume fraction (well, maybe density actually) at the CG point
     int d ; ///< Dimension
 } ;
 //-------------------------
@@ -79,7 +84,8 @@ struct Field {
  uint64_t flag ; ///< Flag for the given field
  string name ; ///< Name for the given field
  TensorOrder type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR
- FieldType ftype ;
+ FieldType ftype ; ///< Mainly used to identified the type of user defined fields
+ Pass passlevel ; ///< Identify at which moment the field gets calculated
 };
 //-------------------------
 /// Data structure handling point data and contact data
@@ -115,6 +121,7 @@ int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data 
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
 int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ; ///< Copy particles through the periodic boundary conditions. Should call clean_periodic_atoms() after the full coarse-graining computation has been performed to clean the added atoms.
 int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; } ///< Clean periodic atoms.
+bool check_field_availability(string name) ; 
 } ;
 //------------------------------------------------------
 #include "WindowLibrary.h"
@@ -141,6 +148,8 @@ public :
         set_field_struct() ;
         Window = new LibLucy3D( &data, w, d) ;
     }
+    ~Coarsing() { if (Window != nullptr) delete Window ; 
+                  if (CGPtemp != nullptr) delete CGPtemp ; }
 
     int d ; ///< Number of dimensions
     int Npt; ///<Number of coarse graining points
@@ -153,7 +162,7 @@ public :
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; ///< Distances between CG points
     v2d box ; ///< CG point location
-    LibBase * Window ; ///> Pointer to the averaging window
+    LibBase * Window = nullptr ; ///> Pointer to the averaging window
 
 
     // Fields variable and function
@@ -164,7 +173,7 @@ public :
     vector <struct Field > FIELDS ; ///< All allowed fields (initialized in grid_getfields)
     int get_id(string nm) ; ///< Find field ID from field name
     struct Field * get_field(string nm) ; ///< Find Field from name
-    int set_flags (vector <string> s) ; ///< Set the fields which are requested from the coarse-graining
+    Pass set_flags (vector <string> s) ; ///< Set the fields which are requested from the coarse-graining
 
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
@@ -199,8 +208,9 @@ public :
     // Coarse graining functions
     int pass_1 () ; ///< Coarse-grain anything based on particles (not contacts) which does not need fluctuating quantities
     int pass_2 (bool usetimeavg=false) ; ///< Coarse-grain anything based on particles (not contacts) which needs fluctuating quantities (call the compute_fluc_ functions before)
-    int pass_3 () ; ///< Coarse-grain anything based on contact informations.
-    int pass_4 () ;
+    int pass_3 () ; ///< Coarse-grain anything based on contact informations (no fluctuations).
+    int pass_4 () ; ///< Coarse-grain anything based on contact informations & fluctuations. 
+    int pass_5 () ; ///< Calculation of derived quantities
     int compute_fluc_vel (bool usetimeavg=false) ; ///< Velocity fluctuation computation
     int compute_fluc_rot (bool usetimeavg=false) ; ///< Angular velocity fluctuation computation
     bool hasvelfluct=false, hasrotfluct=false ;

@@ -176,7 +176,7 @@ pair <string,map<string,string>> XMLReader_base::gettag()
     //printf("\n[%s]", line.c_str()) ;
     ss >> l ;
     while (isspace(l)) ss>>l ;
-    if (l!='<') printf("ERR: gettag should start with a < character\n") ;
+    if (l!='<') printf("ERR: gettag should start with a < character %c\n", l) ;
     ss >> l ;
     if (l=='/')
     {
@@ -248,14 +248,16 @@ int XMLReader::read_radius (vector <double > & radius)
     return 0 ; 
 }
 //-------------------------------------------------------------
-int XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>> & data)
+double XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>> & data)
 {
  ArrayType type ;
  map <string, string> prop ;
  int n=0 ;
+ double time ; 
  auto a=gettag() ;
- if (a.first != "timestep") {printf("ERR: not the right XML element (%s instead of timestep)\n", a.first.c_str()) ; return 1 ; }
- printf("%s ", a.second["ts"].c_str()) ; 
+ if (a.first != "timestep") {printf("ERR: not the right XML element (%s instead of timestep)\n", a.first.c_str()) ; return -1 ; }
+ //printf("%s ", a.second["ts"].c_str()) ; 
+ time = atof (a.second["ts"].c_str()) ; 
  while (a.first !="/timestep")
  {
     a=gettag() ;
@@ -291,8 +293,45 @@ int XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>>
     n++ ;
  }
  type=type ;
- return 0 ;
+ return time ;
 }
+//-------------------------------------------------------------
+std::vector<std::pair<double,std::streampos>> XMLReader::read_index ()
+{
+    std::streampos originalposition = fic.tellg() ; 
+    std::vector<std::pair<double,std::streampos>> res ; 
+    int value ; 
+    char text[500] ; char * textloc ; 
+    pair <string,map<string,string>> a ; 
+    fic.seekg(-1, ios_base::end) ; 
+    do {
+        fic.seekg(-1000, ios_base::cur) ; 
+        fic.ignore(1000, '<') ; 
+        textloc = text ;  do { fic.get(*textloc) ; textloc++ ; } while (*(textloc-1) != ' ' && *(textloc-1) != '>') ; *(textloc-1)=0 ; 
+    } while (!strcmp(text,"entry") || !strcmp(text,"/entry")) ;
+    
+    while (strcmp(text,"index")) 
+    {
+        fic.ignore(1000, '<') ; 
+        textloc = text ;  do { fic.get(*textloc) ; textloc++ ; } while (*(textloc-1) != ' ' && *(textloc-1) != '>') ; *(textloc-1)=0 ;
+    }
+    fic.seekg(-8, ios_base::cur) ; 
+    a=gettag() ;
+    while (a.first!="/index") 
+    {
+        a=gettag() ;
+        if (a.first == "/index") break ; 
+        if (a.first != "entry") printf("ERR: expecting an 'entry' tag.\n") ; 
+        fic >> value ; 
+        res.push_back(std::make_pair(atof(a.second["ts"].c_str()), static_cast<streampos>(value))) ;
+        a=gettag() ;
+        if (a.first != "/entry") printf("ERR: expecting a '/entry' tag.\n") ; 
+    }
+    fic.seekg(originalposition) ; 
+    return res ; 
+    
+}
+
 //-----------------------------------------------
 int XMLWriter::encodebase64f (ostream &out, vector<double>& val)
 {

@@ -9,37 +9,37 @@ int Coarsing::set_field_struct()
  * idx 0x02hhhhhhhh are fluctuation base (pass 2) user defined fields
  * idx 0x04hhhhhhhh are contact base (pass 3) user defined fields
  */
-FIELDS.push_back({1, "RHO"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 36 Density
-FIELDS.push_back({FIELDS.back().flag<<1, "I"    , TensorOrder::SCALAR, FieldType::Defined});    //Eq 65 Moment of Inertia
-FIELDS.push_back({FIELDS.back().flag<<1, "VAVG" , TensorOrder::VECTOR, FieldType::Defined});    //Eq 38 Average Velocity
-FIELDS.push_back({FIELDS.back().flag<<1, "TC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 63 Contact stress
-FIELDS.push_back({FIELDS.back().flag<<1, "TK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 62 Kinetic stress
-FIELDS.push_back({FIELDS.back().flag<<1, "ROT"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 64 Internal spin density
-FIELDS.push_back({FIELDS.back().flag<<1, "MC"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 67 Contact couple stress tensor
-FIELDS.push_back({FIELDS.back().flag<<1, "MK"   , TensorOrder::TENSOR, FieldType::Defined});    //Eq 66 Kinetic couple stress tensor
-FIELDS.push_back({FIELDS.back().flag<<1, "mC"   , TensorOrder::VECTOR, FieldType::Defined});    //Eq 68 spin supply from contacts
-FIELDS.push_back({FIELDS.back().flag<<1, "EKT"  , TensorOrder::SCALAR, FieldType::Defined});    // VAVG^2/2 Kinetic energy density of average velocity
-FIELDS.push_back({FIELDS.back().flag<<1, "eKT"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 69 Kinetic energy density of fluctuating motion
-FIELDS.push_back({FIELDS.back().flag<<1, "EKR"  , TensorOrder::SCALAR, FieldType::Defined});    // (W.K.W)/2, kin energy of avg rotational motion, W angular velocity vector, K moment of inertia tensor
-FIELDS.push_back({FIELDS.back().flag<<1, "eKR"  , TensorOrder::SCALAR, FieldType::Defined});    //Eq 70 Kin energy of fluctuating rotational motion
-FIELDS.push_back({FIELDS.back().flag<<1, "qTC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 72
-FIELDS.push_back({FIELDS.back().flag<<1, "qTK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 71
-FIELDS.push_back({FIELDS.back().flag<<1, "qRC"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 74
-FIELDS.push_back({FIELDS.back().flag<<1, "qRK"  , TensorOrder::VECTOR, FieldType::Defined});    //Eq 73
-FIELDS.push_back({FIELDS.back().flag<<1, "zT"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 75
-FIELDS.push_back({FIELDS.back().flag<<1, "zR"   , TensorOrder::SCALAR, FieldType::Defined});    //Eq 76
+FIELDS.push_back({                    1, "RHO"  , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});                        //Eq 36 Density
+FIELDS.push_back({FIELDS.back().flag<<1, "I"    , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});    //Eq 65 Moment of Inertia
+FIELDS.push_back({FIELDS.back().flag<<1, "VAVG" , TensorOrder::VECTOR, FieldType::Defined, Pass::Pass1});    //Eq 38 Average Velocity
+FIELDS.push_back({FIELDS.back().flag<<1, "TC"   , TensorOrder::TENSOR, FieldType::Defined, Pass::Pass3});    //Eq 63 Contact stress
+FIELDS.push_back({FIELDS.back().flag<<1, "TK"   , TensorOrder::TENSOR, FieldType::Defined, Pass::VelFluct|Pass::Pass2|Pass::Pass1});    //Eq 62 Kinetic stress
+FIELDS.push_back({FIELDS.back().flag<<1, "ROT"  , TensorOrder::VECTOR, FieldType::Defined, Pass::Pass1});    //Eq 64 Internal spin density
+FIELDS.push_back({FIELDS.back().flag<<1, "MC"   , TensorOrder::TENSOR, FieldType::Defined, Pass::Pass3});    //Eq 67 Contact couple stress tensor
+FIELDS.push_back({FIELDS.back().flag<<1, "MK"   , TensorOrder::TENSOR, FieldType::Defined, Pass::VelFluct|Pass::RotFluct|Pass::Pass2|Pass::Pass1});    //Eq 66 Kinetic couple stress tensor
+FIELDS.push_back({FIELDS.back().flag<<1, "mC"   , TensorOrder::VECTOR, FieldType::Defined, Pass::Pass3});    //Eq 68 spin supply from contacts
+FIELDS.push_back({FIELDS.back().flag<<1, "EKT"  , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});    // VAVG^2/2 Kinetic energy density of average velocity
+FIELDS.push_back({FIELDS.back().flag<<1, "eKT"  , TensorOrder::SCALAR, FieldType::Defined, Pass::VelFluct|Pass::Pass2|Pass::Pass1});    //Eq 69 Kinetic energy density of fluctuating motion
+FIELDS.push_back({FIELDS.back().flag<<1, "EKR"  , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});    // (W.K.W)/2, kin energy of avg rotational motion, W angular velocity vector, K moment of inertia tensor
+FIELDS.push_back({FIELDS.back().flag<<1, "eKR"  , TensorOrder::SCALAR, FieldType::Defined, Pass::RotFluct|Pass::Pass2|Pass::Pass1});    //Eq 70 Kin energy of fluctuating rotational motion
+FIELDS.push_back({FIELDS.back().flag<<1, "qTC"  , TensorOrder::VECTOR, FieldType::Defined, Pass::VelFluct|Pass::Pass4});    //Eq 72
+FIELDS.push_back({FIELDS.back().flag<<1, "qTK"  , TensorOrder::VECTOR, FieldType::Defined, Pass::VelFluct|Pass::Pass2|Pass::Pass1});    //Eq 71
+FIELDS.push_back({FIELDS.back().flag<<1, "qRC"  , TensorOrder::VECTOR, FieldType::Defined, Pass::RotFluct|Pass::Pass4});    //Eq 74
+FIELDS.push_back({FIELDS.back().flag<<1, "qRK"  , TensorOrder::VECTOR, FieldType::Defined, Pass::VelFluct|Pass::RotFluct|Pass::Pass2|Pass::Pass1});    //Eq 73
+FIELDS.push_back({FIELDS.back().flag<<1, "zT"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass3});    //Eq 75
+FIELDS.push_back({FIELDS.back().flag<<1, "zR"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass3});    //Eq 76
 
 // Post processing fields
-FIELDS.push_back({FIELDS.back().flag<<1, "TotalStress" ,     TensorOrder::TENSOR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "Pressure" ,        TensorOrder::SCALAR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "KineticPressure" , TensorOrder::SCALAR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "ShearStress" ,     TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "TotalStress" ,     TensorOrder::TENSOR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "Pressure" ,        TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "KineticPressure" , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "ShearStress" ,     TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 
-FIELDS.push_back({FIELDS.back().flag<<1, "StrainRate",           TensorOrder::TENSOR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SCALAR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VECTOR, FieldType::Defined});
-FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined});
+FIELDS.push_back({FIELDS.back().flag<<1, "StrainRate",           TensorOrder::TENSOR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 
 return 0 ;
 } //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
@@ -65,6 +65,9 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
     break ;
   case Windows::Lucy3D :
     setWindow<Windows::Lucy3D> (w) ;
+    break ;
+  case Windows::Lucy3DFancyInt:
+    setWindow<Windows::Lucy3DFancyInt> (w) ; 
     break ;
   case Windows::Hann3D :
     setWindow<Windows::Hann3D> (w) ;
@@ -140,17 +143,21 @@ int Coarsing::grid_neighbour ()
 return 0 ;
 }
 //---------------------------------
-int Coarsing::set_flags (vector <string> s)
+Pass Coarsing::set_flags (vector <string> s)
 {
+ Pass Res = static_cast<Pass>(0) ; 
  flags=0 ; Field * a;
  for (auto i = s.begin() ; i<s.end() ; i++)
  {
      a=get_field(*i) ;
      if (a!=NULL)
+     {
          flags |= a->flag ;
+         Res = Res | a->passlevel ; 
+     }
  }
- printf("Flags: %X\n", flags) ;
-return 0 ;
+ printf("Flags: %X | Pipelines %X \n", flags, static_cast<int>(Res) ) ;
+return Res ;
 }
 
 //--------------------------------
@@ -404,13 +411,20 @@ for (int i=0 ; i<8 ; i+=2) pts[i][2]=x;
 x=clip(ceil((data.pos[2][id]-CGP[0].location[2])/dx[2]), npt[2]) ;
 for (int i=1 ; i<8 ; i+=2) pts[i][2]=x;
 
-
 for (int i=0; i<8 ; i++) pts[i][0] = (nptcum[0]*pts[i][0]+nptcum[1]*pts[i][1]+nptcum[2]*pts[i][2]) ; // Variable reuse ... ...
 //printf("| %d %d %d %d %d {%d} %d %d %g |", pts[0][0], pts[1][0], pts[2][0], pts[3][0], pts[4][0], pts[5][0], pts[6][0], pts[7][0], (*CGPtemp)[pts[5][0]].fields[0][idvel]) ; fflush(stdout) ;
 
+/*vector <CGPoint> * CGbase = nullptr ;
+if (usetimeavg) CGbase = CGPtemp ; 
+else CGbase = &CGP ; */
+
 for (int i=0; i<8 ; i++)
     for (int j=0 ; j<3 ; j++)
-        Qs[j*4] += 1/8. * ((*CGPtemp)[pts[i][0]].fields[0][idvel+j]) ;
+        if (usetimeavg)
+            Qs[j*4] += 1/8. * ((*CGPtemp)[pts[i][0]].fields[0][idvel+j]) ;
+        else
+            Qs[j*4] += 1/8. * (CGP[pts[i][0]].fields[0][idvel+j]) ;
+            
 //printf("%g %g %g|", Qs[0], Qs[4], Qs[8]) ;
 for (int i=0; i<4 ; i++)
   if (pts[0+i][0]!=pts[4+i][0])
@@ -472,10 +486,10 @@ int Coarsing::pass_1 ()
 {
 int i, dd, id ; double wp ;
 bool dorho=true, dovel=true, doomega=true, doI=true ;
-int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;}
-int Iid = get_id("I") ; if (Iid<0) doI=false ;
-int velid=get_id("VAVG"); if (velid<0)  dovel=false ;
-int omegaid=get_id("ROT");if (omegaid<0) doomega=false ;
+int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;} if (dorho && !data.check_field_availability("RHO")) {printf("Data missing for RHO\n") ; dorho=false ; }
+int Iid = get_id("I") ; if (Iid<0) doI=false ;           if (doI     && !data.check_field_availability("I")) {printf("Data missing for I\n") ; doI=false ; }
+int velid=get_id("VAVG"); if (velid<0)  dovel=false ;    if (dovel   && !data.check_field_availability("VAVG")) {printf("Data missing for VAVG\n") ; dovel=false ; }
+int omegaid=get_id("ROT");if (omegaid<0) doomega=false ; if (doomega && !data.check_field_availability("ROT")) {printf("Data missing for ROT\n") ; doomega=false ; }
 
 vector<int> extraid ;
 for (auto &v: FIELDS)
@@ -509,8 +523,8 @@ for (i=0 ; i<data.N ; i++)
      totweight[i]+=wp ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
-     CGP[*j].phi += wp ;
-     if (wp>0) CGP[*j].natom ++ ;
+     //CGP[*j].phi += wp ;
+     //if (wp>0) CGP[*j].natom ++ ;
      if (dorho)
        CGP[*j].fields[cT][rhoid] += wp * data.mass[i] ;
      if (doI)
@@ -570,12 +584,12 @@ int Coarsing::pass_2(bool usetimeavg)
 int i, dd ; double velfluc, rotfluc ; int id ; double wp ;
 bool doeKT=true , doeKR=true, doqTK=true, doqRK=true, doTK=true, doMK=true ;
 int rhoid=get_id("RHO") ; if (rhoid<0) {return 0;}
-int eKTid=get_id("eKT") ; if (eKTid<0) doeKT=false ;
-int eKRid=get_id("eKR") ; if (eKRid<0) doeKR=false ;
-int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ;
-int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ;
-int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;
-int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;
+int eKTid=get_id("eKT") ; if (eKTid<0) doeKT=false ; if (doeKT && !data.check_field_availability("eKT")) {printf("Data missing for eKT\n") ; doeKT=false ; }
+int eKRid=get_id("eKR") ; if (eKRid<0) doeKR=false ; if (doeKR && !data.check_field_availability("eKR")) {printf("Data missing for eKR\n") ; doeKR=false ; }
+int qTKid=get_id("qTK") ; if (qTKid<0) doqTK=false ; if (doqTK && !data.check_field_availability("qTK")) {printf("Data missing for qTK\n") ; doqTK=false ; }
+int qRKid=get_id("qRK") ; if (qRKid<0) doqRK=false ; if (doqRK && !data.check_field_availability("qRK")) {printf("Data missing for qRK\n") ; doqRK=false ; }
+int TKid =get_id("TK")  ; if (TKid<0) doTK=false ;   if (doTK  && !data.check_field_availability("TK")) {printf("Data missing for TK\n") ; doTK=false ; }
+int MKid =get_id("MK")  ; if (MKid<0) doMK=false ;   if (doMK  && !data.check_field_availability("MK")) {printf("Data missing for MK\n") ; doMK=false ; }
 
 if (!hasvelfluct && (doeKT || doTK || doMK || doqTK || doqRK))
   {
@@ -644,14 +658,12 @@ return 0 ;
 int Coarsing::pass_3()
 {
 int i, dd ;
-bool dozT=true , dozR=true, doTC=true, doMC=true, domC=true, doqTC=true, doqRC=true ;
-int zTid=get_id("zT") ; if (zTid<0) dozT=false ;
-int zRid=get_id("zR") ; if (zRid<0) dozR=false ;
-int TCid=get_id("TC") ; if (TCid<0) doTC=false ;
-int MCid=get_id("MC") ; if (MCid<0) doMC=false ;
-int mCid=get_id("mC") ; if (mCid<0) domC=false ;
-int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ;
-int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ;
+bool dozT=true , dozR=true, doTC=true, doMC=true, domC=true;
+int zTid=get_id("zT") ; if (zTid<0) dozT=false ; if (dozT && !data.check_field_availability("zT")) {printf("Data missing for zT\n") ; dozT=false ; }
+int zRid=get_id("zR") ; if (zRid<0) dozR=false ; if (dozR && !data.check_field_availability("zR")) {printf("Data missing for zR\n") ; dozR=false ; }
+int TCid=get_id("TC") ; if (TCid<0) doTC=false ; if (doTC && !data.check_field_availability("TC")) {printf("Data missing for TC\n") ; doTC=false ; }
+int MCid=get_id("MC") ; if (MCid<0) doMC=false ; if (doMC && !data.check_field_availability("MC")) {printf("Data missing for MC\n") ; doMC=false ; }
+int mCid=get_id("mC") ; if (mCid<0) domC=false ; if (domC && !data.check_field_availability("mC")) {printf("Data missing for mC\n") ; domC=false ; }
 double sum=0 ; int p, q, id ; //double rp, rq ; double wpqs, wpqf ;
 printf(" -> Pass 3 ") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
@@ -677,20 +689,6 @@ for (i=0 ; i<data.Ncf ; i++)
     for (dd=0, sum=0 ; dd<d ; dd++)
       sum += (data.mpq[dd][i]*data.omega[dd][p] + data.mqp[dd][i]*data.omega[dd][q]) ;
     CGP[*j].fields[cT][zRid] -= wpqs * sum ;
-  }
-  if (doqTC)
-  {
-    for (dd=0,sum=0 ; dd<d ; dd++)
-     sum += data.fpq[dd][i] * (data.vel_fluc[dd][p]+data.vel_fluc[dd][q]) ;
-    for (dd=0 ; dd<d ; dd++)
-      CGP[*j].fields[cT][qTCid+dd] += wpqf * data.lpq[dd][i] * sum ;
-  }
-  if (doqRC)
-  {
-    for (dd=0,sum=0 ; dd<d ; dd++)
-     sum += data.mpq[dd][i] * data.rot_fluc[dd][p] - data.mqp[dd][i] * data.rot_fluc[dd][q] ;
-    for (dd=0 ; dd<d ; dd++)
-      CGP[*j].fields[cT][qRCid+dd] += wpqf * data.lpq[dd][i] * sum ;
   }
 
   if (doTC)
@@ -721,15 +719,62 @@ for (i=0 ; i<Npt ; i++)
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
   //  , CGP[i].fields[cT][TCid+4], CGP[i].fields[cT][TCid+5], CGP[i].fields[cT][TCid+6], CGP[i].fields[cT][TCid+7], CGP[i].fields[cT][TCid+8]);
     //printf("%g ", CGP[i].natom) ;
-    if (doqTC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qTCid] *= 0.5 ;
-    if (doqRC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qRCid] *= 0.5 ;
     if (doMC) for (dd=0 ; dd<d*d ; dd++) CGP[i].fields[cT][MCid] *= 0.5 ;
 }
 return 0 ;
 }
-
-//======================== PASS 4: post-processing of some fields ==================
+//================ PASS 4 : "qTC", "qRC"==============================
 int Coarsing::pass_4()
+{
+int i, dd ;
+bool doqTC=true, doqRC=true ;
+int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ; if (qTCid && !data.check_field_availability("qTC")) {printf("Data missing for qTC\n") ; doqTC=false ; }
+int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ; if (qRCid && !data.check_field_availability("qRC")) {printf("Data missing for qRC\n") ; doqRC=false ; }
+double sum=0 ; int p, q, id ; //double rp, rq ; double wpqs, wpqf ;
+printf(" -> Pass 4 ") ; fflush(stdout) ;
+for (i=0 ; i<data.Ncf ; i++)
+{
+ id=find_closest_pq(i) ;
+ p=data.id1[i] ; q=data.id2[i] ; if (q<=p) printf("ERR: contacts should be ordered so that p<q\n") ;
+ for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
+ {
+  /*rp=Window->distance(p, CGP[*j].location) ;
+  rq=Window->distance(q, CGP[*j].location) ;
+  wpqs = Window->window_avg (rp, rq) ;
+  wpqf = Window->window_int (rp, rq) ;*/
+  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location) ;
+  //printf("%g %g %g", rp, rq, wpqf) ;
+  if (doqTC)
+  {
+    for (dd=0,sum=0 ; dd<d ; dd++)
+     sum += data.fpq[dd][i] * (data.vel_fluc[dd][p]+data.vel_fluc[dd][q]) ;
+    for (dd=0 ; dd<d ; dd++)
+      CGP[*j].fields[cT][qTCid+dd] += wpqf * data.lpq[dd][i] * sum ;
+  }
+  if (doqRC)
+  {
+    for (dd=0,sum=0 ; dd<d ; dd++)
+     sum += data.mpq[dd][i] * data.rot_fluc[dd][p] - data.mqp[dd][i] * data.rot_fluc[dd][q] ;
+    for (dd=0 ; dd<d ; dd++)
+      CGP[*j].fields[cT][qRCid+dd] += wpqf * data.lpq[dd][i] * sum ;
+  }
+ }
+}
+
+//Last intermediate pass
+printf(" -> subpass 4") ; fflush(stdout) ;
+for (i=0 ; i<Npt ; i++)
+{
+    if (doqTC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qTCid] *= 0.5 ;
+    if (doqRC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qRCid] *= 0.5 ;
+}
+return 0 ;
+}
+
+
+
+//======================== PASS 5: post-processing of some fields ==================
+int Coarsing::pass_5()
 {
 bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true;
 
@@ -749,7 +794,7 @@ vector <double> gradient ;
 if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) gradient.resize(d*d,0) ;
 if ((doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }
 
-printf(" -> Pass 4 ") ; fflush(stdout) ;
+printf(" -> Pass 5 ") ; fflush(stdout) ;
 
 for (int i=0 ; i< Npt ; i++)
 {
@@ -1017,6 +1062,32 @@ int Data::periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclu
 return 0 ;
 }
 
+//----------------------------------------------------------
+bool Data::check_field_availability(string name)
+{
+ if      (name == "RHO" ) return (mass) ; 
+ else if (name == "I"   ) return (mass && Imom) ; 
+ else if (name == "VAVG") return (mass && vel[0]) ; 
+ else if (name == "TC"  ) return (lpq[0] && fpq[0]) ; 
+ else if (name == "TK"  ) return (mass) ; 
+ else if (name == "ROT" ) return (mass && Imom && omega[0]) ; 
+ else if (name == "MC"  ) return (lpq[0] && mqp[0] && mpq[0]) ; 
+ else if (name == "MK"  ) return (mass && Imom) ;
+ else if (name == "mC"  ) return (lpq[0] && fpq[0]) ;
+ else if (name == "EKT" ) return (mass && vel[0]) ; 
+ else if (name == "eKT" ) return (mass) ; 
+ else if (name == "EKR" ) return (mass && Imom && omega[0]) ; 
+ else if (name == "eKR" ) return (mass && Imom) ; 
+ else if (name == "qTC" ) return (lpq[0] && fpq[0]) ;
+ else if (name == "qTK" ) return (mass) ;
+ else if (name == "qRC" ) return (lpq[0] && mqp[0] && mpq[0]) ;
+ else if (name == "qRK" ) return (mass && Imom) ; 
+ else if (name == "zT"  ) return (fpq[0] && vel[0]) ; 
+ else if (name == "zR"  ) return (mpq[0] && mqp[0] && omega[0]) ; 
+ else 
+     return (true) ; 
+}
+
 //====================================================
 int Coarsing::mean_time(bool temporary)
 {
@@ -1028,8 +1099,8 @@ int Coarsing::mean_time(bool temporary)
     {
       CGPtemp->push_back (CGPoint(CGP[i].d, CGP[i].location)) ;
       CGPtemp->back().fields.push_back(CGP[i].fields[0]) ;
-      CGPtemp->back().natom = CGP[i].natom ;
-      CGPtemp->back().phi = CGP[i].phi ;
+      //CGPtemp->back().natom = CGP[i].natom ;
+      //CGPtemp->back().phi = CGP[i].phi ;
       CGPtemp->back().neighbors = CGP[i].neighbors ;
     }
   }
@@ -1066,12 +1137,12 @@ int Coarsing::write_vtk(string sout)
     fprintf(out, "# vtk DataFile Version 2.0\nSome data\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n", npt[0], npt[1], npt[2], CGP[0].location[0], CGP[0].location[1], CGP[0].location[2], dx[0], dx[1], dx[2]) ;
     fprintf(out, "POINT_DATA %d\n", Npt) ;
 
-    fprintf(out,"SCALARS count double \nLOOKUP_TABLE default \n") ;
+    /*fprintf(out,"SCALARS count double \nLOOKUP_TABLE default \n") ;
     for (int k=0 ; k<npt[2] ; k++)
      for (int j=0 ; j<npt[1] ; j++)
       for (int i=0 ; i<npt[0] ; i++)
        fprintf(out, "%g ", CGP[i*npt[1]*npt[2]+j*npt[2]+k].phi) ;
-    fprintf(out,"\n\n") ; 
+    fprintf(out,"\n\n") ; */
 
     for (size_t f=0 ; f<Fidx.size() ; f++)
     {

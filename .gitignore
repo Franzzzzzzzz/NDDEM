@@ -6,6 +6,7 @@ src/Dem/xml2vtk
 src/Texturing/Texturing
 src/build/
 cggui/node_modules
+cggui/cpptest
 examples/Output
 build
 package-lock.json

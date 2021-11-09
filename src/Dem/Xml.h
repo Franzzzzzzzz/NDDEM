@@ -63,6 +63,7 @@ public:
     std::pair<string, map<string,string>> gettag() ;
     tuple <string, map<string,string> , std::vector<double> > gettagdata() ;
     string getcontent() ;
+    void close () {fic.close() ; }
 } ;
 
 class XMLReader : public XMLReader_base
@@ -73,7 +74,8 @@ public:
     };
     int read_boundaries (vector <vector <double>> &boundaries) ;
     int read_radius (vector <double> &radius) ;
-    int read_nextts(vector<string> &names, vector<vector<vector<double>>> & data) ;
+    double read_nextts(vector<string> &names, vector<vector<vector<double>>> & data) ;
+    std::vector<std::pair<double,std::streampos>> read_index () ;
     int decodebase64f (istream &in, vector<float>& val) ;
     int decodebase64f_2dd (istream &in, vector<vector<double>>& val) ;
 
