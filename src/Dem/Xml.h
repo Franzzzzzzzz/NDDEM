@@ -1,3 +1,6 @@
+#ifndef XML_H
+#define XML_H
+
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -81,3 +84,5 @@ public:
 
     std::pair<string, map<string,string>> tags ;
 } ;
+
+#endif

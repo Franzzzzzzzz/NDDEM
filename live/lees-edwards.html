@@ -26,7 +26,7 @@
             <div id="stats"></div>
             <div id="canvas"></div>
         </div>
-        <script async type="text/javascript" src="./deploy/DEMND.js"></script>
+        <script async type="text/javascript" src="./deploy/DEMCGND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script type="module">
@@ -48,7 +48,7 @@
 			let spheres;
             let floor;
             let S;
-            let NDDEMLib;
+            let NDDEMCGLib;
             let pointer;
             let v, omegaMag;
             let radii;
@@ -110,7 +110,7 @@
 
 			async function init() {
 
-				physics = await NDDEMPhysics();
+				physics = await NDDEMCGPhysics();
                 // physics.main(params.dimensions, params.N, inputfile)
 				position = new THREE.Vector3();
 
@@ -203,7 +203,7 @@
 			}
 
             function update_shear_rate() {
-                S.setBoundary(0, [-params.L,params.L,params.shear_rate]);
+                S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
                 // console.warn('NEED TO IMPLEMENT PBCLE UPDATING ON C++ SIDE')
             }
 
@@ -237,14 +237,18 @@
 				requestAnimationFrame( animate );
                 move_spheres();
                 if ( !params.paused ) {
-                    S.step_forward(5);
+                    S.simu_step_forward(5);
+                    S.cg_param_read_timestep(0) ;
+                    S.cg_process_timestep(0,false) ;
+                    var res=S.cg_get_result(0, "RHO", 0) ;
+                    console.log(res) ;
                 }
 				renderer.render( scene, camera );
 			}
 
 
             function add_spheres() {
-                radii = S.getRadii();
+                radii = S.simu_getRadii();
                 spheres = new THREE.Group();
                 scene.add(spheres);
 
@@ -263,16 +267,16 @@
             }
 
             function move_spheres() {
-                var x = S.getX();
-                var orientation = S.getOrientation();
+                var x = S.simu_getX();
+                var orientation = S.simu_getOrientation();
                 if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
-                    v = S.getVelocity();
+                    v = S.simu_getVelocity();
                 }
                 else if ( params.lut === 'Rotation Rate' ) {
-                    omegaMag = S.getRotationRate();
+                    omegaMag = S.simu_getRotationRate();
                 }
                 else if ( params.lut === 'Force' ) {
-                    forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
+                    forceMag = S.simu_getParticleStress(); // NOTE: NOT IMPLEMENTED YET
                 }
 
                 for ( let i = 0; i < params.N; i ++ ) {
@@ -309,57 +313,78 @@
                 }
             }
 
-            async function NDDEMPhysics() {
+            async function NDDEMCGPhysics() {
 
-            	if ( 'DEMND' in window === false ) {
+            	if ( 'DEMCGND' in window === false ) {
 
-            		console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
+            		console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
             		return;
 
             	}
 
-            	NDDEMLib = await DEMND(); // eslint-disable-line no-undef
+            	NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 
                 if ( params.dimension == 3 ) {
-                    S = await new NDDEMLib.Simulation3 (params.N);
+                    S = await new NDDEMCGLib.DEMCGND (params.N);
                     finish_setup();
                 }
                 else if ( params.dimension == 4 ) {
-                    S = await new NDDEMLib.Simulation4 (params.N);
-                    finish_setup();
+                    console.log("D=4 not available") ; 
+                    /*S = await new NDDEMLib.Simulation4 (params.N);
+                    finish_setup();*/
                 }
 
 
 
                 function finish_setup() {
-                    S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-                    S.interpret_command("radius -1 0.5");
-                    S.interpret_command("mass -1 1");
-                    S.interpret_command("auto rho");
-                    S.interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
-                    S.interpret_command("auto mass");
-                    S.interpret_command("auto inertia");
+                    S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+                    S.simu_interpret_command("radius -1 0.5");
+                    S.simu_interpret_command("mass -1 1");
+                    S.simu_interpret_command("auto rho");
+                    S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+                    S.simu_interpret_command("auto mass");
+                    S.simu_interpret_command("auto inertia");
 
-                    S.interpret_command("boundary 0 PBCLE -"+String(params.L)+" "+String(params.L)+" "+String(params.shear_rate));
-                    S.interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 0 PBCLE -"+String(params.L)+" "+String(params.L)+" "+String(params.shear_rate));
+                    S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
                     if ( params.dimension == 4 ) {
-                        S.interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
+                        S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
                     }
-                    S.interpret_command("gravity 0 0 " + "0 ".repeat(params.dimension - 3))
+                    S.simu_interpret_command("gravity 0 0 " + "0 ".repeat(params.dimension - 3))
 
-                    S.interpret_command("auto location randomdrop");
+                    S.simu_interpret_command("auto location randomdrop");
 
-                    S.interpret_command("set Kn 2e5");
-                    S.interpret_command("set Kt 8e4");
-                    S.interpret_command("set GammaN 75");
-                    S.interpret_command("set GammaT 75");
-                    S.interpret_command("set Mu 0.5");
-                    S.interpret_command("set T 150");
-                    S.interpret_command("set dt 0.0001");
-                    S.interpret_command("set tdump 10"); // how often to calculate wall forces
-                    S.interpret_command("auto skin");
-                    S.finalise_init () ;
+                    S.simu_interpret_command("set Kn 2e5");
+                    S.simu_interpret_command("set Kt 8e4");
+                    S.simu_interpret_command("set GammaN 75");
+                    S.simu_interpret_command("set GammaT 75");
+                    S.simu_interpret_command("set Mu 0.5");
+                    S.simu_interpret_command("set T 150");
+                    S.simu_interpret_command("set dt 0.0001");
+                    S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
+                    S.simu_interpret_command("auto skin");
+                    S.simu_finalise_init () ;
+                    
+                    
+                    var cgparam ={} ; 
+                    cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ; 
+                    cgparam["boxes"]=[3,3,3] ;
+                    cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ; 
+                    cgparam["window size"]=2 ;
+                    cgparam["skip"]=0;
+                    cgparam["max time"]=1 ;
+                    cgparam["time average"]="None" ; 
+                    cgparam["fields"]=["RHO", "VAVG"] ; 
+                    cgparam["periodicity"]=[false,false,false];
+                    cgparam["window"]="Lucy3D";
+                    cgparam["dimension"]=3;
+
+                    
+                    console.log(JSON.stringify(cgparam)) ; 
+                    S.cg_param_from_json_string(JSON.stringify(cgparam)) ; 
+                    S.cg_setup_CG() ; 
+                    
                 }
             }
 

@@ -1,4 +1,6 @@
 #include "../Dem/Xml.h"
+#ifndef NDDEMREADER
+#define NDDEMREADER
 
 class NDDEMReader : public Reader {
 public:
@@ -135,3 +137,4 @@ double NDDEMReader::InertiaMomentum (int d , double R, double rho)
    return (res*rho) ;
  }
 }
+#endif

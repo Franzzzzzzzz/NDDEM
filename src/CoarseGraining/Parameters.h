@@ -1,8 +1,9 @@
-
+#ifndef PARAMETERS_H
+#define PARAMETERS_H
 
 using json = nlohmann::json;
 
-enum FileFormat {NDDEM, Liggghts} ; 
+enum FileFormat {NDDEM, Liggghts, Interactive} ; 
 enum FileType {both, particles, contacts} ; 
 //enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, fpq, mpq, mqp} ;
 
@@ -264,6 +265,7 @@ void Param::process_file (json &j2)
         if (v != j.end())
         { if ( *v == "liggghts") format = FileFormat::Liggghts ;
         else if (*v == "NDDEM") format = FileFormat::NDDEM ;
+        else if (*v == "interactive") format = FileFormat::Interactive ;
         else {printf("ERR: unknown file format.\n") ; return ;}
         }
         else { printf("ERR: the key 'format' is required when defining a file. \n") ; return ; }
@@ -280,6 +282,7 @@ void Param::process_file (json &j2)
         
         if (files.back().fileformat == FileFormat::Liggghts)
         {
+            #ifndef NOLIGGGHTS
             if (files.back().filetype == FileType::both)
                 files.back().reader = new LiggghtsReader (files.back().path) ;
             else if (files.back().filetype == FileType::particles)
@@ -298,9 +301,14 @@ void Param::process_file (json &j2)
                 }
                 files.back().reader = new LiggghtsReader_contacts (files.back().path, it->reader, files.back().mapping) ;
             }
+            #else
+            printf("The file has been compiled without Liggghts file format support\n") ; 
+            #endif
         }
         else if (files.back().fileformat == FileFormat::NDDEM)
             files.back().reader = new NDDEMReader (files.back().path); 
+        else if (files.back().fileformat == FileFormat::Interactive)
+            files.back().reader = new InteractiveReader (); 
     }
 }
 //------------------
@@ -369,3 +377,4 @@ double * Param::get_data(DataValue datavalue, int dd)
     }
     return nullptr ;
 }
+#endif

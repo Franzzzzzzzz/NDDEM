@@ -93,7 +93,7 @@ private:
 //-------------------------------------------
 class LiggghtsReader_contacts : public LiggghtsReader {
 public:
-    LiggghtsReader_contacts(std::string ppath, Reader *d, std::map <std::string, std::string> columnmap) : LiggghtsReader(ppath), dump(dynamic_cast<LiggghtsReader_particles*>(d)) {} ; 
+    LiggghtsReader_contacts(std::string ppath, Reader *d, std::map <std::string, std::string> columnmap) : LiggghtsReader(ppath), dump(dynamic_cast<LiggghtsReader_particles*>(d)) {cfmapping=columnmap;} ; 
     double * get_data (DataValue datavalue, int dd) {
         switch(datavalue) {
             case DataValue::id1 : return &(data[0][0]) ;

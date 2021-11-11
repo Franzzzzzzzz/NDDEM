@@ -1,0 +1,41 @@
+{
+  "file": [
+    {
+      "filename": "none",
+      "content": "particles",
+      "format": "interactive",
+      "number": 1
+    }
+  ],
+  "boxes": [
+    5,
+    5,
+    3
+  ],
+  "boundaries": [
+    [
+      -0.0075,
+      -0.0075,
+      -0.001
+    ],
+    [
+      0.0075,
+      0.0075,
+      0.015
+    ]
+  ],
+  "periodicity": [
+    false,
+    false,
+    false
+  ],
+  "window size": 0.001,
+  "window": "Lucy3D",
+  "skip": 0,
+  "max time": 1,
+  "time average": "None",
+  "fields": [
+    "RHO",
+    "VAVG"
+  ]
+}

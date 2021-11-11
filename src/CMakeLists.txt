@@ -61,4 +61,24 @@ add_subdirectory(NrrdIO-1.11.0-src)
 add_subdirectory(CoarseGraining)
 add_subdirectory(Texturing)
 
+set (max_dimension "3" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
+add_compile_definitions(MAXDIM=${max_dimension})
+
+if(EMSCRIPTEN)
+ add_executable(DEMCGND DemCgND.cpp Dem/Parameters.cpp Dem/Tools.cpp Dem/Contacts.cpp Dem/ContactList.cpp Dem/Xml.cpp Dem/Multiproc.cpp
+                        CoarseGraining/Coarsing.cpp )
+ set_property(TARGET DEMCGND PROPERTY CXX_STANDARD 17)
+ target_compile_options(DEMCGND PUBLIC -DNO_OPENMP ${Matlab_Macro} -g -O3 -Wall -Wextra -DNOLIGGGHTS)
+ target_link_libraries(DEMCGND PUBLIC -DNO_OPENMP -g -O3 -lm -Wall -Wextra)
+ set(MODULARIZE "1")
+ set(EXPORT_NAME "DEMCGND")
+ set_target_properties(
+    DEMCGND
+    PROPERTIES
+    LINK_FLAGS
+    "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMCGND' "
+ )
+endif()
+
+
 execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/install.sh)

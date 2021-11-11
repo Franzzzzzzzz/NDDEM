@@ -622,7 +622,9 @@ public:
 } ;
 
 #ifdef EMSCRIPTEN
+#ifdef USEBINDINGS
 #include "emscripten_specific.h"
+#endif
 #endif
 
 /** @} */
