@@ -43,7 +43,7 @@
             var clock = new THREE.Clock();
 
 			let camera, scene, renderer, stats, panel, controls;
-			let physics, position;
+			let position;
             let gui;
 			let spheres;
             let floor;
@@ -313,7 +313,27 @@
                 }
             }
 
+<<<<<<< HEAD
             async function NDDEMCGPhysics() {
+=======
+            async function loadCG() {
+
+            	if ( 'CoarseGraining' in window === false ) {
+            		console.error( 'CoarseGraining: Couldn\'t find CoarseGraining.js' );
+            		return;
+            	}
+
+            	let CGLib = await CoarseGraining(); // eslint-disable-line no-undef
+
+                CG = await new CGLib.CoarseGraining();
+                finish_setup();
+
+                function finish_setup() {
+                    // CG.setup_CG();
+                }
+            }
+
+            async function NDDEMPhysics() {
 
             	if ( 'DEMCGND' in window === false ) {
 
@@ -321,7 +341,7 @@
             		return;
 
             	}
-
+            	
             	NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 
                 if ( params.dimension == 3 ) {

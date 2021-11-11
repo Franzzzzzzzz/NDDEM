@@ -1,4 +1,13 @@
-module.exports = {
+const webpack = require('webpack');
+const path = require('path');
+
+const config = {
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'cggui.bundle.js'
+  },
+  mode: 'development',
   module: {
     rules: [
       {
@@ -16,3 +25,4 @@ module.exports = {
   },
 };
 
+module.exports = config;
