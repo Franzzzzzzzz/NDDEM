@@ -23,7 +23,9 @@
             Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
         <div class="flex-container">
-            <div id="stats"></div>
+            <div id="stats">
+                <a href="#" id="download_tag" title="Download data as a csv file" class="material-icons hidden">file_download</a>
+            </div>
             <div id="canvas"></div>
         </div>
         <script async type="text/javascript" src="./deploy/DEMCGND.js"></script>
@@ -55,6 +57,8 @@
             let particle_volume;
             let NDsolids, material, STLFilename;
             let meshes = new THREE.Group();
+            let density, vavg;
+            let show_stats = true;
 
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
@@ -110,7 +114,7 @@
 
 			async function init() {
 
-				physics = await NDDEMCGPhysics();
+				await NDDEMCGPhysics();
                 // physics.main(params.dimensions, params.N, inputfile)
 				position = new THREE.Vector3();
 
@@ -183,11 +187,11 @@
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {
                         var data = [{
-                                      type: 'scatter3d',
+                                      type: 'scatter',
                                       mode: 'lines',
-                                      x: [], y: [], z: [],
+                                      x: [], y: [],
                                       line: { width: 5 },
-                                      // name: 'Load path'
+                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
                                     }]
                         Plotly.addTraces('stats', data);
                         params.new_line = false;
@@ -198,6 +202,7 @@
                 window.addEventListener( 'resize', onWindowResize, false );
                 window.addEventListener( 'keypress', checkKeys, false );
 
+                if ( show_stats ) { make_graph(); }
 
 			    animate();
 			}
@@ -240,8 +245,11 @@
                     S.simu_step_forward(5);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
-                    var res=S.cg_get_result(0, "RHO", 0) ;
-                    console.log(res) ;
+                    density=S.cg_get_result(0, "RHO", 0) ;
+                    vavg=S.cg_get_result(0, "VAVG", 0) ;
+                    // console.log(res) ;
+
+                    update_graph();
                 }
 				renderer.render( scene, camera );
 			}
@@ -313,43 +321,21 @@
                 }
             }
 
-<<<<<<< HEAD
             async function NDDEMCGPhysics() {
-=======
-            async function loadCG() {
-
-            	if ( 'CoarseGraining' in window === false ) {
-            		console.error( 'CoarseGraining: Couldn\'t find CoarseGraining.js' );
-            		return;
-            	}
-
-            	let CGLib = await CoarseGraining(); // eslint-disable-line no-undef
-
-                CG = await new CGLib.CoarseGraining();
-                finish_setup();
-
-                function finish_setup() {
-                    // CG.setup_CG();
-                }
-            }
-
-            async function NDDEMPhysics() {
 
             	if ( 'DEMCGND' in window === false ) {
-
             		console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
             		return;
-
             	}
-            	
+
             	NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 
                 if ( params.dimension == 3 ) {
                     S = await new NDDEMCGLib.DEMCGND (params.N);
                     finish_setup();
                 }
-                else if ( params.dimension == 4 ) {
-                    console.log("D=4 not available") ; 
+                else if ( params.dimension > 3 ) {
+                    console.log("D>3 not available") ;
                     /*S = await new NDDEMLib.Simulation4 (params.N);
                     finish_setup();*/
                 }
@@ -385,50 +371,56 @@
                     S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;
-                    
-                    
-                    var cgparam ={} ; 
-                    cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ; 
-                    cgparam["boxes"]=[3,3,3] ;
-                    cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ; 
+
+
+                    var cgparam ={} ;
+                    cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
+                    cgparam["boxes"]=[1,1,1] ;
+                    // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
+                    cgparam["boundaries"]=[
+                        [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
+                        [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
                     cgparam["window size"]=2 ;
                     cgparam["skip"]=0;
                     cgparam["max time"]=1 ;
-                    cgparam["time average"]="None" ; 
-                    cgparam["fields"]=["RHO", "VAVG"] ; 
+                    cgparam["time average"]="None" ;
+                    cgparam["fields"]=["RHO", "VAVG"] ;
                     cgparam["periodicity"]=[false,false,false];
                     cgparam["window"]="Lucy3D";
                     cgparam["dimension"]=3;
 
-                    
-                    console.log(JSON.stringify(cgparam)) ; 
-                    S.cg_param_from_json_string(JSON.stringify(cgparam)) ; 
-                    S.cg_setup_CG() ; 
-                    
+
+                    console.log(JSON.stringify(cgparam)) ;
+                    S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
+                    S.cg_setup_CG() ;
+
                 }
             }
 
             function update_graph() {
-                density = params.packing_fraction*material_density;
-                // pressure_time.push(pressure);
+                // density = params.packing_fraction*material_density;
+                // vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
+                // console.log(vertical_stress)
                 // shear_time.push(shear);
                 // density_time.push(density);
 
+                // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
+                console.log(density,vavg)
                     Plotly.extendTraces('stats', {
-                        'x': [[density]],
-                        'y': [[shear]],
-                        'z': [[pressure]],
+                        'x': [density],
+                        // 'y': [[shear]],
+                        'y': [vavg],
                     }, [-1])
                 // }
             }
 
             function make_graph() {
                 var data = [{
-                              type: 'scatter3d',
+                              type: 'scatter',
                               mode: 'lines',
                               x: [],
                               y: [],
-                              z: [],
+                              name: 'Load path 1',
                               // opacity: 1,
                               line: {
                                 width: 5,
@@ -444,40 +436,61 @@
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
+                                    title: 'Density (kg/m<sup>3</sup>)'
+                                    // title: 'Vertical displacement (mm)'
                                 },
                                   yaxis: {
                                     // linecolor: 'white',
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
-                                },
-                                  zaxis: {
-                                    // linecolor: 'white',
-                                    autotick: true,
-                                    autorange: true,
-                                    automargin: true,
-                                },
-                                scene: {
-                            		xaxis:{title: 'Density (kg/m<sup>3</sup>)'},
-                            		yaxis:{title: 'Deviatoric stress (Pa)'},
-                            		zaxis:{title: 'Pressure (Pa)'},
-                                    aspectmode: 'auto',
-                            		},
-                                // paper_bgcolor: 'rgba(0,0,0,1)',
-                                // plot_bgcolor: 'rgba(0,0,0,1)',
-                                margin: {
-                                    t: 20, //top margin
-                                    l: 20, //left margin
-                                    r: 20, //right margin
-                                    b: 20 //bottom margin
+                                    title: 'Average velocity (m/s)'
                                 },
                                 legend: {
                                     x: 1,
                                     xanchor: 'right',
                                     y: 1
-                                  }
+                                },
+                                margin: {
+                                    b: 100,
+                                }
                                 }
                 Plotly.newPlot('stats', data, layout);
+            }
+
+            document.getElementById ("download_tag").addEventListener ("click", download_data, false);
+            document.getElementById ("stats").addEventListener ("mouseenter",
+                () => {
+                    document.getElementById("download_tag").classList.remove("hidden")
+                    document.getElementById("download_tag").classList.add("visible")
+            }, false);
+            document.getElementById ("stats").addEventListener ("mouseleave",
+                () => {
+                    document.getElementById("download_tag").classList.add("hidden")
+                    document.getElementById("download_tag").classList.remove("visible")
+            }, false);
+
+            function download_data() {
+                let gd = document.getElementById('stats')
+                let data = gd.data;
+                let header = 'Vertical displacement (mm),Vertical Stress (Pa)\n';
+                let csv = '';
+                data.forEach( trace => {
+                    csv = csv + header + trace.x.map((el, i) => [el, trace.y[i]].join(",")).join('\n') + '\n'
+                    });
+                var link = document.getElementById("download_tag");
+                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
+                // console.log(link)
+
+
+                // var csv = elev.map(function(d){
+                //                             return d.x.toString()+','+d.y.toString()
+                //                         }).join('\n');
+                // console.log(csv);
+                //
+                // var link = document.getElementById("download");
+                // link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,Distance (m),Elevation (m)\n"+csv));
+                // console.log(link) ;
             }
 
 		</script>
