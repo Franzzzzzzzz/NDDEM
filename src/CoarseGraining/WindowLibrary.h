@@ -7,6 +7,7 @@ class LibBase {
 public:
     LibBase(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
     LibBase() {}
+    virtual ~LibBase() {}
 
     struct Data * data ;
     double w, d ;
@@ -64,6 +65,7 @@ public :
       //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
       return (make_pair(window_avg(first,cur),res)) ;
     }
+    using LibBase::distance ; 
     double distance (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ; }
     void set_integrationsteps (int steps) {if (steps<1) printf("Less than 1 step is not meaningful.") ; if (steps>1000) printf("You've chosen a very large number of integration steps, you may want to reconsider") ; Nsteps=steps ; }
 private:
@@ -83,7 +85,7 @@ public:
 class LibRectND : public LibBase {
 public:
   LibRectND(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) ; return 1/a ;}}
+  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) {} return 1/a ;}}
 };
 //---------------------
 class LibRect3DIntersect : public LibBase {

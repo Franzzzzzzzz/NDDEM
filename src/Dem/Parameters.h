@@ -12,7 +12,7 @@
 #include <fstream>
 #include <map>
 #include <boost/variant.hpp>
-#include <experimental/filesystem>
+#include <filesystem>
 #include "Typedefs.h"
 #include "Xml.h"
 #include "Tools.h"
@@ -395,9 +395,9 @@ void Parameters<d>::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
 
   in.close() ;
   // Self copy :)
-  experimental::filesystem::path p (path) ;
-  experimental::filesystem::path pcp (Directory+"/in") ;// pcp/= p.filename() ;
-  copy_file(p,pcp,experimental::filesystem::copy_options::overwrite_existing);
+  std::filesystem::path p (path) ;
+  std::filesystem::path pcp (Directory+"/in") ;// pcp/= p.filename() ;
+  copy_file(p,pcp,std::filesystem::copy_options::overwrite_existing);
 }
 //-------------------------------------------------
 template <int d>
@@ -552,7 +552,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["set"] = setvalue ;
  Lvl0["auto"] = doauto ;
 
- Lvl0["directory"] = [&](){in>>Directory ; if (! experimental::filesystem::exists(Directory)) experimental::filesystem::create_directory(Directory);};
+ Lvl0["directory"] = [&](){in>>Directory ; if (! std::filesystem::exists(Directory)) std::filesystem::create_directory(Directory);};
  Lvl0["dimensions"] = [&](){int nn; int dd ; in>>dd>>nn ; if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }} ;
  Lvl0["location"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} printf("[INFO] Changing particle location.\n") ; } ;
  Lvl0["velocity"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> V[id][i] ;} printf("[INFO] Changing particle velocity.\n") ; } ;

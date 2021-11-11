@@ -194,7 +194,7 @@ int Texturing<d>::initialise (map <string,string> args)
      colors=allcolorslist ;
 
  View.resize(d, 0) ;
- printf("[[[%d]]]", View.size()) ; fflush(stdout) ; 
+ printf("[[[%ld]]]", View.size()) ; fflush(stdout) ; 
  RenderedAlready.resize(2*(d-3+1), 0) ;
  ViewPoint.resize(d-3+1, INT_MIN) ;
  NewViewPoint.resize(d-3+1, 0) ;
@@ -250,7 +250,7 @@ int Texturing<d>::SetNewViewPoint (map <string,string>  args)
   int Time=atoi(args["ts"].c_str()) ;
   printf("H") ; fflush(stdout) ;
   char dimstr[10] ;
-  printf("[]%d[]", View.size() ) ; fflush(stdout) ;
+  printf("[]%ld[]", View.size() ) ; fflush(stdout) ;
   View[0]=View[1]=View[2]=NAN ;
   printf("E") ; fflush(stdout) ;
   for (uint dd=3 ; dd<d ; dd++)
@@ -576,17 +576,25 @@ else return 0 ;
 template <int d>
 void Texturing<d>::filepathname (char * path, int n, int time, cv1d &View)
 {
+    char tmp[1000] ; 
     sprintf (path, "%s/Texture-%d-%05d", DirectorySave.c_str(), n, time) ;
     for (uint i=0 ; i<d-3 ; i++)
-        sprintf(path, "%s-%.1f", path, View[i]) ;
+    {
+        strcpy(tmp, path) ; 
+        sprintf(path, "%s-%.1f", tmp, View[i]) ;
+    }
     strcat(path, ".png") ;
 }
 template <int d>
 void Texturing<d>::filepathname (char * path, int time, cv1d &View)
 {
+    char tmp[1000] ; 
     sprintf (path, "%s/TextureTile-%05d", DirectorySave.c_str(), time) ;
     for (uint i=0 ; i<d-3 ; i++)
-        sprintf(path, "%s-%.1f", path, View[i]) ;
+    {
+        strcpy(tmp, path) ; 
+        sprintf(path, "%s-%.1f", tmp, View[i]) ;
+    }
     strcat(path, ".png") ;
 }
 //================================================

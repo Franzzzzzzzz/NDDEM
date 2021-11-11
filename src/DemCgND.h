@@ -45,7 +45,7 @@ public:
     int cg_param_get_numts (int file = 0) {return CG.param_get_numts(file) ; }
     void cg_param_post_init() {return CG.param_post_init() ; } 
     
-    int cg_param_read_timestep (int n) {
+    int cg_param_read_timestep ([[maybe_unused]] int n) {
         // In interactive mode, always read the current timestep
         for (auto & v:CG.C->CGP)
             for (auto & w:v.fields[0])

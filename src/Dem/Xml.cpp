@@ -250,7 +250,7 @@ int XMLReader::read_radius (vector <double > & radius)
 //-------------------------------------------------------------
 double XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double>>> & data)
 {
- ArrayType type ;
+ ArrayType type [[maybe_unused]] ;
  map <string, string> prop ;
  int n=0 ;
  double time ; 
@@ -292,7 +292,6 @@ double XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double
     a=gettag() ; if (a.first != "/particles" && a.first != "/contacts") printf("ERR:unexpected tag %s instead of /particles or /contacts\n",a.first.c_str()) ;
     n++ ;
  }
- type=type ;
  return time ;
 }
 //-------------------------------------------------------------

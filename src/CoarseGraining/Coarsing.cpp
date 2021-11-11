@@ -49,7 +49,7 @@ int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
   uint64_t tmp = FIELDS.back().flag<<1 ;
   if (order!=TensorOrder::SCALAR || type !=FieldType::Particle)
     printf("WARN only TensorOrder::SCALAR and FieldType::Particle is currently supported for coarse-graining\n") ;
-  FIELDS.push_back({tmp, name, order, type});
+  FIELDS.push_back({tmp, name, order, type, Pass::Pass1});
   return tmp;
 }
 
@@ -1178,7 +1178,7 @@ int Coarsing::write_vtk(string sout)
 return 0 ;
 }
 //-------------------------------------------------------
-int Coarsing::write_matlab (string path, bool squeeze)
+int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool squeeze)
 {
 #ifdef MATLAB
   double * outdata = nullptr ;
@@ -1431,7 +1431,7 @@ return (std::make_pair(numbytes, outarray)) ;
 
 
 //--------------------------------------------------------
-int Coarsing ::write_NrrdIO (string path)
+int Coarsing ::write_NrrdIO ([[maybe_unused]] string path)
 {
 #ifdef NRRDIO
     double * outdata ;
@@ -1524,7 +1524,7 @@ int Coarsing ::write_NrrdIO (string path)
 return 0 ;
 }
 //------------------------------------------
-int Coarsing::write_netCDF (string sout)
+int Coarsing::write_netCDF ([[maybe_unused]] string sout)
 {
 #ifdef NETCDF
  float *res ; int ret, ncid ; int dim1, dim2s, dim2v, dim2t, dim3 ; int n ; int err,v ;
