@@ -27,6 +27,7 @@
             <div id="canvas"></div>
         </div>
         <script async type="text/javascript" src="./deploy/DEMND.js"></script>
+        <script async type="text/javascript" src="./deploy/CoarseGraining.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script type="module">
@@ -43,12 +44,11 @@
             var clock = new THREE.Clock();
 
 			let camera, scene, renderer, stats, panel, controls;
-			let physics, position;
+			let position;
             let gui;
 			let spheres;
             let floor;
-            let S;
-            let NDDEMLib;
+            let S, CG;
             let pointer;
             let v, omegaMag;
             let radii;
@@ -110,8 +110,11 @@
 
 			async function init() {
 
-				physics = await NDDEMPhysics();
-                // physics.main(params.dimensions, params.N, inputfile)
+				// let physics = await NDDEMPhysics();
+                // let cg = await CoarseGraining();
+                await NDDEMPhysics();
+                await loadCG();
+
 				position = new THREE.Vector3();
 
 				//
@@ -309,6 +312,23 @@
                 }
             }
 
+            async function loadCG() {
+
+            	if ( 'CoarseGraining' in window === false ) {
+            		console.error( 'CoarseGraining: Couldn\'t find CoarseGraining.js' );
+            		return;
+            	}
+
+            	let CGLib = await CoarseGraining(); // eslint-disable-line no-undef
+
+                CG = await new CGLib.CoarseGraining();
+                finish_setup();
+
+                function finish_setup() {
+                    // CG.setup_CG();
+                }
+            }
+
             async function NDDEMPhysics() {
 
             	if ( 'DEMND' in window === false ) {
@@ -318,7 +338,7 @@
 
             	}
 
-            	NDDEMLib = await DEMND(); // eslint-disable-line no-undef
+            	let NDDEMLib = await DEMND(); // eslint-disable-line no-undef
 
                 if ( params.dimension == 3 ) {
                     S = await new NDDEMLib.Simulation3 (params.N);
