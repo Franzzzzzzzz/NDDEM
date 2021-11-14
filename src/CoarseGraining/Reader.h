@@ -29,6 +29,37 @@ public:
     bool is_mapped_ts = false ; 
     std::vector <std::streampos> mapped_ts ; 
     
+    void build_pospqlpq_from_ids (v2d & contactarray , int idx_id1, int idx_id2, int idx_pospq, int idx_lpq,
+                                  v2d & particlearray, int idx_pos, int idx_r=-1)
+    {
+        //size_t N =  particlearray[idx_pos].size() ; 
+        size_t Nc = contactarray[idx_id1].size() ; 
+        int d=get_dimension() ; 
+        for (int i=0 ; i<d ; i++)
+        {
+            contactarray[idx_pospq+i].resize(Nc) ; 
+            contactarray[idx_lpq+i].resize(Nc) ; 
+        }
+        
+        for (size_t i=0 ; i<Nc ; i++)
+        {
+            int id1=static_cast<int>(contactarray[idx_id1][i]) ; 
+            int id2=static_cast<int>(contactarray[idx_id2][i]) ;
+            double fraction = 0.5 ; 
+            for (int dd=0 ; dd<d ; dd++)
+            {
+                contactarray[idx_lpq+dd][i] = particlearray[idx_pos+dd][id1] - particlearray[idx_pos+dd][id2] ; 
+                if (idx_r!=-1)
+                {
+                    fraction = particlearray[idx_r][id2] / (particlearray[idx_r][id1]+particlearray[idx_r][id2]) ; 
+                }                    
+                contactarray[idx_pospq+dd][i] = particlearray[idx_pos+dd][id2] + fraction * contactarray[idx_lpq+dd][i] ;
+            }
+        }
+    }
+    
+    
+    
 protected:
     double Radius=0.00075, Density=2500 ; 
     std::vector<std::pair<double,streampos>> index ; 
