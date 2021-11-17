@@ -76,7 +76,7 @@ if(EMSCRIPTEN)
     DEMCGND
     PROPERTIES
     LINK_FLAGS
-    "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMCGND' "
+    "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMCGND' -s ASSERTIONS=1 "
  )
 endif()
 

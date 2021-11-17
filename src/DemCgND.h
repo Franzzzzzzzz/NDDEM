@@ -5,10 +5,10 @@
 
 class DEMCGND {
 public:
-    DEMCGND(int n) : S(n) {} 
-    Simulation<3> S ; 
-    CoarseGraining CG ; 
-    
+    DEMCGND(int n) : S(n) {}
+    Simulation<3> S ;
+    CoarseGraining CG ;
+
     // function passing
     // Simulations
     void simu_finalise_init () {return S.finalise_init() ; }
@@ -27,13 +27,13 @@ public:
     std::vector<std::vector<double>> simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
     double simu_getTime() {return S.getTime() ; }
-    
+
     //CoarseGraining
     void cg_setup_CG () {
         CG.setup_CG() ;
-        reader = static_cast<InteractiveReader*> (CG.P.files[0].reader) ; 
-        reader->set_num_particles (S.N) ; 
-        reader->set_data (DataValue::radius, S.P.r) ; 
+        reader = static_cast<InteractiveReader*> (CG.P.files[0].reader) ;
+        reader->set_num_particles (S.N) ;
+        reader->set_data (DataValue::radius, S.P.r) ;
         reader->set_data (DataValue::mass, S.P.m) ;
         reader->set_data (DataValue::Imom, S.P.I) ;
     }
@@ -43,42 +43,38 @@ public:
     void cg_param_from_json_string(std::string param) {return CG.param_from_json_string(param) ;}
     std::vector<std::vector<double>> cg_param_get_bounds (int file=0) {return CG.param_get_bounds(file);}
     int cg_param_get_numts (int file = 0) {return CG.param_get_numts(file) ; }
-    void cg_param_post_init() {return CG.param_post_init() ; } 
-    
+    void cg_param_post_init() {return CG.param_post_init() ; }
+
     int cg_param_read_timestep ([[maybe_unused]] int n) {
         // In interactive mode, always read the current timestep
         for (auto & v:CG.C->CGP)
             for (auto & w:v.fields[0])
-                w=0 ; 
-        reader->set_data(DataValue::pos, S.X) ; 
+                w=0 ;
+        reader->set_data(DataValue::pos, S.X) ;
         reader->set_data(DataValue::vel, S.V) ;
-        
-        int Nc=0 ; 
-        for (auto & CLp : S.MP.CLp)
-            Nc += CLp.v.size() ; 
-        reader->reset_contacts(Nc) ; 
+
+        reader->reset_contacts() ;
         for (auto & CLp : S.MP.CLp)
          for (auto & contact: CLp.v)
-            reader->add_contact({DataValue::id1, DataValue::id2, DataValue::fpq}, 
-                                      {static_cast<double>(contact.i),static_cast<double>(contact.j),contact.infos->Fn[0], contact.infos->Fn[1], contact.infos->Fn[2]}) ; 
-         
+             if (contact.ghost==0)
+                reader->add_contact({DataValue::id1, DataValue::id2, DataValue::fpq},
+                                      {static_cast<double>(contact.i),static_cast<double>(contact.j),contact.infos->Fn[0]+contact.infos->Ft[0], contact.infos->Fn[1]+contact.infos->Ft[1], contact.infos->Fn[2]+contact.infos->Ft[2]}) ;
+
         reader->build_pospqlpq_from_ids (reader->data, 12, 13, 14, 17,
                                          reader->data, 3);
-                    
-                    
-                    
-        return 0 ; 
+
+
+
+        return 0 ;
     }
 private:
-    InteractiveReader* reader ; 
-    
+    InteractiveReader* reader ;
+
     std::vector<std::vector<double>> fpq ;
-    std::vector<double> id1, id2 ; 
-    
+    std::vector<double> id1, id2 ;
+
 } ;
 
 #ifdef EMSCRIPTEN
     #include "em_bindings.h"
 #endif
-
-

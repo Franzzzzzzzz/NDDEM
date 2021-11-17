@@ -290,7 +290,7 @@ int LiggghtsReader_contacts::do_post_read()
  int k=0 ;
  for (int j=0 ; j<Nitem ; j++)
  {
-     //if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
+     if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
 
      if (tdata[j][lst[0]]>tdata[j][lst[1]]) swap=1 ;
      else swap = 0 ;

@@ -57,7 +57,8 @@
             let particle_volume;
             let NDsolids, material, STLFilename;
             let meshes = new THREE.Group();
-            let density, vavg;
+            let density, vavg, stressTcxx, stressTcyy, stressTczz, stressTcxy;
+            let pressure=[], shearstress=[], xloc=[] ; 
             let show_stats = true;
 
             const raycaster = new THREE.Raycaster();
@@ -245,9 +246,19 @@
                     S.simu_step_forward(5);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
+                    var grid = S.cg_get_gridinfo(); 
                     density=S.cg_get_result(0, "RHO", 0) ;
-                    vavg=S.cg_get_result(0, "VAVG", 0) ;
-                    // console.log(res) ;
+                    vavg=S.cg_get_result(0, "VAVG", 1) ;
+                    stressTcxx=S.cg_get_result(0, "TC", 0) ;
+                    stressTcyy=S.cg_get_result(0, "TC", 4) ;
+                    stressTczz=S.cg_get_result(0, "TC", 8) ;
+                    stressTcxy=S.cg_get_result(0, "TC", 1) ;
+                    for (var i=0 ; i<stressTcxx.length ; i++)
+                    {
+                        xloc[i]=grid[0]+i*grid[3] ; 
+                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
+                        shearstress[i]=-stressTcxy[i] ; 
+                    }
 
                     update_graph();
                 }
@@ -375,7 +386,7 @@
 
                     var cgparam ={} ;
                     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-                    cgparam["boxes"]=[1,1,1] ;
+                    cgparam["boxes"]=[10,1,1] ;
                     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
                     cgparam["boundaries"]=[
                         [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
@@ -384,8 +395,8 @@
                     cgparam["skip"]=0;
                     cgparam["max time"]=1 ;
                     cgparam["time average"]="None" ;
-                    cgparam["fields"]=["RHO", "VAVG"] ;
-                    cgparam["periodicity"]=[false,false,false];
+                    cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+                    cgparam["periodicity"]=[true,true,true];
                     cgparam["window"]="Lucy3D";
                     cgparam["dimension"]=3;
 
@@ -405,12 +416,38 @@
                 // density_time.push(density);
 
                 // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
-                console.log(density,vavg)
-                    Plotly.extendTraces('stats', {
-                        'x': [density],
-                        // 'y': [[shear]],
-                        'y': [vavg],
-                    }, [-1])
+                //console.log(density,vavg)
+								Plotly.update('stats', {
+										'y': [xloc],
+										// 'y': [[shear]],
+										'x': [vavg],
+								}, {}, [0])
+								
+								Plotly.update('stats', {
+										'y': [xloc],
+										// 'y': [[shear]],
+										'x': [pressure],
+								}, {}, [1])
+								
+								
+								Plotly.update('stats', {
+										'y': [xloc],
+										// 'y': [[shear]],
+										'x': [shearstress],
+								}, {}, [2])
+								
+								/*Plotly.update('stats', {
+										'x': [1,2,3,4,5,6,7,8,9,10],
+										// 'y': [[shear]],
+										'y': [pressure],
+								}, [1])
+								
+								
+								Plotly.update('stats', {
+										'x': [1,2,3,4,5,6,7,8,9,10],
+										// 'y': [[shear]],
+										'y': [shearstress],
+								}, [2])*/
                 // }
             }
 
@@ -420,13 +457,40 @@
                               mode: 'lines',
                               x: [],
                               y: [],
-                              name: 'Load path 1',
+                              name: 'Velocity',
                               // opacity: 1,
                               line: {
                                 width: 5,
                                 color: "black",
                                 // reversescale: false
-                              }
+                              },
+                            }, {
+                              type: 'scatter',
+                              mode: 'lines',
+                              x: [],
+                              y: [],
+                              name: 'Pressure (p)',
+                              // opacity: 1,
+                              line: {
+                                width: 5,
+                                color: "blue",
+                                // reversescale: false
+                              },
+                              xaxis: 'x2'
+                            }, {
+                              type: 'scatter',
+                              mode: 'lines',
+                              x: [],
+                              y: [],
+                              name: 'Shear stress (q)',
+                              // opacity: 1,
+                              line: {
+                                dash: 'dash',
+                                width: 5,
+                                color: "blue",
+                                // reversescale: false
+                              },
+                              xaxis: 'x2'
                             }]
                 var layout = {
                                   // height: 300,
@@ -436,7 +500,8 @@
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
-                                    title: 'Density (kg/m<sup>3</sup>)'
+                                    title: 'Average velocity (m/s)',
+                                    side: 'bottom'
                                     // title: 'Vertical displacement (mm)'
                                 },
                                   yaxis: {
@@ -444,8 +509,18 @@
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
-                                    title: 'Average velocity (m/s)'
+                                    title: 'Location'
                                 },
+                                xaxis2: {
+                                    autotick: true,
+                                    autorange: true,
+                                    automargin: true,
+                                    title: 'Pressure (Pa)',
+                                    overlaying: 'x',
+                                    side: 'top',
+                                    rangemode: 'tozero',
+                                    color: 'blue'
+                                    },
                                 legend: {
                                     x: 1,
                                     xanchor: 'right',
