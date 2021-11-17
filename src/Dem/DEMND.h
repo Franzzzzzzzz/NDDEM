@@ -392,7 +392,7 @@ public:
                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it);//, logghosts) ;
             }
 
-            if (P.contactforcedump && (ti % P.tdump==0))
+            //if (P.contactforcedump && (ti % P.tdump==0))
                 it->saveinfo(C.Act) ;
 
             Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;

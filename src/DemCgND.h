@@ -53,17 +53,15 @@ public:
         reader->set_data(DataValue::pos, S.X) ;
         reader->set_data(DataValue::vel, S.V) ;
 
-        /*int Nc=0 ;
-        for (auto & CLp : S.MP.CLp)
-            Nc += CLp.v.size() ;
-        reader->reset_contacts(Nc) ;
+        reader->reset_contacts() ;
         for (auto & CLp : S.MP.CLp)
          for (auto & contact: CLp.v)
-            reader->add_contact({DataValue::id1, DataValue::id2, DataValue::fpq},
-                                      {static_cast<double>(contact.i),static_cast<double>(contact.j),contact.infos->Fn[0], contact.infos->Fn[1], contact.infos->Fn[2]}) ;
+             if (contact.ghost==0)
+                reader->add_contact({DataValue::id1, DataValue::id2, DataValue::fpq},
+                                      {static_cast<double>(contact.i),static_cast<double>(contact.j),contact.infos->Fn[0]+contact.infos->Ft[0], contact.infos->Fn[1]+contact.infos->Ft[1], contact.infos->Fn[2]+contact.infos->Ft[2]}) ;
 
         reader->build_pospqlpq_from_ids (reader->data, 12, 13, 14, 17,
-                                         reader->data, 3);*/
+                                         reader->data, 3);
 
 
 

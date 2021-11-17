@@ -77,27 +77,33 @@ public:
     
     void add_contact(std::vector<DataValue> dv, std::vector<double> value)
     {
+        if (Nc>=maxNc)
+        {
+            maxNc += growth ; 
+            for (int i=12; i<29 ; i++)
+                data[i].resize(maxNc) ;
+        }
+        
         int id=0 ; 
         for (auto d: dv)
         {
             switch(d) {
-                case DataValue::id1: data[12][curcontact]=value[id++] ; break ; 
-                case DataValue::id2: data[13][curcontact]=value[id++] ; break ;
-                case DataValue::pospq: for (int i=0 ; i<3 ; i++) data[14][curcontact]=value[id++] ; break ;
-                case DataValue::lpq: for (int i=0 ; i<3 ; i++) data[17][curcontact]=value[id++] ; break ;
-                case DataValue::fpq: for (int i=0 ; i<3 ; i++) data[20][curcontact]=value[id++] ; break ;
-                case DataValue::mpq: for (int i=0 ; i<3 ; i++) data[23][curcontact]=value[id++] ; break ;
-                case DataValue::mqp: for (int i=0 ; i<3 ; i++) data[26][curcontact]=value[id++] ; break ;
+                case DataValue::id1: data[12][Nc]=value[id] ; id++; break ; 
+                case DataValue::id2: data[13][Nc]=value[id] ; id++; break ;
+                case DataValue::pospq: for (int i=0 ; i<3 ; i++, id++) data[14+i][Nc]=value[id] ; break ;
+                case DataValue::lpq:   for (int i=0 ; i<3 ; i++, id++) data[17+i][Nc]=value[id] ; break ;
+                case DataValue::fpq:   for (int i=0 ; i<3 ; i++, id++) data[20+i][Nc]=value[id] ; break ;
+                case DataValue::mpq:   for (int i=0 ; i<3 ; i++, id++) data[23+i][Nc]=value[id] ; break ;
+                case DataValue::mqp:   for (int i=0 ; i<3 ; i++, id++) data[26+i][Nc]=value[id] ; break ;
                 default: printf("Unknown Datavalue (InteractiveReader::add_contact)\n") ; 
             }
         }
+        Nc++ ; 
     }
     
-    void reset_contacts (int NNc)
+    void reset_contacts ()
     {
-        Nc=NNc ; 
-        for (int i=12; i<29 ; i++)
-            data[i].resize(Nc) ; 
+        Nc= 0 ; 
     }
     
     v2d data ;
@@ -106,5 +112,6 @@ private :
     int ts=0 ;
     int N=0 ; 
     int Nc=0 ; 
-    int curcontact=0 ; 
+    int maxNc=0 ; 
+    const int growth=100 ; 
 } ; 
