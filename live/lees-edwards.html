@@ -246,7 +246,8 @@
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
                     density=S.cg_get_result(0, "RHO", 0) ;
-                    vavg=S.cg_get_result(0, "VAVG", 0) ;
+                    vavg=S.cg_get_result(0, "VAVG", 1) ;
+                    //stressTcxx=S.cg_get_result(0, "TC", 0) ;
                     // console.log(res) ;
 
                     update_graph();
@@ -375,7 +376,7 @@
 
                     var cgparam ={} ;
                     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-                    cgparam["boxes"]=[1,1,1] ;
+                    cgparam["boxes"]=[10,1,1] ;
                     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
                     cgparam["boundaries"]=[
                         [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
@@ -405,12 +406,12 @@
                 // density_time.push(density);
 
                 // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
-                console.log(density,vavg)
-                    Plotly.extendTraces('stats', {
-                        'x': [density],
-                        // 'y': [[shear]],
-                        'y': [vavg],
-                    }, [-1])
+                //console.log(density,vavg)
+								Plotly.update('stats', {
+										'x': [1,2,3,4,5,6,7,8,9,10],
+										// 'y': [[shear]],
+										'y': [vavg],
+								}, [-1])
                 // }
             }
 

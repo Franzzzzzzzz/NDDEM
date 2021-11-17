@@ -115,6 +115,7 @@
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
+								clear_line: false,
                 loading_rate: 0.001,
                 max_volumetric_strain: 0.2,
                 max_axial_strain: 0.2,
@@ -355,6 +356,19 @@
                         Plotly.addTraces('stats', data);
                         params.new_line = false;
                     });
+								gui.add ( params, 'clear_line').name('Clear line').listen()
+		                    .onChange( () => {
+														Plotly.deleteTraces('stats', [-1])
+		                        var data = [{
+		                                      type: 'scatter3d',
+		                                      mode: 'lines',
+		                                      x: [], y: [], z: [],
+		                                      line: { width: 5 },
+		                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
+		                                    }]
+		                        Plotly.addTraces('stats', data);
+		                        params.clear_line = false;
+		                    });
 				const controls = new OrbitControls( camera, container );
 				controls.target.y = 0.5;
 				controls.update();
@@ -748,16 +762,16 @@
             }
 
             function update_graph() {
-                density = params.packing_fraction*material_density;
+                density = 1/params.packing_fraction; //*material_density;
                 pressure_time.push(pressure);
                 shear_time.push(shear);
                 density_time.push(density);
 
                 // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
                     Plotly.extendTraces('stats', {
-                        'x': [[density]],
-                        'y': [[shear]],
-                        'z': [[pressure]],
+                        'x': [[pressure]],
+                        'y': [[density]],
+                        'z': [[shear]],
                     }, [-1])
                 // }
             }
@@ -799,10 +813,10 @@
                                     automargin: true,
                                 },
                                 scene: {
-                            		xaxis:{title: 'Density (kg/m<sup>3</sup>)'},
-                            		yaxis:{title: 'Deviatoric stress (Pa)'},
-                            		zaxis:{title: 'Pressure (Pa)'},
-                                    aspectmode: 'auto',
+                            		xaxis:{title: 'Pressure p (Pa)'},
+                            		yaxis:{title: 'Specific volume'},// (kg/m<sup>3</sup>)'},
+                            		zaxis:{title: 'Deviatoric stress q (Pa)'},
+                                aspectmode: 'auto',
                             		},
                                 // paper_bgcolor: 'rgba(0,0,0,1)',
                                 // plot_bgcolor: 'rgba(0,0,0,1)',
