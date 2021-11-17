@@ -93,6 +93,7 @@
 			let boxes, spheres;
             let floor, roof, left, right, front, back;
             let S;
+            let x;
             let NDDEMLib;
             let pointer;
             let frameRate = 60;
@@ -262,7 +263,7 @@
             function hit_white_ball() {
                 var work = params.strength;
                 var force = work/params.dt;
-                S.setExternalForce(0, 1, [force*direction.x,force*direction.y,0.,0.]);
+                S.setExternalForce(0, 1, [force*direction.x,force*direction.y,0.,force*direction.d4]);
             }
 
             function onSelectParticle( event ) {
@@ -328,10 +329,12 @@
 
                 direction.copy(spheres.children[0].position);
                 direction.sub(camera.position);
-                var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y);
+                let d4offset = params.d4_cur - x[0][3];
+                var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y + d4offset*d4offset);
                 direction.x /= l;
                 direction.y /= l;
                 direction.z = 0;
+                direction.d4 = d4offset/l;
 
                 ray.rotation.z = Math.atan2(direction.y,direction.x);
 
@@ -358,7 +361,7 @@
 
                 if ( params.track_white_ball ) {
                     if ( NDsolids !== undefined ) {
-                        var x = S.getX();
+                        x = S.getX();
                         params.d4_cur = x[0][3];
                         meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
                     }
@@ -438,7 +441,7 @@
             }
 
             function move_spheres() {
-                var x = S.getX();
+                x = S.getX();
                 var orientation = S.getOrientation();
                 if ( urlParams.has('lut') ) {
                     if ( urlParams.get('lut') === 'velocity' ) {
