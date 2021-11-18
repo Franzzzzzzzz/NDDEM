@@ -107,6 +107,7 @@
             const lut = new Lut( 'blackbody', 512 );
 
             var quality = 5;
+            if ( urlParams.has('quality') ) { quality = parseInt(urlParams.get('quality')); }
 
             var NDParticleShader;
             import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
