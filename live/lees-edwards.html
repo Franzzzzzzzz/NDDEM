@@ -8,6 +8,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-GQE06JN33T"></script>
         <script>
@@ -20,7 +21,7 @@
 	</head>
 	<body>
         <div id="scigem_tag">
-            Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
+            Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a>, <a href="https://threejs.org/">three.js</a> and <a href="https://plotly.com/javascript/">Plotly</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
         <div class="flex-container">
             <div id="stats">
@@ -58,7 +59,7 @@
             let NDsolids, material, STLFilename;
             let meshes = new THREE.Group();
             let density, vavg, stressTcxx, stressTcyy, stressTczz, stressTcxy;
-            let pressure=[], shearstress=[], xloc=[] ; 
+            let pressure=[], shearstress=[], xloc=[] ;
             let show_stats = true;
 
             const raycaster = new THREE.Raycaster();
@@ -122,20 +123,20 @@
 				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 0, 0, 5*params.L );
+				camera.position.set( 0, 0, -5*params.L );
                 camera.up.set(1, 0, 0);
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111 );
 
-				const hemiLight = new THREE.HemisphereLight();
-				hemiLight.intensity = 0.35;
-				scene.add( hemiLight );
+				// const hemiLight = new THREE.HemisphereLight();
+				// hemiLight.intensity = 0.35;
+				// scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight();
-				dirLight.position.set( 5, 5, 5 );
-				dirLight.castShadow = true;
-				scene.add( dirLight );
+				// const dirLight = new THREE.DirectionalLight();
+				// dirLight.position.set( 5, 5, 5 );
+				// dirLight.castShadow = true;
+				// scene.add( dirLight );
 
                 // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
                 // const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
@@ -173,7 +174,7 @@
                             }
                         });
                 }
-                gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (??) (W/S)').listen()
+                gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
                     .onChange( () => update_shear_rate() );
                 gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
                     .onChange( () => {
@@ -184,19 +185,19 @@
                             }
                         }
                     });
-                gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
-                gui.add ( params, 'new_line').name('New loading path').listen()
-                    .onChange( () => {
-                        var data = [{
-                                      type: 'scatter',
-                                      mode: 'lines',
-                                      x: [], y: [],
-                                      line: { width: 5 },
-                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
-                                    }]
-                        Plotly.addTraces('stats', data);
-                        params.new_line = false;
-                    });
+                gui.add ( params, 'paused').name('Paused').listen();
+                // gui.add ( params, 'new_line').name('New loading path').listen()
+                //     .onChange( () => {
+                //         var data = [{
+                //                       type: 'scatter',
+                //                       mode: 'lines',
+                //                       x: [], y: [],
+                //                       line: { width: 5 },
+                //                       name: 'Load path ' + String(document.getElementById('stats').data.length+1)
+                //                     }]
+                //         Plotly.addTraces('stats', data);
+                //         params.new_line = false;
+                //     });
 				controls = new OrbitControls( camera, container );
 				controls.update();
 
@@ -246,7 +247,7 @@
                     S.simu_step_forward(5);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
-                    var grid = S.cg_get_gridinfo(); 
+                    var grid = S.cg_get_gridinfo();
                     density=S.cg_get_result(0, "RHO", 0) ;
                     vavg=S.cg_get_result(0, "VAVG", 1) ;
                     stressTcxx=S.cg_get_result(0, "TC", 0) ;
@@ -255,9 +256,9 @@
                     stressTcxy=S.cg_get_result(0, "TC", 1) ;
                     for (var i=0 ; i<stressTcxx.length ; i++)
                     {
-                        xloc[i]=grid[0]+i*grid[3] ; 
-                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
-                        shearstress[i]=-stressTcxy[i] ; 
+                        xloc[i]=grid[0]+i*grid[3] ;
+                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3./1e3 ;
+                        shearstress[i]=-stressTcxy[i]/1e3 ;
                     }
 
                     update_graph();
@@ -311,6 +312,7 @@
                         object.scale.set(D_draw, D_draw, D_draw);
                     }
                     object.position.set( x[i][0], x[i][1], x[i][2] );
+                    object.material.uniforms.R.value = radii[i];
                     if ( params.lut === 'Velocity' ) {
                         object.material.uniforms.ambient.value = 0.5 + 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
                     }
@@ -417,38 +419,45 @@
 
                 // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
                 //console.log(density,vavg)
-								Plotly.update('stats', {
-										'y': [xloc],
-										// 'y': [[shear]],
-										'x': [vavg],
-								}, {}, [0])
-								
-								Plotly.update('stats', {
-										'y': [xloc],
-										// 'y': [[shear]],
-										'x': [pressure],
-								}, {}, [1])
-								
-								
-								Plotly.update('stats', {
-										'y': [xloc],
-										// 'y': [[shear]],
-										'x': [shearstress],
-								}, {}, [2])
-								
-								/*Plotly.update('stats', {
-										'x': [1,2,3,4,5,6,7,8,9,10],
-										// 'y': [[shear]],
-										'y': [pressure],
-								}, [1])
-								
-								
-								Plotly.update('stats', {
-										'x': [1,2,3,4,5,6,7,8,9,10],
-										// 'y': [[shear]],
-										'y': [shearstress],
-								}, [2])*/
-                // }
+                var maxVelocity = vavg.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+
+				Plotly.update('stats', {
+						'y': [xloc],
+						// 'y': [[shear]],
+						'x': [vavg],
+				}, {
+                    xaxis: {
+                        range: [-maxVelocity, maxVelocity],
+                        title: 'Velocity (mm/s)',
+                    }
+                }, [0])
+
+				Plotly.update('stats', {
+						'y': [xloc],
+						// 'y': [[shear]],
+						'x': [pressure],
+				}, {}, [1])
+
+
+				Plotly.update('stats', {
+						'y': [xloc],
+						// 'y': [[shear]],
+						'x': [shearstress],
+				}, {}, [2])
+
+				/*Plotly.update('stats', {
+						'x': [1,2,3,4,5,6,7,8,9,10],
+						// 'y': [[shear]],
+						'y': [pressure],
+				}, [1])
+
+
+				Plotly.update('stats', {
+						'x': [1,2,3,4,5,6,7,8,9,10],
+						// 'y': [[shear]],
+						'y': [shearstress],
+				}, [2])*/
+// }
             }
 
             function make_graph() {
@@ -485,7 +494,8 @@
                               name: 'Shear stress (q)',
                               // opacity: 1,
                               line: {
-                                dash: 'dash',
+                                // dash: 'dash',
+                                dash: "8px,8px",
                                 width: 5,
                                 color: "blue",
                                 // reversescale: false
@@ -498,7 +508,9 @@
                                   xaxis: {
                                     // linecolor: 'white',
                                     autotick: true,
-                                    autorange: true,
+                                    // autorange: true,
+                                    // range: [-maxVelocity, maxVelocity],
+                                    // range: [-1,1],
                                     automargin: true,
                                     title: 'Average velocity (m/s)',
                                     side: 'bottom'
@@ -509,13 +521,14 @@
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
-                                    title: 'Location'
+                                    title: 'Location (mm)',
+                                    // color: 'black',
                                 },
                                 xaxis2: {
                                     autotick: true,
                                     autorange: true,
                                     automargin: true,
-                                    title: 'Pressure (Pa)',
+                                    title: 'Stress (kPa)',
                                     overlaying: 'x',
                                     side: 'top',
                                     rangemode: 'tozero',
@@ -524,7 +537,9 @@
                                 legend: {
                                     x: 1,
                                     xanchor: 'right',
-                                    y: 1
+                                    y: 1,
+                                    // bgcolor: "rgba(0,0,0,0.01)"
+                                    // opacity: 0.5,
                                 },
                                 margin: {
                                     b: 100,

@@ -39,6 +39,8 @@ var NDDEMShader = new ShaderMaterial({
     "varying vec3 vColor;", // colour at vertex (output)
     "varying vec3 vNormal;", // normal at vertex (output)
 
+    "bool isnan( float val ) { return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true; }",
+
     "void main() {",
     "vNormal = normal;", // for directional lighting
     "const float pi = 3.14159265359;",
@@ -78,12 +80,13 @@ var NDDEMShader = new ShaderMaterial({
     "else {",
     "phi2 = acos(x_rotated.z/sqrt(rsqr));",
     "}",
-    // if ( phi1 == NaN ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
-    // if ( phi2 == NaN ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
-    "if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }",
+
+    "if ( isnan(phi0) ) { phi0 = acos(sign(x_rotated.x)*x_rotated.x); }", // added by benjy, total guess
+    "if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y); }",
+    // "if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }",
 
     "vColor.r = abs(sin(phi0*3.0));",
-    "vColor.g = abs(sin(phi1*2.));",
+    "vColor.g = abs(sin(phi1*2.0));",
     "vColor = vColor * abs(sin(phi0));",
     "}",
     "else { vColor.r = 0.0; }",
@@ -101,7 +104,7 @@ var NDDEMShader = new ShaderMaterial({
     "void main() {",
 
     // add directional lighting
-    "vec3 light = vec3( ambient );",
+    "vec3 light = vec3( 0, 0, -1 );", // bit of trial and error here
     "light = normalize( light );",
     "float directional = max( dot( vNormal, light ), 0.0 );",
     "gl_FragColor = vec4( 0.6*( ambient + directional ) * vColor, 1.0 );", // colours by vertex colour
