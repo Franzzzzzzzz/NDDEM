@@ -20,15 +20,26 @@ int main(int argc, char * argv[])
     
     CoarseGraining Global ; 
     Global.P.from_json(param) ;
+    Global.P.post_init() ; 
     auto a = Global.P.files[0].reader->get_bounds() ; 
-    //Global.P.files[1].reader->get_numts() ; 
+    //printf("{%d} ", Global.P.files[0].reader->get_numts()) ; 
+    Global.P.read_timestep(40) ; 
+    /*for (auto v: Global.P.files[0].reader->mapped_ts)
+        printf("%d ", static_cast<int>(v)) ; 
+    
+    printf("{%d} ", Global.P.files[0].reader->get_numts()) ; 
+    for (auto v: Global.P.files[0].reader->mapped_ts)
+        printf("%d ", static_cast<int>(v)) ; */
+    
+    
+    
+    
     Global.P.read_timestep(5) ; 
     //auto a = Global.P.files[0].reader->get_bounds() ; 
     for (auto v: a)
         for (auto w: v)
             cout << w << " " ; 
-    Global.P.files[0].reader->build_index() ; 
-    Global.P.post_init() ; 
+    //Global.P.files[0].reader->build_index() ; 
     Global.setup_CG () ;
     Global.process_all() ; 
     Global.write() ; 

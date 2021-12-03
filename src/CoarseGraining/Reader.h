@@ -22,6 +22,38 @@ public:
     virtual int read_timestep ([[maybe_unused]] int ts) {return -1 ; }
     
     void set_default_radiusdensity (double radius, double density) {Radius=radius ; Density=density ;}
+    void set_default_radius (double radius) {Radius=radius ; }
+    void set_default_density (double density) {Density=density ; }
+    double get_default_radius () 
+    {
+        static bool info=true ;
+        if (Radius==-1)
+        {
+          if (info)
+          {
+              printf("ERR: the default radius was requested but not set!!!!! set to 1\n") ; 
+              info=false ; 
+          }
+          return 1. ;
+        }
+        else 
+            return Radius ;
+    }
+    double get_default_density () 
+    {
+        static bool info=true ;
+        if (Radius==-1)
+        {
+          if (info)
+          {
+              printf("ERR: the default density was requested but not set!!!!! set to 1\n") ; 
+              info=false ; 
+          }
+          return 1. ;
+        }
+        else 
+            return Radius ;
+    }
     
     //virtual double * get_data(DataValue, int dd) {return nullptr;}
     
@@ -58,11 +90,33 @@ public:
         }
     }
     
+    int clean_contacts (v2d & contactarray, int id1, int id2, int idx_lpq, v2d & particlearray, int idx_r)
+    {
+        size_t Nc = contactarray[0].size() ; 
+        double dst, rr ; 
+        std::vector<bool> rm (Nc,false) ; 
+        
+        for (int i=0 ; i<Nc ; i++)
+        {
+            dst=0 ;
+            for (int dd=0 ; dd<get_dimension() ; dd++)
+                dst += (contactarray[i][idx_lpq+dd]*contactarray[i][idx_lpq+dd]) ;
+            dst=sqrt(dst) ; 
+            rr=particlearray[idx_r][contactarray[i][id1]]+particlearray[idx_r][contactarray[i][id1]] ;
+            
+        }
+        
+    }
+                        
+    
     
     
 protected:
-    double Radius=0.00075, Density=2500 ; 
     std::vector<std::pair<double,streampos>> index ; 
+
+private:
+    double Radius=-1, Density=-1 ; 
+    const double pbcthreshold = 2. ; 
 } ; 
 
 #endif

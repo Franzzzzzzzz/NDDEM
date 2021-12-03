@@ -245,8 +245,8 @@ int LiggghtsReader_particles::do_post_read()
      else
      {
          data[i].resize(Nitem,0) ;
-         if (i==0) for (k=0 ; k<Nitem ; k++) data[i][k]=Radius ; //TODO
-         if (i==1) for (k=0 ; k<Nitem ; k++) data[i][k]=4/3. * M_PI * data[0][k] * data[0][k] * data[0][k] * Density ;
+         if (i==0) for (k=0 ; k<Nitem ; k++) data[i][k]=get_default_radius() ; //TODO
+         if (i==1) for (k=0 ; k<Nitem ; k++) data[i][k]=4/3. * M_PI * data[0][k] * data[0][k] * data[0][k] * get_default_density() ;
          if (i==2) for (k=0 ; k<Nitem ; k++) data[i][k]=2/5. * data[1][k] * data[0][k] * data[0][k] ;
      }
  }

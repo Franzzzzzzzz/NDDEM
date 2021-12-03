@@ -1,6 +1,6 @@
 link_directories(${CMAKE_BINARY_DIR}/NrrdIO-1.11.0-src)
 #add_executable(CoarseGraining IONDDEM.cpp Coarsing.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp)
-add_executable(CoarseGraining Main.cpp Coarsing.cpp Reader-Liggghts.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp)
+add_executable(CoarseGraining Main.cpp Coarsing.cpp Reader-Liggghts.cpp Reader-Mercury.cpp ../Dem/Xml.cpp zlib.cpp gzip.cpp)
 set_property(TARGET CoarseGraining PROPERTY CXX_STANDARD 17)
 #add_executable(CoarseGraining_Liggghts EXCLUDE_FROM_ALL IOLiggghts.cpp Coarsing.cpp zlib.cpp gzip.cpp)
 #set_property(TARGET CoarseGraining_Liggghts PROPERTY CXX_STANDARD 17)

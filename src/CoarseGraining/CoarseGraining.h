@@ -24,6 +24,7 @@
 #include "Reader-Liggghts.h"
 #include "Reader-NDDEM.h"
 #include "Reader-interactive.h"
+#include "Reader-Mercury.h"
 #include "Parameters.h"
 
 class CoarseGraining {

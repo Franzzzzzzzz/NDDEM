@@ -12,8 +12,8 @@ public:
         Nparticles = radius.size() ; 
         for (int i=0 ; i<Nparticles ; i++)
         {
-            mass.push_back(Volume(dimension,radius[i]) * Density) ;
-            Imom.push_back(InertiaMomentum(dimension,radius[i],Density)) ;
+            mass.push_back(Volume(dimension,radius[i]) * get_default_density()) ;
+            Imom.push_back(InertiaMomentum(dimension,radius[i],get_default_density())) ;
         }
         reorganised_pos.resize(dimension, nullptr) ;
         reorganised_vel.resize(dimension, nullptr) ;
