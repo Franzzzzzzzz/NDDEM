@@ -4,6 +4,7 @@
 		<title>NDDEM Lees Edwards Shear</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="icon" type="image/x-icon" href="../visualise/resources/favicon.ico">
         <link rel="stylesheet" href="css/main.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -567,24 +568,16 @@
             function download_data() {
                 let gd = document.getElementById('stats')
                 let data = gd.data;
-                let header = 'Vertical displacement (mm),Vertical Stress (Pa)\n';
+                let header = ['Velocity (mm/s)','Pressure (kPa)','Shear stress (kPa)'];
                 let csv = '';
+                let ix = 0;
                 data.forEach( trace => {
-                    csv = csv + header + trace.x.map((el, i) => [el, trace.y[i]].join(",")).join('\n') + '\n'
+                    csv = csv + 'Position (mm),' + header[ix] + '\n' + trace.y.map((el, i) => [el, trace.x[i]].join(",")).join('\n') + '\n';
+                    ix += 1;
                     });
+
                 var link = document.getElementById("download_tag");
                 link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
-                // console.log(link)
-
-
-                // var csv = elev.map(function(d){
-                //                             return d.x.toString()+','+d.y.toString()
-                //                         }).join('\n');
-                // console.log(csv);
-                //
-                // var link = document.getElementById("download");
-                // link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,Distance (m),Elevation (m)\n"+csv));
-                // console.log(link) ;
             }
 
 		</script>

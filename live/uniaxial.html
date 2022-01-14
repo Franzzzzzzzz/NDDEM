@@ -4,6 +4,7 @@
 		<title>NDDEM Uniaxial</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="icon" type="image/x-icon" href="../visualise/resources/favicon.ico">
         <link rel="stylesheet" href="css/main.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +30,8 @@
             </div>
             <div id="canvas"></div>
         </div>
-        <script async type="text/javascript" src="./deploy/DEMND.js"></script>
+        <!-- <script async type="text/javascript" src="./deploy/DEMND.js"></script> -->
+        <script async type="text/javascript" src="./deploy/DEMCGND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script type="module">
@@ -53,7 +55,7 @@
 			let boxes, spheres;
             let floor, roof, left, right, front, back;
             let S;
-            let NDDEMLib;
+            let NDDEMCGLib;
             let pointer;
             let frameRate = 60;
             let v, omegaMag;
@@ -290,9 +292,9 @@
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
-                            S.interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                            S.simu_interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
                         else {
-                            S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
+                            S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
@@ -368,7 +370,7 @@
 
                 // S.setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
                 // S.setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
-                S.setBoundary(2, [0,params.roof]) ; // Set location of the walls in z
+                S.simu_setBoundary(2, [0,params.roof]) ; // Set location of the walls in z
                 // for (var j = 0; j < params.dimension - 3; j++) {
                     // S.setBoundary(j + 3, [-params.L_cur,params.L_cur]) ; // Set location of the walls in z
                 // }
@@ -411,39 +413,19 @@
                     if (loading_method === 'stress_controlled') {
                         update_walls(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
                     }
-                    S.step_forward(5);
+                    S.simu_step_forward(5);
 
-                    var F = S.getWallForce();
-
-
-                    // let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
-                    // let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    // let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-
-                    // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
-                    // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
-
-                    // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
-                    // vertical_stress = sigma_33;
-                    // console.log(F.length)
-                    if ( F.length > 1 ) { // returns an empty array if hasn't calculated yet
-                        vertical_stress = F[5][2]/params.L/params.L/4.;
-                        // console.log(vertical_stress)
-                    }
-
-                    // console.log(F)
-                    // pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
-                    // shear = sigma_33 - pressure;
-                    // console.log(F[0])
-                    // if ( isNaN(pressure) ) { pressure = 0; }
-
-                    // if ( stats !== undefined ) {
-                    //     stats.begin()
-                    //     panel.update(pressure,1e6)
-                    //     stats.end();
+                    // var F = S.simu_getWallForce();
+                    // if ( F.length > 1 ) { // returns an empty array if hasn't calculated yet
+                    //     vertical_stress = F[5][2]/params.L/params.L/4.;
+                    //     // console.log(vertical_stress)
                     // }
 
+                    S.cg_param_read_timestep(0) ;
+                    S.cg_process_timestep(0,false) ;
+                    var grid = S.cg_get_gridinfo();
+                    vertical_stress = S.cg_get_result(0, "TC", 4)[0] ;
+                    // console.log(vertical_stress)
                 }
 
 				renderer.render( scene, camera );
@@ -472,7 +454,7 @@
             // }
 
             function add_spheres() {
-                radii = S.getRadii();
+                radii = S.simu_getRadii();
                 spheres = new THREE.Group();
                 scene.add(spheres);
                 // const material = new THREE.MeshStandardMaterial();
@@ -508,16 +490,16 @@
             }
 
             function move_spheres() {
-                var x = S.getX();
-                var orientation = S.getOrientation();
+                var x = S.simu_getX();
+                var orientation = S.simu_getOrientation();
                 if ( params.lut === 'Velocity' ) {
-                    v = S.getVelocity();
+                    v = S.simu_getVelocity();
                 }
                 else if ( params.lut === 'Rotation Rate' ) {
-                    omegaMag = S.getRotationRate();
+                    omegaMag = S.simu_getRotationRate();
                 }
                 else if ( params.lut === 'Force' ) {
-                    forceMag = S.getParticleStress(); // NOTE: NOT IMPLEMENTED YET
+                    forceMag = S.simu_getParticleStress(); // NOTE: NOT IMPLEMENTED YET
                 }
                     // spheres.instanceColor.needsUpdate = true;
                 for ( let i = 0; i < params.N; i ++ ) {
@@ -569,62 +551,84 @@
 
             async function NDDEMPhysics() {
 
-            	if ( 'DEMND' in window === false ) {
+            	if ( 'DEMCGND' in window === false ) {
 
-            		console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
+            		console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
             		return;
 
             	}
 
-            	NDDEMLib = await DEMND(); // eslint-disable-line no-undef
+            	NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 
                 if ( params.dimension == 3 ) {
-                    S = await new NDDEMLib.Simulation3 (params.N);
+                    S = await new NDDEMCGLib.DEMCGND (params.N);
                     finish_setup();
                 }
-                else if ( params.dimension == 4 ) {
-                    S = await new NDDEMLib.Simulation4 (params.N);
-                    finish_setup();
+                else if ( params.dimension > 3 ) {
+                    console.log("D>3 not available") ;
+                    // S = await new NDDEMCGLib.Simulation4 (params.N);
+                    // finish_setup();
                 }
 
 
 
                 function finish_setup() {
-                    S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-                    S.interpret_command("radius -1 0.5");
-                    S.interpret_command("mass -1 1");
-                    S.interpret_command("auto rho");
-                    S.interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
-                    S.interpret_command("auto mass");
-                    S.interpret_command("auto inertia");
+                    S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+                    S.simu_interpret_command("radius -1 0.5");
+                    S.simu_interpret_command("mass -1 1");
+                    S.simu_interpret_command("auto rho");
+                    S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+                    S.simu_interpret_command("auto mass");
+                    S.simu_interpret_command("auto inertia");
 
-                    S.interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-                    S.interpret_command("boundary 2 WALL 0 "+String(2*params.L));
+                    S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 2 WALL 0 "+String(2*params.L));
                     if ( params.gravity === true ) {
-                        S.interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                        S.simu_interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
                     else {
-                        S.interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
+                        S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
 
-                    // S.interpret_command("auto location randomsquare");
-                    S.interpret_command("auto location randomdrop");
+                    // S.simu_interpret_command("auto location randomsquare");
+                    S.simu_interpret_command("auto location randomdrop");
 
-                    S.interpret_command("set Kn 2e5");
-                    S.interpret_command("set Kt 8e4");
-                    S.interpret_command("set GammaN 75");
-                    S.interpret_command("set GammaT 75");
-                    S.interpret_command("set Mu 0.5");
-                    S.interpret_command("set T 150");
-                    S.interpret_command("set dt 0.0001");
-                    S.interpret_command("set tdump 10"); // how often to calculate wall forces
-                    S.interpret_command("auto skin");
-                    S.finalise_init () ;
+                    S.simu_interpret_command("set Kn 2e5");
+                    S.simu_interpret_command("set Kt 8e4");
+                    S.simu_interpret_command("set GammaN 75");
+                    S.simu_interpret_command("set GammaT 75");
+                    S.simu_interpret_command("set Mu 0.5");
+                    S.simu_interpret_command("set T 150");
+                    S.simu_interpret_command("set dt 0.0001");
+                    S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
+                    S.simu_interpret_command("auto skin");
+                    S.simu_finalise_init () ;
+
+                    var cgparam ={} ;
+                    cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
+                    cgparam["boxes"]=[1,1,1] ;
+                    // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
+                    cgparam["boundaries"]=[
+                        [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
+                        [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
+                    cgparam["window size"]=2 ;
+                    cgparam["skip"]=0;
+                    cgparam["max time"]=1 ;
+                    cgparam["time average"]="None" ;
+                    cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+                    cgparam["periodicity"]=[true,true,true];
+                    cgparam["window"]="Lucy3D";
+                    cgparam["dimension"]=3;
+
+
+                    console.log(JSON.stringify(cgparam)) ;
+                    S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
+                    S.cg_setup_CG() ;
                 }
             }
 
             function update_graph() {
                 // density = params.packing_fraction*material_density;
-                vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
+                // vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
                 // console.log(vertical_stress)
                 // shear_time.push(shear);
                 // density_time.push(density);
@@ -633,7 +637,7 @@
                     Plotly.extendTraces('stats', {
                         'x': [[params.vertical_strain*params.L]],
                         // 'y': [[shear]],
-                        'y': [[vertical_stress_smooth]],
+                        'y': [[vertical_stress]],
                     }, [-1])
                 // }
             }
