@@ -478,7 +478,9 @@
                         }
                     }
                     if ( i > 0 ) {
-                        for (var j = 1; j < params.N - 3; j++) {
+                        // console.log(params.d4_cur)
+                        for (var j = 0; j < params.dimension - 3; j++) {
+
                           object.material.uniforms.xview.value[j] =
                             params.d4_cur;
                           object.material.uniforms.xpart.value[j] =

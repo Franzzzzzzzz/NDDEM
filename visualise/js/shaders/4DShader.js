@@ -2,14 +2,14 @@ import { ShaderMaterial } from "../../node_modules/three/build/three.module.js";
 
 var N = 4;
 var uniforms = {
-  N: { value: N },
+  N: { value: N }, // dimension
   N_lines: { value: 5.0 },
   //A: { value: new THREE.Matrix4() },
   A: { value: [] }, // Size N*N
   xview: { value: [] }, //Size N-3
   xpart: { value: [] }, //Size N-3
-  x4: { value: 0 },
-  x4p: { value: 0 },
+  // x4: { value: 0 },
+  // x4p: { value: 0 },
   R: { value: 0.5 },
   ambient: { value: 1.0 },
   banding: { value: 3.0 }
@@ -19,9 +19,9 @@ for (var ij = 0; ij < N - 3; ij++) {
   uniforms.xview.value[ij] = 0.0;
   uniforms.xpart.value[ij] = 0.0;
 }
-if (N > 3) {
-  uniforms.x4.value = 0.0;
-}
+// if (N > 3) {
+  // uniforms.x4.value = 0.0;
+// }
 for (var ij = 0; ij < N * N; ij++) {
   if (ij % N == Math.floor(ij / N)) uniforms.A.value[ij] = 1;
   else uniforms.A.value[ij] = 0;
