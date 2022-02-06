@@ -84,7 +84,6 @@ void CoarseGraining::setup_CG ()
     else
         C->setWindow(P.window,P.windowsize) ;
     pipeline = C->set_flags(P.flags) ;
-    printf("###%X###", static_cast<int>(pipeline)) ; 
     auto extrafieldmap = C->grid_setfields() ;
 
     C->cT=-1 ;
@@ -140,7 +139,6 @@ int CoarseGraining::process_fluct_from_avg()
 //----------------------------------------------------------
 void CoarseGraining::process_all ()
 {
-    printf("%d////\n", P.maxT) ;
     for (int ts=0 ; ts<P.maxT ; ts++)
     {
         printf("\r%d ", ts) ; 

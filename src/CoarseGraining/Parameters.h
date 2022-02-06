@@ -3,7 +3,7 @@
 
 using json = nlohmann::json;
 
-enum FileFormat {NDDEM, Liggghts, Mercury, Interactive} ; 
+enum FileFormat {NDDEM, Liggghts, MercuryData, MercuryVTU, Interactive} ; 
 enum FileType {both, particles, contacts} ; 
 //enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, fpq, mpq, mqp} ;
 
@@ -276,7 +276,8 @@ void Param::process_file (json &j2)
         if (v != j.end())
         { if ( *v == "liggghts") format = FileFormat::Liggghts ;
         else if (*v == "NDDEM") format = FileFormat::NDDEM ;
-        else if (*v == "mercury") format = FileFormat::Mercury ;
+        else if (*v == "mercury_legacy") format = FileFormat::MercuryData ;
+        else if (*v == "mercury_vtu") format = FileFormat::MercuryVTU ;
         else if (*v == "interactive") format = FileFormat::Interactive ;
         else {printf("ERR: unknown file format.\n") ; return ;}
         }
@@ -319,14 +320,23 @@ void Param::process_file (json &j2)
         }
         else if (files.back().fileformat == FileFormat::NDDEM)
             files.back().reader = new NDDEMReader (files.back().path); 
-        else if (files.back().fileformat == FileFormat::Mercury)
+        else if (files.back().fileformat == FileFormat::MercuryData)
         {
             if (files.back().filetype == FileType::particles)
-                files.back().reader = new MercuryReader_particles (files.back().path) ;
+                files.back().reader = new MercuryReader_data_particles (files.back().path) ;
             else if (files.back().filetype == FileType::contacts) // TODO
             {}//files.back().reader = new MercuryReader_contacts (files.back().path) ;
             else
                 printf("ERR: no Mercury file format support FileType::both.\n") ; 
+        }
+        else if (files.back().fileformat == FileFormat::MercuryVTU)
+        {
+            if (files.back().filetype == FileType::particles)
+                files.back().reader = new MercuryReader_vtu_particles (files.back().path, number) ;
+            //else if (files.back().filetype == FileType::contacts) // TODO
+            //{}//files.back().reader = new MercuryReader_contacts (files.back().path) ;
+            else
+                printf("ERR: no Mercury VTU file format support FileType::contacts and FileType::both.\n") ; 
         }
         else if (files.back().fileformat == FileFormat::Interactive)
             files.back().reader = new InteractiveReader (); 

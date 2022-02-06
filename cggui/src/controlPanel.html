@@ -5,9 +5,10 @@
     <button type="button" id="updatefile" hidden>Update</button>
 <!--    <button type="button" id="testing">TEST</button> -->
     <div id="file1" class="box" hidden>
-        <input type="file" id="filename1" onChange="document.getElementById('updatefile').hidden=false;"><br>
+        <input type="file" id="filename1" multiple="multiple" onChange="document.getElementById('updatefile').hidden=false;"><br>
         <select name="filetype1" id="filetype1">
             <option value="LiggghtsParticles">Liggghts particles</option>
+            <option value="MercuryVTUParticles">Mercury VTU particles</option>
             <option value="NDDEM">NDDEM</option>
         </select>
     </div>
@@ -15,6 +16,7 @@
         <input type="file" id="filename2" onChange="document.getElementById('updatefile').hidden=false;"><br>
         <select name="filetype2" id="filetype2">
             <option value="LiggghtsContacts">Liggghts contacts</option>
+            <option value="MercuryVTUContacts">Mercury VTU contacts</option>
         </select>
         <button type="button" id="addcolumn">Add column mapping</button>
         <span id="columnmapping"></span><br>

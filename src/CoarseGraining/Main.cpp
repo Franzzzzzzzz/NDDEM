@@ -23,18 +23,13 @@ int main(int argc, char * argv[])
     Global.P.post_init() ; 
     auto a = Global.P.files[0].reader->get_bounds() ; 
     //printf("{%d} ", Global.P.files[0].reader->get_numts()) ; 
-    Global.P.read_timestep(40) ; 
     /*for (auto v: Global.P.files[0].reader->mapped_ts)
         printf("%d ", static_cast<int>(v)) ; 
     
     printf("{%d} ", Global.P.files[0].reader->get_numts()) ; 
     for (auto v: Global.P.files[0].reader->mapped_ts)
         printf("%d ", static_cast<int>(v)) ; */
-    
-    
-    
-    
-    Global.P.read_timestep(5) ; 
+
     //auto a = Global.P.files[0].reader->get_bounds() ; 
     for (auto v: a)
         for (auto w: v)

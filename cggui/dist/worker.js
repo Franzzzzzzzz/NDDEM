@@ -25,14 +25,18 @@ onmessage = async function(e) {
         for (var i=0 ; i<nbfile ; i++)
         {
             console.log(e.data[1]["file"][i].filename) ;
-            CGlib.FS.mount(CGlib.WORKERFS, { files: [e.data[2+i]] }, '/work');
+            CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/work');
             var name = data["file"][i].filename.split(/(\\|\/)/g).pop()
             data["file"][i].filename = '/work/'+name ; 
+            if (e.data[2+i].length>1)
+                data["file"][i].filename=data["file"][i].filename.replace(/[0-9]+/i,"%d") ; 
         }
+        console.log(data) ; 
         var cstring = JSON.stringify(data) ; 
         CG.param_from_json_string (cstring) ;
         CG.param_from_json_string ("{}") ;
         var nts= CG.param_get_numts(0) ;
+        console.log(nts) ; 
         var bounds = CG.param_get_bounds(0) ;
         postMessage(['initialised', nts, bounds]) ; 
     }

@@ -1,6 +1,82 @@
 #include "Reader-Mercury.h"
 
-MercuryReader_particles::MercuryReader_particles(std::string ppath)
+MercuryReader_vtu_particles::MercuryReader_vtu_particles(std::string ppath, int numtstmp)
+{
+  // VTU has to be multiple files ...
+  path = ppath ;
+  numts=numtstmp ; 
+  std::size_t found = path.find_last_of(".");
+  if (path.substr(found+1)!="vtu")
+     printf("WARN: Unexpected MercuryReader_particles file extension\n") ;  
+
+  auto actualcpppath = getpath(0) ; 
+  file_in.open(actualcpppath, ios_base::in) ; 
+  if (!file_in.is_open()) printf("ERR: cannot open file %s\n", actualcpppath.c_str()) ;
+  
+  file_in.close() ; 
+  dimension = 3 ; 
+  is_seekable= true ; 
+  
+  data.resize(8) ; 
+}
+//--------------------
+int MercuryReader_vtu_particles::read_timestep(int ts) 
+{
+    auto filepath = getpath(ts) ;
+    printf("READING TS %d %s %s\n", ts, path.c_str(), filepath.c_str()) ; fflush(stdout); 
+    
+    file_in.open(filepath, ios_base::in);
+    if (!file_in.is_open()) 
+    {
+        printf("ERR: cannot open file %s\n", filepath.c_str()) ;
+        N=0 ; 
+        data.clear() ;
+        return 0 ; 
+    }
+    
+    std::string line ; 
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    size_t res = line.find("\"",0) ;
+    N = std::stoi(line.substr(res+1)) ; 
+    for (auto & v: data) v.resize(N) ; 
+    
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    for (int i=0 ; i<N ; i++) // Get locations
+     file_in >> data[0][i] >> data[1][i]>> data[2][i] ;
+    
+    getline(file_in, line) ; // Get to the end of previous line
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    
+    for (int i=0 ; i<N ; i++) // Get velocities
+     file_in >> data[3][i] >> data[4][i]>> data[5][i] ;
+    
+    getline(file_in, line) ; // Get to the end of previous line
+    getline(file_in, line) ;
+    getline(file_in, line) ;
+    
+    for (int i=0 ; i<N ; i++) // Get Radius
+    {
+     file_in >> data[6][i] ;
+     data[7][i] = 4./3.*M_PI*data[6][i]*data[6][i]*data[6][i]*get_default_density() ; 
+    }
+    file_in.close() ; 
+    curts=ts ; 
+    return 0 ; 
+}
+
+
+
+
+
+//===================================================================================================
+MercuryReader_data_particles::MercuryReader_data_particles(std::string ppath)
 {
   path=ppath ; 
   std::size_t found = path.find_last_of(".");
@@ -37,7 +113,7 @@ MercuryReader_particles::MercuryReader_particles(std::string ppath)
   reset() ; 
 }
 //------
-MercuryReader_contacts::MercuryReader_contacts(std::string ppath, Reader *d): dump(dynamic_cast<MercuryReader_particles*>(d))
+MercuryReader_data_contacts::MercuryReader_data_contacts(std::string ppath, Reader *d): dump(dynamic_cast<MercuryReader_data_particles*>(d))
 {
   path=ppath ; 
   dimension=dump->get_dimension() ; 
@@ -48,7 +124,7 @@ MercuryReader_contacts::MercuryReader_contacts(std::string ppath, Reader *d): du
 }
 
 //--------------------------------------------
-int MercuryReader_particles::build_index () 
+int MercuryReader_data_particles::build_index () 
 {
   reset() ;
   std::string line ;
@@ -65,7 +141,7 @@ int MercuryReader_particles::build_index ()
   return mapped_ts.size() ; 
 }
 //-------
-int MercuryReader_contacts::build_index () 
+int MercuryReader_data_contacts::build_index () 
 {
   reset() ;
   std::string line ;
@@ -90,7 +166,7 @@ int MercuryReader_contacts::build_index ()
 }
 
 //--------------------------------------------    
-std::vector<std::vector<double>> MercuryReader_particles::get_bounds() 
+std::vector<std::vector<double>> MercuryReader_data_particles::get_bounds() 
 {
   std::vector<std::vector<double>> res ; 
   res.resize(2, std::vector<double>(dimension, 0)) ; 
@@ -106,7 +182,7 @@ std::vector<std::vector<double>> MercuryReader_particles::get_bounds()
 }
  
 //--------------------------------------------
-int MercuryReader_particles::read_timestep (int ts) 
+int MercuryReader_data_particles::read_timestep (int ts) 
 {
   if (ts==curts) return 0;
   
@@ -161,7 +237,7 @@ int MercuryReader_particles::read_timestep (int ts)
 }
 
 //-------
-int MercuryReader_contacts::read_timestep (int ts) 
+int MercuryReader_data_contacts::read_timestep (int ts) 
 {
   std::string line ;
       

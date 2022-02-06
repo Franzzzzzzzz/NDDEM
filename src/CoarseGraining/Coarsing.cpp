@@ -29,6 +29,8 @@ FIELDS.push_back({FIELDS.back().flag<<1, "qRK"  , TensorOrder::VECTOR, FieldType
 FIELDS.push_back({FIELDS.back().flag<<1, "zT"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass3});    //Eq 75
 FIELDS.push_back({FIELDS.back().flag<<1, "zR"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass3});    //Eq 76
 
+FIELDS.push_back({FIELDS.back().flag<<1, "RADIUS"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});    //Eq 76
+
 // Post processing fields
 FIELDS.push_back({FIELDS.back().flag<<1, "TotalStress" ,     TensorOrder::TENSOR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "Pressure" ,        TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
@@ -485,11 +487,12 @@ return (res);
 int Coarsing::pass_1 ()
 {
 int i, dd, id ; double wp ;
-bool dorho=true, dovel=true, doomega=true, doI=true ;
+bool dorho=true, dovel=true, doomega=true, doI=true, doradius=true ;
 int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;} if (dorho && !data.check_field_availability("RHO")) {printf("Data missing for RHO\n") ; dorho=false ; }
 int Iid = get_id("I") ; if (Iid<0) doI=false ;           if (doI     && !data.check_field_availability("I")) {printf("Data missing for I\n") ; doI=false ; }
 int velid=get_id("VAVG"); if (velid<0)  dovel=false ;    if (dovel   && !data.check_field_availability("VAVG")) {printf("Data missing for VAVG\n") ; dovel=false ; }
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ; if (doomega && !data.check_field_availability("ROT")) {printf("Data missing for ROT\n") ; doomega=false ; }
+int radiusid = get_id("RADIUS") ; if (radiusid<0) doradius=false ; if (doradius && !data.check_field_availability("RADIUS")) {printf("Data missing for RADIUS\n") ; doradius=false ; }
 
 vector<int> extraid ;
 for (auto &v: FIELDS)
@@ -514,7 +517,8 @@ for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
  id=find_closest(i) ;
- dm=data.mass[i] ; dI=data.Imom[i] ;
+ dm=data.mass[i] ; 
+ if (doI || doomega) dI=data.Imom[i] ;
  for (dd=0 ; dd<d ; dd++) {if (dovel) dv[dd]=data.vel[dd][i] ; if (doomega) dom[dd]=data.omega[dd][i] ; }
 
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
@@ -535,6 +539,8 @@ for (i=0 ; i<data.N ; i++)
      if (doomega)
        for (dd=0 ; dd<d ; dd++)
          *(CGf+omegaid+dd) += wp * dm * dom[dd] * dI ;
+     if (doradius)
+       CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
      if (doextra)
        for (auto v: extraid)
           *(CGf+v) += wp * dm * data.extra[v][i] ;
@@ -571,6 +577,7 @@ for (i=0 ; i<Npt ; i++)
         CGP[i].fields[cT][EKRid] +=  CGP[i].fields[cT][omegaid+dd]*CGP[i].fields[cT][omegaid+dd] * Imom ;
       CGP[i].fields[cT][EKRid] /= 2.0 ;
     }
+    if (doradius && rho!=0) {CGP[i].fields[cT][radiusid] /= rho ; }
     if (doextra && rho!=0)
       for (auto v:extraid)
         CGP[i].fields[cT][v] /= rho ;
@@ -1084,6 +1091,7 @@ bool Data::check_field_availability(string name)
  else if (name == "qRK" ) return (mass && Imom) ; 
  else if (name == "zT"  ) return (fpq[0] && vel[0]) ; 
  else if (name == "zR"  ) return (mpq[0] && mqp[0] && omega[0]) ; 
+ else if (name == "RADIUS"  ) return (radius) ; 
  else 
      return (true) ; 
 }

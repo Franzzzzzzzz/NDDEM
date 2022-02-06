@@ -389,17 +389,33 @@ function generateallparameters () {
     for (var fic = 1 ; fic <=naddedfiles ; fic++)
     {
         files[fic-1] = {} ; 
+        var filelist = document.getElementById("filename"+fic) ; 
+        files[fic-1]["number"] = filelist.files.length ;
+        var tmp = filelist.files[0].name ;
+        if (filelist.files.length>1) tmp.replace(/[0-9]+/i,"%d") ; 
+        files[fic-1]["filename"] = tmp ; 
+        
         files[fic-1]["filename"] = document.getElementById("filename"+fic).value ; 
         var filetype = document.getElementById("filetype"+fic).value ; 
         if (filetype=="LiggghtsParticles")
         {
             files[fic-1]["content"] = "particles" ; 
             files[fic-1]["format"] = "liggghts" ; 
-        }       
+        }
+        else if (filetype == "MercuryVTUParticles")
+        {
+            files[fic-1]["content"] = "particles" ; 
+            files[fic-1]["format"] = "mercury_vtu" ; 
+        }
         else if (filetype == "LiggghtsContacts")
         {
             files[fic-1]["content"] = "contacts" ; 
             files[fic-1]["format"] = "liggghts" ; 
+        }
+        else if (filetype == "MercuryVTUContacts")
+        {
+            files[fic-1]["content"] = "contacts" ; 
+            files[fic-1]["format"] = "mercury_vtu" ; 
         }
         else if (filetype == "NDDEM")
         {
@@ -408,7 +424,6 @@ function generateallparameters () {
         }        
         else
             console.log("This should never happen: unknown file format") ; 
-        files[fic-1]["number"] = 1 ;
         
         if (ncolumnmapping>0 && fic==2)
         {
@@ -445,7 +460,9 @@ function generateallparameters () {
     
     var select = document.getElementById('saveformat');
     data["saveformat"] = [...document.getElementById('saveformat').selectedOptions].map(option => option.value);
-    data["save"] = document.getElementById('savefile').value;
+    data["save"] = document.getElementById('savefile').value; 
+    
+    console.log(data) ; 
     return (data) ; 
 } ; 
 document.querySelector('.savejson').addEventListener('click', async () => {
@@ -467,9 +484,36 @@ document.getElementById('loadjsonfile').addEventListener('change', function() {
     var fr=new FileReader();
     fr.readAsText(this.files[0]);
     fr.onload=function(){
-        console.log(JSON.parse(fr.result));
-            }
-});
+        var data = JSON.parse(fr.result);
+        console.log(data) ; 
+        document.getElementById("xgrid").value = data["boxes"][0] ; 
+        document.getElementById("ygrid").value = data["boxes"][1] ; 
+        document.getElementById("zgrid").value = data["boxes"][2] ; 
+        document.getElementById("xmin").value = data["boundaries"][0][0] ; 
+        document.getElementById("ymin").value = data["boundaries"][0][1] ; 
+        document.getElementById("zmin").value = data["boundaries"][0][2] ; 
+        document.getElementById("xmax").value = data["boundaries"][1][0] ; 
+        document.getElementById("ymax").value = data["boundaries"][1][1] ; 
+        document.getElementById("zmax").value = data["boundaries"][1][2] ; 
+        document.getElementById("xper").checked = data["periodicity"][0] ; 
+        document.getElementById("yper").checked = data["periodicity"][1] ; 
+        document.getElementById("zper").checked = data["periodicity"][2] ; 
+        document.getElementById("windowsize").value = data["window size"] ;
+        document.getElementById("window").value = data["window"] ;
+        
+        timeslider.noUiSlider.updateOptions({range: {'min': 0,'max': data["skip"]+data["max time"]}}) ; 
+        timeslider.noUiSlider.set([data["skip"], data["skip"]+data["max time"]]) ;
+        document.getElementById("timeaverage").value = data["time average"] ; 
+    
+        var fieldlst= ["RHO", "I", "VAVG",  "TC", "TK", "ROT", "MC", "MK" , "mC", "EKT", "eKT", "EKR", "eKR", "qTC", "qTK", "qRC", "qRK", "zT" , "zR", "TotalStress", "Pressure", "KineticPressure", "ShearStress", "StrainRate", "VolumetricStrainRate", "ShearStrainRate", "RotationalVelocity", "RotationalVelocityMag"] ;    
+        fieldlst.forEach(name => document.getElementById(name).checked = false) ; 
+        data["fields"].forEach(name => document.getElementById(name).checked = true)
+        /* TODO
+        * var select = document.getElementById('saveformat');
+        data["saveformat"] = [...document.getElementById('saveformat').selectedOptions].map(option => option.value);
+        data["save"] = document.getElementById('savefile').value; */
+
+    }}) ; 
 //------------------
 var worker = new Worker("worker.js");
 var initialised=false ; 
@@ -478,7 +522,7 @@ document.getElementById('updatefile').addEventListener('click', async () => {
     var data=generateallparameters() ;
     if (naddedfiles == 1) 
     {
-        worker.postMessage([ 'initialise', data, document.getElementById("filename1").files[0]]);
+        worker.postMessage([ 'initialise', data, document.getElementById("filename1").files]);
     }
     else if (naddedfiles==2)
         worker.postMessage([ 'initialise', data, document.getElementById("filename1").files[0], document.getElementById("filename2").files[0]]);
@@ -560,12 +604,15 @@ worker.onmessage = function (e)
 {
  if (e.data[0] == "initialised") 
  {
-     document.getElementById('xmin').value = e.data[2][0][0] ;
-     document.getElementById('xmax').value = e.data[2][1][0] ; 
-     document.getElementById('ymin').value = e.data[2][0][1] ; 
-     document.getElementById('ymax').value = e.data[2][1][1] ; 
-     document.getElementById('zmin').value = e.data[2][0][2] ; 
-     document.getElementById('zmax').value = e.data[2][1][2] ;  
+     if (e.data[2].length>0)
+     {
+        document.getElementById('xmin').value = e.data[2][0][0] ;
+        document.getElementById('xmax').value = e.data[2][1][0] ; 
+        document.getElementById('ymin').value = e.data[2][0][1] ; 
+        document.getElementById('ymax').value = e.data[2][1][1] ; 
+        document.getElementById('zmin').value = e.data[2][0][2] ; 
+        document.getElementById('zmax').value = e.data[2][1][2] ;  
+     }
      timeslider.noUiSlider.updateOptions({range: {'min': 0,'max': e.data[1]-1}}) ; 
      timeslider.noUiSlider.set([0,e.data[1]-1]) ;
      dispslider.noUiSlider.updateOptions({range: {'min': 0,'max': e.data[1]-1}}) ; 

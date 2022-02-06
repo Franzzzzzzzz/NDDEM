@@ -10,7 +10,8 @@
 
 class MercuryReader : public Reader {
 public :
-   int get_dimension() {return dimension;}
+    int get_dimension() {return dimension;}
+    virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd) {return nullptr ; } 
     
     std::string path ;
     int dimension=3 ; 
@@ -27,9 +28,44 @@ protected:
 } ; 
 
 //----------------------------------------------------------
-class MercuryReader_particles: public MercuryReader {
+class MercuryReader_vtu_particles: public MercuryReader {
 public:
-    MercuryReader_particles(std::string ppath) ; 
+    MercuryReader_vtu_particles(std::string ppath, int numtstmp) ; 
+    int get_numts() {return numts; }
+    int get_num_particles () {return N;}
+    
+    double * get_data(DataValue datavalue, int dd) 
+    { 
+        printf("%d %d\n", data.size(), data[0].size()) ; 
+        switch(datavalue) {
+            case DataValue::pos :    
+        printf("POS %lu\n", &(data[0+dd][0])) ; fflush(stdout) ;return &(data[0+dd][0] ) ;
+            case DataValue::vel :    
+        printf("VEL %lu\n", &(data[dimension*1+dd][0] )) ; fflush(stdout) ;return &(data[dimension*1+dd][0] ) ;
+            case DataValue::radius : 
+        printf("RAD %lu\n", &(data[dimension*2][0])) ; fflush(stdout) ;return &(data[dimension*2][0]) ;
+            case DataValue::mass :   
+        printf("MAS %lu\n", &(data[dimension*2+1][0]) ) ; fflush(stdout) ;return &(data[dimension*2+1][0]) ;
+            
+            default : return (nullptr) ; 
+        }
+    } 
+    
+    int read_timestep (int ts) ;
+    
+    std::string getpath (int ts) {char tmp[5000] ;  std::string res ; sprintf(tmp, path.c_str(), ts) ; res = tmp ; return res ;}
+    
+    v2d data ; 
+private :
+    int numts = -1 ; 
+    int N=0 ; 
+};
+
+
+//----------------------------------------------------------
+class MercuryReader_data_particles: public MercuryReader {
+public:
+    MercuryReader_data_particles(std::string ppath) ; 
     int get_numts() 
     { 
         if (!is_mapped_ts)
@@ -67,9 +103,9 @@ private:
 
 
 //-----------------------------
-class MercuryReader_contacts: public MercuryReader {
+class MercuryReader_data_contacts: public MercuryReader {
 public: 
-    MercuryReader_contacts(std::string ppath, Reader *d);
+    MercuryReader_data_contacts(std::string ppath, Reader *d);
     int build_index () ;
     int get_num_contacts () {return Nc;}
     int read_timestep(int ts) ; 
@@ -90,7 +126,7 @@ public:
     
     v2d data ; 
 private :
-    MercuryReader_particles * dump ; 
+    MercuryReader_data_particles * dump ; 
     unsigned int Nc;
     const int growth=100 ; 
     

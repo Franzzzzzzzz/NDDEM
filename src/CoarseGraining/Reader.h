@@ -1,14 +1,10 @@
 #include <vector>
 #include <string>
+#include <cmath>
 #include "Typedefs.h"
 
 #ifndef READER
 #define READER
-
-
-
-
-
 
 class Reader {
 public:
@@ -42,7 +38,7 @@ public:
     double get_default_density () 
     {
         static bool info=true ;
-        if (Radius==-1)
+        if (Density==-1)
         {
           if (info)
           {
@@ -52,7 +48,7 @@ public:
           return 1. ;
         }
         else 
-            return Radius ;
+            return Density;
     }
     
     //virtual double * get_data(DataValue, int dd) {return nullptr;}
@@ -92,11 +88,13 @@ public:
     
     int clean_contacts (v2d & contactarray, int id1, int id2, int idx_lpq, v2d & particlearray, int idx_r)
     {
-        size_t Nc = contactarray[0].size() ; 
+        // WORK IN PROGRESS
+        printf("NEED TO WORK ON THAT ...") ; return 0 ;
+        /*size_t Nc = contactarray[0].size() ; 
         double dst, rr ; 
         std::vector<bool> rm (Nc,false) ; 
         
-        for (int i=0 ; i<Nc ; i++)
+        for (size_t i=0 ; i<Nc ; i++)
         {
             dst=0 ;
             for (int dd=0 ; dd<get_dimension() ; dd++)
@@ -104,7 +102,7 @@ public:
             dst=sqrt(dst) ; 
             rr=particlearray[idx_r][contactarray[i][id1]]+particlearray[idx_r][contactarray[i][id1]] ;
             
-        }
+        }*/
         
     }
                         
