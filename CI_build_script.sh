@@ -1,4 +1,5 @@
 mkdir build
+mkdir deploy
 cd build
 
 embuilder build boost_headers zlib

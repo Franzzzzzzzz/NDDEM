@@ -25,32 +25,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-        
+
       - name: Setup Emscripten toolchain
-        # You may pin to the exact commit or the version.
-        # uses: mymindstorm/setup-emsdk@29ba4851d6da084ffdc1e0fc390efadbd75df9d1
         uses: mymindstorm/setup-emsdk@v11
-#         with:
-          # Version to install
-#           version: # optional, default is latest
-          # If true will not download any version of Emscripten. emsdk will still be added to PATH.
-#           no-install: # optional
-          # If true will not cache any downloads with tc.cacheDir.
-#           no-cache: # optional
-          # Directory to cache emsdk in. This folder will go under $GITHUB_HOME (I.e. build dir) and be cached using @actions/cache.
-#           actions-cache-folder: # optional, default is 
-          # Fetch package information for all the new tools and SDK versions
-#           update: # optional
-          # Deprecated in favor of `update`.
-#           update-tags: # optional
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
+      - name: Compile everything with emscripten
         run: sh CI_build_script.sh
 
-
-#       # Runs a set of commands using the runners shell
-#       - name: Run a multi-line script
-#         run: |
-#           echo Add other actions to build,
-#           echo test, and deploy your project.
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Compiled-artifacts
+          path: deploy/
