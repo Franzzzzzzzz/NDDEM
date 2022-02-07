@@ -213,7 +213,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
   Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ; //TODO check the minus sign
-  
+
   //Update contact history
   //History[make_pair(i,j)]=make_pair (true, tspr) ;
   /*switch (ContactCalc) {

@@ -82,7 +82,7 @@
                 axial_strain: 0,
                 volumetric_strain: 0,
                 paused: false,
-                g_mag: 1e3,
+                g_mag: 2e3,
                 theta: 0, // slope angle in DEGREES
                 d4_cur:0,
                 r_max: 0.55,
@@ -251,7 +251,7 @@
 				requestAnimationFrame( animate );
                 move_spheres();
                 if ( !params.paused ) {
-                    S.simu_step_forward(5);
+                    S.simu_step_forward(10);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
                     var grid = S.cg_get_gridinfo();

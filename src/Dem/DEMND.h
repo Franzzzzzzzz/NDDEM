@@ -673,6 +673,7 @@ Visualisation [shape=box,style=filled,color="0.9 0.6 0.6"] ;
 <pre> boundary dim PBC low high </pre> Periodic boundary condition between the boundaries at low and high.<br>
 <pre> boundary dim WALL low high </pre> Static walls at boundaries low and high (normal of the wall along the dimension dim). <br>
 <pre> boundary dim MOVINGWALL low high vel_low vel_high </pre> Walls moving along their normals<br>
+<pre> boundary dim MOVINGSIDEWAYSWALL low high vel_low vel_high </pre> Walls moving along their normals+1 dim<br>
 <pre> boundary n SPHERE radius x1 x2 ... xn </pre> Define a sherical wall. n should be higher than the dimension (walls or pbs should be defined in the other dimensions). (xi) is the location of the sphere centre.
 
 */

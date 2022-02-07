@@ -1,5 +1,5 @@
 
-var CoarseGraining = (() => {
+var CoarseGraining = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
   return (
@@ -23,9 +23,6 @@ function(CoarseGraining) {
 // can continue to use Module afterwards as well.
 var Module = typeof CoarseGraining !== 'undefined' ? CoarseGraining : {};
 
-// See https://caniuse.com/mdn-javascript_builtins_object_assign
-var objAssign = Object.assign;
-
 // Set up the promise that indicates the Module is initialized
 var readyPromiseResolve, readyPromiseReject;
 Module['ready'] = new Promise(function(resolve, reject) {
@@ -42,11 +39,17 @@ Module['ready'] = new Promise(function(resolve, reject) {
 // we collect those properties and reapply _after_ we configure
 // the current environment's defaults to avoid having to be so
 // defensive during initialization.
-var moduleOverrides = objAssign({}, Module);
+var moduleOverrides = {};
+var key;
+for (key in Module) {
+  if (Module.hasOwnProperty(key)) {
+    moduleOverrides[key] = Module[key];
+  }
+}
 
 var arguments_ = [];
 var thisProgram = './this.program';
-var quit_ = (status, toThrow) => {
+var quit_ = function(status, toThrow) {
   throw toThrow;
 };
 
@@ -85,13 +88,12 @@ var read_,
 // this may no longer be needed under node.
 function logExceptionOnExit(e) {
   if (e instanceof ExitStatus) return;
-  let toLog = e;
+  var toLog = e;
   err('exiting due to exception: ' + toLog);
 }
 
-var fs;
+var nodeFS;
 var nodePath;
-var requireNodeFS;
 
 if (ENVIRONMENT_IS_NODE) {
   if (ENVIRONMENT_IS_WORKER) {
@@ -103,34 +105,27 @@ if (ENVIRONMENT_IS_NODE) {
 // include: node_shell_read.js
 
 
-requireNodeFS = () => {
-  // Use nodePath as the indicator for these not being initialized,
-  // since in some environments a global fs may have already been
-  // created.
-  if (!nodePath) {
-    fs = require('fs');
-    nodePath = require('path');
-  }
-};
-
 read_ = function shell_read(filename, binary) {
-  requireNodeFS();
+  if (!nodeFS) nodeFS = require('fs');
+  if (!nodePath) nodePath = require('path');
   filename = nodePath['normalize'](filename);
-  return fs.readFileSync(filename, binary ? null : 'utf8');
+  return nodeFS['readFileSync'](filename, binary ? null : 'utf8');
 };
 
-readBinary = (filename) => {
+readBinary = function readBinary(filename) {
   var ret = read_(filename, true);
   if (!ret.buffer) {
     ret = new Uint8Array(ret);
   }
+  assert(ret.buffer);
   return ret;
 };
 
-readAsync = (filename, onload, onerror) => {
-  requireNodeFS();
+readAsync = function readAsync(filename, onload, onerror) {
+  if (!nodeFS) nodeFS = require('fs');
+  if (!nodePath) nodePath = require('path');
   filename = nodePath['normalize'](filename);
-  fs.readFile(filename, function(err, data) {
+  nodeFS['readFile'](filename, function(err, data) {
     if (err) onerror(err);
     else onload(data.buffer);
   });
@@ -159,7 +154,7 @@ readAsync = (filename, onload, onerror) => {
   // See https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode
   process['on']('unhandledRejection', function(reason) { throw reason; });
 
-  quit_ = (status, toThrow) => {
+  quit_ = function(status, toThrow) {
     if (keepRuntimeAlive()) {
       process['exitCode'] = status;
       throw toThrow;
@@ -201,18 +196,19 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
   // Differentiate the Web Worker from the Node Worker case, as reading must
   // be done differently.
   {
+
 // include: web_or_worker_shell_read.js
 
 
-  read_ = (url) => {
+  read_ = function(url) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', url, false);
       xhr.send(null);
       return xhr.responseText;
-  }
+  };
 
   if (ENVIRONMENT_IS_WORKER) {
-    readBinary = (url) => {
+    readBinary = function(url) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
         xhr.responseType = 'arraybuffer';
@@ -221,11 +217,11 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
     };
   }
 
-  readAsync = (url, onload, onerror) => {
+  readAsync = function(url, onload, onerror) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
-    xhr.onload = () => {
+    xhr.onload = function() {
       if (xhr.status == 200 || (xhr.status == 0 && xhr.response)) { // file URLs can return 0
         onload(xhr.response);
         return;
@@ -234,12 +230,12 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
     };
     xhr.onerror = onerror;
     xhr.send(null);
-  }
+  };
 
 // end include: web_or_worker_shell_read.js
   }
 
-  setWindowTitle = (title) => document.title = title;
+  setWindowTitle = function(title) { document.title = title };
 } else
 {
 }
@@ -248,7 +244,11 @@ var out = Module['print'] || console.log.bind(console);
 var err = Module['printErr'] || console.warn.bind(console);
 
 // Merge back in the overrides
-objAssign(Module, moduleOverrides);
+for (key in moduleOverrides) {
+  if (moduleOverrides.hasOwnProperty(key)) {
+    Module[key] = moduleOverrides[key];
+  }
+}
 // Free the object hierarchy contained in the overrides, this lets the GC
 // reclaim data used e.g. in memoryInitializerRequest, which is a large typed array.
 moduleOverrides = null;
@@ -270,7 +270,10 @@ if (Module['quit']) quit_ = Module['quit'];
 
 
 var STACK_ALIGN = 16;
-var POINTER_SIZE = 4;
+
+function getPointerSize() {
+  return 4;
+}
 
 function getNativeTypeSize(type) {
   switch (type) {
@@ -281,10 +284,10 @@ function getNativeTypeSize(type) {
     case 'float': return 4;
     case 'double': return 8;
     default: {
-      if (type[type.length - 1] === '*') {
-        return POINTER_SIZE;
+      if (type[type.length-1] === '*') {
+        return getPointerSize();
       } else if (type[0] === 'i') {
-        const bits = Number(type.substr(1));
+        var bits = Number(type.substr(1));
         assert(bits % 8 === 0, 'getNativeTypeSize invalid bits ' + bits + ', type ' + type);
         return bits / 8;
       } else {
@@ -467,8 +470,14 @@ function removeFunction(index) {
 
 // end include: runtime_debug.js
 var tempRet0 = 0;
-var setTempRet0 = (value) => { tempRet0 = value; };
-var getTempRet0 = () => tempRet0;
+
+var setTempRet0 = function(value) {
+  tempRet0 = value;
+};
+
+var getTempRet0 = function() {
+  return tempRet0;
+};
 
 
 
@@ -500,7 +509,8 @@ if (typeof WebAssembly !== 'object') {
     @param {number} value
     @param {string} type
     @param {number|boolean=} noSafe */
-function setValue(ptr, value, type = 'i8', noSafe) {
+function setValue(ptr, value, type, noSafe) {
+  type = type || 'i8';
   if (type.charAt(type.length-1) === '*') type = 'i32';
     switch (type) {
       case 'i1': HEAP8[((ptr)>>0)] = value; break;
@@ -517,7 +527,8 @@ function setValue(ptr, value, type = 'i8', noSafe) {
 /** @param {number} ptr
     @param {string} type
     @param {number|boolean=} noSafe */
-function getValue(ptr, type = 'i8', noSafe) {
+function getValue(ptr, type, noSafe) {
+  type = type || 'i8';
   if (type.charAt(type.length-1) === '*') type = 'i32';
     switch (type) {
       case 'i1': return HEAP8[((ptr)>>0)];
@@ -553,16 +564,14 @@ var EXITSTATUS;
 /** @type {function(*, string=)} */
 function assert(condition, text) {
   if (!condition) {
-    // This build was created without ASSERTIONS defined.  `assert()` should not
-    // ever be called in this configuration but in case there are callers in
-    // the wild leave this simple abort() implemenation here for now.
-    abort(text);
+    abort('Assertion failed: ' + text);
   }
 }
 
 // Returns the C function with a specified identifier (for C++, you need to do manual name mangling)
 function getCFunc(ident) {
   var func = Module['_' + ident]; // closure exported function
+  assert(func, 'Cannot call unknown function ' + ident + ', make sure it is exported');
   return func;
 }
 
@@ -1553,6 +1562,13 @@ var ASM_CONSTS = {
       return _malloc(size + 16) + 16;
     }
 
+  function _atexit(func, arg) {
+    }
+  function ___cxa_atexit(a0,a1
+  ) {
+  return _atexit(a0,a1);
+  }
+
   function ExceptionInfo(excPtr) {
       this.excPtr = excPtr;
       this.ptr = excPtr - 16;
@@ -1858,7 +1874,7 @@ var ASM_CONSTS = {
               var bytesRead = 0;
   
               try {
-                bytesRead = fs.readSync(process.stdin.fd, buf, 0, BUFSIZE, null);
+                bytesRead = nodeFS.readSync(process.stdin.fd, buf, 0, BUFSIZE, null);
               } catch(e) {
                 // Cross-platform differences: on Windows, reading EOF throws an exception, but on other OSes,
                 // reading EOF returns 0. Uniformize behavior by treating the EOF exception to return 0.
@@ -2277,8 +2293,7 @@ var ASM_CONSTS = {
           "2": flags["O_RDWR"],
           "4096": flags["O_SYNC"],
           "512": flags["O_TRUNC"],
-          "1": flags["O_WRONLY"],
-          "131072": flags["O_NOFOLLOW"],
+          "1": flags["O_WRONLY"]
         };
       },convertNodeCode:function(e) {
         var code = e.code;
@@ -2450,13 +2465,10 @@ var ASM_CONSTS = {
           var path = NODEFS.realPath(node);
           try {
             path = fs.readlinkSync(path);
-            path = nodePath.relative(nodePath.resolve(node.mount.opts.root), path);
+            path = NODEJS_PATH.relative(NODEJS_PATH.resolve(node.mount.opts.root), path);
             return path;
           } catch (e) {
             if (!e.code) throw e;
-            // node under windows can return code 'UNKNOWN' here:
-            // https://github.com/emscripten-core/emscripten/issues/15468
-            if (e.code === 'UNKNOWN') throw new FS.ErrnoError(28);
             throw new FS.ErrnoError(NODEFS.convertNodeCode(e));
           }
         }},stream_ops:{open:function (stream) {
@@ -2667,8 +2679,9 @@ var ASM_CONSTS = {
           }
           return position;
         }}};
-  var FS = {root:null,mounts:[],devices:{},streams:[],nextInode:1,nameTable:null,currentPath:"/",initialized:false,ignorePermissions:true,ErrnoError:null,genericErrors:{},filesystems:null,syncFSRequests:0,lookupPath:function(path, opts = {}) {
+  var FS = {root:null,mounts:[],devices:{},streams:[],nextInode:1,nameTable:null,currentPath:"/",initialized:false,ignorePermissions:true,ErrnoError:null,genericErrors:{},filesystems:null,syncFSRequests:0,lookupPath:function(path, opts) {
         path = PATH_FS.resolve(FS.cwd(), path);
+        opts = opts || {};
   
         if (!path) return { path: '', node: null };
   
@@ -2881,7 +2894,9 @@ var ASM_CONSTS = {
           }
         }
         return FS.nodePermissions(node, FS.flagsToPermissionString(flags));
-      },MAX_OPEN_FDS:4096,nextfd:function(fd_start = 0, fd_end = FS.MAX_OPEN_FDS) {
+      },MAX_OPEN_FDS:4096,nextfd:function(fd_start, fd_end) {
+        fd_start = fd_start || 0;
+        fd_end = fd_end || FS.MAX_OPEN_FDS;
         for (var fd = fd_start; fd <= fd_end; fd++) {
           if (!FS.streams[fd]) {
             return fd;
@@ -3245,9 +3260,6 @@ var ASM_CONSTS = {
       },unlink:function(path) {
         var lookup = FS.lookupPath(path, { parent: true });
         var parent = lookup.node;
-        if (!parent) {
-          throw new FS.ErrnoError(44);
-        }
         var name = PATH.basename(path);
         var node = FS.lookupNode(parent, name);
         var errCode = FS.mayDelete(parent, name, false);
@@ -3600,7 +3612,8 @@ var ASM_CONSTS = {
           throw new FS.ErrnoError(59);
         }
         return stream.stream_ops.ioctl(stream, cmd, arg);
-      },readFile:function(path, opts = {}) {
+      },readFile:function(path, opts) {
+        opts = opts || {};
         opts.flags = opts.flags || 0;
         opts.encoding = opts.encoding || 'binary';
         if (opts.encoding !== 'utf8' && opts.encoding !== 'binary') {
@@ -3619,7 +3632,8 @@ var ASM_CONSTS = {
         }
         FS.close(stream);
         return ret;
-      },writeFile:function(path, data, opts = {}) {
+      },writeFile:function(path, data, opts) {
+        opts = opts || {};
         opts.flags = opts.flags || 577;
         var stream = FS.open(path, opts.flags, opts.mode);
         if (typeof data === 'string') {
@@ -3778,6 +3792,8 @@ var ASM_CONSTS = {
       },quit:function() {
         FS.init.initialized = false;
         // force-flush all streams, so we get musl std streams printed out
+        var fflush = Module['_fflush'];
+        if (fflush) fflush(0);
         // close all of our streams
         for (var i = 0; i < FS.streams.length; i++) {
           var stream = FS.streams[i];
@@ -4285,8 +4301,9 @@ var ASM_CONSTS = {
           // need a valid mode
           return -28;
         }
+        var node;
         var lookup = FS.lookupPath(path, { follow: true });
-        var node = lookup.node;
+        node = lookup.node;
         if (!node) {
           return -44;
         }
@@ -4361,8 +4378,8 @@ var ASM_CONSTS = {
           stream.flags |= arg;
           return 0;
         }
-        case 5:
-        /* case 5: Currently in musl F_GETLK64 has same value as F_GETLK, so omitted to avoid duplicate case blocks. If that changes, uncomment this */ {
+        case 12:
+        /* case 12: Currently in musl F_GETLK64 has same value as F_GETLK, so omitted to avoid duplicate case blocks. If that changes, uncomment this */ {
           
           var arg = SYSCALLS.get();
           var offset = 0;
@@ -4370,10 +4387,10 @@ var ASM_CONSTS = {
           HEAP16[(((arg)+(offset))>>1)] = 2;
           return 0;
         }
-        case 6:
-        case 7:
-        /* case 6: Currently in musl F_SETLK64 has same value as F_SETLK, so omitted to avoid duplicate case blocks. If that changes, uncomment this */
-        /* case 7: Currently in musl F_SETLKW64 has same value as F_SETLKW, so omitted to avoid duplicate case blocks. If that changes, uncomment this */
+        case 13:
+        case 14:
+        /* case 13: Currently in musl F_SETLK64 has same value as F_SETLK, so omitted to avoid duplicate case blocks. If that changes, uncomment this */
+        /* case 14: Currently in musl F_SETLKW64 has same value as F_SETLKW, so omitted to avoid duplicate case blocks. If that changes, uncomment this */
           
           
           return 0; // Pretend that the locking is successful.
@@ -4389,7 +4406,7 @@ var ASM_CONSTS = {
         }
       }
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return -e.errno;
   }
   }
@@ -4443,7 +4460,7 @@ var ASM_CONSTS = {
         default: abort('bad ioctl syscall ' + op);
       }
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return -e.errno;
   }
   }
@@ -4456,7 +4473,7 @@ var ASM_CONSTS = {
       var stream = FS.open(pathname, flags, mode);
       return stream.fd;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return -e.errno;
   }
   }
@@ -4596,7 +4613,9 @@ var ASM_CONSTS = {
       }
     }
   /** @param {Object=} options */
-  function registerType(rawType, registeredInstance, options = {}) {
+  function registerType(rawType, registeredInstance, options) {
+      options = options || {};
+  
       if (!('argPackAdvance' in registeredInstance)) {
           throw new TypeError('registerType registeredInstance requires argPackAdvance');
       }
@@ -4702,7 +4721,7 @@ var ASM_CONSTS = {
       throwBindingError(getInstanceTypeName(obj) + ' instance already deleted');
     }
   
-  var finalizationGroup = false;
+  var finalizationRegistry = false;
   
   function detachFinalizer(handle) {}
   
@@ -4721,30 +4740,25 @@ var ASM_CONSTS = {
       }
     }
   function attachFinalizer(handle) {
-      if ('undefined' === typeof FinalizationGroup) {
-          attachFinalizer = (handle) => handle;
+      if ('undefined' === typeof FinalizationRegistry) {
+          attachFinalizer = function (handle) { return handle; };
           return handle;
       }
-      // If the running environment has a FinalizationGroup (see
+      // If the running environment has a FinalizationRegistry (see
       // https://github.com/tc39/proposal-weakrefs), then attach finalizers
-      // for class handles.  We check for the presence of FinalizationGroup
+      // for class handles.  We check for the presence of FinalizationRegistry
       // at run-time, not build-time.
-      finalizationGroup = new FinalizationGroup(function (iter) {
-          for (var result = iter.next(); !result.done; result = iter.next()) {
-              var $$ = result.value;
-              if (!$$.ptr) {
-                  console.warn('object already deleted: ' + $$.ptr);
-              } else {
-                  releaseClassHandle($$);
-              }
-          }
+      finalizationRegistry = new FinalizationRegistry(function (info) {
+        releaseClassHandle(info.$$);
       });
-      attachFinalizer = (handle) => {
-          finalizationGroup.register(handle, handle.$$, handle.$$);
-          return handle;
+      attachFinalizer = function(handle) {
+        var $$ = handle.$$;
+        var info = { $$: $$ };
+        finalizationRegistry.register(handle, info, handle);
+        return handle;
       };
-      detachFinalizer = (handle) => {
-          finalizationGroup.unregister(handle.$$);
+      detachFinalizer = function(handle) {
+          finalizationRegistry.unregister(handle);
       };
       return attachFinalizer(handle);
     }
@@ -5484,7 +5498,7 @@ var ASM_CONSTS = {
           if (undefined !== classType.registeredClass.constructor_body[argCount - 1]) {
               throw new BindingError("Cannot register multiple constructors with identical number of parameters (" + (argCount-1) + ") for class '" + classType.name + "'! Overload resolution is currently only performed using the parameter count, not actual type info!");
           }
-          classType.registeredClass.constructor_body[argCount - 1] = () => {
+          classType.registeredClass.constructor_body[argCount - 1] = function unboundTypeHandler() {
               throwUnboundTypeError('Cannot construct ' + classType.name + ' due to unbound types', rawArgTypes);
           };
   
@@ -5788,11 +5802,14 @@ var ASM_CONSTS = {
       registerType(rawType, {
           name: name,
           'fromWireType': function(value) {
-               return value;
+              return value;
           },
           'toWireType': function(destructors, value) {
-              // The VM will perform JS to Wasm value conversion, according to the spec:
-              // https://www.w3.org/TR/wasm-js-api-1/#towebassemblyvalue
+              // todo: Here we have an opportunity for -O3 level "unsafe" optimizations: we could
+              // avoid the following if() and assume value is of proper type.
+              if (typeof value !== "number" && typeof value !== "boolean") {
+                  throw new TypeError('Cannot convert "' + _embind_repr(value) + '" to ' + this.name);
+              }
               return value;
           },
           'argPackAdvance': 8,
@@ -5825,34 +5842,33 @@ var ASM_CONSTS = {
   
       var shift = getShiftFromSize(size);
   
-      var fromWireType = (value) => value;
+      var fromWireType = function(value) {
+          return value;
+      };
   
       if (minRange === 0) {
           var bitshift = 32 - 8*size;
-          fromWireType = (value) => (value << bitshift) >>> bitshift;
+          fromWireType = function(value) {
+              return (value << bitshift) >>> bitshift;
+          };
       }
   
       var isUnsignedType = (name.includes('unsigned'));
-      var checkAssertions = (value, toTypeName) => {
-      }
-      var toWireType;
-      if (isUnsignedType) {
-          toWireType = function(destructors, value) {
-              checkAssertions(value, this.name);
-              return value >>> 0;
-          }
-      } else {
-          toWireType = function(destructors, value) {
-              checkAssertions(value, this.name);
-              // The VM will perform JS to Wasm value conversion, according to the spec:
-              // https://www.w3.org/TR/wasm-js-api-1/#towebassemblyvalue
-              return value;
-          }
-      }
+  
       registerType(primitiveType, {
           name: name,
           'fromWireType': fromWireType,
-          'toWireType': toWireType,
+          'toWireType': function(destructors, value) {
+              // todo: Here we have an opportunity for -O3 level "unsafe" optimizations: we could
+              // avoid the following two if()s and assume value is of proper type.
+              if (typeof value !== "number" && typeof value !== "boolean") {
+                  throw new TypeError('Cannot convert "' + _embind_repr(value) + '" to ' + this.name);
+              }
+              if (value < minRange || value > maxRange) {
+                  throw new TypeError('Passing a number "' + _embind_repr(value) + '" from JS side to C/C++ side to an argument of type "' + name + '", which is outside the valid range [' + minRange + ', ' + maxRange + ']!');
+              }
+              return isUnsignedType ? (value >>> 0) : (value | 0);
+          },
           'argPackAdvance': 8,
           'readValueFromPointer': integerReadValueFromPointer(name, shift, minRange !== 0),
           destructorFunction: null, // This type does not need a destructor
@@ -5945,9 +5961,9 @@ var ASM_CONSTS = {
                   throwBindingError('Cannot pass non-string to std::string');
               }
               if (stdStringIsUTF8 && valueIsOfTypeString) {
-                  getLength = () => lengthBytesUTF8(value);
+                  getLength = function() {return lengthBytesUTF8(value);};
               } else {
-                  getLength = () => value.length;
+                  getLength = function() {return value.length;};
               }
   
               // assumes 4-byte alignment
@@ -5991,13 +6007,13 @@ var ASM_CONSTS = {
           decodeString = UTF16ToString;
           encodeString = stringToUTF16;
           lengthBytesUTF = lengthBytesUTF16;
-          getHeap = () => HEAPU16;
+          getHeap = function() { return HEAPU16; };
           shift = 1;
       } else if (charSize === 4) {
           decodeString = UTF32ToString;
           encodeString = stringToUTF32;
           lengthBytesUTF = lengthBytesUTF32;
-          getHeap = () => HEAPU32;
+          getHeap = function() { return HEAPU32; };
           shift = 2;
       }
       registerType(rawType, {
@@ -6115,16 +6131,11 @@ var ASM_CONSTS = {
       }
       return a;
     }
-  
-  var emval_registeredMethods = [];
   function __emval_get_method_caller(argCount, argTypes) {
       var types = __emval_lookupTypes(argCount, argTypes);
+  
       var retType = types[0];
       var signatureName = retType.name + "_$" + types.slice(1).map(function (t) { return t.name; }).join("_") + "$";
-      var returnId = emval_registeredMethods[signatureName];
-      if (returnId !== undefined) {
-        return returnId;
-      }
   
       var params = ["retType"];
       var args = [retType];
@@ -6163,9 +6174,7 @@ var ASM_CONSTS = {
   
       params.push(functionBody);
       var invokerFunction = new_(Function, params).apply(null, args);
-      returnId = __emval_addMethodCaller(invokerFunction);
-      emval_registeredMethods[signatureName] = returnId;
-      return returnId;
+      return __emval_addMethodCaller(invokerFunction);
     }
 
   function __emval_incref(handle) {
@@ -6309,7 +6318,7 @@ var ASM_CONSTS = {
       FS.close(stream);
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return e.errno;
   }
   }
@@ -6318,10 +6327,10 @@ var ASM_CONSTS = {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
       var num = SYSCALLS.doReadv(stream, iov, iovcnt);
-      HEAP32[((pnum)>>2)] = num;
+      HEAP32[((pnum)>>2)] = num
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return e.errno;
   }
   }
@@ -6345,7 +6354,7 @@ var ASM_CONSTS = {
       if (stream.getdents && offset === 0 && whence === 0) stream.getdents = null; // reset readdir state
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return e.errno;
   }
   }
@@ -6355,10 +6364,10 @@ var ASM_CONSTS = {
       ;
       var stream = SYSCALLS.getStreamFromFD(fd);
       var num = SYSCALLS.doWritev(stream, iov, iovcnt);
-      HEAP32[((pnum)>>2)] = num;
+      HEAP32[((pnum)>>2)] = num
       return 0;
     } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return e.errno;
   }
   }
@@ -6775,7 +6784,7 @@ var ASM_CONSTS = {
   });
   FS.FSNode = FSNode;
   FS.staticInit();;
-if (ENVIRONMENT_IS_NODE) { requireNodeFS(); NODEFS.staticInit(); };
+if (ENVIRONMENT_IS_NODE) { var fs = require("fs"); var NODEJS_PATH = require("path"); NODEFS.staticInit(); };
 ERRNO_CODES = {
       'EPERM': 63,
       'ENOENT': 44,
@@ -6939,6 +6948,7 @@ function intArrayToString(array) {
 var asmLibraryArg = {
   "__assert_fail": ___assert_fail,
   "__cxa_allocate_exception": ___cxa_allocate_exception,
+  "__cxa_atexit": ___cxa_atexit,
   "__cxa_throw": ___cxa_throw,
   "__syscall_fcntl64": ___syscall_fcntl64,
   "__syscall_ioctl": ___syscall_ioctl,
