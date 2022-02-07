@@ -13,3 +13,5 @@ do
     cp ../bin/$BUILD_TARGET.js ../deploy/
     cp ../bin/$BUILD_TARGET.wasm ../deploy/
 done
+
+cd ..
