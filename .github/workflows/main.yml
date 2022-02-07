@@ -33,8 +33,14 @@ jobs:
       - name: Compile everything with emscripten
         run: sh CI_build_script.sh
 
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
+#       - name: Archive production artifacts
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: Compiled-artifacts
+#           path: deploy/
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: Compiled-artifacts
-          path: deploy/
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
