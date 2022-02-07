@@ -36,16 +36,11 @@ public:
     
     double * get_data(DataValue datavalue, int dd) 
     { 
-        printf("%d %d\n", data.size(), data[0].size()) ; 
         switch(datavalue) {
-            case DataValue::pos :    
-        printf("POS %lu\n", &(data[0+dd][0])) ; fflush(stdout) ;return &(data[0+dd][0] ) ;
-            case DataValue::vel :    
-        printf("VEL %lu\n", &(data[dimension*1+dd][0] )) ; fflush(stdout) ;return &(data[dimension*1+dd][0] ) ;
-            case DataValue::radius : 
-        printf("RAD %lu\n", &(data[dimension*2][0])) ; fflush(stdout) ;return &(data[dimension*2][0]) ;
-            case DataValue::mass :   
-        printf("MAS %lu\n", &(data[dimension*2+1][0]) ) ; fflush(stdout) ;return &(data[dimension*2+1][0]) ;
+            case DataValue::pos : return &(data[0+dd][0] ) ;
+            case DataValue::vel : return &(data[dimension*1+dd][0] ) ;
+            case DataValue::radius : return &(data[dimension*2][0]) ;
+            case DataValue::mass : return &(data[dimension*2+1][0]) ;
             
             default : return (nullptr) ; 
         }

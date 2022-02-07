@@ -44,6 +44,7 @@ const renderWindow = fullScreenRenderer.getRenderWindow();
 fullScreenRenderer.addController(controlPanel);
 
 var dispts = 0 ;
+var defaultdensity = -1 ; 
 
 // ----------------------------------------------------------------------------
 // Example code
@@ -115,9 +116,6 @@ actor.getProperty().setSpecularPower(8.0);
 
 mapper.setInputData(imageData);
 
-// clipPlane1.setNormal([1,0,0]);
-// clipPlane1.setOrigin([25,25,25]);
-// mapper.addClippingPlane(clipPlane1);
 
 renderer.addVolume(actor);
 
@@ -144,20 +142,24 @@ interactorStyle.addMouseManipulator(manipulator4);
 interactorStyle.addGestureManipulator(vtkGestureCameraManipulator.newInstance());
 renderWindow.getInteractor().setInteractorStyle(interactorStyle);
 
-const axes = vtkAxesActor.newInstance({ pickable: true });
-const orientationWidget = vtkOrientationMarkerWidget.newInstance({
-  actor: axes,
-  interactor: interactor,
-});
+// const axes = vtkAxesActor.newInstance({ pickable: true });
+// const orientationWidget = vtkOrientationMarkerWidget.newInstance({
+//   actor: axes,
+//   interactor: interactor,
+// });
 // orientationWidget.setViewportCorner(
 //   vtkOrientationMarkerWidget.Corners.BOTTOM_LEFT
 // );
-orientationWidget.setEnabled(true) ; 
-orientationWidget.setMinPixelSize(100);
-orientationWidget.setMaxPixelSize(300);
+// orientationWidget.setEnabled(true) ; 
+// orientationWidget.setMinPixelSize(100);
+// orientationWidget.setMaxPixelSize(300);
 // renderer
 //   .getActiveCamera()
 //   .onModified(orientationWidget.updateMarkerOrientation);
+
+clipPlane1.setNormal([1,0,0]);
+clipPlane1.setOrigin([0,0,0]);
+mapper.addClippingPlane(clipPlane1);
 
 renderWindow.render();
 
@@ -449,6 +451,8 @@ function generateallparameters () {
     var times=timeslider.noUiSlider.get() ; 
     data["skip"]=parseInt(times[0]) ; 
     data["max time"]=parseInt(times[1])-parseInt(times[0]) ;
+    dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]}}) ; 
+    dispslider.noUiSlider.set(data["skip"]) ; 
     
     data["time average"]=document.getElementById("timeaverage").value ; 
     
@@ -461,6 +465,9 @@ function generateallparameters () {
     var select = document.getElementById('saveformat');
     data["saveformat"] = [...document.getElementById('saveformat').selectedOptions].map(option => option.value);
     data["save"] = document.getElementById('savefile').value; 
+    
+    if (defaultdensity != -1)
+        data["density"]=defaultdensity ; 
     
     console.log(data) ; 
     return (data) ; 
@@ -503,7 +510,13 @@ document.getElementById('loadjsonfile').addEventListener('change', function() {
         
         timeslider.noUiSlider.updateOptions({range: {'min': 0,'max': data["skip"]+data["max time"]}}) ; 
         timeslider.noUiSlider.set([data["skip"], data["skip"]+data["max time"]]) ;
-        document.getElementById("timeaverage").value = data["time average"] ; 
+        document.getElementById("timeaverage").value = data["time average"] ;
+        
+        dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]}}) ; 
+        dispslider.noUiSlider.set(data["skip"]) ; 
+        
+        if (data["density"])
+            defaultdensity=data["density"] ; 
     
         var fieldlst= ["RHO", "I", "VAVG",  "TC", "TK", "ROT", "MC", "MK" , "mC", "EKT", "eKT", "EKR", "eKR", "qTC", "qTK", "qRC", "qRK", "zT" , "zR", "TotalStress", "Pressure", "KineticPressure", "ShearStress", "StrainRate", "VolumetricStrainRate", "ShearStrainRate", "RotationalVelocity", "RotationalVelocityMag"] ;    
         fieldlst.forEach(name => document.getElementById(name).checked = false) ; 
@@ -586,6 +599,67 @@ document.getElementById('component').addEventListener('change', async() => {
     }
 }) ; 
 
+document.getElementById('resetcam').addEventListener('click', async() => {
+    renderer.resetCamera();
+    renderWindow.render();
+}) ; 
+
+document.getElementById('cliptype').addEventListener('change', async() => {
+    var field = document.getElementById('cliptype').value; 
+    
+    document.getElementById("xmin").value
+document.getElementById("ymin").value
+document.getElementById("zmin").value
+document.getElementById("xmax").value
+document.getElementById("ymax").value
+document.getElementById("zmax").value
+    
+    if (field==0)
+    {
+        document.getElementById('cliprange').disabled=true ; 
+        clipPlane1.setNormal([1,0,0]);
+        clipPlane1.setOrigin([parseFloat(document.getElementById('xmin').value),0,0]);
+        renderWindow.render();
+    }
+    else 
+    {
+        console.log(field) ; 
+        document.getElementById('cliprange').disabled=false ; 
+        document.getElementById('cliprange').min = document.getElementById(field+"min").value ; 
+        document.getElementById('cliprange').max = document.getElementById(field+"max").value ; 
+        document.getElementById('cliprange').value = (parseFloat(document.getElementById('cliprange').max)+parseFloat(document.getElementById('cliprange').min))/2
+        document.getElementById('cliprangemin').innerHTML = document.getElementById('cliprange').min ;
+        document.getElementById('cliprangemax').innerHTML = document.getElementById('cliprange').max ;
+        if (field=="x")
+        {
+            clipPlane1.setNormal([1,0,0]);
+            clipPlane1.setOrigin([parseFloat(document.getElementById('cliprange').value),0,0]);
+        }
+        else if (field=="y")
+        {
+            clipPlane1.setNormal([0,1,0]);
+            clipPlane1.setOrigin([0,parseFloat(document.getElementById('cliprange').value),0]);
+        }
+        else
+        {
+            clipPlane1.setNormal([0,0,1]);
+            clipPlane1.setOrigin([0,0,parseFloat(document.getElementById('cliprange').value)]);
+        }
+        renderWindow.render();
+    }
+}) ; 
+
+document.getElementById('cliprange').addEventListener('change', async() => {
+    var field = document.getElementById('cliptype').value; 
+    if (field=="x")
+        clipPlane1.setOrigin([parseFloat(document.getElementById('cliprange').value),0,0]);
+    else if (field=="y")
+        clipPlane1.setOrigin([0,parseFloat(document.getElementById('cliprange').value),0]);
+    else
+        clipPlane1.setOrigin([0,0,parseFloat(document.getElementById('cliprange').value)]);
+    renderWindow.render();
+});
+
 dispslider.noUiSlider.on('change', function() {
     updated=false ; 
     if (document.getElementById('autoupdate').checked)
@@ -597,6 +671,14 @@ dispslider.noUiSlider.on('change', function() {
         });
         document.getElementById('updateCG').dispatchEvent(ev);
     }
+});
+
+document.getElementById('lockcscale').addEventListener('change', async () => {
+    if (document.getElementById('lockcscale').checked) 
+        document.getElementById('lockcscalelbl').innerHTML="&#128274;" ; 
+    else
+        document.getElementById('lockcscalelbl').innerHTML="&#128275;" ; 
+        
 });
 
 // Messages from the worker --------------------------------------------
@@ -657,12 +739,23 @@ worker.onmessage = function (e)
     img.setExtent(0, e.data[2][6]-1, 0, e.data[2][7]-1, 0, e.data[2][8]-1);
     img.getPointData().setScalars(scalars);
     
-    var imgmax = e.data[1].reduce(function(a, b) {return Math.max(a, b);}, 0);
-    var imgmin = e.data[1].reduce(function(a, b) {return Math.min(a, b);}, 0);
-    lookupTable.setMappingRange(...[imgmin,imgmax]);
+    if (document.getElementById('lockcscale').checked)
+    {
+        var imgmin = parseFloat(document.getElementById('cmin').value) ; 
+        var imgmax = parseFloat(document.getElementById('cmax').value) ; 
+        lookupTable.setMappingRange(...[imgmin,imgmax]);
+    }
+    else
+    {
+        var imgmax = e.data[1].reduce(function(a, b) {return Math.max(a, b);}, 0);
+        var imgmin = e.data[1].reduce(function(a, b) {return Math.min(a, b);}, 0);
+        lookupTable.setMappingRange(...[imgmin,imgmax]);
+        document.getElementById('cmin').value = imgmin ; 
+        document.getElementById('cmax').value = imgmax ; 
+    }
     lookupTable.updateRange();
     mapper.setInputData(img);
-    renderer.resetCamera();
+    //renderer.resetCamera();
     renderWindow.render();
  }
     

@@ -93,7 +93,7 @@ MercuryReader_data_particles::MercuryReader_data_particles(std::string ppath)
   std::string line ; 
   getline(file_in, line) ;  
   int res=std::count(line.begin(), line.end(), ' ');
-  printf("%d ", res) ; fflush(stdout) ; 
+  
   if (res==8) 
   {
     dimension=3 ;

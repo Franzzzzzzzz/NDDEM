@@ -89,8 +89,10 @@ void CoarseGraining::setup_CG ()
     C->cT=-1 ;
 }
 //-----------------------------------------
-int CoarseGraining::process_timestep (int ts, bool allow_avg_fluct) 
+int CoarseGraining::process_timestep (int ts_abs, bool allow_avg_fluct) 
 {
+    int ts = ts_abs - P.skipT ; 
+    
     if ((P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) && 
         (((pipeline & Pass::VelFluct) && !C->hasvelfluct) || 
             ((pipeline & Pass::RotFluct) && !C->hasrotfluct)))
@@ -142,7 +144,7 @@ void CoarseGraining::process_all ()
     for (int ts=0 ; ts<P.maxT ; ts++)
     {
         printf("\r%d ", ts) ; 
-        process_timestep(ts, true) ;
+        process_timestep(ts+P.skipT, true) ;
     }
     if (P.timeaverage == AverageType::Final || P.timeaverage == AverageType::Both)
         C->mean_time(false) ; 
@@ -156,8 +158,9 @@ void CoarseGraining::write ()
     if (std::find(P.saveformat.begin(), P.saveformat.end(), "numpy")!=P.saveformat.end()) C->write_numpy(P.save, true) ;
 }
 //------------------------------------------------------
-std::vector<double> CoarseGraining::get_result(int ts, std::string field, int component)
+std::vector<double> CoarseGraining::get_result(int ts_abs, std::string field, int component)
 {
+ int ts = ts_abs - P.skipT ; 
  if (ts != C->cT) {printf("The requested timestep has not been processed.\n"); return {} ; }
  int idx = C->get_id(field) ; 
  idx += component ; 
