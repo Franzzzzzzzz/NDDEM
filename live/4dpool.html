@@ -194,7 +194,8 @@
 
 				add_spheres();
 
-                STLFilename = './stls/4d-pool.stl';
+                // STLFilename = './stls/4d-pool.stl'; // this one has crap pockets
+                STLFilename = './stls/4d-pool-no-holes.stl';
                 // const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
                     // t.encoding = THREE.sRGBEncoding;
                     // t.mapping = THREE.EquirectangularReflectionMapping;
@@ -452,14 +453,14 @@
                 }
                 for ( let i = 0; i < params.N; i ++ ) {
                     var object = spheres.children[i];
-                    if ( object.visible ) {
-                        if ( in_pocket(x[i]) ) {
-                            object.visible = false;
-                            sunk_balls.push(i)
-                            S.fixParticle(i, [1.1*params.L, sunk_balls.length, 0, 0])
-                            S.setFrozen(i);
-                        }
-                    }
+                    // if ( object.visible ) {
+                    //     if ( in_pocket(x[i]) ) {
+                    //         object.visible = false;
+                    //         sunk_balls.push(i)
+                    //         S.fixParticle(i, [1.1*params.L, sunk_balls.length, 0, 0])
+                    //         S.setFrozen(i);
+                    //     }
+                    // }
 
                     // const matrix = new THREE.Matrix4();
                     // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
