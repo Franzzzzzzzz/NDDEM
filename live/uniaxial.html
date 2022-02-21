@@ -94,6 +94,7 @@
                 quality: 5,
                 vmax: 20, // max velocity to colour by
                 omegamax: 20, // max rotation rate to colour by
+                loading_active: false,
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -163,9 +164,10 @@
 					// .name( 'Solids fraction' ).listen();
 					// .onChange( function () { refresh_simulation(); } );
                 if ( loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
-                        .name( 'Vertical strain (W/S)').listen()
-                        .onChange( function () { WALLS.update_top_wall(params, S); } );
+                    // gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
+                        // .name( 'Vertical strain (W/S)').listen()
+                        // .onChange( function () { WALLS.update_top_wall(params, S); } );
+                    gui.add( params, 'loading_active').name( 'Loading active' ).listen();
                     gui.add( params, 'loading_rate', 0.00001, 0.001, 0.00001).name( 'Loading rate' );
                     }
                 else if ( loading_method === 'stress_controlled' ) {
@@ -267,6 +269,16 @@
                         if ( started ) {
                             // counter = counter + 1;
                             // if ( counter == 5 ) { update_top_wall(params, S)aph(); counter = 0; }
+                            if ( params.loading_active) {
+                                params.vertical_strain += params.loading_rate;
+                                if ( (params.vertical_strain > params.max_vertical_strain) || (params.vertical_strain <= 0) ) {
+                                    // params.loading_active = false;
+                                    params.loading_rate = - params.loading_rate;
+                                }
+                                WALLS.update_top_wall(params, S);
+                                console.log(params.vertical_strain)
+
+                            }
                             update_graph();
                     }
 
