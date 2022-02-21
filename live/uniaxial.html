@@ -88,7 +88,7 @@
                 r_min: 0.45,
                 freq: 0.05,
                 new_line: false,
-                loading_rate: 0.0001,
+                loading_rate: 0.01,
                 max_vertical_strain: 0.3,
                 lut: 'None',
                 quality: 5,
@@ -168,7 +168,7 @@
                         // .name( 'Vertical strain (W/S)').listen()
                         // .onChange( function () { WALLS.update_top_wall(params, S); } );
                     gui.add( params, 'loading_active').name( 'Loading active' ).listen();
-                    gui.add( params, 'loading_rate', 0.00001, 0.001, 0.00001).name( 'Loading rate' );
+                    gui.add( params, 'loading_rate', 0.001, 0.1, 0.001).name( 'Loading rate' );
                     }
                 else if ( loading_method === 'stress_controlled' ) {
                     gui.add( params, 'pressure_set_pt', 0,1e5, 1)
@@ -199,7 +199,7 @@
                         else {
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
-                gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
+                gui.add ( params, 'paused').name('Paused').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {
                         // params.vertical_strain = 0;
@@ -270,13 +270,15 @@
                             // counter = counter + 1;
                             // if ( counter == 5 ) { update_top_wall(params, S)aph(); counter = 0; }
                             if ( params.loading_active) {
-                                params.vertical_strain += params.loading_rate;
+                                var dt = new_time - old_time;
+                                console.log(dt)
+                                params.vertical_strain += params.loading_rate*dt;
                                 if ( (params.vertical_strain > params.max_vertical_strain) || (params.vertical_strain <= 0) ) {
                                     // params.loading_active = false;
                                     params.loading_rate = - params.loading_rate;
                                 }
                                 WALLS.update_top_wall(params, S);
-                                console.log(params.vertical_strain)
+                                // console.log(params.vertical_strain)
 
                             }
                             update_graph();

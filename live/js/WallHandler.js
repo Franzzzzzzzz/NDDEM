@@ -129,7 +129,7 @@ export function update_walls(params, S, dt=0.001) {
 
 }
 
-export function update_triaxial_walls(params, S, dt=0.001) {
+export function update_triaxial_walls(params, S, dt=1) {
     params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L_cur-params.W_cur,params.dimension-1)/(params.L_cur - params.H_cur)/Math.pow(2,params.dimension);
     // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
@@ -142,7 +142,7 @@ export function update_triaxial_walls(params, S, dt=0.001) {
     }
     if ( params.shear_active ) {
         if ( params.constant_volume ) {
-            params.H_cur += params.loading_rate
+            params.H_cur += params.loading_rate*dt
             params.W_cur = params.L_cur - Math.sqrt(params.V_const/(params.L_cur - params.H_cur));
             // console.log(params.W_cur)
         } else {
@@ -150,7 +150,7 @@ export function update_triaxial_walls(params, S, dt=0.001) {
             let delta_p = p_controller.update(params.pressure_set_pt,params.current_pressure,dt);
             params.W_cur -= delta_p;
             // strain controlled loading axially
-            params.H_cur += params.loading_rate
+            params.H_cur += params.loading_rate*dt
         }
     }
 
