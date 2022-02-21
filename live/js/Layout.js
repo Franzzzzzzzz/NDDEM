@@ -164,90 +164,95 @@ let plotly_data_3d = [{
 //       }
 //     }
 
-export let plotly_data_three_lines_2d = [{
-  type: 'scatter',
-  mode: 'lines',
-  x: [],
-  y: [],
-  name: 'Velocity',
-  // opacity: 1,
-  line: {
-    width: 5,
-    color: "black",
-    // reversescale: false
-  },
-}, {
-  type: 'scatter',
-  mode: 'lines',
-  x: [],
-  y: [],
-  name: 'Pressure (p)',
-  // opacity: 1,
-  line: {
-    width: 5,
-    color: "blue",
-    // reversescale: false
-  },
-  xaxis: 'x2'
-}, {
-  type: 'scatter',
-  mode: 'lines',
-  x: [],
-  y: [],
-  name: 'Shear stress (q)',
-  // opacity: 1,
-  line: {
-    // dash: 'dash',
-    dash: "8px,8px",
-    width: 5,
-    color: "blue",
-    // reversescale: false
-  },
-  xaxis: 'x2'
-}]
-export let plotly_layout_three_lines_2d = {
-      // height: 300,
-      // width: 500,
-      xaxis: {
-        // linecolor: 'white',
-        autotick: true,
-        // autorange: true,
-        // range: [-maxVelocity, maxVelocity],
-        // range: [-1,1],
-        automargin: true,
-        title: 'Average velocity (m/s)',
-        side: 'bottom'
-        // title: 'Vertical displacement (mm)'
-    },
-      yaxis: {
-        // linecolor: 'white',
-        autotick: true,
-        autorange: true,
-        automargin: true,
-        title: 'Location (mm)',
-        // color: 'black',
-    },
-    xaxis2: {
-        autotick: true,
-        autorange: true,
-        automargin: true,
-        title: 'Stress (kPa)',
-        overlaying: 'x',
-        side: 'top',
-        rangemode: 'tozero',
-        color: 'blue'
+export function plotly_two_xaxis_graph(xlabel1, xlabel2, ylabel, trace0, trace1, trace2) {
+    let layout = {
+          // height: 300,
+          // width: 500,
+          xaxis: {
+            // linecolor: 'white',
+            autotick: true,
+            // autorange: true,
+            // range: [-maxVelocity, maxVelocity],
+            // range: [-1,1],
+            automargin: true,
+            title: xlabel1, //'Average velocity (m/s)',
+            side: 'bottom'
+            // title: 'Vertical displacement (mm)'
         },
-    legend: {
-        x: 1,
-        xanchor: 'right',
-        y: 1,
-        // bgcolor: "rgba(0,0,0,0.01)"
-        // opacity: 0.5,
-    },
-    margin: {
-        b: 100,
-    },
-    font: {
-        family: 'Montserrat, Open sans',
+          yaxis: {
+            // linecolor: 'white',
+            autotick: true,
+            autorange: true,
+            automargin: true,
+            title: ylabel,//'Location (mm)',
+            // color: 'black',
+        },
+        xaxis2: {
+            autotick: true,
+            autorange: true,
+            automargin: true,
+            title: xlabel2, //'Stress (kPa)',
+            overlaying: 'x',
+            side: 'top',
+            rangemode: 'tozero',
+            color: 'blue'
+            },
+        legend: {
+            x: 1,
+            xanchor: 'right',
+            y: 1,
+            // bgcolor: "rgba(0,0,0,0.01)"
+            // opacity: 0.5,
+        },
+        margin: {
+            b: 100,
+        },
+        font: {
+            family: 'Montserrat, Open sans',
+        }
     }
+
+    let data = [{
+      type: 'scatter',
+      mode: 'lines',
+      x: [],
+      y: [],
+      name: trace0,
+      // opacity: 1,
+      line: {
+        width: 5,
+        color: "black",
+        // reversescale: false
+      },
+    }, {
+      type: 'scatter',
+      mode: 'lines',
+      x: [],
+      y: [],
+      name: trace1,
+      // opacity: 1,
+      line: {
+        width: 5,
+        color: "blue",
+        // reversescale: false
+      },
+      xaxis: 'x2'
+    }, {
+      type: 'scatter',
+      mode: 'lines',
+      x: [],
+      y: [],
+      name: trace2,
+      // opacity: 1,
+      line: {
+        // dash: 'dash',
+        dash: "8px,8px",
+        width: 5,
+        color: "blue",
+        // reversescale: false
+      },
+      xaxis: 'x2'
+    }]
+    add_plotly_download_tag(xlabel1 + ',' + xlabel2 + ',' + ylabel);
+    return { data, layout }
 }

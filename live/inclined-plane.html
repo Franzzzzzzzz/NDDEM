@@ -45,7 +45,7 @@
             import { Lut } from './js/Lut.js'
             import { PIDcontroller } from './js/PIDcontroller.js'
             import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
-            import { plotly_data_three_lines_2d, plotly_layout_three_lines_2d } from './js/plotly_layouts.js';
+            import * as LAYOUT from './js/Layout.js';
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -323,7 +323,7 @@
                     S.simu_interpret_command("set GammaT 75");
                     S.simu_interpret_command("set Mu 0.5");
                     S.simu_interpret_command("set T 150");
-                    S.simu_interpret_command("set dt 0.0001");
+                    S.simu_interpret_command("set dt 0.0002");
                     S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;
@@ -401,35 +401,39 @@
 // }
             }
 
+            // function make_graph() {
+            //     Plotly.newPlot('stats', plotly_data_three_lines_2d, plotly_layout_three_lines_2d);
+            // }
+            //
+            // document.getElementById ("download_tag").addEventListener ("click", download_data, false);
+            // document.getElementById ("stats").addEventListener ("mouseenter",
+            //     () => {
+            //         document.getElementById("download_tag").classList.remove("hidden")
+            //         document.getElementById("download_tag").classList.add("visible")
+            // }, false);
+            // document.getElementById ("stats").addEventListener ("mouseleave",
+            //     () => {
+            //         document.getElementById("download_tag").classList.add("hidden")
+            //         document.getElementById("download_tag").classList.remove("visible")
+            // }, false);
+            //
+            // function download_data() {
+            //     let gd = document.getElementById('stats')
+            //     let data = gd.data;
+            //     let header = ['Velocity (mm/s)','Pressure (kPa)','Shear stress (kPa)'];
+            //     let csv = '';
+            //     let ix = 0;
+            //     data.forEach( trace => {
+            //         csv = csv + 'Position (mm),' + header[ix] + '\n' + trace.y.map((el, i) => [el, trace.x[i]].join(",")).join('\n') + '\n';
+            //         ix += 1;
+            //         });
+            //
+            //     var link = document.getElementById("download_tag");
+            //     link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
+            // }
             function make_graph() {
-                Plotly.newPlot('stats', plotly_data_three_lines_2d, plotly_layout_three_lines_2d);
-            }
-
-            document.getElementById ("download_tag").addEventListener ("click", download_data, false);
-            document.getElementById ("stats").addEventListener ("mouseenter",
-                () => {
-                    document.getElementById("download_tag").classList.remove("hidden")
-                    document.getElementById("download_tag").classList.add("visible")
-            }, false);
-            document.getElementById ("stats").addEventListener ("mouseleave",
-                () => {
-                    document.getElementById("download_tag").classList.add("hidden")
-                    document.getElementById("download_tag").classList.remove("visible")
-            }, false);
-
-            function download_data() {
-                let gd = document.getElementById('stats')
-                let data = gd.data;
-                let header = ['Velocity (mm/s)','Pressure (kPa)','Shear stress (kPa)'];
-                let csv = '';
-                let ix = 0;
-                data.forEach( trace => {
-                    csv = csv + 'Position (mm),' + header[ix] + '\n' + trace.y.map((el, i) => [el, trace.x[i]].join(",")).join('\n') + '\n';
-                    ix += 1;
-                    });
-
-                var link = document.getElementById("download_tag");
-                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
+                let { data, layout } = LAYOUT.plotly_two_xaxis_graph('Average velocity (m/s)','Stress (Pa)','Location (mm)','Velocity','Pressure (p)','Shear stress (𝜏)');
+                Plotly.newPlot('stats', data, layout);
             }
 
 		</script>
