@@ -76,6 +76,9 @@ export function update_particle_material(params, lut_folder) {
         lut.setMin(0);
         lut.setMax(params.vmax);
         // var min_el = lut_folder.add()
+    } else if ( params.lut === 'Fluct Velocity') {
+        lut.setMin(-params.vmax);
+        lut.setMax( params.vmax);
     } else if ( params.lut === 'Size' ) {
         lut = new Lut("cooltowarm", 512);
         // lut.setMin(params.r_min);
@@ -108,7 +111,7 @@ export function update_particle_material(params, lut_folder) {
 export function move_spheres(S,params) {
     var x = S.simu_getX();
     var orientation = S.simu_getOrientation();
-    if ( params.lut === 'Velocity' ) {
+    if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
         v = S.simu_getVelocity();
     }
     else if ( params.lut === 'Rotation Rate' ) {
@@ -141,6 +144,9 @@ export function move_spheres(S,params) {
             // object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
             // use LUT to set an actual colour
             let vel_mag = Math.sqrt(Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2));
+            object.material.color = lut.getColor(vel_mag);
+        } else if ( params.lut === 'Fluct Velocity') {
+            let vel_mag = Math.sqrt(Math.pow(v[i][0],2) + Math.pow(v[i][1]- params.shear_rate*x[i][0],2) + Math.pow(v[i][2],2));
             object.material.color = lut.getColor(vel_mag);
         }
         if ( params.lut === 'Rotation Rate' ) {

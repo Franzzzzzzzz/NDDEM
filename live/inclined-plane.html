@@ -180,15 +180,10 @@
                 }
                 gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg) (W/S)').listen()
                     .onChange( () => update_slope_angle() );
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')
-                    .onChange( () => {
-                        if ( params.lut === 'None' ) {
-                            for ( let i = 0; i < params.N; i ++ ) {
-                                var object = spheres.children[i];
-                                object.material.uniforms.ambient.value = 1;
-                            }
-                        }
-                    });
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
+                    .onChange( () => SPHERES.update_particle_material(params,
+                        // lut_folder
+                    ) );
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen()
                     .onChange( () => {

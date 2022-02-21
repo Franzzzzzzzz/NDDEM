@@ -94,8 +94,8 @@
                 shear_rate: 10,
                 lut: 'None',
                 quality: 5,
-                vmax: 20, // max velocity to colour by
-                omegamax: 20, // max rotation rate to colour by
+                vmax: 50, // max velocity to colour by
+                omegamax: 50, // max rotation rate to colour by
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -130,14 +130,14 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x111 );
 
-				// const hemiLight = new THREE.HemisphereLight();
-				// hemiLight.intensity = 0.35;
-				// scene.add( hemiLight );
+				const hemiLight = new THREE.HemisphereLight();
+				hemiLight.intensity = 0.35;
+				scene.add( hemiLight );
 
-				// const dirLight = new THREE.DirectionalLight();
-				// dirLight.position.set( 5, 5, 5 );
-				// dirLight.castShadow = true;
-				// scene.add( dirLight );
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 5, -5, -5 );
+				dirLight.castShadow = true;
+				scene.add( dirLight );
 
                 // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
                 // const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
@@ -177,15 +177,10 @@
                 }
                 gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
                     .onChange( () => update_shear_rate() );
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
-                    .onChange( () => {
-                        if ( params.lut === 'None' ) {
-                            for ( let i = 0; i < params.N; i ++ ) {
-                                var object = spheres.children[i];
-                                object.material.uniforms.ambient.value = 1;
-                            }
-                        }
-                    });
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
+                        .onChange( () => SPHERES.update_particle_material(params,
+                            // lut_folder
+                        ) );
                 gui.add ( params, 'paused').name('Paused').listen();
                 // gui.add ( params, 'new_line').name('New loading path').listen()
                 //     .onChange( () => {
@@ -212,7 +207,7 @@
 
             function update_shear_rate() {
                 S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
-                // console.warn('NEED TO IMPLEMENT PBCLE UPDATING ON C++ SIDE')
+                params.vmax = 1.5*params.shear_rate*params.L;
             }
 
             function checkKeys( event ) {
