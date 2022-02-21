@@ -118,7 +118,7 @@ function process_params(time) {
   params.euler = { theta_1: 0, theta_2: 0, theta_3: 0 }; // rotations in higher dimensions!!!!!!!!!!
   params.velocity = { vmax: 1, omegamax: 1 }; // default GUI options
 
-  params.vr_scale = 0.5; // mapping from DEM units to VR units
+  params.vr_scale = 0.1; // mapping from DEM units to VR units
   params.human_height = 0; // height of the human in m
 
   params.root_dir = "http://localhost:54321/";

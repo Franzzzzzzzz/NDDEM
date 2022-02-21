@@ -34,13 +34,15 @@
 	</head>
 	<body>
         <div id="stats"></div>
-        <script async type="text/javascript" src="../deploy/DEMND.js"></script>
+        <script async type="text/javascript" src="../deploy/DEMCGND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script type="module">
 
 			// import * as THREE from './js/three.module.js';
             import * as THREE from "../visualise/node_modules/three/build/three.module.js";
+            import * as SPHERES from "./js/SphereHandler.js"
+            import * as WALLS from "./js/WallHandler.js"
 			import { OrbitControls } from './js/OrbitControls.js';
             // import { NDDEMPhysics } from './js/NDDEMPhysics.js';
 			import Stats from './js/stats.module.js';
@@ -51,7 +53,7 @@
 
             var urlParams = new URLSearchParams(window.location.search);
 
-            if ( !urlParams.has('lut') ) { urlParams.set('lut','size') }
+            if ( !urlParams.has('lut') ) { urlParams.set('lut','Size') }
 
             var clock = new THREE.Clock();
 
@@ -117,6 +119,10 @@
                 r_min: 0.25,
                 r_max: 0.5,
                 omega: 5, // rotation rate
+                lut: 'Size',
+                quality: 5,
+                vmax: 20, // max velocity to colour by
+                omegamax: 20, // max rotation rate to colour by
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -139,6 +145,7 @@
             if ( urlParams.has('no_stats') ) {
                 show_stats = false;
             }
+            if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
 
             params.L_cur = params.L;
@@ -157,25 +164,7 @@
             //     L = Math.pow(solid_volume/params.packing_fraction,1./3.)
             // }
 
-            const lut = new Lut( 'cooltowarm', 512 );
-
-            if ( params.dimension == 3 ) {
-                p_controller = new PIDcontroller(1e-6,1e-9,0);
-                q_controller = new PIDcontroller(1e-6,1e-9,0);
-            }
-            // else {
-            //     p_controller = new PIDcontroller(1e-7,1e-6,0);
-            //     q_controller = new PIDcontroller(1e-6,1e-5,0);
-            // }
-
-            var quality = 5;
-            if ( urlParams.has('quality') ) { quality = parseInt(urlParams.get('quality')) }
-
-            var NDParticleShader;
-            import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
-                NDParticleShader = module.NDDEMShader;
-    			init();
-            });
+            SPHERES.createNDParticleShader(params).then( init() );
 
 			async function init() {
 
@@ -216,7 +205,7 @@
 				scene.add( boundary );
 
 
-				add_spheres();
+				SPHERES.add_spheres(S,params,scene);
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -381,146 +370,146 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-                move_spheres();
+                SPHERES.move_spheres(S,params);
 
-                S.step_forward(5);
-                let angle = S.getTime()*params.omega;
+                S.simu_step_forward(5);
+                let angle = S.simu_getTime()*params.omega;
                 camera.up.set(-Math.cos(angle), -Math.sin(angle), 0);
                 controls.update();
 
 				renderer.render( scene, camera );
 			}
 
-            function add_spheres() {
-                radii = S.getRadii();
-                spheres = new THREE.Group();
-                scene.add(spheres);
-
-                let color;
-
-                const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
-
-                for ( let i = 0; i < params.N; i ++ ) {
-                    let material;
-                    if ( urlParams.has('lut') ) {
-                        if ( urlParams.get('lut') === 'size' ) { color = lut.getColor( 1 - (radii[i] - params.r_min)/(params.r_max - params.r_min) ) }
-                        material = new THREE.MeshStandardMaterial({ color: color });
-                    }
-                    else { material = NDParticleShader.clone(); }
-                    var object = new THREE.Mesh(geometrySphere, material);
-                    object.position.set(0,0,0);
-                    object.rotation.z = Math.PI / 2;
-                    object.NDDEM_ID = i;
-                    spheres.add(object);
-                }
-            }
-
-            function move_spheres() {
-                var x = S.getX();
-                var orientation = S.getOrientation();
-                if ( urlParams.has('lut') ) {
-                    if ( urlParams.get('lut') === 'velocity' ) {
-                        v = S.getVelocity();
-                    }
-                    // spheres.instanceColor.needsUpdate = true;
-
-                }
-                for ( let i = 0; i < params.N; i ++ ) {
-                    var object = spheres.children[i];
-                    // console.log(object.material)
-                    object.position.set( x[i][0], x[i][1], x[i][2] );
-                    if ( params.dimension == 3 ) {
-                        var D_draw = 2*radii[i];
-                    }
-                    if ( params.dimension == 4 ) {
-                        var D_draw = 2*Math.sqrt(
-                          Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
-                        );
-                        // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
-                    }
-                    if ( params.dimension == 5 ) {
-                        var D_draw = 2*Math.sqrt(
-                          Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2) - Math.pow(params.d5_cur - x[i][4], 2)
-                        );
-                        // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
-                    }
-                    object.scale.set(D_draw, D_draw, D_draw);
-
-                    if ( urlParams.has('lut') ) {
-                        if ( urlParams.get('lut') === 'velocity' ) {
-                            object.material.color.set(lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
-                        }
-                    }
-                    else {
-                        object.material.uniforms.R_draw.value = D_draw/2.;
-                        for (var j = 0; j < params.N - 3; j++) {
-                          object.material.uniforms.xview.value[j] =
-                            params.d4_cur;
-                          object.material.uniforms.xpart.value[j] =
-                            x[i][j + 3];
-                        }
-                        object.material.uniforms.A.value = orientation[i];
-                    }
-                }
-            }
+            // function add_spheres() {
+            //     radii = S.getRadii();
+            //     spheres = new THREE.Group();
+            //     scene.add(spheres);
+            //
+            //     let color;
+            //
+            //     const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
+            //
+            //     for ( let i = 0; i < params.N; i ++ ) {
+            //         let material;
+            //         if ( urlParams.has('lut') ) {
+            //             if ( urlParams.get('lut') === 'size' ) { color = lut.getColor( 1 - (radii[i] - params.r_min)/(params.r_max - params.r_min) ) }
+            //             material = new THREE.MeshStandardMaterial({ color: color });
+            //         }
+            //         else { material = NDParticleShader.clone(); }
+            //         var object = new THREE.Mesh(geometrySphere, material);
+            //         object.position.set(0,0,0);
+            //         object.rotation.z = Math.PI / 2;
+            //         object.NDDEM_ID = i;
+            //         spheres.add(object);
+            //     }
+            // }
+            //
+            // function move_spheres() {
+            //     var x = S.getX();
+            //     var orientation = S.getOrientation();
+            //     if ( urlParams.has('lut') ) {
+            //         if ( urlParams.get('lut') === 'velocity' ) {
+            //             v = S.getVelocity();
+            //         }
+            //         // spheres.instanceColor.needsUpdate = true;
+            //
+            //     }
+            //     for ( let i = 0; i < params.N; i ++ ) {
+            //         var object = spheres.children[i];
+            //         // console.log(object.material)
+            //         object.position.set( x[i][0], x[i][1], x[i][2] );
+            //         if ( params.dimension == 3 ) {
+            //             var D_draw = 2*radii[i];
+            //         }
+            //         if ( params.dimension == 4 ) {
+            //             var D_draw = 2*Math.sqrt(
+            //               Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
+            //             );
+            //             // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
+            //         }
+            //         if ( params.dimension == 5 ) {
+            //             var D_draw = 2*Math.sqrt(
+            //               Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2) - Math.pow(params.d5_cur - x[i][4], 2)
+            //             );
+            //             // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
+            //         }
+            //         object.scale.set(D_draw, D_draw, D_draw);
+            //
+            //         if ( urlParams.has('lut') ) {
+            //             if ( urlParams.get('lut') === 'velocity' ) {
+            //                 object.material.color.set(lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
+            //             }
+            //         }
+            //         else {
+            //             object.material.uniforms.R_draw.value = D_draw/2.;
+            //             for (var j = 0; j < params.N - 3; j++) {
+            //               object.material.uniforms.xview.value[j] =
+            //                 params.d4_cur;
+            //               object.material.uniforms.xpart.value[j] =
+            //                 x[i][j + 3];
+            //             }
+            //             object.material.uniforms.A.value = orientation[i];
+            //         }
+            //     }
+            // }
 
             async function NDDEMPhysics() {
 
-            	if ( 'DEMND' in window === false ) {
+            	if ( 'DEMCGND' in window === false ) {
 
-            		console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
+            		console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
             		return;
 
             	}
 
-            	NDDEMLib = await DEMND(); // eslint-disable-line no-undef
+            	NDDEMLib = await DEMCGND(); // eslint-disable-line no-undef
 
                 if ( params.dimension == 3 ) {
-                    S = await new NDDEMLib.Simulation3 (params.N);
+                    S = await new NDDEMLib.DEMCGND (params.N);
                     finish_setup();
                 }
                 else if ( params.dimension == 4 ) {
-                    S = await new NDDEMLib.Simulation4 (params.N);
+                    S = await new NDDEMLib.DEMCGND (params.N);
                     finish_setup();
                 }
                 else if ( params.dimension == 5 ) {
-                    S = await new NDDEMLib.Simulation5 (params.N);
+                    S = await new NDDEMLib.DEMCGND (params.N);
                     finish_setup();
                 }
 
 
 
                 function finish_setup() {
-                    S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-                    S.interpret_command("radius -1 0.5");
-                    S.interpret_command("mass -1 1");
-                    S.interpret_command("auto rho");
-                    // S.interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
-                    S.interpret_command("auto radius bidisperse "+params.r_min+" "+params.r_max+" 0.5");
-                    S.interpret_command("auto mass");
-                    S.interpret_command("auto inertia");
+                    S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+                    S.simu_interpret_command("radius -1 0.5");
+                    S.simu_interpret_command("mass -1 1");
+                    S.simu_interpret_command("auto rho");
+                    // S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+                    S.simu_interpret_command("auto radius bidisperse "+params.r_min+" "+params.r_max+" 0.5");
+                    S.simu_interpret_command("auto mass");
+                    S.simu_interpret_command("auto inertia");
 
                     for ( let i=0;i<params.dimension;i++ ) {
-                        S.interpret_command("boundary "+String(i)+" WALL -"+2*String(params.L)+" "+2*String(params.L));
+                        S.simu_interpret_command("boundary "+String(i)+" WALL -"+2*String(params.L)+" "+2*String(params.L));
                     }
 
-                    S.interpret_command("boundary "+String(params.dimension)+" SPHERE "+String(params.L)+" 0 0 0 0"); // add a sphere!
+                    S.simu_interpret_command("boundary "+String(params.dimension)+" SPHERE "+String(params.L)+" 0 0 0 0"); // add a sphere!
 
-                    // S.interpret_command("auto location randomsquare");
-                    // S.interpret_command("auto location randomdrop");
-                    S.interpret_command("auto location insphere");
-                    S.interpret_command("gravityrotate 1000 " + params.omega + " 0 1"); // intensity, omega, rotdim0, rotdim1
+                    // S.simu_interpret_command("auto location randomsquare");
+                    // S.simu_interpret_command("auto location randomdrop");
+                    S.simu_interpret_command("auto location insphere");
+                    S.simu_interpret_command("gravityrotate 1000 " + params.omega + " 0 1"); // intensity, omega, rotdim0, rotdim1
 
-                    S.interpret_command("set Kn 2e5");
-                    S.interpret_command("set Kt 8e4");
-                    S.interpret_command("set GammaN 75");
-                    S.interpret_command("set GammaT 75");
-                    S.interpret_command("set Mu 0.25");
-                    S.interpret_command("set Mu_wall 1");
-                    S.interpret_command("set T 150");
-                    S.interpret_command("set dt 0.0001");
-                    S.interpret_command("auto skin");
-                    S.finalise_init () ;
+                    S.simu_interpret_command("set Kn 2e5");
+                    S.simu_interpret_command("set Kt 8e4");
+                    S.simu_interpret_command("set GammaN 75");
+                    S.simu_interpret_command("set GammaT 75");
+                    S.simu_interpret_command("set Mu 0.25");
+                    S.simu_interpret_command("set Mu_wall 1");
+                    S.simu_interpret_command("set T 150");
+                    S.simu_interpret_command("set dt 0.0001");
+                    S.simu_interpret_command("auto skin");
+                    S.simu_finalise_init () ;
                 }
             }
 

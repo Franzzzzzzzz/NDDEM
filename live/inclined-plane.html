@@ -22,7 +22,7 @@
 	</head>
 	<body>
         <div id="scigem_tag">
-            Simulated with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
+            Built with <a href="https://github.com/Franzzzzzzzz/NDDEM/">NDDEM</a>, <a href="https://plotly.com/">plotly</a> and <a href="https://threejs.org/">three.js</a> by <a href="http://francoisguillard.com/en/welcome/">François Guillard</a> and <a href="http://benjymarks.com/">Benjy Marks</a>
         </div>
         <div class="flex-container">
             <div id="stats">
@@ -37,12 +37,15 @@
 		<script type="module">
 
             import * as THREE from "../visualise/node_modules/three/build/three.module.js";
+            import * as SPHERES from "./js/SphereHandler.js"
+            import * as WALLS from "./js/WallHandler.js"
 			import { OrbitControls } from './js/OrbitControls.js';
 			import Stats from './js/stats.module.js';
             import { GUI } from './js/dat.gui.module.js';
             import { Lut } from './js/Lut.js'
             import { PIDcontroller } from './js/PIDcontroller.js'
             import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
+            import { plotly_data_three_lines_2d, plotly_layout_three_lines_2d } from './js/plotly_layouts.js';
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -90,6 +93,9 @@
                 freq: 0.05,
                 new_line: false,
                 lut: 'None',
+                quality: 5,
+                vmax: 20, // max velocity to colour by
+                omegamax: 20, // max rotation rate to colour by
             }
 
             params.average_radius = (params.r_min + params.r_max)/2.;
@@ -109,11 +115,7 @@
 
             var quality = 5;
 
-            var NDParticleShader;
-            import("../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
-                NDParticleShader = module.NDDEMShader;
-    			init();
-            });
+            SPHERES.createNDParticleShader(params).then( init() );
 
 			async function init() {
 
@@ -153,7 +155,7 @@
                 floor.scale.z = 2*params.L + 2*thickness;
                 scene.add( floor );
 
-				add_spheres();
+				SPHERES.add_spheres(S,params,scene);
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -249,7 +251,7 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
-                move_spheres();
+                SPHERES.move_spheres(S,params);
                 if ( !params.paused ) {
                     S.simu_step_forward(10);
                     S.cg_param_read_timestep(0) ;
@@ -272,69 +274,6 @@
                 }
 				renderer.render( scene, camera );
 			}
-
-
-            function add_spheres() {
-                radii = S.simu_getRadii();
-                spheres = new THREE.Group();
-                scene.add(spheres);
-
-                const color = new THREE.Color();
-
-                const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
-
-                for ( let i = 0; i < params.N; i ++ ) {
-                    const material = NDParticleShader.clone();
-                    var object = new THREE.Mesh(geometrySphere, material);
-                    object.position.set(0,0,0);
-                    object.rotation.z = Math.PI / 2;
-                    object.NDDEM_ID = i;
-                    spheres.add(object);
-                }
-            }
-
-            function move_spheres() {
-                var x = S.simu_getX();
-                var orientation = S.simu_getOrientation();
-                if ( params.lut === 'Velocity' ) {
-                    v = S.simu_getVelocity();
-                }
-                else if ( params.lut === 'Rotation Rate' ) {
-                    omegaMag = S.simu_getRotationRate();
-                }
-                else if ( params.lut === 'Force' ) {
-                    forceMag = S.simu_getParticleStress(); // NOTE: NOT IMPLEMENTED YET
-                }
-
-                for ( let i = 0; i < params.N; i ++ ) {
-                    var object = spheres.children[i];
-                    if ( params.dimension == 3 ) {
-                        var D_draw = 2*radii[i];
-                        object.scale.set(D_draw, D_draw, D_draw);
-                    }
-                    else if ( params.dimension == 4 ) {
-                        var D_draw = 2*Math.sqrt(
-                          Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
-                        );
-                        object.scale.set(D_draw, D_draw, D_draw);
-                    }
-                    object.position.set( x[i][0], x[i][1], x[i][2] );
-                    if ( params.lut === 'Velocity' ) {
-                        object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
-                    }
-                    if ( params.lut === 'Rotation Rate' ) {
-                        // console.log(omegaMag[i])
-                        object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
-                    }
-                    for (var j = 0; j < params.N - 3; j++) {
-                      object.material.uniforms.xview.value[j] =
-                        params.d4_cur;
-                      object.material.uniforms.xpart.value[j] =
-                        x[i][j + 3];
-                    }
-                    object.material.uniforms.A.value = orientation[i];
-                }
-            }
 
             async function NDDEMPhysics() {
 
@@ -463,94 +402,7 @@
             }
 
             function make_graph() {
-                var data = [{
-                  type: 'scatter',
-                  mode: 'lines',
-                  x: [],
-                  y: [],
-                  name: 'Velocity',
-                  // opacity: 1,
-                  line: {
-                    width: 5,
-                    color: "black",
-                    // reversescale: false
-                  },
-                }, {
-                  type: 'scatter',
-                  mode: 'lines',
-                  x: [],
-                  y: [],
-                  name: 'Pressure (p)',
-                  // opacity: 1,
-                  line: {
-                    width: 5,
-                    color: "blue",
-                    // reversescale: false
-                  },
-                  xaxis: 'x2'
-                }, {
-                  type: 'scatter',
-                  mode: 'lines',
-                  x: [],
-                  y: [],
-                  name: 'Shear stress (q)',
-                  // opacity: 1,
-                  line: {
-                    // dash: 'dash',
-                    dash: "8px,8px",
-                    width: 5,
-                    color: "blue",
-                    // reversescale: false
-                  },
-                  xaxis: 'x2'
-                }]
-                var layout = {
-                      // height: 300,
-                      // width: 500,
-                      xaxis: {
-                        // linecolor: 'white',
-                        autotick: true,
-                        // autorange: true,
-                        // range: [-maxVelocity, maxVelocity],
-                        // range: [-1,1],
-                        automargin: true,
-                        title: 'Average velocity (m/s)',
-                        side: 'bottom'
-                        // title: 'Vertical displacement (mm)'
-                    },
-                      yaxis: {
-                        // linecolor: 'white',
-                        autotick: true,
-                        autorange: true,
-                        automargin: true,
-                        title: 'Location (mm)',
-                        // color: 'black',
-                    },
-                    xaxis2: {
-                        autotick: true,
-                        autorange: true,
-                        automargin: true,
-                        title: 'Stress (kPa)',
-                        overlaying: 'x',
-                        side: 'top',
-                        rangemode: 'tozero',
-                        color: 'blue'
-                        },
-                    legend: {
-                        x: 1,
-                        xanchor: 'right',
-                        y: 1,
-                        // bgcolor: "rgba(0,0,0,0.01)"
-                        // opacity: 0.5,
-                    },
-                    margin: {
-                        b: 100,
-                    },
-                    font: {
-                        family: 'Montserrat, Open sans',
-                    }
-                }
-                Plotly.newPlot('stats', data, layout);
+                Plotly.newPlot('stats', plotly_data_three_lines_2d, plotly_layout_three_lines_2d);
             }
 
             document.getElementById ("download_tag").addEventListener ("click", download_data, false);

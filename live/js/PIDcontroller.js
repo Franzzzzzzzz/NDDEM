@@ -9,7 +9,12 @@ class PIDcontroller {
         this.old_error = 0;
     }
     update(setpoint, current_val, dt=0.001) {
-        this.error = setpoint - current_val;
+        if ( setpoint !== 0 ) {
+            this.error = (setpoint - current_val)/setpoint;
+        }
+        else {
+            this.error = (setpoint - current_val)/1e2;
+        }
         this.integral += this.error*dt;
         this.slope = (this.error - this.old_error)/dt;
         this.old_error = this.error;

@@ -13,13 +13,14 @@ EMSCRIPTEN_BINDINGS(DEMCGND) {
     .function("simu_getOrientation", &DEMCGND::simu_getOrientation)
     .function("simu_getVelocity", &DEMCGND::simu_getVelocity)
     .function("simu_getRotationRate", &DEMCGND::simu_getRotationRate)
+    .function("simu_getParticleStress", &DEMCGND::simu_getParticleStress)
     .function("simu_getBoundary", &DEMCGND::simu_getBoundary)
     .function("simu_setBoundary", &DEMCGND::simu_setBoundary)
     .function("simu_getWallForce", &DEMCGND::simu_getWallForce)
     .function("simu_setExternalForce", &DEMCGND::simu_setExternalForce)
     .function("simu_getTime", &DEMCGND::simu_getTime)
 
-    .function("cg_setup_CG", &DEMCGND::cg_setup_CG )  
+    .function("cg_setup_CG", &DEMCGND::cg_setup_CG )
     .function("cg_process_timestep", &DEMCGND::cg_process_timestep)
     .function("cg_get_result", &DEMCGND::cg_get_result)
     .function("cg_get_gridinfo", &DEMCGND::cg_get_gridinfo)
@@ -27,10 +28,10 @@ EMSCRIPTEN_BINDINGS(DEMCGND) {
     .function("cg_param_get_bounds", &DEMCGND::cg_param_get_bounds)
     .function("cg_param_get_numts", &DEMCGND::cg_param_get_numts)
     .function("cg_param_read_timestep", &DEMCGND::cg_param_read_timestep)
-    .function("cg_param_post_init", &DEMCGND::cg_param_post_init)        
+    .function("cg_param_post_init", &DEMCGND::cg_param_post_init)
     ;
 }
-    
+
 // EMSCRIPTEN_BINDINGS(stl_wrappers) {
 //     emscripten::register_vector<double>("Vec1DDouble");
 //     emscripten::register_vector<std::vector<double>>("Vec2DDouble");

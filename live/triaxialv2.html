@@ -45,7 +45,7 @@
             import { GUI } from './js/dat.gui.module.js';
             // import { Lut } from './js/Lut.js'
             import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
-            import { plotly_data_3d, plotly_layout_3d } from './js/plotly_layouts.js';
+            import * as LAYOUT from './js/Layout.js';
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -55,15 +55,14 @@
             let pressure = 0;
             let shear = 0;
             let density = 0;
-            let pressure_time = [];
-            let shear_time = [];
-            let density_time = [];
+            // let pressure_time = [];
+            // let shear_time = [];
+            // let density_time = [];
             // var radius = 0.5;
             let started = false;
             let stressTcxx, stressTcyy, stressTczz, stressTcxy;
             let show_stats = true;
             // const thickness = radius;
-            // const material_density = 2700;
             let old_time = 0;
             let new_time = 0;
 
@@ -87,17 +86,22 @@
             var params = {
                 dimension: 3,
                 L: 4, //system size
-                N: 500,
+                N: 580,
                 // packing_fraction: 0.5,
                 constant_volume: true,
-                axial_strain: 0,
+                consolidate_active: false,
                 volumetric_strain: 0,
+                axial_strain: 0,
+                shear_active: false,
                 gravity: false,
                 paused: false,
                 H_cur: 0,
                 W_cur: 0,
-                pressure_set_pt: 1e4,
+                pressure_set_pt: 1000,
                 deviatoric_set_pt: 0,
+                current_pressure: 0,
+                current_shear: 0,
+                current_density: 0,
                 d4_cur:0,
                 r_max: 0.5,
                 r_min: 0.45,
@@ -111,6 +115,7 @@
                 quality: 5,
                 vmax: 20, // max velocity to colour by
                 omegamax: 20, // max rotation rate to colour by
+                material_density: 2700,
             }
 
             params.loading_method = 'strain_controlled';
@@ -120,7 +125,7 @@
 
             params.average_radius = (params.r_min + params.r_max)/2.;
             params.thickness = params.average_radius;
-
+            params.initial_pressure_set_pt = params.pressure_set_pt; // store initial value to reinitialise later
             params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
             if ( urlParams.has('dimension') ) {
                 params.dimension = parseInt(urlParams.get('dimension'));
@@ -196,36 +201,10 @@
 				let gui = new GUI();
 				gui.width = 350;
 
-                if ( params.loading_method === 'strain_controlled' ) {
-                    gui.add( params, 'volumetric_strain', 0, params.max_volumetric_strain, 0.001)
-                        .name( 'Volumetric strain (W/S)').listen()
-                        .onChange( function () { WALLS.update_walls(params, S); } );
-                    gui.add( params, 'axial_strain', -params.max_axial_strain,params.max_axial_strain, 0.001)
-                        .name( 'Axial strain (A/D)').listen()
-                        .onChange( function () { WALLS.update_walls(params, S); } );
-                    gui.add( params, 'loading_rate', 0.0001, 0.01, 0.0001).name( 'Loading rate' );
-                    gui.add ( params, 'constant_volume')
-                        .name('Constant volume').listen()
-                        .onChange( function() { WALLS.update_walls(params, S); });
-                    }
-                else if ( params.loading_method === 'stress_controlled' ) {
-                    gui.add( params, 'pressure_set_pt', 0,1e5, 1)
-                        .name( 'Pressure set point (W/S)').listen()
-                        .onChange( function () { WALLS.update_walls(params, S); } );
-                    gui.add( params, 'deviatoric_set_pt', -1e5,1e5, 1)
-                        .name( 'Deviatoric stress set point (A/D)').listen()
-                        .onChange( function () { WALLS.update_walls(params, S); } );
-                    }
-                if ( params.dimension == 4 ) {
-                    gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
-                        .name( 'D4 location').listen()
-                        // .onChange( function () { WALLS.update_walls(params, S); } );
-                        .onChange( function () {
-                            if ( urlParams.has('stl') ) {
-                                meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
-                            }
-                        });
-                }
+                gui.add( params, 'loading_rate', 0.0001, 0.01, 0.0001).name( 'Axial loading rate (mm/s)' );
+                gui.add ( params, 'constant_volume')
+                    .name('Constant volume shearing').listen()
+                    // .onChange( function() { WALLS.update_walls_from_PID(params, S); });
                 // var lut_folder = gui.addFolder('Colour by');
                 gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
                     .onChange( () => SPHERES.update_particle_material(params,
@@ -234,52 +213,69 @@
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
-                            S.simu_interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                            S.simu_interpret_command("gravity 0 0 -10 " + "0 ".repeat(params.dimension - 3)) }
                         else {
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'paused').name('Paused (Enable to rotate graph)').listen();
+                gui.add ( params, 'clear_line').name('Clear current line').listen()
+                .onChange( () => {
+					Plotly.deleteTraces('stats', [-1])
+                    var data = [{
+                      type: 'scatter3d',
+                      mode: 'lines',
+                      x: [], y: [], z: [],
+                      line: { width: 5 },
+                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
+                    }]
+                    Plotly.addTraces('stats', data);
+                    params.clear_line = false;
+                });
+                gui.add( params, 'pressure_set_pt', 0,1e4, 1)
+                    .name( 'Consolidation pressure (kPa)' ).listen();
+                let consol_button = gui.add( params, 'consolidate_active').name('Perform consolidation').listen();//.onChange(() => {
+                    // let shear_button = gui.add( params, 'shear_active').name('Perform shearing').onChange( () => {
+                        // shear_button.remove()
+                    // });
+                    // consol_button.remove();
+                // });
+                let shear_button = gui.add( params, 'shear_active').name('Perform shearing').listen().onChange( () => {
+                    params.consolidate_active = false;
+                    params.V_const = (params.L_cur - params.W_cur)*(params.L_cur - params.W_cur)*(params.L_cur - params.H_cur);
+                });
                 gui.add ( params, 'new_line').name('New loading path').listen()
-                    .onChange( () => {
-                        params.axial_strain = 0;
-                        params.volumetric_strain = 0;
-                        params.pressure_set_pt = 10000;
-                        params.deviatoric_set_pt = 0;
-                        WALLS.update_walls(params, S);
-                        var data = [{
-                                      type: 'scatter3d',
-                                      mode: 'lines',
-                                      x: [], y: [], z: [],
-                                      line: { width: 5 },
-                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
-                                    }]
-                        Plotly.addTraces('stats', data);
-                        params.new_line = false;
-                    });
-								gui.add ( params, 'clear_line').name('Clear line').listen()
-		                    .onChange( () => {
-														Plotly.deleteTraces('stats', [-1])
-		                        var data = [{
-		                                      type: 'scatter3d',
-		                                      mode: 'lines',
-		                                      x: [], y: [], z: [],
-		                                      line: { width: 5 },
-		                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
-		                                    }]
-		                        Plotly.addTraces('stats', data);
-		                        params.clear_line = false;
-		                    });
+                .onChange( () => {
+                    params.axial_strain = 0;
+                    params.volumetric_strain = 0;
+                    // params.pressure_set_pt = params.initial_pressure_set_pt;
+                    // params.deviatoric_set_pt = 0;
+                    params.L_cur = params.L;
+                    params.W_cur = 0;
+                    params.H_cur = 0;
+                    params.shear_active = false;
+                    params.consolidate_active = false;
+                    // WALLS.update_walls_from_PID(params, S);
+                    var data = [{
+                                  type: 'scatter3d',
+                                  mode: 'lines',
+                                  x: [], y: [], z: [],
+                                  line: { width: 5 },
+                                  name: 'Load path ' + String(document.getElementById('stats').data.length+1)
+                                }]
+                    Plotly.addTraces('stats', data);
+                    params.new_line = false;
+                });
 				const controls = new OrbitControls( camera, container );
 				controls.target.y = 0.5;
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
                 // container.addEventListener( 'mousemove', onMouseMove, false );
-                window.addEventListener( 'keypress', onSelectParticle, false );
+                // window.addEventListener( 'keypress', onSelectParticle, false );
 
                 if ( show_stats ) { make_graph(); }
 
-                WALLS.update_walls(params, S);
+                WALLS.update_triaxial_walls(params, S);
 			    animate();
 			}
 
@@ -292,45 +288,30 @@
 
             }
 
-            function onSelectParticle( event ) {
-                if ( event.code === 'KeyW' ) {
-                    if ( params.loading_method === 'strain_controlled' && params.volumetric_strain < params.max_volumetric_strain) { params.volumetric_strain += params.loading_rate; }
-                    else { params.pressure_set_pt *= 1 + params.loading_rate; }
-                    WALLS.update_walls(params, S);
-                    }
-                if ( event.code === 'KeyS' ) {
-                    if ( params.loading_method === 'strain_controlled' && params.volumetric_strain > 0 ) { params.volumetric_strain -= params.loading_rate; }
-                    else { params.pressure_set_pt /= 1 + params.loading_rate; }
-                    WALLS.update_walls(params, S);
-                    }
-                if ( event.code === 'KeyD' ) {
-                    if ( params.loading_method === 'strain_controlled' && params.axial_strain < params.max_axial_strain ) { params.axial_strain += params.loading_rate; }
-                    // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = 1; }
-                    else { params.deviatoric_set_pt += params.loading_rate*params.pressure_set_pt; }
-                    WALLS.update_walls(params, S);
-                    }
-                if ( event.code === 'KeyA' && params.axial_strain > -params.max_axial_strain ) {
-                    if ( params.loading_method === 'strain_controlled' ) { params.axial_strain -= params.loading_rate; }
-                    // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = -1; }
-                    else { params.deviatoric_set_pt -= params.loading_rate*params.pressure_set_pt; }
-                    WALLS.update_walls(params, S);
-                    }
-                // if ( event.code === 'Space' ) {
-                //     if ( locked_particle === null ) {
-                //         locked_particle = INTERSECTED;
-                //         // console.log(locked_particle);
-                //         ref_location = locked_particle.position;
-                //
-                //         camera.getWorldDirection( camera_direction ); // update camera direction
-                //         // set the plane for the particle to move along to be orthogonal to the camera
-                //         intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
-                //                                                           locked_particle.position );
-                //     }
-                //     else {
-                //         locked_particle = null;
-                //     }
-                // }
-            }
+            // function onSelectParticle( event ) {
+            //     if ( event.code === 'KeyW' ) {
+            //         if ( params.loading_method === 'strain_controlled' && params.volumetric_strain < params.max_volumetric_strain) { params.volumetric_strain += params.loading_rate; }
+            //         else { params.pressure_set_pt *= 1 + params.loading_rate; }
+            //         WALLS.update_walls(params, S);
+            //         }
+            //     if ( event.code === 'KeyS' ) {
+            //         if ( params.loading_method === 'strain_controlled' && params.volumetric_strain > 0 ) { params.volumetric_strain -= params.loading_rate; }
+            //         else { params.pressure_set_pt /= 1 + params.loading_rate; }
+            //         WALLS.update_walls(params, S);
+            //         }
+            //     if ( event.code === 'KeyD' ) {
+            //         if ( params.loading_method === 'strain_controlled' && params.axial_strain < params.max_axial_strain ) { params.axial_strain += params.loading_rate; }
+            //         // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = 1; }
+            //         else { params.deviatoric_set_pt += params.loading_rate*params.pressure_set_pt; }
+            //         WALLS.update_walls(params, S);
+            //         }
+            //     if ( event.code === 'KeyA' && params.axial_strain > -params.max_axial_strain ) {
+            //         if ( params.loading_method === 'strain_controlled' ) { params.axial_strain -= params.loading_rate; }
+            //         // else if ( params.deviatoric_set_pt === 0 ) { params.deviatoric_set_pt = -1; }
+            //         else { params.deviatoric_set_pt -= params.loading_rate*params.pressure_set_pt; }
+            //         WALLS.update_walls(params, S);
+            //         }
+            // }
 
 
             function onWindowResize(){
@@ -349,90 +330,35 @@
             }
 
 			function animate() {
-                if ( clock.getElapsedTime() > 3 ) { started = true; }
+                if ( clock.getElapsedTime() > 1 ) { started = true; }
 				requestAnimationFrame( animate );
                 SPHERES.move_spheres(S,params);
-                // if ( locked_particle !== null ) {
-                //     // console.log(locked_particle)
-                //     // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
-                //         // console.log('success!')
-        		// 		// ref_location.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-        		// 	// }
-                //     // ref_location.x = mouse.x;
-                //     raycaster.ray.intersectPlane( intersection_plane, ref_location);
-                //     ref_location.clamp( new THREE.Vector3(back.position.x,  left.position.y,floor.position.z),
-                //                         new THREE.Vector3(front.position.x,right.position.y, roof.position.z) );
-                //     // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
-                //         // console.log(ref_location.x)
-                //         // console.log(back.position.x)
-                //     S.simu_fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
-                //     // }
-                // }
 
                 if ( !params.paused ) {
                     new_time = clock.getElapsedTime()
 
                         if ( show_stats && started ) {
-                            // counter = counter + 1;
-                            // if ( counter == 5 ) { update_graph(); counter = 0; }
                             update_graph();
+                            WALLS.update_triaxial_walls(params, S, new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
                     }
 
-                    if ( params.loading_method === 'stress_controlled') {
-                        update_walls(params, S, new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
-                    }
                     S.simu_step_forward(5);
-
-                    // var F = S.simu_getWallForce();
-                    //
-                    // if ( F.length > 1 ) { // returns an empty array if hasn't calculated yet
-                    //     let sigma_11 = (-F[0][0] + F[1][0])/2/params.L_cur/params.L_cur;
-                    //     let sigma_22 = (-F[2][1] + F[3][1])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    //     let sigma_33 = (-F[4][2] + F[5][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    //
-                    //     // let sigma_12 = (-F[0][1] + F[1][1])/2/params.L_cur/params.L_cur;
-                    //     // let sigma_23 = (-F[2][2] + F[3][2])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    //     // let sigma_31 = (-F[4][0] + F[5][0])/2/params.L_cur/(params.L_cur - params.H_cur);
-                    //
-                    //     // if ( params.dimension == 4 ) { sigma_44 = (-F[6][3] + F[7][3])/2/params.L_cur/(params.L_cur - params.H_cur);}
-                    //
-                    //     pressure = (sigma_11 + sigma_22 + sigma_33)/3.;
-                    //     shear = sigma_33 - pressure;
-                    // }
-
-                    S.cg_param_read_timestep(0) ;
-                    S.cg_process_timestep(0,false) ;
+                    S.cg_param_read_timestep(0);
+                    S.cg_process_timestep(0,false);
                     var grid = S.cg_get_gridinfo();
-                    density=S.cg_get_result(0, "RHO", 0)[0] ;
+                    density=S.cg_get_result(0, "RHO", 0)[0];
                     // vavg=S.cg_get_result(0, "VAVG", 1)[0] ;
-                    stressTcxx=S.cg_get_result(0, "TC", 0)[0] ;
-                    stressTcyy=S.cg_get_result(0, "TC", 4)[0] ;
-                    stressTczz=S.cg_get_result(0, "TC", 8)[0] ;
-                    stressTcxy=S.cg_get_result(0, "TC", 1)[0] ;
+                    params.stressTcxx=S.cg_get_result(0, "TC", 0)[0];
+                    params.stressTcyy=S.cg_get_result(0, "TC", 4)[0];
+                    params.stressTczz=S.cg_get_result(0, "TC", 8)[0];
+                    params.stressTcxy=S.cg_get_result(0, "TC", 1)[0];
 
-                    pressure = (stressTcxx+stressTcyy+stressTczz)/3./1e3 ;
-                    shear = -stressTcxy/1e3 ;
-
+                    params.current_pressure = (params.stressTcxx +
+                                               params.stressTcyy +
+                                               params.stressTczz)/3.;
+                    // params.current_shear = -params.stressTcxy;
+                    params.current_shear = params.stressTczz - params.stressTcxx;
                 }
-
-                // update the picking ray with the camera and mouse position
-            	// raycaster.setFromCamera( mouse, camera );
-                //
-                // const intersects = raycaster.intersectObjects( spheres.children );
-				// if ( intersects.length > 0 ) { // if found something
-				// 	if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
-                //             if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
-    			// 			INTERSECTED = intersects[ 0 ].object;
-                //             INTERSECTED.material.uniforms.ambient.value = 5.0;
-				// 	}
-				// }
-                // else { // didn't find anything
-				// 	if ( INTERSECTED !== null ) { // there was something before
-                //         INTERSECTED.material.uniforms.ambient.value = 1.0;
-                //         INTERSECTED = null;
-                //     }
-				// }
-
 
 				renderer.render( scene, camera );
 
@@ -493,14 +419,21 @@
                     S.simu_interpret_command("auto mass");
                     S.simu_interpret_command("auto inertia");
 
-                    S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
-                    S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-                    S.simu_interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
+                    // var wall_type = 'PBC';
+                    var wall_type = 'WALL';
+
+                    S.simu_interpret_command("boundary 0 "+wall_type+" -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 1 "+wall_type+" -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 2 "+wall_type+" -"+String(params.L)+" "+String(params.L));
                     if ( params.dimension == 3 ) {
-                        S.simu_interpret_command("gravity 0 0 0")
+                        if ( params.gravity ) {
+                            S.simu_interpret_command("gravity 0 0 -10");
+                        } else {
+                            S.simu_interpret_command("gravity 0 0 0");
+                        }
                     }
                     if ( params.dimension == 4 ) {
-                        S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
+                        S.simu_interpret_command("boundary 3 "+wall_type+" -"+String(params.L)+" "+String(params.L));
                         S.simu_interpret_command("gravity 0 0 0 -10")
                     }
 
@@ -511,10 +444,11 @@
                     S.simu_interpret_command("set Kt 8e4");
                     S.simu_interpret_command("set GammaN 75");
                     S.simu_interpret_command("set GammaT 75");
-                    S.simu_interpret_command("set Mu 0.5");
+                    S.simu_interpret_command("set Mu 1.0");
+                    S.simu_interpret_command("set Mu_wall 0");
                     S.simu_interpret_command("set T 150");
-                    S.simu_interpret_command("set dt 0.0001");
-                    S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
+                    S.simu_interpret_command("set dt 0.0002");
+                    S.simu_interpret_command("set tdump 100000"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;
 
@@ -542,47 +476,20 @@
             }
 
             function update_graph() {
-                density = params.packing_fraction; //*material_density;
-                pressure_time.push(pressure);
-                shear_time.push(shear);
-                density_time.push(density);
+                params.current_density = params.packing_fraction*params.material_density;
 
-                // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
-                    Plotly.extendTraces('stats', {
-                        'x': [[pressure]],
-                        'y': [[density]],
-                        'z': [[shear]],
-                    }, [-1])
-                // }
+                Plotly.extendTraces('stats', {
+                    'x': [[params.current_pressure]],
+                    'y': [[params.current_density]],
+                    'z': [[params.current_shear]],
+                }, [-1])
             }
 
             function make_graph() {
-                Plotly.newPlot('stats', plotly_data_3d, plotly_layout_3d);
+                let { data, layout } = LAYOUT.plotly_graph('Pressure (Pa)','Density (kg/m<sup>3</sup>)','Deviatoric stress (Pa)');
+                Plotly.newPlot('stats', data, layout);
             }
 
-            document.getElementById ("download_tag").addEventListener ("click", download_data, false);
-            document.getElementById ("stats").addEventListener ("mouseenter",
-                () => {
-                    document.getElementById("download_tag").classList.remove("hidden")
-                    document.getElementById("download_tag").classList.add("visible")
-            }, false);
-            document.getElementById ("stats").addEventListener ("mouseleave",
-                () => {
-                    document.getElementById("download_tag").classList.add("hidden")
-                    document.getElementById("download_tag").classList.remove("visible")
-            }, false);
-
-            function download_data() {
-                let gd = document.getElementById('stats')
-                let data = gd.data;
-                let header = 'Density (kg/m3),Deviatoric stress (Pa),Pressure (Pa)\n';
-                let csv = '';
-                data.forEach( trace => {
-                    csv = csv + header + trace.x.map((el, i) => [el, trace.y[i],trace.z[i]].join(",")).join('\n') + '\n'
-                    });
-                var link = document.getElementById("download_tag");
-                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
-            }
 		</script>
 	</body>
 </html>
