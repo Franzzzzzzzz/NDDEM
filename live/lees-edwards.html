@@ -253,8 +253,8 @@
                     for (var i=0 ; i<stressTcxx.length ; i++)
                     {
                         xloc[i]=grid[0]+i*grid[3] ;
-                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3./1e3 ;
-                        shearstress[i]=-stressTcxy[i]/1e3 ;
+                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
+                        shearstress[i]=-stressTcxy[i] ;
                     }
 
                     update_graph();
@@ -376,7 +376,7 @@
                     S.simu_interpret_command("set GammaT 75");
                     S.simu_interpret_command("set Mu 0.5");
                     S.simu_interpret_command("set T 150");
-                    S.simu_interpret_command("set dt 0.0001");
+                    S.simu_interpret_command("set dt 0.0002");
                     S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;
@@ -384,7 +384,7 @@
 
                     var cgparam ={} ;
                     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-                    cgparam["boxes"]=[10,1,1] ;
+                    cgparam["boxes"]=[20,1,1] ;
                     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
                     cgparam["boundaries"]=[
                         [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],

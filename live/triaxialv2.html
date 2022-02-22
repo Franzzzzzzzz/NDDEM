@@ -86,7 +86,8 @@
             var params = {
                 dimension: 3,
                 L: 4, //system size
-                N: 580,
+                aspect_ratio: 1,
+                N: 520,
                 // packing_fraction: 0.5,
                 constant_volume: true,
                 consolidate_active: false,
@@ -142,13 +143,13 @@
 
 
             params.L_cur = params.L;
-            params.packing_fraction = params.N*params.particle_volume/Math.pow(2*params.L,3);
+            params.packing_fraction = params.N*params.particle_volume/Math.pow(2*params.L,2)/(params.L*params.aspect_ratio);
             params.back = -params.L;
             params.front = params.L;
             params.left = -params.L;
             params.right = params.L;
-            params.floor = -params.L;
-            params.roof = params.L;
+            params.floor = -params.L*params.aspect_ratio;
+            params.roof = params.L*params.aspect_ratio;
 
             SPHERES.createNDParticleShader(params).then( init() );
 
@@ -157,7 +158,7 @@
 				await NDDEMPhysics();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );
+				camera.position.set( 3*params.L, 3*params.L, 1.5*params.L*params.aspect_ratio );
                 camera.up.set(0, 0, 1);
 				camera.lookAt( 0, 0, 0 );
 
@@ -232,7 +233,7 @@
                     params.clear_line = false;
                 });
                 gui.add( params, 'pressure_set_pt', 0,1e4, 1)
-                    .name( 'Consolidation pressure (kPa)' ).listen();
+                    .name( 'Consolidation pressure (Pa)' ).listen();
                 let consol_button = gui.add( params, 'consolidate_active').name('Perform consolidation').listen();//.onChange(() => {
                     // let shear_button = gui.add( params, 'shear_active').name('Perform shearing').onChange( () => {
                         // shear_button.remove()
@@ -241,7 +242,7 @@
                 // });
                 let shear_button = gui.add( params, 'shear_active').name('Perform shearing').listen().onChange( () => {
                     params.consolidate_active = false;
-                    params.V_const = (params.L_cur - params.W_cur)*(params.L_cur - params.W_cur)*(params.L_cur - params.H_cur);
+                    params.V_const = params.aspect_ratio*(params.L_cur - params.W_cur)*(params.L_cur - params.W_cur)*(params.L_cur - params.H_cur);
                 });
                 gui.add ( params, 'new_line').name('New loading path').listen()
                 .onChange( () => {
@@ -424,7 +425,7 @@
 
                     S.simu_interpret_command("boundary 0 "+wall_type+" -"+String(params.L)+" "+String(params.L));
                     S.simu_interpret_command("boundary 1 "+wall_type+" -"+String(params.L)+" "+String(params.L));
-                    S.simu_interpret_command("boundary 2 "+wall_type+" -"+String(params.L)+" "+String(params.L));
+                    S.simu_interpret_command("boundary 2 "+wall_type+" -"+String(params.L*params.aspect_ratio)+" "+String(params.L*params.aspect_ratio));
                     if ( params.dimension == 3 ) {
                         if ( params.gravity ) {
                             S.simu_interpret_command("gravity 0 0 -10");
@@ -457,8 +458,8 @@
                     cgparam["boxes"]=[1,1,1] ;
                     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
                     cgparam["boundaries"]=[
-                        [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-                        [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
+                        [-params.L+params.r_max,-params.L+params.r_max,-params.L*params.aspect_ratio+params.r_max],
+                        [ params.L-params.r_max, params.L-params.r_max, params.L*params.aspect_ratio-params.r_max]] ;
                     cgparam["window size"]=2 ;
                     cgparam["skip"]=0;
                     cgparam["max time"]=1 ;

@@ -43,13 +43,13 @@ export function add_cuboid_walls(params, scene) {
 
     floor = new Mesh( wall_geometry, wall_material );
     floor.rotation.x = Math.PI/2.;
-    floor.position.z = - params.L - params.thickness/2.;
+    floor.position.z = - params.L*params.aspect_ratio - params.thickness/2.;
     // left.receiveShadow = true;
     scene.add( floor );
 
     roof = new Mesh( wall_geometry, wall_material );
     roof.rotation.x = Math.PI/2.;
-    roof.position.z = params.L + params.thickness/2.;
+    roof.position.z = params.L*params.aspect_ratio + params.thickness/2.;
     // right.receiveShadow = true;
     scene.add( roof );
 
@@ -130,7 +130,7 @@ export function update_walls(params, S, dt=0.001) {
 }
 
 export function update_triaxial_walls(params, S, dt=1) {
-    params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L_cur-params.W_cur,params.dimension-1)/(params.L_cur - params.H_cur)/Math.pow(2,params.dimension);
+    params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L_cur-params.W_cur,params.dimension-1)/(params.L_cur*params.aspect_ratio - params.H_cur)/Math.pow(2,params.dimension);
     // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
     if ( params.consolidate_active ) {
@@ -159,8 +159,8 @@ export function update_triaxial_walls(params, S, dt=1) {
         params.back  = -params.L_cur + params.W_cur;
         params.left  = -params.L_cur + params.W_cur;
         params.right =  params.L_cur - params.W_cur;
-        params.floor = -params.L_cur + params.H_cur;
-        params.roof  =  params.L_cur - params.H_cur;
+        params.floor = -params.L_cur*params.aspect_ratio + params.H_cur*params.aspect_ratio;
+        params.roof  =  params.L_cur*params.aspect_ratio - params.H_cur*params.aspect_ratio;
 
         S.simu_setBoundary(0, [params.back,params.front]) ; // Set location of the walls in x
         S.simu_setBoundary(1, [params.left,params.right]) ; // Set location of the walls in y
@@ -182,7 +182,7 @@ export function update_triaxial_walls(params, S, dt=1) {
 
         vert_walls.forEach( function(mesh) {
             mesh.scale.x = 2*params.L_cur + 2*params.thickness;
-            mesh.scale.z = 2*(params.L_cur-params.H_cur) + 2*params.thickness;
+            mesh.scale.z = 2*(params.L_cur*params.aspect_ratio-params.H_cur) + 2*params.thickness;
         });
 
         horiz_walls.forEach( function(mesh) {

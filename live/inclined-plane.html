@@ -30,7 +30,6 @@
             </div>
             <div id="canvas"></div>
         </div>
-        <!-- <script async type="text/javascript" src="./deploy/DEMCGND.js"></script> -->
         <script async type="text/javascript" src="../deploy/DEMCGND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -78,25 +77,24 @@
 
             var params = {
                 dimension: 3,
-                L: 3.7, //system size
-                N: 500,
+                L: 4, //system size
+                N: 800,
                 // packing_fraction: 0.5,
-                constant_volume: true,
-                axial_strain: 0,
-                volumetric_strain: 0,
                 paused: false,
-                g_mag: 2e3,
+                g_mag: 10,
                 theta: 0, // slope angle in DEGREES
                 d4_cur:0,
                 r_max: 0.55,
                 r_min: 0.45,
-                freq: 0.05,
                 new_line: false,
                 lut: 'None',
                 quality: 5,
                 vmax: 20, // max velocity to colour by
                 omegamax: 20, // max rotation rate to colour by
             }
+
+            let counter = 0;
+            var grid;
 
             params.average_radius = (params.r_min + params.r_max)/2.;
             let thickness = params.average_radius;
@@ -180,7 +178,7 @@
                 }
                 gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg) (W/S)').listen()
                     .onChange( () => update_slope_angle() );
-                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
+                gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Size', 'Particle Stress' ]).name('Colour by')
                     .onChange( () => SPHERES.update_particle_material(params,
                         // lut_folder
                     ) );
@@ -207,6 +205,7 @@
                 window.addEventListener( 'keypress', checkKeys, false );
 
                 if ( show_stats ) { make_graph(); }
+                update_slope_angle()
 
 			    animate();
 			}
@@ -248,10 +247,9 @@
 				requestAnimationFrame( animate );
                 SPHERES.move_spheres(S,params);
                 if ( !params.paused ) {
-                    S.simu_step_forward(10);
+                    S.simu_step_forward(5);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
-                    var grid = S.cg_get_gridinfo();
                     density=S.cg_get_result(0, "RHO", 0) ;
                     vavg=S.cg_get_result(0, "VAVG", 1) ;
                     stressTcxx=S.cg_get_result(0, "TC", 0) ;
@@ -261,10 +259,12 @@
                     for (var i=0 ; i<stressTcxx.length ; i++)
                     {
                         xloc[i]=grid[0]+i*grid[3] ;
-                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3./1e3 ;
-                        shearstress[i]=-stressTcxy[i]/1e3 ;
+                        pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
+                        shearstress[i]=-stressTcxy[i] ;
                     }
 
+                    // if ( counter % 3 == 0 ) { update_graph(); }
+                    // counter += 1;
                     update_graph();
                 }
 				renderer.render( scene, camera );
@@ -302,7 +302,7 @@
                     S.simu_interpret_command("auto mass");
                     S.simu_interpret_command("auto inertia");
 
-                    S.simu_interpret_command("boundary 0 WALL 0 "+String(50*params.L));
+                    S.simu_interpret_command("boundary 0 WALL 0 "+String(10*params.L));
                     S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
                     S.simu_interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
                     if ( params.dimension == 4 ) {
@@ -311,21 +311,22 @@
                     S.simu_interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3))
 
                     S.simu_interpret_command("auto location roughinclineplane");
+                    // S.simu_interpret_command("auto location randomdrop");
 
-                    S.simu_interpret_command("set Kn 2e5");
-                    S.simu_interpret_command("set Kt 8e4");
+                    S.simu_interpret_command("set Kn 2e4");
+                    S.simu_interpret_command("set Kt 8e3");
                     S.simu_interpret_command("set GammaN 75");
                     S.simu_interpret_command("set GammaT 75");
                     S.simu_interpret_command("set Mu 0.5");
                     S.simu_interpret_command("set T 150");
-                    S.simu_interpret_command("set dt 0.0002");
-                    S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
+                    S.simu_interpret_command("set dt 0.002");
+                    S.simu_interpret_command("set tdump 1000"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;
 
                     var cgparam ={} ;
                     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-                    cgparam["boxes"]=[10,1,1] ;
+                    cgparam["boxes"]=[20,1,1] ;
                     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
                     cgparam["boundaries"]=[
                         [ params.r_max,-params.L+params.r_max,-params.L+params.r_max],
@@ -343,6 +344,7 @@
                     console.log(JSON.stringify(cgparam)) ;
                     S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
                     S.cg_setup_CG() ;
+                    grid = S.cg_get_gridinfo();
                 }
             }
 
@@ -362,10 +364,10 @@
 						// 'y': [[shear]],
 						'x': [vavg],
 				}, {
-                    xaxis: {
-                        range: [-maxVelocity, maxVelocity],
-                        title: 'Velocity (mm/s)',
-                    }
+                    // xaxis: {
+                    //     range: [-maxVelocity, maxVelocity],
+                    //     title: 'Velocity (mm/s)',
+                    // },
                 }, [0])
 
 				Plotly.update('stats', {
@@ -374,12 +376,19 @@
 						'x': [pressure],
 				}, {}, [1])
 
-
 				Plotly.update('stats', {
 						'y': [xloc],
 						// 'y': [[shear]],
 						'x': [shearstress],
 				}, {}, [2])
+
+                var update = {
+                    xaxis: {
+                        range: [-maxVelocity, maxVelocity],
+                        title: 'Velocity (mm/s)',
+                    },
+                }
+                Plotly.relayout('stats', update);
 
 				/*Plotly.update('stats', {
 						'x': [1,2,3,4,5,6,7,8,9,10],
@@ -427,7 +436,16 @@
             //     link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
             // }
             function make_graph() {
-                let { data, layout } = LAYOUT.plotly_two_xaxis_graph('Average velocity (m/s)','Stress (Pa)','Location (mm)','Velocity','Pressure (p)','Shear stress (𝜏)');
+                let { data, layout } = LAYOUT.plotly_two_xaxis_graph('Downslope velocity (m/s)','Stress (Pa)','Height (mm)','Velocity','Pressure (p)','Shear stress (𝜏)');
+                var maxStress = 10*params.L*params.g_mag*0.6;
+                layout.xaxis2 = {
+                    range: [0,maxStress],
+                    title: 'Stress (Pa)',
+                    overlaying: 'x',
+                    side: 'top',
+                    rangemode: 'tozero',
+                    color: 'blue'
+                }
                 Plotly.newPlot('stats', data, layout);
             }
 

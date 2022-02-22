@@ -78,7 +78,7 @@
                 L: 4, //system size
                 N: 600,
                 vertical_strain: 0,
-                gravity: true,
+                gravity: false,
                 paused: false,
                 H_cur: 0,
                 pressure_set_pt: 1e4,
@@ -195,7 +195,7 @@
                 gui.add ( params, 'gravity').name('Gravity').listen()
                     .onChange( function() {
                         if ( params.gravity === true ) {
-                            S.simu_interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                            S.simu_interpret_command("gravity 0 0 -10 " + "0 ".repeat(params.dimension - 3)) }
                         else {
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
@@ -337,7 +337,7 @@
                     S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
                     S.simu_interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
                     if ( params.gravity === true ) {
-                        S.simu_interpret_command("gravity 0 0 -1000 " + "0 ".repeat(params.dimension - 3)) }
+                        S.simu_interpret_command("gravity 0 0 -10 " + "0 ".repeat(params.dimension - 3)) }
                     else {
                         S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
 
