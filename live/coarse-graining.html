@@ -85,8 +85,6 @@
                 lut: 'White',
                 cg_field: 'Density',
                 quality: 5,
-                vmax: 50, // max velocity to colour by
-                omegamax: 50, // max rotation rate to colour by
                 cg_width: 50,
                 cg_height: 50,
                 cg_opacity: 0.8,
@@ -173,7 +171,7 @@
                 }
                 gui.add ( params, 'cg_opacity', 0, 1).name('Opacity').listen();
                 gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
-                gui.add ( params, 'cg_window_size', 0.5, 3*params.L).name('Window size').listen().onChange( () => {
+                gui.add ( params, 'cg_window_size', 0.5, params.L/2.).name('Window size').listen().onChange( () => {
                     update_cg_params(S, params);
                 });
                 gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
@@ -183,33 +181,9 @@
                 gui.add ( params, 'paused').name('Paused').listen();
 
                 window.addEventListener( 'resize', onWindowResize, false );
-                window.addEventListener( 'keypress', checkKeys, false );
-
-                // controls = new OrbitControls( camera, container );
-				// controls.target.x = 1*params.L;
-                // controls.target.y = 0;
-                // controls.target.z = 0;
-				// controls.update();
-
 
 			    animate();
 			}
-
-            function update_shear_rate() {
-                S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
-                params.vmax = 1.5*params.shear_rate*params.L;
-            }
-
-            function checkKeys( event ) {
-                if ( event.code === 'KeyW' ) {
-                    params.shear_rate += 0.1;
-                    update_shear_rate();
-                    }
-                if ( event.code === 'KeyS' ) {
-                    params.shear_rate -= 0.1;
-                    update_shear_rate();
-                    }
-            }
 
             function onWindowResize(){
 
@@ -274,6 +248,7 @@
 
                     }
                     const texture = new THREE.DataTexture( data, params.cg_width, params.cg_height );
+                    // texture.magFilter = THREE.LinearFilter; // smooth the data artifically
                     texture.needsUpdate = true;
                     cg_mesh.material.map = texture;
                     // cg_mesh.material.opacity = parseInt(255*params.opacity);

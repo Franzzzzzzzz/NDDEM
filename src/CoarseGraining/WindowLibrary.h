@@ -18,7 +18,7 @@ public:
         double rq=distance(q, loc) ;
         double wpqs = window_avg (rp, rq) ;
         double wpqf = window_int (rp, rq) ;
-        return (make_pair(wpqs, wpqf)) ; 
+        return (make_pair(wpqs, wpqf)) ;
     }
     virtual double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     virtual double window_avg (double r1, double r2) {return (0.5*(window(r1)+window(r2))) ; }
@@ -29,9 +29,10 @@ public:
 class LibLucy3D : public LibBase {
 public :
     LibLucy3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-    LibLucy3D() {} ; 
+    LibLucy3D() {} ;
     double Lucy (double r) {static double cst=105./(16*M_PI*w*w*w) ; if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
     double window(double r) {return (Lucy(r)) ;}
+    double cutoff (void) {return 1*w ;} // added by benjy to get rid of extra (hopefully useless) data
     //double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
 };
@@ -39,37 +40,37 @@ public :
 class LibLucy3DFancyInt : public LibLucy3D {
 public :
     LibLucy3DFancyInt(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc) 
+    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
     {
-      double res = 0 ; 
-      double prev, cur, first ; 
+      double res = 0 ;
+      double prev, cur, first ;
       v1d locp (d,0) ;
-      v1d lpq(d,0) ; 
-      for (int i=0 ; i<d ;i++) 
+      v1d lpq(d,0) ;
+      for (int i=0 ; i<d ;i++)
       {
         lpq[i] = data->pos[i][q] - data->pos[i][p] ;
-        locp[i] = data->pos[i][p] ; 
+        locp[i] = data->pos[i][p] ;
       }
-        
+
       double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
-      
+
       first=prev=Lucy(LibLucy3D::distance(p,locp)) ;
       for (int i=0 ; i<Nsteps ; i++)
       {
         for (int j=0; j<d ; j++)
-            locp[j] += (1./Nsteps) * lpq[j] ; 
-        cur=Lucy(distance(locp,loc)) ; 
-        res += (cur+prev)/2.*length ; 
-        prev=cur ; 
+            locp[j] += (1./Nsteps) * lpq[j] ;
+        cur=Lucy(distance(locp,loc)) ;
+        res += (cur+prev)/2.*length ;
+        prev=cur ;
       }
-      //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ; 
+      //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ;
       return (make_pair(window_avg(first,cur),res)) ;
     }
-    using LibBase::distance ; 
+    using LibBase::distance ;
     double distance (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ; }
     void set_integrationsteps (int steps) {if (steps<1) printf("Less than 1 step is not meaningful.") ; if (steps>1000) printf("You've chosen a very large number of integration steps, you may want to reconsider") ; Nsteps=steps ; }
 private:
-    int Nsteps = 10 ; 
+    int Nsteps = 10 ;
 };
 
 
@@ -117,7 +118,7 @@ public:
     }
     double cutoff (void) {
         double maxr=0 ;
-        if (data->N==0) return 2*w ; 
+        if (data->N==0) return 2*w ;
         for (int i=0 ; i<data -> N ; i++)
             if (maxr<data->radius[i])
                 maxr=data->radius[i] ;
@@ -125,46 +126,46 @@ public:
     }
     double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
     double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
-    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc) 
+    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
     {
         double rp=LibBase::distance(p, loc) ;
         double rq=LibBase::distance(q, loc) ;
         double wpqs = window_avg (rp, rq) ;
         double wpqf = 0 ;
-        
+
         v1d locp (d,0) ;
-        v1d lpq(d,0) ; 
-        double normp=0, normlpq=0 ; 
-        double b = 0 ; 
-        for (int i=0 ; i<d ;i++) 
+        v1d lpq(d,0) ;
+        double normp=0, normlpq=0 ;
+        double b = 0 ;
+        for (int i=0 ; i<d ;i++)
         {
           lpq[i] = data->pos[i][q] - data->pos[i][p] ;
           locp[i] = data->pos[i][p]-loc[i] ;
-          normp += locp[i]*locp[i] ; 
+          normp += locp[i]*locp[i] ;
           normlpq += lpq[i]*lpq[i] ;
-          b += locp[i]*lpq[i] ; 
-        } 
+          b += locp[i]*lpq[i] ;
+        }
         b*=2 ;
-        
-        double Delta = b*b-4*normlpq*(normp-w*w) ; 
-        if (Delta<=0) 
-            wpqs = 0 ; 
+
+        double Delta = b*b-4*normlpq*(normp-w*w) ;
+        if (Delta<=0)
+            wpqs = 0 ;
         else
         {
-            double alpha1 = (-b - sqrt(Delta))/(2*normlpq) ; 
+            double alpha1 = (-b - sqrt(Delta))/(2*normlpq) ;
             double alpha2 = (-b + sqrt(Delta))/(2*normlpq) ;
-            
+
             if (alpha1<0 && alpha2>0 && alpha2<1)
-                wpqf = cst * alpha2 ; 
+                wpqf = cst * alpha2 ;
             else if (alpha1<0 && alpha2>1)
-                wpqf = cst ; 
+                wpqf = cst ;
             else if (alpha1>0 && alpha1<1 && alpha2>1)
-                wpqf = cst * (1-alpha1) ; 
+                wpqf = cst * (1-alpha1) ;
             else if (alpha1>0 && alpha1<1 && alpha2>0 && alpha2<1) //this is a VERY small window ... ...
                 wpqf = cst*(alpha2-alpha1) ;
-            else 
+            else
                 wpqf = 0 ;
-            
+
         }
         return (make_pair(wpqs,wpqf)) ;
     }
@@ -200,7 +201,7 @@ class LibLucyND_Periodic : public LibLucyND
   LibLucyND_Periodic(struct Data * D, double ww, double dd, int periodic, vector<int>boxes, vector<double> deltas)
     : LibLucyND(D,ww,dd-__builtin_popcount(periodic))
   {
-    printf("%g ", scale) ; 
+    printf("%g ", scale) ;
     maskperiodic = 0 ;
     for (size_t i =0 ; i<boxes.size() ; i++)
       if ((periodic&(1<<i)) && boxes[i]==1)
