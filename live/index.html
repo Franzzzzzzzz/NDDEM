@@ -48,6 +48,7 @@
             import { Lut } from './js/Lut.js'
             import { PIDcontroller } from './js/PIDcontroller.js'
             import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
+            import * as RAYCAST from './js/RaycastHandler.js'
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
@@ -82,15 +83,7 @@
             let NDsolids, material, STLFilename;
             let meshes = new THREE.Group();
 
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
-            let intersection_plane = new THREE.Plane();
-            let camera_direction = new THREE.Vector3();
 
-            let INTERSECTED = null;
-            let last_intersection = null;
-            let locked_particle = null;
-            let ref_location;
 
             let loading_method = 'strain_controlled';
             if ( urlParams.has('stress_controlled') ) {
@@ -321,8 +314,7 @@
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
-                window.addEventListener( 'mousemove', onMouseMove, false );
-                window.addEventListener( 'keypress', onSelectParticle, false );
+
 
                 if ( show_stats ) { make_graph(); }
 
@@ -330,34 +322,8 @@
 			    animate();
 			}
 
-            function onMouseMove( event ) {
 
-            	// calculate mouse position in normalized device coordinates
-            	// (-1 to +1) for both components
 
-            	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-            	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-            }
-
-            function onSelectParticle( event ) {
-                // console.log(camera.getWorldDirection() )
-                if ( event.code === 'Space' ) {
-                    if ( locked_particle === null ) {
-                        locked_particle = INTERSECTED;
-                        // console.log(locked_particle);
-                        ref_location = locked_particle.position;
-
-                        camera.getWorldDirection( camera_direction ); // update camera direction
-                        // set the plane for the particle to move along to be orthogonal to the camera
-                        intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
-                                                                          locked_particle.position );
-                    }
-                    else {
-                        locked_particle = null;
-                    }
-                }
-            }
 
 
             function onWindowResize(){
@@ -432,22 +398,7 @@
                 if ( clock.getElapsedTime() > 1 ) { started = true; }
 				requestAnimationFrame( animate );
                 move_spheres();
-                if ( locked_particle !== null ) {
-                    // console.log(locked_particle)
-                    // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
-                        // console.log('success!')
-        				// ref_location.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-        			// }
-                    // ref_location.x = mouse.x;
-                    raycaster.ray.intersectPlane( intersection_plane, ref_location);
-                    ref_location.clamp( new THREE.Vector3(back.position.x,  left.position.y,floor.position.z),
-                                        new THREE.Vector3(front.position.x,right.position.y, roof.position.z) );
-                    // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
-                        // console.log(ref_location.x)
-                        // console.log(back.position.x)
-                    S.fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
-                    // }
-                }
+                RAYCAST.animate_locked_particle(S, camera, spheres);
 
                 if ( !params.paused ) {
                     new_time = clock.getElapsedTime()
@@ -488,26 +439,6 @@
                     }
 
                 }
-
-                // update the picking ray with the camera and mouse position
-            	raycaster.setFromCamera( mouse, camera );
-
-
-                const intersects = raycaster.intersectObjects( spheres.children );
-				if ( intersects.length > 0 ) { // if found something
-					if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
-                            if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
-    						INTERSECTED = intersects[ 0 ].object;
-                            INTERSECTED.material.uniforms.ambient.value = 5.0;
-					}
-				}
-                else { // didn't find anything
-					if ( INTERSECTED !== null ) { // there was something before
-                        INTERSECTED.material.uniforms.ambient.value = 1.0;
-                        INTERSECTED = null;
-                    }
-				}
-
 
 				renderer.render( scene, camera );
 
@@ -693,7 +624,7 @@
                     S.interpret_command("set GammaT 75");
                     S.interpret_command("set Mu 0.5");
                     S.interpret_command("set T 150");
-                    S.interpret_command("set dt 0.0001");
+                    S.interpret_command("set dt 0.0002");
                     S.interpret_command("auto skin");
                     S.finalise_init () ;
                 }

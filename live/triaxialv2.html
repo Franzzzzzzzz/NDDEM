@@ -331,7 +331,7 @@
             }
 
 			function animate() {
-                if ( clock.getElapsedTime() > 1 ) { started = true; }
+                if ( clock.getElapsedTime() > 2 ) { started = true; }
 				requestAnimationFrame( animate );
                 SPHERES.move_spheres(S,params);
 
@@ -448,7 +448,7 @@
                     S.simu_interpret_command("set Mu 1.0");
                     S.simu_interpret_command("set Mu_wall 0");
                     S.simu_interpret_command("set T 150");
-                    S.simu_interpret_command("set dt 0.0002");
+                    S.simu_interpret_command("set dt 0.0001");
                     S.simu_interpret_command("set tdump 100000"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;

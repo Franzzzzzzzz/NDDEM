@@ -1,5 +1,5 @@
 let radii;
-let spheres;
+export let spheres;
 let NDParticleShader;
 let v, omegaMag;
 
@@ -88,6 +88,8 @@ export function update_particle_material(params, lut_folder) {
             // object.material.color = lut.getColor(radii[i]);
             object.material.color = lut.getColor( 1 - (radii[i] - params.r_min)/(params.r_max - params.r_min) )
         }
+    } else if ( params.lut === 'White' ) {
+        // do nothing, they're already white
     } else if (params.lut === "Rotation Rate") {
       lut.setMin(0);
       lut.setMax(params.omegamax);
