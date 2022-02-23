@@ -61,9 +61,6 @@
             let radii;
             let particle_volume;
 
-            var lut = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
-
-
             var params = {
                 dimension: 3,
                 L: 5, //system size
@@ -90,6 +87,10 @@
                 cg_opacity: 0.8,
                 cg_window_size: 1,
             }
+
+            let rainbow    = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
+            let cooltowarm = new Lut("cooltowarm", 512); // options are rainbow, cooltowarm and blackbody
+            let blackbody  = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
             params.average_radius = (params.r_min + params.r_max)/2.;
             let thickness = params.average_radius;
@@ -174,11 +175,11 @@
                 gui.add ( params, 'cg_window_size', 0.5, params.L/2.).name('Window size').listen().onChange( () => {
                     update_cg_params(S, params);
                 });
-                gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
-                    params.cg_height = params.cg_width;
-                    update_cg_params(S, params);
-                });
-                gui.add ( params, 'paused').name('Paused').listen();
+                // gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
+                    // params.cg_height = params.cg_width;
+                    // update_cg_params(S, params);
+                // });
+                // gui.add ( params, 'paused').name('Paused').listen();
 
                 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -211,8 +212,20 @@
                     const data = new Uint8Array( 4 * size );
                     const opacity = parseInt(255 * params.cg_opacity);
                     let val;
-                    if ( params.cg_field === 'Density' ) { val = S.cg_get_result(0, "RHO", 0); }
-                    else if ( params.cg_field === 'Velocity' ) { val = S.cg_get_result(0, "VAVG", 1); }
+                    let lut;
+                    if ( params.cg_field === 'Density' ) {
+                        val = S.cg_get_result(0, "RHO", 0);
+                        lut = rainbow;
+                        lut.setMin(0);
+                        lut.setMax(2.5);
+                    }
+                    else if ( params.cg_field === 'Velocity' ) {
+                        val = S.cg_get_result(0, "VAVG", 1);
+                        lut = cooltowarm;
+                        let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+                        lut.setMin(-maxVal);
+                        lut.setMax(maxVal);
+                    }
                     else if ( params.cg_field === 'Pressure' ) {
                         const stressTcxx=S.cg_get_result(0, "TC", 0) ;
                         const stressTcyy=S.cg_get_result(0, "TC", 4) ;
@@ -222,11 +235,19 @@
                         {
                             val[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
                         }
-                    } else if ( params.cg_field === 'Shear stress' ) { val = S.cg_get_result(0, "TC", 1); }
+                        lut = rainbow;
+                        let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+                        lut.setMin(0);
+                        lut.setMax(maxVal);
+                    } else if ( params.cg_field === 'Shear stress' ) {
+                        val = S.cg_get_result(0, "TC", 1);
+                        lut = cooltowarm;
+                        let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+                        lut.setMin(-maxVal);
+                        lut.setMax( maxVal);
+                    }
 
-                    let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-                    lut.setMin(-maxVal);
-                    lut.setMax( maxVal);
+
 
 
                     for ( let i = 0; i < size; i ++ ) {
@@ -323,6 +344,7 @@
                     S.simu_interpret_command("set GammaN 75");
                     S.simu_interpret_command("set GammaT 75");
                     S.simu_interpret_command("set Mu 1");
+                    S.simu_interpret_command("set Mu_wall 0");
                     S.simu_interpret_command("set T 150");
                     S.simu_interpret_command("set dt 0.0002");
                     S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
