@@ -69,7 +69,7 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
     setWindow<Windows::Lucy3D> (w) ;
     break ;
   case Windows::Lucy3DFancyInt:
-    setWindow<Windows::Lucy3DFancyInt> (w) ; 
+    setWindow<Windows::Lucy3DFancyInt> (w) ;
     break ;
   case Windows::Hann3D :
     setWindow<Windows::Hann3D> (w) ;
@@ -81,7 +81,7 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
     setWindow<Windows::LucyND> (w) ;
     break ;
   case Windows::LucyND_Periodic:
-    setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ; 
+    setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ;
     break ;
   default:
     printf("Unknown window, check Coarsing::setWindow\n") ;
@@ -130,6 +130,7 @@ int Coarsing::grid_neighbour ()
     double dst ;
     for (int i=0 ; i<Npt ; i++)
     {
+        CGP[i].neighbors.clear() ; 
         CGP[i].neighbors.push_back(i) ;
         for (int j=0 ; j<Npt ; j++)
         {
@@ -147,7 +148,7 @@ return 0 ;
 //---------------------------------
 Pass Coarsing::set_flags (vector <string> s)
 {
- Pass Res = static_cast<Pass>(0) ; 
+ Pass Res = static_cast<Pass>(0) ;
  flags=0 ; Field * a;
  for (auto i = s.begin() ; i<s.end() ; i++)
  {
@@ -155,7 +156,7 @@ Pass Coarsing::set_flags (vector <string> s)
      if (a!=NULL)
      {
          flags |= a->flag ;
-         Res = Res | a->passlevel ; 
+         Res = Res | a->passlevel ;
      }
  }
  printf("Flags: %X | Pipelines %X \n", flags, static_cast<int>(Res) ) ;
@@ -417,7 +418,7 @@ for (int i=0; i<8 ; i++) pts[i][0] = (nptcum[0]*pts[i][0]+nptcum[1]*pts[i][1]+np
 //printf("| %d %d %d %d %d {%d} %d %d %g |", pts[0][0], pts[1][0], pts[2][0], pts[3][0], pts[4][0], pts[5][0], pts[6][0], pts[7][0], (*CGPtemp)[pts[5][0]].fields[0][idvel]) ; fflush(stdout) ;
 
 /*vector <CGPoint> * CGbase = nullptr ;
-if (usetimeavg) CGbase = CGPtemp ; 
+if (usetimeavg) CGbase = CGPtemp ;
 else CGbase = &CGP ; */
 
 for (int i=0; i<8 ; i++)
@@ -426,7 +427,7 @@ for (int i=0; i<8 ; i++)
             Qs[j*4] += 1/8. * ((*CGPtemp)[pts[i][0]].fields[0][idvel+j]) ;
         else
             Qs[j*4] += 1/8. * (CGP[pts[i][0]].fields[0][idvel+j]) ;
-            
+
 //printf("%g %g %g|", Qs[0], Qs[4], Qs[8]) ;
 for (int i=0; i<4 ; i++)
   if (pts[0+i][0]!=pts[4+i][0])
@@ -517,7 +518,7 @@ for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
  id=find_closest(i) ;
- dm=data.mass[i] ; 
+ dm=data.mass[i] ;
  if (doI || doomega) dI=data.Imom[i] ;
  for (dd=0 ; dd<d ; dd++) {if (dovel) dv[dd]=data.vel[dd][i] ; if (doomega) dom[dd]=data.omega[dd][i] ; }
 
@@ -795,7 +796,7 @@ int Gamdotid=get_id("StrainRate") ;            if (Gamdotid<0) doGamdot=false ;
 int Gamvdotid=get_id("VolumetricStrainRate") ; if (Gamvdotid<0) doGamvdot=false ;
 int Gamtauid=get_id("ShearStrainRate") ;       if (Gamtauid<0) doGamtau=false ;
 int Omegaid=get_id("RotationalVelocity") ;     if (Omegaid<0) doOmega=false ;
-int OmegaMagid=get_id("RotationalVelocityMag");if (OmegaMagid<0) doOmegaMag=false ;  
+int OmegaMagid=get_id("RotationalVelocityMag");if (OmegaMagid<0) doOmegaMag=false ;
 int VAVGid=get_id("VAVG") ;
 vector <double> gradient ;
 if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) gradient.resize(d*d,0) ;
@@ -852,25 +853,25 @@ for (int i=0 ; i< Npt ; i++)
           else // backward difference
               gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i+nptcum[l]].fields[cT][VAVGid+k])/(2*dx[l]) ;
          }
-    
+
      // Antisymetric part of the velocity gradient
      if (doOmega)
      {
          assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
-         CGP[i].fields[cT][Omegaid+0] = 0.5*(gradient[2*d+1] - gradient[1*d+2]) ; 
-         CGP[i].fields[cT][Omegaid+1] = 0.5*(gradient[0*d+2] - gradient[2*d+0]) ; 
-         CGP[i].fields[cT][Omegaid+2] = 0.5*(gradient[1*d+0] - gradient[0*d+1]) ; 
+         CGP[i].fields[cT][Omegaid+0] = 0.5*(gradient[2*d+1] - gradient[1*d+2]) ;
+         CGP[i].fields[cT][Omegaid+1] = 0.5*(gradient[0*d+2] - gradient[2*d+0]) ;
+         CGP[i].fields[cT][Omegaid+2] = 0.5*(gradient[1*d+0] - gradient[0*d+1]) ;
      }
-     
+
      if (doOmegaMag)
      {
          assert(d==3) ; //For other dimensions, need to do the full rotation matrix etc...
-         CGP[i].fields[cT][OmegaMagid]  = (0.5*(gradient[2*d+1] - gradient[1*d+2])*0.5*(gradient[2*d+1] - gradient[1*d+2])) ; 
-         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[0*d+2] - gradient[2*d+0])*0.5*(gradient[0*d+2] - gradient[2*d+0])) ; 
+         CGP[i].fields[cT][OmegaMagid]  = (0.5*(gradient[2*d+1] - gradient[1*d+2])*0.5*(gradient[2*d+1] - gradient[1*d+2])) ;
+         CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[0*d+2] - gradient[2*d+0])*0.5*(gradient[0*d+2] - gradient[2*d+0])) ;
          CGP[i].fields[cT][OmegaMagid] += (0.5*(gradient[1*d+0] - gradient[0*d+1])*0.5*(gradient[1*d+0] - gradient[0*d+1])) ;
-         CGP[i].fields[cT][OmegaMagid]=sqrt(CGP[i].fields[cT][OmegaMagid]) ; 
-     }    
-     
+         CGP[i].fields[cT][OmegaMagid]=sqrt(CGP[i].fields[cT][OmegaMagid]) ;
+     }
+
      // Symetric part of the velocity gradient
      for (int k=0 ; k<d ; k++)
          for (int l=0 ; l<d ; l++)
@@ -1072,28 +1073,28 @@ return 0 ;
 //----------------------------------------------------------
 bool Data::check_field_availability(string name)
 {
- if      (name == "RHO" ) return (mass) ; 
- else if (name == "I"   ) return (mass && Imom) ; 
- else if (name == "VAVG") return (mass && vel[0]) ; 
- else if (name == "TC"  ) return (lpq[0] && fpq[0]) ; 
- else if (name == "TK"  ) return (mass) ; 
- else if (name == "ROT" ) return (mass && Imom && omega[0]) ; 
- else if (name == "MC"  ) return (lpq[0] && mqp[0] && mpq[0]) ; 
+ if      (name == "RHO" ) return (mass) ;
+ else if (name == "I"   ) return (mass && Imom) ;
+ else if (name == "VAVG") return (mass && vel[0]) ;
+ else if (name == "TC"  ) return (lpq[0] && fpq[0]) ;
+ else if (name == "TK"  ) return (mass) ;
+ else if (name == "ROT" ) return (mass && Imom && omega[0]) ;
+ else if (name == "MC"  ) return (lpq[0] && mqp[0] && mpq[0]) ;
  else if (name == "MK"  ) return (mass && Imom) ;
  else if (name == "mC"  ) return (lpq[0] && fpq[0]) ;
- else if (name == "EKT" ) return (mass && vel[0]) ; 
- else if (name == "eKT" ) return (mass) ; 
- else if (name == "EKR" ) return (mass && Imom && omega[0]) ; 
- else if (name == "eKR" ) return (mass && Imom) ; 
+ else if (name == "EKT" ) return (mass && vel[0]) ;
+ else if (name == "eKT" ) return (mass) ;
+ else if (name == "EKR" ) return (mass && Imom && omega[0]) ;
+ else if (name == "eKR" ) return (mass && Imom) ;
  else if (name == "qTC" ) return (lpq[0] && fpq[0]) ;
  else if (name == "qTK" ) return (mass) ;
  else if (name == "qRC" ) return (lpq[0] && mqp[0] && mpq[0]) ;
- else if (name == "qRK" ) return (mass && Imom) ; 
- else if (name == "zT"  ) return (fpq[0] && vel[0]) ; 
- else if (name == "zR"  ) return (mpq[0] && mqp[0] && omega[0]) ; 
- else if (name == "RADIUS"  ) return (radius) ; 
- else 
-     return (true) ; 
+ else if (name == "qRK" ) return (mass && Imom) ;
+ else if (name == "zT"  ) return (fpq[0] && vel[0]) ;
+ else if (name == "zR"  ) return (mpq[0] && mqp[0] && omega[0]) ;
+ else if (name == "RADIUS"  ) return (radius) ;
+ else
+     return (true) ;
 }
 
 //====================================================

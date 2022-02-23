@@ -3,13 +3,13 @@
 
 using json = nlohmann::json;
 
-enum FileFormat {NDDEM, Liggghts, MercuryData, MercuryVTU, Interactive} ; 
-enum FileType {both, particles, contacts} ; 
+enum FileFormat {NDDEM, Liggghts, MercuryData, MercuryVTU, Interactive} ;
+enum FileType {both, particles, contacts} ;
 //enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, fpq, mpq, mqp} ;
 
 class Param {
 public:
-    
+
   int skipT=0 ;
   int maxT =-1;
   vector <string> flags = {} ;
@@ -21,26 +21,26 @@ public:
   double default_density=-1, default_radius=-1 ;
 
   AverageType timeaverage = AverageType::None ;
-  
+
   Windows window = Windows::Lucy3D ;
   double windowsize ;
   vector<bool> periodicity ;
   vector<double>delta ;
 
   std::map <std::string, bool> requiredfieldset = {{"dimension", false}, {"window size", false}, {"fields", false}, {"max time", false}, {"boundaries", false}, {"boxes", false}} ;
-  
+
   //----- Files
   struct File {
       std::string path ;
-      FileFormat fileformat; 
-      FileType filetype ; 
-      int numfiles ; 
-      std::map <std::string, std::string> mapping ; 
-      Reader * reader   ; 
-      //~File() {if (reader != nullptr) {reader->close() ; delete (reader) ; }} 
-  } ; 
-  std::vector <File> files ; 
-  
+      FileFormat fileformat;
+      FileType filetype ;
+      int numfiles ;
+      std::map <std::string, std::string> mapping ;
+      Reader * reader   ;
+      //~File() {if (reader != nullptr) {reader->close() ; delete (reader) ; }}
+  } ;
+  std::vector <File> files ;
+
   //----- Extra fields
   struct ExtaField {
     string name  ;
@@ -48,21 +48,21 @@ public:
     FieldType type ;
   } ;
   vector<ExtaField> extrafields ;
-  
+
   int curts=0 ;
-  bool tsread = false ; 
+  bool tsread = false ;
 
   void from_json (json & j) ;
   int read_timestep (int ts) ;
-  int set_data (Data & cgdata) ; 
-  int get_num_particles () ; 
+  int set_data (Data & cgdata) ;
+  int get_num_particles () ;
   int get_num_contacts () ;
   double * get_data(DataValue datavalue, int dd=0) ;
   void post_init () ;
-  
+
 
 private :
-  int identify_max_level() ; 
+  int identify_max_level() ;
   Windows identify_window(std::string windowname) ;
   void process_extrafields (json &j) ;
   void process_file (json &j) ;
@@ -82,19 +82,19 @@ void Param::from_json(json &j)
         }
         else if (v.key() == "window size")
         { windowsize = v.value(); requiredfieldset[v.key()] = true ; }
-        else if (v.key() == "skip") skipT = v.value() ; 
+        else if (v.key() == "skip") skipT = v.value() ;
         else if (v.key() == "max time") { maxT = v.value() ; requiredfieldset[v.key()] = true ;}
         else if (v.key() == "fields") { flags = v.value().get<vector<string>>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boxes")  {boxes = v.value().get<decltype(boxes)>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boundaries") {boundaries = v.value().get<decltype(boundaries)>(); requiredfieldset[v.key()] = true ; }
-        else if (v.key() == "time average") 
+        else if (v.key() == "time average")
         {
-            if (v.value() == "None") timeaverage = AverageType::None ; 
-            else if (v.value() == "Final") timeaverage = AverageType::Final ; 
-            else if (v.value() == "Intermediate") timeaverage = AverageType::Intermediate ; 
-            else if (v.value() == "Intermediate and Final" || v.value() =="Final and Intermediate") timeaverage = AverageType::Both ; 
+            if (v.value() == "None") timeaverage = AverageType::None ;
+            else if (v.value() == "Final") timeaverage = AverageType::Final ;
+            else if (v.value() == "Intermediate") timeaverage = AverageType::Intermediate ;
+            else if (v.value() == "Intermediate and Final" || v.value() =="Final and Intermediate") timeaverage = AverageType::Both ;
             else
-                printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final'). Case sensitive\n") ; 
+                printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final'). Case sensitive\n") ;
         }
         else if (v.key() == "window") {window = identify_window(v.value().get<string>()); }
         else if (v.key() == "periodicity") {periodicity = v.value().get<decltype(periodicity)>();}
@@ -103,22 +103,22 @@ void Param::from_json(json &j)
         else if (v.key() == "diameter") { default_radius=v.value().get<double>()/2. ; }
         else if (v.key() == "extra fields") { process_extrafields(v.value()) ; }
         else if (v.key() == "dimension") {dim = v.value() ; requiredfieldset[v.key()] = true ; }
-        else printf("Unknown json key: %s.\n", v.key().c_str()) ; 
+        else printf("Unknown json key: %s.\n", v.key().c_str()) ;
     }
-  
-  
+
+
 /*
     post_init() ;
 */
 }
 //-----------------------------------------------
-int Param::read_timestep (int ts) 
+int Param::read_timestep (int ts)
 {
     if (curts == ts && tsread) return 0 ; //Already read and all
-    
+
     for (auto & v: files)
     {
-     v.reader->read_timestep(ts) ;    
+     v.reader->read_timestep(ts) ;
     }
     return 1 ;
 }
@@ -126,25 +126,25 @@ int Param::read_timestep (int ts)
 void Param::post_init()
 {
     if (files.size() ==0) { printf("ERR: a file should be defined.\n"); return ; }
-    if (dim == -1 || !requiredfieldset["dimension"] ) dim=files[0].reader->get_dimension() ; 
+    if (dim == -1 || !requiredfieldset["dimension"] ) dim=files[0].reader->get_dimension() ;
     if (!requiredfieldset["window size"]) { printf("ERR: 'window size' is required and cannot be built. \n") ; return ; }
     if (!requiredfieldset["fields"]) { printf("ERR: 'fields' is required and cannot be built. \n") ; return ; }
     if (!requiredfieldset["boxes"]) { printf("ERR: the number of boxes in each dimension is required and cannot be built.\n") ; return ; }
     if (!requiredfieldset["max time"])
     {
-        maxT = files[0].reader->get_numts() ; 
-        printf("//%d %d//", maxT, skipT) ; 
+        maxT = files[0].reader->get_numts() ;
+        printf("//%d %d//", maxT, skipT) ;
         if (maxT==-1)
         {
             printf("ERR: Cannot find the total number of timestep from the file.\n") ;
-            return ; 
+            return ;
         }
-        maxT -= skipT ; 
-        printf("//%d//", maxT) ; 
-        if (maxT<0) maxT=0 ; 
+        maxT -= skipT ;
+        printf("//%d//", maxT) ;
+        if (maxT<0) maxT=0 ;
     }
-    if (!requiredfieldset["boundaries"]) boundaries= files[0].reader->get_bounds() ; 
-    
+    if (!requiredfieldset["boundaries"]) boundaries= files[0].reader->get_bounds() ;
+
     if (boundaries.size() != 2 || boundaries[0].size() != static_cast<unsigned int>(dim) || boundaries[1].size()!=static_cast<unsigned int>(dim))
         printf("ERR: dimension of the boundaries is not consistent (should be '2 x dimension')\n") ;
     if (boxes.size() != static_cast<unsigned int>(dim))
@@ -173,18 +173,18 @@ void Param::post_init()
         }
       }
     }
-    
+
     if (default_density!=-1)
         for (auto &v: files)
-            v.reader->set_default_density(default_density) ; 
+            v.reader->set_default_density(default_density) ;
     if (default_radius!=-1)
         for (auto &v: files)
-            v.reader->set_default_radius(default_radius) ; 
+            v.reader->set_default_radius(default_radius) ;
 }
 //---------------------------------------------------
 int Param::identify_max_level()
 {
-    printf("THIS FUNCTION HAS BEEN REMOVED (identify_max_level)\n") ; 
+    printf("THIS FUNCTION HAS BEEN REMOVED (identify_max_level)\n") ;
 /*    if (!hascontactdata && (
         std::find(flags.begin(), flags.end(), "TC") != flags.end() ||
         std::find(flags.begin(), flags.end(), "MC") != flags.end() ||
@@ -226,12 +226,12 @@ int Param::identify_max_level()
         std::find(flags.begin(), flags.end(), "VolumetricStrainRate"   ) != flags.end() ||
         std::find(flags.begin(), flags.end(), "ShearStrainRate"   ) != flags.end())
     maxlevel = 4 ;
-    
+
     return maxlevel ; */
 return -1 ;
 }
 //----------------------------------------------------------
-Windows Param::identify_window(std::string windowstr) 
+Windows Param::identify_window(std::string windowstr)
 {
          if ( windowstr=="Rect3D") return Windows::Rect3D ;
     else if ( windowstr=="Rect3DIntersect") return Windows::Rect3DIntersect ;
@@ -240,7 +240,7 @@ Windows Param::identify_window(std::string windowstr)
     else if ( windowstr=="RectND") return Windows::RectND ;
     else if ( windowstr=="LucyND") return Windows::LucyND ;
     else if ( windowstr=="LucyND_Periodic") return Windows::LucyND_Periodic ;
-    else if ( windowstr=="Lucy3DFancyInt")  return Windows::Lucy3DFancyInt; 
+    else if ( windowstr=="Lucy3DFancyInt")  return Windows::Lucy3DFancyInt;
     else {printf("Unknown windowing function.\n") ; return Windows::Lucy3D ; }
 }
 //-------------------------------------
@@ -248,7 +248,7 @@ void Param::process_extrafields (json &j)
 {
     for (auto & v : j)
     {
-        FieldType typ=FieldType::Particle ; 
+        FieldType typ=FieldType::Particle ;
              if (v["type"]=="Particle") typ = FieldType::Particle ;
         else if (v["type"]=="Contact") typ = FieldType::Contact ;
         else if (v["type"]=="Fluctuation") typ = FieldType::Fluctuation ;
@@ -265,13 +265,13 @@ void Param::process_file (json &j2)
         auto v = j.find("content") ;
         if (v != j.end())
         { if ( *v == "particles") content = FileType::particles ;
-        else if (*v == "contacts") content = FileType::contacts ;   
-        else if (*v == "both") content = FileType::both ;   
-        else printf("WARN: unknown file content.\n") ; 
+        else if (*v == "contacts") content = FileType::contacts ;
+        else if (*v == "both") content = FileType::both ;
+        else printf("WARN: unknown file content.\n") ;
         }
         else {printf("WARN: the key 'content' is recommended when defining a file. Set to 'particles' by default.\n") ;}
-    
-        FileFormat format ; 
+
+        FileFormat format ;
         v = j.find("format") ;
         if (v != j.end())
         { if ( *v == "liggghts") format = FileFormat::Liggghts ;
@@ -282,17 +282,17 @@ void Param::process_file (json &j2)
         else {printf("ERR: unknown file format.\n") ; return ;}
         }
         else { printf("ERR: the key 'format' is required when defining a file. \n") ; return ; }
-        
-        int number = 1 ; 
+
+        int number = 1 ;
         v = j.find("number") ;
-        if (v != j.end()) number = *v ; 
-        
+        if (v != j.end()) number = *v ;
+
         std::map <std::string, std::string> mapping ;
         v = j.find("mapping") ;
         if (v != j.end()) mapping= v->get<std::map <std::string, std::string>>();
-        
+
         files.push_back({.path=j["filename"], .fileformat=format, .filetype=content, .numfiles=number, .mapping=mapping, .reader = nullptr}) ;
-        
+
         if (files.back().fileformat == FileFormat::Liggghts)
         {
             #ifndef NOLIGGGHTS
@@ -302,24 +302,25 @@ void Param::process_file (json &j2)
                 files.back().reader = new LiggghtsReader_particles (files.back().path) ;
             else if (files.back().filetype == FileType::contacts)
             {
-                std::vector<File>::iterator it ; 
+                std::vector<File>::iterator it ;
                 for (it = files.begin() ; it<files.end() ; it++)
                     if (it->filetype==FileType::particles)
-                        break ; 
+                        break ;
                 if (it == files.end())
                 {
-                    printf("ERR: a dump particles needs to be defined before defining a dump contacts\n") ; 
-                    files.pop_back() ; 
-                    continue ; 
+                    printf("ERR: a dump particles needs to be defined before defining a dump contacts\n") ;
+                    files.pop_back() ;
+                    continue ;
                 }
                 files.back().reader = new LiggghtsReader_contacts (files.back().path, it->reader, files.back().mapping) ;
             }
             #else
-            printf("The file has been compiled without Liggghts file format support\n") ; 
+            printf("The file has been compiled without Liggghts file format support\n") ;
             #endif
         }
         else if (files.back().fileformat == FileFormat::NDDEM)
-            files.back().reader = new NDDEMReader (files.back().path); 
+            files.back().reader = new NDDEMReader (files.back().path);
+        #ifndef NOMERCURY
         else if (files.back().fileformat == FileFormat::MercuryData)
         {
             if (files.back().filetype == FileType::particles)
@@ -327,7 +328,7 @@ void Param::process_file (json &j2)
             else if (files.back().filetype == FileType::contacts) // TODO
             {}//files.back().reader = new MercuryReader_contacts (files.back().path) ;
             else
-                printf("ERR: no Mercury file format support FileType::both.\n") ; 
+                printf("ERR: no Mercury file format support FileType::both.\n") ;
         }
         else if (files.back().fileformat == FileFormat::MercuryVTU)
         {
@@ -336,10 +337,11 @@ void Param::process_file (json &j2)
             //else if (files.back().filetype == FileType::contacts) // TODO
             //{}//files.back().reader = new MercuryReader_contacts (files.back().path) ;
             else
-                printf("ERR: no Mercury VTU file format support FileType::contacts and FileType::both.\n") ; 
+                printf("ERR: no Mercury VTU file format support FileType::contacts and FileType::both.\n") ;
         }
+        #endif
         else if (files.back().fileformat == FileFormat::Interactive)
-            files.back().reader = new InteractiveReader (); 
+            files.back().reader = new InteractiveReader ();
     }
 }
 //------------------
@@ -350,17 +352,17 @@ int Param::set_data(struct Data & D)
     D.mass   = get_data(DataValue::mass) ;
     D.Imom   = get_data(DataValue::Imom) ;
 
-    D.pos.resize(dim) ; D.vel.resize(dim) ; 
-    D.pospq.resize(dim) ; D.lpq.resize (dim) ; 
-    D.fpq.resize (dim) ; 
-    D.omega.resize(dim*(dim-1)/2); 
+    D.pos.resize(dim) ; D.vel.resize(dim) ;
+    D.pospq.resize(dim) ; D.lpq.resize (dim) ;
+    D.fpq.resize (dim) ;
+    D.omega.resize(dim*(dim-1)/2);
     D.mpq.resize (dim*(dim-1)/2) ; D.mqp.resize (dim*(dim-1)/2) ;
-    
+
     D.id1 = get_data(DataValue::id1);
     D.id2 = get_data(DataValue::id2);
     for (int dd=0 ; dd<dim ; dd++)
     {
-        D.pos[dd]   = get_data(DataValue::pos, dd) ; 
+        D.pos[dd]   = get_data(DataValue::pos, dd) ;
         D.vel[dd]   = get_data(DataValue::vel, dd) ;
         D.pospq[dd] = get_data(DataValue::pospq, dd) ;
         D.lpq[dd]   = get_data(DataValue::lpq, dd) ;
@@ -372,7 +374,7 @@ int Param::set_data(struct Data & D)
         D.mpq[dd]   = get_data(DataValue::mpq, dd) ;
         D.mqp[dd]   = get_data(DataValue::mqp, dd) ;
     }
-    
+
     /*for (auto &v: extrafieldmap) //TODO
     {
       if (D.extra.size() < v.second+1)
@@ -399,10 +401,10 @@ int Param::get_num_contacts ()
 }
 double * Param::get_data(DataValue datavalue, int dd)
 {
-    double * res ; 
+    double * res ;
     for (auto &v: files)
     {
-        res = v.reader->get_data(datavalue, dd) ; 
+        res = v.reader->get_data(datavalue, dd) ;
         if (res != nullptr)
             return res;
     }
