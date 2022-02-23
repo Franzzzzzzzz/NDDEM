@@ -1,4 +1,4 @@
-let left, right, floor, roof, front, back;
+export let left, right, floor, roof, front, back;
 
 import {
     BoxGeometry,
@@ -23,47 +23,72 @@ let q_controller = new PIDcontroller(5e-4,1e-5,0);
     // q_controller = new PIDcontroller(1e-6,1e-5,0);
 // }
 
-export function add_cuboid_walls(params, scene) {
+const wall_geometry = new BoxGeometry( 1, 1, 1 );
+const wall_material = new MeshLambertMaterial();
+// wall_material.wireframe = true;
 
-    // const wall_geometry = new THREE.BoxGeometry( params.L*2 + params.thickness*2, params.thickness, params.L*2 + params.thickness*2 );
-    const wall_geometry = new BoxGeometry( 1, params.thickness, 1 );
-    const wall_material = new MeshLambertMaterial();
-    wall_material.wireframe = true;
-    // const wall_material = new THREE.ShadowMaterial( )
 
+export function add_left(params, scene) {
     left = new Mesh( wall_geometry, wall_material );
+    left.scale.y = params.thickness;
     left.position.y = - params.L - params.thickness/2.;
     // floor.receiveShadow = true;
     scene.add( left );
+}
 
+export function add_right(params, scene) {
     right = new Mesh( wall_geometry, wall_material );
+    right.scale.y = params.thickness;
     right.position.y = params.L + params.thickness/2.;
     // top.receiveShadow = true;
     scene.add( right );
+}
 
+export function add_floor(params, scene) {
     floor = new Mesh( wall_geometry, wall_material );
+    floor.scale.y = params.thickness;
     floor.rotation.x = Math.PI/2.;
     floor.position.z = - params.L*params.aspect_ratio - params.thickness/2.;
     // left.receiveShadow = true;
     scene.add( floor );
+}
 
+export function add_roof(params, scene) {
     roof = new Mesh( wall_geometry, wall_material );
     roof.rotation.x = Math.PI/2.;
     roof.position.z = params.L*params.aspect_ratio + params.thickness/2.;
     // right.receiveShadow = true;
     scene.add( roof );
+}
 
+export function add_front(params, scene) {
     front = new Mesh( wall_geometry, wall_material );
     front.rotation.z = Math.PI/2.;
     front.position.x = params.L + params.thickness/2.;
     // back.receiveShadow = true;
     scene.add( front );
+}
 
+export function add_back(params, scene) {
     back = new Mesh( wall_geometry, wall_material );
     back.rotation.z = Math.PI/2.;
     back.position.x = -params.L - params.thickness/2.;
     // front.receiveShadow = true;
     scene.add( back );
+}
+
+export function add_cuboid_walls(params, scene) {
+
+    // const wall_geometry = new THREE.BoxGeometry( params.L*2 + params.thickness*2, params.thickness, params.L*2 + params.thickness*2 );
+    // const wall_material = new THREE.ShadowMaterial( )
+
+    add_left(params,scene);
+    add_right(params,scene);
+    add_floor(params, scene);
+    add_roof(params, scene);
+    add_front(params, scene);
+    add_back(params, scene);
+
 }
 
 export function update_walls(params, S, dt=0.001) {

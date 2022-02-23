@@ -40,11 +40,8 @@
             import * as SPHERES from "./js/SphereHandler.js"
             import * as WALLS from "./js/WallHandler.js"
 			import { OrbitControls } from './js/OrbitControls.js';
-			import Stats from './js/stats.module.js';
             import { GUI } from './js/dat.gui.module.js';
             import { Lut } from './js/Lut.js'
-            import { PIDcontroller } from './js/PIDcontroller.js'
-            import { NDSTLLoader, renderSTL } from './js/NDSTLLoader.js';
             import * as LAYOUT from './js/Layout.js';
             import * as RAYCAST from './js/RaycastHandler.js';
 
@@ -55,7 +52,7 @@
             let gui;
             let S;
             let NDDEMCGLib;
-            let cg_mesh;
+            let cg_mesh, colorbar_mesh;
             let pointer;
             let v, omegaMag;
             let radii;
@@ -64,7 +61,7 @@
             var params = {
                 dimension: 3,
                 L: 5, //system size
-                N: 50,
+                N: 70,
                 zoom: 15,
                 // packing_fraction: 0.5,
                 constant_volume: true,
@@ -85,7 +82,8 @@
                 cg_width: 50,
                 cg_height: 50,
                 cg_opacity: 0.8,
-                cg_window_size: 1,
+                cg_window_size: 1.5,
+                aspect_ratio: 1,
             }
 
             let rainbow    = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
@@ -93,7 +91,7 @@
             let blackbody  = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
             params.average_radius = (params.r_min + params.r_max)/2.;
-            let thickness = params.average_radius;
+            params.thickness = params.average_radius;
 
             particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
             if ( urlParams.has('dimension') ) {
@@ -123,8 +121,9 @@
                     -1000,
                     1000
                 );
-				camera.position.set( 0, 0, 5*params.L );
-                // camera.up.set(1, 1, 0);
+				camera.position.set( 0, 0, -5*params.L );
+                camera.up.set(0, 0, 1);
+                camera.lookAt(0,0,0);
                 // console.log(camera)
 
 				scene = new THREE.Scene();
@@ -141,13 +140,30 @@
 
 				SPHERES.add_spheres(S,params,scene);
 
-                const geometry = new THREE.PlaneGeometry( 2*params.L, 2*params.L );
-                const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+                WALLS.add_back(params, scene);
+                WALLS.add_left(params, scene);
+                WALLS.add_right(params, scene);
+                WALLS.back.scale.y = params.thickness;//Math.PI/2.;
+                var vert_walls = [WALLS.left,WALLS.right,WALLS.back];
+
+                vert_walls.forEach( function(mesh) {
+                    mesh.scale.x = 2*params.L + 2*params.thickness;
+                    mesh.scale.z = 2*params.L + 2*params.thickness;
+                });
+
+                let geometry = new THREE.PlaneGeometry( 2*params.L, 2*params.L );
+                let material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
                 material.transparent = true;
                 cg_mesh = new THREE.Mesh( geometry, material );
-                cg_mesh.position.z = 1;
-
+                cg_mesh.position.z = -1;
                 scene.add( cg_mesh );
+
+                // geometry = new THREE.PlaneGeometry( 2*params.L, 0.1*params.L );
+                // material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+                // colorbar_mesh = new THREE.Mesh( geometry, material );
+                // colorbar_mesh.position.y = -1.1*params.L;
+                // scene.add( colorbar_mesh );
+
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -180,6 +196,9 @@
                     // update_cg_params(S, params);
                 // });
                 // gui.add ( params, 'paused').name('Paused').listen();
+
+                // const controls = new OrbitControls( camera, renderer.domElement );
+				// controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -238,7 +257,7 @@
                         lut = rainbow;
                         let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
                         lut.setMin(0);
-                        lut.setMax(maxVal);
+                        lut.setMax(0.9*maxVal);
                     } else if ( params.cg_field === 'Shear stress' ) {
                         val = S.cg_get_result(0, "TC", 1);
                         lut = cooltowarm;
@@ -289,7 +308,7 @@
                 cgparam["max time"]=1 ;
                 cgparam["time average"]="None" ;
                 cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-                cgparam["periodicity"]=[true,true,true];
+                cgparam["periodicity"]=[false,false,false];
                 cgparam["window"]="Lucy3D";
                 cgparam["dimension"]=3;
 
@@ -335,7 +354,7 @@
                     if ( params.dimension == 4 ) {
                         S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
                     }
-                    S.simu_interpret_command("gravity 0 -1000 " + "0 ".repeat(params.dimension - 3))
+                    S.simu_interpret_command("gravity -1000 0 " + "0 ".repeat(params.dimension - 3))
 
                     S.simu_interpret_command("auto location randomdrop");
 
