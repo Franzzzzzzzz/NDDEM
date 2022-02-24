@@ -25,8 +25,7 @@ let q_controller = new PIDcontroller(5e-4,1e-5,0);
 
 const wall_geometry = new BoxGeometry( 1, 1, 1 );
 const wall_material = new MeshLambertMaterial();
-// wall_material.wireframe = true;
-
+wall_material.wireframe = true;
 
 export function add_left(params, scene) {
     left = new Mesh( wall_geometry, wall_material );
@@ -55,6 +54,7 @@ export function add_floor(params, scene) {
 
 export function add_roof(params, scene) {
     roof = new Mesh( wall_geometry, wall_material );
+    roof.scale.y = params.thickness;
     roof.rotation.x = Math.PI/2.;
     roof.position.z = params.L*params.aspect_ratio + params.thickness/2.;
     // right.receiveShadow = true;
@@ -63,6 +63,7 @@ export function add_roof(params, scene) {
 
 export function add_front(params, scene) {
     front = new Mesh( wall_geometry, wall_material );
+    front.scale.y = params.thickness;
     front.rotation.z = Math.PI/2.;
     front.position.x = params.L + params.thickness/2.;
     // back.receiveShadow = true;
@@ -71,6 +72,7 @@ export function add_front(params, scene) {
 
 export function add_back(params, scene) {
     back = new Mesh( wall_geometry, wall_material );
+    back.scale.y = params.thickness;
     back.rotation.z = Math.PI/2.;
     back.position.x = -params.L - params.thickness/2.;
     // front.receiveShadow = true;
