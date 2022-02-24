@@ -235,8 +235,9 @@
                     if ( params.cg_field === 'Density' ) {
                         val = S.cg_get_result(0, "RHO", 0);
                         lut = rainbow;
+												let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
                         lut.setMin(0);
-                        lut.setMax(2.5);
+                        lut.setMax(1);
                     }
                     else if ( params.cg_field === 'Velocity' ) {
                         val = S.cg_get_result(0, "VAVG", 1);

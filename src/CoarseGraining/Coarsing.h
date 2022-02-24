@@ -57,10 +57,10 @@ double Volume (int d , double R) ; ///< Compute a sphere volume in dimension D
 
 enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2} ;
 enum FieldType {Defined, Particle, Fluctuation, Contact} ;
-enum AverageType {None, Final, Intermediate, Both} ; 
-enum Pass {Pass1=1, Pass2=2, Pass3=4, Pass4=8, Pass5=16, 
-           VelFluct=256, RotFluct=512} ; 
-           
+enum AverageType {None, Final, Intermediate, Both} ;
+enum Pass {Pass1=1, Pass2=2, Pass3=4, Pass4=8, Pass5=16,
+           VelFluct=256, RotFluct=512} ;
+
 inline Pass operator|(Pass a, Pass b){return static_cast<Pass>(static_cast<int>(a) | static_cast<int>(b));}
 //inline Pass operator|=(Pass a, const Pass b){return static_cast<Pass>(static_cast<int>(a) | static_cast<int>(b));} // Not working for some reason
 inline bool operator& (Pass a, Pass b) { return (static_cast<int>(a) & static_cast<int>(b)) ; }
@@ -121,7 +121,7 @@ int random_test (int N, int Ncf, int d, v2d box ) ; ///< Randomly fill the data 
 int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
 int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ; ///< Copy particles through the periodic boundary conditions. Should call clean_periodic_atoms() after the full coarse-graining computation has been performed to clean the added atoms.
 int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; } ///< Clean periodic atoms.
-bool check_field_availability(string name) ; 
+bool check_field_availability(string name) ;
 } ;
 //------------------------------------------------------
 #include "WindowLibrary.h"
@@ -148,7 +148,7 @@ public :
         set_field_struct() ;
         Window = new LibLucy3D( &data, w, d) ;
     }
-    ~Coarsing() { if (Window != nullptr) delete Window ; 
+    ~Coarsing() { if (Window != nullptr) delete Window ;
                   if (CGPtemp != nullptr) delete CGPtemp ; }
 
     int d ; ///< Number of dimensions
@@ -209,7 +209,7 @@ public :
     int pass_1 () ; ///< Coarse-grain anything based on particles (not contacts) which does not need fluctuating quantities
     int pass_2 (bool usetimeavg=false) ; ///< Coarse-grain anything based on particles (not contacts) which needs fluctuating quantities (call the compute_fluc_ functions before)
     int pass_3 () ; ///< Coarse-grain anything based on contact informations (no fluctuations).
-    int pass_4 () ; ///< Coarse-grain anything based on contact informations & fluctuations. 
+    int pass_4 () ; ///< Coarse-grain anything based on contact informations & fluctuations.
     int pass_5 () ; ///< Calculation of derived quantities
     int compute_fluc_vel (bool usetimeavg=false) ; ///< Velocity fluctuation computation
     int compute_fluc_rot (bool usetimeavg=false) ; ///< Angular velocity fluctuation computation
@@ -249,6 +249,7 @@ int Coarsing::setWindow (double w)
         Window=new LibRect3DIntersect (&data, w, d) ;
         break ;
       case Windows::Lucy3D :
+        printf("HELLO") ; fflush(stdout) ;  
         Window=new LibLucy3D (&data, w, d) ;
         break ;
       case Windows::Lucy3DFancyInt :
@@ -277,11 +278,11 @@ int Coarsing::setWindow (double w, vector<bool> per, vector<int> boxes, vector<d
   static_assert(W == Windows::LucyND_Periodic) ;
   cutoff = Window->cutoff() ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
-  
+
   int p = 0 ;
   for (size_t i=0 ; i<per.size() ; i++)
     if (per[i])
-        p |= (1<<i) ; 
+        p |= (1<<i) ;
 
   Window = new LibLucyND_Periodic (&data,w,d,p,boxes,deltas) ;
 return 0 ;
