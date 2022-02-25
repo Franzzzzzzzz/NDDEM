@@ -203,22 +203,7 @@
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'paused').name('Paused').listen();
-                gui.add ( params, 'new_line').name('New loading path').listen()
-                    .onChange( () => {
-                        // params.vertical_strain = 0;
-                        // params.pressure_set_pt = 10000;
-                        // params.deviatoric_set_pt = 0;
-                        WALLS.update_top_wall(params, S);
-                        var data = [{
-                                      type: 'scatter',
-                                      mode: 'lines',
-                                      x: [], y: [],
-                                      line: { width: 5 },
-                                      name: 'Load path ' + String(document.getElementById('stats').data.length+1)
-                                    }]
-                        Plotly.addTraces('stats', data);
-                        params.new_line = false;
-                    });
+                // gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );
 				const controls = new OrbitControls( camera, container );
 				controls.target.y = 0.5;
 				controls.update();
@@ -231,6 +216,19 @@
                 WALLS.update_top_wall(params, S);
 			    animate();
 			}
+
+            function new_load_path() {
+                WALLS.update_top_wall(params, S);
+                var data = [{
+                              type: 'scatter',
+                              mode: 'lines',
+                              x: [], y: [],
+                              line: { width: 5 },
+                              name: 'Load path ' + String(document.getElementById('stats').data.length+1)
+                            }]
+                Plotly.addTraces('stats', data);
+                params.new_line = false;
+            }
 
             function onKeyPress( event ) {
                 if ( event.code === 'KeyW' ) {
@@ -284,9 +282,10 @@
                                     loading_direction = 0; // pause for a bit
                                     window.setTimeout(() => { loading_direction = -1}, 3000) // wait one second then reverse
 
-                                } else if ( params.vertical_strain <= 0 ) {
+                                } else if ( params.vertical_strain <= 0 && loading_direction === -1 ) {
                                     loading_direction = 0; // pause for a bit
-                                    window.setTimeout(() => { loading_direction = 1}, 3000) // wait one second then reverse
+                                    window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait one second then reverse
+
                                 }
                                 WALLS.update_top_wall(params, S);
                                 // console.log(params.vertical_strain)
