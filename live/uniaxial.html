@@ -51,6 +51,7 @@
 
             var urlParams = new URLSearchParams(window.location.search);
             var clock = new THREE.Clock();
+            var startTime = clock.getElapsedTime()
 
 			let camera, scene, renderer, stats, panel;
             let S;
@@ -90,9 +91,9 @@
                 r_min: 0.0025,
                 freq: 0.05,
                 new_line: false,
-                loading_rate: 1,
+                loading_rate: 0.5,
                 // max_vertical_strain: 0.3,
-                target_stress: 5e3,
+                target_stress: 1e3,
                 lut: 'None',
                 quality: 5,
                 vmax: 20, // max velocity to colour by
@@ -129,6 +130,8 @@
                 WALLS.add_cuboid_walls(params,scene);
                 WALLS.update_top_wall(params, S, scene);
                 setup_CG();
+                started = false;
+                startTime = clock.getElapsedTime()
             }
 
             if ( urlParams.has('dimension') ) {
@@ -188,7 +191,7 @@
                         // .onChange( function () { WALLS.update_top_wall(params, S); } );
                     gui.add( params, 'initial_packing_fraction', 0.5, 0.7, 0.01 )
     					.name( 'Initial solids fraction' ).listen().onChange( reset_particles );
-                    gui.add( params, 'loading_rate', 0.1, 100, 0.1).name( 'Loading rate (mm/s)' );
+                    gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );
                     gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );
                     }
                 else if ( loading_method === 'stress_controlled' ) {
@@ -278,12 +281,12 @@
             }
 
 			function animate() {
-                if ( clock.getElapsedTime() > 3 ) { started = true; }
+                if ( clock.getElapsedTime() - startTime > 3 ) { started = true; }
 				requestAnimationFrame( animate );
                 SPHERES.move_spheres(S,params);
 
                 if ( !params.paused ) {
-                    new_time = clock.getElapsedTime()
+                    new_time = clock.getElapsedTime() - startTime;
 
                         if ( started ) {
                             // counter = counter + 1;
@@ -296,16 +299,17 @@
                                 //     // params.loading_active = false;
                                 //     params.loading_rate = - params.loading_rate;
                                 // }
-                                if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) {
-                                    loading_direction = 0; // pause for a bit
+                                if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) { // just run this once
                                     window.setTimeout(() => { loading_direction = -1}, 3000) // wait then reverse
-
-                                } else if ( (params.vertical_displacement <= 0) && (loading_direction === -1) ) {
-                                    console.log('went negative');
-                                    console.log(params.vertical_displacement)
-                                    loading_direction = 0; // pause for a bit
+                                }
+                                if ( (vertical_stress >= params.target_stress) && (loading_direction > 0) ) {
+                                    loading_direction *= 0.5; // slow down gradually
+                                }
+                                if ( (params.vertical_displacement <= 1e-4) && (loading_direction === -1) ) { // just run this once
                                     window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse
-
+                                }
+                                if ( (params.vertical_displacement <= 1e-4) && (loading_direction < 0) ) {
+                                    loading_direction *= 0.5; // slow down gradually
                                 }
                                 WALLS.update_top_wall(params, S, scene);
                                 // console.log(params.vertical_strain)
