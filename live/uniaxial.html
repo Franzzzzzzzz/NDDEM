@@ -127,7 +127,7 @@
                 set_derived_properties();
                 SPHERES.randomise_particles(params, S);
                 WALLS.add_cuboid_walls(params,scene);
-                WALLS.update_top_wall(params, S);
+                WALLS.update_top_wall(params, S, scene);
                 setup_CG();
             }
 
@@ -165,7 +165,8 @@
 				scene.add( dirLight );
 
                 WALLS.add_cuboid_walls(params,scene);
-                WALLS.update_top_wall(params, S);
+                WALLS.update_top_wall(params, S, scene);
+                WALLS.add_scale(params, scene);
 
 				SPHERES.add_spheres(S,params,scene);
 
@@ -193,10 +194,10 @@
                 else if ( loading_method === 'stress_controlled' ) {
                     gui.add( params, 'pressure_set_pt', 0,1e5, 1)
                         .name( 'Pressure set point (W/S)').listen()
-                        .onChange( function () { WALLS.update_top_wall(params, S); } );
+                        .onChange( function () { WALLS.update_top_wall(params, S, scene); } );
                     gui.add( params, 'deviatoric_set_pt', -1e5,1e5, 1)
                         .name( 'Deviatoric stress set point (A/D)').listen()
-                        .onChange( function () { WALLS.update_top_wall(params, S); } );
+                        .onChange( function () { WALLS.update_top_wall(params, S, scene); } );
                     }
                 if ( params.dimension == 4 ) {
                     gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
@@ -230,12 +231,12 @@
 
                 make_graph();
 
-                WALLS.update_top_wall(params, S);
+                WALLS.update_top_wall(params, S, scene);
 			    animate();
 			}
 
             function new_load_path() {
-                WALLS.update_top_wall(params, S);
+                WALLS.update_top_wall(params, S, scene);
                 var data = [{
                               type: 'scatter',
                               mode: 'lines',
@@ -306,16 +307,16 @@
                                     window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse
 
                                 }
-                                WALLS.update_top_wall(params, S);
+                                WALLS.update_top_wall(params, S, scene);
                                 // console.log(params.vertical_strain)
 
                             }
                             update_graph();
                     }
 
-                    if (loading_method === 'stress_controlled') {
-                        WALLS.update_top_wall(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
-                    }
+                    // if (loading_method === 'stress_controlled') {
+                        // WALLS.update_top_wall(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
+                    // }
                     S.simu_step_forward(5);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;

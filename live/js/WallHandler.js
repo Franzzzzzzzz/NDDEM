@@ -1,9 +1,15 @@
 export let left, right, floor, roof, front, back;
+export let axesHelper, axesLabels;
 
 import {
     BoxGeometry,
     MeshLambertMaterial,
     Mesh,
+    Group,
+    CylinderGeometry,
+    FontLoader,
+    TextBufferGeometry,
+    TextGeometry,
 } from "./three.module.js";
 
 import { PIDcontroller } from './PIDcontroller.js'
@@ -97,6 +103,130 @@ export function add_cuboid_walls(params, scene) {
     add_front(params, scene);
     add_back(params, scene);
 
+}
+
+export function add_scale(params, scene) {
+  if (axesLabels !== undefined) {
+      scene.remove(axesLabels);
+      scene.remove(axesHelper);
+      }
+        // if you haven't already made the axes
+        var arrow_colour = 0xDDDDDD;
+        var XYaxeslength = 2 * params.L - params.thickness/2.; // length of axes vectors
+        var Zaxislength = params.L + params.L_cur - params.thickness/2.
+        var fontsize = 0.1 * params.L; // font size
+        var thickness = 0.02 * params.L; // line thickness
+        axesHelper = new Group();
+        axesLabels = new Group();
+
+        scene.add(axesHelper);
+        scene.add(axesLabels);
+
+        var arrow_body = new CylinderGeometry(
+          thickness,
+          thickness,
+          XYaxeslength,
+          Math.pow(2, params.quality),
+          Math.pow(2, params.quality)
+        );
+        var arrow_head = new CylinderGeometry(
+          0,
+          2 * thickness,
+          4 * thickness,
+          Math.pow(2, params.quality),
+          Math.pow(2, params.quality)
+        );
+
+      var arrow_material = new MeshLambertMaterial({ color: arrow_colour });
+        var arrow_x = new Mesh(arrow_body, arrow_material);
+        var arrow_y = new Mesh(arrow_body, arrow_material);
+        var arrow_body = new CylinderGeometry(
+          thickness,
+          thickness,
+          Zaxislength,
+          Math.pow(2, params.quality),
+          Math.pow(2, params.quality)
+        );
+        var arrow_z = new Mesh(arrow_body, arrow_material);
+        var arrow_head_x = new Mesh(arrow_head, arrow_material);
+        var arrow_head_y = new Mesh(arrow_head, arrow_material);
+        var arrow_head_z = new Mesh(arrow_head, arrow_material);
+
+        arrow_head_x.position.y = XYaxeslength/2.;
+        arrow_head_y.position.y = XYaxeslength/2;
+        arrow_head_z.position.y = Zaxislength/2;
+
+        arrow_x.add(arrow_head_x);
+        arrow_y.add(arrow_head_y);
+        arrow_z.add(arrow_head_z);
+
+        var loader = new FontLoader();
+        loader.load(
+            "../visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
+          function (font) {
+            var textGeo_x = new TextBufferGeometry(roundToTwo(params.L*1e3) + " mm", {
+              font: font,
+              size: fontsize,
+              height: fontsize / 5,
+            });
+            var textMaterial_x = new MeshLambertMaterial({ color: 0xff0000 });
+            var mesh_x = new Mesh(textGeo_x, arrow_material);
+            mesh_x.position.y = XYaxeslength/2. - 6*fontsize;
+            mesh_x.position.x = 2*fontsize;
+            // mesh_x.position.z = fontsize / 4;
+            mesh_x.rotation.z = Math.PI/2;
+            // mesh_x.rotation.y = Math.PI;
+            // mesh_x.position.y = XYaxeslength/2.;
+            arrow_x.add(mesh_x);
+
+          var textGeo_y = new TextGeometry(roundToTwo(params.L*1e3) + " mm", {
+            font: font,
+            size: fontsize,
+            height: fontsize / 5,
+          });
+          var textMaterial_y = new MeshLambertMaterial({ color: 0x00ff00 });
+          var mesh_y = new Mesh(textGeo_y, arrow_material);
+          // mesh_y.position.x = -0.15 * params.L;
+          // mesh_y.position.y = XYaxeslength;// - fontsize*6;
+          // mesh_y.position.z = fontsize / 4;
+          // mesh_y.rotation.z = -Math.PI / 2;
+          mesh_y.position.y = XYaxeslength/2.;// - 6*fontsize;
+          mesh_y.position.x = -2*fontsize;
+          mesh_y.rotation.z = -Math.PI/2;
+          arrow_y.add(mesh_y);
+
+          var textGeo_z = new TextGeometry(roundToTwo(params.L_cur*1e3) + " mm", {
+            font: font,
+            size: fontsize,
+            height: fontsize / 5,
+          });
+          var textMaterial_z = new MeshLambertMaterial({ color: 0x0000ff });
+          var mesh_z = new Mesh(textGeo_z, arrow_material);
+          mesh_z.position.x = - 1.5*fontsize;
+          // mesh_z.position.y = fontsize / 4;
+          mesh_z.position.y = Zaxislength/2. - 6*fontsize;// + 1.5 * fontsize;
+          // mesh_z.rotation.z = -Math.PI / 2;
+          mesh_z.rotation.z = Math.PI / 2;
+          arrow_z.add(mesh_z);
+          }
+        );
+
+    arrow_x.position.x = XYaxeslength / 2;
+    arrow_x.rotation.z = -Math.PI / 2;
+
+    arrow_y.position.y = XYaxeslength / 2;
+
+    // arrow_z.scale.x = Zaxislength/XYaxeslength;
+    arrow_z.position.z = Zaxislength / 2;
+    arrow_z.rotation.x = Math.PI / 2;
+
+    axesHelper.add(arrow_x);
+    axesHelper.add(arrow_y);
+    axesHelper.add(arrow_z);
+    axesHelper.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
+    axesHelper.rotation.z = -Math.PI/2;
+      // axesLabels.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
+      // axesLabels.rotation.z = -Math.PI/2;
 }
 
 export function update_walls(params, S, dt=0.001) {
@@ -226,7 +356,7 @@ export function update_triaxial_walls(params, S, dt=1) {
 
 }
 
-export function update_top_wall(params, S, dt=0.001) {
+export function update_top_wall(params, S, scene, dt=0.001) {
     params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L,params.dimension-1)/(params.L_cur)/Math.pow(2,params.dimension)*2;
     // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
@@ -251,4 +381,11 @@ export function update_top_wall(params, S, dt=0.001) {
         mesh.scale.z = 2*params.L + 2*params.thickness;
     });
 
+    if ( axesHelper !== undefined ) { add_scale(params, scene); }
+
+}
+
+function roundToTwo(num) {
+    // stolen from https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
+    return +(Math.round(num + "e+2")  + "e-2");
 }
