@@ -223,8 +223,8 @@ export function add_scale(params, scene) {
     axesHelper.add(arrow_x);
     axesHelper.add(arrow_y);
     axesHelper.add(arrow_z);
-    axesHelper.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
-    axesHelper.rotation.z = -Math.PI/2;
+    axesHelper.position.set(params.L, params.L, -params.L); // move to bottom left hand corner
+    axesHelper.rotation.z = Math.PI;
       // axesLabels.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
       // axesLabels.rotation.z = -Math.PI/2;
 }

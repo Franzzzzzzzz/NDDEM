@@ -221,7 +221,7 @@
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );
-                gui.add ( params, 'paused').name('Paused').listen();
+                // gui.add ( params, 'paused').name('Paused').listen();
                 gui.add( params, 'loading_active').name( 'Loading active' ).listen();
 				const controls = new OrbitControls( camera, container );
 				controls.update();
