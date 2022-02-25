@@ -28,6 +28,7 @@ const wall_material = new MeshLambertMaterial();
 wall_material.wireframe = true;
 
 export function add_left(params, scene) {
+    if ( left !== undefined ) { scene.remove(left); }
     left = new Mesh( wall_geometry, wall_material );
     left.scale.y = params.thickness;
     left.position.y = - params.L - params.thickness/2.;
@@ -36,6 +37,7 @@ export function add_left(params, scene) {
 }
 
 export function add_right(params, scene) {
+    if ( right !== undefined ) { scene.remove(right); }
     right = new Mesh( wall_geometry, wall_material );
     right.scale.y = params.thickness;
     right.position.y = params.L + params.thickness/2.;
@@ -44,6 +46,7 @@ export function add_right(params, scene) {
 }
 
 export function add_floor(params, scene) {
+    if ( floor !== undefined ) { scene.remove(floor); }
     floor = new Mesh( wall_geometry, wall_material );
     floor.scale.y = params.thickness;
     floor.rotation.x = Math.PI/2.;
@@ -53,6 +56,7 @@ export function add_floor(params, scene) {
 }
 
 export function add_roof(params, scene) {
+    if ( roof !== undefined ) { scene.remove(roof); }
     roof = new Mesh( wall_geometry, wall_material );
     roof.scale.y = params.thickness;
     roof.rotation.x = Math.PI/2.;
@@ -62,6 +66,7 @@ export function add_roof(params, scene) {
 }
 
 export function add_front(params, scene) {
+    if ( front !== undefined ) { scene.remove(front); }
     front = new Mesh( wall_geometry, wall_material );
     front.scale.y = params.thickness;
     front.rotation.z = Math.PI/2.;
@@ -71,6 +76,7 @@ export function add_front(params, scene) {
 }
 
 export function add_back(params, scene) {
+    if ( back !== undefined ) { scene.remove(back); }
     back = new Mesh( wall_geometry, wall_material );
     back.scale.y = params.thickness;
     back.rotation.z = Math.PI/2.;
@@ -224,11 +230,13 @@ export function update_top_wall(params, S, dt=0.001) {
     params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L,params.dimension-1)/(params.L_cur)/Math.pow(2,params.dimension)*2;
     // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
-    params.L_cur =  params.L*(1-2*params.vertical_strain);
+    params.L_cur =  params.L*(1-2*params.vertical_displacement);
     params.roof  =  params.L_cur;// - params.H_cur;
+    params.floor = -params.L;
 
     S.simu_setBoundary(2, [-params.L,params.roof]) ; // Set location of the walls in z
     roof.position.z = params.roof + params.thickness/2.;
+    floor.position.z = params.floor - params.thickness/2.;
 
     var horiz_walls = [floor,roof];
     var vert_walls = [left,right,front,back];

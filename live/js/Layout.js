@@ -75,7 +75,7 @@ export function plotly_graph(xlabel, ylabel, zlabel) {
     }
 
     let data;
-    console.log(zlabel)
+
     if ( zlabel === undefined ) {
         data = plotly_data_2d;
         add_plotly_download_tag(xlabel + ',' + ylabel);

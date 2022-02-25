@@ -174,3 +174,33 @@ export function move_spheres(S,params) {
     // spheres.instanceMatrix.needsUpdate = true;
     // console.log(orientation[0])
 }
+
+export function setCollisionTimeAndRestitutionCoefficient (tc, eps, mass) {
+    // stolen from MercuryDPM
+    // Sets k, disp such that it matches a given tc and eps for a collision of two copies of equal mass m.
+    //
+    // Parameters
+    // [in]	tc	collision time
+    // [in]	eps	restitution coefficient
+    // [in]	mass	harmonic average particle mass, \(\frac{2}{1/m1+1/m2}\)
+    let stiffness, dissipation
+    if ( eps === 0.0 ) {
+        stiffness = 0.5 * mass * Math.pow(Math.PI / tc, 2);
+        dissipation = Math.sqrt(2.0 * mass * stiffness);
+    } else {
+        dissipation = -mass / tc * Math.log(eps);
+        stiffness = .5 * mass * ( Math.pow(Math.PI / tc, 2) + Math.pow(dissipation / mass, 2) );
+    }
+    return { 'dissipation': dissipation, 'stiffness': stiffness }
+}
+
+export function randomise_particles( params, S ) {
+    if ( S !== undefined ) {
+        for ( let i = 0; i < params.N; i ++ ) {
+            S.simu_fixParticle(i,[
+                -params.L + Math.random()*2*params.L,
+                -params.L + Math.random()*2*params.L,
+                -params.L + Math.random()*2*params.L]);
+        }
+    }
+}
