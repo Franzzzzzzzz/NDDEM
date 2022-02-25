@@ -426,6 +426,8 @@
 
             function make_graph() {
                 let { data, layout } = LAYOUT.plotly_graph('Vertical Displacement (mm)','Vertical Stress (Pa)');
+                // layout.yaxis.range = [0,1e5];
+                // layout.yaxis.autorange = false;
                 Plotly.newPlot('stats', data, layout);
             }
 

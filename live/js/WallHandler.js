@@ -360,7 +360,8 @@ export function update_top_wall(params, S, scene, dt=0.001) {
     params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L,params.dimension-1)/(params.L_cur)/Math.pow(2,params.dimension)*2;
     // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
 
-    params.L_cur =  params.L*(1-2*params.vertical_displacement);
+    // params.L_cur =  params.L*(1-2*params.vertical_displacement);
+    params.L_cur = params.L - params.vertical_displacement;
     params.roof  =  params.L_cur;// - params.H_cur;
     params.floor = -params.L;
 
