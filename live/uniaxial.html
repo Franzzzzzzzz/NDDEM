@@ -281,9 +281,12 @@
                                 //     params.loading_rate = - params.loading_rate;
                                 // }
                                 if ( vertical_stress >= params.target_stress ) {
-                                    loading_direction = -1; // unloading
+                                    loading_direction = 0; // pause for a bit
+                                    window.setTimeout(() => { loading_direction = -1}, 3000) // wait one second then reverse
+
                                 } else if ( params.vertical_strain <= 0 ) {
-                                    loading_direction = 1;
+                                    loading_direction = 0; // pause for a bit
+                                    window.setTimeout(() => { loading_direction = 1}, 3000) // wait one second then reverse
                                 }
                                 WALLS.update_top_wall(params, S);
                                 // console.log(params.vertical_strain)
