@@ -128,6 +128,7 @@
                 SPHERES.randomise_particles(params, S);
                 WALLS.add_cuboid_walls(params,scene);
                 WALLS.update_top_wall(params, S);
+                setup_CG();
             }
 
             if ( urlParams.has('dimension') ) {
@@ -184,7 +185,6 @@
                     // gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
                         // .name( 'Vertical strain (W/S)').listen()
                         // .onChange( function () { WALLS.update_top_wall(params, S); } );
-                    gui.add( params, 'loading_active').name( 'Loading active' ).listen();
                     gui.add( params, 'initial_packing_fraction', 0.5, 0.7, 0.01 )
     					.name( 'Initial solids fraction' ).listen().onChange( reset_particles );
                     gui.add( params, 'loading_rate', 0.1, 100, 0.1).name( 'Loading rate (mm/s)' );
@@ -219,8 +219,9 @@
                         else {
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
-                gui.add ( params, 'paused').name('Paused').listen();
                 gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );
+                gui.add ( params, 'paused').name('Paused').listen();
+                gui.add( params, 'loading_active').name( 'Loading active' ).listen();
 				const controls = new OrbitControls( camera, container );
 				controls.update();
 
@@ -340,7 +341,8 @@
 
                 if ( params.dimension == 3 ) {
                     S = await new NDDEMCGLib.DEMCGND (params.N);
-                    finish_setup();
+                    setup_NDDEM();
+                    setup_CG();
                 }
                 else if ( params.dimension > 3 ) {
                     console.log("D>3 not available") ;
@@ -350,7 +352,7 @@
 
 
 
-                function finish_setup() {
+                function setup_NDDEM() {
                     S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
                     S.simu_interpret_command("radius -1 0.5");
                     // now need to find the mass of a particle with diameter 1
@@ -386,7 +388,9 @@
                     S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
                     S.simu_interpret_command("auto skin");
                     S.simu_finalise_init () ;
+                }
 
+                function setup_CG() {
                     var cgparam ={} ;
                     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
                     cgparam["boxes"]=[1,1,1] ;
