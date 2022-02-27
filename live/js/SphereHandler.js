@@ -2,6 +2,7 @@ let radii;
 export let spheres;
 let NDParticleShader;
 let v, omegaMag;
+export let total_particle_volume;
 
 import { Lut } from "../../visualise/node_modules/three/examples/jsm/math/Lut.js";
 // import { Lut } from './js/Lut.js'
@@ -23,6 +24,11 @@ export async function createNDParticleShader(params) {
 
 export function add_spheres(S,params,scene) {
     radii = S.simu_getRadii();
+    total_particle_volume = 0;
+    for ( let i=0; i<radii.length; i++ ) {
+        total_particle_volume += 4./3.*Math.PI*Math.pow(radii[i],3);
+    }
+    console.log('Actual particle volume: ' + total_particle_volume);
     spheres = new Group();
     scene.add(spheres);
     // const material = new THREE.MeshStandardMaterial();

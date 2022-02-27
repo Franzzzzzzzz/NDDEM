@@ -130,7 +130,7 @@ export function add_scale(params, scene) {
     let arrow_body = new CylinderGeometry(
       thickness,
       thickness,
-      XYaxeslength,
+      XYaxeslength - 2*thickness,
       Math.pow(2, params.quality),
       Math.pow(2, params.quality)
     );
@@ -150,7 +150,7 @@ export function add_scale(params, scene) {
 
 
     arrow_head_x.position.y = XYaxeslength/2.;
-    arrow_head_y.position.y = XYaxeslength/2;
+    arrow_head_y.position.y = XYaxeslength/2.;
 
 
     arrow_x.add(arrow_head_x);
@@ -187,10 +187,10 @@ export function add_scale(params, scene) {
     mesh_y.rotation.z = -Math.PI/2;
     arrow_y.add(mesh_y);
 
-    arrow_x.position.x = XYaxeslength / 2;
+    arrow_x.position.x = XYaxeslength / 2 - 2*thickness;
     arrow_x.rotation.z = -Math.PI / 2;
 
-    arrow_y.position.y = XYaxeslength / 2;
+    arrow_y.position.y = XYaxeslength / 2 - 2*thickness;
     axesHelper.add(arrow_x);
     axesHelper.add(arrow_y);
     // now the z axis
@@ -201,7 +201,7 @@ export function add_scale(params, scene) {
     var arrow_body_z = new CylinderGeometry(
       thickness,
       thickness,
-      Zaxislength,
+      Zaxislength - 4*thickness,
       Math.pow(2, params.quality),
       Math.pow(2, params.quality)
     );
@@ -225,7 +225,7 @@ export function add_scale(params, scene) {
     arrow_z.add(mesh_z);
 
     // arrow_z.scale.x = Zaxislength/XYaxeslength;
-    arrow_z.position.z = Zaxislength / 2;
+    arrow_z.position.z = Zaxislength / 2 - 2*thickness;
     arrow_z.rotation.x = Math.PI / 2;
 
 
@@ -373,6 +373,8 @@ export function update_top_wall(params, S, scene, dt=0.001) {
     params.roof  =  params.L_cur;// - params.H_cur;
     params.floor = -params.L;
 
+    S.simu_setBoundary(0, [-params.L,params.L]) ; // Set location of the walls in z
+    S.simu_setBoundary(1, [-params.L,params.L]) ; // Set location of the walls in z
     S.simu_setBoundary(2, [-params.L,params.roof]) ; // Set location of the walls in z
     roof.position.z = params.roof + params.thickness/2.;
     floor.position.z = params.floor - params.thickness/2.;

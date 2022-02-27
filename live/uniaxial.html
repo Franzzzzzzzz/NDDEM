@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>NDDEM Uniaxial</title>
+		<title>NDDEM Oedometric Compression</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <link rel="icon" type="image/x-icon" href="../visualise/resources/favicon.ico">
@@ -30,18 +30,15 @@
             </div>
             <div id="canvas"></div>
         </div>
-        <!-- <script async type="text/javascript" src="./deploy/DEMND.js"></script> -->
         <script async type="text/javascript" src="../deploy/DEMCGND.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 		<script type="module">
 
-			// import * as THREE from './js/three.module.js';
             import * as THREE from "../visualise/node_modules/three/build/three.module.js";
             import * as SPHERES from "./js/SphereHandler.js"
             import * as WALLS from "./js/WallHandler.js"
 			import { OrbitControls } from './js/OrbitControls.js';
-            // import { NDDEMPhysics } from './js/NDDEMPhysics.js';
 			import Stats from './js/stats.module.js';
             import { GUI } from './js/dat.gui.module.js';
             import { Lut } from './js/Lut.js'
@@ -66,11 +63,6 @@
             let meshes = new THREE.Group();
             let loading_direction = 1;
 
-            let loading_method = 'strain_controlled';
-            if ( urlParams.has('stress_controlled') ) {
-                loading_method = 'stress_controlled';
-            }
-
             let graph_fraction = 0.5;
             document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
             document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
@@ -87,13 +79,13 @@
                 pressure_set_pt: 1e4,
                 deviatoric_set_pt: 0,
                 d4_cur:0,
-                r_max: 0.0035,
-                r_min: 0.0025,
+                r_max: 0.0033,
+                r_min: 0.0027,
                 freq: 0.05,
                 new_line: false,
                 loading_rate: 0.5,
                 // max_vertical_strain: 0.3,
-                target_stress: 1e3,
+                target_stress: 5e3,
                 lut: 'None',
                 quality: 5,
                 vmax: 20, // max velocity to colour by
@@ -105,20 +97,21 @@
 
             function set_derived_properties() {
                 params.average_radius = (params.r_min + params.r_max)/2.;
-                params.thickness = params.average_radius;
+                params.thickness = 0.0001;//params.average_radius;
 
                 params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+                console.log('estimate of particle volume: ' + params.particle_volume*params.N)
                 params.particle_mass = params.particle_volume * params.particle_density;
                 params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;
 
                 params.L_cur = params.L;
-                params.packing_fraction = params.N*params.particle_volume/Math.pow(2*params.L,3);
-                params.back = -params.L;
-                params.front = params.L;
-                params.left = -params.L;
-                params.right = params.L;
-                params.floor = 0;
-                params.roof = params.L;
+                // params.packing_fraction = params.N*params.particle_volume/Math.pow(2*params.L,3);
+                // params.back = -params.L;
+                // params.front = params.L;
+                // params.left = -params.L;
+                // params.right = params.L;
+                // params.floor = -params.L;
+                // params.roof = params.L;
             }
 
             function reset_particles() {
@@ -185,23 +178,10 @@
 				let gui = new GUI();
 				gui.width = 350;
 
-                if ( loading_method === 'strain_controlled' ) {
-                    // gui.add( params, 'vertical_strain', 0, params.max_vertical_strain, 0.001)
-                        // .name( 'Vertical strain (W/S)').listen()
-                        // .onChange( function () { WALLS.update_top_wall(params, S); } );
-                    gui.add( params, 'initial_packing_fraction', 0.5, 0.7, 0.01 )
-    					.name( 'Initial solids fraction' ).listen().onChange( reset_particles );
-                    gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );
-                    gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );
-                    }
-                else if ( loading_method === 'stress_controlled' ) {
-                    gui.add( params, 'pressure_set_pt', 0,1e5, 1)
-                        .name( 'Pressure set point (W/S)').listen()
-                        .onChange( function () { WALLS.update_top_wall(params, S, scene); } );
-                    gui.add( params, 'deviatoric_set_pt', -1e5,1e5, 1)
-                        .name( 'Deviatoric stress set point (A/D)').listen()
-                        .onChange( function () { WALLS.update_top_wall(params, S, scene); } );
-                    }
+                gui.add( params, 'initial_packing_fraction', 0.45, 0.55, 0.01 )
+					.name( 'Initial solids fraction' ).listen().onChange( reset_particles );
+                gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );
+                gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );
                 if ( params.dimension == 4 ) {
                     gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
                         .name( 'D4 location').listen()
@@ -224,16 +204,14 @@
                             S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
                         });
                 gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );
-                // gui.add ( params, 'paused').name('Paused').listen();
+                gui.add ( params, 'paused').name('Paused').listen();
                 gui.add( params, 'loading_active').name( 'Loading active' ).listen();
 				const controls = new OrbitControls( camera, container );
 				controls.update();
 
                 window.addEventListener( 'resize', onWindowResize, false );
-                // window.addEventListener( 'keypress', onKeyPress, false );
 
                 make_graph();
-
                 WALLS.update_top_wall(params, S, scene);
 			    animate();
 			}
@@ -250,20 +228,6 @@
                 Plotly.addTraces('stats', data);
                 params.new_line = false;
             }
-
-            // function onKeyPress( event ) {
-            //     if ( event.code === 'KeyW' ) {
-            //         if ( loading_method === 'strain_controlled' && params.vertical_strain < params.max_vertical_strain ) { params.vertical_strain += params.loading_rate; }
-            //         else { params.pressure_set_pt *= 1 + params.loading_rate; }
-            //         WALLS.update_top_wall(params, S);
-            //         }
-            //     if ( event.code === 'KeyS' ) {
-            //         if ( loading_method === 'strain_controlled' && params.vertical_strain > 0 ) { params.vertical_strain -= params.loading_rate; }
-            //         else { params.pressure_set_pt /= 1 + params.loading_rate; }
-            //         WALLS.update_top_wall(params, S);
-            //         }
-            // }
-
 
             function onWindowResize(){
 
@@ -284,49 +248,34 @@
                 if ( clock.getElapsedTime() - startTime > 3 ) { started = true; }
 				requestAnimationFrame( animate );
                 SPHERES.move_spheres(S,params);
-
+                new_time = clock.getElapsedTime() - startTime;
                 if ( !params.paused ) {
-                    new_time = clock.getElapsedTime() - startTime;
-
-                        if ( started ) {
-                            // counter = counter + 1;
-                            // if ( counter == 5 ) { update_top_wall(params, S)aph(); counter = 0; }
-                            if ( params.loading_active) {
-                                var dt = new_time - old_time;
-                                // console.log(dt)
-                                params.vertical_displacement += loading_direction*params.loading_rate*dt/1e3; // convert from mm/s to m
-                                // if ( (params.vertical_strain > params.max_vertical_strain) || (params.vertical_strain <= 0) ) {
-                                //     // params.loading_active = false;
-                                //     params.loading_rate = - params.loading_rate;
-                                // }
-                                if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) { // just run this once
-                                    window.setTimeout(() => { loading_direction = -1}, 3000) // wait then reverse
-                                }
-                                if ( (vertical_stress >= params.target_stress) && (loading_direction > 0) ) {
-                                    loading_direction *= 0.5; // slow down gradually
-                                }
-                                if ( (params.vertical_displacement <= 1e-4) && (loading_direction === -1) ) { // just run this once
-                                    window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse
-                                }
-                                if ( (params.vertical_displacement <= 1e-4) && (loading_direction < 0) ) {
-                                    loading_direction *= 0.5; // slow down gradually
-                                }
-                                WALLS.update_top_wall(params, S, scene);
-                                // console.log(params.vertical_strain)
-
+                    if ( started ) {
+                        if ( params.loading_active) {
+                            var dt = new_time - old_time;
+                            params.vertical_displacement += loading_direction*params.loading_rate*dt/1e3; // convert from mm/s to m
+                            if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) { // just run this once
+                                window.setTimeout(() => { loading_direction = -1}, 3000) // wait then reverse
                             }
-                            update_graph();
+                            if ( (vertical_stress >= params.target_stress) && (loading_direction > 0) ) {
+                                loading_direction *= 0.5; // slow down gradually
+                            }
+                            if ( (params.vertical_displacement <= 1e-4) && (loading_direction === -1) ) { // just run this once
+                                window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse
+                            }
+                            if ( (params.vertical_displacement <= 1e-4) && (loading_direction < 0) ) {
+                                loading_direction *= 0.5; // slow down gradually
+                            }
+                            WALLS.update_top_wall(params, S, scene);
+                        }
+                        update_graph();
                     }
 
-                    // if (loading_method === 'stress_controlled') {
-                        // WALLS.update_top_wall(new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
-                    // }
                     S.simu_step_forward(5);
                     S.cg_param_read_timestep(0) ;
                     S.cg_process_timestep(0,false) ;
                     var grid = S.cg_get_gridinfo();
                     vertical_stress = S.cg_get_result(0, "TC", 4)[0];
-                    // console.log(vertical_stress)
                 }
 
 				renderer.render( scene, camera );
@@ -385,7 +334,7 @@
                 let tc = 1e-3;
                 let rest = 0.2; // super low restitution coeff to dampen out quickly
                 let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
-                console.log(vals)
+
                 S.simu_interpret_command("set Kn " + String(vals.stiffness));
                 S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
                 S.simu_interpret_command("set GammaN " + String(vals.dissipation));
@@ -416,7 +365,7 @@
                 cgparam["dimension"]=3;
 
 
-                console.log(JSON.stringify(cgparam)) ;
+                // console.log(JSON.stringify(cgparam)) ;
                 S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
                 S.cg_setup_CG() ;
             }
@@ -434,7 +383,6 @@
                 // layout.yaxis.autorange = false;
                 Plotly.newPlot('stats', data, layout);
             }
-
 		</script>
 	</body>
 </html>
