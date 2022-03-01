@@ -7,9 +7,10 @@ src/Texturing/Texturing
 src/build/
 cggui/node_modules
 cggui/cpptest
+visualise/node_modules
 examples/Output
+deploy
 build
-package-lock.json
 Samples
 Textures
 testing

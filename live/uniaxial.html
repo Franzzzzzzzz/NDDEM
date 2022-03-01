@@ -56,7 +56,6 @@
             let vertical_stress = 0;
             let density = 0;
             let started = false;
-            const material_density = 2700;
             let old_time = 0;
             let new_time = 0;
             let NDsolids, material, STLFilename;
@@ -276,6 +275,7 @@
                     S.cg_process_timestep(0,false) ;
                     var grid = S.cg_get_gridinfo();
                     vertical_stress = S.cg_get_result(0, "TC", 4)[0];
+                    density = S.cg_get_result(0, "RHO", 0)[0];
                 }
 
 				renderer.render( scene, camera );
@@ -353,13 +353,16 @@
                 cgparam["boxes"]=[1,1,1] ;
                 // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
                 cgparam["boundaries"]=[
-                    [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-                    [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
-                cgparam["window size"]=params.L ;
+                    [-params.L/2.,-params.L/2.,-params.L/2.],
+                    [ params.L/2., params.L/2., params.L/2.]] ;
+                    // [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
+                    // [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
+
+                cgparam["window size"]=params.L/2. ;
                 cgparam["skip"]=0;
                 cgparam["max time"]=1 ;
                 cgparam["time average"]="None" ;
-                cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+                cgparam["fields"]=["RHO", "TC"] ;
                 cgparam["periodicity"]=[false,false,false];
                 cgparam["window"]="Lucy3D";
                 cgparam["dimension"]=3;
@@ -372,8 +375,11 @@
 
             function update_graph() {
                 Plotly.extendTraces('stats', {
-                    'x': [[params.vertical_displacement*1e3]], // convert m to mm
-                    'y': [[vertical_stress]],
+                    // 'x': [[params.vertical_displacement*1e3]], // convert m to mm
+                    // 'y': [[vertical_stress]],
+
+                    'y': [[1./(density/params.particle_density) - 1.]], // void ratio
+                    'x': [[Math.log(vertical_stress)]], // pressure
                 }, [-1])
             }
 

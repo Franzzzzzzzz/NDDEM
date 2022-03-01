@@ -183,6 +183,7 @@ export function move_spheres(S,params) {
 
 export function setCollisionTimeAndRestitutionCoefficient (tc, eps, mass) {
     // stolen from MercuryDPM
+    // ONLY USE THIS FOR LINEAR SPRINGS
     // Sets k, disp such that it matches a given tc and eps for a collision of two copies of equal mass m.
     //
     // Parameters
@@ -198,6 +199,14 @@ export function setCollisionTimeAndRestitutionCoefficient (tc, eps, mass) {
         stiffness = .5 * mass * ( Math.pow(Math.PI / tc, 2) + Math.pow(dissipation / mass, 2) );
     }
     return { 'dissipation': dissipation, 'stiffness': stiffness }
+}
+
+export function getHertzCriticalTimestep (bulk_modulus, poisson_coefficient, radius, density) {
+    // stolen from Burns et at 2019
+    let beta = 0.8766 + 0.163*poisson_coefficient;
+    let critical_timestep = Math.PI * radius / beta * Math.sqrt(density / bulk_modulus);
+
+    return critical_timestep
 }
 
 export function randomise_particles( params, S ) {
