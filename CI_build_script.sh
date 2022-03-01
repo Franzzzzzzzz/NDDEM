@@ -3,9 +3,15 @@ mkdir deploy
 mkdir Samples
 mkdir Textures
 
+# set up the live visualisation compilation and deploy with webpack
+npm ci
+npm run build
+
+# now install dependencies for old static display stuff
 cd visualise
 npm ci
 
+# now compile with emscripten
 cd ../build
 
 embuilder build boost_headers zlib

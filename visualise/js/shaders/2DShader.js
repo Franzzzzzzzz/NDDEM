@@ -1,4 +1,4 @@
-import { ShaderMaterial } from "../../node_modules/three/build/three.module.js";
+import { ShaderMaterial } from "three";
 
 var N = 2;
 var uniforms = {
