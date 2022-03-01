@@ -32,8 +32,14 @@ jobs:
       - name: Compile everything with Emscripten
         run: sh CI_build_script.sh
 
-      - name: Add & Commit to repository
-        uses: EndBug/add-and-commit@v8.0.1
+      #- name: Add & Commit to repository
+      #  uses: EndBug/add-and-commit@v8.0.1
+      #  with:
+      #    add: '*'
+      #    cwd: './deploy/'
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
-          add: '*'
-          cwd: './deploy/'
+          branch: gh-pages
+          folder: .
