@@ -1,10 +1,19 @@
+import {
+	BufferAttribute,
+	BufferGeometry,
+	FileLoader,
+	Float32BufferAttribute,
+	Loader,
+	LoaderUtils,
+	Vector3,
+    Mesh,
+    Group
+} from 'three';
+
+import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js";
+
+
 /**
- * @author aleeper / http://adamleeper.com/
- * @author mrdoob / http://mrdoob.com/
- * @author gero3 / https://github.com/gero3
- * @author Mugen87 / https://github.com/Mugen87
- * @author neverhood311 / https://github.com/neverhood311
- *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
  * Supports both binary and ASCII encoded files, with automatic detection of type.
@@ -17,7 +26,7 @@
  *  ASCII decoding assumes file is UTF-8.
  *
  * Usage:
- *  var loader = new NDSTLLoader();
+ *  const loader = new STLLoader();
  *  loader.load( './models/stl/slotted_disk.stl', function ( geometry ) {
  *    scene.add( new THREE.Mesh( geometry ) );
  *  });
@@ -27,24 +36,24 @@
  *  if (geometry.hasColors) {
  *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: true });
  *  } else { .... }
- *  var mesh = new THREE.Mesh( geometry, material );
+ *  const mesh = new THREE.Mesh( geometry, material );
  *
  * For ASCII STLs containing multiple solids, each solid is assigned to a different group.
  * Groups can be used to assign a different color by defining an array of materials with the same length of
  * geometry.groups and passing it to the Mesh constructor:
  *
- * var mesh = new THREE.Mesh( geometry, material );
+ * const mesh = new THREE.Mesh( geometry, material );
  *
  * For example:
  *
- *  var materials = [];
- *  var nGeometryGroups = geometry.groups.length;
+ *  const materials = [];
+ *  const nGeometryGroups = geometry.groups.length;
  *
- *  var colorMap = ...; // Some logic to index colors.
+ *  const colorMap = ...; // Some logic to index colors.
  *
- *  for (var i = 0; i < nGeometryGroups; i++) {
+ *  for (let i = 0; i < nGeometryGroups; i++) {
  *
- *		var material = new THREE.MeshPhongMaterial({
+ *		const material = new THREE.MeshPhongMaterial({
  *			color: colorMap[i],
  *			wireframe: false
  *		});
@@ -52,43 +61,29 @@
  *  }
  *
  *  materials.push(material);
- *  var mesh = new THREE.Mesh(geometry, materials);
+ *  const mesh = new THREE.Mesh(geometry, materials);
  */
 
-import {
-	BufferAttribute,
-	BufferGeometry,
-	FileLoader,
-	Float32BufferAttribute,
-	Loader,
-	LoaderUtils,
-	Vector3,
-    Mesh,
-    Group
-} from "./three.module.js";
 
-import { ConvexGeometry } from './ConvexGeometry.js';
+class NDSTLLoader extends Loader {
 
-var NDSTLLoader = function ( manager ) {
+	constructor( manager ) {
 
-	Loader.call( this, manager );
+		super( manager );
 
-};
+	}
 
-NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	load( url, onLoad, onProgress, onError ) {
 
-	constructor: NDSTLLoader,
+		const scope = this;
 
-	load: function ( params, onLoad, onProgress, onError ) {
-        let url = params[0];
-        let W = params[1];
-
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		const loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
-		loader.load( url,  function ( text ) {
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
+
+		loader.load( url, function ( text ) {
 
 			try {
 
@@ -112,17 +107,16 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function isBinary( data ) {
 
-			var expect, face_size, n_faces, reader;
-			reader = new DataView( data );
-			face_size = ( 32 / 8 * 3 ) + ( ( 32 / 8 * 3 ) * 3 ) + ( 16 / 8 );
-			n_faces = reader.getUint32( 80, true );
-			expect = 80 + ( 32 / 8 ) + ( n_faces * face_size );
+			const reader = new DataView( data );
+			const face_size = ( 32 / 8 * 3 ) + ( ( 32 / 8 * 3 ) * 3 ) + ( 16 / 8 );
+			const n_faces = reader.getUint32( 80, true );
+			const expect = 80 + ( 32 / 8 ) + ( n_faces * face_size );
 
 			if ( expect === reader.byteLength ) {
 
@@ -140,9 +134,9 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
 
-			var solid = [ 115, 111, 108, 105, 100 ];
+			const solid = [ 115, 111, 108, 105, 100 ];
 
-			for ( var off = 0; off < 5; off ++ ) {
+			for ( let off = 0; off < 5; off ++ ) {
 
 				// If "solid" text is matched to the current offset, declare it to be an ASCII STL.
 
@@ -160,9 +154,9 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// Check if each byte in query matches the corresponding byte from the current offset
 
-			for ( var i = 0, il = query.length; i < il; i ++ ) {
+			for ( let i = 0, il = query.length; i < il; i ++ ) {
 
-				if ( query[ i ] !== reader.getUint8( offset + i, false ) ) return false;
+				if ( query[ i ] !== reader.getUint8( offset + i ) ) return false;
 
 			}
 
@@ -172,16 +166,16 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseBinary( data ) {
 
-			var reader = new DataView( data );
-			var faces = reader.getUint32( 80, true );
+			const reader = new DataView( data );
+			const faces = reader.getUint32( 80, true );
 
-			var r, g, b, hasColors = false, colors;
-			var defaultR, defaultG, defaultB, alpha;
+			let r, g, b, hasColors = false, colors;
+			let defaultR, defaultG, defaultB, alpha;
 
 			// process STL header
 			// check for default color in header ("COLOR=rgba" sequence).
 
-			for ( var index = 0; index < 80 - 10; index ++ ) {
+			for ( let index = 0; index < 80 - 10; index ++ ) {
 
 				if ( ( reader.getUint32( index, false ) == 0x434F4C4F /*COLO*/ ) &&
 					( reader.getUint8( index + 4 ) == 0x52 /*'R'*/ ) &&
@@ -199,24 +193,24 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			var dataOffset = 84;
-			var faceLength = 12 * 4 + 2;
+			const dataOffset = 84;
+			const faceLength = 12 * 4 + 2;
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 
-			var vertices = new Float32Array( faces * 3 * 3 );
-			var normals = new Float32Array( faces * 3 * 3 );
+			const vertices = new Float32Array( faces * 3 * 3 );
+			const normals = new Float32Array( faces * 3 * 3 );
 
-			for ( var face = 0; face < faces; face ++ ) {
+			for ( let face = 0; face < faces; face ++ ) {
 
-				var start = dataOffset + face * faceLength;
-				var normalX = reader.getFloat32( start, true );
-				var normalY = reader.getFloat32( start + 4, true );
-				var normalZ = reader.getFloat32( start + 8, true );
+				const start = dataOffset + face * faceLength;
+				const normalX = reader.getFloat32( start, true );
+				const normalY = reader.getFloat32( start + 4, true );
+				const normalZ = reader.getFloat32( start + 8, true );
 
 				if ( hasColors ) {
 
-					var packedColor = reader.getUint16( start + 48, true );
+					const packedColor = reader.getUint16( start + 48, true );
 
 					if ( ( packedColor & 0x8000 ) === 0 ) {
 
@@ -236,10 +230,10 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				for ( var i = 1; i <= 3; i ++ ) {
+				for ( let i = 1; i <= 3; i ++ ) {
 
-					var vertexstart = start + i * 12;
-					var componentIdx = ( face * 3 * 3 ) + ( ( i - 1 ) * 3 );
+					const vertexstart = start + i * 12;
+					const componentIdx = ( face * 3 * 3 ) + ( ( i - 1 ) * 3 );
 
 					vertices[ componentIdx ] = reader.getFloat32( vertexstart, true );
 					vertices[ componentIdx + 1 ] = reader.getFloat32( vertexstart + 4, true );
@@ -276,7 +270,7 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseASCII( data ) {
+        function parseASCII( data ) {
             var N;
 
             var patternDimension = /solid ([0-9]+)/g ;
@@ -337,8 +331,8 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			if ( typeof buffer === 'string' ) {
 
-				var array_buffer = new Uint8Array( buffer.length );
-				for ( var i = 0; i < buffer.length; i ++ ) {
+				const array_buffer = new Uint8Array( buffer.length );
+				for ( let i = 0; i < buffer.length; i ++ ) {
 
 					array_buffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly assumes little-endian
 
@@ -357,13 +351,13 @@ NDSTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		// start
 
         return parseASCII( ensureString( data ) );
-		// var binData = ensureBinary( data );
+		// const binData = ensureBinary( data );
 
 		// return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );
 
 	}
 
-} );
+}
 
 function pushUnique(arr, new_entry) {
     let added = false;

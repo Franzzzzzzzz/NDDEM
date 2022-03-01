@@ -4,7 +4,7 @@ import {
     Raycaster,
     Plane,
     Color
-} from "./three.module.js";
+} from "three";
 
 const raycaster = new Raycaster();
 const mouse = new Vector2();

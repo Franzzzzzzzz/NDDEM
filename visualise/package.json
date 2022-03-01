@@ -9,6 +9,7 @@
     "url": "https://github.com/Franzzzzzzzz/NDDEM"
   },
   "dependencies": {
+    "papaparse": "^5.3.1",
     "three": "^0.117.1"
   },
   "devDependencies": {

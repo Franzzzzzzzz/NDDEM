@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>4D Pool</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        <style>
+            * { font-family: Montserrat; }
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+            #N_tag {
+                color: white;
+                padding: 24px;
+                font: 48px Montserrat;
+                /* font-weight: bold; */
+                position:absolute;
+            }
+            #stats {
+                position: absolute;
+                width: 300px;
+                height: 200px;
+                margin: 0;
+                padding: 0;
+            }
+            #hit_me {
+                font-weight: bold;
+                position:absolute;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                bottom: 5pt;
+                text-align: center;
+                font-size: 14pt;
+                z-index: 99;
+                color: #fff;
+            }
+            #web_instructions {
+                font-weight: bold;
+                position:absolute;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                bottom: 5pt;
+                text-align: center;
+                font-size: 14pt;
+                z-index: 99;
+                color: #fff;
+            }
+            #hit_me:active {
+                color: #777;
+            }
+        </style>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-GQE06JN33T"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-GQE06JN33T');
+        </script>
+	</head>
+	<body>
+        <div id="hit_me">Shoot</div>
+        <div id="web_instructions">Press Enter to shoot.</div>
+        <script async type="text/javascript" src="../deploy/DEMND.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+		<script type="module" src='./deploy/4d-pool-bundle.js'></script>
+	</body>
+</html>

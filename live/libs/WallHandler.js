@@ -8,16 +8,15 @@ import {
     Mesh,
     Group,
     CylinderGeometry,
-    FontLoader,
-    TextBufferGeometry,
-    TextGeometry,
-} from "./three.module.js";
+} from "three";
+
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
 import { PIDcontroller } from './PIDcontroller.js'
 
 var loader = new FontLoader();
-loader.load("../visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json", function (f) { font = f });
-
+loader.load("./deploy/helvetiker_bold.typeface.json", function (f) { font = f });
 
 let p_controller = new PIDcontroller(5e-4,1e-5,0);
 let q_controller = new PIDcontroller(5e-4,1e-5,0);
@@ -156,7 +155,7 @@ export function add_scale(params, scene) {
     arrow_x.add(arrow_head_x);
     arrow_y.add(arrow_head_y);
 
-    var textGeo_x = new TextBufferGeometry(String((params.L*1e3).toFixed(2)) + " mm", {
+    var textGeo_x = new TextGeometry(String((params.L*1e3).toFixed(2)) + " mm", {
       font: font,
       size: fontsize,
       height: fontsize / 5,

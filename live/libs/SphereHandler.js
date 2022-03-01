@@ -4,7 +4,7 @@ let NDParticleShader;
 let v, omegaMag;
 export let total_particle_volume;
 
-import { Lut } from "../../visualise/node_modules/three/examples/jsm/math/Lut.js";
+import { Lut } from "three/examples/jsm/math/Lut.js";
 // import { Lut } from './js/Lut.js'
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
@@ -14,10 +14,10 @@ import {
     Mesh,
     SphereGeometry,
     MeshPhongMaterial
-} from "./three.module.js";
+} from "three";
 
 export async function createNDParticleShader(params) {
-    import("../../visualise/js/shaders/" + params.dimension + "DShader.js").then((module) => {
+    import("./shaders/" + params.dimension + "DShader.js").then((module) => {
         NDParticleShader = module.NDDEMShader;
     });
 }
