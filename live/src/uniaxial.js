@@ -336,11 +336,11 @@ function setup_CG() {
 
 function update_graph() {
     Plotly.extendTraces('stats', {
-        // 'x': [[params.vertical_displacement*1e3]], // convert m to mm
-        // 'y': [[vertical_stress]],
+        'x': [[params.vertical_displacement*1e3]], // convert m to mm
+        'y': [[vertical_stress]],
 
-        'y': [[1./(density/params.particle_density) - 1.]], // void ratio
-        'x': [[Math.log(vertical_stress)]], // pressure
+        // 'y': [[1./(density/params.particle_density) - 1.]], // void ratio
+        // 'x': [[Math.log(vertical_stress)]], // pressure
     }, [-1])
 }
 
