@@ -5,12 +5,12 @@ mkdir Textures
 mkdir live/deploy
 
 # set up the live visualisation compilation and deploy with webpack
-npm ci
+npm install
 npm run build
 
 # now install dependencies for old static display stuff
 cd visualise
-npm ci
+npm install
 
 # now compile with emscripten
 cd ../build
