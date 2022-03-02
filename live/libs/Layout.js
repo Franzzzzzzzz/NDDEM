@@ -1,6 +1,7 @@
 
 export function add_plotly_download_tag(header) {
     var dimension = header.split(',').length;
+    if ( !header.endsWith('\n') ) { header += '\n'; }
 
     document.getElementById ("download_tag").addEventListener ("click", download_data, false);
     document.getElementById ("stats").addEventListener ("mouseenter",
