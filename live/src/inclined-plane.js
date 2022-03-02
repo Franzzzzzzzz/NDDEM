@@ -1,3 +1,4 @@
+// import { DEMCGND } from "../../deploy/DEMCGND.js";
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -240,73 +241,72 @@ async function NDDEMPhysics() {
     //
     // }
 
-    // NDDEMLib = await DEMCGND(); // eslint-disable-line no-undef
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMLib.DEMCGND (params.N);
+            S = new NDDEMCGLib.DEMCGND (params.N);
             finish_setup();
         }
         else if ( params.dimension > 3 ) {
             console.log("D>3 not available") ;
-            // S = await new NDDEMLib.Simulation4 (params.N);
+            // S = await new NDDEMCGLib.Simulation4 (params.N);
             // finish_setup();
         }
-    });
+    } );
+}
 
 
-    function finish_setup() {
-        S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-        S.simu_interpret_command("radius -1 0.5");
-        S.simu_interpret_command("mass -1 1");
-        S.simu_interpret_command("auto rho");
-        S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
-        S.simu_interpret_command("auto mass");
-        S.simu_interpret_command("auto inertia");
+function finish_setup() {
+    S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+    S.simu_interpret_command("radius -1 0.5");
+    S.simu_interpret_command("mass -1 1");
+    S.simu_interpret_command("auto rho");
+    S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+    S.simu_interpret_command("auto mass");
+    S.simu_interpret_command("auto inertia");
 
-        S.simu_interpret_command("boundary 0 WALL 0 "+String(10*params.L));
-        S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
-        S.simu_interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
-        if ( params.dimension == 4 ) {
-            S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
-        }
-        S.simu_interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3))
-
-        S.simu_interpret_command("auto location roughinclineplane");
-        // S.simu_interpret_command("auto location randomdrop");
-
-        S.simu_interpret_command("set Kn 2e4");
-        S.simu_interpret_command("set Kt 8e3");
-        S.simu_interpret_command("set GammaN 75");
-        S.simu_interpret_command("set GammaT 75");
-        S.simu_interpret_command("set Mu 0.5");
-        S.simu_interpret_command("set T 150");
-        S.simu_interpret_command("set dt 0.002");
-        S.simu_interpret_command("set tdump 1000"); // how often to calculate wall forces
-        S.simu_interpret_command("auto skin");
-        S.simu_finalise_init () ;
-
-        var cgparam ={} ;
-        cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-        cgparam["boxes"]=[20,1,1] ;
-        // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
-        cgparam["boundaries"]=[
-            [ params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-            [ 4*params.L,   params.L-params.r_max, params.L-params.r_max]] ;
-        cgparam["window size"]=2 ;
-        cgparam["skip"]=0;
-        cgparam["max time"]=1 ;
-        cgparam["time average"]="None" ;
-        cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-        cgparam["periodicity"]=[true,true,true];
-        cgparam["window"]="Lucy3D";
-        cgparam["dimension"]=3;
-
-
-        console.log(JSON.stringify(cgparam)) ;
-        S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
-        S.cg_setup_CG() ;
-        grid = S.cg_get_gridinfo();
+    S.simu_interpret_command("boundary 0 WALL 0 "+String(10*params.L));
+    S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
+    S.simu_interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
+    if ( params.dimension == 4 ) {
+        S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
     }
+    S.simu_interpret_command("gravity " + String(-params.g_mag*Math.cos(params.theta*Math.PI/180.)) + " " + String(-params.g_mag*Math.sin(params.theta*Math.PI/180.)) + " 0 " + "0 ".repeat(params.dimension - 3))
+
+    S.simu_interpret_command("auto location roughinclineplane");
+    // S.simu_interpret_command("auto location randomdrop");
+
+    S.simu_interpret_command("set Kn 2e4");
+    S.simu_interpret_command("set Kt 8e3");
+    S.simu_interpret_command("set GammaN 75");
+    S.simu_interpret_command("set GammaT 75");
+    S.simu_interpret_command("set Mu 0.5");
+    S.simu_interpret_command("set T 150");
+    S.simu_interpret_command("set dt 0.002");
+    S.simu_interpret_command("set tdump 1000"); // how often to calculate wall forces
+    S.simu_interpret_command("auto skin");
+    S.simu_finalise_init () ;
+
+    var cgparam ={} ;
+    cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
+    cgparam["boxes"]=[20,1,1] ;
+    // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
+    cgparam["boundaries"]=[
+        [ params.r_max,-params.L+params.r_max,-params.L+params.r_max],
+        [ 4*params.L,   params.L-params.r_max, params.L-params.r_max]] ;
+    cgparam["window size"]=2 ;
+    cgparam["skip"]=0;
+    cgparam["max time"]=1 ;
+    cgparam["time average"]="None" ;
+    cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+    cgparam["periodicity"]=[true,true,true];
+    cgparam["window"]="Lucy3D";
+    cgparam["dimension"]=3;
+
+
+    console.log(JSON.stringify(cgparam)) ;
+    S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
+    S.cg_setup_CG() ;
+    grid = S.cg_get_gridinfo();
 }
 
 function update_graph() {
