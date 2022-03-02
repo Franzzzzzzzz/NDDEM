@@ -358,18 +358,18 @@ async function NDDEMPhysics() {
     //
 	// }
 
-	let NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
-
-    if ( params.dimension == 3 ) {
-        S = await new NDDEMCGLib.DEMCGND (params.N);
-        finish_setup();
-    }
-    else if ( params.dimension > 3 ) {
-        console.log( 'N>3 not implemented yet')
-        // S = await new NDDEMLib.Simulation4 (params.N);
-        // finish_setup();
-    }
-
+	// let NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
+    await DEMCGND().then( (NDDEMCGLib) => {
+        if ( params.dimension == 3 ) {
+            S = new NDDEMCGLib.DEMCGND (params.N);
+            finish_setup();
+        }
+        else if ( params.dimension > 3 ) {
+            console.log( 'N>3 not implemented yet')
+            // S = await new NDDEMLib.Simulation4 (params.N);
+            // finish_setup();
+        }
+    });
 
 
     function finish_setup() {

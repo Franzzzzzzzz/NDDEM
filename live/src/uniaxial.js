@@ -1,5 +1,3 @@
-<script async type="text/javascript" src="../deploy/DEMCGND.js"></script>
-
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -128,17 +126,17 @@ async function init() {
 
     SPHERES.add_spheres(S,params,scene);
 
-    renderer = new THREE.WebGLRenderer();// { antialias: true } );
-    // renderer.setPixelRatio( window.devicePixelRatio );
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
-    // renderer.shadowMap.enabled = true;
-    // renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
 
     let gui = new GUI();
-    gui.width = 350;
+    gui.width = 450;
 
     gui.add( params, 'initial_packing_fraction', 0.45, 0.55, 0.01 )
         .name( 'Initial solids fraction' ).listen().onChange( reset_particles );
@@ -256,19 +254,18 @@ async function NDDEMPhysics() {
     //
     // }
 
-    let NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
-
-    if ( params.dimension == 3 ) {
-        S = await new NDDEMCGLib.DEMCGND (params.N);
-        setup_NDDEM();
-        setup_CG();
-    }
-    else if ( params.dimension > 3 ) {
-        console.log("D>3 not available") ;
-        // S = await new NDDEMCGLib.Simulation4 (params.N);
-        // finish_setup();
-    }
-
+    await DEMCGND().then( (NDDEMCGLib) => {
+        if ( params.dimension == 3 ) {
+            S = new NDDEMCGLib.DEMCGND (params.N);
+            setup_NDDEM();
+            setup_CG();
+        }
+        else if ( params.dimension > 3 ) {
+            console.log("D>3 not available") ;
+            // S = await new NDDEMCGLib.Simulation4 (params.N);
+            // finish_setup();
+        }
+    } );
 }
 
 function setup_NDDEM() {
