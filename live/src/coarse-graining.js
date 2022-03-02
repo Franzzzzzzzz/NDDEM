@@ -199,7 +199,7 @@ function animate() {
         if ( params.cg_field === 'Density' ) {
             val = S.cg_get_result(0, "RHO", 0);
             lut = rainbow;
-                                    let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax(1);
         }
@@ -212,8 +212,8 @@ function animate() {
         }
         else if ( params.cg_field === 'Pressure' ) {
             const stressTcxx=S.cg_get_result(0, "TC", 0) ;
-            const stressTcyy=S.cg_get_result(0, "TC", 4) ;
-            const stressTczz=S.cg_get_result(0, "TC", 8) ;
+            const stressTcyy=S.cg_get_result(0, "TC", 3) ;
+            const stressTczz=S.cg_get_result(0, "TC", 6) ;
             val = new Array(stressTcxx.length);
             for (var i=0 ; i<stressTcxx.length ; i++)
             {
@@ -236,7 +236,7 @@ function animate() {
 
         for ( let i = 0; i < size; i ++ ) {
             var color = lut.getColor(val[i]);
-            // console.log(lut)
+            // console.log(val[i])
             const r = Math.floor( color.r * 255 );
             const g = Math.floor( color.g * 255 );
             const b = Math.floor( color.b * 255 );
@@ -263,19 +263,19 @@ function animate() {
 function update_cg_params(S, params) {
     var cgparam ={} ;
     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-    cgparam["boxes"]=[params.cg_width,params.cg_height,1] ;
+    cgparam["boxes"]=[params.cg_width,params.cg_height] ;
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"]=[
-        [-params.L,-params.L,-1],
-        [ params.L, params.L, 1]] ;
+        [-params.L,-params.L],
+        [ params.L, params.L]] ;
     cgparam["window size"]=params.cg_window_size ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
     cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-    cgparam["periodicity"]=[false,false,false];
-    cgparam["window"]="Lucy3D";
-    cgparam["dimension"]=3;
+    cgparam["periodicity"]=[false,false];
+    cgparam["window"]="Lucy2D";
+    cgparam["dimension"]=2;
 
 
     // console.log(JSON.stringify(cgparam)) ;
@@ -293,7 +293,7 @@ async function NDDEMCGPhysics() {
     // NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = await new NDDEMCGLib.DEMCGND (params.N);
+            S = new NDDEMCGLib.DEMCGND (params.N);
             finish_setup();
         }
         else if ( params.dimension > 3 ) {

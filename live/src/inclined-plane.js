@@ -243,7 +243,7 @@ async function NDDEMPhysics() {
     // NDDEMLib = await DEMCGND(); // eslint-disable-line no-undef
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = await new NDDEMLib.DEMCGND (params.N);
+            S = new NDDEMLib.DEMCGND (params.N);
             finish_setup();
         }
         else if ( params.dimension > 3 ) {
