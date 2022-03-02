@@ -266,8 +266,8 @@ function update_cg_params(S, params) {
     cgparam["boxes"]=[params.cg_width,params.cg_height,1] ;
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"]=[
-        [-params.L,-params.L,-params.L],
-        [ params.L, params.L, params.L]] ;
+        [-params.L,-params.L,-1],
+        [ params.L, params.L, 1]] ;
     cgparam["window size"]=params.cg_window_size ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
