@@ -427,12 +427,12 @@ function move_spheres() {
 
 async function NDDEMPhysics() {
 
-    if ( 'DEMND' in window === false ) {
-
-        console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
-        return;
-
-    }
+    // if ( 'DEMND' in window === false ) {
+    //
+    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
+    //     return;
+    //
+    // }
 
     NDDEMLib = await DEMND(); // eslint-disable-line no-undef
 

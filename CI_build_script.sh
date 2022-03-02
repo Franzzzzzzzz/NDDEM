@@ -9,7 +9,7 @@ npm install
 npm run build
 
 # quick peek at if it worked
-ls live/deploy
+# ls live/deploy
 
 # now install dependencies for old static display stuff
 cd visualise
@@ -30,4 +30,4 @@ done
 
 cd ..
 
-ls deploy
+# ls deploy

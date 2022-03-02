@@ -233,12 +233,12 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
-
-        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-        return;
-
-    }
+    // if ( 'DEMCGND' in window === false ) {
+    //
+    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+    //     return;
+    //
+    // }
 
     NDDEMLib = await DEMCGND(); // eslint-disable-line no-undef
 

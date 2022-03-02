@@ -1,3 +1,5 @@
+<script async type="text/javascript" src="../deploy/DEMCGND.js"></script>
+
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -247,12 +249,12 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
-
-        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-        return;
-
-    }
+    // if ( 'DEMCGND' in window === false ) {
+    //
+    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+    //     return;
+    //
+    // }
 
     let NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 

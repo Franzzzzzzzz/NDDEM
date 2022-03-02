@@ -293,10 +293,10 @@ function animate() {
 
 async function NDDEMCGPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
-        console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
-        return;
-    }
+    // if ( 'DEMCGND' in window === false ) {
+    //     console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
+    //     return;
+    // }
 
     NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 

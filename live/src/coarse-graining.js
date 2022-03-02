@@ -285,10 +285,10 @@ function update_cg_params(S, params) {
 
 async function NDDEMCGPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
-        console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
-        return;
-    }
+    // if ( 'DEMCGND' in window === false ) {
+    //     console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
+    //     return;
+    // }
 
     NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
 
