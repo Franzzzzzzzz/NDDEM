@@ -437,11 +437,11 @@ async function NDDEMPhysics() {
     // NDDEMLib = await DEMND(); // eslint-disable-line no-undef
     await DEMND().then( (NDDEMLib) => {
         if ( params.dimension == 3 ) {
-            S = await new NDDEMLib.Simulation3 (params.N);
+            S = new NDDEMLib.Simulation3 (params.N);
             finish_setup();
         }
         else if ( params.dimension == 4 ) {
-            S = await new NDDEMLib.Simulation4 (params.N);
+            S = new NDDEMLib.Simulation4 (params.N);
             finish_setup();
         }
     });
