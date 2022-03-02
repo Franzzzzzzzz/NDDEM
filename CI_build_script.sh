@@ -2,7 +2,6 @@ mkdir build
 mkdir deploy
 mkdir Samples
 mkdir Textures
-mkdir live/deploy
 
 # set up the live visualisation compilation and deploy with webpack
 npm i -D webpack webpack-cli

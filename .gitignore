@@ -10,7 +10,7 @@ cggui/cpptest
 visualise/node_modules
 examples/Output
 node_modules
-deploy
+/deploy/
 build
 Samples
 Textures
