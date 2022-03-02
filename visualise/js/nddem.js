@@ -1,11 +1,11 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
 console.log("Using threejs version " + THREE.REVISION);
 // import { LoaderSupport } from "../node_modules/three/examples/js/loaders/LoaderSupport.js";
-import { OBJLoader } from "../node_modules/three/examples/jsm/loaders/OBJLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 // import { MTLLoader } from "../node_modules/three/examples/js/loaders/MTLLoader.js";
 import { VRController } from "../js/VRControllerModule.js";
-import { Lut } from "../node_modules/three/examples/jsm/math/Lut.js";
-import Stats from "../node_modules/three/examples/jsm/libs/stats.module.js";
+import { Lut } from "three/examples/jsm/math/Lut.js";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 import * as PARAMS from "./params.js";
 import * as CAMERA from "./camera.js";

@@ -1,4 +1,7 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
+
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 var R, r; // parameters of torus
 var wristband1, wristband2;
@@ -227,11 +230,11 @@ function update_higher_dims_right() {
  * @param {number} controller controller number (0 or 1)
  */
 function add_left_oculus_model(controller) {
-  new THREE.MTLLoader()
+  new MTLLoader()
     .setPath(params.root_dir + "visualise/resources/oculus/")
     .load("oculus-touch-controller-left.mtl", function (materials) {
       materials.preload();
-      new THREE.OBJLoader()
+      new OBJLoader()
         .setMaterials(materials)
         .setPath(params.root_dir + "visualise/resources/oculus/")
         .load("oculus-touch-controller-left.obj", function (object) {
@@ -343,11 +346,11 @@ function add_left_oculus_model(controller) {
  * @param {number} controller controller number (0 or 1)
  */
 function add_right_oculus_model(controller) {
-  new THREE.MTLLoader()
+  new MTLLoader()
     .setPath(params.root_dir + "visualise/resources/oculus/")
     .load("oculus-touch-controller-right.mtl", function (materials) {
       materials.preload();
-      new THREE.OBJLoader()
+      new OBJLoader()
         .setMaterials(materials)
         .setPath(params.root_dir + "visualise/resources/oculus/")
         .load("oculus-touch-controller-right.obj", function (object) {
@@ -457,7 +460,7 @@ function add_right_oculus_model(controller) {
  * Add the two vive controllers
  */
 function add_vive_models(scene, params, world) {
-  var loader = new THREE.OBJLoader();
+  var loader = new OBJLoader();
   loader.setPath(params.root_dir + "visualise/resources/vive/");
   loader.load("vr_controller_vive_1_5.obj", function (object) {
     var loader = new THREE.TextureLoader();

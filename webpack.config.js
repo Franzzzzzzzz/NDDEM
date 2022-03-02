@@ -64,4 +64,16 @@ module.exports = [
             filename: 'coarse-graining-bundle.js',
         },
     },
+
+    // old visualise stuff
+
+    {
+        mode: "development",
+        // mode: "production",
+        entry: './visualise/js/nddem.js',
+        output: {
+            path: path.resolve(__dirname, 'visualise/js'),
+            filename: 'nddem-bundle.js',
+        },
+    },
 ];
