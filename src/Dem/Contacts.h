@@ -30,17 +30,17 @@ public:
     vector < double > Torquej ; ///< Torque on particle j
     vector < double > vrel ; ///< Relative velocity
 
-    void particle_particle   ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Force & torque between 2 particles
-    void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri,
+    void particle_particle   ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
+                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) ; ///< Force & torque between 2 particles
+    void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
                                cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
-    void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri,
+    void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi, 
                                cv1d & cn, cv1d & Vj, cp & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
-    void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
+    void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
+                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
 
-    void particle_ghost_regular (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact)
+    void particle_ghost_regular (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
+                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact)
     {
         vector <double> loc (d, 0) ;
         loc=Xj ;
@@ -55,8 +55,8 @@ public:
 
 
 
-    void particle_ghost_LE (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
-                              cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, cp & Contact) /*, FILE * debug = nullptr*/
+    void particle_ghost_LE (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
+                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) /*, FILE * debug = nullptr*/
     {
         vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ;
@@ -65,7 +65,7 @@ public:
         {
             loc=Xj ;
             compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ;
-            particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ;
+            particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact) ;
             //if (debug != nullptr)
             // fprintf(debug, "%g %g %g %g %g 0 %d\n", loc[0], loc[1], Vj[0], Vj[1], rj, Contact.j) ;
         }
@@ -84,7 +84,7 @@ public:
 
          gh>>=1 ; ghd>>=1 ;
          compute_normalpbcloc (loc, 1, gh, ghd) ;
-         particle_particle (Xi, Vi, Omegai, ri, loc, vel, Omegaj, rj, Contact) ;
+         particle_particle (Xi, Vi, Omegai, ri, mi, loc, vel, Omegaj, rj, mj, Contact) ;
          //if (debug != nullptr)
          //    fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], rj, n, Contact.j) ;
 
@@ -156,9 +156,10 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
 //--------------------------------------------------------------------------------------
 //---------------------- particle particle contact ----------------------------
 template <int d>
-void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri,
-                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, cp & Contact)
+void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi, 
+                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp & Contact)
 {
+  double kn, kt, gamman, gammat ; 
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;
@@ -174,8 +175,26 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
+  if (P->ContactModel == HERTZ)
+  {
+      double Rstar = (ri*rj)/(ri+rj) ; 
+      double Mstar = (mi*mj)/(mi+mj) ; 
+      double sqrtovlpR = sqrt(ovlp*Rstar) ;
+      kn = P->Kn * sqrtovlpR; 
+      kt = P->Kt * sqrtovlpR; 
+      gamman = P->Gamman * Mstar * sqrtovlpR; 
+      gammat = P->Gammat * Mstar * sqrtovlpR; 
+  }
+  else
+  {
+    kn=P->Kn ;
+    kt=P->Kt ; 
+    gamman = P->Gamman ; 
+    gammat = P->Gammat ; 
+  }
+  
   //Normal force
-  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; //TODO
+  Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
 
   //Tangential force computation: retrieve contact or create new contact
   /*if (ContactCalc == BOTH || ContactCalc == FORWARD)
@@ -193,7 +212,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 
   Tools<d>::vAddScaled (tspr, P->dt, vt) ; //tspr += vt*dt ;
   Tools<d>::vSubScaled(tspr, Tools<d>::dot(tspr,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
-  Tools<d>::vMul(Ft, tspr, - P->Kt) ; //Ft=  tspr*(-Kt) ;
+  Tools<d>::vMul(Ft, tspr, - kt) ; //Ft=  tspr*(-Kt) ;
   Coulomb=P->Mu*Tools<d>::norm(Fn) ;
 
   if (Tools<d>::norm(Ft) >= Coulomb)
@@ -203,13 +222,13 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
       Tools<d>::vMul(tvec, Ft, 1/Tools<d>::norm(Ft)) ; //tvec=Ft * (1/Tools<d>::norm(Ft)) ;
       Tools<d>::vMul(Ftc, tvec, Coulomb) ; //Ftc = tvec * Coulomb ;
       Ft=Ftc ;
-      Tools<d>::vMul(tspr, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
+      Tools<d>::vMul(tspr, Ftc, -1/ kt) ; //tspr=Ftc*(-1/Kt) ;
     }
     else
       Tools<d>::setzero(Ft) ;
   }
   else
-      Tools<d>::vSubScaled(Ft, P->Gammat, vt) ; //Ft -= (vt*Gammat) ;
+      Tools<d>::vSubScaled(Ft, gammat, vt) ; //Ft -= (vt*Gammat) ;
 
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
   Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ; //TODO check the minus sign
@@ -238,7 +257,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 
 //---------------------- particle wall contact ----------------------------
 template <int d>
-void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
+void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi, 
                                   cv1d & cn, cp & Contact)
                                   //int j, int orient, cp & Contact)
 {
@@ -251,7 +270,25 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
   vn = cn * (Tools<d>::dot(vrel, cn)) ;
   vt= vrel - vn ; //vt=self.vrel-vn*cn ; // BUG: from python, must be wrong
-  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ;
+ 
+  double kn, kt, gamman, gammat ; 
+  if (P->ContactModel == HERTZ)
+  {
+      double sqrtovlpR = sqrt(ovlp*ri) ;
+      kn = P->Kn * sqrtovlpR; 
+      kt = P->Kt * sqrtovlpR; 
+      gamman = P->Gamman * mi * sqrtovlpR; 
+      gammat = P->Gammat * mi * sqrtovlpR; 
+  }
+  else
+  {
+    kn=P->Kn ;
+    kt=P->Kt ; 
+    gamman = P->Gamman ; 
+    gammat = P->Gammat ; 
+  }
+ 
+  Fn=cn*(ovlp*kn) - vn*gamman;
 
   //Tangential force computation: retrieve contact or create new contact
   //history=History[make_pair(i,-(2*j+k+1))] ;
@@ -260,7 +297,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
 
   tspr += vt*P->dt ;
   tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr| Actually does not seem to change anything ...
-  Ft=  tspr*(- P->Kt) ;
+  Ft=  tspr*(- kt) ;
   Coulomb=P->Mu_wall*Tools<d>::norm(Fn) ;
 
   if (Tools<d>::norm(Ft) > Coulomb)
@@ -270,13 +307,13 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
       tvec=Ft * (1/Tools<d>::norm(Ft)) ;
       Ftc = tvec * Coulomb ;
       Ft=Ftc ;
-      tspr=Ftc*(-1/ P->Kt) ;
+      tspr=Ftc*(-1/ kt) ;
     }
     else
       Tools<d>::setzero(Ft) ;
   }
   else
-     Ft -= (vt*P->Gammat) ;
+     Ft -= (vt*gammat) ;
 
   Torquei=Tools<d>::wedgeproduct(rri, Ft) ;
 
@@ -287,8 +324,8 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri,
 
 //---------------------- particle particle contact ----------------------------
 template <int d>
-void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, double ri,
-                                       cv1d & cn, cv1d & Vj, cp & Contact)
+void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi, 
+                                        cv1d & cn, cv1d & Vj, cp & Contact)
 {
   contactlength=Contact.contactlength ;
 
@@ -301,8 +338,25 @@ void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, doub
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
+  double kn, kt, gamman, gammat ; 
+  if (P->ContactModel == HERTZ)
+  {
+      double sqrtovlpR = sqrt(ovlp*ri) ;
+      kn = P->Kn * sqrtovlpR; 
+      kt = P->Kt * sqrtovlpR; 
+      gamman = P->Gamman * mi * sqrtovlpR; 
+      gammat = P->Gammat * mi * sqrtovlpR; 
+  }
+  else
+  {
+    kn=P->Kn ;
+    kt=P->Kt ; 
+    gamman = P->Gamman ; 
+    gammat = P->Gammat ; 
+  }
+  
   //Normal force
-  Fn=cn*(ovlp*P->Kn) - vn*P->Gamman ; //TODO
+  Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
 
   //Tangential force computation: retrieve contact or create new contact
   tspr=Contact.tspr ;
@@ -310,7 +364,7 @@ void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, doub
 
   Tools<d>::vAddScaled (tspr, P->dt, vt) ; //tspr += vt*dt ;
   Tools<d>::vSubScaled(tspr, Tools<d>::dot(tspr,cn), cn) ; // tspr -= cn * Tools<d>::dot(tspr,cn) ; //WARNING: might need an additional scaling so that |tsprnew|=|tspr|
-  Tools<d>::vMul(Ft, tspr, - P->Kt) ; //Ft=  tspr*(-Kt) ;
+  Tools<d>::vMul(Ft, tspr, - kt) ; //Ft=  tspr*(-Kt) ;
   Coulomb=P->Mu_wall*Tools<d>::norm(Fn) ;
 
   if (Tools<d>::norm(Ft) >= Coulomb)
@@ -320,13 +374,13 @@ void Contacts<d>::particle_movingwall (           cv1d & Vi, cv1d & Omegai, doub
       Tools<d>::vMul(tvec, Ft, 1/Tools<d>::norm(Ft)) ; //tvec=Ft * (1/Tools<d>::norm(Ft)) ;
       Tools<d>::vMul(Ftc, tvec, Coulomb) ; //Ftc = tvec * Coulomb ;
       Ft=Ftc ;
-      Tools<d>::vMul(tspr, Ftc, -1/ P->Kt) ; //tspr=Ftc*(-1/Kt) ;
+      Tools<d>::vMul(tspr, Ftc, -1/ kt) ; //tspr=Ftc*(-1/Kt) ;
     }
     else
       Tools<d>::setzero(Ft) ;
   }
   else
-      Tools<d>::vSubScaled(Ft, P->Gammat, vt) ; //Ft -= (vt*Gammat) ;
+      Tools<d>::vSubScaled(Ft, gammat, vt) ; //Ft -= (vt*Gammat) ;
 
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
 

@@ -383,13 +383,13 @@ public:
             {
             if (it->ghost==0)
             {
-                C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it) ;
+                C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
+                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it) ;
             }
             else
             {
-                (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i],
-                                       X[it->j], V[it->j], Omega[it->j], P.r[it->j], *it);//, logghosts) ;
+                (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
+                                       X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it);//, logghosts) ;
             }
 
             //if (P.contactforcedump && (ti % P.tdump==0))
@@ -421,7 +421,7 @@ public:
                     for (int dd = 0 ; dd<d ; dd++)
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
-                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
+                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;
                 }
                 else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ROTATINGSPHERE))
                 {
@@ -429,14 +429,14 @@ public:
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;
-                    C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], tmpcn, tmpvel, *it) ;
+                    C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, tmpvel, *it) ;
                 }
                 else
                 {
 
                     Tools<d>::unitvec(tmpcn, it->j/2) ;
                     tmpcn=tmpcn*(-((it->j%2==0)?-1:1)) ; // l give the orientation (+1 or -1)
-                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], tmpcn, *it) ;
+                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;
                 }
 
                 //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; // F[it->i] += (Act.Fn+Act.Ft) ;

@@ -17,6 +17,8 @@ using cv1f = const vector <float> ;
 using bitdim = unsigned int ;
 using v1i = vector <int> ;
 enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, lpq, fpq, mpq, mqp} ;
+
+enum ContactModels {HOOKE=0, HERTZ} ; 
 #endif
 
 /** @} */

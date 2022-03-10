@@ -89,6 +89,7 @@ public :
     double damping; //< Artificial rolling damping
     double skin ; ///< Skin for use in verlet list \warning Experimental
     double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental
+    ContactModels ContactModel=HOOKE ; 
     vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
     //ExportType dumpkind ;
     //ExportData dumplist ;
@@ -446,7 +447,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      {"orientationtracking",orientationtracking},
      {"tinfo",tinfo},
      {"dt",dt},
-     {"skin", skin}
+     {"skin", skin},
   } ;
 
 // Lambda definitions
@@ -561,6 +562,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["radius"]   = [&](){int id ; double radius ; in>>id>>radius ; if(id==-1) r = v1d(N,radius) ; else r[id]=radius ; printf("[INFO] Set radius of particle.\n") ;} ;
  Lvl0["mass"]     = [&](){int id ; double mass ;   in>>id>>mass   ; if(id==-1) m = v1d(N,mass  ) ; else r[id]=mass   ; printf("[INFO] Set mass of particle.\n") ;} ;
  Lvl0["gravity"]  = [&](){for (int i=0 ; i<d ; i++) {in >> g[i] ;} printf("[INFO] Changing gravity.\n") ; } ;
+ Lvl0["ContactModel"] = [&](){ std::string s ; in >> s ; if (s=="Hertz") {ContactModel=ContactModels::HERTZ ;printf("[INFO] Using Hertz model\n") ;} else ContactModel=ContactModels::HOOKE ; } ; 
  Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
     Tools<d>::setzero(g) ;
     g[0] = -intensity * cos(angle / 180. * M_PI) ;
