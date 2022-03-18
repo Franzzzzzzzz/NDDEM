@@ -13,6 +13,15 @@ module.exports = [
     {
         mode: "development",
         // mode: "production",
+        entry: './live/src/isotropic.js',
+        output: {
+            path: path.resolve(__dirname, 'live/deploy'),
+            filename: 'isotropic-bundle.js',
+        },
+    },
+    {
+        mode: "development",
+        // mode: "production",
         entry: './live/src/triaxial.js',
         output: {
             path: path.resolve(__dirname, 'live/deploy'),

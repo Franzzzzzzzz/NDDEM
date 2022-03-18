@@ -372,8 +372,8 @@ export function update_top_wall(params, S, scene, dt=0.001) {
     params.roof  =  params.L_cur;// - params.H_cur;
     params.floor = -params.L;
 
-    S.simu_setBoundary(0, [-params.L,params.L]) ; // Set location of the walls in z
-    S.simu_setBoundary(1, [-params.L,params.L]) ; // Set location of the walls in z
+    S.simu_setBoundary(0, [-params.L,params.L]) ; // Set location of the walls in x
+    S.simu_setBoundary(1, [-params.L,params.L]) ; // Set location of the walls in y
     S.simu_setBoundary(2, [-params.L,params.roof]) ; // Set location of the walls in z
     roof.position.z = params.roof + params.thickness/2.;
     floor.position.z = params.floor - params.thickness/2.;
@@ -393,4 +393,164 @@ export function update_top_wall(params, S, scene, dt=0.001) {
 
     if ( axesHelper !== undefined ) { add_scale(params, scene); }
 
+}
+
+
+export function update_isotropic_wall(params, S, scene, dt=0.001) {
+    //params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L,params.dimension-1)/(params.L_cur)/Math.pow(2,params.dimension)*2;
+    // console.log(params.packing_fraction) // NOTE: STILL A BIT BUGGY!!!!
+
+    // params.L_cur =  params.L*(1-2*params.vertical_displacement);
+    params.H_cur = (1-params.epsilonv/3.)*params.H ;
+    params.L_cur = (1-params.epsilonv/3.)*params.L ;
+
+    S.simu_setBoundary(0, [-params.L_cur,params.L_cur]) ; // Set location of the walls in x
+    S.simu_setBoundary(1, [-params.L_cur,params.L_cur]) ; // Set location of the walls in y
+    S.simu_setBoundary(2, [-params.H_cur,params.H_cur]) ; // Set location of the walls in z
+    roof.position.z = params.roof + params.thickness/2.;
+    floor.position.z = params.floor - params.thickness/2.;
+    left.position.y = -params.L_cur ;
+    right.position.y = params.L_cur ;
+    front.position.x =params.L_cur ;
+    back.position.x =-params.L_cur ;
+
+    var horiz_walls = [floor,roof];
+    var vert_walls = [left,right,front,back];
+
+    vert_walls.forEach( function(mesh) {
+        mesh.scale.x = 2*params.L_cur + 2*params.thickness;
+        mesh.scale.z = 2*(params.H_cur) + 2*params.thickness;
+    });
+
+    horiz_walls.forEach( function(mesh) {
+        mesh.scale.x = 2*params.L_cur ;//+ 2*params.thickness;
+        mesh.scale.z = 2*params.L_cur ;//+ 2*params.thickness;
+    });
+
+    if ( axesHelper !== undefined ) { add_scale_isotropic(params, scene); }
+
+}
+
+export function add_scale_isotropic(params, scene) {
+    var XYaxeslength = 2 * params.L_cur - params.thickness/2.; // length of axes vectors
+
+    var fontsize = 0.1 * params.L; // font size
+    var thickness = 0.02 * params.L; // line thickness
+
+    if (axesHelper !== undefined) {
+        scene.remove(axesHelper);
+    } //else {}
+    // if you haven't already made the axes
+
+    axesHelper = new Group();
+    scene.add(axesHelper);
+
+    let arrow_body = new CylinderGeometry(
+      thickness,
+      thickness,
+      XYaxeslength - 2*thickness,
+      Math.pow(2, params.quality),
+      Math.pow(2, params.quality)
+    );
+    let arrow_head = new CylinderGeometry(
+      0,
+      2 * thickness,
+      4 * thickness,
+      Math.pow(2, params.quality),
+      Math.pow(2, params.quality)
+    );
+
+    arrow_x = new Mesh(arrow_body, arrow_material);
+    arrow_y = new Mesh(arrow_body, arrow_material);
+
+    var arrow_head_x = new Mesh(arrow_head, arrow_material);
+    var arrow_head_y = new Mesh(arrow_head, arrow_material);
+
+
+    arrow_head_x.position.y = XYaxeslength/2.;
+    arrow_head_y.position.y = XYaxeslength/2.;
+
+
+    arrow_x.add(arrow_head_x);
+    arrow_y.add(arrow_head_y);
+
+    var textGeo_x = new TextGeometry(String((2*params.L_cur*1e3).toFixed(2)) + " mm", {
+      font: font,
+      size: fontsize,
+      height: fontsize / 5,
+    });
+    var textMaterial_x = new MeshLambertMaterial({ color: 0xff0000 });
+    var mesh_x = new Mesh(textGeo_x, arrow_material);
+    mesh_x.position.y = XYaxeslength/2. - 6*fontsize;
+    mesh_x.position.x = 2*fontsize;
+    // mesh_x.position.z = fontsize / 4;
+    mesh_x.rotation.z = Math.PI/2;
+    // mesh_x.rotation.y = Math.PI;
+    // mesh_x.position.y = XYaxeslength/2.;
+    arrow_x.add(mesh_x);
+
+    var textGeo_y = new TextGeometry(String((2*params.L_cur*1e3).toFixed(2)) + " mm", {
+        font: font,
+        size: fontsize,
+        height: fontsize / 5,
+    });
+    var textMaterial_y = new MeshLambertMaterial({ color: 0x00ff00 });
+    var mesh_y = new Mesh(textGeo_y, arrow_material);
+    // mesh_y.position.x = -0.15 * params.L;
+    // mesh_y.position.y = XYaxeslength;// - fontsize*6;
+    // mesh_y.position.z = fontsize / 4;
+    // mesh_y.rotation.z = -Math.PI / 2;
+    mesh_y.position.y = XYaxeslength/2.;// - 6*fontsize;
+    mesh_y.position.x = -2*fontsize;
+    mesh_y.rotation.z = -Math.PI/2;
+    arrow_y.add(mesh_y);
+
+    arrow_x.position.x = XYaxeslength / 2 - 2*thickness;
+    arrow_x.rotation.z = -Math.PI / 2;
+
+    arrow_y.position.y = XYaxeslength / 2 - 2*thickness;
+    axesHelper.add(arrow_x);
+    axesHelper.add(arrow_y);
+    // now the z axis
+    var Zaxislength = 2*params.H_cur - params.thickness/2.
+    var fontsize = 0.1 * params.L; // font size
+    var thickness = 0.02 * params.L; // line thickness
+
+    var arrow_body_z = new CylinderGeometry(
+      thickness,
+      thickness,
+      Zaxislength - 4*thickness,
+      Math.pow(2, params.quality),
+      Math.pow(2, params.quality)
+    );
+    arrow_z = new Mesh(arrow_body_z, arrow_material);
+    var arrow_head_z = new Mesh(arrow_head, arrow_material);
+    arrow_head_z.position.y = Zaxislength/2;
+    arrow_z.add(arrow_head_z);
+
+    var textGeo_z = new TextGeometry(String((2*params.H_cur*1e3).toFixed(2)) + " mm", {
+        font: font,
+        size: fontsize,
+        height: fontsize / 5,
+    });
+    var textMaterial_z = new MeshLambertMaterial({ color: 0x0000ff });
+    var mesh_z = new Mesh(textGeo_z, arrow_material);
+    mesh_z.position.x = - 1.5*fontsize;
+    // mesh_z.position.y = fontsize / 4;
+    mesh_z.position.y = Zaxislength/2. - 6*fontsize;// + 1.5 * fontsize;
+    // mesh_z.rotation.z = -Math.PI / 2;
+    mesh_z.rotation.z = Math.PI / 2;
+    arrow_z.add(mesh_z);
+
+    // arrow_z.scale.x = Zaxislength/XYaxeslength;
+    arrow_z.position.z = Zaxislength / 2 - 2*thickness;
+    arrow_z.rotation.x = Math.PI / 2;
+
+
+    axesHelper.add(arrow_z);
+
+    axesHelper.position.set(params.L_cur, params.L_cur, -params.H_cur); // move to bottom left hand corner
+    axesHelper.rotation.z = Math.PI;
+      // axesLabels.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
+      // axesLabels.rotation.z = -Math.PI/2;
 }

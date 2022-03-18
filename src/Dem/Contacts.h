@@ -34,7 +34,7 @@ public:
                                cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) ; ///< Force & torque between 2 particles
     void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
                                cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
-    void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi, 
+    void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
                                cv1d & cn, cv1d & Vj, cp & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
     void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
                                       cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
@@ -156,10 +156,10 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
 //--------------------------------------------------------------------------------------
 //---------------------- particle particle contact ----------------------------
 template <int d>
-void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi, 
+void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi,
                                      cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp & Contact)
 {
-  double kn, kt, gamman, gammat ; 
+  double kn, kt, gamman, gammat ;
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;
@@ -177,22 +177,22 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 
   if (P->ContactModel == HERTZ)
   {
-      double Rstar = (ri*rj)/(ri+rj) ; 
-      double Mstar = (mi*mj)/(mi+mj) ; 
+      double Rstar = (ri*rj)/(ri+rj) ;
+      double Mstar = (mi*mj)/(mi+mj) ;
       double sqrtovlpR = sqrt(ovlp*Rstar) ;
-      kn = P->Kn * sqrtovlpR; 
-      kt = P->Kt * sqrtovlpR; 
-      gamman = P->Gamman * Mstar * sqrtovlpR; 
-      gammat = P->Gammat * Mstar * sqrtovlpR; 
+      kn = P->Kn * sqrtovlpR;
+      kt = P->Kt * sqrtovlpR;
+      gamman = P->Gamman * sqrt(Mstar * kn);
+      gammat = P->Gammat * sqrt(Mstar * kt); 
   }
   else
   {
     kn=P->Kn ;
-    kt=P->Kt ; 
-    gamman = P->Gamman ; 
-    gammat = P->Gammat ; 
+    kt=P->Kt ;
+    gamman = P->Gamman ;
+    gammat = P->Gammat ;
   }
-  
+
   //Normal force
   Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
 
@@ -257,7 +257,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 
 //---------------------- particle wall contact ----------------------------
 template <int d>
-void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi, 
+void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
                                   cv1d & cn, cp & Contact)
                                   //int j, int orient, cp & Contact)
 {
@@ -270,24 +270,24 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
   vn = cn * (Tools<d>::dot(vrel, cn)) ;
   vt= vrel - vn ; //vt=self.vrel-vn*cn ; // BUG: from python, must be wrong
- 
-  double kn, kt, gamman, gammat ; 
+
+  double kn, kt, gamman, gammat ;
   if (P->ContactModel == HERTZ)
   {
       double sqrtovlpR = sqrt(ovlp*ri) ;
-      kn = P->Kn * sqrtovlpR; 
-      kt = P->Kt * sqrtovlpR; 
-      gamman = P->Gamman * mi * sqrtovlpR; 
-      gammat = P->Gammat * mi * sqrtovlpR; 
+      kn = P->Kn * sqrtovlpR;
+      kt = P->Kt * sqrtovlpR;
+      gamman = P->Gamman * mi * sqrtovlpR;
+      gammat = P->Gammat * mi * sqrtovlpR;
   }
   else
   {
     kn=P->Kn ;
-    kt=P->Kt ; 
-    gamman = P->Gamman ; 
-    gammat = P->Gammat ; 
+    kt=P->Kt ;
+    gamman = P->Gamman ;
+    gammat = P->Gammat ;
   }
- 
+
   Fn=cn*(ovlp*kn) - vn*gamman;
 
   //Tangential force computation: retrieve contact or create new contact
@@ -324,7 +324,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
 
 //---------------------- particle particle contact ----------------------------
 template <int d>
-void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi, 
+void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
                                         cv1d & cn, cv1d & Vj, cp & Contact)
 {
   contactlength=Contact.contactlength ;
@@ -338,23 +338,23 @@ void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, dou
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
-  double kn, kt, gamman, gammat ; 
+  double kn, kt, gamman, gammat ;
   if (P->ContactModel == HERTZ)
   {
       double sqrtovlpR = sqrt(ovlp*ri) ;
-      kn = P->Kn * sqrtovlpR; 
-      kt = P->Kt * sqrtovlpR; 
-      gamman = P->Gamman * mi * sqrtovlpR; 
-      gammat = P->Gammat * mi * sqrtovlpR; 
+      kn = P->Kn * sqrtovlpR;
+      kt = P->Kt * sqrtovlpR;
+      gamman = P->Gamman * mi * sqrtovlpR;
+      gammat = P->Gammat * mi * sqrtovlpR;
   }
   else
   {
     kn=P->Kn ;
-    kt=P->Kt ; 
-    gamman = P->Gamman ; 
-    gammat = P->Gammat ; 
+    kt=P->Kt ;
+    gamman = P->Gamman ;
+    gammat = P->Gammat ;
   }
-  
+
   //Normal force
   Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
 
