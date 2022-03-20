@@ -22,11 +22,11 @@ export function add_plotly_download_tag(header) {
         let csv = '';
         if ( dimension === 2 ) {
             data.forEach( trace => {
-                csv = csv + header + trace.x.map((el, i) => [el, trace.y[i]].join(",")).join('\n') + '\n'
+                csv = csv + header + trace.x.map((el, i) => [el.toFixed(4), trace.y[i].toFixed(4)].join(",")).join('\n') + '\n'
                 });
         } else if ( dimension === 3 ) {
             data.forEach( trace => {
-                csv = csv + header + trace.x.map((el, i) => [el, trace.y[i],trace.z[i]].join(",")).join('\n') + '\n'
+                csv = csv + header + trace.x.map((el, i) => [el.toFixed(4), trace.y[i].toFixed(4),trace.z[i].toFixed(4)].join(",")).join('\n') + '\n'
                 });
         }
         var link = document.getElementById("download_tag");
@@ -36,7 +36,7 @@ export function add_plotly_download_tag(header) {
 
 let plotly_data_2d = [{
   type: 'scatter',
-  mode: 'lines',
+  mode: 'line',
   x: [],
   y: [],
   name: 'Load path 1',

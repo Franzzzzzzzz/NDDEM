@@ -14,7 +14,9 @@ var startTime = clock.getElapsedTime()
 let camera, scene, renderer, stats, panel;
 let S;
 let pressure = 0;
-let vertical_stress = 0;
+let sigma_xx = 0;
+let sigma_yy = 0;
+let sigma_zz = 0;
 let density = 0;
 let started = false;
 let old_time = 0;
@@ -31,7 +33,7 @@ var params = {
     dimension: 3,
     // L: 4, //system size
     L:0.025,
-    H: 0.025,
+    H: 0.05,
     boxratio: 1.5,
     initial_packing_fraction: 0.5,
     N: 300,
@@ -49,6 +51,7 @@ var params = {
     loading_rate: 0.05,
     // max_vertical_strain: 0.3,
     target_stress: 5e3,
+    unloading_stress:100,
     lut: 'None',
     quality: 5,
     vmax: 20, // max velocity to colour by
@@ -84,7 +87,7 @@ function reset_particles() {
     params.vertical_displacement = 0;
     loading_direction = 1;
     set_derived_properties();
-    SPHERES.randomise_particles(params, S);
+    SPHERES.randomise_particles_isotropic(params, S);
     WALLS.add_cuboid_walls(params,scene);
     WALLS.update_isotropic_wall(params, S, scene);
     setup_CG();
@@ -108,7 +111,7 @@ async function init() {
 
     await NDDEMPhysics();
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
-    camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );
+    camera.position.set( -3*params.L, -3*params.L, 1.5*params.L );
     camera.up.set(0, 0, 1);
     camera.lookAt( 0, 0, 0 );
 
@@ -146,7 +149,8 @@ async function init() {
     gui.add( params, 'initial_packing_fraction', 0.45, 0.55, 0.01 )
         .name( 'Initial solids fraction' ).listen().onChange( reset_particles );
     gui.add( params, 'loading_rate', 0.001, 0.1, 0.001).name( 'Volumetric strainrate (1/s)' );
-    gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );
+    gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress - loading' );
+    gui.add( params, 'unloading_stress', 0, 1e4).name( 'Target stress - unloading' );
     if ( params.dimension == 4 ) {
         gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
@@ -161,15 +165,15 @@ async function init() {
         .onChange( () => SPHERES.update_particle_material(params,
             // lut_folder
         ) );
-    gui.add ( params, 'gravity').name('Gravity').listen()
+    /*gui.add ( params, 'gravity').name('Gravity').listen()
         .onChange( function() {
             if ( params.gravity === true ) {
                 S.simu_interpret_command("gravity 0 0 -10 " + "0 ".repeat(params.dimension - 3)) }
             else {
                 S.simu_interpret_command("gravity 0 0 0 " + "0 ".repeat(params.dimension - 3)) }
-            });
+            });*/
     gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );
-    gui.add ( params, 'paused').name('Paused').listen();
+    //gui.add ( params, 'paused').name('Paused').listen();
     gui.add( params, 'loading_active').name( 'Loading active' ).listen();
     const controls = new OrbitControls( camera, container );
     controls.update();
@@ -219,28 +223,31 @@ function animate() {
             if ( params.loading_active) {
                 var dt = new_time - old_time;
                 params.epsilonv += loading_direction*params.loading_rate*dt;
-                if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) { // just run this once
+                if ( (pressure >= params.target_stress) && (loading_direction === 1) ) { // just run this once
                     window.setTimeout(() => { loading_direction = -1}, 3000) // wait then reverse
                 }
-                if ( (vertical_stress >= params.target_stress) && (loading_direction > 0) ) {
+                if ( (pressure >= params.target_stress) && (loading_direction > 0) ) {
                     loading_direction *= 0.5; // slow down gradually
                 }
-                if ( (params.epsilonv <= 1e-4) && (loading_direction === -1) ) { // just run this once
+                if ( (params.epsilonv <= 1e-4 || pressure<params.unloading_stress) && (loading_direction === -1) ) { // just run this once
                     window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse
                 }
-                if ( (params.epsilonv <= 1e-4) && (loading_direction < 0) ) {
+                if ( (params.epsilonv <= 1e-4 || pressure<params.unloading_stress) && (loading_direction < 0) ) {
                     loading_direction *= 0.5; // slow down gradually
                 }
                 WALLS.update_isotropic_wall(params, S, scene);
+                update_graph();
             }
-            update_graph();
         }
 
         S.simu_step_forward(5);
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
-        vertical_stress = S.cg_get_result(0, "TC", 4)[0];
+        sigma_xx = S.cg_get_result(0, "TC", 0)[0];
+        sigma_yy = S.cg_get_result(0, "TC", 4)[0];
+        sigma_zz = S.cg_get_result(0, "TC", 8)[0];
+        pressure=(sigma_xx+sigma_yy+sigma_zz)/3
         density = S.cg_get_result(0, "RHO", 0)[0];
     }
 
@@ -284,7 +291,7 @@ function setup_NDDEM() {
     S.simu_interpret_command("auto mass");
     S.simu_interpret_command("auto inertia");
     S.simu_interpret_command("auto skin");
-
+    console.log(params.L, params.H)
     S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
     S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
     S.simu_interpret_command("boundary 2 WALL -"+String(params.H)+" "+String(params.H));
@@ -300,10 +307,10 @@ function setup_NDDEM() {
     let rest = 0.2; // super low restitution coeff to dampen out quickly
     let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 
-    S.simu_interpret_command("set Kn 1000000"); //+ String(vals.stiffness));
-    S.simu_interpret_command("set Kt 1000000"); //+ String(0.8*vals.stiffness));
-    S.simu_interpret_command("set GammaN 0.1"); //+ String(vals.dissipation));
-    S.simu_interpret_command("set GammaT 0.1"); //+ String(vals.dissipation));
+    S.simu_interpret_command("set Kn 500000"); //+ String(vals.stiffness));
+    S.simu_interpret_command("set Kt 500000"); //+ String(0.8*vals.stiffness));
+    S.simu_interpret_command("set GammaN 0.2"); //+ String(vals.dissipation));
+    S.simu_interpret_command("set GammaT 0.2"); //+ String(vals.dissipation));
     S.simu_interpret_command("set Mu 0.5");
     S.simu_interpret_command("set Mu_wall 0");
     S.simu_interpret_command("set T 150");
@@ -342,15 +349,16 @@ function setup_CG() {
 function update_graph() {
     Plotly.extendTraces('stats', {
         'x': [[params.epsilonv*1e2]], // convert to %
-        'y': [[vertical_stress]],
+        'y': [[pressure]],
 
         // 'y': [[1./(density/params.particle_density) - 1.]], // void ratio
         // 'x': [[Math.log(vertical_stress)]], // pressure
     }, [-1])
+    //console.log(data.length) ; 
 }
 
 function make_graph() {
-    let { data, layout } = LAYOUT.plotly_graph('Volumetric strain (%)','Vertical Stress (Pa)');
+    let { data, layout } = LAYOUT.plotly_graph('Volumetric strain (%)','Pressure (Pa)');
     // layout.yaxis.range = [0,1e5];
     // layout.yaxis.autorange = false;
     Plotly.newPlot('stats', data, layout);

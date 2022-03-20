@@ -50,7 +50,7 @@ public:
           if (gh&1)
             loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
-        return (particle_particle (Xi, Vi, Omegai, ri, loc, Vj, Omegaj, rj, Contact) ) ;
+        return (particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact) ) ;
     } ///< Calculate the particle to regular (non Lees-Edward) ghost contact
 
 

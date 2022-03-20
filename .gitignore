@@ -11,6 +11,7 @@ visualise/node_modules
 examples/Output
 node_modules
 /deploy/
+/live/deploy
 /build
 Samples
 Textures
