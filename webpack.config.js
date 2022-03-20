@@ -1,88 +1,35 @@
 const path = require('path');
 
-module.exports = [
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/uniaxial.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'uniaxial-bundle.js',
+module.exports = [{
+    mode: "development",
+    // mode: "production",
+    entry: {
+        'uniaxial' : './live/src/uniaxial.js',
+        'triaxial' : './live/src/triaxial.js',
+        'isotropic' : './live/src/isotropic.js',
+        'inclined-plane' : './live/src/inclined-plane.js',
+        'lees-edwards' : './live/src/lees-edwards.js',
+        'rotation' : './live/src/rotation.js',
+        '4d-pool' : './live/src/4d-pool.js',
+        'coarse-graining' : './live/src/coarse-graining.js',
+        'nddem' : './visualise/js/nddem.js',
+    },
+    output: {
+        path: path.resolve(__dirname, 'live/deploy'),
+        filename: '[name]-bundle.js',
+        clean: true,
+    },
+    devServer: {
+        static: {
+          directory: '.'
         },
     },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/isotropic.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'isotropic-bundle.js',
-        },
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"],
+            },
+        ],
     },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/triaxial.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'triaxial-bundle.js',
-        },
-    },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/inclined-plane.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'inclined-plane-bundle.js',
-        },
-    },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/lees-edwards.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'lees-edwards-bundle.js',
-        },
-    },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/rotation.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'rotation-bundle.js',
-        },
-    },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/4d-pool.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: '4d-pool-bundle.js',
-        },
-    },
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './live/src/coarse-graining.js',
-        output: {
-            path: path.resolve(__dirname, 'live/deploy'),
-            filename: 'coarse-graining-bundle.js',
-        },
-    },
-
-    // old visualise stuff
-
-    {
-        mode: "development",
-        // mode: "production",
-        entry: './visualise/js/nddem.js',
-        output: {
-            path: path.resolve(__dirname, 'visualise/js'),
-            filename: 'nddem-bundle.js',
-        },
-    },
-];
+}];
