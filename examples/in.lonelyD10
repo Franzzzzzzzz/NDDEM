@@ -1,0 +1,40 @@
+# Incline plane flow
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD10
+#directory OutputTest
+dimensions 10 1
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
+boundary 4 WALL 0 5
+boundary 5 WALL 0 5
+boundary 6 WALL 0 5
+boundary 7 WALL 0 5
+boundary 8 WALL 0 5
+boundary 9 WALL 0 5
+
+location 0 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5
+velocity 0 0.03062601 0.34067903 0.24343772 0.50037291 0.46338657 0.44310011 0.24865912 0.07589347 0.30025805 0.06748319
+
+
+gravity 0 0 0 0 0 0 0 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+set T 50
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+set dumps CSV with 1 Orientation
+#set dumps VTK with 0
+set tdump 1000
+EOF

@@ -1,0 +1,1915 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset='utf-8'>
+  <title>NDDEM Visualisation  | Documentation</title>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link href='assets/bass.css' rel='stylesheet'>
+  <link href='assets/style.css' rel='stylesheet'>
+  <link href='assets/github.css' rel='stylesheet'>
+  <link href='assets/split.css' rel='stylesheet'>
+</head>
+<body class='documentation m0'>
+    <div class='flex'>
+      <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
+        <div class='py1 px2'>
+          <h3 class='mb0 no-anchor'>NDDEM Visualisation</h3>
+          <div class='mb1'><code></code></div>
+          <input
+            placeholder='Filter'
+            id='filter-input'
+            class='col12 block input'
+            spellcheck='false'
+            autocapitalize='off'
+            autocorrect='off'
+            type='text' />
+          <div id='toc'>
+            <ul class='list-reset h5 py1-ul'>
+              
+                
+                <li><a
+                  href='#introduction'
+                  class="h5 bold black caps">
+                  Introduction
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#particle-visualisation'
+                  class="h5 bold black caps">
+                  Particle visualisation
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#coarse-grained-data'
+                  class="h5 bold black caps">
+                  Coarse grained data
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#reference'
+                  class="h5 bold black caps">
+                  Reference
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#build_world'
+                  class="">
+                  build_world
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#update_higher_dims_left'
+                  class="">
+                  update_higher_dims_left
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#update_higher_dims_right'
+                  class="">
+                  update_higher_dims_right
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_left_oculus_model'
+                  class="">
+                  add_left_oculus_model
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_right_oculus_model'
+                  class="">
+                  add_right_oculus_model
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_vive_models'
+                  class="">
+                  add_vive_models
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_camera'
+                  class="">
+                  make_camera
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_renderer'
+                  class="">
+                  add_renderer
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_gui'
+                  class="">
+                  add_gui
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_controllers'
+                  class="">
+                  add_controllers
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#aim_camera'
+                  class="">
+                  aim_camera
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_axes'
+                  class="">
+                  make_axes
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_lights'
+                  class="">
+                  make_lights
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_walls'
+                  class="">
+                  make_walls
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#add_torus'
+                  class="">
+                  add_torus
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#remove_everything'
+                  class="">
+                  remove_everything
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_initial_sphere_texturing'
+                  class="">
+                  make_initial_sphere_texturing
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_initial_spheres_mercury'
+                  class="">
+                  make_initial_spheres_Mercury
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#make_initial_spheres_csv'
+                  class="">
+                  make_initial_spheres_CSV
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#load_textures'
+                  class="">
+                  load_textures
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#update_spheres_texturing'
+                  class="">
+                  update_spheres_texturing
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#update_spheres_csv'
+                  class="">
+                  update_spheres_CSV
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#onwindowresize'
+                  class="">
+                  onWindowResize
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#check_if_won'
+                  class="">
+                  check_if_won
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#animate'
+                  class="">
+                  animate
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#render'
+                  class="">
+                  render
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#remove_loading_screen'
+                  class="">
+                  remove_loading_screen
+                  
+                </a>
+                
+                </li>
+              
+            </ul>
+          </div>
+          <div class='mt1 h6 quiet'>
+            <a href='https://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
+          </div>
+        </div>
+      </div>
+      <div id='split-right' class='relative overflow-auto height-viewport-100'>
+        
+          
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='introduction' class='mt0'>
+    Introduction
+  </h2>
+
+  
+    <p>This module contains two distinct methods for:</p>
+<ol>
+<li>Particle visualisation</li>
+<li>Coarse grained data visualisation</li>
+</ol>
+<p>These methods both leverage <a href="https://threejs.org/">three.js</a> to render the visualisations in the browser. Visualisation options are controlled by setting the URL of the browser correctly.</p>
+<h3>Installation</h3>
+<p>To be able to view local data, that data needs to be served from a local server. This can be done by using the TexturingServer described elsewhere, or if no texturing is needed, two lightweight servers are included that work under Python or JS:</p>
+<h4>TexturingServer method</h4>
+<p>Follow the instructions to compile the TexturingServer.</p>
+<h4>JS Method</h4>
+<ol>
+<li>Install node.js. Try <code>sudo apt-get install nodejs</code> (tested with node.js v11.13.0)</li>
+<li>Install required packages by running <code>npm install express cors glob</code></li>
+</ol>
+<h4>Python method</h4>
+<p>This should work under <code>python2</code> or <code>python3</code>, with no additional dependencies, so as long as you have either of these installed on your system you have no need to install anything</p>
+<h3>Usage</h3>
+<ol>
+<li>Navigate to the main github directory and run <code>node server.js</code> or <code>python server.py</code> or <code>./Texturing/TexturingServer</code> to start a web server which will be used to serve local files.</li>
+<li>Open <code>visualise/index.html</code> in chrome or firefox. Supermedium is recommended if you want to use VR.</li>
+<li>Visualisation flags can either be hardcoded in <code>index.html</code> or can be set via the URL, for example: <code>index.html?fname=Samples/SpinnerD5/&#x26;view_mode=rotations</code></li>
+</ol>
+<h3>Flags:</h3>
+<ul>
+<li><code>fname</code>: folder name where data is stored. Trailing slash is optional. Default is <code>Samples/D4/</code></li>
+<li><code>display_type</code>: <code>VR</code>, <code>keyboard</code> or <code>anaglyph</code>. Default is <code>keyboard</code>.</li>
+<li><code>view_mode</code>: <code>undefined</code> (normal and default), <code>catch_particle</code>, <code>rotations</code>, <code>rotations2</code>, <code>velocity</code> or <code>rotation_rate</code>. <code>rotations</code> requires the <code>TexturingServer</code> to be running and works in any number of dimensions. <code>rotations2</code> can be computed in the browser, and can be used with any server, and does the calculations on the GPU at render time, but only works for <code>N</code> = 3 or 4.</li>
+<li><code>autoplay</code>: <code>true</code> or <code>false</code> to start time marching on load. Default is <code>false</code>.</li>
+<li><code>rate</code>: <code>float</code> that sets the speed of time marching. Units are DEM time units\second. Default is <code>5.0</code>.</li>
+<li><code>shadows</code>: <code>true</code> or <code>false</code> to render shadows. Default is <code>true</code>.</li>
+<li><code>quality</code>: <code>int</code> to set quality of rendering. Higher is more compute expensive. Default is <code>5</code>.</li>
+<li><code>zoom</code>: <code>float</code> to set how much to zoom in. Default is <code>20</code>.</li>
+<li><code>pinky</code>: only used if <code>view_mode</code> is <code>catch_particle</code>. <code>int</code> that sets which particle to render in pink. Default is <code>100</code>.</li>
+<li><code>cache</code>: <code>true</code> or <code>false</code> to cache local data in the browser. Default is <code>false</code>.</li>
+<li><code>hard_mode</code>: <code>true</code> or <code>false</code> to disable tori in VR mode to make things harder for the user. Default is <code>false</code>. This is meant to be more 'fun' but YMMV.</li>
+<li><code>no_axes</code>: include this flag to disable drawing of axes.</li>
+<li><code>no_walls</code>: include this flag to disable drawing of walls.</li>
+<li><code>quasicrystal</code>: <code>true</code> or <code>false</code> to view in quasicrystal mode. Default is <code>false</code>.</li>
+<li><code>mercury</code>: <code>true</code> or <code>false</code> to load MercuryDPM data instead of NDDEM data. Default is <code>false</code>.</li>
+<li><code>colour_scheme</code>: set to <code>inverted</code> to invert global colour scheme to have a white background.</li>
+<li><code>rotate_torus</code>: <code>float</code> to rotate the torus around the x1 axis in degrees</li>
+<li><code>record</code>: <code>true</code> or <code>false</code> to save frames when autoplay is ticked. Default is <code>false</code>.</li>
+<li><code>initial_camera_location</code>: three numbers (e.g. <code>initial_camera_location=1,2,3</code>) to set the initial camera location if so desired.</li>
+<li><code>camera_target</code>: three numbers (e.g. <code>camera_target=1,2,3</code>) to set what the camera is pointing at if so desired.</li>
+<li><code>t0</code>: <code>float</code> to set the initial timestep to display. Default is <code>0</code>.</li>
+<li><code>binary</code>: if included, this flag loads from binary data instead of csv data. You can convert csv to binary data using the included script <code>binarise_output.py</code> in the <code>scripts</code> folder.</li>
+<li></li>
+</ul>
+<p>An example command that works for me, when the TexturingServer is running: <code>/path/to/index.html?fname=D5Cristal/&#x26;view_mode=D4&#x26;colour_scheme=inverted&#x26;time=350&#x26;rate=5&#x26;display_type=keyboard</code></p>
+
+  
+</section></div>
+          
+        
+          
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='particle-visualisation' class='mt0'>
+    Particle visualisation
+  </h2>
+
+  
+    <p>Below is the default output of the visualisation software for a 3D simulation of spheres flowing down an inclined plane. You can manually move through time, or enable auto playing in the top right. The speed it is playing can be controlled with the "Rate" parameter.</p>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/index.html?fname=D3"></iframe>
+<h3>Getting around in ND</h3>
+<p>But what about dimensions higher than 3? For this, we need some way to project particles from higher dimensions down to 3D. In this example, we will project a 3D sphere down to a 2D circle by slicing it. Move the pink plane on the left around with the slider and see the resulting size of the circle on the right. The circle is largest when the sphere is sliced through its centre.</p>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/slice.html"></iframe>
+<p>Now, lets try that same thing, but we are going to slice a 5D hypersphere with a 3D volume. For this, there are two coordinates for where we are slicing, which you can control with the sliders. The torus on the right hand side represents where we are in these two dimensions. Notice how as you move around, the small pink ball moves. This small pink ball represents the location of the hypersphere relative to these two coordinates. The sphere on the left is again largest when we slice through its centre — when the ball is at the centre of the black cross</p>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/torus_explainer.html"></iframe>
+<p>Let's now go and look at inclined plane flow in 5D</p>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/index.html?fname=D5&rotate_torus=-150"></iframe>
+<h3>Particle rotation</h3>
+<p>To be able to see a particle rotate, we need to attach a texture to it. Here is how we visualise the earth rotating.</p>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/rotating_earth.html"></iframe>
+<p>In 3D, there are three directions that an object can rotate in.</p>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/multiple_rotating_earths.html"></iframe>
+<!-- <span style="color:red">In higher dimensions, there are more!... Information needed. See paper. Maybe just include the full movie we are making for the supplementary information?</span> -->
+<p>As we can't render the textures needed to do this without a local installation, here is a video explaining how rotations work</p>
+<p><video style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" controls><source src="https://www.benjymarks.com/nddem/videos/hypersphere-rotations.mp4"></video></p>
+<h3>Trying out VR (this will look blank if you don't have a VR headset attached)</h3>
+<iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/examples/vr-menu.html"></iframe>
+
+  
+</section></div>
+          
+        
+          
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='coarse-grained-data' class='mt0'>
+    Coarse grained data
+  </h2>
+
+  
+    <iframe style="width:90%;height:500px;display:block;margin-left:auto;margin-right:auto;" src="../../visualise/coarse_grain.html"></iframe>
+
+  
+</section></div>
+          
+        
+          
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='reference' class='mt0'>
+    Reference
+  </h2>
+
+  
+    
+
+  
+</section></div>
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='build_world'>
+      build_world
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Initialise the threejs scene, adding everything necessary, such as camera, controls, lighting etc.</p>
+
+    <div class='pre p1 fill-light mt0'>build_world()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='update_higher_dims_left'>
+      update_higher_dims_left
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Get the current orientation of the left hand controller and set world coordinates appropriately</p>
+
+    <div class='pre p1 fill-light mt0'>update_higher_dims_left()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='update_higher_dims_right'>
+      update_higher_dims_right
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Get the current orientation of the right hand controller and set world coordinates appropriately</p>
+
+    <div class='pre p1 fill-light mt0'>update_higher_dims_right()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_left_oculus_model'>
+      add_left_oculus_model
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the left oculus controller</p>
+
+    <div class='pre p1 fill-light mt0'>add_left_oculus_model(controller: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>controller</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    controller number (0 or 1)
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_right_oculus_model'>
+      add_right_oculus_model
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the right oculus controller</p>
+
+    <div class='pre p1 fill-light mt0'>add_right_oculus_model(controller: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>controller</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    controller number (0 or 1)
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_vive_models'>
+      add_vive_models
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the two vive controllers</p>
+
+    <div class='pre p1 fill-light mt0'>add_vive_models()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_camera'>
+      make_camera
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Make the camera and position it</p>
+
+    <div class='pre p1 fill-light mt0'>make_camera()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_renderer'>
+      add_renderer
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the renderer and associated VR warnings if necessary</p>
+
+    <div class='pre p1 fill-light mt0'>add_renderer()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_gui'>
+      add_gui
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the non-VR GUI and set all sliders</p>
+
+    <div class='pre p1 fill-light mt0'>add_gui()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_controllers'>
+      add_controllers
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the non-VR and/or VR controllers and associated buttons</p>
+
+    <div class='pre p1 fill-light mt0'>add_controllers()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='aim_camera'>
+      aim_camera
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>If the current example requires a specific direction for the camera to face at all times (e.g. a 1D or 2D simulation) then set that</p>
+
+    <div class='pre p1 fill-light mt0'>aim_camera()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_axes'>
+      make_axes
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Make the axes, including labels and arrows</p>
+
+    <div class='pre p1 fill-light mt0'>make_axes()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_lights'>
+      make_lights
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Make the scene lighting</p>
+
+    <div class='pre p1 fill-light mt0'>make_lights()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_walls'>
+      make_walls
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Make any necessary walls</p>
+
+    <div class='pre p1 fill-light mt0'>make_walls()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='add_torus'>
+      add_torus
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Add the torus(es) as necessary</p>
+
+    <div class='pre p1 fill-light mt0'>add_torus()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='remove_everything'>
+      remove_everything
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Remove everything from scene - very useful for presentation mode when we don't want to kill the computer by loading multiple scenes simultaneously</p>
+
+    <div class='pre p1 fill-light mt0'>remove_everything()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_initial_sphere_texturing'>
+      make_initial_sphere_texturing
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Make the initial texturing if showing rotations</p>
+
+    <div class='pre p1 fill-light mt0'>make_initial_sphere_texturing()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_initial_spheres_mercury'>
+      make_initial_spheres_Mercury
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Load particles from MercuryDPM file format - NOTE: THIS IS NOT WORKING YET</p>
+
+    <div class='pre p1 fill-light mt0'>make_initial_spheres_Mercury()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='make_initial_spheres_csv'>
+      make_initial_spheres_CSV
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Make the initial particles</p>
+
+    <div class='pre p1 fill-light mt0'>make_initial_spheres_CSV()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='load_textures'>
+      load_textures
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Load textures from TexturingServer</p>
+
+    <div class='pre p1 fill-light mt0'>load_textures(t: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, Viewpoint: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>t</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    timestep
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>Viewpoint</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    where we are in D>3 space
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='update_spheres_texturing'>
+      update_spheres_texturing
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Update textures from TexturingServer</p>
+
+    <div class='pre p1 fill-light mt0'>update_spheres_texturing(t: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>t</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    timestep
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='update_spheres_csv'>
+      update_spheres_CSV
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Update sphere locations</p>
+
+    <div class='pre p1 fill-light mt0'>update_spheres_CSV(t: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, changed_higher_dim_view: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>t</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    timestep
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>changed_higher_dim_view</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    flag to determine if we have changed which dimensions we are representing --- NOTE: CURRENTLY NOT DOING ANYTHING
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='onwindowresize'>
+      onWindowResize
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Update camera and renderer if window size changes</p>
+
+    <div class='pre p1 fill-light mt0'>onWindowResize()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='check_if_won'>
+      check_if_won
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>In catch_mode, let the user know if they found the pink ball</p>
+
+    <div class='pre p1 fill-light mt0'>check_if_won()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='animate'>
+      animate
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Animation loop that runs every frame</p>
+
+    <div class='pre p1 fill-light mt0'>animate()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='render'>
+      render
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Do the actual rendering</p>
+
+    <div class='pre p1 fill-light mt0'>render()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='remove_loading_screen'>
+      remove_loading_screen
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Remove loading screen</p>
+
+    <div class='pre p1 fill-light mt0'>remove_loading_screen()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+      </div>
+    </div>
+  <script src='assets/anchor.js'></script>
+  <script src='assets/split.js'></script>
+  <script src='assets/site.js'></script>
+</body>
+</html>

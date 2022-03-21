@@ -1,0 +1,59 @@
+# Incline plane flow
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD30
+#directory OutputTest
+dimensions 30 1
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 5
+boundary 1 WALL 0 5
+boundary 2 WALL 0 5
+boundary 3 WALL 0 5
+boundary 4 WALL 0 5
+boundary 5 WALL 0 5
+boundary 6 WALL 0 5
+boundary 7 WALL 0 5
+boundary 8 WALL 0 5
+boundary 9 WALL 0 5
+boundary 10 WALL 0 5
+boundary 11 WALL 0 5
+boundary 12 WALL 0 5
+boundary 13 WALL 0 5
+boundary 14 WALL 0 5
+boundary 15 WALL 0 5
+boundary 16 WALL 0 5
+boundary 17 WALL 0 5
+boundary 18 WALL 0 5
+boundary 19 WALL 0 5
+boundary 20 WALL 0 5
+boundary 21 WALL 0 5
+boundary 22 WALL 0 5
+boundary 23 WALL 0 5
+boundary 24 WALL 0 5
+boundary 25 WALL 0 5
+boundary 26 WALL 0 5
+boundary 27 WALL 0 5
+boundary 28 WALL 0 5
+boundary 29 WALL 0 5
+
+location 0 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5 2.5
+velocity 0 0.14612598 0.08376032 0.15669009 0.17192298 0.1181035 0.11786906 0.05725445 0.20814173 0.08307005 0.16683804 0.16850818 0.27434564 0.09920698 0.01263298 0.0162108 0.15495428 0.31803355 0.25707399 0.06012884 0.2326699 0.15127811 0.00034455 0.12855791 0.24526831 0.06032618 0.12120213 0.333983 0.22780151 0.23201762 0.33204912
+
+gravity 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+set T 50
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+set dumps CSV with 1 Orientation
+#set dumps VTK with 0
+set tdump 1000
+EOF

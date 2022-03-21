@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>NDDEM</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="stylesheet"
+         href="https://fonts.googleapis.com/css?family=Montserrat">
+        <style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+            #N_tag {
+                color: white;
+                padding: 24px;
+                font: 48px Montserrat;
+                /* font-weight: bold; */
+                position:absolute;
+            }
+		</style>
+	</head>
+	<body>
+		<script src="../node_modules/three/build/three.js"></script>
+        <!-- <script src="../node_modules/three/examples/js/WebGL.js"></script> -->
+        <!-- <script src="../node_modules/three/examples/js/controls/TrackballControls.js"></script> -->
+        <!-- <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
+        <script src="../js/dat.gui.min.custom.js"></script>
+        <script src="../js/CCapture.all.min.js"></script>
+        <script type="x-shader/x-vertex" id="vertexshader-3D">
+            uniform int N; // number of dimensions in simulation
+            uniform float N_lines; // number of lines to render across particle
+			uniform mat4 A;  // orientation matrix for this particle
+            uniform float R; // particle radius
+            uniform float x4; // loc of viewing position
+            uniform float x4p; // loc of centre of particle in D4
+			varying vec3 vColor; // colour at vertex (output)
+            varying vec3 vNormal; // normal at vertex (output)
+
+            void main() {
+                vNormal = normal; // for directional lighting
+                const float pi = 3.14159265359;
+                float R_draw; // radius particle will be drawn at
+                float R_draw_squared = pow(R,2.0)-pow(x4-x4p,2.0);
+                if ( R_draw_squared > 0.0 ) { // only if visible
+                    R_draw = sqrt(R_draw_squared);
+                    vec4 x;
+                    vec4 x_rotated;
+                    float phi2;
+                    // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
+                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    x.x = R_draw*sin((uv.y-0.5)*pi);
+                    x.w = x4 - x4p;
+
+                    // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
+                    x_rotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
+                    x_rotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
+                    x_rotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
+                    x_rotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
+
+                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                    float rsqr = pow(length(x_rotated),2.0);
+                    float phi0 = acos(x_rotated.x/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.x*x_rotated.x;
+                    float phi1 = acos(x_rotated.y/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.y*x_rotated.y;
+                    if ( x_rotated.w == 0.0 ) {
+                        if ( x_rotated.z < 0.0 ) { phi2 = pi; }
+                        else if ( x_rotated.z == 0.0 ) {
+                            phi1 = 0.0;
+                            phi2 = 0.0;
+                        }
+                        else { phi2 = 0.0; }
+                    }
+                    else {
+                        phi2 = acos(x_rotated.z/sqrt(rsqr));
+                    }
+                    // if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    // if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+                    if ( x_rotated.w < 0.0 ) { phi2 = 2.0*pi - phi2; }
+
+                    vColor.r = abs(sin(phi0*3.0));
+                    vColor.g = abs(sin(phi1*2.));
+                    vColor = vColor * abs(sin(phi0));
+                }
+                else { vColor.r = 0.0; }
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+		</script>
+        <script type="x-shader/x-vertex" id="vertexshader-4D">
+            uniform int N; // number of dimensions in simulation
+            uniform float N_lines; // number of lines to render across particle
+			uniform mat4 A;  // orientation matrix for this particle
+            uniform float R; // particle radius
+            uniform float x4; // loc of viewing position
+            uniform float x4p; // loc of centre of particle in D4
+			varying vec3 vColor; // colour at vertex (output)
+            varying vec3 vNormal; // normal at vertex (output)
+
+            void main() {
+                vNormal = normal; // for directional lighting
+                const float pi = 3.14159265359;
+                float R_draw; // radius particle will be drawn at
+                float R_draw_squared = pow(R,2.0)-pow(x4-x4p,2.0);
+                if ( R_draw_squared > 0.0 ) { // only if visible
+                    R_draw = sqrt(R_draw_squared);
+                    vec4 x;
+                    vec4 x_rotated;
+                    float phi2;
+                    // get 3d locations in x,y,z,w in coord system where center of sphere is at 0,0,0,0
+                    x.z = R_draw*cos((uv.y-0.5)*pi)*cos((uv.x-0.5)*2.0*pi);
+                    x.y = R_draw*cos((uv.y-0.5)*pi)*sin((uv.x-0.5)*2.0*pi);
+                    x.x = R_draw*sin((uv.y-0.5)*pi);
+                    x.w = x4 - x4p;
+                    // w,z,y,x
+                    // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
+                    x_rotated.x = A[0].x*x.x + A[0].y*x.y + A[0].z*x.z + A[0].w*x.w;
+                    x_rotated.y = A[1].x*x.x + A[1].y*x.y + A[1].z*x.z + A[1].w*x.w;
+                    x_rotated.z = A[2].x*x.x + A[2].y*x.y + A[2].z*x.z + A[2].w*x.w;
+                    x_rotated.w = A[3].x*x.x + A[3].y*x.y + A[3].z*x.z + A[3].w*x.w;
+
+                    // convert that new vector in hyperspherical coordinates (you can have a look at the hyperspherical_xtophi function in Tools.h)
+                    // NOTE: STILL PROBABLY NOT RIGHT
+                    float rsqr = pow(length(x_rotated),2.0);
+                    float phi0 = acos(x_rotated.w/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.w*x_rotated.w;
+                    float phi1 = acos(x_rotated.x/sqrt(rsqr));
+                    rsqr = rsqr - x_rotated.x*x_rotated.x;
+                    if ( x_rotated.z == 0.0 ) {
+                        if ( x_rotated.y < 0.0 ) phi2 = pi;
+                        else if ( x_rotated.y == 0.0 ) {
+                            phi2 = 0.0;
+                            phi1 = 0.0;
+                        }
+                        else { phi2 = 0.0; }
+                    }
+                    else {
+                        phi2 = acos(x_rotated.y/sqrt(rsqr));
+                    }
+                    //if ( isnan(phi1) ) { phi1 = acos(sign(x_rotated.y)*x_rotated.y);}
+                    //if ( isnan(phi2) ) { phi2 = acos(sign(x_rotated.z)*x_rotated.z);}
+
+                    if ( x_rotated.z < 0.0 ) { phi2 = 2.0*pi - phi2; }
+
+                    vColor.r = abs(sin(phi0*3.0));
+                    vColor.g = abs(sin(phi1*3.0));
+                    vColor.b = abs(sin(phi2*2.0));
+                    vColor = vColor * abs(sin(phi0));
+                    vColor = vColor * abs(sin(phi1));
+
+                    // vColor.r = 0.0;
+                    // vColor.g = 0.0;
+                    // vColor.b = 0.0;
+
+
+                    // vColor.r = abs(x_rotated.x);
+                    // vColor.g = abs(x_rotated.y);
+                    // vColor.b = abs(x_rotated.z);
+
+                    // vColor.r = phi0/2.0/pi;
+                    // vColor.g = phi1/2.0/pi;
+                    // vColor.b = phi2/2.0/pi;
+
+
+
+
+                    // if ( N > 4 ) { rescale(vColor); }
+                }
+                else { vColor.r = 0.0; }
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+            varying vec3 vNormal;
+            varying vec3 vColor;
+
+            void main() {
+
+                // add directional lighting
+                const float ambient = 0.6;
+                vec3 light = vec3( 1.0 );
+                light = normalize( light );
+                float directional = max( dot( vNormal, light ), 0.0 );
+                gl_FragColor = vec4( ( ambient + 0.5*directional ) * vColor, 1.0 ); // colours by vertex colour
+
+                // no directional lighting
+                // const float ambient = 1.0;
+                // gl_FragColor = vec4( ( ambient ) * vColor, 1.0 ); // colours by vertex colour
+
+            }
+        </script>
+        <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        var N = 4;
+        var time = {'play': false };
+        var container;
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+
+        if ( urlParams.has('N') ) { N = parseInt(urlParams.get('N')); }
+
+        N_tag = document.createElement( 'div' );
+        N_tag.setAttribute("id", "N_tag");
+        N_tag.innerHTML = String(N) + "D";
+        container.appendChild(N_tag);
+
+        // if ( WEBGL.isWebGL2Available() === false ) {
+        // 	document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+        // }
+
+        var root_dir = 'http://localhost:54321/';
+        if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}
+        else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
+
+        var fname = "visualise/resources/earthmap.jpg";
+
+        const recorder = new CCapture({
+        	verbose: true,
+        	display: true,
+        	framerate: 30,
+        	quality: 100,
+        	format: 'png',
+        	timeLimit: 100,
+        	frameLimit: 0,
+        	autoSaveTime: 0
+        });
+        var record = false; var quality = 8;
+        var slice = {'omega1':0,'omega2':0,'omega3':0,'omega4':0,'omega5':0,'omega6':0,'x4':0}
+        if ( urlParams.has('fname') ) { fname = urlParams.get('fname'); };
+        if ( urlParams.has('quality') ) { quality = parseInt(urlParams.get('quality'))}
+        clock = new THREE.Clock();
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0x111111 );
+		var camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 0.1, 1000 );
+        // var width = 6;
+        // var height = 3;
+        // camera = new THREE.OrthographicCamera(-width/2, width/2, -height/2, height/2, 1, 1000);
+		camera.position.z = 6;
+
+        var canvas = document.createElement( 'canvas' );
+        var context = canvas.getContext( 'webgl2', { alpha: false } );
+        var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias: true } );
+		// var renderer = new THREE.WebGLRenderer({}); // NEED TO ENABLE THIS TO GET RID OF JAGGED EDGES
+        if ( urlParams.has('controls') ) { var controls = new THREE.TrackballControls( camera, renderer.domElement ); controls.handleResize();}
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+        var background_light = new THREE.AmbientLight( 0xffffff );
+        scene.add( background_light );
+        var light = new THREE.DirectionalLight(0xaaaaaa);
+        light.position.x = -2
+        light.position.z = 2
+        scene.add( light );
+
+        var sphere;
+        var rect;
+
+        var uniforms = {
+            N: {value: 4},
+            N_lines: {value: 5.0},
+            A: { value: new THREE.Matrix4() },
+			x4: { value: 0.0 },
+            x4p: { value: 0.0 },
+            R: { value: 0.5 },
+		};
+        uniforms.A.value.set(1,0,0,0,
+                             0,1,0,0,
+                             0,0,1,0,
+                             0,0,0,1);
+
+
+        if ( urlParams.has('N') ) { uniforms.N.value = parseInt(urlParams.get('N')); }
+        var rect_geometry = new THREE.PlaneBufferGeometry( 1, 1, Math.pow(2,quality), Math.pow(2,quality) );
+        sphere_geometry = new THREE.BufferGeometry().fromGeometry( new THREE.SphereGeometry( 1, Math.pow(2,quality), Math.pow(2,quality) ) );
+
+        var numFaces = sphere_geometry.attributes.position.count / 3;
+        // var colors = new Float32Array( numFaces * 3 * 3 );
+        // var color = new THREE.Color();
+
+        // sphere_geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) ); // NOTE: THIS FUNCTION CHANGES NAME IN THREEJS v110 TO setAttribute!!!!!
+        // rect_geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+        var vertexShader = document.getElementById( 'vertexshader-'+String(uniforms.N.value)+'D' ).textContent;
+        var shaderMaterial = new THREE.ShaderMaterial( {
+			uniforms: uniforms,
+			// vertexShader: document.getElementById( 'vertexshader-4D' ).textContent,
+            vertexShader: vertexShader,
+			fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+		} );
+
+        sphere = new THREE.Mesh( sphere_geometry, shaderMaterial );
+        rect = new THREE.Mesh( rect_geometry, shaderMaterial );
+        sphere.position.x = -2
+        rect.position.x = 2
+        rect.scale.set(4,2,1);
+        // sphere.rotation.y = Math.PI/2.;
+        // sphere.rotation.z = Math.PI/2.;
+
+        scene.add( sphere );
+        scene.add( rect );
+
+        var gui = new dat.GUI();
+        gui.add( slice, 'omega1').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>1</sub>') ;
+        gui.add( slice, 'omega2').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>2</sub>') ;
+        gui.add( slice, 'omega3').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>3</sub>') ;
+        if ( uniforms.N.value > 3 ) {
+            gui.add( slice, 'omega4').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>4</sub>') ;
+            gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>5</sub>') ;
+            gui.add( slice, 'omega6').min(-1).max(1).step(0.01).listen().name('&omega;&#775;<sub>6</sub>') ;
+            gui.add( slice, 'x4').min(-uniforms.R.value).max(uniforms.R.value).step(0.01).listen().name('x<sub>4</sub>').onChange( function( ) {
+                R_squared = Math.pow(uniforms.R.value,2) - Math.pow(uniforms.x4p.value - slice.x4,2);
+                if ( R_squared > 0 ) {
+                    sphere.visible = true;
+                    R = Math.sqrt(R_squared);
+                    sphere.scale.set(R,R,R);
+                }
+                else {
+                    sphere.visible = false;
+                }
+            });
+        }
+        gui.add(time, "play").name("Play")
+          .onChange(function (flag) {
+            time.play = flag;
+            if (flag && record) {
+              recorder.start();
+              console.log("Recording");
+            } else if ( record ) {
+              recorder.stop();
+              recorder.save();
+              console.log("saving recording");
+            }
+          });
+        // if ( N > 4 ) {
+            // gui.add( slice, 'omega5').min(-1).max(1).step(0.01).listen().name('Omega 5') ;
+        // }
+        gui.open();
+
+        if ( urlParams.has('record') ) { addRecordOnKeypress() };
+
+        function addRecordOnKeypress() {
+            document.addEventListener("keydown", function(event) {
+                if (event.code == 'Space') {
+                    if (record) {
+                        recorder.stop();
+                        recorder.save();
+                    }
+                    else {
+                        recorder.start();
+                    }
+                    record = !record;
+                }
+            }, false);
+        }
+
+		var animate = function () {
+            if ( urlParams.has('controls') ) { controls.update(); }
+            var delta = clock.getDelta()
+            delta = Math.min(0.1,delta); // in case they have gone away from the tab for a while
+            if ( time.play ) {
+                var O = new THREE.Matrix4();
+                O.set(            0, slice.omega1,-slice.omega2, slice.omega4,
+                      -slice.omega1,            0, slice.omega3,-slice.omega5,
+                       slice.omega2,-slice.omega3,            0, slice.omega6,
+                      -slice.omega4, slice.omega5,-slice.omega6,            0);
+
+                var dA = O.multiply(uniforms.A.value).multiplyScalar(delta).toArray();
+                var Sum = uniforms.A.value.elements.map(function (num, idx) {
+                  return num - dA[idx];
+                });
+                uniforms.A.value.elements = Sum;
+
+                //Orthonormalisation
+                for (i=0 ; i<uniforms.N.value ; i++)
+                {
+                    for (j=0 ; j<i ; j++)
+                    {
+                        for (dd=0, dot=0 ; dd<uniforms.N.value ; dd++)
+                            dot += uniforms.A.value.elements[i*4+dd] * uniforms.A.value.elements[j*4+dd] ;
+                        for (dd=0 ; dd<uniforms.N.value ; dd++)
+                            uniforms.A.value.elements[i*4+dd] -= uniforms.A.value.elements[j*4+dd] * dot ;
+                    }
+                    for (dd=0, norme=0 ; dd<uniforms.N.value ; dd++)
+                        norme += uniforms.A.value.elements[i*4+dd]*uniforms.A.value.elements[i*4+dd] ;
+                    for (dd=0 ; dd<uniforms.N.value ; dd++)
+                        uniforms.A.value.elements[i*4+dd] /= norme ;
+                }
+            }
+            uniforms.x4.value = slice.x4;
+
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
+            if ( record ) {
+                recorder.capture(renderer.domElement);
+            }
+
+		};
+        window.addEventListener( 'resize', onWindowResize, false );
+		animate();
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            if ( controls !== undefined ) { controls.handleResize(); }
+        };
+        </script>
+
+	</body>
+</html>

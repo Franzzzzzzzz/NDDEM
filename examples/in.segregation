@@ -1,0 +1,38 @@
+# Incline plane flow
+directory Output
+dimensions 3 50
+
+# The order is quite important here: 1/set the density base on a particle of mass 1 and diameter 1. 2/update everyone radius 3/update the mass and inertia based on the previously defined rho and radius.
+radius -1 0.5
+mass -1 1
+auto rho
+auto radius uniform 0.5 1
+auto mass
+auto inertia
+auto skin
+
+boundary 0 WALL  0 20
+boundary 1 WALL  0 20
+boundary 2 WALL  0 20
+#boundary 3 SPHERE 5 10 10 10
+boundary 3 ROTATINGSPHERE 5 10 10 10 0.0001 0 0
+#boundary 3 PBC  0 3.4
+
+auto location insphere
+
+gravity 10 1 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 500
+set dt 0.0001
+#set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 1 Orientation
+set dumps VTK with 2 Orientation Radius
+set tdump 10000
+
+EOF

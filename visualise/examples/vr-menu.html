@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>NDDEM</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
+		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
+        <style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+            #N_tag {
+                color: white;
+                padding: 24px;
+                font: 48px Montserrat;
+                font-weight: bold;
+                position:absolute;
+            }
+		</style>
+	</head>
+	<body>
+		<script src="../node_modules/three/build/three.js"></script>
+        <script src="../node_modules/three/examples/js/WebGL.js"></script>
+		<script src="../node_modules/three/examples/js/vr/WebVR.js"></script>
+        <script src="../node_modules/three/examples/js/effects/AnaglyphEffect.js"></script>
+        <script src="../node_modules/three/examples/js/loaders/VTKLoader.js"></script>
+		<script src="../node_modules/three/examples/js/loaders/OBJLoader.js"></script>
+		<script src="../node_modules/three/examples/js/loaders/MTLLoader.js"></script>
+		<script src="../node_modules/three/examples/js/vr/ViveController.js"></script>
+		<script src="../js/VRController.js"></script>
+        <script src="../node_modules/papaparse/papaparse.js"></script>
+        <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+        <!-- <script src="../js/datguivr.js"></script> -->
+        <script src="../node_modules/three/examples/js/math/Lut.js"></script>
+        <script>
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+
+		var root_dir = 'http://localhost:54321/';
+		if ( window.location.hostname.includes('benjymarks') ) {
+		    root_dir = 'http://www.benjymarks.com/nddem/';
+		    cache = true;
+		}
+        else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
+
+		scene = new THREE.Scene();
+	    scene.background = new THREE.Color( 0xdddddd ); // revealjs background colour
+
+		var intersected = [];
+		var tempMatrix = new THREE.Matrix4(); // catching grains
+		var buttons = new THREE.Group();
+        var button_bgs = new THREE.Group();
+		vive = false;
+		add_buttons();
+		add_controllers();
+
+		camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near, far
+		// camera.position.set(5,5,2);
+        // camera.rotation.z = Math.PI/2.;
+		make_lights();
+		add_renderer();
+		window.addEventListener( 'resize', onWindowResize, false );
+		animate();
+
+		function add_renderer() {
+		    renderer = new THREE.WebGLRenderer( { antialias: true } );
+		    renderer.setPixelRatio( window.devicePixelRatio );
+		    renderer.setSize( window.innerWidth, window.innerHeight );
+		    // renderer.setSize( container.offsetWidth, container.offsetHeight );
+		    renderer.vr.enabled = true;
+		    container.appendChild( renderer.domElement );
+	        container.appendChild( WEBVR.createButton( renderer ) );
+    	};
+
+
+		function add_left_oculus_model(controller) {
+		    new THREE.MTLLoader()
+		    .setPath( root_dir + 'visualise/resources/oculus/' )
+		    .load( 'oculus-touch-controller-left.mtl', function ( materials ) {
+		        materials.preload();
+		        new THREE.OBJLoader()
+		        .setMaterials( materials )
+		        .setPath( root_dir + 'visualise/resources/oculus/' )
+		        .load( 'oculus-touch-controller-left.obj', function ( object ) {
+		            object.castShadow = true;
+		            object.receiveShadow = true;
+					console.log(object)
+		            // Pause label
+		            var font_loader = new THREE.FontLoader();
+		            font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+		                var fontsize = 0.005;
+		                controller.add( object );
+	                    var geometry = new THREE.TextBufferGeometry( "Pick", { font: font, size: fontsize, height: fontsize/5. } );
+						var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+	                    var move_label = new THREE.Mesh( geometry, material );
+	                    move_label.rotation.x = -1.*Math.PI/4.;
+	                    move_label.rotation.y = Math.PI;
+	                    move_label.position.y = -0.035 -fontsize;
+	                    move_label.position.x = 0.018;
+	                    move_label.position.z = 0.045;
+						object.add(move_label);
+		            });
+		        });
+		    } );
+		}
+
+		function add_right_oculus_model(controller) {
+		    new THREE.MTLLoader()
+		    .setPath( root_dir + 'visualise/resources/oculus/' )
+		    .load( 'oculus-touch-controller-right.mtl', function ( materials ) {
+		        materials.preload();
+		        new THREE.OBJLoader()
+		        .setMaterials( materials )
+		        .setPath( root_dir + 'visualise/resources/oculus/' )
+		        .load( 'oculus-touch-controller-right.obj', function ( object ) {
+		            object.castShadow = true;
+		            object.receiveShadow = true;
+
+		            // Pause label
+		            var font_loader = new THREE.FontLoader();
+		            font_loader.load( root_dir + 'visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+		                var fontsize = 0.005;
+						controller.add( object );
+		                // scene.add( object );
+
+	                    var geometry = new THREE.TextBufferGeometry( "Pick", { font: font, size: fontsize, height: fontsize/5. } );
+						var material = new THREE.MeshPhongMaterial( { color: 0xdddddd } );
+	                    var move_label = new THREE.Mesh( geometry, material );
+	                    move_label.rotation.x = -1.*Math.PI/4.;
+	                    move_label.rotation.y = Math.PI;
+	                    move_label.position.y = -0.035 -fontsize;
+	                    move_label.position.x = 0.0;
+	                    move_label.position.z = 0.045;
+	                    object.add(move_label);
+		            });
+		        });
+		    } );
+		}
+
+		function add_controllers() {
+			controller1 = new THREE.Object3D;
+			controller2 = new THREE.Object3D;
+
+			if ( vive ) {
+			    var loader = new THREE.OBJLoader();
+					loader.setPath( 'visualise/resources/vive/' );
+					loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+						var loader = new THREE.TextureLoader();
+						loader.setPath( 'visualise/resources/vive/' );
+						var controller = object.children[ 0 ];
+						controller.material.map = loader.load( 'onepointfive_texture.png' );
+						controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
+						controller1.add( controller.clone() );
+						controller2.add( controller.clone() );
+					} );
+				}
+
+			var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+			var line = new THREE.Line( geometry );
+			line.name = 'line';
+			line.scale.z = 5;
+
+			controller1.add( line.clone() );
+			controller2.add( line.clone() );
+
+			raycaster = new THREE.Raycaster();
+
+			window.addEventListener( 'vr controller connected', function( event ){
+			   	 //  Here it is, your VR controller instance.
+			   	 //  It’s really a THREE.Object3D so you can just add it to your scene:
+			   	 var controller = event.detail
+			   	 if ( controller.gamepad.hand === 'left' ) {
+			   		 controller.add(controller1);
+					 if ( controller.gamepad.id === 'Oculus Touch (Left)') { add_left_oculus_model(controller); }
+			   	 }
+			   	 else if ( controller.gamepad.hand === 'right' ) {
+			   		 controller.add(controller2);
+					 if ( controller.gamepad.id === 'Oculus Touch (Right)') { add_right_oculus_model(controller); }
+			   	 }
+			   	 scene.add( controller )
+			   	 controller.standingMatrix = renderer.vr.getStandingMatrix()
+			   	 controller.head = window.camera
+
+			   	 controller.addEventListener( 'primary press began', onSelectStart );
+				 // controller.addEventListener( 'primary press began', onSelectEnd );
+		    });
+		}
+		function add_buttons() {
+			fontsize = 0.25;
+			vert_offset = 2.*fontsize;
+			horiz_offset = 3.5;
+			back = 8.0;
+			vert_initial_value = 2;
+			horiz_initial_value = -8;
+			var loader = new THREE.FontLoader();
+			loader.load( 'http://localhost:54321/visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json', function ( font ) {
+				Lonely_Ds = [3,4,5,6,7,8,9,10,30];
+				Inclined_Ds = [3,4,5];//,6];
+				Uniaxial_Ds = [3,4,5];//,6];
+				Catch_Ds = [3,4,5];//,6];
+
+				names = ['Lonely','Inclined','Uniaxial','Catch','Catch (Harder)'];
+				fnames = ['Lonely','','Uniaxial','',''];
+				Ds = [Lonely_Ds,Inclined_Ds,Uniaxial_Ds,Catch_Ds,Catch_Ds];
+				extra_strings = ['','','','&view_mode=catch_particle','&view_mode=catch_particle&hard_mode=true']
+
+
+				for ( var i=0;i<Ds.length;i++ ) {
+					for ( var j=0;j<Ds[i].length;j++ ) {
+						var mat = new THREE.MeshPhongMaterial( { color: 0xe72564 } );
+						var geom = new THREE.TextBufferGeometry( names[i] + " D" + String(Ds[i][j]), { font: font, size: fontsize, height: fontsize/5., } );
+			    		var button = new THREE.Mesh( geom, mat );
+
+                        var url = 'http://localhost:54321/visualise/index.html?display_type=VR&fname='+fnames[i]+'D'+String(Ds[i][j])+extra_strings[i];
+
+						button.rotation.y = -Math.PI/2.;
+						button.position.y = vert_initial_value - vert_offset*j;
+						button.position.x = back;
+						button.position.z = horiz_initial_value + horiz_offset*i;
+						button.url = url;
+
+                        var mat = new THREE.MeshPhongMaterial( { color: 0x333333 } );
+        				var geom = new THREE.BoxGeometry( 0.9*horiz_offset,0.8*vert_offset, 0.1 );
+        				var bg_current = new THREE.Mesh( geom, mat );
+                        bg_current.url = url;
+                        bg_current.rotation.y = -Math.PI/2.;
+						bg_current.position.y = vert_initial_value - vert_offset*j + 0.3*vert_offset;
+						bg_current.position.x = back + 0.01;
+						bg_current.position.z = horiz_initial_value + horiz_offset*i +  0.4*horiz_offset;;
+                        button_bgs.add(bg_current);
+						buttons.add(button);
+					}
+				}
+
+			});
+			scene.add(buttons);
+            scene.add(button_bgs);
+		}
+
+		function make_lights() {
+		    var background_light = new THREE.AmbientLight( 0xFFFFFF );
+		    scene.add( background_light );
+		}
+
+		function onSelectStart( event ) {
+		    var controller = event.target;
+		    var intersections = getIntersections( controller );
+		    if ( intersections.length > 0 ) {
+		        var intersection = intersections[ 0 ];
+		        tempMatrix.getInverse( controller.matrixWorld );
+		        var object = intersection.object;
+				window.location.href = object.url; // simulate mouse click
+				//window.location.replace(object.url); // simulate HTTP redirect
+		        // object.matrix.premultiply( tempMatrix );
+		        // object.matrix.decompose( object.position, object.quaternion, object.scale );
+		        // object.material.emissive.b = 1;
+		        // controller.add( object );
+		        // controller.userData.selected = object;
+		    }
+		}
+
+		function onSelectEnd( event ) {
+		    var controller = event.target;
+		    if ( controller.userData.selected !== undefined ) {
+		        var object = controller.userData.selected;
+		        object.matrix.premultiply( controller.matrixWorld );
+		        object.matrix.decompose( object.position, object.quaternion, object.scale );
+		        // object.material.emissive.b = 0;
+		        //buttons.add( object );
+		        controller.userData.selected = undefined;
+		    }
+		};
+
+		function getIntersections( controller ) {
+
+		    tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+		    raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+		    raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+
+		    return raycaster.intersectObjects( button_bgs.children );
+
+		}
+
+		function intersectObjects( controller ) {
+
+		    // Do not highlight when already selected
+
+		    if ( controller.userData.selected !== undefined ) return;
+
+		    var line = controller.getObjectByName( 'line' );
+		    var intersections = getIntersections( controller );
+
+		    if ( intersections.length > 0 ) {
+
+		        var intersection = intersections[ 0 ];
+
+		        var object = intersection.object;
+		        object.material.emissive = new THREE.Color( 0x222222 );
+		        intersected.push( object );
+
+		        line.scale.z = intersection.distance;
+
+		    } else {
+
+		        line.scale.z = 5;
+
+		    }
+
+		}
+
+		function cleanIntersected() {
+		    while ( intersected.length ) {
+		        var object = intersected.pop();
+		        object.material.emissive = new THREE.Color ( 0x000000 );
+		    }
+		};
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+		    camera.updateProjectionMatrix();
+		    renderer.setSize( window.innerWidth, window.innerHeight );
+		    render();
+		};
+
+		function animate() {
+		    THREE.VRController.update();
+		    requestAnimationFrame( animate );
+		    renderer.setAnimationLoop( render );
+		};
+
+		function render() {
+	        cleanIntersected();
+	        intersectObjects( controller1 );
+	        intersectObjects( controller2 );
+ 			renderer.render( scene, camera );
+		};
+
+        </script>
+	</body>
+</html>

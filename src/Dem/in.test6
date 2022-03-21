@@ -1,0 +1,24 @@
+# Incline plane flow
+directory Output
+dimensions 4 400
+boundary 0 WALL 0 0.02
+boundary 1 PBC 0 0.01
+boundary 2 PBC 0 0.005
+boundary 3 PBC 0 0.005
+gravity -10 0 0 0
+radius -1 0.00075
+set rho 2500
+auto location roughinclineplane
+auto mass
+auto inertia
+set Kn 8.1e5
+set Kt 8e5
+set GammaN 0.1
+set GammaT 0.1
+set Mu 0.5
+set T 1
+set dt 0.000001
+set dumpkind VTK
+set tdump 10000
+event 0.1 gravity -9.1 4.23 0 0
+EOF

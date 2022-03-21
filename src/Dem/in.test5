@@ -1,0 +1,21 @@
+# Incline plane flow
+dimensions 3 21
+boundary 0 PBC 0 0.005
+boundary 1 PBC 0 0.005
+boundary 2 WALL 0 0.02
+gravity 0 0.2 -0.92
+radius -1 0.00075
+set rho 2500
+auto location square
+auto mass
+auto inertia
+set Kn 8.1e5
+set Kt 8e4
+set GammaN 0.1
+set GammaT 0.1
+set Mu 0.5
+set T 1
+set dt 0.000001
+set dumpkind VTK
+set tdump 10000
+EOF

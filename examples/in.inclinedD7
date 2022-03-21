@@ -1,0 +1,34 @@
+# Incline plane flow
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/D7
+dimensions 7 16704
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 20
+boundary 1 PBC  0 5
+boundary 2 PBC  0 3.4
+boundary 3 PBC  0 3.4
+boundary 4 PBC  0 3.4
+boundary 5 PBC  0 3.4
+boundary 6 PBC  0 3.4
+
+auto location roughinclineplane
+
+gravity -1 0 0 0 0 0 0
+set Kn 2e5
+set Kt 8e-4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 500
+set dt 0.0001
+set dumpkind CSV
+set tdump 10000
+event 20 gravity -0.9 0.42 0 0 0 0 0
+EOF

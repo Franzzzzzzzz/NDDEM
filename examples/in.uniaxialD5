@@ -1,0 +1,39 @@
+# Incline plane flow
+directory /Users/FGuillard/Dropbox/DEM_ND/Samples/UniaxialD5
+dimensions 5 2000
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 20
+boundary 1 PBC  0 4
+boundary 2 PBC  0 4
+boundary 3 PBC  0 4
+boundary 4 PBC  0 4
+#boundary 3 PBC 0 3.4
+
+#auto location roughinclineplane2
+auto location randomdrop
+
+gravity -1 0 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+set skin 1.5
+
+
+set T 150
+set dt 0.0001
+#set dumps VTK with 1 Omega
+set dumps CSV with 1 Orientation
+set dumps WALLFORCE
+set tdump 10000
+event 50 boundary 0 MOVINGWALL 0 10 0. -0.1
+#event 10 boundary 2 MOVINGWALL 0 5 0.02 -0.02
+#event 10 boundary 1 MOVINGWALL 0 5 0.02 -0.02
+EOF

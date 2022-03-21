@@ -1,0 +1,8 @@
+toc:
+  - name: Introduction
+    file: intro.md
+  - name: Particle visualisation
+    file: particles.md
+  - name: Coarse grained data
+    file: coarse_grain.md
+  - name: Reference

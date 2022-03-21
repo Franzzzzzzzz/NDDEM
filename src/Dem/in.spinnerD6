@@ -1,0 +1,93 @@
+# Incline plane flow
+directory /home/franz/Dropbox/DEM_ND/Samples/SpinnerD6
+#directory OutputTest
+dimensions 6 30
+
+#set adimensional
+radius -1 0.45
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 PBC -3 3
+boundary 1 PBC -3 3
+boundary 2 PBC -1 1
+boundary 3 PBC -1 1
+boundary 4 PBC -1 1
+boundary 5 PBC -1 1
+
+location 0 -2 3 0 0 0 0
+location 1 -1 3 0 0 0 0
+location 2 0 3 0 0 0 0
+location 3 1 3 0 0 0 0
+location 4 2 3 0 0 0 0
+location 5 -1 2 0 0 0 0
+location 6 0 2 0 0 0 0
+location 7 1 2 0 0 0 0
+location 8 2 2 0 0 0 0
+location 9 0 1 0 0 0 0
+location 10 1 1 0 0 0 0
+location 11 2 1 0 0 0 0
+location 12 1 0 0 0 0 0
+location 13 2 0 0 0 0 0
+location 14 2 -1 0 0 0 0
+location 15 -3 2 0 0 0 0
+location 16 -3 1 0 0 0 0
+location 17 -2 1 0 0 0 0
+location 18 -3 0 0 0 0 0
+location 19 -2 0 0 0 0 0
+location 20 -1 0 0 0 0 0
+location 21 -3 -1 0 0 0 0
+location 22 -2 -1 0 0 0 0
+location 23 -1 -1 0 0 0 0
+location 24 0 -1 0 0 0 0
+location 25 -3 -2 0 0 0 0
+location 26 -2 -2 0 0 0 0
+location 27 -1 -2 0 0 0 0
+location 28 0 -2 0 0 0 0
+location 29 1 -2 0 0 0 0
+omega 0 0.1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+omega 1 0 0.1 0 0 0 0 0 0 0 0 0 0 0 0 0
+omega 2 0 0 0.1 0 0 0 0 0 0 0 0 0 0 0 0
+omega 3 0 0 0 0.1 0 0 0 0 0 0 0 0 0 0 0
+omega 4 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0 0
+omega 5 0 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0
+omega 6 0 0 0 0 0 0 0.1 0 0 0 0 0 0 0 0
+omega 7 0 0 0 0 0 0 0 0.1 0 0 0 0 0 0 0
+omega 8 0 0 0 0 0 0 0 0 0.1 0 0 0 0 0 0
+omega 9 0 0 0 0 0 0 0 0 0 0.1 0 0 0 0 0
+omega 10 0 0 0 0 0 0 0 0 0 0 0.1 0 0 0 0
+omega 11 0 0 0 0 0 0 0 0 0 0 0 0.1 0 0 0
+omega 12 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0 0
+omega 13 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0
+omega 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1
+omega 15 0.1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+omega 16 0 0.1 0 0 0 0 0 0 0 0 0 0 0 0 0
+omega 17 0 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0
+omega 18 0 0 0.1 0 0 0 0 0 0 0 0 0 0 0 0
+omega 19 0 0 0 0 0 0 0.1 0 0 0 0 0 0 0 0
+omega 20 0 0 0 0 0 0 0 0 0 0.1 0 0 0 0 0
+omega 21 0 0 0 0.1 0 0 0 0 0 0 0 0 0 0 0
+omega 22 0 0 0 0 0 0 0 0.1 0 0 0 0 0 0 0
+omega 23 0 0 0 0 0 0 0 0 0 0 0.1 0 0 0 0
+omega 24 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0 0
+omega 25 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0 0
+omega 26 0 0 0 0 0 0 0 0 0.1 0 0 0 0 0 0
+omega 27 0 0 0 0 0 0 0 0 0 0 0 0.1 0 0 0
+omega 28 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0
+omega 29 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1
+
+gravity 0 0 0 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+set T 63
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+set dumps CSV with 1 Orientation
+#set dumps VTK with 1 OmegaMag
+set tdump 10000
+EOF

@@ -1,0 +1,10 @@
+location 0 0.1 0.1 0.2
+set Mu 0.3
+boundary PBC 2 0 0.5
+
+
+
+
+
+
+
