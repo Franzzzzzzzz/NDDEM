@@ -235,7 +235,7 @@ function animate() {
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
-        vertical_stress = S.cg_get_result(0, "TC", 4)[0];
+        vertical_stress = S.cg_get_result(0, "TC", 8)[0];
         density = S.cg_get_result(0, "RHO", 0)[0];
     }
 
