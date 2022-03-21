@@ -111,7 +111,7 @@ async function init() {
 
     await NDDEMPhysics();
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
-    camera.position.set( -3*params.L, -3*params.L, 1.5*params.L );
+    camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );
     camera.up.set(0, 0, 1);
     camera.lookAt( 0, 0, 0 );
 
@@ -354,7 +354,7 @@ function update_graph() {
         // 'y': [[1./(density/params.particle_density) - 1.]], // void ratio
         // 'x': [[Math.log(vertical_stress)]], // pressure
     }, [-1])
-    //console.log(data.length) ; 
+    //console.log(data.length) ;
 }
 
 function make_graph() {
