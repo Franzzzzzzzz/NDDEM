@@ -35,7 +35,7 @@ var params = {
     L:0.025,
     H: 0.05,
     boxratio: 1.5,
-    initial_packing_fraction: 0.5,
+    initial_packing_fraction: 0.4,
     N: 300,
     epsilonv: 0,
     gravity: false,
@@ -146,7 +146,7 @@ async function init() {
     let gui = new GUI();
     gui.width = 450;
 
-    gui.add( params, 'initial_packing_fraction', 0.45, 0.55, 0.01 )
+    gui.add( params, 'initial_packing_fraction', 0.35, 0.55, 0.01 )
         .name( 'Initial solids fraction' ).listen().onChange( reset_particles );
     gui.add( params, 'loading_rate', 0.001, 0.1, 0.001).name( 'Volumetric strainrate (1/s)' );
     gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress - loading' );
@@ -307,8 +307,8 @@ function setup_NDDEM() {
     let rest = 0.2; // super low restitution coeff to dampen out quickly
     let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 
-    S.simu_interpret_command("set Kn 500000"); //+ String(vals.stiffness));
-    S.simu_interpret_command("set Kt 500000"); //+ String(0.8*vals.stiffness));
+    S.simu_interpret_command("set Kn 250000"); //+ String(vals.stiffness));
+    S.simu_interpret_command("set Kt 250000"); //+ String(0.8*vals.stiffness));
     S.simu_interpret_command("set GammaN 0.2"); //+ String(vals.dissipation));
     S.simu_interpret_command("set GammaT 0.2"); //+ String(vals.dissipation));
     S.simu_interpret_command("set Mu 0.5");
