@@ -218,6 +218,7 @@ export function plotly_two_xaxis_graph(xlabel1, xlabel2, ylabel, trace0, trace1,
       mode: 'lines',
       x: [],
       y: [],
+      hoverinfo: 'skip',
       name: trace0,
       // opacity: 1,
       line: {

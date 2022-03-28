@@ -1,5 +1,6 @@
 export let left, right, floor, roof, front, back;
 export let axesHelper, arrow_x, arrow_y, arrow_z;
+
 let font;
 
 import {
@@ -427,7 +428,7 @@ export function update_isotropic_wall(params, S, scene, dt=0.001) {
         mesh.scale.z = 2*params.L_cur ;//+ 2*params.thickness;
     });
 
-    if ( axesHelper !== undefined ) { add_scale_isotropic(params, scene); }
+    if ( !params.hideaxes && axesHelper !== undefined ) { add_scale_isotropic(params, scene); }
 
 }
 
@@ -445,13 +446,14 @@ export function add_scale_isotropic(params, scene) {
     axesHelper = new Group();
     scene.add(axesHelper);
 
-    let arrow_body = new CylinderGeometry(
+    var arrow_body = new CylinderGeometry(
       thickness,
       thickness,
-      XYaxeslength - 2*thickness,
+      XYaxeslength - 2*thickness ,
       Math.pow(2, params.quality),
       Math.pow(2, params.quality)
     );
+
     let arrow_head = new CylinderGeometry(
       0,
       2 * thickness,
@@ -479,7 +481,6 @@ export function add_scale_isotropic(params, scene) {
       size: fontsize,
       height: fontsize / 5,
     });
-    var textMaterial_x = new MeshLambertMaterial({ color: 0xff0000 });
     var mesh_x = new Mesh(textGeo_x, arrow_material);
     mesh_x.position.y = XYaxeslength/2. - 6*fontsize;
     mesh_x.position.x = 2*fontsize;
@@ -494,12 +495,7 @@ export function add_scale_isotropic(params, scene) {
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_y = new MeshLambertMaterial({ color: 0x00ff00 });
     var mesh_y = new Mesh(textGeo_y, arrow_material);
-    // mesh_y.position.x = -0.15 * params.L;
-    // mesh_y.position.y = XYaxeslength;// - fontsize*6;
-    // mesh_y.position.z = fontsize / 4;
-    // mesh_y.rotation.z = -Math.PI / 2;
     mesh_y.position.y = XYaxeslength/2.;// - 6*fontsize;
     mesh_y.position.x = -2*fontsize;
     mesh_y.rotation.z = -Math.PI/2;
@@ -533,7 +529,7 @@ export function add_scale_isotropic(params, scene) {
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_z = new MeshLambertMaterial({ color: 0x0000ff });
+    //var textMaterial_z = new MeshLambertMaterial({ color: 0x0000ff });
     var mesh_z = new Mesh(textGeo_z, arrow_material);
     mesh_z.position.x = - 1.5*fontsize;
     // mesh_z.position.y = fontsize / 4;
