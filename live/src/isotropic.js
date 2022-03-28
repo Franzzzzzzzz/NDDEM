@@ -58,6 +58,7 @@ var params = {
     omegamax: 20, // max rotation rate to colour by
     loading_active: false,
     particle_density: 2700, // kg/m^3
+    hideaxes: false,
 }
 set_derived_properties();
 
@@ -174,7 +175,9 @@ async function init() {
             });*/
     gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );
     //gui.add ( params, 'paused').name('Paused').listen();
+    gui.add(params, 'hideaxes').name("Static axes (allow many cycles)").listen() ;
     gui.add( params, 'loading_active').name( 'Loading active' ).listen();
+
     const controls = new OrbitControls( camera, container );
     controls.update();
 
@@ -346,6 +349,7 @@ function setup_CG() {
     S.cg_setup_CG() ;
 }
 
+var decimate=0 ;
 function update_graph() {
     Plotly.extendTraces('stats', {
         'x': [[params.epsilonv*1e2]], // convert to %
