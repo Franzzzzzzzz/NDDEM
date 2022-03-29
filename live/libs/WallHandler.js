@@ -1,6 +1,7 @@
 export let left, right, floor, roof, front, back;
 export let axesHelper, arrow_x, arrow_y, arrow_z;
-
+let arrow_body, arrow_head;
+let textGeo_x, textGeo_y, textGeo_z;
 let font;
 
 import {
@@ -446,24 +447,41 @@ export function add_scale_isotropic(params, scene) {
     axesHelper = new Group();
     scene.add(axesHelper);
 
-    var arrow_body = new CylinderGeometry(
-      thickness,
-      thickness,
-      XYaxeslength - 2*thickness ,
-      Math.pow(2, params.quality),
-      Math.pow(2, params.quality)
-    );
+    let arrow_length = XYaxeslength - 2*thickness;
+    if ( arrow_body === undefined ) {
+        arrow_body = new CylinderGeometry(
+          thickness,
+          thickness,
+          1,
+          Math.pow(2, params.quality),
+          Math.pow(2, params.quality)
+        );
 
-    let arrow_head = new CylinderGeometry(
-      0,
-      2 * thickness,
-      4 * thickness,
-      Math.pow(2, params.quality),
-      Math.pow(2, params.quality)
-    );
+        arrow_head = new CylinderGeometry(
+          0,
+          2 * thickness,
+          4 * thickness,
+          Math.pow(2, params.quality),
+          Math.pow(2, params.quality)
+        );
+    }
+    if ( textGeo_x !== undefined ) {
+        textGeo_x.dispose();
+        textGeo_y.dispose();
+        textGeo_z.dispose();
+    }
 
-    arrow_x = new Mesh(arrow_body, arrow_material);
-    arrow_y = new Mesh(arrow_body, arrow_material);
+    arrow_x = new Group();
+    arrow_y = new Group();
+
+    let arrow_body_x = new Mesh(arrow_body, arrow_material);
+    let arrow_body_y = new Mesh(arrow_body, arrow_material);
+    arrow_body_x.scale.y = arrow_length;
+    arrow_body_y.scale.y = arrow_length;
+
+
+    arrow_x.add( arrow_body_x );
+    arrow_y.add( arrow_body_y );
 
     var arrow_head_x = new Mesh(arrow_head, arrow_material);
     var arrow_head_y = new Mesh(arrow_head, arrow_material);
@@ -476,7 +494,7 @@ export function add_scale_isotropic(params, scene) {
     arrow_x.add(arrow_head_x);
     arrow_y.add(arrow_head_y);
 
-    var textGeo_x = new TextGeometry(String((2*params.L_cur*1e3).toFixed(2)) + " mm", {
+    textGeo_x = new TextGeometry(String((2*params.L_cur*1e3).toFixed(2)) + " mm", {
       font: font,
       size: fontsize,
       height: fontsize / 5,
@@ -490,7 +508,7 @@ export function add_scale_isotropic(params, scene) {
     // mesh_x.position.y = XYaxeslength/2.;
     arrow_x.add(mesh_x);
 
-    var textGeo_y = new TextGeometry(String((2*params.L_cur*1e3).toFixed(2)) + " mm", {
+    textGeo_y = new TextGeometry(String((2*params.L_cur*1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
@@ -512,19 +530,23 @@ export function add_scale_isotropic(params, scene) {
     var fontsize = 0.1 * params.L; // font size
     var thickness = 0.02 * params.L; // line thickness
 
-    var arrow_body_z = new CylinderGeometry(
-      thickness,
-      thickness,
-      Zaxislength - 4*thickness,
-      Math.pow(2, params.quality),
-      Math.pow(2, params.quality)
-    );
-    arrow_z = new Mesh(arrow_body_z, arrow_material);
+    // var arrow_body_z = new CylinderGeometry(
+    //   thickness,
+    //   thickness,
+    //   Zaxislength - 4*thickness,
+    //   Math.pow(2, params.quality),
+    //   Math.pow(2, params.quality)
+    // );
+    let arrow_body_z = new Mesh(arrow_body, arrow_material);
+    arrow_body_z.scale.y = Zaxislength - 4*thickness;
     var arrow_head_z = new Mesh(arrow_head, arrow_material);
     arrow_head_z.position.y = Zaxislength/2;
+
+    arrow_z = new Group();
+    arrow_z.add(arrow_body_z);
     arrow_z.add(arrow_head_z);
 
-    var textGeo_z = new TextGeometry(String((2*params.H_cur*1e3).toFixed(2)) + " mm", {
+    textGeo_z = new TextGeometry(String((2*params.H_cur*1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
