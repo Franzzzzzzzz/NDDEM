@@ -123,7 +123,6 @@ function process_params(time) {
 
   // params.root_dir = "http://localhost:54321/";
   params.root_dir = window.location.origin + '/';
-  console.log('HELLO!');
   params.data_dir = params.root_dir;
   if (window.location.hostname.includes("benjymarks")) {
     params.root_dir = "https://franzzzzzzzz.github.io/NDDEM/"; //window.location.href;
