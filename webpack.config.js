@@ -12,7 +12,6 @@ module.exports = [{
         'rotation' : './live/src/rotation.js',
         '4d-pool' : './live/src/4d-pool.js',
         'coarse-graining' : './live/src/coarse-graining.js',
-        'nddem' : './visualise/js/nddem.js',
     },
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
@@ -32,4 +31,25 @@ module.exports = [{
             },
         ],
     },
-}];
+},
+{
+    mode: "development",
+    // mode: "production",
+    entry: {
+        'nddem' : './visualise/js/nddem.js',
+    },
+    output: {
+        path: path.resolve(__dirname, 'visualise/deploy'),
+        filename: '[name]-bundle.js',
+        clean: true,
+    },
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"],
+            },
+        ],
+    },
+}
+];
