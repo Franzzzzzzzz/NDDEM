@@ -1,3 +1,6 @@
+import * as THREE from "three";
+// import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
 var root_dir = window.location.origin + '/';
 if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}
 else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
@@ -66,7 +69,7 @@ var loader = new THREE.TextureLoader()
         scene.add( rect );
     } );
 
-// var gui = new dat.GUI();
+// var gui = new GUI();
 // gui.add( slice, 'loc').min(-1).max(1).step(0.01).listen().name('Slice').onChange( function( val ) { update_spheres(val); }) ;
 // gui.open();
 

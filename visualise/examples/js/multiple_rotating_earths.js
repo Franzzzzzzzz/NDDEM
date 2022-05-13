@@ -1,3 +1,6 @@
+import * as THREE from "three";
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
 var root_dir = window.location.origin + '/';
 if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/' }
 else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/' }

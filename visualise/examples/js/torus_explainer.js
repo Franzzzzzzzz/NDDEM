@@ -1,3 +1,6 @@
+import * as THREE from "three";
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
 const urlParams = new URLSearchParams(window.location.search);
 const recorder = new CCapture({
     verbose: true,
@@ -149,7 +152,7 @@ point.scale.set(1./10.,1./10.,1./10.);
 torus.add( point );
 update_spheres();
 
-var gui = new dat.GUI();
+var gui = new GUI();
 gui.add( slice, 'D4').min(-3).max(3).step(0.01).listen().name('x<sub>4</sub>').onChange( function( val ) { update_spheres(); }) ;
 gui.add( slice, 'D5').min(-3).max(3).step(0.01).listen().name('x<sub>5</sub>').onChange( function( val ) { update_spheres(); }) ;
 gui.open();
