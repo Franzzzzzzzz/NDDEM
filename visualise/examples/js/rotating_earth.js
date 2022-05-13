@@ -3,7 +3,7 @@ import * as THREE from "three";
 
 var root_dir = window.location.origin + '/';
 if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}
-else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
+else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; var cache=true; }
 
 function update_texture(t) {
     if ( sphere !== undefined ) {

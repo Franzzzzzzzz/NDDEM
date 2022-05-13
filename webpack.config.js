@@ -37,6 +37,7 @@ module.exports = [{
     // mode: "production",
     entry: {
         'nddem' : './visualise/js/nddem.js',
+        'coarse_grain' : './visualise/js/coarse_grain.js',
         'logo' : './visualise/examples/js/logo.js',
         'slice' : './visualise/examples/js/slice.js',
         'multiple_rotating_earths' : './visualise/examples/js/multiple_rotating_earths.js',
