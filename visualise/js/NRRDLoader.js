@@ -1,9 +1,12 @@
-THREE.NRRDLoader = function (manager) {
+import * as THREE from "three";
+import { Volume } from "three/examples/jsm/misc/Volume.js";
+
+let NRRDLoader = function (manager) {
   this.manager = manager !== undefined ? manager : THREE.DefaultLoadingManager;
 };
 
-THREE.NRRDLoader.prototype = {
-  constructor: THREE.NRRDLoader,
+NRRDLoader.prototype = {
+  constructor: NRRDLoader,
 
   load: function (url, onLoad, onProgress, onError) {
     var scope = this;
@@ -133,7 +136,7 @@ THREE.NRRDLoader.prototype = {
         } else if ((m = l.match(/(.*):(.*)/))) {
           field = m[1].trim();
           data = m[2].trim();
-          fn = THREE.NRRDLoader.prototype.fieldFunctions[field];
+          fn = NRRDLoader.prototype.fieldFunctions[field];
           if (fn) {
             fn.call(headerObject, data);
           } else {
@@ -263,7 +266,7 @@ THREE.NRRDLoader.prototype = {
     // .. let's use the underlying array buffer
     _data = _data.buffer;
 
-    var volume = new THREE.Volume();
+    var volume = new Volume();
     volume.header = headerObject;
     //
     // parse the (unzipped) data to a datastream of the correct type
@@ -516,3 +519,5 @@ THREE.NRRDLoader.prototype = {
     },
   },
 };
+
+export { NRRDLoader };
