@@ -22,12 +22,6 @@ module.exports = [{
         static: {
            directory: '.'
         },
-        headers: {
-          'Cache-Control': 'no-store',
-        },
-    },
-    optimization: {
-      runtimeChunk: 'single',
     },
     module: {
         rules: [

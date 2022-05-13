@@ -7,6 +7,8 @@ import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
+console.log('hi!');
+
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
 var startTime = clock.getElapsedTime()

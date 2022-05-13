@@ -6,7 +6,8 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-(self["webpackChunknddem"] = self["webpackChunknddem"] || []).push([["uniaxial"],{
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
 
 /***/ "./live/libs/Layout.js":
 /*!*****************************!*\
@@ -69,7 +70,7 @@ eval("var map = {\n\t\"./2DShader.js\": [\n\t\t\"./live/libs/shaders/2DShader.js
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three */ \"./node_modules/three/build/three.module.js\");\n/* harmony import */ var three_examples_jsm_controls_OrbitControls_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three/examples/jsm/controls/OrbitControls.js */ \"./node_modules/three/examples/jsm/controls/OrbitControls.js\");\n/* harmony import */ var three_examples_jsm_libs_lil_gui_module_min_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three/examples/jsm/libs/lil-gui.module.min.js */ \"./node_modules/three/examples/jsm/libs/lil-gui.module.min.js\");\n/* harmony import */ var _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../libs/SphereHandler.js */ \"./live/libs/SphereHandler.js\");\n/* harmony import */ var _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../libs/WallHandler.js */ \"./live/libs/WallHandler.js\");\n/* harmony import */ var _libs_Layout_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../libs/Layout.js */ \"./live/libs/Layout.js\");\n\n\n\n\n\n\n\n// import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';\n\nvar urlParams = new URLSearchParams(window.location.search);\nvar clock = new three__WEBPACK_IMPORTED_MODULE_5__.Clock();\nvar startTime = clock.getElapsedTime()\n\nlet camera, scene, renderer, stats, panel;\nlet S;\nlet pressure = 0;\nlet vertical_stress = 0;\nlet density = 0;\nlet started = false;\nlet old_time = 0;\nlet new_time = 0;\nlet NDsolids, material, STLFilename;\nlet meshes = new three__WEBPACK_IMPORTED_MODULE_5__.Group();\nlet loading_direction = 1;\n\nlet graph_fraction = 0.5;\ndocument.getElementById(\"stats\").style.width = String(100*graph_fraction) + '%';\ndocument.getElementById(\"canvas\").style.width = String(100*(1-graph_fraction)) + '%';\n\nvar params = {\n    dimension: 3,\n    // L: 4, //system size\n    initial_packing_fraction: 0.5,\n    N: 600,\n    vertical_displacement: 0,\n    gravity: false,\n    paused: false,\n    H_cur: 0,\n    pressure_set_pt: 1e4,\n    deviatoric_set_pt: 0,\n    d4_cur:0,\n    r_max: 0.0033,\n    r_min: 0.0027,\n    freq: 0.05,\n    new_line: false,\n    loading_rate: 0.5,\n    // max_vertical_strain: 0.3,\n    target_stress: 5e3,\n    lut: 'None',\n    quality: 5,\n    vmax: 20, // max velocity to colour by\n    omegamax: 20, // max rotation rate to colour by\n    loading_active: false,\n    particle_density: 2700, // kg/m^3\n}\nset_derived_properties();\n\nfunction set_derived_properties() {\n    params.average_radius = (params.r_min + params.r_max)/2.;\n    params.thickness = 0.0001;//params.average_radius;\n\n    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);\n    console.log('estimate of particle volume: ' + params.particle_volume*params.N)\n    params.particle_mass = params.particle_volume * params.particle_density;\n    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;\n\n    params.L_cur = params.L;\n    // params.packing_fraction = params.N*params.particle_volume/Math.pow(2*params.L,3);\n    // params.back = -params.L;\n    // params.front = params.L;\n    // params.left = -params.L;\n    // params.right = params.L;\n    // params.floor = -params.L;\n    // params.roof = params.L;\n}\n\nfunction reset_particles() {\n    params.loading_active = false;\n    params.vertical_displacement = 0;\n    loading_direction = 1;\n    set_derived_properties();\n    _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.randomise_particles(params, S);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.add_cuboid_walls(params,scene);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    setup_CG();\n    started = false;\n    startTime = clock.getElapsedTime()\n}\n\nif ( urlParams.has('dimension') ) {\n    params.dimension = parseInt(urlParams.get('dimension'));\n}\nif ( params.dimension === 4) {\n    params.L = 2.5;\n    params.N = 300\n    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;\n}\nif ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }\n\n_libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.createNDParticleShader(params).then( init() );\n\nasync function init() {\n\n    await NDDEMPhysics();\n    camera = new three__WEBPACK_IMPORTED_MODULE_5__.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );\n    camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );\n    camera.up.set(0, 0, 1);\n    camera.lookAt( 0, 0, 0 );\n\n    scene = new three__WEBPACK_IMPORTED_MODULE_5__.Scene();\n    scene.background = new three__WEBPACK_IMPORTED_MODULE_5__.Color( 0x111 );\n\n    const hemiLight = new three__WEBPACK_IMPORTED_MODULE_5__.HemisphereLight();\n    hemiLight.intensity = 0.35;\n    scene.add( hemiLight );\n\n    const dirLight = new three__WEBPACK_IMPORTED_MODULE_5__.DirectionalLight();\n    dirLight.position.set( 5, 5, 5 );\n    dirLight.castShadow = true;\n    dirLight.shadow.camera.zoom = 2;\n    scene.add( dirLight );\n\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.add_cuboid_walls(params,scene);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.add_scale(params, scene);\n\n    _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.add_spheres(S,params,scene);\n\n    renderer = new three__WEBPACK_IMPORTED_MODULE_5__.WebGLRenderer( { antialias: true } );\n    renderer.setPixelRatio( window.devicePixelRatio );\n    renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );\n    renderer.shadowMap.enabled = true;\n    renderer.outputEncoding = three__WEBPACK_IMPORTED_MODULE_5__.sRGBEncoding;\n\n    var container = document.getElementById( 'canvas' );\n    container.appendChild( renderer.domElement );\n\n    let gui = new three_examples_jsm_libs_lil_gui_module_min_js__WEBPACK_IMPORTED_MODULE_1__.GUI();\n    gui.width = 450;\n\n    gui.add( params, 'initial_packing_fraction', 0.45, 0.55, 0.01 )\n        .name( 'Initial solids fraction' ).listen().onChange( reset_particles );\n    gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );\n    gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );\n    if ( params.dimension == 4 ) {\n        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)\n            .name( 'D4 location').listen()\n            // .onChange( function () { WALLS.update_top_wall(params, S); } );\n            .onChange( function () {\n                if ( urlParams.has('stl') ) {\n                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );\n                }\n            });\n    }\n    gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')\n        .onChange( () => _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.update_particle_material(params,\n            // lut_folder\n        ) );\n    gui.add ( params, 'gravity').name('Gravity').listen()\n        .onChange( function() {\n            if ( params.gravity === true ) {\n                S.simu_interpret_command(\"gravity 0 0 -10 \" + \"0 \".repeat(params.dimension - 3)) }\n            else {\n                S.simu_interpret_command(\"gravity 0 0 0 \" + \"0 \".repeat(params.dimension - 3)) }\n            });\n    gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );\n    gui.add ( params, 'paused').name('Paused').listen();\n    gui.add( params, 'loading_active').name( 'Loading active' ).listen();\n    const controls = new three_examples_jsm_controls_OrbitControls_js__WEBPACK_IMPORTED_MODULE_0__.OrbitControls( camera, container );\n    controls.update();\n\n    window.addEventListener( 'resize', onWindowResize, false );\n\n    make_graph();\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    animate();\n}\n\nfunction new_load_path() {\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    var data = [{\n                  type: 'scatter',\n                  mode: 'lines',\n                  x: [], y: [],\n                  line: { width: 5 },\n                  name: 'Load path ' + String(document.getElementById('stats').data.length+1)\n                }]\n    Plotly.addTraces('stats', data);\n    params.new_line = false;\n}\n\nfunction onWindowResize(){\n\n    camera.aspect = window.innerWidth*(1-graph_fraction) / window.innerHeight;\n    camera.updateProjectionMatrix();\n\n    renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );\n\n    var update = {\n        width: window.innerWidth*graph_fraction,\n        height: window.innerHeight\n        };\n    Plotly.relayout('stats', update);\n\n}\n\nfunction animate() {\n    if ( clock.getElapsedTime() - startTime > 3 ) { started = true; }\n    requestAnimationFrame( animate );\n    _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.move_spheres(S,params);\n    new_time = clock.getElapsedTime() - startTime;\n    if ( !params.paused ) {\n        if ( started ) {\n            if ( params.loading_active) {\n                var dt = new_time - old_time;\n                params.vertical_displacement += loading_direction*params.loading_rate*dt/1e3; // convert from mm/s to m\n                if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) { // just run this once\n                    window.setTimeout(() => { loading_direction = -1}, 3000) // wait then reverse\n                }\n                if ( (vertical_stress >= params.target_stress) && (loading_direction > 0) ) {\n                    loading_direction *= 0.5; // slow down gradually\n                }\n                if ( (params.vertical_displacement <= 1e-4) && (loading_direction === -1) ) { // just run this once\n                    window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse\n                }\n                if ( (params.vertical_displacement <= 1e-4) && (loading_direction < 0) ) {\n                    loading_direction *= 0.5; // slow down gradually\n                }\n                _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n            }\n            update_graph();\n        }\n\n        S.simu_step_forward(5);\n        S.cg_param_read_timestep(0) ;\n        S.cg_process_timestep(0,false) ;\n        var grid = S.cg_get_gridinfo();\n        vertical_stress = S.cg_get_result(0, \"TC\", 8)[0];\n        density = S.cg_get_result(0, \"RHO\", 0)[0];\n    }\n\n    renderer.render( scene, camera );\n\n    old_time = new_time;\n\n}\n\nasync function NDDEMPhysics() {\n\n    // if ( 'DEMCGND' in window === false ) {\n    //\n    //     console.error( 'NDDEMPhysics: Couldn\\'t find DEMCGND.js' );\n    //     return;\n    //\n    // }\n\n    await DEMCGND().then( (NDDEMCGLib) => {\n        if ( params.dimension == 3 ) {\n            S = new NDDEMCGLib.DEMCGND (params.N);\n            setup_NDDEM();\n            setup_CG();\n        }\n        else if ( params.dimension > 3 ) {\n            console.log(\"D>3 not available\") ;\n            // S = await new NDDEMCGLib.Simulation4 (params.N);\n            // finish_setup();\n        }\n    } );\n}\n\nfunction setup_NDDEM() {\n    S.simu_interpret_command(\"dimensions \" + String(params.dimension) + \" \" + String(params.N));\n    S.simu_interpret_command(\"radius -1 0.5\");\n    // now need to find the mass of a particle with diameter 1\n    let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;\n    S.simu_interpret_command(\"mass -1 \" + String(m));\n    S.simu_interpret_command(\"auto rho\");\n    S.simu_interpret_command(\"auto radius uniform \"+params.r_min+\" \"+params.r_max);\n    S.simu_interpret_command(\"auto mass\");\n    S.simu_interpret_command(\"auto inertia\");\n    S.simu_interpret_command(\"auto skin\");\n\n    S.simu_interpret_command(\"boundary 0 WALL -\"+String(params.L)+\" \"+String(params.L));\n    S.simu_interpret_command(\"boundary 1 WALL -\"+String(params.L)+\" \"+String(params.L));\n    S.simu_interpret_command(\"boundary 2 WALL -\"+String(params.L)+\" \"+String(params.L));\n    if ( params.gravity === true ) {\n        S.simu_interpret_command(\"gravity 0 0 \" + String(-9.81) + \"0 \".repeat(params.dimension - 3)) }\n    else {\n        S.simu_interpret_command(\"gravity 0 0 0 \" + \"0 \".repeat(params.dimension - 3)) }\n\n    // S.simu_interpret_command(\"auto location randomsquare\");\n    S.simu_interpret_command(\"auto location randomdrop\");\n\n    let tc = 1e-3;\n    let rest = 0.2; // super low restitution coeff to dampen out quickly\n    let vals = _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)\n\n    S.simu_interpret_command(\"set Kn \" + String(vals.stiffness));\n    S.simu_interpret_command(\"set Kt \" + String(0.8*vals.stiffness));\n    S.simu_interpret_command(\"set GammaN \" + String(vals.dissipation));\n    S.simu_interpret_command(\"set GammaT \" + String(vals.dissipation));\n    S.simu_interpret_command(\"set Mu 0.5\");\n    S.simu_interpret_command(\"set Mu_wall 0\");\n    S.simu_interpret_command(\"set T 150\");\n    S.simu_interpret_command(\"set dt \" + String(tc/20));\n    S.simu_interpret_command(\"set tdump 1000000\"); // how often to calculate wall forces\n    S.simu_finalise_init () ;\n}\n\nfunction setup_CG() {\n    var cgparam ={} ;\n    cgparam[\"file\"]=[{\"filename\":\"none\", \"content\": \"particles\", \"format\":\"interactive\", \"number\":1}] ;\n    cgparam[\"boxes\"]=[1,1,1] ;\n    // cgparam[\"boundaries\"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;\n    cgparam[\"boundaries\"]=[\n        [-params.L/2.,-params.L/2.,-params.L/2.],\n        [ params.L/2., params.L/2., params.L/2.]] ;\n        // [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],\n        // [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;\n\n    cgparam[\"window size\"]=params.L/2. ;\n    cgparam[\"skip\"]=0;\n    cgparam[\"max time\"]=1 ;\n    cgparam[\"time average\"]=\"None\" ;\n    cgparam[\"fields\"]=[\"RHO\", \"TC\"] ;\n    cgparam[\"periodicity\"]=[false,false,false];\n    cgparam[\"window\"]=\"Lucy3D\";\n    cgparam[\"dimension\"]=3;\n\n\n    // console.log(JSON.stringify(cgparam)) ;\n    S.cg_param_from_json_string(JSON.stringify(cgparam)) ;\n    S.cg_setup_CG() ;\n}\n\nfunction update_graph() {\n    Plotly.extendTraces('stats', {\n        'x': [[params.vertical_displacement*1e3]], // convert m to mm\n        'y': [[vertical_stress]],\n\n        // 'y': [[1./(density/params.particle_density) - 1.]], // void ratio\n        // 'x': [[Math.log(vertical_stress)]], // pressure\n    }, [-1])\n}\n\nfunction make_graph() {\n    let { data, layout } = _libs_Layout_js__WEBPACK_IMPORTED_MODULE_4__.plotly_graph('Vertical Displacement (mm)','Vertical Stress (Pa)');\n    // layout.yaxis.range = [0,1e5];\n    // layout.yaxis.autorange = false;\n    Plotly.newPlot('stats', data, layout);\n}\n\n\n//# sourceURL=webpack://nddem/./live/src/uniaxial.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three */ \"./node_modules/three/build/three.module.js\");\n/* harmony import */ var three_examples_jsm_controls_OrbitControls_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three/examples/jsm/controls/OrbitControls.js */ \"./node_modules/three/examples/jsm/controls/OrbitControls.js\");\n/* harmony import */ var three_examples_jsm_libs_lil_gui_module_min_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three/examples/jsm/libs/lil-gui.module.min.js */ \"./node_modules/three/examples/jsm/libs/lil-gui.module.min.js\");\n/* harmony import */ var _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../libs/SphereHandler.js */ \"./live/libs/SphereHandler.js\");\n/* harmony import */ var _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../libs/WallHandler.js */ \"./live/libs/WallHandler.js\");\n/* harmony import */ var _libs_Layout_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../libs/Layout.js */ \"./live/libs/Layout.js\");\n\n\n\n\n\n\n\n// import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';\n\nconsole.log('hi!');\n\nvar urlParams = new URLSearchParams(window.location.search);\nvar clock = new three__WEBPACK_IMPORTED_MODULE_5__.Clock();\nvar startTime = clock.getElapsedTime()\n\nlet camera, scene, renderer, stats, panel;\nlet S;\nlet pressure = 0;\nlet vertical_stress = 0;\nlet density = 0;\nlet started = false;\nlet old_time = 0;\nlet new_time = 0;\nlet NDsolids, material, STLFilename;\nlet meshes = new three__WEBPACK_IMPORTED_MODULE_5__.Group();\nlet loading_direction = 1;\n\nlet graph_fraction = 0.5;\ndocument.getElementById(\"stats\").style.width = String(100*graph_fraction) + '%';\ndocument.getElementById(\"canvas\").style.width = String(100*(1-graph_fraction)) + '%';\n\nvar params = {\n    dimension: 3,\n    // L: 4, //system size\n    initial_packing_fraction: 0.5,\n    N: 600,\n    vertical_displacement: 0,\n    gravity: false,\n    paused: false,\n    H_cur: 0,\n    pressure_set_pt: 1e4,\n    deviatoric_set_pt: 0,\n    d4_cur:0,\n    r_max: 0.0033,\n    r_min: 0.0027,\n    freq: 0.05,\n    new_line: false,\n    loading_rate: 0.5,\n    // max_vertical_strain: 0.3,\n    target_stress: 5e3,\n    lut: 'None',\n    quality: 5,\n    vmax: 20, // max velocity to colour by\n    omegamax: 20, // max rotation rate to colour by\n    loading_active: false,\n    particle_density: 2700, // kg/m^3\n}\nset_derived_properties();\n\nfunction set_derived_properties() {\n    params.average_radius = (params.r_min + params.r_max)/2.;\n    params.thickness = 0.0001;//params.average_radius;\n\n    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);\n    console.log('estimate of particle volume: ' + params.particle_volume*params.N)\n    params.particle_mass = params.particle_volume * params.particle_density;\n    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;\n\n    params.L_cur = params.L;\n    // params.packing_fraction = params.N*params.particle_volume/Math.pow(2*params.L,3);\n    // params.back = -params.L;\n    // params.front = params.L;\n    // params.left = -params.L;\n    // params.right = params.L;\n    // params.floor = -params.L;\n    // params.roof = params.L;\n}\n\nfunction reset_particles() {\n    params.loading_active = false;\n    params.vertical_displacement = 0;\n    loading_direction = 1;\n    set_derived_properties();\n    _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.randomise_particles(params, S);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.add_cuboid_walls(params,scene);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    setup_CG();\n    started = false;\n    startTime = clock.getElapsedTime()\n}\n\nif ( urlParams.has('dimension') ) {\n    params.dimension = parseInt(urlParams.get('dimension'));\n}\nif ( params.dimension === 4) {\n    params.L = 2.5;\n    params.N = 300\n    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;\n}\nif ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }\n\n_libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.createNDParticleShader(params).then( init() );\n\nasync function init() {\n\n    await NDDEMPhysics();\n    camera = new three__WEBPACK_IMPORTED_MODULE_5__.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );\n    camera.position.set( 3*params.L, 3*params.L, 1.5*params.L );\n    camera.up.set(0, 0, 1);\n    camera.lookAt( 0, 0, 0 );\n\n    scene = new three__WEBPACK_IMPORTED_MODULE_5__.Scene();\n    scene.background = new three__WEBPACK_IMPORTED_MODULE_5__.Color( 0x111 );\n\n    const hemiLight = new three__WEBPACK_IMPORTED_MODULE_5__.HemisphereLight();\n    hemiLight.intensity = 0.35;\n    scene.add( hemiLight );\n\n    const dirLight = new three__WEBPACK_IMPORTED_MODULE_5__.DirectionalLight();\n    dirLight.position.set( 5, 5, 5 );\n    dirLight.castShadow = true;\n    dirLight.shadow.camera.zoom = 2;\n    scene.add( dirLight );\n\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.add_cuboid_walls(params,scene);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.add_scale(params, scene);\n\n    _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.add_spheres(S,params,scene);\n\n    renderer = new three__WEBPACK_IMPORTED_MODULE_5__.WebGLRenderer( { antialias: true } );\n    renderer.setPixelRatio( window.devicePixelRatio );\n    renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );\n    renderer.shadowMap.enabled = true;\n    renderer.outputEncoding = three__WEBPACK_IMPORTED_MODULE_5__.sRGBEncoding;\n\n    var container = document.getElementById( 'canvas' );\n    container.appendChild( renderer.domElement );\n\n    let gui = new three_examples_jsm_libs_lil_gui_module_min_js__WEBPACK_IMPORTED_MODULE_1__.GUI();\n    gui.width = 450;\n\n    gui.add( params, 'initial_packing_fraction', 0.45, 0.55, 0.01 )\n        .name( 'Initial solids fraction' ).listen().onChange( reset_particles );\n    gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );\n    gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );\n    if ( params.dimension == 4 ) {\n        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)\n            .name( 'D4 location').listen()\n            // .onChange( function () { WALLS.update_top_wall(params, S); } );\n            .onChange( function () {\n                if ( urlParams.has('stl') ) {\n                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );\n                }\n            });\n    }\n    gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')\n        .onChange( () => _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.update_particle_material(params,\n            // lut_folder\n        ) );\n    gui.add ( params, 'gravity').name('Gravity').listen()\n        .onChange( function() {\n            if ( params.gravity === true ) {\n                S.simu_interpret_command(\"gravity 0 0 -10 \" + \"0 \".repeat(params.dimension - 3)) }\n            else {\n                S.simu_interpret_command(\"gravity 0 0 0 \" + \"0 \".repeat(params.dimension - 3)) }\n            });\n    gui.add ( params, 'new_line').name('New loading path').listen().onChange( new_load_path );\n    gui.add ( params, 'paused').name('Paused').listen();\n    gui.add( params, 'loading_active').name( 'Loading active' ).listen();\n    const controls = new three_examples_jsm_controls_OrbitControls_js__WEBPACK_IMPORTED_MODULE_0__.OrbitControls( camera, container );\n    controls.update();\n\n    window.addEventListener( 'resize', onWindowResize, false );\n\n    make_graph();\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    animate();\n}\n\nfunction new_load_path() {\n    _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n    var data = [{\n                  type: 'scatter',\n                  mode: 'lines',\n                  x: [], y: [],\n                  line: { width: 5 },\n                  name: 'Load path ' + String(document.getElementById('stats').data.length+1)\n                }]\n    Plotly.addTraces('stats', data);\n    params.new_line = false;\n}\n\nfunction onWindowResize(){\n\n    camera.aspect = window.innerWidth*(1-graph_fraction) / window.innerHeight;\n    camera.updateProjectionMatrix();\n\n    renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );\n\n    var update = {\n        width: window.innerWidth*graph_fraction,\n        height: window.innerHeight\n        };\n    Plotly.relayout('stats', update);\n\n}\n\nfunction animate() {\n    if ( clock.getElapsedTime() - startTime > 3 ) { started = true; }\n    requestAnimationFrame( animate );\n    _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.move_spheres(S,params);\n    new_time = clock.getElapsedTime() - startTime;\n    if ( !params.paused ) {\n        if ( started ) {\n            if ( params.loading_active) {\n                var dt = new_time - old_time;\n                params.vertical_displacement += loading_direction*params.loading_rate*dt/1e3; // convert from mm/s to m\n                if ( (vertical_stress >= params.target_stress) && (loading_direction === 1) ) { // just run this once\n                    window.setTimeout(() => { loading_direction = -1}, 3000) // wait then reverse\n                }\n                if ( (vertical_stress >= params.target_stress) && (loading_direction > 0) ) {\n                    loading_direction *= 0.5; // slow down gradually\n                }\n                if ( (params.vertical_displacement <= 1e-4) && (loading_direction === -1) ) { // just run this once\n                    window.setTimeout(() => { loading_direction = 1; new_load_path();}, 3000) // wait then reverse\n                }\n                if ( (params.vertical_displacement <= 1e-4) && (loading_direction < 0) ) {\n                    loading_direction *= 0.5; // slow down gradually\n                }\n                _libs_WallHandler_js__WEBPACK_IMPORTED_MODULE_3__.update_top_wall(params, S, scene);\n            }\n            update_graph();\n        }\n\n        S.simu_step_forward(5);\n        S.cg_param_read_timestep(0) ;\n        S.cg_process_timestep(0,false) ;\n        var grid = S.cg_get_gridinfo();\n        vertical_stress = S.cg_get_result(0, \"TC\", 8)[0];\n        density = S.cg_get_result(0, \"RHO\", 0)[0];\n    }\n\n    renderer.render( scene, camera );\n\n    old_time = new_time;\n\n}\n\nasync function NDDEMPhysics() {\n\n    // if ( 'DEMCGND' in window === false ) {\n    //\n    //     console.error( 'NDDEMPhysics: Couldn\\'t find DEMCGND.js' );\n    //     return;\n    //\n    // }\n\n    await DEMCGND().then( (NDDEMCGLib) => {\n        if ( params.dimension == 3 ) {\n            S = new NDDEMCGLib.DEMCGND (params.N);\n            setup_NDDEM();\n            setup_CG();\n        }\n        else if ( params.dimension > 3 ) {\n            console.log(\"D>3 not available\") ;\n            // S = await new NDDEMCGLib.Simulation4 (params.N);\n            // finish_setup();\n        }\n    } );\n}\n\nfunction setup_NDDEM() {\n    S.simu_interpret_command(\"dimensions \" + String(params.dimension) + \" \" + String(params.N));\n    S.simu_interpret_command(\"radius -1 0.5\");\n    // now need to find the mass of a particle with diameter 1\n    let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;\n    S.simu_interpret_command(\"mass -1 \" + String(m));\n    S.simu_interpret_command(\"auto rho\");\n    S.simu_interpret_command(\"auto radius uniform \"+params.r_min+\" \"+params.r_max);\n    S.simu_interpret_command(\"auto mass\");\n    S.simu_interpret_command(\"auto inertia\");\n    S.simu_interpret_command(\"auto skin\");\n\n    S.simu_interpret_command(\"boundary 0 WALL -\"+String(params.L)+\" \"+String(params.L));\n    S.simu_interpret_command(\"boundary 1 WALL -\"+String(params.L)+\" \"+String(params.L));\n    S.simu_interpret_command(\"boundary 2 WALL -\"+String(params.L)+\" \"+String(params.L));\n    if ( params.gravity === true ) {\n        S.simu_interpret_command(\"gravity 0 0 \" + String(-9.81) + \"0 \".repeat(params.dimension - 3)) }\n    else {\n        S.simu_interpret_command(\"gravity 0 0 0 \" + \"0 \".repeat(params.dimension - 3)) }\n\n    // S.simu_interpret_command(\"auto location randomsquare\");\n    S.simu_interpret_command(\"auto location randomdrop\");\n\n    let tc = 1e-3;\n    let rest = 0.2; // super low restitution coeff to dampen out quickly\n    let vals = _libs_SphereHandler_js__WEBPACK_IMPORTED_MODULE_2__.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)\n\n    S.simu_interpret_command(\"set Kn \" + String(vals.stiffness));\n    S.simu_interpret_command(\"set Kt \" + String(0.8*vals.stiffness));\n    S.simu_interpret_command(\"set GammaN \" + String(vals.dissipation));\n    S.simu_interpret_command(\"set GammaT \" + String(vals.dissipation));\n    S.simu_interpret_command(\"set Mu 0.5\");\n    S.simu_interpret_command(\"set Mu_wall 0\");\n    S.simu_interpret_command(\"set T 150\");\n    S.simu_interpret_command(\"set dt \" + String(tc/20));\n    S.simu_interpret_command(\"set tdump 1000000\"); // how often to calculate wall forces\n    S.simu_finalise_init () ;\n}\n\nfunction setup_CG() {\n    var cgparam ={} ;\n    cgparam[\"file\"]=[{\"filename\":\"none\", \"content\": \"particles\", \"format\":\"interactive\", \"number\":1}] ;\n    cgparam[\"boxes\"]=[1,1,1] ;\n    // cgparam[\"boundaries\"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;\n    cgparam[\"boundaries\"]=[\n        [-params.L/2.,-params.L/2.,-params.L/2.],\n        [ params.L/2., params.L/2., params.L/2.]] ;\n        // [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],\n        // [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;\n\n    cgparam[\"window size\"]=params.L/2. ;\n    cgparam[\"skip\"]=0;\n    cgparam[\"max time\"]=1 ;\n    cgparam[\"time average\"]=\"None\" ;\n    cgparam[\"fields\"]=[\"RHO\", \"TC\"] ;\n    cgparam[\"periodicity\"]=[false,false,false];\n    cgparam[\"window\"]=\"Lucy3D\";\n    cgparam[\"dimension\"]=3;\n\n\n    // console.log(JSON.stringify(cgparam)) ;\n    S.cg_param_from_json_string(JSON.stringify(cgparam)) ;\n    S.cg_setup_CG() ;\n}\n\nfunction update_graph() {\n    Plotly.extendTraces('stats', {\n        'x': [[params.vertical_displacement*1e3]], // convert m to mm\n        'y': [[vertical_stress]],\n\n        // 'y': [[1./(density/params.particle_density) - 1.]], // void ratio\n        // 'x': [[Math.log(vertical_stress)]], // pressure\n    }, [-1])\n}\n\nfunction make_graph() {\n    let { data, layout } = _libs_Layout_js__WEBPACK_IMPORTED_MODULE_4__.plotly_graph('Vertical Displacement (mm)','Vertical Stress (Pa)');\n    // layout.yaxis.range = [0,1e5];\n    // layout.yaxis.autorange = false;\n    Plotly.newPlot('stats', data, layout);\n}\n\n\n//# sourceURL=webpack://nddem/./live/src/uniaxial.js?");
 
 /***/ }),
 
@@ -139,9 +140,260 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ })
 
-},
-/******/ __webpack_require__ => { // webpackRuntimeModules
-/******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-/******/ var __webpack_exports__ = (__webpack_exec__("./live/src/uniaxial.js"));
-/******/ }
-]);
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = __webpack_modules__;
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/ensure chunk */
+/******/ 	(() => {
+/******/ 		__webpack_require__.f = {};
+/******/ 		// This file contains only the entry chunk.
+/******/ 		// The chunk loading function for additional chunks
+/******/ 		__webpack_require__.e = (chunkId) => {
+/******/ 			return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
+/******/ 				__webpack_require__.f[key](chunkId, promises);
+/******/ 				return promises;
+/******/ 			}, []));
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/get javascript chunk filename */
+/******/ 	(() => {
+/******/ 		// This function allow to reference async chunks
+/******/ 		__webpack_require__.u = (chunkId) => {
+/******/ 			// return url for filenames based on template
+/******/ 			return "" + chunkId + "-bundle.js";
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	(() => {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/load script */
+/******/ 	(() => {
+/******/ 		var inProgress = {};
+/******/ 		var dataWebpackPrefix = "nddem:";
+/******/ 		// loadScript function to load a script via script tag
+/******/ 		__webpack_require__.l = (url, done, key, chunkId) => {
+/******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
+/******/ 			var script, needAttach;
+/******/ 			if(key !== undefined) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				for(var i = 0; i < scripts.length; i++) {
+/******/ 					var s = scripts[i];
+/******/ 					if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+/******/ 				}
+/******/ 			}
+/******/ 			if(!script) {
+/******/ 				needAttach = true;
+/******/ 				script = document.createElement('script');
+/******/ 		
+/******/ 				script.charset = 'utf-8';
+/******/ 				script.timeout = 120;
+/******/ 				if (__webpack_require__.nc) {
+/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
+/******/ 				}
+/******/ 				script.setAttribute("data-webpack", dataWebpackPrefix + key);
+/******/ 				script.src = url;
+/******/ 			}
+/******/ 			inProgress[url] = [done];
+/******/ 			var onScriptComplete = (prev, event) => {
+/******/ 				// avoid mem leaks in IE.
+/******/ 				script.onerror = script.onload = null;
+/******/ 				clearTimeout(timeout);
+/******/ 				var doneFns = inProgress[url];
+/******/ 				delete inProgress[url];
+/******/ 				script.parentNode && script.parentNode.removeChild(script);
+/******/ 				doneFns && doneFns.forEach((fn) => (fn(event)));
+/******/ 				if(prev) return prev(event);
+/******/ 			}
+/******/ 			;
+/******/ 			var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+/******/ 			script.onerror = onScriptComplete.bind(null, script.onerror);
+/******/ 			script.onload = onScriptComplete.bind(null, script.onload);
+/******/ 			needAttach && document.head.appendChild(script);
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		var scriptUrl;
+/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
+/******/ 		var document = __webpack_require__.g.document;
+/******/ 		if (!scriptUrl && document) {
+/******/ 			if (document.currentScript)
+/******/ 				scriptUrl = document.currentScript.src
+/******/ 			if (!scriptUrl) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				if(scripts.length) scriptUrl = scripts[scripts.length - 1].src
+/******/ 			}
+/******/ 		}
+/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
+/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
+/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
+/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
+/******/ 		__webpack_require__.p = scriptUrl;
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/jsonp chunk loading */
+/******/ 	(() => {
+/******/ 		// no baseURI
+/******/ 		
+/******/ 		// object to store loaded and loading chunks
+/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 		var installedChunks = {
+/******/ 			"uniaxial": 0
+/******/ 		};
+/******/ 		
+/******/ 		__webpack_require__.f.j = (chunkId, promises) => {
+/******/ 				// JSONP chunk loading for javascript
+/******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
+/******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
+/******/ 		
+/******/ 					// a Promise means "currently loading".
+/******/ 					if(installedChunkData) {
+/******/ 						promises.push(installedChunkData[2]);
+/******/ 					} else {
+/******/ 						if(true) { // all chunks have JS
+/******/ 							// setup Promise in chunk cache
+/******/ 							var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
+/******/ 							promises.push(installedChunkData[2] = promise);
+/******/ 		
+/******/ 							// start chunk loading
+/******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
+/******/ 							// create error before stack unwound to get useful stacktrace later
+/******/ 							var error = new Error();
+/******/ 							var loadingEnded = (event) => {
+/******/ 								if(__webpack_require__.o(installedChunks, chunkId)) {
+/******/ 									installedChunkData = installedChunks[chunkId];
+/******/ 									if(installedChunkData !== 0) installedChunks[chunkId] = undefined;
+/******/ 									if(installedChunkData) {
+/******/ 										var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 										var realSrc = event && event.target && event.target.src;
+/******/ 										error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+/******/ 										error.name = 'ChunkLoadError';
+/******/ 										error.type = errorType;
+/******/ 										error.request = realSrc;
+/******/ 										installedChunkData[1](error);
+/******/ 									}
+/******/ 								}
+/******/ 							};
+/******/ 							__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
+/******/ 						} else installedChunks[chunkId] = 0;
+/******/ 					}
+/******/ 				}
+/******/ 		};
+/******/ 		
+/******/ 		// no prefetching
+/******/ 		
+/******/ 		// no preloaded
+/******/ 		
+/******/ 		// no HMR
+/******/ 		
+/******/ 		// no HMR manifest
+/******/ 		
+/******/ 		// no on chunks loaded
+/******/ 		
+/******/ 		// install a JSONP callback for chunk loading
+/******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 			var [chunkIds, moreModules, runtime] = data;
+/******/ 			// add "moreModules" to the modules object,
+/******/ 			// then flag all "chunkIds" as loaded and fire callback
+/******/ 			var moduleId, chunkId, i = 0;
+/******/ 			if(chunkIds.some((id) => (installedChunks[id] !== 0))) {
+/******/ 				for(moduleId in moreModules) {
+/******/ 					if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 						__webpack_require__.m[moduleId] = moreModules[moduleId];
+/******/ 					}
+/******/ 				}
+/******/ 				if(runtime) var result = runtime(__webpack_require__);
+/******/ 			}
+/******/ 			if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
+/******/ 			for(;i < chunkIds.length; i++) {
+/******/ 				chunkId = chunkIds[i];
+/******/ 				if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 					installedChunks[chunkId][0]();
+/******/ 				}
+/******/ 				installedChunks[chunkId] = 0;
+/******/ 			}
+/******/ 		
+/******/ 		}
+/******/ 		
+/******/ 		var chunkLoadingGlobal = self["webpackChunknddem"] = self["webpackChunknddem"] || [];
+/******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
+/******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module can't be inlined because the eval devtool is used.
+/******/ 	var __webpack_exports__ = __webpack_require__("./live/src/uniaxial.js");
+/******/ 	
+/******/ })()
+;
