@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
 var R, r; // parameters of torus
 var wristband1, wristband2;
@@ -248,7 +249,7 @@ function add_left_oculus_model(controller) {
               "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
             function (font) {
               var fontsize = 0.005;
-              var geometry = new THREE.TextBufferGeometry("  Play \nPause", {
+              var geometry = new TextGeometry("  Play \nPause", {
                 font: font,
                 size: fontsize,
                 height: fontsize / 5,
@@ -279,7 +280,7 @@ function add_left_oculus_model(controller) {
               pause_line.rotation.z = Math.PI / 2;
               object.add(pause_line);
 
-              var geometry = new THREE.TextBufferGeometry("Menu", {
+              var geometry = new TextGeometry("Menu", {
                 font: font,
                 size: fontsize,
                 height: fontsize / 5,
@@ -319,7 +320,7 @@ function add_left_oculus_model(controller) {
 
               if (!params.no_tori) {
                 // Move label
-                geometry = new THREE.TextBufferGeometry("Move", {
+                geometry = new TextGeometry("Move", {
                   font: font,
                   size: fontsize,
                   height: fontsize / 5,
@@ -364,7 +365,7 @@ function add_right_oculus_model(controller) {
               "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
             function (font) {
               var fontsize = 0.005;
-              var geometry = new THREE.TextBufferGeometry("  Play \nPause", {
+              var geometry = new TextGeometry("  Play \nPause", {
                 font: font,
                 size: fontsize,
                 height: fontsize / 5,
@@ -395,7 +396,7 @@ function add_right_oculus_model(controller) {
               pause_line.rotation.z = Math.PI / 2;
               object.add(pause_line);
 
-              var geometry = new THREE.TextBufferGeometry("Menu", {
+              var geometry = new TextGeometry("Menu", {
                 font: font,
                 size: fontsize,
                 height: fontsize / 5,
@@ -435,7 +436,7 @@ function add_right_oculus_model(controller) {
 
               if (!params.no_tori) {
                 // Move label
-                geometry = new THREE.TextBufferGeometry("Move", {
+                geometry = new TextGeometry("Move", {
                   font: font,
                   size: fontsize,
                   height: fontsize / 5,
@@ -478,7 +479,7 @@ function add_vive_models(scene, params, world) {
         "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
       function (font) {
         var fontsize = 0.005;
-        var geometry = new THREE.TextBufferGeometry("  Play \nPause", {
+        var geometry = new TextGeometry("  Play \nPause", {
           font: font,
           size: fontsize,
           height: fontsize / 5,
@@ -491,7 +492,7 @@ function add_vive_models(scene, params, world) {
         pause_label.position.z = 0.05;
         controller.add(pause_label);
 
-        var geometry = new THREE.TextBufferGeometry("Menu", {
+        var geometry = new TextGeometry("Menu", {
           font: font,
           size: fontsize,
           height: fontsize / 5,
@@ -509,7 +510,7 @@ function add_vive_models(scene, params, world) {
 
         if (!params.no_tori) {
           // Move label
-          geometry = new THREE.TextBufferGeometry("Move", {
+          geometry = new TextGeometry("Move", {
             font: font,
             size: fontsize,
             height: fontsize / 5,

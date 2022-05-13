@@ -1,4 +1,5 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
 var walls;
 /**
@@ -124,7 +125,7 @@ function make_axes(scene, params, world) {
       params.root_dir +
         "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
       function (font) {
-        var textGeo_x = new THREE.TextBufferGeometry("x" + world.ref_dim.x, {
+        var textGeo_x = new TextGeometry("x" + world.ref_dim.x, {
           font: font,
           size: fontsize,
           height: fontsize / 5,

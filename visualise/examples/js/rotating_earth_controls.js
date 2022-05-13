@@ -1,3 +1,7 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+
 var root_dir = window.location.origin + '/';
 if ( window.location.hostname.includes('benjymarks') ) { root_dir = 'http://www.benjymarks.com/nddem/'}
 else if ( window.location.hostname.includes('github') ) { root_dir = 'https://franzzzzzzzz.github.io/NDDEM/'; cache=true; }
@@ -25,7 +29,7 @@ camera.position.z = 5;
 // camera.position.y = -1.5;
 
 var renderer = new THREE.WebGLRenderer();
-var controls = new THREE.OrbitControls( camera, renderer.domElement );
+var controls = new OrbitControls( camera, renderer.domElement );
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
@@ -56,7 +60,7 @@ var loader1 = new THREE.TextureLoader()
         scene.add( sphere1 );
     } );
 
-var gui = new dat.GUI();
+var gui = new GUI();
 gui.add( rot, 'x').min(-Math.PI).max(Math.PI).step(0.01).listen().name('x Rotation').onChange( function( val ) { update_texture(rot); }) ;
 gui.add( rot, 'y').min(-Math.PI).max(Math.PI).step(0.01).listen().name('y Rotation').onChange( function( val ) { update_texture(rot); }) ;
 gui.add( rot, 'z').min(-Math.PI).max(Math.PI).step(0.01).listen().name('z Rotation').onChange( function( val ) { update_texture(rot); }) ;
