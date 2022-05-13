@@ -16,7 +16,7 @@ body {
     padding: 0;
 }
 #canvas {
-    width: 50%;
+    width: 100%;
     height: 100%;
 }
 
@@ -27,6 +27,7 @@ body {
     width: 55% !important;
 }
 #scigem_tag {
+    color:white;
     position:absolute;
     bottom:5pt;
     left:5pt;
@@ -48,7 +49,7 @@ body {
 a {
     font-weight: bolder;
     text-decoration: none;
-    color: black;
+    color: white;
 }
 
 .visible {
@@ -65,4 +66,12 @@ a {
 .lil-gui {
 	--number-color: #fc2eff;
     --string-color: #fc2eff;
+}
+
+#N_tag {
+    color: white;
+    padding: 24px;
+    font: 48px Montserrat;
+    /* font-weight: bold; */
+    position:absolute;
 }
