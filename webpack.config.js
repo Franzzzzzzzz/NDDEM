@@ -20,8 +20,14 @@ module.exports = [{
     },
     devServer: {
         static: {
-          directory: '.'
+           directory: '.'
         },
+        headers: {
+          'Cache-Control': 'no-store',
+        },
+    },
+    optimization: {
+      runtimeChunk: 'single',
     },
     module: {
         rules: [
@@ -37,6 +43,12 @@ module.exports = [{
     // mode: "production",
     entry: {
         'nddem' : './visualise/js/nddem.js',
+        'logo' : './visualise/examples/js/logo.js',
+        'slice' : './visualise/examples/js/slice.js',
+        'multiple_rotating_earths' : './visualise/examples/js/multiple_rotating_earths.js',
+        'rotating_earth_controls' : './visualise/examples/js/rotating_earth_controls.js',
+        'rotating_earth' : './visualise/examples/js/rotating_earth.js',
+        'torus_explainer' : './visualise/examples/js/torus_explainer.js',
     },
     output: {
         path: path.resolve(__dirname, 'visualise/deploy'),
