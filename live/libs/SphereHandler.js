@@ -2,6 +2,7 @@ let radii;
 export let spheres;
 let NDParticleShader;
 let v, omegaMag;
+let forces;
 export let total_particle_volume;
 
 import { Lut } from "three/examples/jsm/math/Lut.js";
@@ -13,8 +14,14 @@ import {
     Color,
     Mesh,
     SphereGeometry,
+    CylinderGeometry,
     MeshPhongMaterial
 } from "three";
+
+const cylinder_geometry = new THREE.CylinderGeometry( 1, 1, 1, 16 );
+const cylinder_material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
+const cylinder = new THREE.Mesh( cylinder_geometry, cylinder_material );
+
 
 export async function createNDParticleShader(params) {
     import("./shaders/" + params.dimension + "DShader.js").then((module) => {
@@ -229,4 +236,21 @@ export function randomise_particles_isotropic( params, S ) {
                 -params.H + params.r_max + Math.random()*2*(params.H-params.r_max)]);
         }
     }
+}
+
+
+export function draw_force_network(S,params,scene) {
+    if ( S !== undefined ) {
+        if ( forces !== undefined ) { scene.remove( forces ) }
+        var F = S.simu_getParticleForces(); // NOTE: Not implemented yet
+        for ( let i = 0; i < F.length; i ++ ) {
+            let c = cylinder.clone();
+            c.position.x = 0;
+            c.position.y = 0;
+            c.position.z = 0;
+            // c.rotation....
+            forces.add( c )
+        }
+    }
+    scene.add ( forces );
 }

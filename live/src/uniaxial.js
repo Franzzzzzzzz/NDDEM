@@ -1,10 +1,13 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 import * as SPHERES from "../libs/SphereHandler.js"
 import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
+import * as CONTROLLERS from '../libs/controllers.js';
+
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
 var urlParams = new URLSearchParams(window.location.search);
@@ -135,6 +138,12 @@ async function init() {
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
 
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        container.appendChild( VRButton.createButton( renderer ) );
+        renderer.xr.enabled = true;
+        CONTROLLERS.add_controllers(renderer, scene);
+    }
+
     let gui = new GUI();
     gui.width = 450;
 
@@ -239,7 +248,15 @@ function animate() {
         density = S.cg_get_result(0, "RHO", 0)[0];
     }
 
-    renderer.render( scene, camera );
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        renderer.setAnimationLoop( function () {
+            renderer.render( scene, camera );
+        } );
+    } else {
+        requestAnimationFrame( animate );
+    	renderer.render( scene, camera );
+    }
+    // renderer.render( scene, camera );
 
     old_time = new_time;
 
