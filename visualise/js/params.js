@@ -121,7 +121,8 @@ function process_params(time) {
   params.vr_scale = 0.1; // mapping from DEM units to VR units
   params.human_height = 0; // height of the human in m
 
-  params.root_dir = "http://localhost:54321/";
+  // params.root_dir = "http://localhost:54321/";
+  params.root_dir = window.location.origin + '/';
   params.data_dir = params.root_dir;
   if (window.location.hostname.includes("benjymarks")) {
     params.root_dir = "https://franzzzzzzzz.github.io/NDDEM/"; //window.location.href;

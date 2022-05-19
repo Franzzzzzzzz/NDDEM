@@ -5,7 +5,7 @@
  * @author Data Arts Team / https://github.com/dataarts
  */
 
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
 
 /*
 

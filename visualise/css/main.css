@@ -1,0 +1,77 @@
+html * {
+    font-family: 'Montserrat', sans-serif;
+}
+body {
+    margin: 0;
+    overflow: hidden;
+}
+.flex-container {
+    display: flex;
+    flex-direction: row;
+}
+#stats {
+    width: 50%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+#canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.dg .c {
+    width: 45% !important;
+}
+.dg .property-name {
+    width: 55% !important;
+}
+#scigem_tag {
+    color:white;
+    position:absolute;
+    bottom:5pt;
+    left:5pt;
+    font-size: 8pt;
+    z-index: 99;
+}
+#download_tag {
+    position:absolute;
+    top:5pt;
+    left:5pt;
+    font-size: 14pt;
+    z-index: 99;
+    color: #bbb;
+}
+#download_tag:hover {
+    color: #777;
+}
+
+a {
+    font-weight: bolder;
+    text-decoration: none;
+    color: white;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.25s linear;
+}
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 0.25s, opacity 0.25s linear;
+}
+
+.lil-gui {
+	--number-color: #fc2eff;
+    --string-color: #fc2eff;
+}
+
+#N_tag {
+    color: white;
+    padding: 24px;
+    font: 48px Montserrat;
+    /* font-weight: bold; */
+    position:absolute;
+}

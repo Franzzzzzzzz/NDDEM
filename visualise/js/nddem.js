@@ -252,7 +252,6 @@ function make_initial_sphere_texturing() {
     true
   );
   console.log(request)
-  console.log("HELLO")
   request.send(null);
 
   request.onload = function () {
@@ -294,12 +293,10 @@ function make_initial_spheres(spheres) {
     );
   } else {
     // var geometry = new THREE.SphereGeometry( 1, Math.pow(2,params.quality), Math.pow(2,params.quality) );
-    var geometry = new THREE.BufferGeometry().fromGeometry(
-      new THREE.SphereGeometry(
+    var geometry = new THREE.SphereGeometry(
         1,
         Math.pow(2, params.quality),
         Math.pow(2, params.quality)
-      )
     );
   }
   var pointsGeometry = new THREE.SphereGeometry(

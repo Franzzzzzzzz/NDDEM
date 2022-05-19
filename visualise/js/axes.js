@@ -1,4 +1,6 @@
-import * as THREE from "../node_modules/three/build/three.module.js";
+import * as THREE from "three";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 
 var walls;
 /**
@@ -119,12 +121,12 @@ function make_axes(scene, params, world) {
       }
     }
     // console.log(ref_dim)
-    var loader = new THREE.FontLoader();
+    var loader = new FontLoader();
     loader.load(
       params.root_dir +
-        "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
+        "../node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
       function (font) {
-        var textGeo_x = new THREE.TextBufferGeometry("x" + world.ref_dim.x, {
+        var textGeo_x = new TextGeometry("x" + world.ref_dim.x, {
           font: font,
           size: fontsize,
           height: fontsize / 5,
@@ -142,7 +144,7 @@ function make_axes(scene, params, world) {
         axesLabels.add(mesh_x);
 
         if (params.N > 1) {
-          var textGeo_y = new THREE.TextGeometry("x" + world.ref_dim.y, {
+          var textGeo_y = new TextGeometry("x" + world.ref_dim.y, {
             font: font,
             size: fontsize,
             height: fontsize / 5,
@@ -157,7 +159,7 @@ function make_axes(scene, params, world) {
           axesLabels.add(mesh_y);
         }
         if (params.N > 2) {
-          var textGeo_z = new THREE.TextGeometry("x" + world.ref_dim.z, {
+          var textGeo_z = new TextGeometry("x" + world.ref_dim.z, {
             font: font,
             size: fontsize,
             height: fontsize / 5,
