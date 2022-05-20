@@ -451,6 +451,7 @@ public:
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif
         } //END PARALLEL PART
+        getParticleStress() ;
 
         // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
         for (int i=0 ; i<MP.P ; i++)
@@ -554,7 +555,25 @@ public:
   std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
 
   // /** \brief Expose the array of particle stress. WARNING: Not implemented! \ingroup API */
-  std::vector<std::vector<double>> getParticleStress() { return X; }
+  std::vector<std::vector<double>> getParticleStress()
+  {
+    std::vector<std::vector<double>> res ;
+    std::vector<double> tmpfrc ;
+    tmpfrc.resize(2+d) ;
+    for (int i=0 ; i<MP.CLp.size() ; i++)
+    {
+      for (auto it = MP.CLp[i].v.begin() ; it!=MP.CLp[i].v.end() ; it++)
+      {
+        if (it->infos == nullptr) continue ;
+        tmpfrc[0]=it->i ;
+        tmpfrc[1]=it->j ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+j]=it->infos->Fn[j] ;
+        res.push_back(tmpfrc) ;
+      }
+    }
+
+    return res;
+  }
 
   /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }
