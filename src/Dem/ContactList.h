@@ -26,7 +26,7 @@ public :
  * */
 class SpecificAction: public Action {
 public :
-    int id ; 
+    int id ;
     int duration ;
 } ;
 
@@ -65,11 +65,16 @@ public:
  void saveinfo (Action & a) {
      if (!owninfos)
      {
-         infos = new Action ; 
-         owninfos = true ; 
+         infos = new Action ;
+         owninfos = true ;
      }
-     *infos = a ; 
- } ///< Save information regarding the contact forces for later write down. 
+     infos->Fn = a.Fn ;
+     //printf("%g %g %g\n",a.Fn[0], a.Fn[1], a.Fn[2]) ;   
+     infos->Ft = a.Ft ;
+     infos->Torquei = a.Torquei ;
+     infos->Torquej = a.Torquej ;
+
+ } ///< Save information regarding the contact forces for later write down.
 
  int i ;  ///< Index of contacting particle.
  int j ; ///< Index of second contacting particle or wall. If this is a wall contact, j=2*walldimension + (0 or 1 if it is the low wall or high wall)
@@ -156,7 +161,7 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, c
         {
             double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
-            //printf("/%g %g %g %g %g %g %g/", partialsum, sumspawn, X1[0], X1[1], X2[0], X2[1], Delta ) ; 
+            //printf("/%g %g %g %g %g %g %g/", partialsum, sumspawn, X1[0], X1[1], X2[0], X2[1], Delta ) ;
             if (sumspawn<P.skinsqr)
                 check_ghost_regular (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
         }
@@ -167,7 +172,7 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, c
         tmpcp.contactlength=sqrt(sum) ;
         tmpcp.ghost=mask ;
         insert(tmpcp) ;
-        //printf("[%d %d %X %X %g]\n", tmpcp.i, tmpcp.j, tmpcp.ghost, tmpcp.ghostdir, tmpcp.contactlength) ; 
+        //printf("[%d %d %X %X %g]\n", tmpcp.i, tmpcp.j, tmpcp.ghost, tmpcp.ghostdir, tmpcp.contactlength) ;
     }
 }
 
@@ -177,38 +182,38 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
                                      [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
     if (P.Boundaries[0][3] != static_cast<int>(WallType::PBC_LE))
-            check_ghost_regular(gst, P, X1, X2, tmpcp) ; 
+            check_ghost_regular(gst, P, X1, X2, tmpcp) ;
     else
     {
-     if ((gst & 1)==0) 
+     if ((gst & 1)==0)
      {
          double partialsum = (X1[0]-X2[0]) * (X1[0]-X2[0]) ;
-         assert (((gst>>30 & 1) ==0)) ; 
-         check_ghost_regular(gst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ; 
+         assert (((gst>>30 & 1) ==0)) ;
+         check_ghost_regular(gst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ;
      }
      else //There is an image through the LE
      {
          //1 : case without taking that image
          double partialsum = (X1[0]-X2[0]) * (X1[0]-X2[0]) ;
-         bitdim newgst = gst ; newgst &= (~(1<<30)) ; 
-         check_ghost_regular(newgst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ; 
-         
+         bitdim newgst = gst ; newgst &= (~(1<<30)) ;
+         check_ghost_regular(newgst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ;
+
          //2: now is the hard case: we take the image path
          double Delta= (tmpcp.ghostdir&1?-1:1) * P.Boundaries[0][2] ;
          partialsum = (X1[0]-X2[0]-Delta) * (X1[0]-X2[0]-Delta) ;
-         newgst = gst ; 
+         newgst = gst ;
          newgst &= (~(1<<1)) ;      // Clearing bit 1
-         newgst |= ((gst>>30)<<1) ; // Setting bit 1 to the value of bit 30 
+         newgst |= ((gst>>30)<<1) ; // Setting bit 1 to the value of bit 30
          newgst &= (~(1<<30)) ;     // Clearing bit 30
-         tmpcp.ghostdir &= (~(1<<1)) ; //Clearing bit 1 
-         tmpcp.ghostdir |= ((tmpcp.ghostdir>>30)<<1) ; // Setting the value of bit 1 to the value of bit 30. No need for clearing in the ghostdir. 
+         tmpcp.ghostdir &= (~(1<<1)) ; //Clearing bit 1
+         tmpcp.ghostdir |= ((tmpcp.ghostdir>>30)<<1) ; // Setting the value of bit 1 to the value of bit 30. No need for clearing in the ghostdir.
          auto tmpX2 = X2 ;
-         tmpX2[1] += (tmpcp.ghostdir&1?-1:1)*P.Boundaries[0][5] ; 
+         tmpX2[1] += (tmpcp.ghostdir&1?-1:1)*P.Boundaries[0][5] ;
          if (tmpX2[1] > P.Boundaries[1][1]) tmpX2[1] -= P.Boundaries[1][2] ;
          if (tmpX2[1] < P.Boundaries[1][0]) tmpX2[1] += P.Boundaries[1][2] ;
-         //printf("{%g %g %X %X", tmpX2[0], tmpX2[1], newgst>>1, tmpcp.ghostdir) ; 
+         //printf("{%g %g %X %X", tmpX2[0], tmpX2[1], newgst>>1, tmpcp.ghostdir) ;
          check_ghost_regular(newgst>>1, P, X1, tmpX2, tmpcp, 1, partialsum, 1) ;
-         //printf("}") ; 
+         //printf("}") ;
      }
     }
 }

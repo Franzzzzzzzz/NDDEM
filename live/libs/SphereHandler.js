@@ -245,9 +245,9 @@ export function draw_force_network(S,params,scene) {
         var F = S.simu_getParticleForces(); // NOTE: Not implemented yet
         for ( let i = 0; i < F.length; i ++ ) {
             let c = cylinder.clone();
-            c.position.x = 0;
-            c.position.y = 0;
-            c.position.z = 0;
+            c.position.x = F[i,0];
+            c.position.y = F[i,1];
+            c.position.z = F[i,2];
             // c.rotation....
             forces.add( c )
         }
