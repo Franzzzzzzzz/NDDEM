@@ -2,7 +2,10 @@ import * as THREE from "three";
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { AnaglyphEffect } from "three/examples/jsm/effects/AnaglyphEffect.js";
-import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
+// import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
+import { OculusHandModel } from 'three/examples/jsm/webxr/OculusHandModel.js';
 
 var camera, controls, effect;
 /**

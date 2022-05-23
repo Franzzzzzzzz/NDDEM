@@ -338,41 +338,18 @@ Object.assign(Module, moduleOverrides);
 // Free the object hierarchy contained in the overrides, this lets the GC
 // reclaim data used e.g. in memoryInitializerRequest, which is a large typed array.
 moduleOverrides = null;
+checkIncomingModuleAPI();
 
 // Emit code to handle expected values on the Module object. This applies Module.x
 // to the proper local x. This has two benefits: first, we only emit it if it is
 // expected to arrive, and second, by using a local everywhere else that can be
 // minified.
 
-if (Module['arguments']) arguments_ = Module['arguments'];
-if (!Object.getOwnPropertyDescriptor(Module, 'arguments')) {
-  Object.defineProperty(Module, 'arguments', {
-    configurable: true,
-    get: function() {
-      abort('Module.arguments has been replaced with plain arguments_ (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
+if (Module['arguments']) arguments_ = Module['arguments'];legacyModuleProp('arguments', 'arguments_');
 
-if (Module['thisProgram']) thisProgram = Module['thisProgram'];
-if (!Object.getOwnPropertyDescriptor(Module, 'thisProgram')) {
-  Object.defineProperty(Module, 'thisProgram', {
-    configurable: true,
-    get: function() {
-      abort('Module.thisProgram has been replaced with plain thisProgram (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
+if (Module['thisProgram']) thisProgram = Module['thisProgram'];legacyModuleProp('thisProgram', 'thisProgram');
 
-if (Module['quit']) quit_ = Module['quit'];
-if (!Object.getOwnPropertyDescriptor(Module, 'quit')) {
-  Object.defineProperty(Module, 'quit', {
-    configurable: true,
-    get: function() {
-      abort('Module.quit has been replaced with plain quit_ (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
+if (Module['quit']) quit_ = Module['quit'];legacyModuleProp('quit', 'quit_');
 
 // perform assertions in shell.js after we set up out() and err(), as otherwise if an assertion fails it cannot print the message
 // Assertions on removed incoming Module JS APIs.
@@ -385,42 +362,10 @@ assert(typeof Module['readAsync'] == 'undefined', 'Module.readAsync option was r
 assert(typeof Module['readBinary'] == 'undefined', 'Module.readBinary option was removed (modify readBinary in JS)');
 assert(typeof Module['setWindowTitle'] == 'undefined', 'Module.setWindowTitle option was removed (modify setWindowTitle in JS)');
 assert(typeof Module['TOTAL_MEMORY'] == 'undefined', 'Module.TOTAL_MEMORY has been renamed Module.INITIAL_MEMORY');
-
-if (!Object.getOwnPropertyDescriptor(Module, 'read')) {
-  Object.defineProperty(Module, 'read', {
-    configurable: true,
-    get: function() {
-      abort('Module.read has been replaced with plain read_ (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
-
-if (!Object.getOwnPropertyDescriptor(Module, 'readAsync')) {
-  Object.defineProperty(Module, 'readAsync', {
-    configurable: true,
-    get: function() {
-      abort('Module.readAsync has been replaced with plain readAsync (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
-
-if (!Object.getOwnPropertyDescriptor(Module, 'readBinary')) {
-  Object.defineProperty(Module, 'readBinary', {
-    configurable: true,
-    get: function() {
-      abort('Module.readBinary has been replaced with plain readBinary (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
-
-if (!Object.getOwnPropertyDescriptor(Module, 'setWindowTitle')) {
-  Object.defineProperty(Module, 'setWindowTitle', {
-    configurable: true,
-    get: function() {
-      abort('Module.setWindowTitle has been replaced with plain setWindowTitle (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
+legacyModuleProp('read', 'read_');
+legacyModuleProp('readAsync', 'readAsync');
+legacyModuleProp('readBinary', 'readBinary');
+legacyModuleProp('setWindowTitle', 'setWindowTitle');
 var IDBFS = 'IDBFS is no longer included by default; build with -lidbfs.js';
 var PROXYFS = 'PROXYFS is no longer included by default; build with -lproxyfs.js';
 var WORKERFS = 'WORKERFS is no longer included by default; build with -lworkerfs.js';
@@ -633,6 +578,48 @@ function removeFunction(index) {
 // include: runtime_debug.js
 
 
+function legacyModuleProp(prop, newName) {
+  if (!Object.getOwnPropertyDescriptor(Module, prop)) {
+    Object.defineProperty(Module, prop, {
+      configurable: true,
+      get: function() {
+        abort('Module.' + prop + ' has been replaced with plain ' + newName + ' (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)');
+      }
+    });
+  }
+}
+
+function ignoredModuleProp(prop) {
+  if (Object.getOwnPropertyDescriptor(Module, prop)) {
+    abort('`Module.' + prop + '` was supplied but `' + prop + '` not included in INCOMING_MODULE_JS_API');
+  }
+}
+
+function unexportedMessage(sym, isFSSybol) {
+  var msg = "'" + sym + "' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)";
+  if (isFSSybol) {
+    msg += '. Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you';
+  }
+  return msg;
+}
+
+function unexportedRuntimeSymbol(sym, isFSSybol) {
+  if (!Object.getOwnPropertyDescriptor(Module, sym)) {
+    Object.defineProperty(Module, sym, {
+      configurable: true,
+      get: function() {
+        abort(unexportedMessage(sym, isFSSybol));
+      }
+    });
+  }
+}
+
+function unexportedRuntimeFunction(sym, isFSSybol) {
+  if (!Object.getOwnPropertyDescriptor(Module, sym)) {
+    Module[sym] = () => abort(unexportedMessage(sym, isFSSybol));
+  }
+}
+
 // end include: runtime_debug.js
 var tempRet0 = 0;
 var setTempRet0 = (value) => { tempRet0 = value; };
@@ -651,24 +638,8 @@ var getTempRet0 = () => tempRet0;
 //    is up at http://kripken.github.io/emscripten-site/docs/api_reference/preamble.js.html
 
 var wasmBinary;
-if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
-if (!Object.getOwnPropertyDescriptor(Module, 'wasmBinary')) {
-  Object.defineProperty(Module, 'wasmBinary', {
-    configurable: true,
-    get: function() {
-      abort('Module.wasmBinary has been replaced with plain wasmBinary (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
-var noExitRuntime = Module['noExitRuntime'] || true;
-if (!Object.getOwnPropertyDescriptor(Module, 'noExitRuntime')) {
-  Object.defineProperty(Module, 'noExitRuntime', {
-    configurable: true,
-    get: function() {
-      abort('Module.noExitRuntime has been replaced with plain noExitRuntime (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
+if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];legacyModuleProp('wasmBinary', 'wasmBinary');
+var noExitRuntime = Module['noExitRuntime'] || true;legacyModuleProp('noExitRuntime', 'noExitRuntime');
 
 if (typeof WebAssembly != 'object') {
   abort('no native wasm support detected');
@@ -855,26 +826,26 @@ function allocate(slab, allocator) {
 
 // runtime_strings.js: Strings related runtime functions that are part of both MINIMAL_RUNTIME and regular runtime.
 
-// Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the given array that contains uint8 values, returns
-// a copy of that string as a Javascript String object.
-
 var UTF8Decoder = typeof TextDecoder != 'undefined' ? new TextDecoder('utf8') : undefined;
 
+// Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the given array that contains uint8 values, returns
+// a copy of that string as a Javascript String object.
 /**
+ * heapOrArray is either a regular array, or a JavaScript typed array view.
  * @param {number} idx
  * @param {number=} maxBytesToRead
  * @return {string}
  */
-function UTF8ArrayToString(heap, idx, maxBytesToRead) {
+function UTF8ArrayToString(heapOrArray, idx, maxBytesToRead) {
   var endIdx = idx + maxBytesToRead;
   var endPtr = idx;
   // TextDecoder needs to know the byte length in advance, it doesn't stop on null terminator by itself.
   // Also, use the length info to avoid running tiny strings through TextDecoder, since .subarray() allocates garbage.
   // (As a tiny code save trick, compare endPtr against endIdx using a negation, so that undefined means Infinity)
-  while (heap[endPtr] && !(endPtr >= endIdx)) ++endPtr;
+  while (heapOrArray[endPtr] && !(endPtr >= endIdx)) ++endPtr;
 
-  if (endPtr - idx > 16 && heap.subarray && UTF8Decoder) {
-    return UTF8Decoder.decode(heap.subarray(idx, endPtr));
+  if (endPtr - idx > 16 && heapOrArray.buffer && UTF8Decoder) {
+    return UTF8Decoder.decode(heapOrArray.subarray(idx, endPtr));
   } else {
     var str = '';
     // If building with TextDecoder, we have already computed the string length above, so test loop end condition against that
@@ -883,16 +854,16 @@ function UTF8ArrayToString(heap, idx, maxBytesToRead) {
       // http://en.wikipedia.org/wiki/UTF-8#Description
       // https://www.ietf.org/rfc/rfc2279.txt
       // https://tools.ietf.org/html/rfc3629
-      var u0 = heap[idx++];
+      var u0 = heapOrArray[idx++];
       if (!(u0 & 0x80)) { str += String.fromCharCode(u0); continue; }
-      var u1 = heap[idx++] & 63;
+      var u1 = heapOrArray[idx++] & 63;
       if ((u0 & 0xE0) == 0xC0) { str += String.fromCharCode(((u0 & 31) << 6) | u1); continue; }
-      var u2 = heap[idx++] & 63;
+      var u2 = heapOrArray[idx++] & 63;
       if ((u0 & 0xF0) == 0xE0) {
         u0 = ((u0 & 15) << 12) | (u1 << 6) | u2;
       } else {
         if ((u0 & 0xF8) != 0xF0) warnOnce('Invalid UTF-8 leading byte 0x' + u0.toString(16) + ' encountered when deserializing a UTF-8 string in wasm memory to a JS string!');
-        u0 = ((u0 & 7) << 18) | (u1 << 12) | (u2 << 6) | (heap[idx++] & 63);
+        u0 = ((u0 & 7) << 18) | (u1 << 12) | (u2 << 6) | (heapOrArray[idx++] & 63);
       }
 
       if (u0 < 0x10000) {
@@ -1237,31 +1208,24 @@ function writeAsciiToMemory(str, buffer, dontAddNull) {
 // end include: runtime_strings_extra.js
 // Memory management
 
-function alignUp(x, multiple) {
-  if (x % multiple > 0) {
-    x += multiple - (x % multiple);
-  }
-  return x;
-}
-
 var HEAP,
-/** @type {ArrayBuffer} */
+/** @type {!ArrayBuffer} */
   buffer,
-/** @type {Int8Array} */
+/** @type {!Int8Array} */
   HEAP8,
-/** @type {Uint8Array} */
+/** @type {!Uint8Array} */
   HEAPU8,
-/** @type {Int16Array} */
+/** @type {!Int16Array} */
   HEAP16,
-/** @type {Uint16Array} */
+/** @type {!Uint16Array} */
   HEAPU16,
-/** @type {Int32Array} */
+/** @type {!Int32Array} */
   HEAP32,
-/** @type {Uint32Array} */
+/** @type {!Uint32Array} */
   HEAPU32,
-/** @type {Float32Array} */
+/** @type {!Float32Array} */
   HEAPF32,
-/** @type {Float64Array} */
+/** @type {!Float64Array} */
   HEAPF64;
 
 function updateGlobalBufferAndViews(buf) {
@@ -1279,15 +1243,7 @@ function updateGlobalBufferAndViews(buf) {
 var TOTAL_STACK = 5242880;
 if (Module['TOTAL_STACK']) assert(TOTAL_STACK === Module['TOTAL_STACK'], 'the stack size can no longer be determined at runtime')
 
-var INITIAL_MEMORY = Module['INITIAL_MEMORY'] || 16777216;
-if (!Object.getOwnPropertyDescriptor(Module, 'INITIAL_MEMORY')) {
-  Object.defineProperty(Module, 'INITIAL_MEMORY', {
-    configurable: true,
-    get: function() {
-      abort('Module.INITIAL_MEMORY has been replaced with plain INITIAL_MEMORY (the initial value can be provided on Module, but after startup the value is only looked for on a local variable of that name)')
-    }
-  });
-}
+var INITIAL_MEMORY = Module['INITIAL_MEMORY'] || 16777216;legacyModuleProp('INITIAL_MEMORY', 'INITIAL_MEMORY');
 
 assert(INITIAL_MEMORY >= TOTAL_STACK, 'INITIAL_MEMORY should be larger than TOTAL_STACK, was ' + INITIAL_MEMORY + '! (TOTAL_STACK=' + TOTAL_STACK + ')');
 
@@ -1313,9 +1269,11 @@ var wasmTable;
 function writeStackCookie() {
   var max = _emscripten_stack_get_end();
   assert((max & 3) == 0);
-  // The stack grows downwards
-  HEAP32[((max + 4)>>2)] = 0x2135467;
-  HEAP32[((max + 8)>>2)] = 0x89BACDFE;
+  // The stack grow downwards towards _emscripten_stack_get_end.
+  // We write cookies to the final two words in the stack and detect if they are
+  // ever overwritten.
+  HEAP32[((max)>>2)] = 0x2135467;
+  HEAP32[(((max)+(4))>>2)] = 0x89BACDFE;
   // Also test the global address 0 for integrity.
   HEAP32[0] = 0x63736d65; /* 'emsc' */
 }
@@ -1323,8 +1281,8 @@ function writeStackCookie() {
 function checkStackCookie() {
   if (ABORT) return;
   var max = _emscripten_stack_get_end();
-  var cookie1 = HEAPU32[((max + 4)>>2)];
-  var cookie2 = HEAPU32[((max + 8)>>2)];
+  var cookie1 = HEAPU32[((max)>>2)];
+  var cookie2 = HEAPU32[(((max)+(4))>>2)];
   if (cookie1 != 0x2135467 || cookie2 != 0x89BACDFE) {
     abort('Stack overflow! Stack cookie has been overwritten, expected hex dwords 0x89BACDFE and 0x2135467, but received 0x' + cookie2.toString(16) + ' 0x' + cookie1.toString(16));
   }
@@ -1351,11 +1309,9 @@ var __ATEXIT__    = []; // functions called during shutdown
 var __ATPOSTRUN__ = []; // functions called after the main() is called
 
 var runtimeInitialized = false;
-var runtimeExited = false;
-var runtimeKeepaliveCounter = 0;
 
 function keepRuntimeAlive() {
-  return noExitRuntime || runtimeKeepaliveCounter > 0;
+  return noExitRuntime;
 }
 
 function preRun() {
@@ -1382,11 +1338,6 @@ FS.ignorePermissions = false;
 
 TTY.init();
   callRuntimeCallbacks(__ATINIT__);
-}
-
-function exitRuntime() {
-  checkStackCookie();
-  runtimeExited = true;
 }
 
 function postRun() {
@@ -1587,7 +1538,6 @@ function createExportWrapper(name, fixedasm) {
       asm = Module['asm'];
     }
     assert(runtimeInitialized, 'native function `' + displayName + '` called before runtime initialization');
-    assert(!runtimeExited, 'native function `' + displayName + '` called after runtime exit (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
     if (!asm[name]) {
       assert(asm[name], 'exported native function `' + displayName + '` not found');
     }
@@ -1681,6 +1631,7 @@ function createWasm() {
     addOnInit(Module['asm']['__wasm_call_ctors']);
 
     removeRunDependency('wasm-instantiate');
+
   }
   // we can't run yet (except in a pthread, where we have a custom sync instantiator)
   addRunDependency('wasm-instantiate');
@@ -1723,7 +1674,7 @@ function createWasm() {
         // Don't use streaming for file:// delivered objects in a webview, fetch them synchronously.
         !isFileURI(wasmBinaryFile) &&
         typeof fetch == 'function') {
-      return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function (response) {
+      return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
         // Suppress closure warning here since the upstream definition for
         // instantiateStreaming only allows Promise<Repsponse> rather than
         // an actual Response.
@@ -1749,6 +1700,7 @@ function createWasm() {
   // User shell pages can write their own Module.instantiateWasm = function(imports, successCallback) callback
   // to manually instantiate the Wasm module themselves. This allows pages to run the instantiation parallel
   // to any other async startup actions they are performing.
+  // Also pthreads and wasm workers initialize the wasm instance through this path.
   if (Module['instantiateWasm']) {
     try {
       var exports = Module['instantiateWasm'](info, receiveInstance);
@@ -1789,8 +1741,13 @@ var ASM_CONSTS = {
         var func = callback.func;
         if (typeof func == 'number') {
           if (callback.arg === undefined) {
+            // Run the wasm function ptr with signature 'v'. If no function
+            // with such signature was exported, this call does not need
+            // to be emitted (and would confuse Closure)
             getWasmTableEntry(func)();
           } else {
+            // If any function with signature 'vi' was exported, run
+            // the callback with that signature.
             getWasmTableEntry(func)(callback.arg);
           }
         } else {
@@ -2607,11 +2564,7 @@ var ASM_CONSTS = {
           follow_mount: true,
           recurse_count: 0
         };
-        for (var key in defaults) {
-          if (opts[key] === undefined) {
-            opts[key] = defaults[key];
-          }
-        }
+        opts = Object.assign(defaults, opts)
   
         if (opts.recurse_count > 8) {  // max recursive lookup of 8
           throw new FS.ErrnoError(32);
@@ -2649,7 +2602,7 @@ var ASM_CONSTS = {
               var link = FS.readlink(current_path);
               current_path = PATH_FS.resolve(PATH.dirname(current_path), link);
   
-              var lookup = FS.lookupPath(current_path, { recurse_count: opts.recurse_count });
+              var lookup = FS.lookupPath(current_path, { recurse_count: opts.recurse_count + 1 });
               current = lookup.node;
   
               if (count++ > 40) {  // limit max consecutive symlinks to 40 (SYMLOOP_MAX).
@@ -4240,10 +4193,6 @@ var ASM_CONSTS = {
           return -2;
         }
         return 0;
-      },doDup:function(path, flags, suggestFD) {
-        var suggest = FS.getStream(suggestFD);
-        if (suggest) FS.close(suggest);
-        return FS.open(path, flags, 0, suggestFD, suggestFD).fd;
       },doReadv:function(stream, iov, iovcnt, offset) {
         var ret = 0;
         for (var i = 0; i < iovcnt; i++) {
@@ -4351,22 +4300,6 @@ var ASM_CONSTS = {
   }
   }
 
-  function ___syscall_fstatat64(dirfd, path, buf, flags) {
-  try {
-  
-      path = SYSCALLS.getStr(path);
-      var nofollow = flags & 256;
-      var allowEmpty = flags & 4096;
-      flags = flags & (~4352);
-      assert(!flags, flags);
-      path = SYSCALLS.calculateAt(dirfd, path, allowEmpty);
-      return SYSCALLS.doStat(nofollow ? FS.lstat : FS.stat, path, buf);
-    } catch (e) {
-    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
-    return -e.errno;
-  }
-  }
-
   function ___syscall_ioctl(fd, op, varargs) {
   SYSCALLS.varargs = varargs;
   try {
@@ -4444,14 +4377,30 @@ var ASM_CONSTS = {
   }
   }
 
-  function ___syscall_open(path, flags, varargs) {
+  function ___syscall_newfstatat(dirfd, path, buf, flags) {
+  try {
+  
+      path = SYSCALLS.getStr(path);
+      var nofollow = flags & 256;
+      var allowEmpty = flags & 4096;
+      flags = flags & (~4352);
+      assert(!flags, flags);
+      path = SYSCALLS.calculateAt(dirfd, path, allowEmpty);
+      return SYSCALLS.doStat(nofollow ? FS.lstat : FS.stat, path, buf);
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
+    return -e.errno;
+  }
+  }
+
+  function ___syscall_openat(dirfd, path, flags, varargs) {
   SYSCALLS.varargs = varargs;
   try {
   
-      var pathname = SYSCALLS.getStr(path);
+      path = SYSCALLS.getStr(path);
+      path = SYSCALLS.calculateAt(dirfd, path);
       var mode = varargs ? SYSCALLS.get() : 0;
-      var stream = FS.open(pathname, flags, mode);
-      return stream.fd;
+      return FS.open(path, flags, mode).fd;
     } catch (e) {
     if (typeof FS == 'undefined' || !(e instanceof FS.ErrnoError)) throw e;
     return -e.errno;
@@ -4511,15 +4460,14 @@ var ASM_CONSTS = {
   var char_9 = 57;
   function makeLegalFunctionName(name) {
       if (undefined === name) {
-          return '_unknown';
+        return '_unknown';
       }
       name = name.replace(/[^a-zA-Z0-9_]/g, '$');
       var f = name.charCodeAt(0);
       if (f >= char_0 && f <= char_9) {
-          return '_' + name;
-      } else {
-          return name;
+        return '_' + name;
       }
+      return name;
     }
   function createNamedFunction(name, body) {
       name = makeLegalFunctionName(name);
@@ -4582,25 +4530,25 @@ var ASM_CONSTS = {
       var typeConverters = new Array(dependentTypes.length);
       var unregisteredTypes = [];
       var registered = 0;
-      dependentTypes.forEach(function(dt, i) {
-          if (registeredTypes.hasOwnProperty(dt)) {
-              typeConverters[i] = registeredTypes[dt];
-          } else {
-              unregisteredTypes.push(dt);
-              if (!awaitingDependencies.hasOwnProperty(dt)) {
-                  awaitingDependencies[dt] = [];
-              }
-              awaitingDependencies[dt].push(function() {
-                  typeConverters[i] = registeredTypes[dt];
-                  ++registered;
-                  if (registered === unregisteredTypes.length) {
-                      onComplete(typeConverters);
-                  }
-              });
+      dependentTypes.forEach((dt, i) => {
+        if (registeredTypes.hasOwnProperty(dt)) {
+          typeConverters[i] = registeredTypes[dt];
+        } else {
+          unregisteredTypes.push(dt);
+          if (!awaitingDependencies.hasOwnProperty(dt)) {
+            awaitingDependencies[dt] = [];
           }
+          awaitingDependencies[dt].push(() => {
+            typeConverters[i] = registeredTypes[dt];
+            ++registered;
+            if (registered === unregisteredTypes.length) {
+              onComplete(typeConverters);
+            }
+          });
+        }
       });
       if (0 === unregisteredTypes.length) {
-          onComplete(typeConverters);
+        onComplete(typeConverters);
       }
     }
   /** @param {Object=} options */
@@ -4625,11 +4573,9 @@ var ASM_CONSTS = {
       delete typeDependencies[rawType];
   
       if (awaitingDependencies.hasOwnProperty(rawType)) {
-          var callbacks = awaitingDependencies[rawType];
-          delete awaitingDependencies[rawType];
-          callbacks.forEach(function(cb) {
-              cb();
-          });
+        var callbacks = awaitingDependencies[rawType];
+        delete awaitingDependencies[rawType];
+        callbacks.forEach((cb) => cb());
       }
     }
   function __embind_register_bool(rawType, name, size, trueValue, falseValue) {
@@ -4667,10 +4613,10 @@ var ASM_CONSTS = {
 
   function ClassHandle_isAliasOf(other) {
       if (!(this instanceof ClassHandle)) {
-          return false;
+        return false;
       }
       if (!(other instanceof ClassHandle)) {
-          return false;
+        return false;
       }
   
       var leftClass = this.$$.ptrType.registeredClass;
@@ -4679,13 +4625,13 @@ var ASM_CONSTS = {
       var right = other.$$.ptr;
   
       while (leftClass.baseClass) {
-          left = leftClass.upcast(left);
-          leftClass = leftClass.baseClass;
+        left = leftClass.upcast(left);
+        leftClass = leftClass.baseClass;
       }
   
       while (rightClass.baseClass) {
-          right = rightClass.upcast(right);
-          rightClass = rightClass.baseClass;
+        right = rightClass.upcast(right);
+        rightClass = rightClass.baseClass;
       }
   
       return leftClass === rightClass && left === right;
@@ -4725,16 +4671,16 @@ var ASM_CONSTS = {
       $$.count.value -= 1;
       var toDelete = 0 === $$.count.value;
       if (toDelete) {
-          runDestructor($$);
+        runDestructor($$);
       }
     }
   
   function downcastPointer(ptr, ptrClass, desiredClass) {
       if (ptrClass === desiredClass) {
-          return ptr;
+        return ptr;
       }
       if (undefined === desiredClass.baseClass) {
-          return null; // no conversion
+        return null; // no conversion
       }
   
       var rv = downcastPointer(ptr, ptrClass, desiredClass.baseClass);
@@ -4763,9 +4709,9 @@ var ASM_CONSTS = {
   var deletionQueue = [];
   function flushPendingDeletes() {
       while (deletionQueue.length) {
-          var obj = deletionQueue.pop();
-          obj.$$.deleteScheduled = false;
-          obj['delete']();
+        var obj = deletionQueue.pop();
+        obj.$$.deleteScheduled = false;
+        obj['delete']();
       }
     }
   
@@ -4773,7 +4719,7 @@ var ASM_CONSTS = {
   function setDelayFunction(fn) {
       delayFunction = fn;
       if (deletionQueue.length && delayFunction) {
-          delayFunction(flushPendingDeletes);
+        delayFunction(flushPendingDeletes);
       }
     }
   function init_embind() {
@@ -4801,18 +4747,18 @@ var ASM_CONSTS = {
   
   function makeClassHandle(prototype, record) {
       if (!record.ptrType || !record.ptr) {
-          throwInternalError('makeClassHandle requires ptr and ptrType');
+        throwInternalError('makeClassHandle requires ptr and ptrType');
       }
       var hasSmartPtrType = !!record.smartPtrType;
       var hasSmartPtr = !!record.smartPtr;
       if (hasSmartPtrType !== hasSmartPtr) {
-          throwInternalError('Both smartPtrType and smartPtr must be specified');
+        throwInternalError('Both smartPtrType and smartPtr must be specified');
       }
       record.count = { value: 1 };
       return attachFinalizer(Object.create(prototype, {
-          $$: {
-              value: record,
-          },
+        $$: {
+            value: record,
+        },
       }));
     }
   function RegisteredPointer_fromWireType(ptr) {
@@ -4821,53 +4767,53 @@ var ASM_CONSTS = {
       // rawPointer is a maybe-null raw pointer
       var rawPointer = this.getPointee(ptr);
       if (!rawPointer) {
-          this.destructor(ptr);
-          return null;
+        this.destructor(ptr);
+        return null;
       }
   
       var registeredInstance = getInheritedInstance(this.registeredClass, rawPointer);
       if (undefined !== registeredInstance) {
-          // JS object has been neutered, time to repopulate it
-          if (0 === registeredInstance.$$.count.value) {
-              registeredInstance.$$.ptr = rawPointer;
-              registeredInstance.$$.smartPtr = ptr;
-              return registeredInstance['clone']();
-          } else {
-              // else, just increment reference count on existing object
-              // it already has a reference to the smart pointer
-              var rv = registeredInstance['clone']();
-              this.destructor(ptr);
-              return rv;
-          }
+        // JS object has been neutered, time to repopulate it
+        if (0 === registeredInstance.$$.count.value) {
+          registeredInstance.$$.ptr = rawPointer;
+          registeredInstance.$$.smartPtr = ptr;
+          return registeredInstance['clone']();
+        } else {
+          // else, just increment reference count on existing object
+          // it already has a reference to the smart pointer
+          var rv = registeredInstance['clone']();
+          this.destructor(ptr);
+          return rv;
+        }
       }
   
       function makeDefaultHandle() {
-          if (this.isSmartPointer) {
-              return makeClassHandle(this.registeredClass.instancePrototype, {
-                  ptrType: this.pointeeType,
-                  ptr: rawPointer,
-                  smartPtrType: this,
-                  smartPtr: ptr,
-              });
-          } else {
-              return makeClassHandle(this.registeredClass.instancePrototype, {
-                  ptrType: this,
-                  ptr: ptr,
-              });
-          }
+        if (this.isSmartPointer) {
+          return makeClassHandle(this.registeredClass.instancePrototype, {
+            ptrType: this.pointeeType,
+            ptr: rawPointer,
+            smartPtrType: this,
+            smartPtr: ptr,
+          });
+        } else {
+          return makeClassHandle(this.registeredClass.instancePrototype, {
+            ptrType: this,
+            ptr: ptr,
+          });
+        }
       }
   
       var actualType = this.registeredClass.getActualType(rawPointer);
       var registeredPointerRecord = registeredPointers[actualType];
       if (!registeredPointerRecord) {
-          return makeDefaultHandle.call(this);
+        return makeDefaultHandle.call(this);
       }
   
       var toType;
       if (this.isConst) {
-          toType = registeredPointerRecord.constPointerType;
+        toType = registeredPointerRecord.constPointerType;
       } else {
-          toType = registeredPointerRecord.pointerType;
+        toType = registeredPointerRecord.pointerType;
       }
       var dp = downcastPointer(
           rawPointer,
@@ -4877,17 +4823,17 @@ var ASM_CONSTS = {
           return makeDefaultHandle.call(this);
       }
       if (this.isSmartPointer) {
-          return makeClassHandle(toType.registeredClass.instancePrototype, {
-              ptrType: toType,
-              ptr: dp,
-              smartPtrType: this,
-              smartPtr: ptr,
-          });
+        return makeClassHandle(toType.registeredClass.instancePrototype, {
+          ptrType: toType,
+          ptr: dp,
+          smartPtrType: this,
+          smartPtr: ptr,
+        });
       } else {
-          return makeClassHandle(toType.registeredClass.instancePrototype, {
-              ptrType: toType,
-              ptr: dp,
-          });
+        return makeClassHandle(toType.registeredClass.instancePrototype, {
+          ptrType: toType,
+          ptr: dp,
+        });
       }
     }
   function attachFinalizer(handle) {
@@ -4904,66 +4850,66 @@ var ASM_CONSTS = {
           releaseClassHandle(info.$$);
       });
       attachFinalizer = (handle) => {
-          var $$ = handle.$$;
-          var hasSmartPtr = !!$$.smartPtr;
-          if (hasSmartPtr) {
-              // We should not call the destructor on raw pointers in case other code expects the pointee to live
-              var info = { $$: $$ };
-              // Create a warning as an Error instance in advance so that we can store
-              // the current stacktrace and point to it when / if a leak is detected.
-              // This is more useful than the empty stacktrace of `FinalizationRegistry`
-              // callback.
-              var cls = $$.ptrType.registeredClass;
-              info.leakWarning = new Error("Embind found a leaked C++ instance " + cls.name + " <0x" + $$.ptr.toString(16) + ">.\n" +
-              "We'll free it automatically in this case, but this functionality is not reliable across various environments.\n" +
-              "Make sure to invoke .delete() manually once you're done with the instance instead.\n" +
-              "Originally allocated"); // `.stack` will add "at ..." after this sentence
-              if ('captureStackTrace' in Error) {
-                  Error.captureStackTrace(info.leakWarning, RegisteredPointer_fromWireType);
-              }
-              finalizationRegistry.register(handle, info, handle);
+        var $$ = handle.$$;
+        var hasSmartPtr = !!$$.smartPtr;
+        if (hasSmartPtr) {
+          // We should not call the destructor on raw pointers in case other code expects the pointee to live
+          var info = { $$: $$ };
+          // Create a warning as an Error instance in advance so that we can store
+          // the current stacktrace and point to it when / if a leak is detected.
+          // This is more useful than the empty stacktrace of `FinalizationRegistry`
+          // callback.
+          var cls = $$.ptrType.registeredClass;
+          info.leakWarning = new Error("Embind found a leaked C++ instance " + cls.name + " <0x" + $$.ptr.toString(16) + ">.\n" +
+          "We'll free it automatically in this case, but this functionality is not reliable across various environments.\n" +
+          "Make sure to invoke .delete() manually once you're done with the instance instead.\n" +
+          "Originally allocated"); // `.stack` will add "at ..." after this sentence
+          if ('captureStackTrace' in Error) {
+              Error.captureStackTrace(info.leakWarning, RegisteredPointer_fromWireType);
           }
-          return handle;
+          finalizationRegistry.register(handle, info, handle);
+        }
+        return handle;
       };
       detachFinalizer = (handle) => finalizationRegistry.unregister(handle);
       return attachFinalizer(handle);
     }
   function ClassHandle_clone() {
       if (!this.$$.ptr) {
-          throwInstanceAlreadyDeleted(this);
+        throwInstanceAlreadyDeleted(this);
       }
   
       if (this.$$.preservePointerOnDelete) {
-          this.$$.count.value += 1;
-          return this;
+        this.$$.count.value += 1;
+        return this;
       } else {
-          var clone = attachFinalizer(Object.create(Object.getPrototypeOf(this), {
-              $$: {
-                  value: shallowCopyInternalPointer(this.$$),
-              }
-          }));
+        var clone = attachFinalizer(Object.create(Object.getPrototypeOf(this), {
+          $$: {
+            value: shallowCopyInternalPointer(this.$$),
+          }
+        }));
   
-          clone.$$.count.value += 1;
-          clone.$$.deleteScheduled = false;
-          return clone;
+        clone.$$.count.value += 1;
+        clone.$$.deleteScheduled = false;
+        return clone;
       }
     }
   
   function ClassHandle_delete() {
       if (!this.$$.ptr) {
-          throwInstanceAlreadyDeleted(this);
+        throwInstanceAlreadyDeleted(this);
       }
   
       if (this.$$.deleteScheduled && !this.$$.preservePointerOnDelete) {
-          throwBindingError('Object already scheduled for deletion');
+        throwBindingError('Object already scheduled for deletion');
       }
   
       detachFinalizer(this);
       releaseClassHandle(this.$$);
   
       if (!this.$$.preservePointerOnDelete) {
-          this.$$.smartPtr = undefined;
-          this.$$.ptr = undefined;
+        this.$$.smartPtr = undefined;
+        this.$$.ptr = undefined;
       }
     }
   
@@ -4973,14 +4919,14 @@ var ASM_CONSTS = {
   
   function ClassHandle_deleteLater() {
       if (!this.$$.ptr) {
-          throwInstanceAlreadyDeleted(this);
+        throwInstanceAlreadyDeleted(this);
       }
       if (this.$$.deleteScheduled && !this.$$.preservePointerOnDelete) {
-          throwBindingError('Object already scheduled for deletion');
+        throwBindingError('Object already scheduled for deletion');
       }
       deletionQueue.push(this);
       if (deletionQueue.length === 1 && delayFunction) {
-          delayFunction(flushPendingDeletes);
+        delayFunction(flushPendingDeletes);
       }
       this.$$.deleteScheduled = true;
       return this;
@@ -4997,55 +4943,53 @@ var ASM_CONSTS = {
   
   function ensureOverloadTable(proto, methodName, humanName) {
       if (undefined === proto[methodName].overloadTable) {
-          var prevFunc = proto[methodName];
-          // Inject an overload resolver function that routes to the appropriate overload based on the number of arguments.
-          proto[methodName] = function() {
-              // TODO This check can be removed in -O3 level "unsafe" optimizations.
-              if (!proto[methodName].overloadTable.hasOwnProperty(arguments.length)) {
-                  throwBindingError("Function '" + humanName + "' called with an invalid number of arguments (" + arguments.length + ") - expects one of (" + proto[methodName].overloadTable + ")!");
-              }
-              return proto[methodName].overloadTable[arguments.length].apply(this, arguments);
-          };
-          // Move the previous function into the overload table.
-          proto[methodName].overloadTable = [];
-          proto[methodName].overloadTable[prevFunc.argCount] = prevFunc;
+        var prevFunc = proto[methodName];
+        // Inject an overload resolver function that routes to the appropriate overload based on the number of arguments.
+        proto[methodName] = function() {
+          // TODO This check can be removed in -O3 level "unsafe" optimizations.
+          if (!proto[methodName].overloadTable.hasOwnProperty(arguments.length)) {
+              throwBindingError("Function '" + humanName + "' called with an invalid number of arguments (" + arguments.length + ") - expects one of (" + proto[methodName].overloadTable + ")!");
+          }
+          return proto[methodName].overloadTable[arguments.length].apply(this, arguments);
+        };
+        // Move the previous function into the overload table.
+        proto[methodName].overloadTable = [];
+        proto[methodName].overloadTable[prevFunc.argCount] = prevFunc;
       }
     }
   /** @param {number=} numArguments */
   function exposePublicSymbol(name, value, numArguments) {
       if (Module.hasOwnProperty(name)) {
-          if (undefined === numArguments || (undefined !== Module[name].overloadTable && undefined !== Module[name].overloadTable[numArguments])) {
-              throwBindingError("Cannot register public name '" + name + "' twice");
-          }
+        if (undefined === numArguments || (undefined !== Module[name].overloadTable && undefined !== Module[name].overloadTable[numArguments])) {
+          throwBindingError("Cannot register public name '" + name + "' twice");
+        }
   
-          // We are exposing a function with the same name as an existing function. Create an overload table and a function selector
-          // that routes between the two.
-          ensureOverloadTable(Module, name, name);
-          if (Module.hasOwnProperty(numArguments)) {
-              throwBindingError("Cannot register multiple overloads of a function with the same number of arguments (" + numArguments + ")!");
-          }
-          // Add the new function into the overload table.
-          Module[name].overloadTable[numArguments] = value;
+        // We are exposing a function with the same name as an existing function. Create an overload table and a function selector
+        // that routes between the two.
+        ensureOverloadTable(Module, name, name);
+        if (Module.hasOwnProperty(numArguments)) {
+            throwBindingError("Cannot register multiple overloads of a function with the same number of arguments (" + numArguments + ")!");
+        }
+        // Add the new function into the overload table.
+        Module[name].overloadTable[numArguments] = value;
       }
       else {
-          Module[name] = value;
-          if (undefined !== numArguments) {
-              Module[name].numArguments = numArguments;
-          }
+        Module[name] = value;
+        if (undefined !== numArguments) {
+          Module[name].numArguments = numArguments;
+        }
       }
     }
   
   /** @constructor */
-  function RegisteredClass(
-      name,
-      constructor,
-      instancePrototype,
-      rawDestructor,
-      baseClass,
-      getActualType,
-      upcast,
-      downcast
-    ) {
+  function RegisteredClass(name,
+                               constructor,
+                               instancePrototype,
+                               rawDestructor,
+                               baseClass,
+                               getActualType,
+                               upcast,
+                               downcast) {
       this.name = name;
       this.constructor = constructor;
       this.instancePrototype = instancePrototype;
@@ -5059,27 +5003,27 @@ var ASM_CONSTS = {
   
   function upcastPointer(ptr, ptrClass, desiredClass) {
       while (ptrClass !== desiredClass) {
-          if (!ptrClass.upcast) {
-              throwBindingError("Expected null or instance of " + desiredClass.name + ", got an instance of " + ptrClass.name);
-          }
-          ptr = ptrClass.upcast(ptr);
-          ptrClass = ptrClass.baseClass;
+        if (!ptrClass.upcast) {
+          throwBindingError("Expected null or instance of " + desiredClass.name + ", got an instance of " + ptrClass.name);
+        }
+        ptr = ptrClass.upcast(ptr);
+        ptrClass = ptrClass.baseClass;
       }
       return ptr;
     }
   function constNoSmartPtrRawPointerToWireType(destructors, handle) {
       if (handle === null) {
-          if (this.isReference) {
-              throwBindingError('null is not a valid ' + this.name);
-          }
-          return 0;
+        if (this.isReference) {
+          throwBindingError('null is not a valid ' + this.name);
+        }
+        return 0;
       }
   
       if (!handle.$$) {
-          throwBindingError('Cannot pass "' + _embind_repr(handle) + '" as a ' + this.name);
+        throwBindingError('Cannot pass "' + _embind_repr(handle) + '" as a ' + this.name);
       }
       if (!handle.$$.ptr) {
-          throwBindingError('Cannot pass deleted object as a pointer of type ' + this.name);
+        throwBindingError('Cannot pass deleted object as a pointer of type ' + this.name);
       }
       var handleClass = handle.$$.ptrType.registeredClass;
       var ptr = upcastPointer(handle.$$.ptr, handleClass, this.registeredClass);
@@ -5089,92 +5033,92 @@ var ASM_CONSTS = {
   function genericPointerToWireType(destructors, handle) {
       var ptr;
       if (handle === null) {
-          if (this.isReference) {
-              throwBindingError('null is not a valid ' + this.name);
-          }
+        if (this.isReference) {
+          throwBindingError('null is not a valid ' + this.name);
+        }
   
-          if (this.isSmartPointer) {
-              ptr = this.rawConstructor();
-              if (destructors !== null) {
-                  destructors.push(this.rawDestructor, ptr);
-              }
-              return ptr;
-          } else {
-              return 0;
+        if (this.isSmartPointer) {
+          ptr = this.rawConstructor();
+          if (destructors !== null) {
+            destructors.push(this.rawDestructor, ptr);
           }
+          return ptr;
+        } else {
+          return 0;
+        }
       }
   
       if (!handle.$$) {
-          throwBindingError('Cannot pass "' + _embind_repr(handle) + '" as a ' + this.name);
+        throwBindingError('Cannot pass "' + _embind_repr(handle) + '" as a ' + this.name);
       }
       if (!handle.$$.ptr) {
-          throwBindingError('Cannot pass deleted object as a pointer of type ' + this.name);
+        throwBindingError('Cannot pass deleted object as a pointer of type ' + this.name);
       }
       if (!this.isConst && handle.$$.ptrType.isConst) {
-          throwBindingError('Cannot convert argument of type ' + (handle.$$.smartPtrType ? handle.$$.smartPtrType.name : handle.$$.ptrType.name) + ' to parameter type ' + this.name);
+        throwBindingError('Cannot convert argument of type ' + (handle.$$.smartPtrType ? handle.$$.smartPtrType.name : handle.$$.ptrType.name) + ' to parameter type ' + this.name);
       }
       var handleClass = handle.$$.ptrType.registeredClass;
       ptr = upcastPointer(handle.$$.ptr, handleClass, this.registeredClass);
   
       if (this.isSmartPointer) {
-          // TODO: this is not strictly true
-          // We could support BY_EMVAL conversions from raw pointers to smart pointers
-          // because the smart pointer can hold a reference to the handle
-          if (undefined === handle.$$.smartPtr) {
-              throwBindingError('Passing raw pointer to smart pointer is illegal');
-          }
+        // TODO: this is not strictly true
+        // We could support BY_EMVAL conversions from raw pointers to smart pointers
+        // because the smart pointer can hold a reference to the handle
+        if (undefined === handle.$$.smartPtr) {
+          throwBindingError('Passing raw pointer to smart pointer is illegal');
+        }
   
-          switch (this.sharingPolicy) {
-              case 0: // NONE
-                  // no upcasting
-                  if (handle.$$.smartPtrType === this) {
-                      ptr = handle.$$.smartPtr;
-                  } else {
-                      throwBindingError('Cannot convert argument of type ' + (handle.$$.smartPtrType ? handle.$$.smartPtrType.name : handle.$$.ptrType.name) + ' to parameter type ' + this.name);
-                  }
-                  break;
+        switch (this.sharingPolicy) {
+          case 0: // NONE
+            // no upcasting
+            if (handle.$$.smartPtrType === this) {
+              ptr = handle.$$.smartPtr;
+            } else {
+              throwBindingError('Cannot convert argument of type ' + (handle.$$.smartPtrType ? handle.$$.smartPtrType.name : handle.$$.ptrType.name) + ' to parameter type ' + this.name);
+            }
+            break;
   
-              case 1: // INTRUSIVE
-                  ptr = handle.$$.smartPtr;
-                  break;
+          case 1: // INTRUSIVE
+            ptr = handle.$$.smartPtr;
+            break;
   
-              case 2: // BY_EMVAL
-                  if (handle.$$.smartPtrType === this) {
-                      ptr = handle.$$.smartPtr;
-                  } else {
-                      var clonedHandle = handle['clone']();
-                      ptr = this.rawShare(
-                          ptr,
-                          Emval.toHandle(function() {
-                              clonedHandle['delete']();
-                          })
-                      );
-                      if (destructors !== null) {
-                          destructors.push(this.rawDestructor, ptr);
-                      }
-                  }
-                  break;
+          case 2: // BY_EMVAL
+            if (handle.$$.smartPtrType === this) {
+              ptr = handle.$$.smartPtr;
+            } else {
+              var clonedHandle = handle['clone']();
+              ptr = this.rawShare(
+                ptr,
+                Emval.toHandle(function() {
+                  clonedHandle['delete']();
+                })
+              );
+              if (destructors !== null) {
+                destructors.push(this.rawDestructor, ptr);
+              }
+            }
+            break;
   
-              default:
-                  throwBindingError('Unsupporting sharing policy');
-          }
+          default:
+            throwBindingError('Unsupporting sharing policy');
+        }
       }
       return ptr;
     }
   
   function nonConstNoSmartPtrRawPointerToWireType(destructors, handle) {
       if (handle === null) {
-          if (this.isReference) {
-              throwBindingError('null is not a valid ' + this.name);
-          }
-          return 0;
+        if (this.isReference) {
+          throwBindingError('null is not a valid ' + this.name);
+        }
+        return 0;
       }
   
       if (!handle.$$) {
-          throwBindingError('Cannot pass "' + _embind_repr(handle) + '" as a ' + this.name);
+        throwBindingError('Cannot pass "' + _embind_repr(handle) + '" as a ' + this.name);
       }
       if (!handle.$$.ptr) {
-          throwBindingError('Cannot pass deleted object as a pointer of type ' + this.name);
+        throwBindingError('Cannot pass deleted object as a pointer of type ' + this.name);
       }
       if (handle.$$.ptrType.isConst) {
           throwBindingError('Cannot convert argument of type ' + handle.$$.ptrType.name + ' to parameter type ' + this.name);
@@ -5190,20 +5134,20 @@ var ASM_CONSTS = {
   
   function RegisteredPointer_getPointee(ptr) {
       if (this.rawGetPointee) {
-          ptr = this.rawGetPointee(ptr);
+        ptr = this.rawGetPointee(ptr);
       }
       return ptr;
     }
   
   function RegisteredPointer_destructor(ptr) {
       if (this.rawDestructor) {
-          this.rawDestructor(ptr);
+        this.rawDestructor(ptr);
       }
     }
   
   function RegisteredPointer_deleteObject(handle) {
       if (handle !== null) {
-          handle['delete']();
+        handle['delete']();
       }
     }
   function init_RegisteredPointer() {
@@ -5252,34 +5196,34 @@ var ASM_CONSTS = {
       this.rawDestructor = rawDestructor;
   
       if (!isSmartPointer && registeredClass.baseClass === undefined) {
-          if (isConst) {
-              this['toWireType'] = constNoSmartPtrRawPointerToWireType;
-              this.destructorFunction = null;
-          } else {
-              this['toWireType'] = nonConstNoSmartPtrRawPointerToWireType;
-              this.destructorFunction = null;
-          }
+        if (isConst) {
+          this['toWireType'] = constNoSmartPtrRawPointerToWireType;
+          this.destructorFunction = null;
+        } else {
+          this['toWireType'] = nonConstNoSmartPtrRawPointerToWireType;
+          this.destructorFunction = null;
+        }
       } else {
-          this['toWireType'] = genericPointerToWireType;
-          // Here we must leave this.destructorFunction undefined, since whether genericPointerToWireType returns
-          // a pointer that needs to be freed up is runtime-dependent, and cannot be evaluated at registration time.
-          // TODO: Create an alternative mechanism that allows removing the use of var destructors = []; array in
-          //       craftInvokerFunction altogether.
+        this['toWireType'] = genericPointerToWireType;
+        // Here we must leave this.destructorFunction undefined, since whether genericPointerToWireType returns
+        // a pointer that needs to be freed up is runtime-dependent, and cannot be evaluated at registration time.
+        // TODO: Create an alternative mechanism that allows removing the use of var destructors = []; array in
+        //       craftInvokerFunction altogether.
       }
     }
   
   /** @param {number=} numArguments */
   function replacePublicSymbol(name, value, numArguments) {
       if (!Module.hasOwnProperty(name)) {
-          throwInternalError('Replacing nonexistant public symbol');
+        throwInternalError('Replacing nonexistant public symbol');
       }
       // If there's an overload table for this symbol, replace the symbol in the overload table instead.
       if (undefined !== Module[name].overloadTable && undefined !== numArguments) {
-          Module[name].overloadTable[numArguments] = value;
+        Module[name].overloadTable[numArguments] = value;
       }
       else {
-          Module[name] = value;
-          Module[name].argCount = numArguments;
+        Module[name] = value;
+        Module[name].argCount = numArguments;
       }
     }
   
@@ -5343,129 +5287,123 @@ var ASM_CONSTS = {
       var unboundTypes = [];
       var seen = {};
       function visit(type) {
-          if (seen[type]) {
-              return;
-          }
-          if (registeredTypes[type]) {
-              return;
-          }
-          if (typeDependencies[type]) {
-              typeDependencies[type].forEach(visit);
-              return;
-          }
-          unboundTypes.push(type);
-          seen[type] = true;
+        if (seen[type]) {
+          return;
+        }
+        if (registeredTypes[type]) {
+          return;
+        }
+        if (typeDependencies[type]) {
+          typeDependencies[type].forEach(visit);
+          return;
+        }
+        unboundTypes.push(type);
+        seen[type] = true;
       }
       types.forEach(visit);
   
       throw new UnboundTypeError(message + ': ' + unboundTypes.map(getTypeName).join([', ']));
     }
-  function __embind_register_class(
-      rawType,
-      rawPointerType,
-      rawConstPointerType,
-      baseClassRawType,
-      getActualTypeSignature,
-      getActualType,
-      upcastSignature,
-      upcast,
-      downcastSignature,
-      downcast,
-      name,
-      destructorSignature,
-      rawDestructor
-    ) {
+  function __embind_register_class(rawType,
+                                     rawPointerType,
+                                     rawConstPointerType,
+                                     baseClassRawType,
+                                     getActualTypeSignature,
+                                     getActualType,
+                                     upcastSignature,
+                                     upcast,
+                                     downcastSignature,
+                                     downcast,
+                                     name,
+                                     destructorSignature,
+                                     rawDestructor) {
       name = readLatin1String(name);
       getActualType = embind__requireFunction(getActualTypeSignature, getActualType);
       if (upcast) {
-          upcast = embind__requireFunction(upcastSignature, upcast);
+        upcast = embind__requireFunction(upcastSignature, upcast);
       }
       if (downcast) {
-          downcast = embind__requireFunction(downcastSignature, downcast);
+        downcast = embind__requireFunction(downcastSignature, downcast);
       }
       rawDestructor = embind__requireFunction(destructorSignature, rawDestructor);
       var legalFunctionName = makeLegalFunctionName(name);
   
       exposePublicSymbol(legalFunctionName, function() {
-          // this code cannot run if baseClassRawType is zero
-          throwUnboundTypeError('Cannot construct ' + name + ' due to unbound types', [baseClassRawType]);
+        // this code cannot run if baseClassRawType is zero
+        throwUnboundTypeError('Cannot construct ' + name + ' due to unbound types', [baseClassRawType]);
       });
   
       whenDependentTypesAreResolved(
-          [rawType, rawPointerType, rawConstPointerType],
-          baseClassRawType ? [baseClassRawType] : [],
-          function(base) {
-              base = base[0];
+        [rawType, rawPointerType, rawConstPointerType],
+        baseClassRawType ? [baseClassRawType] : [],
+        function(base) {
+          base = base[0];
   
-              var baseClass;
-              var basePrototype;
-              if (baseClassRawType) {
-                  baseClass = base.registeredClass;
-                  basePrototype = baseClass.instancePrototype;
-              } else {
-                  basePrototype = ClassHandle.prototype;
-              }
-  
-              var constructor = createNamedFunction(legalFunctionName, function() {
-                  if (Object.getPrototypeOf(this) !== instancePrototype) {
-                      throw new BindingError("Use 'new' to construct " + name);
-                  }
-                  if (undefined === registeredClass.constructor_body) {
-                      throw new BindingError(name + " has no accessible constructor");
-                  }
-                  var body = registeredClass.constructor_body[arguments.length];
-                  if (undefined === body) {
-                      throw new BindingError("Tried to invoke ctor of " + name + " with invalid number of parameters (" + arguments.length + ") - expected (" + Object.keys(registeredClass.constructor_body).toString() + ") parameters instead!");
-                  }
-                  return body.apply(this, arguments);
-              });
-  
-              var instancePrototype = Object.create(basePrototype, {
-                  constructor: { value: constructor },
-              });
-  
-              constructor.prototype = instancePrototype;
-  
-              var registeredClass = new RegisteredClass(
-                  name,
-                  constructor,
-                  instancePrototype,
-                  rawDestructor,
-                  baseClass,
-                  getActualType,
-                  upcast,
-                  downcast);
-  
-              var referenceConverter = new RegisteredPointer(
-                  name,
-                  registeredClass,
-                  true,
-                  false,
-                  false);
-  
-              var pointerConverter = new RegisteredPointer(
-                  name + '*',
-                  registeredClass,
-                  false,
-                  false,
-                  false);
-  
-              var constPointerConverter = new RegisteredPointer(
-                  name + ' const*',
-                  registeredClass,
-                  false,
-                  true,
-                  false);
-  
-              registeredPointers[rawType] = {
-                  pointerType: pointerConverter,
-                  constPointerType: constPointerConverter
-              };
-  
-              replacePublicSymbol(legalFunctionName, constructor);
-  
-              return [referenceConverter, pointerConverter, constPointerConverter];
+          var baseClass;
+          var basePrototype;
+          if (baseClassRawType) {
+            baseClass = base.registeredClass;
+            basePrototype = baseClass.instancePrototype;
+          } else {
+            basePrototype = ClassHandle.prototype;
           }
+  
+          var constructor = createNamedFunction(legalFunctionName, function() {
+            if (Object.getPrototypeOf(this) !== instancePrototype) {
+              throw new BindingError("Use 'new' to construct " + name);
+            }
+            if (undefined === registeredClass.constructor_body) {
+              throw new BindingError(name + " has no accessible constructor");
+            }
+            var body = registeredClass.constructor_body[arguments.length];
+            if (undefined === body) {
+              throw new BindingError("Tried to invoke ctor of " + name + " with invalid number of parameters (" + arguments.length + ") - expected (" + Object.keys(registeredClass.constructor_body).toString() + ") parameters instead!");
+            }
+            return body.apply(this, arguments);
+          });
+  
+          var instancePrototype = Object.create(basePrototype, {
+            constructor: { value: constructor },
+          });
+  
+          constructor.prototype = instancePrototype;
+  
+          var registeredClass = new RegisteredClass(name,
+                                                    constructor,
+                                                    instancePrototype,
+                                                    rawDestructor,
+                                                    baseClass,
+                                                    getActualType,
+                                                    upcast,
+                                                    downcast);
+  
+          var referenceConverter = new RegisteredPointer(name,
+                                                         registeredClass,
+                                                         true,
+                                                         false,
+                                                         false);
+  
+          var pointerConverter = new RegisteredPointer(name + '*',
+                                                       registeredClass,
+                                                       false,
+                                                       false,
+                                                       false);
+  
+          var constPointerConverter = new RegisteredPointer(name + ' const*',
+                                                            registeredClass,
+                                                            false,
+                                                            true,
+                                                            false);
+  
+          registeredPointers[rawType] = {
+            pointerType: pointerConverter,
+            constPointerType: constPointerConverter
+          };
+  
+          replacePublicSymbol(legalFunctionName, constructor);
+  
+          return [referenceConverter, pointerConverter, constPointerConverter];
+        }
       );
     }
 
@@ -5480,9 +5418,9 @@ var ASM_CONSTS = {
   
   function runDestructors(destructors) {
       while (destructors.length) {
-          var ptr = destructors.pop();
-          var del = destructors.pop();
-          del(ptr);
+        var ptr = destructors.pop();
+        var del = destructors.pop();
+        del(ptr);
       }
     }
   function __embind_register_class_constructor(
@@ -5500,43 +5438,42 @@ var ASM_CONSTS = {
       var destructors = [];
   
       whenDependentTypesAreResolved([], [rawClassType], function(classType) {
-          classType = classType[0];
-          var humanName = 'constructor ' + classType.name;
+        classType = classType[0];
+        var humanName = 'constructor ' + classType.name;
   
-          if (undefined === classType.registeredClass.constructor_body) {
-              classType.registeredClass.constructor_body = [];
-          }
-          if (undefined !== classType.registeredClass.constructor_body[argCount - 1]) {
-              throw new BindingError("Cannot register multiple constructors with identical number of parameters (" + (argCount-1) + ") for class '" + classType.name + "'! Overload resolution is currently only performed using the parameter count, not actual type info!");
-          }
-          classType.registeredClass.constructor_body[argCount - 1] = () => {
-              throwUnboundTypeError('Cannot construct ' + classType.name + ' due to unbound types', rawArgTypes);
-          };
+        if (undefined === classType.registeredClass.constructor_body) {
+          classType.registeredClass.constructor_body = [];
+        }
+        if (undefined !== classType.registeredClass.constructor_body[argCount - 1]) {
+          throw new BindingError("Cannot register multiple constructors with identical number of parameters (" + (argCount-1) + ") for class '" + classType.name + "'! Overload resolution is currently only performed using the parameter count, not actual type info!");
+        }
+        classType.registeredClass.constructor_body[argCount - 1] = () => {
+          throwUnboundTypeError('Cannot construct ' + classType.name + ' due to unbound types', rawArgTypes);
+        };
   
-          whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
-              // Insert empty slot for context type (argTypes[1]).
-              argTypes.splice(1, 0, null);
-              classType.registeredClass.constructor_body[argCount - 1] = craftInvokerFunction(humanName, argTypes, null, invoker, rawConstructor);
-              return [];
-          });
+        whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
+          // Insert empty slot for context type (argTypes[1]).
+          argTypes.splice(1, 0, null);
+          classType.registeredClass.constructor_body[argCount - 1] = craftInvokerFunction(humanName, argTypes, null, invoker, rawConstructor);
           return [];
+        });
+        return [];
       });
     }
 
   function new_(constructor, argumentList) {
       if (!(constructor instanceof Function)) {
-          throw new TypeError('new_ called with constructor type ' + typeof(constructor) + " which is not a function");
+        throw new TypeError('new_ called with constructor type ' + typeof(constructor) + " which is not a function");
       }
-  
       /*
        * Previously, the following line was just:
-  
-       function dummy() {};
-  
-       * Unfortunately, Chrome was preserving 'dummy' as the object's name, even though at creation, the 'dummy' has the
-       * correct constructor name.  Thus, objects created with IMVU.new would show up in the debugger as 'dummy', which
-       * isn't very helpful.  Using IMVU.createNamedFunction addresses the issue.  Doublely-unfortunately, there's no way
-       * to write a test for this behavior.  -NRD 2013.02.22
+       *   function dummy() {};
+       * Unfortunately, Chrome was preserving 'dummy' as the object's name, even
+       * though at creation, the 'dummy' has the correct constructor name.  Thus,
+       * objects created with IMVU.new would show up in the debugger as 'dummy',
+       * which isn't very helpful.  Using IMVU.createNamedFunction addresses the
+       * issue.  Doublely-unfortunately, there's no way to write a test for this
+       * behavior.  -NRD 2013.02.22
        */
       var dummy = createNamedFunction(constructor.name || 'unknownFunctionName', function(){});
       dummy.prototype = constructor.prototype;
@@ -5557,7 +5494,7 @@ var ASM_CONSTS = {
       var argCount = argTypes.length;
   
       if (argCount < 2) {
-          throwBindingError("argTypes array size mismatch! Must at least get return value and 'this' types!");
+        throwBindingError("argTypes array size mismatch! Must at least get return value and 'this' types!");
       }
   
       var isClassMethodFunc = (argTypes[1] !== null && classType !== null);
@@ -5573,10 +5510,10 @@ var ASM_CONSTS = {
       var needsDestructorStack = false;
   
       for (var i = 1; i < argTypes.length; ++i) { // Skip return value at index 0 - it's not deleted here.
-          if (argTypes[i] !== null && argTypes[i].destructorFunction === undefined) { // The type does not define a destructor function - must use dynamic stack
-              needsDestructorStack = true;
-              break;
-          }
+        if (argTypes[i] !== null && argTypes[i].destructorFunction === undefined) { // The type does not define a destructor function - must use dynamic stack
+          needsDestructorStack = true;
+          break;
+        }
       }
   
       var returns = (argTypes[0].name !== "void");
@@ -5584,8 +5521,8 @@ var ASM_CONSTS = {
       var argsList = "";
       var argsListWired = "";
       for (var i = 0; i < argCount - 2; ++i) {
-          argsList += (i!==0?", ":"")+"arg"+i;
-          argsListWired += (i!==0?", ":"")+"arg"+i+"Wired";
+        argsList += (i!==0?", ":"")+"arg"+i;
+        argsListWired += (i!==0?", ":"")+"arg"+i+"Wired";
       }
   
       var invokerFnBody =
@@ -5595,8 +5532,7 @@ var ASM_CONSTS = {
           "}\n";
   
       if (needsDestructorStack) {
-          invokerFnBody +=
-              "var destructors = [];\n";
+        invokerFnBody += "var destructors = [];\n";
       }
   
       var dtorStack = needsDestructorStack ? "destructors" : "null";
@@ -5604,38 +5540,38 @@ var ASM_CONSTS = {
       var args2 = [throwBindingError, cppInvokerFunc, cppTargetFunc, runDestructors, argTypes[0], argTypes[1]];
   
       if (isClassMethodFunc) {
-          invokerFnBody += "var thisWired = classParam.toWireType("+dtorStack+", this);\n";
+        invokerFnBody += "var thisWired = classParam.toWireType("+dtorStack+", this);\n";
       }
   
       for (var i = 0; i < argCount - 2; ++i) {
-          invokerFnBody += "var arg"+i+"Wired = argType"+i+".toWireType("+dtorStack+", arg"+i+"); // "+argTypes[i+2].name+"\n";
-          args1.push("argType"+i);
-          args2.push(argTypes[i+2]);
+        invokerFnBody += "var arg"+i+"Wired = argType"+i+".toWireType("+dtorStack+", arg"+i+"); // "+argTypes[i+2].name+"\n";
+        args1.push("argType"+i);
+        args2.push(argTypes[i+2]);
       }
   
       if (isClassMethodFunc) {
-          argsListWired = "thisWired" + (argsListWired.length > 0 ? ", " : "") + argsListWired;
+        argsListWired = "thisWired" + (argsListWired.length > 0 ? ", " : "") + argsListWired;
       }
   
       invokerFnBody +=
           (returns?"var rv = ":"") + "invoker(fn"+(argsListWired.length>0?", ":"")+argsListWired+");\n";
   
       if (needsDestructorStack) {
-          invokerFnBody += "runDestructors(destructors);\n";
+        invokerFnBody += "runDestructors(destructors);\n";
       } else {
-          for (var i = isClassMethodFunc?1:2; i < argTypes.length; ++i) { // Skip return value at index 0 - it's not deleted here. Also skip class type if not a method.
-              var paramName = (i === 1 ? "thisWired" : ("arg"+(i - 2)+"Wired"));
-              if (argTypes[i].destructorFunction !== null) {
-                  invokerFnBody += paramName+"_dtor("+paramName+"); // "+argTypes[i].name+"\n";
-                  args1.push(paramName+"_dtor");
-                  args2.push(argTypes[i].destructorFunction);
-              }
+        for (var i = isClassMethodFunc?1:2; i < argTypes.length; ++i) { // Skip return value at index 0 - it's not deleted here. Also skip class type if not a method.
+          var paramName = (i === 1 ? "thisWired" : ("arg"+(i - 2)+"Wired"));
+          if (argTypes[i].destructorFunction !== null) {
+            invokerFnBody += paramName+"_dtor("+paramName+"); // "+argTypes[i].name+"\n";
+            args1.push(paramName+"_dtor");
+            args2.push(argTypes[i].destructorFunction);
           }
+        }
       }
   
       if (returns) {
-          invokerFnBody += "var ret = retType.fromWireType(rv);\n" +
-                           "return ret;\n";
+        invokerFnBody += "var ret = retType.fromWireType(rv);\n" +
+                         "return ret;\n";
       } else {
       }
   
@@ -5646,66 +5582,65 @@ var ASM_CONSTS = {
       var invokerFunction = new_(Function, args1).apply(null, args2);
       return invokerFunction;
     }
-  function __embind_register_class_function(
-      rawClassType,
-      methodName,
-      argCount,
-      rawArgTypesAddr, // [ReturnType, ThisType, Args...]
-      invokerSignature,
-      rawInvoker,
-      context,
-      isPureVirtual
-    ) {
+  function __embind_register_class_function(rawClassType,
+                                              methodName,
+                                              argCount,
+                                              rawArgTypesAddr, // [ReturnType, ThisType, Args...]
+                                              invokerSignature,
+                                              rawInvoker,
+                                              context,
+                                              isPureVirtual) {
       var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
       methodName = readLatin1String(methodName);
       rawInvoker = embind__requireFunction(invokerSignature, rawInvoker);
   
       whenDependentTypesAreResolved([], [rawClassType], function(classType) {
-          classType = classType[0];
-          var humanName = classType.name + '.' + methodName;
+        classType = classType[0];
+        var humanName = classType.name + '.' + methodName;
   
-          if (methodName.startsWith("@@")) {
-              methodName = Symbol[methodName.substring(2)];
-          }
+        if (methodName.startsWith("@@")) {
+          methodName = Symbol[methodName.substring(2)];
+        }
   
-          if (isPureVirtual) {
-              classType.registeredClass.pureVirtualFunctions.push(methodName);
-          }
+        if (isPureVirtual) {
+          classType.registeredClass.pureVirtualFunctions.push(methodName);
+        }
   
-          function unboundTypesHandler() {
-              throwUnboundTypeError('Cannot call ' + humanName + ' due to unbound types', rawArgTypes);
-          }
+        function unboundTypesHandler() {
+          throwUnboundTypeError('Cannot call ' + humanName + ' due to unbound types', rawArgTypes);
+        }
   
-          var proto = classType.registeredClass.instancePrototype;
-          var method = proto[methodName];
-          if (undefined === method || (undefined === method.overloadTable && method.className !== classType.name && method.argCount === argCount - 2)) {
-              // This is the first overload to be registered, OR we are replacing a function in the base class with a function in the derived class.
-              unboundTypesHandler.argCount = argCount - 2;
-              unboundTypesHandler.className = classType.name;
-              proto[methodName] = unboundTypesHandler;
+        var proto = classType.registeredClass.instancePrototype;
+        var method = proto[methodName];
+        if (undefined === method || (undefined === method.overloadTable && method.className !== classType.name && method.argCount === argCount - 2)) {
+          // This is the first overload to be registered, OR we are replacing a
+          // function in the base class with a function in the derived class.
+          unboundTypesHandler.argCount = argCount - 2;
+          unboundTypesHandler.className = classType.name;
+          proto[methodName] = unboundTypesHandler;
+        } else {
+          // There was an existing function with the same name registered. Set up
+          // a function overload routing table.
+          ensureOverloadTable(proto, methodName, humanName);
+          proto[methodName].overloadTable[argCount - 2] = unboundTypesHandler;
+        }
+  
+        whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
+          var memberFunction = craftInvokerFunction(humanName, argTypes, classType, rawInvoker, context);
+  
+          // Replace the initial unbound-handler-stub function with the appropriate member function, now that all types
+          // are resolved. If multiple overloads are registered for this function, the function goes into an overload table.
+          if (undefined === proto[methodName].overloadTable) {
+            // Set argCount in case an overload is registered later
+            memberFunction.argCount = argCount - 2;
+            proto[methodName] = memberFunction;
           } else {
-              // There was an existing function with the same name registered. Set up a function overload routing table.
-              ensureOverloadTable(proto, methodName, humanName);
-              proto[methodName].overloadTable[argCount - 2] = unboundTypesHandler;
+            proto[methodName].overloadTable[argCount - 2] = memberFunction;
           }
   
-          whenDependentTypesAreResolved([], rawArgTypes, function(argTypes) {
-  
-              var memberFunction = craftInvokerFunction(humanName, argTypes, classType, rawInvoker, context);
-  
-              // Replace the initial unbound-handler-stub function with the appropriate member function, now that all types
-              // are resolved. If multiple overloads are registered for this function, the function goes into an overload table.
-              if (undefined === proto[methodName].overloadTable) {
-                  // Set argCount in case an overload is registered later
-                  memberFunction.argCount = argCount - 2;
-                  proto[methodName] = memberFunction;
-              } else {
-                  proto[methodName].overloadTable[argCount - 2] = memberFunction;
-              }
-  
-              return [];
-          });
           return [];
+        });
+        return [];
       });
     }
 
@@ -5714,26 +5649,26 @@ var ASM_CONSTS = {
   var emval_handle_array = [{},{value:undefined},{value:null},{value:true},{value:false}];
   function __emval_decref(handle) {
       if (handle > 4 && 0 === --emval_handle_array[handle].refcount) {
-          emval_handle_array[handle] = undefined;
-          emval_free_list.push(handle);
+        emval_handle_array[handle] = undefined;
+        emval_free_list.push(handle);
       }
     }
   
   function count_emval_handles() {
       var count = 0;
       for (var i = 5; i < emval_handle_array.length; ++i) {
-          if (emval_handle_array[i] !== undefined) {
-              ++count;
-          }
+        if (emval_handle_array[i] !== undefined) {
+          ++count;
+        }
       }
       return count;
     }
   
   function get_first_emval() {
       for (var i = 5; i < emval_handle_array.length; ++i) {
-          if (emval_handle_array[i] !== undefined) {
-              return emval_handle_array[i];
-          }
+        if (emval_handle_array[i] !== undefined) {
+          return emval_handle_array[i];
+        }
       }
       return null;
     }
@@ -5741,45 +5676,45 @@ var ASM_CONSTS = {
       Module['count_emval_handles'] = count_emval_handles;
       Module['get_first_emval'] = get_first_emval;
     }
-  var Emval = {toValue:function(handle) {
+  var Emval = {toValue:(handle) => {
         if (!handle) {
             throwBindingError('Cannot use deleted val. handle = ' + handle);
         }
         return emval_handle_array[handle].value;
-      },toHandle:function(value) {
+      },toHandle:(value) => {
         switch (value) {
-          case undefined :{ return 1; }
-          case null :{ return 2; }
-          case true :{ return 3; }
-          case false :{ return 4; }
+          case undefined: return 1;
+          case null: return 2;
+          case true: return 3;
+          case false: return 4;
           default:{
             var handle = emval_free_list.length ?
                 emval_free_list.pop() :
                 emval_handle_array.length;
-    
+  
             emval_handle_array[handle] = {refcount: 1, value: value};
             return handle;
-            }
           }
+        }
       }};
   function __embind_register_emval(rawType, name) {
       name = readLatin1String(name);
       registerType(rawType, {
-          name: name,
-          'fromWireType': function(handle) {
-              var rv = Emval.toValue(handle);
-              __emval_decref(handle);
-              return rv;
-          },
-          'toWireType': function(destructors, value) {
-              return Emval.toHandle(value);
-          },
-          'argPackAdvance': 8,
-          'readValueFromPointer': simpleReadValueFromPointer,
-          destructorFunction: null, // This type does not need a destructor
+        name: name,
+        'fromWireType': function(handle) {
+          var rv = Emval.toValue(handle);
+          __emval_decref(handle);
+          return rv;
+        },
+        'toWireType': function(destructors, value) {
+          return Emval.toHandle(value);
+        },
+        'argPackAdvance': 8,
+        'readValueFromPointer': simpleReadValueFromPointer,
+        destructorFunction: null, // This type does not need a destructor
   
-          // TODO: do we need a deleteObject here?  write a test where
-          // emval is passed into JS via an interface
+        // TODO: do we need a deleteObject here?  write a test where
+        // emval is passed into JS via an interface
       });
     }
 
@@ -5895,34 +5830,34 @@ var ASM_CONSTS = {
 
   function __embind_register_memory_view(rawType, dataTypeIndex, name) {
       var typeMapping = [
-          Int8Array,
-          Uint8Array,
-          Int16Array,
-          Uint16Array,
-          Int32Array,
-          Uint32Array,
-          Float32Array,
-          Float64Array,
+        Int8Array,
+        Uint8Array,
+        Int16Array,
+        Uint16Array,
+        Int32Array,
+        Uint32Array,
+        Float32Array,
+        Float64Array,
       ];
   
       var TA = typeMapping[dataTypeIndex];
   
       function decodeMemoryView(handle) {
-          handle = handle >> 2;
-          var heap = HEAPU32;
-          var size = heap[handle]; // in elements
-          var data = heap[handle + 1]; // byte offset into emscripten heap
-          return new TA(buffer, data, size);
+        handle = handle >> 2;
+        var heap = HEAPU32;
+        var size = heap[handle]; // in elements
+        var data = heap[handle + 1]; // byte offset into emscripten heap
+        return new TA(buffer, data, size);
       }
   
       name = readLatin1String(name);
       registerType(rawType, {
-          name: name,
-          'fromWireType': decodeMemoryView,
-          'argPackAdvance': 8,
-          'readValueFromPointer': decodeMemoryView,
+        name: name,
+        'fromWireType': decodeMemoryView,
+        'argPackAdvance': 8,
+        'readValueFromPointer': decodeMemoryView,
       }, {
-          ignoreDuplicateRegistrations: true,
+        ignoreDuplicateRegistrations: true,
       });
     }
 
@@ -6022,67 +5957,67 @@ var ASM_CONSTS = {
       name = readLatin1String(name);
       var decodeString, encodeString, getHeap, lengthBytesUTF, shift;
       if (charSize === 2) {
-          decodeString = UTF16ToString;
-          encodeString = stringToUTF16;
-          lengthBytesUTF = lengthBytesUTF16;
-          getHeap = () => HEAPU16;
-          shift = 1;
+        decodeString = UTF16ToString;
+        encodeString = stringToUTF16;
+        lengthBytesUTF = lengthBytesUTF16;
+        getHeap = () => HEAPU16;
+        shift = 1;
       } else if (charSize === 4) {
-          decodeString = UTF32ToString;
-          encodeString = stringToUTF32;
-          lengthBytesUTF = lengthBytesUTF32;
-          getHeap = () => HEAPU32;
-          shift = 2;
+        decodeString = UTF32ToString;
+        encodeString = stringToUTF32;
+        lengthBytesUTF = lengthBytesUTF32;
+        getHeap = () => HEAPU32;
+        shift = 2;
       }
       registerType(rawType, {
-          name: name,
-          'fromWireType': function(value) {
-              // Code mostly taken from _embind_register_std_string fromWireType
-              var length = HEAPU32[value >> 2];
-              var HEAP = getHeap();
-              var str;
+        name: name,
+        'fromWireType': function(value) {
+          // Code mostly taken from _embind_register_std_string fromWireType
+          var length = HEAPU32[value >> 2];
+          var HEAP = getHeap();
+          var str;
   
-              var decodeStartPtr = value + 4;
-              // Looping here to support possible embedded '0' bytes
-              for (var i = 0; i <= length; ++i) {
-                  var currentBytePtr = value + 4 + i * charSize;
-                  if (i == length || HEAP[currentBytePtr >> shift] == 0) {
-                      var maxReadBytes = currentBytePtr - decodeStartPtr;
-                      var stringSegment = decodeString(decodeStartPtr, maxReadBytes);
-                      if (str === undefined) {
-                          str = stringSegment;
-                      } else {
-                          str += String.fromCharCode(0);
-                          str += stringSegment;
-                      }
-                      decodeStartPtr = currentBytePtr + charSize;
-                  }
+          var decodeStartPtr = value + 4;
+          // Looping here to support possible embedded '0' bytes
+          for (var i = 0; i <= length; ++i) {
+            var currentBytePtr = value + 4 + i * charSize;
+            if (i == length || HEAP[currentBytePtr >> shift] == 0) {
+              var maxReadBytes = currentBytePtr - decodeStartPtr;
+              var stringSegment = decodeString(decodeStartPtr, maxReadBytes);
+              if (str === undefined) {
+                str = stringSegment;
+              } else {
+                str += String.fromCharCode(0);
+                str += stringSegment;
               }
+              decodeStartPtr = currentBytePtr + charSize;
+            }
+          }
   
-              _free(value);
+          _free(value);
   
-              return str;
-          },
-          'toWireType': function(destructors, value) {
-              if (!(typeof value == 'string')) {
-                  throwBindingError('Cannot pass non-string to C++ string type ' + name);
-              }
+          return str;
+        },
+        'toWireType': function(destructors, value) {
+          if (!(typeof value == 'string')) {
+            throwBindingError('Cannot pass non-string to C++ string type ' + name);
+          }
   
-              // assumes 4-byte alignment
-              var length = lengthBytesUTF(value);
-              var ptr = _malloc(4 + length + charSize);
-              HEAPU32[ptr >> 2] = length >> shift;
+          // assumes 4-byte alignment
+          var length = lengthBytesUTF(value);
+          var ptr = _malloc(4 + length + charSize);
+          HEAPU32[ptr >> 2] = length >> shift;
   
-              encodeString(value, ptr + 4, length + charSize);
+          encodeString(value, ptr + 4, length + charSize);
   
-              if (destructors !== null) {
-                  destructors.push(_free, ptr);
-              }
-              return ptr;
-          },
-          'argPackAdvance': 8,
-          'readValueFromPointer': simpleReadValueFromPointer,
-          destructorFunction: function(ptr) { _free(ptr); },
+          if (destructors !== null) {
+            destructors.push(_free, ptr);
+          }
+          return ptr;
+        },
+        'argPackAdvance': 8,
+        'readValueFromPointer': simpleReadValueFromPointer,
+        destructorFunction: function(ptr) { _free(ptr); },
       });
     }
 
@@ -6100,6 +6035,10 @@ var ASM_CONSTS = {
               return undefined;
           },
       });
+    }
+
+  function __emscripten_date_now() {
+      return Date.now();
     }
 
   function requireRegisteredType(rawType, humanName) {
@@ -6128,10 +6067,9 @@ var ASM_CONSTS = {
   function getStringOrSymbol(address) {
       var symbol = emval_symbols[address];
       if (symbol === undefined) {
-          return readLatin1String(address);
-      } else {
-          return symbol;
+        return readLatin1String(address);
       }
+      return symbol;
     }
   
   var emval_methodCallers = [];
@@ -6152,9 +6090,8 @@ var ASM_CONSTS = {
   function __emval_lookupTypes(argCount, argTypes) {
       var a = new Array(argCount);
       for (var i = 0; i < argCount; ++i) {
-          a[i] = requireRegisteredType(
-              HEAP32[(argTypes >> 2) + i],
-              "parameter " + i);
+        a[i] = requireRegisteredType(HEAP32[(argTypes >> 2) + i],
+                                     "parameter " + i);
       }
       return a;
     }
@@ -6174,9 +6111,9 @@ var ASM_CONSTS = {
   
       var argsList = ""; // 'arg0, arg1, arg2, ... , argN'
       for (var i = 0; i < argCount - 1; ++i) {
-          argsList += (i !== 0 ? ", " : "") + "arg" + i;
-          params.push("argType" + i);
-          args.push(types[1 + i]);
+        argsList += (i !== 0 ? ", " : "") + "arg" + i;
+        params.push("argType" + i);
+        args.push(types[1 + i]);
       }
   
       var functionName = makeLegalFunctionName("methodCaller_" + signatureName);
@@ -6219,7 +6156,7 @@ var ASM_CONSTS = {
 
   function __emval_incref(handle) {
       if (handle > 4) {
-          emval_handle_array[handle].refcount += 1;
+        emval_handle_array[handle].refcount += 1;
       }
     }
 
@@ -6314,11 +6251,6 @@ var ASM_CONSTS = {
       abort('native code called abort()');
     }
 
-  function _clock() {
-      if (_clock.start === undefined) _clock.start = Date.now();
-      return ((Date.now() - _clock.start) * (1000000 / 1000))|0;
-    }
-
   function _emscripten_memcpy_big(dest, src, num) {
       HEAPU8.copyWithin(dest, src, src + num);
     }
@@ -6346,7 +6278,7 @@ var ASM_CONSTS = {
   function _emscripten_resize_heap(requestedSize) {
       var oldSize = HEAPU8.length;
       requestedSize = requestedSize >>> 0;
-      // With pthreads, races can happen (another thread might increase the size
+      // With multithreaded builds, races can happen (another thread might increase the size
       // in between), so return a failure, and let the caller retry.
       assert(requestedSize > oldSize);
   
@@ -6374,6 +6306,8 @@ var ASM_CONSTS = {
         err('Cannot enlarge memory, asked to go up to ' + requestedSize + ' bytes, but the limit is ' + maxHeapSize + ' bytes!');
         return false;
       }
+  
+      let alignUp = (x, multiple) => x + (multiple - x % multiple) % multiple;
   
       // Loop through potential heap size increases. If we attempt a too eager
       // reservation that fails, cut down on the attempted size and reserve a
@@ -6772,23 +6706,8 @@ var ASM_CONSTS = {
           return date.tm_wday || 7;
         },
         '%U': function(date) {
-          // Replaced by the week number of the year as a decimal number [00,53].
-          // The first Sunday of January is the first day of week 1;
-          // days in the new year before this are in week 0. [ tm_year, tm_wday, tm_yday]
-          var janFirst = new Date(date.tm_year+1900, 0, 1);
-          var firstSunday = janFirst.getDay() === 0 ? janFirst : __addDays(janFirst, 7-janFirst.getDay());
-          var endDate = new Date(date.tm_year+1900, date.tm_mon, date.tm_mday);
-  
-          // is target date after the first Sunday?
-          if (compareByDay(firstSunday, endDate) < 0) {
-            // calculate difference in days between first Sunday and endDate
-            var februaryFirstUntilEndMonth = __arraySum(__isLeapYear(endDate.getFullYear()) ? __MONTH_DAYS_LEAP : __MONTH_DAYS_REGULAR, endDate.getMonth()-1)-31;
-            var firstSundayUntilEndJanuary = 31-firstSunday.getDate();
-            var days = firstSundayUntilEndJanuary+februaryFirstUntilEndMonth+endDate.getDate();
-            return leadingNulls(Math.ceil(days/7), 2);
-          }
-  
-          return compareByDay(firstSunday, janFirst) === 0 ? '01': '00';
+          var days = date.tm_yday + 7 - date.tm_wday;
+          return leadingNulls(Math.floor(days / 7), 2);
         },
         '%V': function(date) {
           // Replaced by the week number of the year (Monday as the first day of the week)
@@ -6796,54 +6715,35 @@ var ASM_CONSTS = {
           // or more days in the new year, then it is considered week 1.
           // Otherwise, it is the last week of the previous year, and the next week is week 1.
           // Both January 4th and the first Thursday of January are always in week 1. [ tm_year, tm_wday, tm_yday]
-          var janFourthThisYear = new Date(date.tm_year+1900, 0, 4);
-          var janFourthNextYear = new Date(date.tm_year+1901, 0, 4);
-  
-          var firstWeekStartThisYear = getFirstWeekStartDate(janFourthThisYear);
-          var firstWeekStartNextYear = getFirstWeekStartDate(janFourthNextYear);
-  
-          var endDate = __addDays(new Date(date.tm_year+1900, 0, 1), date.tm_yday);
-  
-          if (compareByDay(endDate, firstWeekStartThisYear) < 0) {
-            // if given date is before this years first week, then it belongs to the 53rd week of last year
-            return '53';
+          var val = Math.floor((date.tm_yday + 7 - (date.tm_wday + 6) % 7 ) / 7);
+          // If 1 Jan is just 1-3 days past Monday, the previous week
+          // is also in this year.
+          if ((date.tm_wday + 371 - date.tm_yday - 2) % 7 <= 2) {
+            val++;
           }
-  
-          if (compareByDay(firstWeekStartNextYear, endDate) <= 0) {
-            // if given date is after next years first week, then it belongs to the 01th week of next year
-            return '01';
+          if (!val) {
+            val = 52;
+            // If 31 December of prev year a Thursday, or Friday of a
+            // leap year, then the prev year has 53 weeks.
+            var dec31 = (date.tm_wday + 7 - date.tm_yday - 1) % 7;
+            if (dec31 == 4 || (dec31 == 5 && __isLeapYear(date.tm_year%400-1))) {
+              val++;
+            }
+          } else if (val == 53) {
+            // If 1 January is not a Thursday, and not a Wednesday of a
+            // leap year, then this year has only 52 weeks.
+            var jan1 = (date.tm_wday + 371 - date.tm_yday) % 7;
+            if (jan1 != 4 && (jan1 != 3 || !__isLeapYear(date.tm_year)))
+              val = 1;
           }
-  
-          // given date is in between CW 01..53 of this calendar year
-          var daysDifference;
-          if (firstWeekStartThisYear.getFullYear() < date.tm_year+1900) {
-            // first CW of this year starts last year
-            daysDifference = date.tm_yday+32-firstWeekStartThisYear.getDate()
-          } else {
-            // first CW of this year starts this year
-            daysDifference = date.tm_yday+1-firstWeekStartThisYear.getDate();
-          }
-          return leadingNulls(Math.ceil(daysDifference/7), 2);
+          return leadingNulls(val, 2);
         },
         '%w': function(date) {
           return date.tm_wday;
         },
         '%W': function(date) {
-          // Replaced by the week number of the year as a decimal number [00,53].
-          // The first Monday of January is the first day of week 1;
-          // days in the new year before this are in week 0. [ tm_year, tm_wday, tm_yday]
-          var janFirst = new Date(date.tm_year, 0, 1);
-          var firstMonday = janFirst.getDay() === 1 ? janFirst : __addDays(janFirst, janFirst.getDay() === 0 ? 1 : 7-janFirst.getDay()+1);
-          var endDate = new Date(date.tm_year+1900, date.tm_mon, date.tm_mday);
-  
-          // is target date after the first Monday?
-          if (compareByDay(firstMonday, endDate) < 0) {
-            var februaryFirstUntilEndMonth = __arraySum(__isLeapYear(endDate.getFullYear()) ? __MONTH_DAYS_LEAP : __MONTH_DAYS_REGULAR, endDate.getMonth()-1)-31;
-            var firstMondayUntilEndJanuary = 31-firstMonday.getDate();
-            var days = firstMondayUntilEndJanuary+februaryFirstUntilEndMonth+endDate.getDate();
-            return leadingNulls(Math.ceil(days/7), 2);
-          }
-          return compareByDay(firstMonday, janFirst) === 0 ? '01': '00';
+          var days = date.tm_yday + 7 - ((date.tm_wday + 6) % 7);
+          return leadingNulls(Math.floor(days / 7), 2);
         },
         '%y': function(date) {
           // Replaced by the last two digits of the year as a decimal number [00,99]. [ tm_year]
@@ -6891,15 +6791,6 @@ var ASM_CONSTS = {
     }
   function _strftime_l(s, maxsize, format, tm) {
       return _strftime(s, maxsize, format, tm); // no locale support yet
-    }
-
-  function _time(ptr) {
-      ;
-      var ret = (Date.now()/1000)|0;
-      if (ptr) {
-        HEAP32[((ptr)>>2)] = ret;
-      }
-      return ret;
     }
 
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
@@ -7108,17 +6999,20 @@ function intArrayToString(array) {
 }
 
 
+function checkIncomingModuleAPI() {
+  ignoredModuleProp('fetchSettings');
+}
 var asmLibraryArg = {
   "__assert_fail": ___assert_fail,
   "__cxa_allocate_exception": ___cxa_allocate_exception,
   "__cxa_throw": ___cxa_throw,
   "__syscall_fcntl64": ___syscall_fcntl64,
   "__syscall_fstat64": ___syscall_fstat64,
-  "__syscall_fstatat64": ___syscall_fstatat64,
   "__syscall_ioctl": ___syscall_ioctl,
   "__syscall_lstat64": ___syscall_lstat64,
   "__syscall_mkdir": ___syscall_mkdir,
-  "__syscall_open": ___syscall_open,
+  "__syscall_newfstatat": ___syscall_newfstatat,
+  "__syscall_openat": ___syscall_openat,
   "__syscall_stat64": ___syscall_stat64,
   "_embind_register_bigint": __embind_register_bigint,
   "_embind_register_bool": __embind_register_bool,
@@ -7132,6 +7026,7 @@ var asmLibraryArg = {
   "_embind_register_std_string": __embind_register_std_string,
   "_embind_register_std_wstring": __embind_register_std_wstring,
   "_embind_register_void": __embind_register_void,
+  "_emscripten_date_now": __emscripten_date_now,
   "_emval_as": __emval_as,
   "_emval_call_void_method": __emval_call_void_method,
   "_emval_decref": __emval_decref,
@@ -7145,7 +7040,6 @@ var asmLibraryArg = {
   "_localtime_js": __localtime_js,
   "_tzset_js": __tzset_js,
   "abort": _abort,
-  "clock": _clock,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
   "environ_get": _environ_get,
@@ -7156,8 +7050,7 @@ var asmLibraryArg = {
   "fd_seek": _fd_seek,
   "fd_write": _fd_write,
   "setTempRet0": _setTempRet0,
-  "strftime_l": _strftime_l,
-  "time": _time
+  "strftime_l": _strftime_l
 };
 var asm = createWasm();
 /** @type {function(...*):?} */
@@ -7231,329 +7124,322 @@ var dynCall_iiiiiijj = Module["dynCall_iiiiiijj"] = createExportWrapper("dynCall
 
 // === Auto-generated postamble setup entry stuff ===
 
-if (!Object.getOwnPropertyDescriptor(Module, "intArrayFromString")) Module["intArrayFromString"] = () => abort("'intArrayFromString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "intArrayToString")) Module["intArrayToString"] = () => abort("'intArrayToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ccall")) Module["ccall"] = () => abort("'ccall' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "cwrap")) Module["cwrap"] = () => abort("'cwrap' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setValue")) Module["setValue"] = () => abort("'setValue' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getValue")) Module["getValue"] = () => abort("'getValue' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "allocate")) Module["allocate"] = () => abort("'allocate' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "UTF8ArrayToString")) Module["UTF8ArrayToString"] = () => abort("'UTF8ArrayToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "UTF8ToString")) Module["UTF8ToString"] = () => abort("'UTF8ToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stringToUTF8Array")) Module["stringToUTF8Array"] = () => abort("'stringToUTF8Array' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stringToUTF8")) Module["stringToUTF8"] = () => abort("'stringToUTF8' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "lengthBytesUTF8")) Module["lengthBytesUTF8"] = () => abort("'lengthBytesUTF8' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stackTrace")) Module["stackTrace"] = () => abort("'stackTrace' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addOnPreRun")) Module["addOnPreRun"] = () => abort("'addOnPreRun' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addOnInit")) Module["addOnInit"] = () => abort("'addOnInit' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addOnPreMain")) Module["addOnPreMain"] = () => abort("'addOnPreMain' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addOnExit")) Module["addOnExit"] = () => abort("'addOnExit' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addOnPostRun")) Module["addOnPostRun"] = () => abort("'addOnPostRun' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeStringToMemory")) Module["writeStringToMemory"] = () => abort("'writeStringToMemory' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeArrayToMemory")) Module["writeArrayToMemory"] = () => abort("'writeArrayToMemory' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeAsciiToMemory")) Module["writeAsciiToMemory"] = () => abort("'writeAsciiToMemory' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addRunDependency")) Module["addRunDependency"] = () => abort("'addRunDependency' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "removeRunDependency")) Module["removeRunDependency"] = () => abort("'removeRunDependency' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createFolder")) Module["FS_createFolder"] = () => abort("'FS_createFolder' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createPath")) Module["FS_createPath"] = () => abort("'FS_createPath' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createDataFile")) Module["FS_createDataFile"] = () => abort("'FS_createDataFile' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createPreloadedFile")) Module["FS_createPreloadedFile"] = () => abort("'FS_createPreloadedFile' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createLazyFile")) Module["FS_createLazyFile"] = () => abort("'FS_createLazyFile' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createLink")) Module["FS_createLink"] = () => abort("'FS_createLink' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_createDevice")) Module["FS_createDevice"] = () => abort("'FS_createDevice' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "FS_unlink")) Module["FS_unlink"] = () => abort("'FS_unlink' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ). Alternatively, forcing filesystem support (-s FORCE_FILESYSTEM=1) can export this for you");
-if (!Object.getOwnPropertyDescriptor(Module, "getLEB")) Module["getLEB"] = () => abort("'getLEB' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getFunctionTables")) Module["getFunctionTables"] = () => abort("'getFunctionTables' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "alignFunctionTables")) Module["alignFunctionTables"] = () => abort("'alignFunctionTables' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerFunctions")) Module["registerFunctions"] = () => abort("'registerFunctions' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "addFunction")) Module["addFunction"] = () => abort("'addFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "removeFunction")) Module["removeFunction"] = () => abort("'removeFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getFuncWrapper")) Module["getFuncWrapper"] = () => abort("'getFuncWrapper' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "prettyPrint")) Module["prettyPrint"] = () => abort("'prettyPrint' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "dynCall")) Module["dynCall"] = () => abort("'dynCall' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getCompilerSetting")) Module["getCompilerSetting"] = () => abort("'getCompilerSetting' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "print")) Module["print"] = () => abort("'print' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "printErr")) Module["printErr"] = () => abort("'printErr' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getTempRet0")) Module["getTempRet0"] = () => abort("'getTempRet0' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setTempRet0")) Module["setTempRet0"] = () => abort("'setTempRet0' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "callMain")) Module["callMain"] = () => abort("'callMain' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "abort")) Module["abort"] = () => abort("'abort' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "keepRuntimeAlive")) Module["keepRuntimeAlive"] = () => abort("'keepRuntimeAlive' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "zeroMemory")) Module["zeroMemory"] = () => abort("'zeroMemory' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stringToNewUTF8")) Module["stringToNewUTF8"] = () => abort("'stringToNewUTF8' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emscripten_realloc_buffer")) Module["emscripten_realloc_buffer"] = () => abort("'emscripten_realloc_buffer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ENV")) Module["ENV"] = () => abort("'ENV' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "withStackSave")) Module["withStackSave"] = () => abort("'withStackSave' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ERRNO_CODES")) Module["ERRNO_CODES"] = () => abort("'ERRNO_CODES' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ERRNO_MESSAGES")) Module["ERRNO_MESSAGES"] = () => abort("'ERRNO_MESSAGES' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setErrNo")) Module["setErrNo"] = () => abort("'setErrNo' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "inetPton4")) Module["inetPton4"] = () => abort("'inetPton4' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "inetNtop4")) Module["inetNtop4"] = () => abort("'inetNtop4' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "inetPton6")) Module["inetPton6"] = () => abort("'inetPton6' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "inetNtop6")) Module["inetNtop6"] = () => abort("'inetNtop6' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "readSockaddr")) Module["readSockaddr"] = () => abort("'readSockaddr' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeSockaddr")) Module["writeSockaddr"] = () => abort("'writeSockaddr' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "DNS")) Module["DNS"] = () => abort("'DNS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getHostByName")) Module["getHostByName"] = () => abort("'getHostByName' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "Protocols")) Module["Protocols"] = () => abort("'Protocols' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "Sockets")) Module["Sockets"] = () => abort("'Sockets' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getRandomDevice")) Module["getRandomDevice"] = () => abort("'getRandomDevice' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "traverseStack")) Module["traverseStack"] = () => abort("'traverseStack' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "convertFrameToPC")) Module["convertFrameToPC"] = () => abort("'convertFrameToPC' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "UNWIND_CACHE")) Module["UNWIND_CACHE"] = () => abort("'UNWIND_CACHE' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "saveInUnwindCache")) Module["saveInUnwindCache"] = () => abort("'saveInUnwindCache' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "convertPCtoSourceLocation")) Module["convertPCtoSourceLocation"] = () => abort("'convertPCtoSourceLocation' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "readAsmConstArgsArray")) Module["readAsmConstArgsArray"] = () => abort("'readAsmConstArgsArray' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "readAsmConstArgs")) Module["readAsmConstArgs"] = () => abort("'readAsmConstArgs' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "mainThreadEM_ASM")) Module["mainThreadEM_ASM"] = () => abort("'mainThreadEM_ASM' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "jstoi_q")) Module["jstoi_q"] = () => abort("'jstoi_q' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "jstoi_s")) Module["jstoi_s"] = () => abort("'jstoi_s' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getExecutableName")) Module["getExecutableName"] = () => abort("'getExecutableName' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "listenOnce")) Module["listenOnce"] = () => abort("'listenOnce' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "autoResumeAudioContext")) Module["autoResumeAudioContext"] = () => abort("'autoResumeAudioContext' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "dynCallLegacy")) Module["dynCallLegacy"] = () => abort("'dynCallLegacy' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getDynCaller")) Module["getDynCaller"] = () => abort("'getDynCaller' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "dynCall")) Module["dynCall"] = () => abort("'dynCall' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "callRuntimeCallbacks")) Module["callRuntimeCallbacks"] = () => abort("'callRuntimeCallbacks' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "wasmTableMirror")) Module["wasmTableMirror"] = () => abort("'wasmTableMirror' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setWasmTableEntry")) Module["setWasmTableEntry"] = () => abort("'setWasmTableEntry' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getWasmTableEntry")) Module["getWasmTableEntry"] = () => abort("'getWasmTableEntry' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "handleException")) Module["handleException"] = () => abort("'handleException' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "runtimeKeepalivePush")) Module["runtimeKeepalivePush"] = () => abort("'runtimeKeepalivePush' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "runtimeKeepalivePop")) Module["runtimeKeepalivePop"] = () => abort("'runtimeKeepalivePop' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "callUserCallback")) Module["callUserCallback"] = () => abort("'callUserCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "maybeExit")) Module["maybeExit"] = () => abort("'maybeExit' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "safeSetTimeout")) Module["safeSetTimeout"] = () => abort("'safeSetTimeout' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "asmjsMangle")) Module["asmjsMangle"] = () => abort("'asmjsMangle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "asyncLoad")) Module["asyncLoad"] = () => abort("'asyncLoad' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "alignMemory")) Module["alignMemory"] = () => abort("'alignMemory' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "mmapAlloc")) Module["mmapAlloc"] = () => abort("'mmapAlloc' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "reallyNegative")) Module["reallyNegative"] = () => abort("'reallyNegative' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "unSign")) Module["unSign"] = () => abort("'unSign' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "reSign")) Module["reSign"] = () => abort("'reSign' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "formatString")) Module["formatString"] = () => abort("'formatString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "PATH")) Module["PATH"] = () => abort("'PATH' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "PATH_FS")) Module["PATH_FS"] = () => abort("'PATH_FS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SYSCALLS")) Module["SYSCALLS"] = () => abort("'SYSCALLS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getSocketFromFD")) Module["getSocketFromFD"] = () => abort("'getSocketFromFD' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getSocketAddress")) Module["getSocketAddress"] = () => abort("'getSocketAddress' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "JSEvents")) Module["JSEvents"] = () => abort("'JSEvents' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerKeyEventCallback")) Module["registerKeyEventCallback"] = () => abort("'registerKeyEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "specialHTMLTargets")) Module["specialHTMLTargets"] = () => abort("'specialHTMLTargets' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "maybeCStringToJsString")) Module["maybeCStringToJsString"] = () => abort("'maybeCStringToJsString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "findEventTarget")) Module["findEventTarget"] = () => abort("'findEventTarget' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "findCanvasEventTarget")) Module["findCanvasEventTarget"] = () => abort("'findCanvasEventTarget' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getBoundingClientRect")) Module["getBoundingClientRect"] = () => abort("'getBoundingClientRect' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillMouseEventData")) Module["fillMouseEventData"] = () => abort("'fillMouseEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerMouseEventCallback")) Module["registerMouseEventCallback"] = () => abort("'registerMouseEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerWheelEventCallback")) Module["registerWheelEventCallback"] = () => abort("'registerWheelEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerUiEventCallback")) Module["registerUiEventCallback"] = () => abort("'registerUiEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerFocusEventCallback")) Module["registerFocusEventCallback"] = () => abort("'registerFocusEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillDeviceOrientationEventData")) Module["fillDeviceOrientationEventData"] = () => abort("'fillDeviceOrientationEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerDeviceOrientationEventCallback")) Module["registerDeviceOrientationEventCallback"] = () => abort("'registerDeviceOrientationEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillDeviceMotionEventData")) Module["fillDeviceMotionEventData"] = () => abort("'fillDeviceMotionEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerDeviceMotionEventCallback")) Module["registerDeviceMotionEventCallback"] = () => abort("'registerDeviceMotionEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "screenOrientation")) Module["screenOrientation"] = () => abort("'screenOrientation' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillOrientationChangeEventData")) Module["fillOrientationChangeEventData"] = () => abort("'fillOrientationChangeEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerOrientationChangeEventCallback")) Module["registerOrientationChangeEventCallback"] = () => abort("'registerOrientationChangeEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillFullscreenChangeEventData")) Module["fillFullscreenChangeEventData"] = () => abort("'fillFullscreenChangeEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerFullscreenChangeEventCallback")) Module["registerFullscreenChangeEventCallback"] = () => abort("'registerFullscreenChangeEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerRestoreOldStyle")) Module["registerRestoreOldStyle"] = () => abort("'registerRestoreOldStyle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "hideEverythingExceptGivenElement")) Module["hideEverythingExceptGivenElement"] = () => abort("'hideEverythingExceptGivenElement' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "restoreHiddenElements")) Module["restoreHiddenElements"] = () => abort("'restoreHiddenElements' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setLetterbox")) Module["setLetterbox"] = () => abort("'setLetterbox' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "currentFullscreenStrategy")) Module["currentFullscreenStrategy"] = () => abort("'currentFullscreenStrategy' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "restoreOldWindowedStyle")) Module["restoreOldWindowedStyle"] = () => abort("'restoreOldWindowedStyle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "softFullscreenResizeWebGLRenderTarget")) Module["softFullscreenResizeWebGLRenderTarget"] = () => abort("'softFullscreenResizeWebGLRenderTarget' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "doRequestFullscreen")) Module["doRequestFullscreen"] = () => abort("'doRequestFullscreen' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillPointerlockChangeEventData")) Module["fillPointerlockChangeEventData"] = () => abort("'fillPointerlockChangeEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerPointerlockChangeEventCallback")) Module["registerPointerlockChangeEventCallback"] = () => abort("'registerPointerlockChangeEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerPointerlockErrorEventCallback")) Module["registerPointerlockErrorEventCallback"] = () => abort("'registerPointerlockErrorEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "requestPointerLock")) Module["requestPointerLock"] = () => abort("'requestPointerLock' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillVisibilityChangeEventData")) Module["fillVisibilityChangeEventData"] = () => abort("'fillVisibilityChangeEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerVisibilityChangeEventCallback")) Module["registerVisibilityChangeEventCallback"] = () => abort("'registerVisibilityChangeEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerTouchEventCallback")) Module["registerTouchEventCallback"] = () => abort("'registerTouchEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillGamepadEventData")) Module["fillGamepadEventData"] = () => abort("'fillGamepadEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerGamepadEventCallback")) Module["registerGamepadEventCallback"] = () => abort("'registerGamepadEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerBeforeUnloadEventCallback")) Module["registerBeforeUnloadEventCallback"] = () => abort("'registerBeforeUnloadEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "fillBatteryEventData")) Module["fillBatteryEventData"] = () => abort("'fillBatteryEventData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "battery")) Module["battery"] = () => abort("'battery' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerBatteryEventCallback")) Module["registerBatteryEventCallback"] = () => abort("'registerBatteryEventCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setCanvasElementSize")) Module["setCanvasElementSize"] = () => abort("'setCanvasElementSize' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getCanvasElementSize")) Module["getCanvasElementSize"] = () => abort("'getCanvasElementSize' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "demangle")) Module["demangle"] = () => abort("'demangle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "demangleAll")) Module["demangleAll"] = () => abort("'demangleAll' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "jsStackTrace")) Module["jsStackTrace"] = () => abort("'jsStackTrace' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stackTrace")) Module["stackTrace"] = () => abort("'stackTrace' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getEnvStrings")) Module["getEnvStrings"] = () => abort("'getEnvStrings' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "checkWasiClock")) Module["checkWasiClock"] = () => abort("'checkWasiClock' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeI53ToI64")) Module["writeI53ToI64"] = () => abort("'writeI53ToI64' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeI53ToI64Clamped")) Module["writeI53ToI64Clamped"] = () => abort("'writeI53ToI64Clamped' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeI53ToI64Signaling")) Module["writeI53ToI64Signaling"] = () => abort("'writeI53ToI64Signaling' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeI53ToU64Clamped")) Module["writeI53ToU64Clamped"] = () => abort("'writeI53ToU64Clamped' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeI53ToU64Signaling")) Module["writeI53ToU64Signaling"] = () => abort("'writeI53ToU64Signaling' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "readI53FromI64")) Module["readI53FromI64"] = () => abort("'readI53FromI64' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "readI53FromU64")) Module["readI53FromU64"] = () => abort("'readI53FromU64' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "convertI32PairToI53")) Module["convertI32PairToI53"] = () => abort("'convertI32PairToI53' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "convertU32PairToI53")) Module["convertU32PairToI53"] = () => abort("'convertU32PairToI53' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setImmediateWrapped")) Module["setImmediateWrapped"] = () => abort("'setImmediateWrapped' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "clearImmediateWrapped")) Module["clearImmediateWrapped"] = () => abort("'clearImmediateWrapped' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "polyfillSetImmediate")) Module["polyfillSetImmediate"] = () => abort("'polyfillSetImmediate' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "uncaughtExceptionCount")) Module["uncaughtExceptionCount"] = () => abort("'uncaughtExceptionCount' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "exceptionLast")) Module["exceptionLast"] = () => abort("'exceptionLast' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "exceptionCaught")) Module["exceptionCaught"] = () => abort("'exceptionCaught' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ExceptionInfo")) Module["ExceptionInfo"] = () => abort("'ExceptionInfo' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "CatchInfo")) Module["CatchInfo"] = () => abort("'CatchInfo' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "exception_addRef")) Module["exception_addRef"] = () => abort("'exception_addRef' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "exception_decRef")) Module["exception_decRef"] = () => abort("'exception_decRef' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "Browser")) Module["Browser"] = () => abort("'Browser' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "funcWrappers")) Module["funcWrappers"] = () => abort("'funcWrappers' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getFuncWrapper")) Module["getFuncWrapper"] = () => abort("'getFuncWrapper' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setMainLoop")) Module["setMainLoop"] = () => abort("'setMainLoop' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "wget")) Module["wget"] = () => abort("'wget' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "FS")) Module["FS"] = () => abort("'FS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "MEMFS")) Module["MEMFS"] = () => abort("'MEMFS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "TTY")) Module["TTY"] = () => abort("'TTY' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "PIPEFS")) Module["PIPEFS"] = () => abort("'PIPEFS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SOCKFS")) Module["SOCKFS"] = () => abort("'SOCKFS' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "_setNetworkCallback")) Module["_setNetworkCallback"] = () => abort("'_setNetworkCallback' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "tempFixedLengthArray")) Module["tempFixedLengthArray"] = () => abort("'tempFixedLengthArray' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "miniTempWebGLFloatBuffers")) Module["miniTempWebGLFloatBuffers"] = () => abort("'miniTempWebGLFloatBuffers' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "heapObjectForWebGLType")) Module["heapObjectForWebGLType"] = () => abort("'heapObjectForWebGLType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "heapAccessShiftForWebGLHeap")) Module["heapAccessShiftForWebGLHeap"] = () => abort("'heapAccessShiftForWebGLHeap' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "GL")) Module["GL"] = () => abort("'GL' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emscriptenWebGLGet")) Module["emscriptenWebGLGet"] = () => abort("'emscriptenWebGLGet' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "computeUnpackAlignedImageSize")) Module["computeUnpackAlignedImageSize"] = () => abort("'computeUnpackAlignedImageSize' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emscriptenWebGLGetTexPixelData")) Module["emscriptenWebGLGetTexPixelData"] = () => abort("'emscriptenWebGLGetTexPixelData' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emscriptenWebGLGetUniform")) Module["emscriptenWebGLGetUniform"] = () => abort("'emscriptenWebGLGetUniform' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "webglGetUniformLocation")) Module["webglGetUniformLocation"] = () => abort("'webglGetUniformLocation' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "webglPrepareUniformLocationsBeforeFirstUse")) Module["webglPrepareUniformLocationsBeforeFirstUse"] = () => abort("'webglPrepareUniformLocationsBeforeFirstUse' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "webglGetLeftBracePos")) Module["webglGetLeftBracePos"] = () => abort("'webglGetLeftBracePos' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emscriptenWebGLGetVertexAttrib")) Module["emscriptenWebGLGetVertexAttrib"] = () => abort("'emscriptenWebGLGetVertexAttrib' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "writeGLArray")) Module["writeGLArray"] = () => abort("'writeGLArray' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "AL")) Module["AL"] = () => abort("'AL' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SDL_unicode")) Module["SDL_unicode"] = () => abort("'SDL_unicode' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SDL_ttfContext")) Module["SDL_ttfContext"] = () => abort("'SDL_ttfContext' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SDL_audio")) Module["SDL_audio"] = () => abort("'SDL_audio' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SDL")) Module["SDL"] = () => abort("'SDL' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "SDL_gfx")) Module["SDL_gfx"] = () => abort("'SDL_gfx' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "GLUT")) Module["GLUT"] = () => abort("'GLUT' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "EGL")) Module["EGL"] = () => abort("'EGL' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "GLFW_Window")) Module["GLFW_Window"] = () => abort("'GLFW_Window' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "GLFW")) Module["GLFW"] = () => abort("'GLFW' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "GLEW")) Module["GLEW"] = () => abort("'GLEW' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "IDBStore")) Module["IDBStore"] = () => abort("'IDBStore' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "runAndAbortIfError")) Module["runAndAbortIfError"] = () => abort("'runAndAbortIfError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "InternalError")) Module["InternalError"] = () => abort("'InternalError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "BindingError")) Module["BindingError"] = () => abort("'BindingError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "UnboundTypeError")) Module["UnboundTypeError"] = () => abort("'UnboundTypeError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "PureVirtualError")) Module["PureVirtualError"] = () => abort("'PureVirtualError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "init_embind")) Module["init_embind"] = () => abort("'init_embind' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "throwInternalError")) Module["throwInternalError"] = () => abort("'throwInternalError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "throwBindingError")) Module["throwBindingError"] = () => abort("'throwBindingError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "throwUnboundTypeError")) Module["throwUnboundTypeError"] = () => abort("'throwUnboundTypeError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ensureOverloadTable")) Module["ensureOverloadTable"] = () => abort("'ensureOverloadTable' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "exposePublicSymbol")) Module["exposePublicSymbol"] = () => abort("'exposePublicSymbol' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "replacePublicSymbol")) Module["replacePublicSymbol"] = () => abort("'replacePublicSymbol' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "extendError")) Module["extendError"] = () => abort("'extendError' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "createNamedFunction")) Module["createNamedFunction"] = () => abort("'createNamedFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registeredInstances")) Module["registeredInstances"] = () => abort("'registeredInstances' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getBasestPointer")) Module["getBasestPointer"] = () => abort("'getBasestPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerInheritedInstance")) Module["registerInheritedInstance"] = () => abort("'registerInheritedInstance' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "unregisterInheritedInstance")) Module["unregisterInheritedInstance"] = () => abort("'unregisterInheritedInstance' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getInheritedInstance")) Module["getInheritedInstance"] = () => abort("'getInheritedInstance' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getInheritedInstanceCount")) Module["getInheritedInstanceCount"] = () => abort("'getInheritedInstanceCount' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getLiveInheritedInstances")) Module["getLiveInheritedInstances"] = () => abort("'getLiveInheritedInstances' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registeredTypes")) Module["registeredTypes"] = () => abort("'registeredTypes' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "awaitingDependencies")) Module["awaitingDependencies"] = () => abort("'awaitingDependencies' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "typeDependencies")) Module["typeDependencies"] = () => abort("'typeDependencies' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registeredPointers")) Module["registeredPointers"] = () => abort("'registeredPointers' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "registerType")) Module["registerType"] = () => abort("'registerType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "whenDependentTypesAreResolved")) Module["whenDependentTypesAreResolved"] = () => abort("'whenDependentTypesAreResolved' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "embind_charCodes")) Module["embind_charCodes"] = () => abort("'embind_charCodes' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "embind_init_charCodes")) Module["embind_init_charCodes"] = () => abort("'embind_init_charCodes' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "readLatin1String")) Module["readLatin1String"] = () => abort("'readLatin1String' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getTypeName")) Module["getTypeName"] = () => abort("'getTypeName' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "heap32VectorToArray")) Module["heap32VectorToArray"] = () => abort("'heap32VectorToArray' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "requireRegisteredType")) Module["requireRegisteredType"] = () => abort("'requireRegisteredType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getShiftFromSize")) Module["getShiftFromSize"] = () => abort("'getShiftFromSize' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "integerReadValueFromPointer")) Module["integerReadValueFromPointer"] = () => abort("'integerReadValueFromPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "enumReadValueFromPointer")) Module["enumReadValueFromPointer"] = () => abort("'enumReadValueFromPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "floatReadValueFromPointer")) Module["floatReadValueFromPointer"] = () => abort("'floatReadValueFromPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "simpleReadValueFromPointer")) Module["simpleReadValueFromPointer"] = () => abort("'simpleReadValueFromPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "runDestructors")) Module["runDestructors"] = () => abort("'runDestructors' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "new_")) Module["new_"] = () => abort("'new_' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "craftInvokerFunction")) Module["craftInvokerFunction"] = () => abort("'craftInvokerFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "embind__requireFunction")) Module["embind__requireFunction"] = () => abort("'embind__requireFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "tupleRegistrations")) Module["tupleRegistrations"] = () => abort("'tupleRegistrations' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "structRegistrations")) Module["structRegistrations"] = () => abort("'structRegistrations' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "genericPointerToWireType")) Module["genericPointerToWireType"] = () => abort("'genericPointerToWireType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "constNoSmartPtrRawPointerToWireType")) Module["constNoSmartPtrRawPointerToWireType"] = () => abort("'constNoSmartPtrRawPointerToWireType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "nonConstNoSmartPtrRawPointerToWireType")) Module["nonConstNoSmartPtrRawPointerToWireType"] = () => abort("'nonConstNoSmartPtrRawPointerToWireType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "init_RegisteredPointer")) Module["init_RegisteredPointer"] = () => abort("'init_RegisteredPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "RegisteredPointer")) Module["RegisteredPointer"] = () => abort("'RegisteredPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "RegisteredPointer_getPointee")) Module["RegisteredPointer_getPointee"] = () => abort("'RegisteredPointer_getPointee' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "RegisteredPointer_destructor")) Module["RegisteredPointer_destructor"] = () => abort("'RegisteredPointer_destructor' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "RegisteredPointer_deleteObject")) Module["RegisteredPointer_deleteObject"] = () => abort("'RegisteredPointer_deleteObject' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "RegisteredPointer_fromWireType")) Module["RegisteredPointer_fromWireType"] = () => abort("'RegisteredPointer_fromWireType' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "runDestructor")) Module["runDestructor"] = () => abort("'runDestructor' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "releaseClassHandle")) Module["releaseClassHandle"] = () => abort("'releaseClassHandle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "finalizationRegistry")) Module["finalizationRegistry"] = () => abort("'finalizationRegistry' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "detachFinalizer_deps")) Module["detachFinalizer_deps"] = () => abort("'detachFinalizer_deps' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "detachFinalizer")) Module["detachFinalizer"] = () => abort("'detachFinalizer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "attachFinalizer")) Module["attachFinalizer"] = () => abort("'attachFinalizer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "makeClassHandle")) Module["makeClassHandle"] = () => abort("'makeClassHandle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "init_ClassHandle")) Module["init_ClassHandle"] = () => abort("'init_ClassHandle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ClassHandle")) Module["ClassHandle"] = () => abort("'ClassHandle' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ClassHandle_isAliasOf")) Module["ClassHandle_isAliasOf"] = () => abort("'ClassHandle_isAliasOf' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "throwInstanceAlreadyDeleted")) Module["throwInstanceAlreadyDeleted"] = () => abort("'throwInstanceAlreadyDeleted' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ClassHandle_clone")) Module["ClassHandle_clone"] = () => abort("'ClassHandle_clone' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ClassHandle_delete")) Module["ClassHandle_delete"] = () => abort("'ClassHandle_delete' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "deletionQueue")) Module["deletionQueue"] = () => abort("'deletionQueue' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ClassHandle_isDeleted")) Module["ClassHandle_isDeleted"] = () => abort("'ClassHandle_isDeleted' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "ClassHandle_deleteLater")) Module["ClassHandle_deleteLater"] = () => abort("'ClassHandle_deleteLater' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "flushPendingDeletes")) Module["flushPendingDeletes"] = () => abort("'flushPendingDeletes' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "delayFunction")) Module["delayFunction"] = () => abort("'delayFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "setDelayFunction")) Module["setDelayFunction"] = () => abort("'setDelayFunction' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "RegisteredClass")) Module["RegisteredClass"] = () => abort("'RegisteredClass' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "shallowCopyInternalPointer")) Module["shallowCopyInternalPointer"] = () => abort("'shallowCopyInternalPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "downcastPointer")) Module["downcastPointer"] = () => abort("'downcastPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "upcastPointer")) Module["upcastPointer"] = () => abort("'upcastPointer' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "validateThis")) Module["validateThis"] = () => abort("'validateThis' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "char_0")) Module["char_0"] = () => abort("'char_0' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "char_9")) Module["char_9"] = () => abort("'char_9' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "makeLegalFunctionName")) Module["makeLegalFunctionName"] = () => abort("'makeLegalFunctionName' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_handle_array")) Module["emval_handle_array"] = () => abort("'emval_handle_array' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_free_list")) Module["emval_free_list"] = () => abort("'emval_free_list' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_symbols")) Module["emval_symbols"] = () => abort("'emval_symbols' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "init_emval")) Module["init_emval"] = () => abort("'init_emval' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "count_emval_handles")) Module["count_emval_handles"] = () => abort("'count_emval_handles' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "get_first_emval")) Module["get_first_emval"] = () => abort("'get_first_emval' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "getStringOrSymbol")) Module["getStringOrSymbol"] = () => abort("'getStringOrSymbol' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "Emval")) Module["Emval"] = () => abort("'Emval' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_newers")) Module["emval_newers"] = () => abort("'emval_newers' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "craftEmvalAllocator")) Module["craftEmvalAllocator"] = () => abort("'craftEmvalAllocator' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_get_global")) Module["emval_get_global"] = () => abort("'emval_get_global' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_methodCallers")) Module["emval_methodCallers"] = () => abort("'emval_methodCallers' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "emval_registeredMethods")) Module["emval_registeredMethods"] = () => abort("'emval_registeredMethods' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "warnOnce")) Module["warnOnce"] = () => abort("'warnOnce' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stackSave")) Module["stackSave"] = () => abort("'stackSave' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stackRestore")) Module["stackRestore"] = () => abort("'stackRestore' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stackAlloc")) Module["stackAlloc"] = () => abort("'stackAlloc' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "AsciiToString")) Module["AsciiToString"] = () => abort("'AsciiToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stringToAscii")) Module["stringToAscii"] = () => abort("'stringToAscii' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "UTF16ToString")) Module["UTF16ToString"] = () => abort("'UTF16ToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stringToUTF16")) Module["stringToUTF16"] = () => abort("'stringToUTF16' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "lengthBytesUTF16")) Module["lengthBytesUTF16"] = () => abort("'lengthBytesUTF16' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "UTF32ToString")) Module["UTF32ToString"] = () => abort("'UTF32ToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "stringToUTF32")) Module["stringToUTF32"] = () => abort("'stringToUTF32' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "lengthBytesUTF32")) Module["lengthBytesUTF32"] = () => abort("'lengthBytesUTF32' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "allocateUTF8")) Module["allocateUTF8"] = () => abort("'allocateUTF8' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
-if (!Object.getOwnPropertyDescriptor(Module, "allocateUTF8OnStack")) Module["allocateUTF8OnStack"] = () => abort("'allocateUTF8OnStack' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)");
+unexportedRuntimeFunction('intArrayFromString', false);
+unexportedRuntimeFunction('intArrayToString', false);
+unexportedRuntimeFunction('ccall', false);
+unexportedRuntimeFunction('cwrap', false);
+unexportedRuntimeFunction('setValue', false);
+unexportedRuntimeFunction('getValue', false);
+unexportedRuntimeFunction('allocate', false);
+unexportedRuntimeFunction('UTF8ArrayToString', false);
+unexportedRuntimeFunction('UTF8ToString', false);
+unexportedRuntimeFunction('stringToUTF8Array', false);
+unexportedRuntimeFunction('stringToUTF8', false);
+unexportedRuntimeFunction('lengthBytesUTF8', false);
+unexportedRuntimeFunction('stackTrace', false);
+unexportedRuntimeFunction('addOnPreRun', false);
+unexportedRuntimeFunction('addOnInit', false);
+unexportedRuntimeFunction('addOnPreMain', false);
+unexportedRuntimeFunction('addOnExit', false);
+unexportedRuntimeFunction('addOnPostRun', false);
+unexportedRuntimeFunction('writeStringToMemory', false);
+unexportedRuntimeFunction('writeArrayToMemory', false);
+unexportedRuntimeFunction('writeAsciiToMemory', false);
+unexportedRuntimeFunction('addRunDependency', true);
+unexportedRuntimeFunction('removeRunDependency', true);
+unexportedRuntimeFunction('FS_createFolder', false);
+unexportedRuntimeFunction('FS_createPath', true);
+unexportedRuntimeFunction('FS_createDataFile', true);
+unexportedRuntimeFunction('FS_createPreloadedFile', true);
+unexportedRuntimeFunction('FS_createLazyFile', true);
+unexportedRuntimeFunction('FS_createLink', false);
+unexportedRuntimeFunction('FS_createDevice', true);
+unexportedRuntimeFunction('FS_unlink', true);
+unexportedRuntimeFunction('getLEB', false);
+unexportedRuntimeFunction('getFunctionTables', false);
+unexportedRuntimeFunction('alignFunctionTables', false);
+unexportedRuntimeFunction('registerFunctions', false);
+unexportedRuntimeFunction('addFunction', false);
+unexportedRuntimeFunction('removeFunction', false);
+unexportedRuntimeFunction('getFuncWrapper', false);
+unexportedRuntimeFunction('prettyPrint', false);
+unexportedRuntimeFunction('dynCall', false);
+unexportedRuntimeFunction('getCompilerSetting', false);
+unexportedRuntimeFunction('print', false);
+unexportedRuntimeFunction('printErr', false);
+unexportedRuntimeFunction('getTempRet0', false);
+unexportedRuntimeFunction('setTempRet0', false);
+unexportedRuntimeFunction('callMain', false);
+unexportedRuntimeFunction('abort', false);
+unexportedRuntimeFunction('keepRuntimeAlive', false);
+unexportedRuntimeFunction('zeroMemory', false);
+unexportedRuntimeFunction('stringToNewUTF8', false);
+unexportedRuntimeFunction('emscripten_realloc_buffer', false);
+unexportedRuntimeFunction('ENV', false);
+unexportedRuntimeFunction('ERRNO_CODES', false);
+unexportedRuntimeFunction('ERRNO_MESSAGES', false);
+unexportedRuntimeFunction('setErrNo', false);
+unexportedRuntimeFunction('inetPton4', false);
+unexportedRuntimeFunction('inetNtop4', false);
+unexportedRuntimeFunction('inetPton6', false);
+unexportedRuntimeFunction('inetNtop6', false);
+unexportedRuntimeFunction('readSockaddr', false);
+unexportedRuntimeFunction('writeSockaddr', false);
+unexportedRuntimeFunction('DNS', false);
+unexportedRuntimeFunction('getHostByName', false);
+unexportedRuntimeFunction('Protocols', false);
+unexportedRuntimeFunction('Sockets', false);
+unexportedRuntimeFunction('getRandomDevice', false);
+unexportedRuntimeFunction('traverseStack', false);
+unexportedRuntimeFunction('UNWIND_CACHE', false);
+unexportedRuntimeFunction('convertPCtoSourceLocation', false);
+unexportedRuntimeFunction('readAsmConstArgsArray', false);
+unexportedRuntimeFunction('readAsmConstArgs', false);
+unexportedRuntimeFunction('mainThreadEM_ASM', false);
+unexportedRuntimeFunction('jstoi_q', false);
+unexportedRuntimeFunction('jstoi_s', false);
+unexportedRuntimeFunction('getExecutableName', false);
+unexportedRuntimeFunction('listenOnce', false);
+unexportedRuntimeFunction('autoResumeAudioContext', false);
+unexportedRuntimeFunction('dynCallLegacy', false);
+unexportedRuntimeFunction('getDynCaller', false);
+unexportedRuntimeFunction('dynCall', false);
+unexportedRuntimeFunction('handleException', false);
+unexportedRuntimeFunction('runtimeKeepalivePush', false);
+unexportedRuntimeFunction('runtimeKeepalivePop', false);
+unexportedRuntimeFunction('callUserCallback', false);
+unexportedRuntimeFunction('maybeExit', false);
+unexportedRuntimeFunction('safeSetTimeout', false);
+unexportedRuntimeFunction('asmjsMangle', false);
+unexportedRuntimeFunction('asyncLoad', false);
+unexportedRuntimeFunction('alignMemory', false);
+unexportedRuntimeFunction('mmapAlloc', false);
+unexportedRuntimeFunction('reallyNegative', false);
+unexportedRuntimeFunction('unSign', false);
+unexportedRuntimeFunction('reSign', false);
+unexportedRuntimeFunction('formatString', false);
+unexportedRuntimeFunction('PATH', false);
+unexportedRuntimeFunction('PATH_FS', false);
+unexportedRuntimeFunction('SYSCALLS', false);
+unexportedRuntimeFunction('getSocketFromFD', false);
+unexportedRuntimeFunction('getSocketAddress', false);
+unexportedRuntimeFunction('JSEvents', false);
+unexportedRuntimeFunction('registerKeyEventCallback', false);
+unexportedRuntimeFunction('specialHTMLTargets', false);
+unexportedRuntimeFunction('maybeCStringToJsString', false);
+unexportedRuntimeFunction('findEventTarget', false);
+unexportedRuntimeFunction('findCanvasEventTarget', false);
+unexportedRuntimeFunction('getBoundingClientRect', false);
+unexportedRuntimeFunction('fillMouseEventData', false);
+unexportedRuntimeFunction('registerMouseEventCallback', false);
+unexportedRuntimeFunction('registerWheelEventCallback', false);
+unexportedRuntimeFunction('registerUiEventCallback', false);
+unexportedRuntimeFunction('registerFocusEventCallback', false);
+unexportedRuntimeFunction('fillDeviceOrientationEventData', false);
+unexportedRuntimeFunction('registerDeviceOrientationEventCallback', false);
+unexportedRuntimeFunction('fillDeviceMotionEventData', false);
+unexportedRuntimeFunction('registerDeviceMotionEventCallback', false);
+unexportedRuntimeFunction('screenOrientation', false);
+unexportedRuntimeFunction('fillOrientationChangeEventData', false);
+unexportedRuntimeFunction('registerOrientationChangeEventCallback', false);
+unexportedRuntimeFunction('fillFullscreenChangeEventData', false);
+unexportedRuntimeFunction('registerFullscreenChangeEventCallback', false);
+unexportedRuntimeFunction('registerRestoreOldStyle', false);
+unexportedRuntimeFunction('hideEverythingExceptGivenElement', false);
+unexportedRuntimeFunction('restoreHiddenElements', false);
+unexportedRuntimeFunction('setLetterbox', false);
+unexportedRuntimeFunction('currentFullscreenStrategy', false);
+unexportedRuntimeFunction('restoreOldWindowedStyle', false);
+unexportedRuntimeFunction('softFullscreenResizeWebGLRenderTarget', false);
+unexportedRuntimeFunction('doRequestFullscreen', false);
+unexportedRuntimeFunction('fillPointerlockChangeEventData', false);
+unexportedRuntimeFunction('registerPointerlockChangeEventCallback', false);
+unexportedRuntimeFunction('registerPointerlockErrorEventCallback', false);
+unexportedRuntimeFunction('requestPointerLock', false);
+unexportedRuntimeFunction('fillVisibilityChangeEventData', false);
+unexportedRuntimeFunction('registerVisibilityChangeEventCallback', false);
+unexportedRuntimeFunction('registerTouchEventCallback', false);
+unexportedRuntimeFunction('fillGamepadEventData', false);
+unexportedRuntimeFunction('registerGamepadEventCallback', false);
+unexportedRuntimeFunction('registerBeforeUnloadEventCallback', false);
+unexportedRuntimeFunction('fillBatteryEventData', false);
+unexportedRuntimeFunction('battery', false);
+unexportedRuntimeFunction('registerBatteryEventCallback', false);
+unexportedRuntimeFunction('setCanvasElementSize', false);
+unexportedRuntimeFunction('getCanvasElementSize', false);
+unexportedRuntimeFunction('demangle', false);
+unexportedRuntimeFunction('demangleAll', false);
+unexportedRuntimeFunction('jsStackTrace', false);
+unexportedRuntimeFunction('stackTrace', false);
+unexportedRuntimeFunction('getEnvStrings', false);
+unexportedRuntimeFunction('checkWasiClock', false);
+unexportedRuntimeFunction('writeI53ToI64', false);
+unexportedRuntimeFunction('writeI53ToI64Clamped', false);
+unexportedRuntimeFunction('writeI53ToI64Signaling', false);
+unexportedRuntimeFunction('writeI53ToU64Clamped', false);
+unexportedRuntimeFunction('writeI53ToU64Signaling', false);
+unexportedRuntimeFunction('readI53FromI64', false);
+unexportedRuntimeFunction('readI53FromU64', false);
+unexportedRuntimeFunction('convertI32PairToI53', false);
+unexportedRuntimeFunction('convertU32PairToI53', false);
+unexportedRuntimeFunction('setImmediateWrapped', false);
+unexportedRuntimeFunction('clearImmediateWrapped', false);
+unexportedRuntimeFunction('polyfillSetImmediate', false);
+unexportedRuntimeFunction('uncaughtExceptionCount', false);
+unexportedRuntimeFunction('exceptionLast', false);
+unexportedRuntimeFunction('exceptionCaught', false);
+unexportedRuntimeFunction('ExceptionInfo', false);
+unexportedRuntimeFunction('CatchInfo', false);
+unexportedRuntimeFunction('exception_addRef', false);
+unexportedRuntimeFunction('exception_decRef', false);
+unexportedRuntimeFunction('Browser', false);
+unexportedRuntimeFunction('funcWrappers', false);
+unexportedRuntimeFunction('getFuncWrapper', false);
+unexportedRuntimeFunction('setMainLoop', false);
+unexportedRuntimeFunction('wget', false);
+unexportedRuntimeFunction('FS', false);
+unexportedRuntimeFunction('MEMFS', false);
+unexportedRuntimeFunction('TTY', false);
+unexportedRuntimeFunction('PIPEFS', false);
+unexportedRuntimeFunction('SOCKFS', false);
+unexportedRuntimeFunction('_setNetworkCallback', false);
+unexportedRuntimeFunction('tempFixedLengthArray', false);
+unexportedRuntimeFunction('miniTempWebGLFloatBuffers', false);
+unexportedRuntimeFunction('heapObjectForWebGLType', false);
+unexportedRuntimeFunction('heapAccessShiftForWebGLHeap', false);
+unexportedRuntimeFunction('GL', false);
+unexportedRuntimeFunction('emscriptenWebGLGet', false);
+unexportedRuntimeFunction('computeUnpackAlignedImageSize', false);
+unexportedRuntimeFunction('emscriptenWebGLGetTexPixelData', false);
+unexportedRuntimeFunction('emscriptenWebGLGetUniform', false);
+unexportedRuntimeFunction('webglGetUniformLocation', false);
+unexportedRuntimeFunction('webglPrepareUniformLocationsBeforeFirstUse', false);
+unexportedRuntimeFunction('webglGetLeftBracePos', false);
+unexportedRuntimeFunction('emscriptenWebGLGetVertexAttrib', false);
+unexportedRuntimeFunction('writeGLArray', false);
+unexportedRuntimeFunction('AL', false);
+unexportedRuntimeFunction('SDL_unicode', false);
+unexportedRuntimeFunction('SDL_ttfContext', false);
+unexportedRuntimeFunction('SDL_audio', false);
+unexportedRuntimeFunction('SDL', false);
+unexportedRuntimeFunction('SDL_gfx', false);
+unexportedRuntimeFunction('GLUT', false);
+unexportedRuntimeFunction('EGL', false);
+unexportedRuntimeFunction('GLFW_Window', false);
+unexportedRuntimeFunction('GLFW', false);
+unexportedRuntimeFunction('GLEW', false);
+unexportedRuntimeFunction('IDBStore', false);
+unexportedRuntimeFunction('runAndAbortIfError', false);
+unexportedRuntimeFunction('InternalError', false);
+unexportedRuntimeFunction('BindingError', false);
+unexportedRuntimeFunction('UnboundTypeError', false);
+unexportedRuntimeFunction('PureVirtualError', false);
+unexportedRuntimeFunction('init_embind', false);
+unexportedRuntimeFunction('throwInternalError', false);
+unexportedRuntimeFunction('throwBindingError', false);
+unexportedRuntimeFunction('throwUnboundTypeError', false);
+unexportedRuntimeFunction('ensureOverloadTable', false);
+unexportedRuntimeFunction('exposePublicSymbol', false);
+unexportedRuntimeFunction('replacePublicSymbol', false);
+unexportedRuntimeFunction('extendError', false);
+unexportedRuntimeFunction('createNamedFunction', false);
+unexportedRuntimeFunction('registeredInstances', false);
+unexportedRuntimeFunction('getBasestPointer', false);
+unexportedRuntimeFunction('registerInheritedInstance', false);
+unexportedRuntimeFunction('unregisterInheritedInstance', false);
+unexportedRuntimeFunction('getInheritedInstance', false);
+unexportedRuntimeFunction('getInheritedInstanceCount', false);
+unexportedRuntimeFunction('getLiveInheritedInstances', false);
+unexportedRuntimeFunction('registeredTypes', false);
+unexportedRuntimeFunction('awaitingDependencies', false);
+unexportedRuntimeFunction('typeDependencies', false);
+unexportedRuntimeFunction('registeredPointers', false);
+unexportedRuntimeFunction('registerType', false);
+unexportedRuntimeFunction('whenDependentTypesAreResolved', false);
+unexportedRuntimeFunction('embind_charCodes', false);
+unexportedRuntimeFunction('embind_init_charCodes', false);
+unexportedRuntimeFunction('readLatin1String', false);
+unexportedRuntimeFunction('getTypeName', false);
+unexportedRuntimeFunction('heap32VectorToArray', false);
+unexportedRuntimeFunction('requireRegisteredType', false);
+unexportedRuntimeFunction('getShiftFromSize', false);
+unexportedRuntimeFunction('integerReadValueFromPointer', false);
+unexportedRuntimeFunction('enumReadValueFromPointer', false);
+unexportedRuntimeFunction('floatReadValueFromPointer', false);
+unexportedRuntimeFunction('simpleReadValueFromPointer', false);
+unexportedRuntimeFunction('runDestructors', false);
+unexportedRuntimeFunction('new_', false);
+unexportedRuntimeFunction('craftInvokerFunction', false);
+unexportedRuntimeFunction('embind__requireFunction', false);
+unexportedRuntimeFunction('tupleRegistrations', false);
+unexportedRuntimeFunction('structRegistrations', false);
+unexportedRuntimeFunction('genericPointerToWireType', false);
+unexportedRuntimeFunction('constNoSmartPtrRawPointerToWireType', false);
+unexportedRuntimeFunction('nonConstNoSmartPtrRawPointerToWireType', false);
+unexportedRuntimeFunction('init_RegisteredPointer', false);
+unexportedRuntimeFunction('RegisteredPointer', false);
+unexportedRuntimeFunction('RegisteredPointer_getPointee', false);
+unexportedRuntimeFunction('RegisteredPointer_destructor', false);
+unexportedRuntimeFunction('RegisteredPointer_deleteObject', false);
+unexportedRuntimeFunction('RegisteredPointer_fromWireType', false);
+unexportedRuntimeFunction('runDestructor', false);
+unexportedRuntimeFunction('releaseClassHandle', false);
+unexportedRuntimeFunction('finalizationRegistry', false);
+unexportedRuntimeFunction('detachFinalizer_deps', false);
+unexportedRuntimeFunction('detachFinalizer', false);
+unexportedRuntimeFunction('attachFinalizer', false);
+unexportedRuntimeFunction('makeClassHandle', false);
+unexportedRuntimeFunction('init_ClassHandle', false);
+unexportedRuntimeFunction('ClassHandle', false);
+unexportedRuntimeFunction('ClassHandle_isAliasOf', false);
+unexportedRuntimeFunction('throwInstanceAlreadyDeleted', false);
+unexportedRuntimeFunction('ClassHandle_clone', false);
+unexportedRuntimeFunction('ClassHandle_delete', false);
+unexportedRuntimeFunction('deletionQueue', false);
+unexportedRuntimeFunction('ClassHandle_isDeleted', false);
+unexportedRuntimeFunction('ClassHandle_deleteLater', false);
+unexportedRuntimeFunction('flushPendingDeletes', false);
+unexportedRuntimeFunction('delayFunction', false);
+unexportedRuntimeFunction('setDelayFunction', false);
+unexportedRuntimeFunction('RegisteredClass', false);
+unexportedRuntimeFunction('shallowCopyInternalPointer', false);
+unexportedRuntimeFunction('downcastPointer', false);
+unexportedRuntimeFunction('upcastPointer', false);
+unexportedRuntimeFunction('validateThis', false);
+unexportedRuntimeFunction('char_0', false);
+unexportedRuntimeFunction('char_9', false);
+unexportedRuntimeFunction('makeLegalFunctionName', false);
+unexportedRuntimeFunction('emval_handle_array', false);
+unexportedRuntimeFunction('emval_free_list', false);
+unexportedRuntimeFunction('emval_symbols', false);
+unexportedRuntimeFunction('init_emval', false);
+unexportedRuntimeFunction('count_emval_handles', false);
+unexportedRuntimeFunction('get_first_emval', false);
+unexportedRuntimeFunction('getStringOrSymbol', false);
+unexportedRuntimeFunction('Emval', false);
+unexportedRuntimeFunction('emval_newers', false);
+unexportedRuntimeFunction('craftEmvalAllocator', false);
+unexportedRuntimeFunction('emval_get_global', false);
+unexportedRuntimeFunction('emval_methodCallers', false);
+unexportedRuntimeFunction('emval_registeredMethods', false);
+unexportedRuntimeFunction('warnOnce', false);
+unexportedRuntimeFunction('stackSave', false);
+unexportedRuntimeFunction('stackRestore', false);
+unexportedRuntimeFunction('stackAlloc', false);
+unexportedRuntimeFunction('AsciiToString', false);
+unexportedRuntimeFunction('stringToAscii', false);
+unexportedRuntimeFunction('UTF16ToString', false);
+unexportedRuntimeFunction('stringToUTF16', false);
+unexportedRuntimeFunction('lengthBytesUTF16', false);
+unexportedRuntimeFunction('UTF32ToString', false);
+unexportedRuntimeFunction('stringToUTF32', false);
+unexportedRuntimeFunction('lengthBytesUTF32', false);
+unexportedRuntimeFunction('allocateUTF8', false);
+unexportedRuntimeFunction('allocateUTF8OnStack', false);
 Module["writeStackCookie"] = writeStackCookie;
 Module["checkStackCookie"] = checkStackCookie;
-if (!Object.getOwnPropertyDescriptor(Module, "ALLOC_NORMAL")) Object.defineProperty(Module, "ALLOC_NORMAL", { configurable: true, get: function() { abort("'ALLOC_NORMAL' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") } });
-if (!Object.getOwnPropertyDescriptor(Module, "ALLOC_STACK")) Object.defineProperty(Module, "ALLOC_STACK", { configurable: true, get: function() { abort("'ALLOC_STACK' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") } });
+unexportedRuntimeSymbol('ALLOC_NORMAL', false);
+unexportedRuntimeSymbol('ALLOC_STACK', false);
 
 var calledRun;
 
@@ -7679,21 +7565,13 @@ function checkUnflushedContent() {
 function exit(status, implicit) {
   EXITSTATUS = status;
 
-  // Skip this check if the runtime is being kept alive deliberately.
-  // For example if `exit_with_live_runtime` is called.
-  if (!runtimeKeepaliveCounter) {
-    checkUnflushedContent();
-  }
+  checkUnflushedContent();
 
-  if (keepRuntimeAlive()) {
-    // if exit() was called, we may warn the user if the runtime isn't actually being shut down
-    if (!implicit) {
-      var msg = 'program exited (with status: ' + status + '), but EXIT_RUNTIME is not set, so halting execution but not exiting the runtime or preventing further async execution (build with EXIT_RUNTIME=1, if you want a true shutdown)';
-      readyPromiseReject(msg);
-      err(msg);
-    }
-  } else {
-    exitRuntime();
+  // if exit() was called explicitly, warn the user if the runtime isn't actually being shut down
+  if (keepRuntimeAlive() && !implicit) {
+    var msg = 'program exited (with status: ' + status + '), but EXIT_RUNTIME is not set, so halting execution but not exiting the runtime or preventing further async execution (build with EXIT_RUNTIME=1, if you want a true shutdown)';
+    readyPromiseReject(msg);
+    err(msg);
   }
 
   procExit(status);
