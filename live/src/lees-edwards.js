@@ -168,6 +168,7 @@ async function init() {
 function update_shear_rate() {
     S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
     params.vmax = 1.5*params.shear_rate*params.L;
+    SPHERES.update_particle_material(params);
 }
 
 function checkKeys( event ) {
