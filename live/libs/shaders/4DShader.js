@@ -12,7 +12,8 @@ var uniforms = {
   // x4p: { value: 0 },
   R: { value: 0.5 },
   ambient: { value: 1.0 },
-  banding: { value: 3.0 }
+  banding: { value: 3.0 },
+  opacity: { value: 1.0 },
 };
 
 for (var ij = 0; ij < N - 3; ij++) {
@@ -109,7 +110,7 @@ var NDDEMShader = new ShaderMaterial({
     "vec3 light = vec3( 1.0 );",
     "light = normalize( light );",
     "float directional = max( dot( vNormal, light ), 0.0 );",
-    "gl_FragColor = vec4( 0.6*( ambient + directional ) * vColor, 1.0 );", // colours by vertex colour
+    "gl_FragColor = vec4( 0.6*( ambient + directional ) * vColor, opacity );", // colours by vertex colour
 
     // no directional lighting
     // const float ambient = 1.0;

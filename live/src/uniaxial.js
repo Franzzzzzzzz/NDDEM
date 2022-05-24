@@ -1,10 +1,13 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 import * as SPHERES from "../libs/SphereHandler.js"
 import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
+import * as CONTROLLERS from '../libs/controllers.js';
+
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
 console.log('hi!');
@@ -54,6 +57,7 @@ var params = {
     omegamax: 20, // max rotation rate to colour by
     loading_active: false,
     particle_density: 2700, // kg/m^3
+    particle_opacity: 1.0,
 }
 set_derived_properties();
 
@@ -137,6 +141,12 @@ async function init() {
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
 
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        container.appendChild( VRButton.createButton( renderer ) );
+        renderer.xr.enabled = true;
+        CONTROLLERS.add_controllers(renderer, scene);
+    }
+
     let gui = new GUI();
     gui.width = 450;
 
@@ -154,6 +164,9 @@ async function init() {
                 }
             });
     }
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
     gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')
         .onChange( () => SPHERES.update_particle_material(params,
             // lut_folder
@@ -231,6 +244,7 @@ function animate() {
                 WALLS.update_top_wall(params, S, scene);
             }
             update_graph();
+            SPHERES.draw_force_network(S, params, scene);
         }
 
         S.simu_step_forward(5);
@@ -241,7 +255,15 @@ function animate() {
         density = S.cg_get_result(0, "RHO", 0)[0];
     }
 
-    renderer.render( scene, camera );
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        renderer.setAnimationLoop( function () {
+            renderer.render( scene, camera );
+        } );
+    } else {
+        // requestAnimationFrame( animate );
+    	renderer.render( scene, camera );
+    }
+    // renderer.render( scene, camera );
 
     old_time = new_time;
 

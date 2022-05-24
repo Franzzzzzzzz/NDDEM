@@ -2,6 +2,7 @@ let radii;
 export let spheres;
 let NDParticleShader;
 let v, omegaMag;
+
 export let total_particle_volume;
 
 import { Lut } from "three/examples/jsm/math/Lut.js";
@@ -9,12 +10,24 @@ import { Lut } from "three/examples/jsm/math/Lut.js";
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
 import {
+    Vector3,
+    Matrix4,
     Group,
     Color,
     Mesh,
     SphereGeometry,
-    MeshPhongMaterial
+    CylinderGeometry,
+    MeshStandardMaterial
 } from "three";
+
+let forces = new Group();
+
+const cylinder_geometry = new CylinderGeometry( 1, 1, 1, 16 );
+cylinder_geometry.applyMatrix( new Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
+const cylinder_material = new MeshStandardMaterial( {color: 0xffffff} );
+cylinder_material.emissive = new Color( 0x0000ff );
+cylinder_material.transparent = false;
+const cylinder = new Mesh( cylinder_geometry, cylinder_material );
 
 export async function createNDParticleShader(params) {
     import("./shaders/" + params.dimension + "DShader.js").then((module) => {
@@ -70,12 +83,17 @@ export function update_particle_material(params, lut_folder) {
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
             object.material = NDParticleShader.clone();
+            object.material.transparent = true;
+            // object.material.opacity = params.particle_opacity;
+            object.material.uniforms.opacity.value = params.particle_opacity;
         }
     }
     else {
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
-            object.material = new MeshPhongMaterial();
+            object.material = new MeshStandardMaterial();
+            object.material.transparent = true;
+            object.material.opacity = params.particle_opacity;
         }
     }
     if ( params.lut === 'Velocity' ) {
@@ -229,4 +247,49 @@ export function randomise_particles_isotropic( params, S ) {
                 -params.H + params.r_max + Math.random()*2*(params.H-params.r_max)]);
         }
     }
+}
+
+
+export function draw_force_network(S,params,scene) {
+    if ( S !== undefined ) {
+        scene.remove( forces );
+        forces = new Group();
+
+        var F = S.simu_getParticleForce(); // very poorly named
+
+        let width = radii[0]/2.;
+        let F_mag_max = 1e0;
+
+        for ( let i = 0; i < F.length; i ++ ) {
+        // for ( let i = 0; i < 100; i ++ ) {
+            let F_mag = Math.sqrt(
+                Math.pow(F[i][2],2) +
+                Math.pow(F[i][3],2) +
+                Math.pow(F[i][4],2)
+            )
+            if (F_mag > 0) {
+                let c = cylinder.clone();
+                let a = spheres.children[F[i][0]].position;
+                let b = spheres.children[F[i][1]].position;
+                let distance = a.distanceTo( b );
+                let mid_point = new Vector3();
+                mid_point.addVectors(a,b);
+                mid_point.divideScalar(2);
+                c.position.copy( mid_point );
+                c.scale.set(width*F_mag/F_mag_max,
+                            width*F_mag/F_mag_max,
+                            distance);
+                c.lookAt(a);
+
+                // c.material.emissiveIntensity = F_mag/F_mag_max;
+
+                // console.log( c.position )
+                forces.add( c );
+            }
+            // console.log(F[i])
+        }
+        // console.log( forces );
+        scene.add ( forces );
+    }
+
 }
