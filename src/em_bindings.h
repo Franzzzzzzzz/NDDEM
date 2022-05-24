@@ -13,7 +13,7 @@ EMSCRIPTEN_BINDINGS(DEMCGND) {
     .function("simu_getOrientation", &DEMCGND::simu_getOrientation)
     .function("simu_getVelocity", &DEMCGND::simu_getVelocity)
     .function("simu_getRotationRate", &DEMCGND::simu_getRotationRate)
-    .function("simu_getParticleStress", &DEMCGND::simu_getParticleStress)
+    .function("simu_getParticleForce", &DEMCGND::simu_getParticleForce)
     .function("simu_getBoundary", &DEMCGND::simu_getBoundary)
     .function("simu_setBoundary", &DEMCGND::simu_setBoundary)
     .function("simu_getWallForce", &DEMCGND::simu_getWallForce)

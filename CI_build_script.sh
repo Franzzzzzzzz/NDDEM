@@ -12,11 +12,11 @@ npm run build
 # ls live/deploy
 
 # now install dependencies for old static display stuff
-cd visualise
-npm install
+# cd visualise
+# npm install
 
 # now compile with emscripten
-cd ../build
+cd build
 
 embuilder build boost_headers zlib
 emcmake cmake ../src
