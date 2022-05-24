@@ -46,7 +46,7 @@ document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) +
 
 var params = {
     dimension: 3,
-    L: 4, //system size
+    L: 0.03, //system size
     aspect_ratio: 1,
     N: 520,
     // packing_fraction: 0.5,
@@ -65,8 +65,8 @@ var params = {
     current_shear: 0,
     current_density: 0,
     d4_cur:0,
-    r_max: 0.5,
-    r_min: 0.45,
+    r_max: 0.0033,
+    r_min: 0.0027,
     freq: 0.05,
     new_line: false,
 	clear_line: false,
@@ -77,8 +77,10 @@ var params = {
     quality: 5,
     vmax: 20, // max velocity to colour by
     omegamax: 20, // max rotation rate to colour by
-    material_density: 2700,
+    particle_density: 2700,
+    particle_opacity: 1.0,
 }
+
 
 params.loading_method = 'strain_controlled';
 if ( urlParams.has('stress_controlled') ) {
@@ -89,6 +91,7 @@ params.average_radius = (params.r_min + params.r_max)/2.;
 params.thickness = params.average_radius;
 params.initial_pressure_set_pt = params.pressure_set_pt; // store initial value to reinitialise later
 params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+params.particle_mass = params.particle_volume * params.particle_density;
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
@@ -118,7 +121,7 @@ async function init() {
 
 	await NDDEMPhysics();
 
-	camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
+	camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
 	camera.position.set( 3*params.L, 3*params.L, 1.5*params.L*params.aspect_ratio );
     camera.up.set(0, 0, 1);
 	camera.lookAt( 0, 0, 0 );
@@ -168,7 +171,10 @@ async function init() {
         .name('Constant volume shearing').listen()
         // .onChange( function() { WALLS.update_walls_from_PID(params, S); });
     // var lut_folder = gui.addFolder('Colour by');
-    gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
+    gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')
         .onChange( () => SPHERES.update_particle_material(params,
             // lut_folder
         ) );
@@ -228,7 +234,7 @@ async function init() {
         params.new_line = false;
     });
 	const controls = new OrbitControls( camera, container );
-	controls.target.y = 0.5;
+	// controls.target.y = 0.5;
 	controls.update();
 
     window.addEventListener( 'resize', onWindowResize, false );
@@ -301,6 +307,7 @@ function animate() {
 
             if ( show_stats && started ) {
                 update_graph();
+                SPHERES.draw_force_network(S, params, scene);
                 WALLS.update_triaxial_walls(params, S, new_time - old_time); // TODO: MAKE THIS WORK BETTER WHEN THE SYSTEM IS PAUSED i.e. DIFFERENCE BETWEEN WALLTIME AND REAL TIME
         }
 
@@ -375,12 +382,14 @@ async function NDDEMPhysics() {
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
-        S.simu_interpret_command("mass -1 1");
+        // now need to find the mass of a particle with diameter 1
+        let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
         S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
         S.simu_interpret_command("auto mass");
         S.simu_interpret_command("auto inertia");
-
+        S.simu_interpret_command("auto skin");
         // var wall_type = 'PBC';
         var wall_type = 'WALL';
 
@@ -402,16 +411,19 @@ async function NDDEMPhysics() {
         // S.simu_interpret_command("auto location randomsquare");
         S.simu_interpret_command("auto location randomdrop");
 
-        S.simu_interpret_command("set Kn 2e5");
-        S.simu_interpret_command("set Kt 8e4");
-        S.simu_interpret_command("set GammaN 75");
-        S.simu_interpret_command("set GammaT 75");
+        let tc = 1e-3;
+        let rest = 0.2; // super low restitution coeff to dampen out quickly
+        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+
+        S.simu_interpret_command("set Kn " + String(vals.stiffness));
+        S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
+        S.simu_interpret_command("set GammaN " + String(vals.dissipation));
+        S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 1.0");
         S.simu_interpret_command("set Mu_wall 0");
         S.simu_interpret_command("set T 150");
-        S.simu_interpret_command("set dt 0.0001");
-        S.simu_interpret_command("set tdump 100000"); // how often to calculate wall forces
-        S.simu_interpret_command("auto skin");
+        S.simu_interpret_command("set dt " + String(tc/20));
+        S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.simu_finalise_init () ;
 
         var cgparam ={} ;
@@ -421,7 +433,7 @@ async function NDDEMPhysics() {
         cgparam["boundaries"]=[
             [-params.L+params.r_max,-params.L+params.r_max,-params.L*params.aspect_ratio+params.r_max],
             [ params.L-params.r_max, params.L-params.r_max, params.L*params.aspect_ratio-params.r_max]] ;
-        cgparam["window size"]=2 ;
+        cgparam["window size"]=2*params.average_radius ;
         cgparam["skip"]=0;
         cgparam["max time"]=1 ;
         cgparam["time average"]="None" ;
@@ -438,7 +450,7 @@ async function NDDEMPhysics() {
 }
 
 function update_graph() {
-    params.current_density = params.packing_fraction*params.material_density;
+    params.current_density = params.packing_fraction*params.particle_density;
 
     Plotly.extendTraces('stats', {
         'x': [[params.current_pressure]],

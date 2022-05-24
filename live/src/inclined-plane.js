@@ -39,20 +39,31 @@ document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) +
 
 var params = {
     dimension: 3,
-    L: 4, //system size
+    L: 0.025, //system size
     N: 800,
     // packing_fraction: 0.5,
     paused: false,
     g_mag: 10,
     theta: 0, // slope angle in DEGREES
     d4_cur:0,
-    r_max: 0.55,
-    r_min: 0.45,
+    r_max: 0.0033,
+    r_min: 0.0027,
     new_line: false,
     lut: 'None',
     quality: 5,
     vmax: 20, // max velocity to colour by
     omegamax: 20, // max rotation rate to colour by
+    particle_opacity: 1.0,
+    particle_density: 2700,
+}
+
+set_derived_properties();
+
+function set_derived_properties() {
+    params.average_radius = (params.r_min + params.r_max)/2.;
+    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+    params.particle_mass = params.particle_volume * params.particle_density;
+
 }
 
 let counter = 0;
@@ -85,7 +96,7 @@ async function init() {
 
     //
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
     camera.position.set( 1*params.L, 0, -5*params.L );
     camera.up.set(1, 0, 0);
 
@@ -140,7 +151,10 @@ async function init() {
     }
     gui.add ( params, 'theta', 0, 90, 0.1).name('Slope angle (deg) (W/S)').listen()
         .onChange( () => update_slope_angle() );
-    gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Size', 'Particle Stress' ]).name('Colour by')
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
+    gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Size']).name('Colour by')
         .onChange( () => SPHERES.update_particle_material(params,
             // lut_folder
         ) );
@@ -228,6 +242,7 @@ function animate() {
         // if ( counter % 3 == 0 ) { update_graph(); }
         // counter += 1;
         update_graph();
+        SPHERES.draw_force_network(S, params, scene);
     }
     renderer.render( scene, camera );
 }
@@ -258,11 +273,13 @@ async function NDDEMPhysics() {
 function finish_setup() {
     S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
     S.simu_interpret_command("radius -1 0.5");
-    S.simu_interpret_command("mass -1 1");
+    let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+    S.simu_interpret_command("mass -1 " + String(m));
     S.simu_interpret_command("auto rho");
     S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
     S.simu_interpret_command("auto mass");
     S.simu_interpret_command("auto inertia");
+    S.simu_interpret_command("auto skin");
 
     S.simu_interpret_command("boundary 0 WALL 0 "+String(10*params.L));
     S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
@@ -275,14 +292,18 @@ function finish_setup() {
     S.simu_interpret_command("auto location roughinclineplane");
     // S.simu_interpret_command("auto location randomdrop");
 
-    S.simu_interpret_command("set Kn 2e4");
-    S.simu_interpret_command("set Kt 8e3");
-    S.simu_interpret_command("set GammaN 75");
-    S.simu_interpret_command("set GammaT 75");
+    let tc = 5e-3;
+    let rest = 0.2; // super low restitution coeff to dampen out quickly
+    let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+
+    S.simu_interpret_command("set Kn " + String(vals.stiffness));
+    S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
+    S.simu_interpret_command("set GammaN " + String(vals.dissipation));
+    S.simu_interpret_command("set GammaT " + String(vals.dissipation));
     S.simu_interpret_command("set Mu 0.5");
     S.simu_interpret_command("set T 150");
-    S.simu_interpret_command("set dt 0.002");
-    S.simu_interpret_command("set tdump 1000"); // how often to calculate wall forces
+    S.simu_interpret_command("set dt " + String(tc/20));
+    S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
     S.simu_interpret_command("auto skin");
     S.simu_finalise_init () ;
 
@@ -293,7 +314,7 @@ function finish_setup() {
     cgparam["boundaries"]=[
         [ params.r_max,-params.L+params.r_max,-params.L+params.r_max],
         [ 4*params.L,   params.L-params.r_max, params.L-params.r_max]] ;
-    cgparam["window size"]=2 ;
+    cgparam["window size"]=2*params.average_radius ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
@@ -398,7 +419,7 @@ function update_graph() {
 // }
 function make_graph() {
     let { data, layout } = LAYOUT.plotly_two_xaxis_graph('Downslope velocity (m/s)','Stress (Pa)','Height (mm)','Velocity','Pressure (p)','Shear stress (𝜏)');
-    var maxStress = 10*params.L*params.g_mag*0.6;
+    var maxStress = 4*params.L*params.particle_density*params.g_mag*0.6;
     layout.xaxis2 = {
         range: [0,maxStress],
         title: 'Stress (Pa)',
