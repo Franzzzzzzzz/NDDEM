@@ -98,11 +98,11 @@ export function update_particle_material(params, lut_folder) {
     }
     if ( params.lut === 'Velocity' ) {
         lut.setMin(0);
-        lut.setMax(params.vmax);
+        lut.setMax( params.vmax );
         // var min_el = lut_folder.add()
     } else if ( params.lut === 'Fluct Velocity') {
-        lut.setMin(-params.vmax);
-        lut.setMax( params.vmax);
+        lut.setMin(0);
+        lut.setMax( params.vmax/2. );
     } else if ( params.lut === 'Size' ) {
         lut = new Lut("cooltowarm", 512);
         // lut.setMin(params.r_min);
@@ -284,13 +284,10 @@ export function draw_force_network(S,params,scene) {
 
                     // c.material.emissiveIntensity = F_mag/F_mag_max;
 
-                    // console.log( c.position )
                     forces.add( c );
                 }
             }
-            // console.log(F[i])
         }
-        // console.log( forces );
         scene.add ( forces );
     }
 
