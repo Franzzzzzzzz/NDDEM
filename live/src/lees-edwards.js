@@ -20,7 +20,6 @@ let NDDEMCGLib;
 let pointer;
 let v, omegaMag;
 let radii;
-let particle_volume;
 let NDsolids, material, STLFilename;
 let meshes = new THREE.Group();
 let density, vavg, stressTcxx, stressTcyy, stressTczz, stressTcxy;
@@ -38,7 +37,8 @@ document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) +
 
 var params = {
     dimension: 3,
-    L: 3.7, //system size
+    initial_packing_fraction: 0.6,
+    // L: 0.025, //system size
     N: 500,
     // packing_fraction: 0.5,
     constant_volume: true,
@@ -48,8 +48,8 @@ var params = {
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
     d4_cur:0,
-    r_max: 0.55,
-    r_min: 0.45,
+    r_max: 0.0033,
+    r_min: 0.0027,
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -57,19 +57,28 @@ var params = {
     quality: 5,
     vmax: 50, // max velocity to colour by
     omegamax: 50, // max rotation rate to colour by
+    particle_density: 2700,
+    particle_opacity: 1.0,
 }
 
-params.average_radius = (params.r_min + params.r_max)/2.;
-let thickness = params.average_radius;
+set_derived_properties();
 
-particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+function set_derived_properties() {
+    params.average_radius = (params.r_min + params.r_max)/2.;
+    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+    console.log('estimate of particle volume: ' + params.particle_volume*params.N)
+    params.particle_mass = params.particle_volume * params.particle_density;
+    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;
+}
+
+
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
 if ( params.dimension === 4) {
     params.L = 2.5;
     params.N = 300
-    particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
 }
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
@@ -84,7 +93,7 @@ async function init() {
 
     //
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
     camera.position.set( 0, 0, -5*params.L );
     camera.up.set(1, 0, 0);
 
@@ -99,19 +108,6 @@ async function init() {
     dirLight.position.set( 5, -5, -5 );
     dirLight.castShadow = true;
     scene.add( dirLight );
-
-    // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
-    // const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
-    // const wall_material = new THREE.MeshLambertMaterial();
-    // wall_material.wireframe = true;
-    // const wall_material = new THREE.ShadowMaterial( )
-
-    // floor = new THREE.Mesh( wall_geometry, wall_material );
-    // floor.rotation.z = Math.PI/2.;
-    // // floor.position.x = -params.L - thickness/2.;// + params.r_min + params.r_max;
-    // floor.scale.x = 2*params.L + 2*thickness;
-    // floor.scale.z = 2*params.L + 2*thickness;
-    // scene.add( floor );
 
     SPHERES.add_spheres(S,params,scene);
 
@@ -138,7 +134,10 @@ async function init() {
     }
     gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
         .onChange( () => update_shear_rate() );
-    gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
+    gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
             .onChange( () => SPHERES.update_particle_material(params,
                 // lut_folder
             ) );
@@ -219,6 +218,7 @@ function animate() {
         }
 
         update_graph();
+        SPHERES.draw_force_network(S, params, scene);
     }
     renderer.render( scene, camera );
 }
@@ -316,11 +316,13 @@ async function NDDEMCGPhysics() {
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
-        S.simu_interpret_command("mass -1 1");
+        let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
         S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
         S.simu_interpret_command("auto mass");
         S.simu_interpret_command("auto inertia");
+        S.simu_interpret_command("auto skin");
 
         S.simu_interpret_command("boundary 0 PBCLE -"+String(params.L)+" "+String(params.L)+" "+String(params.shear_rate));
         S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
@@ -332,17 +334,19 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("auto location randomdrop");
 
-        S.simu_interpret_command("set Kn 2e5");
-        S.simu_interpret_command("set Kt 8e4");
-        S.simu_interpret_command("set GammaN 75");
-        S.simu_interpret_command("set GammaT 75");
+        let tc = 1e-3;
+        let rest = 0.2; // super low restitution coeff to dampen out quickly
+        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+
+        S.simu_interpret_command("set Kn " + String(vals.stiffness));
+        S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
+        S.simu_interpret_command("set GammaN " + String(vals.dissipation));
+        S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
         S.simu_interpret_command("set T 150");
-        S.simu_interpret_command("set dt 0.0002");
-        S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
-        S.simu_interpret_command("auto skin");
+        S.simu_interpret_command("set dt " + String(tc/20));
+        S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.simu_finalise_init () ;
-
 
         var cgparam ={} ;
         cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
@@ -351,7 +355,7 @@ async function NDDEMCGPhysics() {
         cgparam["boundaries"]=[
             [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
             [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
-        cgparam["window size"]=2 ;
+        cgparam["window size"]=2*params.average_radius ;
         cgparam["skip"]=0;
         cgparam["max time"]=1 ;
         cgparam["time average"]="None" ;

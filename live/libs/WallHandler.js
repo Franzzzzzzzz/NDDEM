@@ -20,8 +20,11 @@ import { PIDcontroller } from './PIDcontroller.js'
 var loader = new FontLoader();
 loader.load("./helvetiker_bold.typeface.json", function (f) { font = f });
 
-let p_controller = new PIDcontroller(5e-4,1e-5,0);
-let q_controller = new PIDcontroller(5e-4,1e-5,0);
+// let p_controller = new PIDcontroller(5e-4,1e-5,0);
+// let q_controller = new PIDcontroller(5e-4,1e-5,0);
+let p_controller = new PIDcontroller(1e-5,5e-6,0);
+let q_controller = new PIDcontroller(1e-5,5e-6,0);
+
 // let radial_controller = new PIDcontroller(1e-3,0,0);
 // let y_controller = new PIDcontroller(1e-3,0,0);
 // let z_controller = new PIDcontroller(1e-3,0,0);
