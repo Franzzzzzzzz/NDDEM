@@ -272,19 +272,21 @@ export function draw_force_network(S,params,scene) {
                 let a = spheres.children[F[i][0]].position;
                 let b = spheres.children[F[i][1]].position;
                 let distance = a.distanceTo( b );
-                let mid_point = new Vector3();
-                mid_point.addVectors(a,b);
-                mid_point.divideScalar(2);
-                c.position.copy( mid_point );
-                c.scale.set(width*F_mag/F_mag_max,
-                            width*F_mag/F_mag_max,
-                            distance);
-                c.lookAt(a);
+                if ( distance < (radii[F[i][0]] + radii[F[i][1]]) ) { // ignore periodic boundaries
+                    let mid_point = new Vector3();
+                    mid_point.addVectors(a,b);
+                    mid_point.divideScalar(2);
+                    c.position.copy( mid_point );
+                    c.scale.set(width*F_mag/F_mag_max,
+                                width*F_mag/F_mag_max,
+                                distance);
+                    c.lookAt(a);
 
-                // c.material.emissiveIntensity = F_mag/F_mag_max;
+                    // c.material.emissiveIntensity = F_mag/F_mag_max;
 
-                // console.log( c.position )
-                forces.add( c );
+                    // console.log( c.position )
+                    forces.add( c );
+                }
             }
             // console.log(F[i])
         }
