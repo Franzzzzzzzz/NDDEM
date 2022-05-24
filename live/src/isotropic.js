@@ -58,6 +58,7 @@ var params = {
     omegamax: 20, // max rotation rate to colour by
     loading_active: false,
     particle_density: 2700, // kg/m^3
+    particle_opacity: 1.0,
     hideaxes: false,
 }
 set_derived_properties();
@@ -162,6 +163,9 @@ async function init() {
                 }
             });
     }
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
     gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')
         .onChange( () => SPHERES.update_particle_material(params,
             // lut_folder
@@ -240,6 +244,8 @@ function animate() {
                 }
                 WALLS.update_isotropic_wall(params, S, scene);
                 update_graph();
+                SPHERES.draw_force_network(S, params, scene);
+
             }
         }
 
