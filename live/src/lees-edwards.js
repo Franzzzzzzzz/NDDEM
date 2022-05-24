@@ -59,6 +59,7 @@ var params = {
     omegamax: 50, // max rotation rate to colour by
     particle_density: 2700,
     particle_opacity: 1.0,
+    show_colorbar: true,
 }
 
 set_derived_properties();
@@ -132,7 +133,7 @@ async function init() {
                 }
             });
     }
-    gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
+    gui.add ( params, 'shear_rate', -100, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
         .onChange( () => update_shear_rate() );
     gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
         // lut_folder
@@ -165,9 +166,11 @@ async function init() {
     animate();
 }
 
+
 function update_shear_rate() {
     S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
-    params.vmax = 1.5*params.shear_rate*params.L;
+    params.vmax = 1.5*Math.abs(params.shear_rate)*params.L;
+    params.omegamax = 1e3*Math.abs(params.shear_rate)*params.average_radius;
     SPHERES.update_particle_material(params);
 }
 

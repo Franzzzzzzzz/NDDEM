@@ -132,6 +132,34 @@ export function update_particle_material(params, lut_folder) {
         // spheres[i][4]
       // );
     }
+
+    // if ( params.show_colorbar ) {
+    //     let canvas = document.getElementById("canvas");
+    //     let colorbar = document.createElement("canvas");
+    //     canvas.appendChild(colorbar);
+    //     colorbar.setAttribute("id", "colorbar");
+    //     let colorbarCanvas = lut.createCanvas();
+    //
+    //     console.log(canvas)
+    //     colorbar.width = canvas.offsetWidth;
+    //     colorbar.height = 50;
+    //
+    //     //grab the context from your destination canvas
+    //     var ctx = colorbar.getContext('2d');
+    //
+    //
+    //     ctx.translate(ctx.width/2., ctx.height/2.);
+    //
+    //     // rotate around that point, converting our
+    //     // angle from degrees to radians
+    //     ctx.rotate(Math.PI/2.);
+    //     ctx.translate(-ctx.width/2.,-ctx.height/2.);
+    //
+    //     // draw it up and to the left by half the width
+    //     // and height of the image
+    //     // ctx.drawImage(colorbarCanvas, -(colorbarCanvas.width/2), -(colorbarCanvas.height/2));
+    //     ctx.drawImage(colorbarCanvas, 0, 0, ctx.width, ctx.height);
+    // }
 }
 
 export function move_spheres(S,params) {
@@ -252,43 +280,48 @@ export function randomise_particles_isotropic( params, S ) {
 
 export function draw_force_network(S,params,scene) {
     if ( S !== undefined ) {
-        scene.remove( forces );
-        forces = new Group();
+        if (params.particle_opacity < 1) {
+            scene.remove( forces );
+            forces = new Group();
 
-        var F = S.simu_getParticleForce(); // very poorly named
+            var F = S.simu_getParticleForce(); // very poorly named
 
-        let width = radii[0]/2.;
-        let F_mag_max = 1e0;
+            let width = radii[0]/2.;
+            let F_mag_max = 1e0;
 
-        for ( let i = 0; i < F.length; i ++ ) {
-        // for ( let i = 0; i < 100; i ++ ) {
-            let F_mag = Math.sqrt(
-                Math.pow(F[i][2],2) +
-                Math.pow(F[i][3],2) +
-                Math.pow(F[i][4],2)
-            )
-            if (F_mag > 0) {
-                let c = cylinder.clone();
-                let a = spheres.children[F[i][0]].position;
-                let b = spheres.children[F[i][1]].position;
-                let distance = a.distanceTo( b );
-                if ( distance < (radii[F[i][0]] + radii[F[i][1]]) ) { // ignore periodic boundaries
-                    let mid_point = new Vector3();
-                    mid_point.addVectors(a,b);
-                    mid_point.divideScalar(2);
-                    c.position.copy( mid_point );
-                    c.scale.set(width*F_mag/F_mag_max,
-                                width*F_mag/F_mag_max,
-                                distance);
-                    c.lookAt(a);
+            for ( let i = 0; i < F.length; i ++ ) {
+            // for ( let i = 0; i < 100; i ++ ) {
+                let F_mag = Math.sqrt(
+                    Math.pow(F[i][2],2) +
+                    Math.pow(F[i][3],2) +
+                    Math.pow(F[i][4],2)
+                )
+                if (F_mag > 0) {
+                    let c = cylinder.clone();
+                    let a = spheres.children[F[i][0]].position;
+                    let b = spheres.children[F[i][1]].position;
+                    let distance = a.distanceTo( b );
+                    if ( distance < (radii[F[i][0]] + radii[F[i][1]]) ) { // ignore periodic boundaries
+                        let mid_point = new Vector3();
+                        mid_point.addVectors(a,b);
+                        mid_point.divideScalar(2);
+                        c.position.copy( mid_point );
+                        c.scale.set(width*F_mag/F_mag_max,
+                                    width*F_mag/F_mag_max,
+                                    distance);
+                        c.lookAt(a);
 
-                    // c.material.emissiveIntensity = F_mag/F_mag_max;
+                        // c.material.emissiveIntensity = F_mag/F_mag_max;
 
-                    forces.add( c );
+                        forces.add( c );
+                    }
                 }
             }
+            scene.add ( forces );
         }
-        scene.add ( forces );
+        else {
+            if ( forces.parent === scene ) { scene.remove(forces) }
+        }
     }
 
 }
