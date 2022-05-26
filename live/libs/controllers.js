@@ -1,6 +1,6 @@
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 
-let controller1, controller2;
+export let controller1, controller2, controllerGrip1, controllerGrip2;
 
 function onSelectStart() {
 
@@ -23,14 +23,14 @@ export function add_controllers(renderer, scene) {
 
 	const controllerModelFactory = new XRControllerModelFactory();
 
-	// let controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-	// controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-	// scene.add( controllerGrip1 );
-    //
-	// let controllerGrip2 = renderer.xr.getControllerGrip( 1 );
-	// controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
-	// scene.add( controllerGrip2 );
+	let controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+	controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+	scene.add( controllerGrip1 );
 
-    let controllerHand0 = renderer.xr.getHand( 0 );
-	scene.add( controllerHand0 );
+	let controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+	controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+	scene.add( controllerGrip2 );
+
+    // let controllerHand0 = renderer.xr.getHand( 0 );
+	// scene.add( controllerHand0 );
 }
