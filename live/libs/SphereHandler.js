@@ -2,8 +2,9 @@ let radii;
 export let spheres;
 let NDParticleShader;
 let v, omegaMag;
-
+export let ray;
 export let total_particle_volume;
+export let x;
 
 import { Lut } from "three/examples/jsm/math/Lut.js";
 // import { Lut } from './js/Lut.js'
@@ -14,20 +15,31 @@ import {
     Matrix4,
     Group,
     Color,
+    Line,
     Mesh,
+    BufferGeometry,
     SphereGeometry,
     CylinderGeometry,
+    LineBasicMaterial,
     MeshStandardMaterial
 } from "three";
 
 let forces = new Group();
 
 const cylinder_geometry = new CylinderGeometry( 1, 1, 1, 16 );
-cylinder_geometry.applyMatrix( new Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
+cylinder_geometry.applyMatrix4( new Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
 const cylinder_material = new MeshStandardMaterial( {color: 0xffffff} );
 cylinder_material.emissive = new Color( 0x0000ff );
 cylinder_material.transparent = false;
 const cylinder = new Mesh( cylinder_geometry, cylinder_material );
+
+ray = new Line(
+    new BufferGeometry().setFromPoints([
+        new Vector3(0,-3,0),
+        new Vector3(0,0,0),
+    ]),
+    new LineBasicMaterial( { color: 0xffffff })
+);
 
 export async function createNDParticleShader(params) {
     import("./shaders/" + params.dimension + "DShader.js").then((module) => {
@@ -78,12 +90,53 @@ export function add_spheres(S,params,scene) {
     update_particle_material(params, lut_folder)
 }
 
+export function add_pool_spheres(S,params,scene) {
+    radii = S.simu_getRadii();
+
+    spheres = new Group();
+    scene.add(spheres);
+
+    const geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
+
+    for ( let i = 0; i < params.N; i ++ ) {
+        if ( i == 0 ) {
+            var material = new MeshStandardMaterial( {
+                color: 0x0aaaaaa });
+        }
+        else {
+            var material = NDParticleShader.clone();
+            material.uniforms.R.value = params.radius;
+            material.uniforms.banding.value = 1 + 2*(i%3);
+            // material.uniforms.opacity.value = 1;
+        }
+        var object = new Mesh(geometrySphere, material);
+        object.position.set(0,0,0);
+        object.rotation.z = Math.PI / 2;
+        object.NDDEM_ID = i;
+        object.castShadow = true;
+        object.receiveShadow = true;
+        spheres.add(object);
+    }
+
+    // display white ball
+    // spheres.children[0].material.uniforms.banding.value = 1.;
+    // spheres.children[0].material.uniforms.ambient.value = 5.;
+
+    // display black ball
+    spheres.children[11].material.uniforms.banding.value = 0.;
+    spheres.children[11].material.uniforms.ambient.value = 1.;
+
+    spheres.children[0].add(ray); // add line
+
+}
+
 export function update_particle_material(params, lut_folder) {
+    if ( params.particle_opacity === undefined ) { params.particle_opacity = 1; }
     if ( params.lut === 'None' ) {
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
             object.material = NDParticleShader.clone();
-            object.material.transparent = true;
+            if ( params.particle_opacity < 1 ) { object.material.transparent = true; }
             // object.material.opacity = params.particle_opacity;
             object.material.uniforms.opacity.value = params.particle_opacity;
         }
@@ -163,7 +216,7 @@ export function update_particle_material(params, lut_folder) {
 }
 
 export function move_spheres(S,params) {
-    var x = S.simu_getX();
+    x = S.simu_getX();
     var orientation = S.simu_getOrientation();
     if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
         v = S.simu_getVelocity();
