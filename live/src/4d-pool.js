@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 import * as SPHERES from "../libs/SphereHandler.js"
 import * as WALLS from "../libs/WallHandler.js"
@@ -43,7 +44,6 @@ var raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let intersection_plane = new THREE.Plane();
 let camera_direction = new THREE.Vector3();
-let ray;
 let isMobile;
 
 let INTERSECTED = null;
@@ -72,19 +72,14 @@ var params = {
     dt: 0.0005,
     track_white_ball: true,
     strength: 1,
+    quality: 7,
 }
 
 params.N = get_num_particles(params.pyramid_size);
 
-var quality = 7;
 let sunk_balls = [];
 
-var NDParticleShader;
-import("../libs/shaders/" + params.dimension + "DShader.js").then((module) => {
-    NDParticleShader = module.NDDEMShader;
-    init();
-});
-// SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init() );
 
 async function init() {
 
@@ -109,15 +104,7 @@ async function init() {
     dirLight.shadow.mapSize.height = 2*1024;
     scene.add( dirLight );
 
-    ray = new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(0,-3,0),
-            new THREE.Vector3(0,0,0),
-        ]),
-        new THREE.LineBasicMaterial( { color: 0xffffff })
-    );
-
-    add_spheres();
+    SPHERES.add_pool_spheres(S,params,scene);
 
     // STLFilename = './stls/4d-pool.stl'; // this one has crap pockets
     STLFilename = './stls/4d-pool-no-holes.stl';
@@ -142,13 +129,19 @@ async function init() {
     renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild( renderer.domElement );
 
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        document.body.appendChild( VRButton.createButton( renderer ) );
+        renderer.xr.enabled = true;
+        CONTROLLERS.add_controllers(renderer, scene);
+    }
+
     // gui
     gui = new GUI();
     gui.width = 400;
 
     gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
     gui.add( params, 'strength', 0,2, 0.001).name( 'Strength (a/d)').listen().onChange(() => {
-        ray.scale.y = 2*params.strength;
+        SPHERES.ray.scale.y = 2*params.strength;
     });
     gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
     const controls = new OrbitControls( camera, renderer.domElement );
@@ -251,18 +244,18 @@ function onWindowResize(){
 function animate() {
     if ( clock.getElapsedTime() > 1 ) { started = true; }
     requestAnimationFrame( animate );
-    move_spheres();
+    SPHERES.move_spheres(S,params);
 
-    direction.copy(spheres.children[0].position);
+    direction.copy(SPHERES.spheres.children[0].position);
     direction.sub(camera.position);
-    let d4offset = params.d4_cur - x[0][3];
+    let d4offset = params.d4_cur - SPHERES.x[0][3];
     var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y + d4offset*d4offset);
     direction.x /= l;
     direction.y /= l;
     direction.z = 0;
     direction.d4 = d4offset/l;
 
-    ray.rotation.z = Math.atan2(direction.y,direction.x);
+    SPHERES.ray.rotation.z = Math.atan2(direction.y,direction.x);
 
     if ( locked_particle !== null ) {
         // console.log(locked_particle)
@@ -284,6 +277,8 @@ function animate() {
     if ( !params.paused ) {
         S.step_forward(20);
     }
+
+    check_pockets();
 
     if ( params.track_white_ball ) {
         if ( NDsolids !== undefined ) {
@@ -318,112 +313,140 @@ function animate() {
 
 }
 
-function add_spheres() {
-    spheres = new THREE.Group();
-    scene.add(spheres);
+// function add_pool_spheres() {
+//     spheres = new THREE.Group();
+//     scene.add(spheres);
+//
+//     const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
+//
+//     for ( let i = 0; i < params.N; i ++ ) {
+//         if ( i == 0 ) {
+//             var material = new THREE.MeshStandardMaterial( {
+//                 color: 0x0aaaaaa });
+//         }
+//         else {
+//             var material = NDParticleShader.clone();
+//             material.uniforms.R.value = params.radius;
+//             material.uniforms.banding.value = 1 + 2*(i%3);
+//         }
+//         var object = new THREE.Mesh(geometrySphere, material);
+//         object.position.set(0,0,0);
+//         object.rotation.z = Math.PI / 2;
+//         object.NDDEM_ID = i;
+//         object.castShadow = true;
+//         object.receiveShadow = true;
+//         spheres.add(object);
+//     }
+//
+//     // display white ball
+//     // spheres.children[0].material.uniforms.banding.value = 1.;
+//     // spheres.children[0].material.uniforms.ambient.value = 5.;
+//
+//     // display black ball
+//     spheres.children[11].material.uniforms.banding.value = 0.;
+//     spheres.children[11].material.uniforms.ambient.value = 1.;
+//
+//     spheres.children[0].add(ray); // add line
+//
+// }
 
-    const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
+let pocket_locs = [
+    [-params.L1,-params.L2],
+    [-params.L1, params.L2],
+    [ params.L1,-params.L2],
+    [ params.L1, params.L2],
+    [         0,-params.L2],
+    [         0, params.L2],
+];
 
-    for ( let i = 0; i < params.N; i ++ ) {
-        if ( i == 0 ) {
-            var material = new THREE.MeshStandardMaterial( {
-                color: 0x0aaaaaa });
+function in_pocket(loc) {
+    // should work for actual pockets:
+    // if ( x[2] < -params.L3+params.radius-params.pocket_size ) {
+    //     console.log('fallen off table (hopefully out of a hole)')
+    //     return true;
+    //     // return false;
+    // }
+    pocket_locs.forEach(pocket => {
+        if ( Math.pow(loc[0] - pocket[0],2) + Math.pow(loc[1] - pocket[1],2) < params.pocket_size ) {
+            console.log('fallen off table (hopefully out of a hole)')
+            return true;
         }
-        else {
-            var material = NDParticleShader.clone();
-            material.uniforms.R.value = params.radius;
-            material.uniforms.banding.value = 1 + 2*(i%3);
-        }
-        var object = new THREE.Mesh(geometrySphere, material);
-        object.position.set(0,0,0);
-        object.rotation.z = Math.PI / 2;
-        object.NDDEM_ID = i;
-        object.castShadow = true;
-        object.receiveShadow = true;
-        spheres.add(object);
-    }
-
-    // display white ball
-    // spheres.children[0].material.uniforms.banding.value = 1.;
-    // spheres.children[0].material.uniforms.ambient.value = 5.;
-
-    // display black ball
-    spheres.children[11].material.uniforms.banding.value = 0.;
-    spheres.children[11].material.uniforms.ambient.value = 1.;
-
-    spheres.children[0].add(ray); // add line
-
+    });
+    return false;
 }
 
-function in_pocket(x) {
-    if ( x[2] < -params.L3+params.radius-params.pocket_size ) {
-        console.log('fallen off table (hopefully out of a hole)')
-        return true;
-        // return false;
-    }
-    else {
-        return false
-    }
-}
-
-function move_spheres() {
-    x = S.getX();
-    var orientation = S.getOrientation();
-    if ( urlParams.has('lut') ) {
-        if ( urlParams.get('lut') === 'velocity' ) {
-            v = S.getVelocity();
-        }
-        // spheres.instanceColor.needsUpdate = true;
-
-    }
+function check_pockets() {
     for ( let i = 0; i < params.N; i ++ ) {
-        var object = spheres.children[i];
-        // if ( object.visible ) {
-        //     if ( in_pocket(x[i]) ) {
-        //         object.visible = false;
-        //         sunk_balls.push(i)
-        //         S.fixParticle(i, [1.1*params.L, sunk_balls.length, 0, 0])
-        //         S.setFrozen(i);
-        //     }
-        // }
-
-        // const matrix = new THREE.Matrix4();
-        // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
-        if ( params.dimension == 4 ) {
-            var D_draw = 2*Math.sqrt(
-              Math.pow(params.radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
-            );
-            object.scale.set(D_draw, D_draw, D_draw);
-            // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
-        }
-        // spheres.setMatrixAt( i, matrix );
-        object.position.set( x[i][0], x[i][1], x[i][2] );
-        if ( urlParams.has('lut') ) {
-            if ( urlParams.get('lut') === 'velocity' ) {
-                spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
+        var object = SPHERES.spheres.children[i];
+        if ( object.visible ) {
+            if ( in_pocket(SPHERES.x[i]) ) {
+                object.visible = false;
+                sunk_balls.push(i)
+                S.fixParticle(i, [1.1*params.L1, sunk_balls.length, 0, 0])
+                S.setFrozen(i);
             }
         }
-        if ( i > 0 ) {
-            // console.log(params.d4_cur)
-            for (var j = 0; j < params.dimension - 3; j++) {
-
-              object.material.uniforms.xview.value[j] =
-                params.d4_cur;
-              object.material.uniforms.xpart.value[j] =
-                x[i][j + 3];
-            }
-            object.material.uniforms.A.value = orientation[i];
-        }
-        // if (params.dimension > 3) {
-        //   object.material.uniforms.x4p.value = x[i][j + 3];
-        //   object.material.uniforms.x4.value = params.d4_cur;
-        // } else {
-        //   object.material.uniforms.x4p.value = 0.0;
-        // }
     }
-    // spheres.instanceMatrix.needsUpdate = true;
-    // console.log(orientation[0])
 }
+
+// function move_spheres() {
+//     x = S.getX();
+//     var orientation = S.getOrientation();
+//     if ( urlParams.has('lut') ) {
+//         if ( urlParams.get('lut') === 'velocity' ) {
+//             v = S.getVelocity();
+//         }
+//         // spheres.instanceColor.needsUpdate = true;
+//
+//     }
+//     for ( let i = 0; i < params.N; i ++ ) {
+//         var object = spheres.children[i];
+//         // if ( object.visible ) {
+//         //     if ( in_pocket(x[i]) ) {
+//         //         object.visible = false;
+//         //         sunk_balls.push(i)
+//         //         S.fixParticle(i, [1.1*params.L, sunk_balls.length, 0, 0])
+//         //         S.setFrozen(i);
+//         //     }
+//         // }
+//
+//         // const matrix = new THREE.Matrix4();
+//         // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
+//         if ( params.dimension == 4 ) {
+//             var D_draw = 2*Math.sqrt(
+//               Math.pow(params.radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
+//             );
+//             object.scale.set(D_draw, D_draw, D_draw);
+//             // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
+//         }
+//         // spheres.setMatrixAt( i, matrix );
+//         object.position.set( x[i][0], x[i][1], x[i][2] );
+//         if ( urlParams.has('lut') ) {
+//             if ( urlParams.get('lut') === 'velocity' ) {
+//                 spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
+//             }
+//         }
+//         if ( i > 0 ) {
+//             // console.log(params.d4_cur)
+//             for (var j = 0; j < params.dimension - 3; j++) {
+//
+//               object.material.uniforms.xview.value[j] =
+//                 params.d4_cur;
+//               object.material.uniforms.xpart.value[j] =
+//                 x[i][j + 3];
+//             }
+//             object.material.uniforms.A.value = orientation[i];
+//         }
+//         // if (params.dimension > 3) {
+//         //   object.material.uniforms.x4p.value = x[i][j + 3];
+//         //   object.material.uniforms.x4.value = params.d4_cur;
+//         // } else {
+//         //   object.material.uniforms.x4p.value = 0.0;
+//         // }
+//     }
+//     // spheres.instanceMatrix.needsUpdate = true;
+//     // console.log(orientation[0])
+// }
 
 async function NDDEMPhysics() {
 
@@ -446,6 +469,10 @@ async function NDDEMPhysics() {
         }
     });
 
+    // overload for old DEMND instead of DEMCGND
+    S.simu_getRadii = S.getRadii;
+    S.simu_getX = S.getX;
+    S.simu_getOrientation = S.getOrientation;
 
 
     function finish_setup() {

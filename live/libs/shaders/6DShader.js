@@ -152,6 +152,7 @@ var NDDEMShader = new ShaderMaterial({
 
   fragmentShader: [
     "uniform float ambient;", // brightness of particle
+    "uniform float opacity;", // opacity of particle
 
     "varying vec3 vNormal;",
     "varying vec3 vColor;",
