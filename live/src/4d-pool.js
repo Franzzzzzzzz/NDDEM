@@ -7,6 +7,9 @@ import * as SPHERES from "../libs/SphereHandler.js"
 import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
 import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
+
+import * as CONTROLLERS from '../libs/controllers.js';
+import * as POOLCUE from '../libs/PoolCue.js';
 // import { PoolTableShader } from '../libs/PoolTableShader.js';
 
 var urlParams = new URLSearchParams(window.location.search);
@@ -76,6 +79,12 @@ var params = {
 }
 
 params.N = get_num_particles(params.pyramid_size);
+if ( urlParams.has('vr') || urlParams.has('VR') ) {
+    params.N_real = params.N + 1;
+}
+else {
+    params.N_real = params.N;
+}
 
 let sunk_balls = [];
 
@@ -106,8 +115,8 @@ async function init() {
 
     SPHERES.add_pool_spheres(S,params,scene);
 
-    // STLFilename = './stls/4d-pool.stl'; // this one has crap pockets
-    STLFilename = './stls/4d-pool-no-holes.stl';
+    STLFilename = './stls/4d-pool.stl'; // this one has crap pockets
+    // STLFilename = './stls/4d-pool-no-holes.stl';
     // const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
         // t.encoding = THREE.sRGBEncoding;
         // t.mapping = THREE.EquirectangularReflectionMapping;
@@ -166,6 +175,11 @@ async function init() {
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'keypress', onSelectParticle, false );
+
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        POOLCUE.add_pool_cue( CONTROLLERS.controller1 );
+    }
+
 
     animate();
 }
@@ -243,7 +257,7 @@ function onWindowResize(){
 
 function animate() {
     if ( clock.getElapsedTime() > 1 ) { started = true; }
-    requestAnimationFrame( animate );
+
     SPHERES.move_spheres(S,params);
 
     direction.copy(SPHERES.spheres.children[0].position);
@@ -306,6 +320,16 @@ function animate() {
     //         INTERSECTED = null;
     //     }
     // }
+
+    if ( urlParams.has('vr') || urlParams.has('VR') ) {
+        renderer.setAnimationLoop( function () {
+	           renderer.render( scene, camera );
+       } );
+    }
+    else {
+        requestAnimationFrame( animate );
+    }
+
 
 
     renderer.render( scene, camera );
@@ -460,11 +484,11 @@ async function NDDEMPhysics() {
     // NDDEMLib = await DEMND(); // eslint-disable-line no-undef
     await DEMND().then( (NDDEMLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMLib.Simulation3 (params.N);
+            S = new NDDEMLib.Simulation3 (params.N_real);
             finish_setup();
         }
         else if ( params.dimension == 4 ) {
-            S = new NDDEMLib.Simulation4 (params.N);
+            S = new NDDEMLib.Simulation4 (params.N_real);
             finish_setup();
         }
     });
@@ -476,7 +500,8 @@ async function NDDEMPhysics() {
 
 
     function finish_setup() {
-        S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
+        S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N_real));
+
         S.interpret_command("radius -1 " + String(params.radius));
         S.interpret_command("mass -1 0.1");
         S.interpret_command("auto rho");
@@ -510,6 +535,14 @@ async function NDDEMPhysics() {
                 }
             }
         }
+
+        // add the cue stick
+        if ( urlParams.has('VR') || urlParams.has('vr') ) {
+            S.interpret_command("location " + String(params.N) + " 0 0 0 0")
+        }
+
+
+
         S.interpret_command("set Kn 2e5");
         S.interpret_command("set Kt 8e4");
         S.interpret_command("set GammaN 75");
