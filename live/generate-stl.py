@@ -177,21 +177,22 @@ def make_3D_pool_table():
 def make_4D_pool_table_no_holes():
     N = 4 # dimension
     L1 = 2
-    L2 = 1
-    L3 = 0.1 # this is the direction of gravity
+    L2 = 0.1 # this is the direction of gravity
+    L3 = 1
     L4 = 0.5
 
-    bottom_wall = d4cube(zero_dim=2)
-    bottom_wall.scale([L1,L2,1,L4])
-    bottom_wall.translate([0,0,-L3,0])
 
-    left_wall = d4cube(zero_dim=1)
-    left_wall.scale([L1,1,L3,L4])
-    left_wall.translate([0,-L2,0,0])
+    bottom_wall = d4cube(zero_dim=1)
+    bottom_wall.scale([L1,1,L3,L4])
+    bottom_wall.translate([0,-L2,0,0])
 
-    right_wall = d4cube(zero_dim=1)
-    right_wall.scale([L1,1,L3,L4])
-    right_wall.translate([0,L2,0,0])
+    left_wall = d4cube(zero_dim=2)
+    left_wall.scale([L1,L2,1,L4])
+    left_wall.translate([0,0,-L3,0])
+
+    right_wall = d4cube(zero_dim=2)
+    right_wall.scale([L1,L2,1,L4])
+    right_wall.translate([0,0,L3,0])
 
     front_wall = d4cube(zero_dim=0)
     front_wall.scale([1,L2,L3,L4])
@@ -215,32 +216,36 @@ def make_4D_pool_table_no_holes():
 def make_4D_pool_table():
     N = 4 # dimension
     L1 = 2
-    L2 = 1
-    L3 = 0.1 # this is the direction of gravity
+    L2 = 0.1 # this is the direction of gravity
+    L3 = 1
     L4 = 0.5
-    pocket_size = 0.25
+    pocket_size = 0.15
     n_bottom_walls = 20
     bottom_walls = []
     for i in range(n_bottom_walls):
         theta = i*np.pi/2/(n_bottom_walls-1) # angle along arc of pocket
-        L1_cur = L1 - pocket_size*np.sin(theta)
-        L2_cur = L2 - pocket_size*np.cos(theta)
-        bottom_wall = d4cube(zero_dim=2)
-        bottom_wall.scale([L1_cur,L2_cur,1,L4])
-        bottom_wall.translate([0,0,-L3,0])
+        L1_cur = L1/2. - pocket_size*np.sin(theta)
+        L3_cur = L3 - pocket_size*np.cos(theta)
+        bottom_wall = d4cube(zero_dim=1)
+        bottom_wall.scale([L1_cur,1,L3_cur,L4])
+        bottom_wall.translate([L1/2.,-L2,0,0])
+        bottom_walls.append(bottom_wall.data.copy())
+
+        bottom_wall.translate([-L1,0,0,0])
         bottom_walls.append(bottom_wall.data)
 
-    bottom_wall_b = d4cube(zero_dim=2)
-    bottom_wall_b.scale([L1-pocket_size,L2,1,L4])
-    bottom_wall_b.translate([0,0,-L3,0])
 
-    left_wall = d4cube(zero_dim=1)
-    left_wall.scale([L1,1,L3,L4])
-    left_wall.translate([0,-L2,0,0])
+    # bottom_wall_b = d4cube(zero_dim=2)
+    # bottom_wall_b.scale([L1-pocket_size,1,L3,L4])
+    # bottom_wall_b.translate([0,-L2,0,0])
 
-    right_wall = d4cube(zero_dim=1)
-    right_wall.scale([L1,1,L3,L4])
-    right_wall.translate([0,L2,0,0])
+    left_wall = d4cube(zero_dim=2)
+    left_wall.scale([L1,L2,1,L4])
+    left_wall.translate([0,0,-L3,0])
+
+    right_wall = d4cube(zero_dim=2)
+    right_wall.scale([L1,L2,1,L4])
+    right_wall.translate([0,0,L3,0])
 
     front_wall = d4cube(zero_dim=0)
     front_wall.scale([1,L2,L3,L4])

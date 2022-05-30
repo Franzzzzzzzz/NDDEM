@@ -47,7 +47,9 @@ var params = {
     paused: false,
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
-    d4_cur:0,
+    d4: { cur:0,
+         min:0,
+         max:0 },
     r_max: 0.0033,
     r_min: 0.0027,
     freq: 0.05,
@@ -227,82 +229,8 @@ function animate() {
     renderer.render( scene, camera );
 }
 
-
-// function add_spheres() {
-//     radii = S.simu_getRadii();
-//     spheres = new THREE.Group();
-//     scene.add(spheres);
-//
-//     const color = new THREE.Color();
-//
-//     const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
-//
-//     for ( let i = 0; i < params.N; i ++ ) {
-//         const material = NDParticleShader.clone();
-//         var object = new THREE.Mesh(geometrySphere, material);
-//         object.position.set(0,0,0);
-//         object.rotation.z = Math.PI / 2;
-//         object.NDDEM_ID = i;
-//         spheres.add(object);
-//     }
-// }
-//
-// function move_spheres() {
-//     var x = S.simu_getX();
-//     var orientation = S.simu_getOrientation();
-//     if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
-//         v = S.simu_getVelocity();
-//     }
-//     else if ( params.lut === 'Rotation Rate' ) {
-//         omegaMag = S.simu_getRotationRate();
-//     }
-//     else if ( params.lut === 'Force' ) {
-//         forceMag = S.simu_getParticleStress(); // NOTE: NOT IMPLEMENTED YET
-//     }
-//
-//     for ( let i = 0; i < params.N; i ++ ) {
-//         var object = spheres.children[i];
-//         if ( params.dimension == 3 ) {
-//             var D_draw = 2*radii[i];
-//             object.scale.set(D_draw, D_draw, D_draw);
-//         }
-//         else if ( params.dimension == 4 ) {
-//             var D_draw = 2*Math.sqrt(
-//               Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
-//             );
-//             object.scale.set(D_draw, D_draw, D_draw);
-//         }
-//         object.position.set( x[i][0], x[i][1], x[i][2] );
-//         object.material.uniforms.R.value = radii[i];
-//         if ( params.lut === 'Velocity' ) {
-//             object.material.uniforms.ambient.value = 0.5 + 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
-//         }
-//         if ( params.lut === 'Fluct Velocity' ) {
-//             object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1] - params.shear_rate*x[i][0],2) + Math.pow(v[i][2],2) );
-//             // object.material.uniforms.ambient.value = params.shear_rate*x[i][0];
-//         }
-//         if ( params.lut === 'Rotation Rate' ) {
-//             // console.log(omegaMag[i])
-//             object.material.uniforms.ambient.value = 0.5 + 0.01*omegaMag[i];
-//         }
-//         for (var j = 0; j < params.N - 3; j++) {
-//           object.material.uniforms.xview.value[j] =
-//             params.d4_cur;
-//           object.material.uniforms.xpart.value[j] =
-//             x[i][j + 3];
-//         }
-//         object.material.uniforms.A.value = orientation[i];
-//     }
-// }
-
 async function NDDEMCGPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //     console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    // }
-
-    // NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
             S = new NDDEMCGLib.DEMCGND (params.N);
@@ -377,14 +305,7 @@ async function NDDEMCGPhysics() {
 }
 
 function update_graph() {
-    // density = params.packing_fraction*material_density;
-    // vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
-    // console.log(vertical_stress)
-    // shear_time.push(shear);
-    // density_time.push(density);
 
-    // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
-    //console.log(density,vavg)
     var maxVelocity = vavg.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
 
     Plotly.update('stats', {
@@ -410,139 +331,7 @@ function update_graph() {
             // 'y': [[shear]],
             'x': [shearstress],
     }, {}, [2])
-
-    /*Plotly.update('stats', {
-            'x': [1,2,3,4,5,6,7,8,9,10],
-            // 'y': [[shear]],
-            'y': [pressure],
-    }, [1])
-
-
-    Plotly.update('stats', {
-            'x': [1,2,3,4,5,6,7,8,9,10],
-            // 'y': [[shear]],
-            'y': [shearstress],
-    }, [2])*/
-// }
 }
-
-// function make_graph() {
-//     var data = [{
-//       type: 'scatter',
-//       mode: 'lines',
-//       x: [],
-//       y: [],
-//       name: 'Velocity',
-//       // opacity: 1,
-//       line: {
-//         width: 5,
-//         color: "black",
-//         // reversescale: false
-//       },
-//     }, {
-//       type: 'scatter',
-//       mode: 'lines',
-//       x: [],
-//       y: [],
-//       name: 'Pressure (p)',
-//       // opacity: 1,
-//       line: {
-//         width: 5,
-//         color: "blue",
-//         // reversescale: false
-//       },
-//       xaxis: 'x2'
-//     }, {
-//       type: 'scatter',
-//       mode: 'lines',
-//       x: [],
-//       y: [],
-//       name: 'Shear stress (q)',
-//       // opacity: 1,
-//       line: {
-//         // dash: 'dash',
-//         dash: "8px,8px",
-//         width: 5,
-//         color: "blue",
-//         // reversescale: false
-//       },
-//       xaxis: 'x2'
-//     }]
-//     var layout = {
-//           // height: 300,
-//           // width: 500,
-//           xaxis: {
-//             // linecolor: 'white',
-//             autotick: true,
-//             // autorange: true,
-//             // range: [-maxVelocity, maxVelocity],
-//             // range: [-1,1],
-//             automargin: true,
-//             title: 'Average velocity (m/s)',
-//             side: 'bottom'
-//             // title: 'Vertical displacement (mm)'
-//         },
-//           yaxis: {
-//             // linecolor: 'white',
-//             autotick: true,
-//             autorange: true,
-//             automargin: true,
-//             title: 'Location (mm)',
-//             // color: 'black',
-//         },
-//         xaxis2: {
-//             autotick: true,
-//             autorange: true,
-//             automargin: true,
-//             title: 'Stress (kPa)',
-//             overlaying: 'x',
-//             side: 'top',
-//             rangemode: 'tozero',
-//             color: 'blue'
-//             },
-//         legend: {
-//             x: 1,
-//             xanchor: 'right',
-//             y: 1,
-//             // bgcolor: "rgba(0,0,0,0.01)"
-//             // opacity: 0.5,
-//         },
-//         margin: {
-//             b: 100,
-//         },
-//         font: {
-//             family: 'Montserrat, Open sans',
-//         }
-//     }
-//     Plotly.newPlot('stats', data, layout);
-// }
-//
-// document.getElementById ("download_tag").addEventListener ("click", download_data, false);
-// document.getElementById ("stats").addEventListener ("mouseenter",
-//     () => {
-//         document.getElementById("download_tag").classList.remove("hidden")
-//         document.getElementById("download_tag").classList.add("visible")
-// }, false);
-// document.getElementById ("stats").addEventListener ("mouseleave",
-//     () => {
-//         document.getElementById("download_tag").classList.add("hidden")
-//         document.getElementById("download_tag").classList.remove("visible")
-// }, false);
-//
-// function download_data() {
-//     let gd = document.getElementById('stats')
-//     let data = gd.data;
-//     let header = ['Velocity (mm/s)','Pressure (kPa)','Shear stress (kPa)'];
-//     let csv = '';
-//     let ix = 0;
-//     data.forEach( trace => {
-//         csv = csv + 'Position (mm),' + header[ix] + '\n' + trace.y.map((el, i) => [el, trace.x[i]].join(",")).join('\n') + '\n';
-//         ix += 1;
-//         });
-//
-//     var link = document.getElementById("download_tag");
-//     link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
-// }
 
 function make_graph() {
     let { data, layout } = LAYOUT.plotly_two_xaxis_graph('Average velocity (m/s)','Stress (Pa)','Location (mm)','Velocity','Pressure (p)','Shear stress (𝜏)');

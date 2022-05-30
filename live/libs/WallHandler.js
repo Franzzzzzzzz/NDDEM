@@ -18,7 +18,7 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import { PIDcontroller } from './PIDcontroller.js'
 
 var loader = new FontLoader();
-loader.load("./helvetiker_bold.typeface.json", function (f) { font = f });
+loader.load("./resources/helvetiker_bold.typeface.json", function (f) { font = f });
 
 // let p_controller = new PIDcontroller(5e-4,1e-5,0);
 // let q_controller = new PIDcontroller(5e-4,1e-5,0);

@@ -8,6 +8,8 @@ EMSCRIPTEN_BINDINGS(DEMCGND) {
     .function("simu_finalise", &DEMCGND::simu_finalise)
     .function("simu_getX", &DEMCGND::simu_getX)
     .function("simu_getRadii", &DEMCGND::simu_getRadii)
+    .function("simu_setRadius", &DEMCGND::simu_setRadius)
+    .function("simu_setMass", &DEMCGND::simu_setMass)
     .function("simu_fixParticle", &DEMCGND::simu_fixParticle)
     .function("simu_setFrozen", &DEMCGND::simu_setFrozen)
     .function("simu_getOrientation", &DEMCGND::simu_getOrientation)

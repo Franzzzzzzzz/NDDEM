@@ -7,6 +7,7 @@ export let total_particle_volume;
 export let x;
 
 import { Lut } from "three/examples/jsm/math/Lut.js";
+import { r, R } from "./controllers.js"
 // import { Lut } from './js/Lut.js'
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
@@ -21,7 +22,8 @@ import {
     SphereGeometry,
     CylinderGeometry,
     LineBasicMaterial,
-    MeshStandardMaterial
+    PointsMaterial,
+    MeshStandardMaterial,
 } from "three";
 
 let forces = new Group();
@@ -101,7 +103,11 @@ export function add_pool_spheres(S,params,scene) {
     for ( let i = 0; i < params.N; i ++ ) {
         if ( i == 0 ) {
             var material = new MeshStandardMaterial( {
-                color: 0x0aaaaaa });
+                color: 0xaaaaaa });
+        }
+        else if ( i === 11 ) {
+            var material = new MeshStandardMaterial( {
+                color: 0x060606 });
         }
         else {
             var material = NDParticleShader.clone();
@@ -123,11 +129,67 @@ export function add_pool_spheres(S,params,scene) {
     // spheres.children[0].material.uniforms.ambient.value = 5.;
 
     // display black ball
-    spheres.children[11].material.uniforms.banding.value = 0.;
-    spheres.children[11].material.uniforms.ambient.value = 1.;
+    // spheres.children[11].material.uniforms.banding.value = 0.;
+    // spheres.children[11].material.uniforms.ambient.value = 1.;
 
-    spheres.children[0].add(ray); // add line
+    if ( !params.vr ) {
+        spheres.children[0].add(ray); // add line
+    }
 
+    // add_spheres_to_torus(params,controller1,controller2);
+}
+
+export function add_spheres_to_torus(params,target) {
+    const pointsGeometry = new SphereGeometry(
+        1,
+        Math.max(Math.pow(2, params.quality - 2), 4),
+        Math.max(Math.pow(2, params.quality - 2), 4)
+    );
+
+    var scale = 20; // size of particles on tori
+    let group = new Group();
+
+    for ( let i = 0; i < params.N; i ++ ) {
+        let color;
+        if ( i == 0 ) { color = 0xaaaaaa; }
+        else if ( i === 11 ) { color = 0x060606 }
+        else if ( i%3 ) { color = 0x00ff00 }
+        else { color = 0xff0000 }
+        var pointsMaterial = new PointsMaterial({ color: color });
+        var object = new Mesh(pointsGeometry, pointsMaterial);
+
+        object.scale.set(R / scale, R / scale, R / scale);
+
+        group.add(object);
+    }
+    target.add(group);
+}
+
+export function move_spheres_on_torus(params,target) {
+    // console.log(target.children[0]);
+    let real_target = target.children[0];
+    if ( params.dimension === 4 ) {
+        for ( let i = 0; i < params.N; i ++ ) {
+            var object = real_target.children[i];
+            var phi = (2 * Math.PI * (params.d4.cur - x[i][3])) / (params.d4.max - params.d4.min) - Math.PI / 2;
+            var x_obj = (R + r) * Math.cos(phi);
+            var y_obj = (R + r) * Math.sin(phi);
+            var z_obj = 0;
+            object.position.set(x_obj, y_obj, z_obj);
+        }
+    }
+    else if ( params.dimension > 4 ) {
+        console.log('trying both torus axes')
+        for ( let i = 0; i < params.N; i ++ ) {
+            var object = real_target.children[i];
+            var phi =   (2 * Math.PI * (params.d4.cur - x[i][3])) / (params.d4.max - params.d4.min) - Math.PI / 2;
+            var theta = (2 * Math.PI * (params.d5.cur - x[i][4])) / (params.d5.max - params.d5.min);
+            var x_obj = (R + r * Math.cos(theta)) * Math.cos(phi);
+            var y_obj = (R + r * Math.cos(theta)) * Math.sin(phi);
+            var z_obj = r * Math.sin(theta);
+            object.position.set(x_obj, y_obj, z_obj);
+        }
+    }
 }
 
 export function update_particle_material(params, lut_folder) {
@@ -171,15 +233,15 @@ export function update_particle_material(params, lut_folder) {
       lut.setMin(0);
       lut.setMax(params.omegamax);
     } else if (params.view_mode === "D4") {
-      lut.setMin(world[3].cur - 2 * TORUS.r);
-      lut.setMax(world[3].cur + 2 * TORUS.r);
+      lut.setMin(params.d4.cur - 2 * r);
+      lut.setMax(params.d4.cur + 2 * r);
       // object.material.color = lut.getColor(x3_unrotated);
       // TORUS.wristband1.children[i].material.color = lut.getColor(
         // x3_unrotated
       // );
     } else if (params.view_mode === "D5") {
-      lut.setMin(world[4].cur - 2 * TORUS.r);
-      lut.setMax(world[4].cur + 2 * TORUS.r);
+      lut.setMin(params.d5.cur - 2 * r);
+      lut.setMax(params.d5.cur + 2 * r);
       // object.material.color = lut.getColor(spheres[i][4]);
       // TORUS.wristband1.children[i].material.color = lut.getColor(
         // spheres[i][4]
@@ -215,9 +277,9 @@ export function update_particle_material(params, lut_folder) {
     // }
 }
 
-export function move_spheres(S,params) {
+export function move_spheres(S,params,controller1,controller2) {
     x = S.simu_getX();
-    var orientation = S.simu_getOrientation();
+    let orientation = S.simu_getOrientation();
     if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
         v = S.simu_getVelocity();
     }
@@ -239,7 +301,7 @@ export function move_spheres(S,params) {
         }
         else if ( params.dimension == 4 ) {
             var D_draw = 2*Math.sqrt(
-              Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
+              Math.pow(radii[i], 2) - Math.pow(params.d4.cur - x[i][3], 2)
             );
             object.scale.set(D_draw, D_draw, D_draw);
             // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
@@ -260,21 +322,19 @@ export function move_spheres(S,params) {
             // console.log(omegaMag[i])
             // object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
             object.material.color = lut.getColor(omegaMag[i]);
-        } else if ( params.lut === 'None' ) {
-            for (var j = 0; j < params.N - 3; j++) {
+        } else if ( object.material.type === 'ShaderMaterial' ) { // found a custom shader material
+            for (var j = 0; j < params.dimension - 3; j++) {
               object.material.uniforms.xview.value[j] =
-                params.d4_cur;
+                params.d4.cur;
               object.material.uniforms.xpart.value[j] =
                 x[i][j + 3];
             }
             object.material.uniforms.A.value = orientation[i];
         }
-        // if (params.dimension > 3) {
-        //   object.material.uniforms.x4p.value = x[i][j + 3];
-        //   object.material.uniforms.x4.value = params.d4_cur;
-        // } else {
-        //   object.material.uniforms.x4p.value = 0.0;
-        // }
+        if (params.dimension > 3) {
+
+        }
+
     }
     // spheres.instanceMatrix.needsUpdate = true;
     // console.log(orientation[0])
@@ -295,7 +355,7 @@ export function setCollisionTimeAndRestitutionCoefficient (tc, eps, mass) {
         dissipation = Math.sqrt(2.0 * mass * stiffness);
     } else {
         dissipation = -mass / tc * Math.log(eps);
-        stiffness = .5 * mass * ( Math.pow(Math.PI / tc, 2) + Math.pow(dissipation / mass, 2) );
+        stiffness = 0.5 * mass * ( Math.pow(Math.PI / tc, 2) + Math.pow(dissipation / mass, 2) );
     }
     return { 'dissipation': dissipation, 'stiffness': stiffness }
 }
