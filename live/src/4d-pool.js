@@ -10,37 +10,24 @@ import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
 import * as CONTROLLERS from '../libs/controllers.js';
 import * as POOLCUE from '../libs/PoolCue.js';
+import * as AUDIO from '../libs/audio.js';
 // import { PoolTableShader } from '../libs/PoolTableShader.js';
 
 var urlParams = new URLSearchParams(window.location.search);
-var clock = new THREE.Clock();
 
-let camera, scene, renderer, stats, panel;
-let physics, position;
+let camera, scene, renderer;
 let gui;
-let boxes, spheres;
 let S;
 let x;
-let NDDEMLib;
-let pointer;
-let frameRate = 60;
-let v;
 let NDsolids, material, STLFilename;
 let meshes;
 var direction = new THREE.Vector3();
 var raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-let intersection_plane = new THREE.Plane();
-let camera_direction = new THREE.Vector3();
 let isMobile;
 let white_ball_initial_loc;
 let end_of_pool_cue = new THREE.Vector3();
 let nice_d4;
-
-let INTERSECTED = null;
-let last_intersection = null;
-let locked_particle = null;
-let ref_location;
 
 var params = {
     radius: 0.05,
@@ -54,7 +41,7 @@ var params = {
     d4: { cur: 0 },
     particle_density: 2700,
     track_white_ball: true,
-    strength: 1,
+    strength: 0.5,
     quality: 7,
     dt: 1e-3,
     table_height: 1.,
@@ -83,20 +70,18 @@ SPHERES.createNDParticleShader(params).then( init() );
 
 async function init() {
 
-    physics = await NDDEMPhysics();
-    position = new THREE.Vector3();
+    await NDDEMPhysics();
 
     camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 1000 );
     camera.position.set( 3*params.L1, 2*params.L1 + params.table_height, 0 );
+    AUDIO.make_listener( camera );
     // camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
-    // set things up for VR —--- NOTE: EXPERIMENTAL!!!
-    // if ( params.vr ) {
-    //     scene.rotation.y = -Math.PI/2.
-    //     scene.position.set( 0, params.table_height, -1.1*params.L1);
-    // }
+
     scene.background = new THREE.Color( 0x111111 );
+    const gridHelper = new THREE.GridHelper( 10, 10 );
+    scene.add( gridHelper );
 
     const ambientLight = new THREE.AmbientLight( 0x404040 );
     scene.add( ambientLight );
@@ -126,6 +111,8 @@ async function init() {
 
     loadSTL();
 
+    add_table_legs();
+
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -146,8 +133,8 @@ async function init() {
     gui.width = 400;
 
     gui.add( params.d4, 'cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
-    gui.add( params, 'strength', 0,5, 0.01).name( 'Strength (a/d)').listen().onChange(() => {
-        SPHERES.ray.scale.y = params.strength;
+    gui.add( params, 'strength', 0,1, 0.01).name( 'Strength (a/d)').listen().onChange(() => {
+        SPHERES.ray.scale.y = 2*params.strength;
     });
     gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
     const controls = new OrbitControls( camera, renderer.domElement );
@@ -200,6 +187,10 @@ function hit_white_ball() {
     var work = params.strength;
     var force = work/params.dt;
     S.setExternalForce(0, 1, [force*direction.x,0,force*direction.z,force*direction.d4]);
+
+    // JUST TESTING HOW SOUNDS WORK!
+    // how the hell to integrate this with the rest of the code?!?? there aren't really 'collision' events...
+    // SPHERES.spheres.children[0].children[0].play();
 }
 
 function onSelectParticle( event ) {
@@ -248,6 +239,23 @@ function onWindowResize(){
 
 }
 
+function add_table_legs() {
+    let thickness = 2*params.radius;
+    let cylinder = new THREE.CylinderGeometry( thickness, thickness, 0.98*(params.table_height-params.L2), Math.pow(2, params.quality), Math.pow(2, params.quality) );
+    let material = new THREE.MeshStandardMaterial( { color: 0xaaaaaa } );
+
+    let leg = new THREE.Mesh( cylinder, material );
+    leg.position.set( 0.75*(-params.L1+thickness), (params.table_height-params.L2)/2., -params.L3+thickness );
+    scene.add(leg.clone());
+    leg.position.set( 0.75*( params.L1-thickness), (params.table_height-params.L2)/2., -params.L3+thickness );
+    scene.add(leg.clone());
+    leg.position.set( 0.75*(-params.L1+thickness), (params.table_height-params.L2)/2.,  params.L3-thickness );
+    scene.add(leg.clone());
+    leg.position.set( 0.75*( params.L1-thickness), (params.table_height-params.L2)/2.,  params.L3-thickness );
+    scene.add(leg);
+
+}
+
 function update() {
 
     SPHERES.move_spheres(S,params);
@@ -259,7 +267,7 @@ function update() {
 
         POOLCUE.small_sphere.getWorldPosition(end_of_pool_cue);
         nice_d4 = clamp(params.d4.cur,params.d4.min,params.d4.max);
-        // console.log(params.d4.cur)
+
         S.fixParticle(params.N, [end_of_pool_cue.x,
                                  end_of_pool_cue.y,
                                  end_of_pool_cue.z,
@@ -276,19 +284,6 @@ function update() {
     direction.d4 = d4offset/l;
 
     SPHERES.ray.rotation.x = -Math.atan2(direction.z,direction.x);
-
-    if ( locked_particle !== null ) {
-        // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
-            // ref_location.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-        // }
-        // ref_location.x = mouse.x;
-        raycaster.ray.intersectPlane( intersection_plane, ref_location);
-        ref_location.clamp( new THREE.Vector3(-params.L1, 0, -params.L3),
-                            new THREE.Vector3( params.L1, 0,  params.L3) );
-        // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
-        S.fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
-        // }
-    }
 
     S.step_forward(20);
 
@@ -316,14 +311,14 @@ let pocket_locs = [
 ];
 
 function in_pocket(loc) {
+    let retval = false;
+
     // should work for actual pockets:
     // if ( x[1] < params.table_height ) {
     //     console.log('fallen off table (hopefully out of a hole)')
-    //     return true;
-    //     // return false;
+    //     retval = true;
     // }
-    // console.log(loc)
-    let retval = false;
+
     pocket_locs.forEach(pocket => {
         if ( Math.pow(loc[0] - pocket[0],2) + Math.pow(loc[2] - pocket[1],2) < params.pocket_size*params.pocket_size ) {
             console.log('fallen off table (hopefully out of a hole)')
@@ -361,14 +356,6 @@ function check_pockets() {
 
 async function NDDEMPhysics() {
 
-    // if ( 'DEMND' in window === false ) {
-    //
-    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
-    //     return;
-    //
-    // }
-
-    // NDDEMLib = await DEMND(); // eslint-disable-line no-undef
     await DEMND().then( (NDDEMLib) => {
         if ( params.dimension == 3 ) {
             S = new NDDEMLib.Simulation3 (params.N_real);
@@ -418,7 +405,7 @@ async function NDDEMPhysics() {
         S.interpret_command("set GammaT " + String(vals.dissipation));
         S.interpret_command("set Mu 0.1");
         S.interpret_command("set Mu_wall 0.5");
-        // S.interpret_command("set damping 0.5");
+        S.interpret_command("set damping 2");
         S.interpret_command("set T 150");
         S.interpret_command("set dt " + String(params.dt));
         S.interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -452,9 +439,6 @@ function set_ball_positions() {
             }
         }
     }
-
-    // S.setRadius(0, params.radius/5.);
-    // S.setMass(0, params.particle_mass/10);
 
     // add the cue stick
     if ( params.vr ) {

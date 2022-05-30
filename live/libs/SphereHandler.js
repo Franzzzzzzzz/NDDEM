@@ -8,6 +8,8 @@ export let x;
 
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { r, R } from "./controllers.js"
+import * as AUDIO from '../libs/audio.js';
+
 // import { Lut } from './js/Lut.js'
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
@@ -83,6 +85,7 @@ export function add_spheres(S,params,scene) {
         object.position.set(0,0,0);
         object.rotation.z = Math.PI / 2;
         object.NDDEM_ID = i;
+
         spheres.add(object);
         // spheres.setMatrixAt( i, matrix );
         // spheres.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
@@ -121,6 +124,7 @@ export function add_pool_spheres(S,params,scene) {
         object.NDDEM_ID = i;
         object.castShadow = true;
         object.receiveShadow = true;
+        AUDIO.add_impact_sound( object );
         spheres.add(object);
     }
 
