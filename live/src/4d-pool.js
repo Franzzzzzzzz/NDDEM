@@ -10,81 +10,59 @@ import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
 import * as CONTROLLERS from '../libs/controllers.js';
 import * as POOLCUE from '../libs/PoolCue.js';
+import * as AUDIO from '../libs/audio.js';
 // import { PoolTableShader } from '../libs/PoolTableShader.js';
 
 var urlParams = new URLSearchParams(window.location.search);
-var clock = new THREE.Clock();
 
-let camera, scene, renderer, stats, panel;
-let physics, position;
+let camera, scene, renderer;
 let gui;
-let boxes, spheres;
-let floor, roof, left, right, front, back;
 let S;
 let x;
-let NDDEMLib;
-let pointer;
-let frameRate = 60;
-let v;
-let pressure = 0;
-let shear = 0;
-let density = 0;
-let pressure_time = [];
-let shear_time = [];
-let density_time = [];
-let particle_volume;
-let started = false;
-let show_stats = true;
-const material_density = 2700;
-let old_time = 0;
-let new_time = 0;
-let counter = 0;
-let p_controller, q_controller;
 let NDsolids, material, STLFilename;
-let meshes = new THREE.Group();
+let meshes;
 var direction = new THREE.Vector3();
 var raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-let intersection_plane = new THREE.Plane();
-let camera_direction = new THREE.Vector3();
 let isMobile;
-
-let INTERSECTED = null;
-let last_intersection = null;
-let locked_particle = null;
-let ref_location;
+let white_ball_initial_loc;
+let end_of_pool_cue = new THREE.Vector3();
+let nice_d4;
 
 var params = {
     radius: 0.05,
     dimension: 4,
     L1: 2,
-    L2: 1,
-    L3: 0.1, // this is the direction of gravity
+    L2: 0.1,  // this is the direction of gravity
+    L3: 1,
     L4: 0.5,
-    pocket_size: 0.05,
+    pocket_size: 0.15,
     pyramid_size: 5,
-    // packing_fraction: 0.5,
-    axial_strain: 0,
-    volumetric_strain: 0,
-    gravity: true,
-    paused: false,
-    H_cur: 0,
-    pressure_set_pt: 1e4,
-    deviatoric_set_pt: 0,
-    d4_cur:0,
-    dt: 0.0005,
+    d4: { cur: 0 },
+    particle_density: 2700,
     track_white_ball: true,
-    strength: 1,
+    strength: 0.5,
     quality: 7,
+    dt: 1e-3,
+    table_height: 1.,
+    lut: 'None'
 }
 
 params.N = get_num_particles(params.pyramid_size);
 if ( urlParams.has('vr') || urlParams.has('VR') ) {
+    params.vr = true;
     params.N_real = params.N + 1;
 }
 else {
+    params.vr = false;
     params.N_real = params.N;
 }
+
+params.d4.min = -params.L4;
+params.d4.max =  params.L4;
+
+params.particle_volume = Math.PI*Math.PI*Math.pow(params.radius,4)/2.;
+params.particle_mass = params.particle_volume * params.particle_density;
 
 let sunk_balls = [];
 
@@ -92,26 +70,29 @@ SPHERES.createNDParticleShader(params).then( init() );
 
 async function init() {
 
-    physics = await NDDEMPhysics();
-    position = new THREE.Vector3();
+    await NDDEMPhysics();
 
     camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.set( 2*params.L1, 0, 2*params.L1 );
-    camera.up.set(0, 0, 1);
+    camera.position.set( 3*params.L1, 2*params.L1 + params.table_height, 0 );
+    AUDIO.make_listener( camera );
+    // camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x666666 );
 
-    const hemiLight = new THREE.HemisphereLight();
-    hemiLight.intensity = 0.35;
-    scene.add( hemiLight );
+    scene.background = new THREE.Color( 0x111111 );
+    const gridHelper = new THREE.GridHelper( 10, 10 );
+    scene.add( gridHelper );
 
-    const dirLight = new THREE.DirectionalLight();
-    dirLight.position.set( 0, 0, 5 );
+    const ambientLight = new THREE.AmbientLight( 0x404040 );
+    scene.add( ambientLight );
+
+    const dirLight = new THREE.DirectionalLight( 0xFFFFFF, 1);
+    dirLight.position.set( 0, 3, 0 );
     dirLight.castShadow = true;
+    scene.add( dirLight );
+
     dirLight.shadow.mapSize.width = 2*1024;
     dirLight.shadow.mapSize.height = 2*1024;
-    scene.add( dirLight );
 
     SPHERES.add_pool_spheres(S,params,scene);
 
@@ -123,38 +104,41 @@ async function init() {
     // } );
     material = new THREE.MeshStandardMaterial( {
         color: 0x00aa00,
-        metalness: 1,
         roughness: 1,
         // map: texture,
     } );
+    // material.wireframe = true;
 
     loadSTL();
+
+    add_table_legs();
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    // renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild( renderer.domElement );
 
-    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+    if ( params.vr ) {
         document.body.appendChild( VRButton.createButton( renderer ) );
         renderer.xr.enabled = true;
-        CONTROLLERS.add_controllers(renderer, scene);
+        CONTROLLERS.add_controllers(renderer, scene, params);
+
     }
 
     // gui
     gui = new GUI();
     gui.width = 400;
 
-    gui.add( params, 'd4_cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
-    gui.add( params, 'strength', 0,2, 0.001).name( 'Strength (a/d)').listen().onChange(() => {
+    gui.add( params.d4, 'cur', -params.L4,params.L4, 0.001).name( 'D4 location (w/s)').listen();
+    gui.add( params, 'strength', 0,1, 0.01).name( 'Strength (a/d)').listen().onChange(() => {
         SPHERES.ray.scale.y = 2*params.strength;
     });
     gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
     const controls = new OrbitControls( camera, renderer.domElement );
-    controls.target.y = -params.L3;
+    controls.target.y = params.table_height-params.L2;
     controls.update();
 
     isMobile = navigator.userAgentData.mobile; //resolves true/false
@@ -173,15 +157,21 @@ async function init() {
     }
 
     window.addEventListener( 'resize', onWindowResize, false );
-    window.addEventListener( 'mousemove', onMouseMove, false );
+    // window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'keypress', onSelectParticle, false );
 
-    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+    if ( params.vr ) {
         POOLCUE.add_pool_cue( CONTROLLERS.controller1 );
+        CONTROLLERS.add_torus( CONTROLLERS.controller2, params ).then(() => {
+            SPHERES.add_spheres_to_torus(params, CONTROLLERS.torus1);
+        });
+
     }
 
-
-    animate();
+    renderer.setAnimationLoop( function () {
+       update();
+       renderer.render( scene, camera );
+    } );
 }
 
 function onMouseMove( event ) {
@@ -196,45 +186,39 @@ function onMouseMove( event ) {
 function hit_white_ball() {
     var work = params.strength;
     var force = work/params.dt;
-    S.setExternalForce(0, 1, [force*direction.x,force*direction.y,0.,force*direction.d4]);
+    S.setExternalForce(0, 1, [force*direction.x,0,force*direction.z,force*direction.d4]);
+
+    // JUST TESTING HOW SOUNDS WORK!
+    // how the hell to integrate this with the rest of the code?!?? there aren't really 'collision' events...
+    // SPHERES.spheres.children[0].children[0].play();
 }
 
 function onSelectParticle( event ) {
-    // console.log(camera.getWorldDirection() )
     if ( event.key === 'Enter' ) {
-        // console.log('hit!')
         hit_white_ball();
-
     }
     if ( event.code === 'Space' ) {
         event.preventDefault(); // stop page from skipping downwards
         params.track_white_ball = !params.track_white_ball;
-        // if ( locked_particle === null ) {
-        //     locked_particle = INTERSECTED;
-        //     // console.log(locked_particle);
-        //     ref_location = locked_particle.position;
-        //
-        //     camera.getWorldDirection( camera_direction ); // update camera direction
-        //     // set the plane for the particle to move along to be orthogonal to the camera
-        //     intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
-        //                                                       locked_particle.position );
-        // }
-        // else {
-        //     locked_particle = null;
-        // }
     }
     else if ( event.key === "w" ) {
         params.track_white_ball = false;
-        params.d4_cur += 0.1*params.radius;
-        meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+        if ( params.d4.cur < params.d4.max ) {
+            params.d4.cur += 0.1*params.radius;
+            replace_meshes();
+        }
     }
     else if ( event.key === "s" ) {
         params.track_white_ball = false;
-        params.d4_cur -= 0.1*params.radius;
-        meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+        if ( params.d4.cur > params.d4.min ) {
+            params.d4.cur -= 0.1*params.radius;
+            replace_meshes();
+        }
     }
     else if ( event.key === "a" ) {
-        params.strength -= 0.01;
+        if ( params.strength > 0 ) {
+            params.strength -= 0.01;
+        }
     }
     else if ( event.key === "d" ) {
         params.strength += 0.01;
@@ -255,233 +239,123 @@ function onWindowResize(){
 
 }
 
-function animate() {
-    if ( clock.getElapsedTime() > 1 ) { started = true; }
+function add_table_legs() {
+    let thickness = 2*params.radius;
+    let cylinder = new THREE.CylinderGeometry( thickness, thickness, 0.98*(params.table_height-params.L2), Math.pow(2, params.quality), Math.pow(2, params.quality) );
+    let material = new THREE.MeshStandardMaterial( { color: 0xaaaaaa } );
+
+    let leg = new THREE.Mesh( cylinder, material );
+    leg.position.set( 0.75*(-params.L1+thickness), (params.table_height-params.L2)/2., -params.L3+thickness );
+    scene.add(leg.clone());
+    leg.position.set( 0.75*( params.L1-thickness), (params.table_height-params.L2)/2., -params.L3+thickness );
+    scene.add(leg.clone());
+    leg.position.set( 0.75*(-params.L1+thickness), (params.table_height-params.L2)/2.,  params.L3-thickness );
+    scene.add(leg.clone());
+    leg.position.set( 0.75*( params.L1-thickness), (params.table_height-params.L2)/2.,  params.L3-thickness );
+    scene.add(leg);
+
+}
+
+function update() {
 
     SPHERES.move_spheres(S,params);
 
+    if ( params.vr ) {
+        params.track_white_ball = false;
+        SPHERES.move_spheres_on_torus(params,CONTROLLERS.torus1);
+        if ( CONTROLLERS.controller2.userData.isSqueezing ) { params = CONTROLLERS.update_higher_dims(CONTROLLERS.controller2, params) }
+
+        POOLCUE.small_sphere.getWorldPosition(end_of_pool_cue);
+        nice_d4 = clamp(params.d4.cur,params.d4.min,params.d4.max);
+
+        S.fixParticle(params.N, [end_of_pool_cue.x,
+                                 end_of_pool_cue.y,
+                                 end_of_pool_cue.z,
+                                 nice_d4]);
+    }
+
     direction.copy(SPHERES.spheres.children[0].position);
     direction.sub(camera.position);
-    let d4offset = params.d4_cur - SPHERES.x[0][3];
-    var l = Math.sqrt(direction.x*direction.x + direction.y*direction.y + d4offset*d4offset);
+    let d4offset = params.d4.cur - SPHERES.x[0][3];
+    var l = Math.sqrt(direction.x*direction.x + direction.z*direction.z + d4offset*d4offset);
     direction.x /= l;
-    direction.y /= l;
-    direction.z = 0;
+    direction.z /= l;
+    direction.y = 0;
     direction.d4 = d4offset/l;
 
-    SPHERES.ray.rotation.z = Math.atan2(direction.y,direction.x);
+    SPHERES.ray.rotation.x = -Math.atan2(direction.z,direction.x);
 
-    if ( locked_particle !== null ) {
-        // console.log(locked_particle)
-        // if ( raycaster.ray.intersectsPlane( intersection_plane ) ) { // if the mouse is over the plane - why would i need to check this?
-            // console.log('success!')
-            // ref_location.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-        // }
-        // ref_location.x = mouse.x;
-        raycaster.ray.intersectPlane( intersection_plane, ref_location);
-        ref_location.clamp( new THREE.Vector3(-params.L1, -params.L2,0),
-                            new THREE.Vector3( params.L1,  params.L2,0) );
-        // if ( ref_location.x > back.position.x + radius && ref_location.x < front.position.x - radius ) {
-            // console.log(ref_location.x)
-            // console.log(back.position.x)
-        S.fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
-        // }
-    }
-
-    if ( !params.paused ) {
-        S.step_forward(20);
-    }
+    S.step_forward(20);
 
     check_pockets();
 
     if ( params.track_white_ball ) {
         if ( NDsolids !== undefined ) {
             x = S.getX();
-            params.d4_cur = x[0][3];
-            meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+            if ( params.d4.cur !== x[0][3] ) {
+                params.d4.cur = x[0][3];
+                replace_meshes();
+            }
         }
     }
-
-    // ray.position.set
-
-    // const intersects = raycaster.intersectObjects( spheres.children );
-    // console.log(intersects)
-    // if ( intersects.length > 0 ) { // if found something
-        // console.log(intersects)
-    // 	if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
-    //             if ( INTERSECTED !== null ) { INTERSECTED.material.uniforms.ambient.value = 1.0; }
-    // 			INTERSECTED = intersects[ 0 ].object;
-    //             INTERSECTED.material.uniforms.ambient.value = 5.0;
-    // 	}
-    // }
-    // else { // didn't find anything
-    // 	if ( INTERSECTED !== null ) { // there was something before
-    //         INTERSECTED.material.uniforms.ambient.value = 1.0;
-    //         INTERSECTED = null;
-    //     }
-    // }
-
-    if ( urlParams.has('vr') || urlParams.has('VR') ) {
-        renderer.setAnimationLoop( function () {
-	           renderer.render( scene, camera );
-       } );
-    }
-    else {
-        requestAnimationFrame( animate );
-    }
-
-
-
-    renderer.render( scene, camera );
-    old_time = new_time;
 
 }
 
-// function add_pool_spheres() {
-//     spheres = new THREE.Group();
-//     scene.add(spheres);
-//
-//     const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
-//
-//     for ( let i = 0; i < params.N; i ++ ) {
-//         if ( i == 0 ) {
-//             var material = new THREE.MeshStandardMaterial( {
-//                 color: 0x0aaaaaa });
-//         }
-//         else {
-//             var material = NDParticleShader.clone();
-//             material.uniforms.R.value = params.radius;
-//             material.uniforms.banding.value = 1 + 2*(i%3);
-//         }
-//         var object = new THREE.Mesh(geometrySphere, material);
-//         object.position.set(0,0,0);
-//         object.rotation.z = Math.PI / 2;
-//         object.NDDEM_ID = i;
-//         object.castShadow = true;
-//         object.receiveShadow = true;
-//         spheres.add(object);
-//     }
-//
-//     // display white ball
-//     // spheres.children[0].material.uniforms.banding.value = 1.;
-//     // spheres.children[0].material.uniforms.ambient.value = 5.;
-//
-//     // display black ball
-//     spheres.children[11].material.uniforms.banding.value = 0.;
-//     spheres.children[11].material.uniforms.ambient.value = 1.;
-//
-//     spheres.children[0].add(ray); // add line
-//
-// }
-
 let pocket_locs = [
-    [-params.L1,-params.L2],
-    [-params.L1, params.L2],
-    [ params.L1,-params.L2],
-    [ params.L1, params.L2],
-    [         0,-params.L2],
-    [         0, params.L2],
+    [-params.L1,-params.L3],
+    [-params.L1, params.L3],
+    [ params.L1,-params.L3],
+    [ params.L1, params.L3],
+    [         0,-params.L3],
+    [         0, params.L3],
 ];
 
 function in_pocket(loc) {
+    let retval = false;
+
     // should work for actual pockets:
-    // if ( x[2] < -params.L3+params.radius-params.pocket_size ) {
+    // if ( x[1] < params.table_height ) {
     //     console.log('fallen off table (hopefully out of a hole)')
-    //     return true;
-    //     // return false;
+    //     retval = true;
     // }
+
     pocket_locs.forEach(pocket => {
-        if ( Math.pow(loc[0] - pocket[0],2) + Math.pow(loc[1] - pocket[1],2) < params.pocket_size ) {
+        if ( Math.pow(loc[0] - pocket[0],2) + Math.pow(loc[2] - pocket[1],2) < params.pocket_size*params.pocket_size ) {
             console.log('fallen off table (hopefully out of a hole)')
-            return true;
+            retval = true;
         }
     });
-    return false;
+    return retval;
 }
 
 function check_pockets() {
     for ( let i = 0; i < params.N; i ++ ) {
         var object = SPHERES.spheres.children[i];
-        if ( object.visible ) {
+        if ( !(i in sunk_balls) ) {
             if ( in_pocket(SPHERES.x[i]) ) {
-                object.visible = false;
-                sunk_balls.push(i)
-                S.fixParticle(i, [1.1*params.L1, sunk_balls.length, 0, 0])
-                S.setFrozen(i);
+                if ( i == 0 ) {
+                    console.log('sunk white ball')
+                    S.fixParticle(0, white_ball_initial_loc)
+                }
+                else if ( i == 11 ) {
+                    console.log('sunk black ball')
+                    alert('Black ball sunk. You win!')
+                    set_ball_positions();
+                }
+                else {
+                    console.log('SUNK BALL ' + String(i))
+                    // object.visible = false;
+                    sunk_balls.push(i)
+                    S.fixParticle(i, [1.1*params.L1, params.table_height, sunk_balls.length*2*params.radius, 0])
+                    S.setFrozen(i);
+                }
             }
         }
     }
 }
 
-// function move_spheres() {
-//     x = S.getX();
-//     var orientation = S.getOrientation();
-//     if ( urlParams.has('lut') ) {
-//         if ( urlParams.get('lut') === 'velocity' ) {
-//             v = S.getVelocity();
-//         }
-//         // spheres.instanceColor.needsUpdate = true;
-//
-//     }
-//     for ( let i = 0; i < params.N; i ++ ) {
-//         var object = spheres.children[i];
-//         // if ( object.visible ) {
-//         //     if ( in_pocket(x[i]) ) {
-//         //         object.visible = false;
-//         //         sunk_balls.push(i)
-//         //         S.fixParticle(i, [1.1*params.L, sunk_balls.length, 0, 0])
-//         //         S.setFrozen(i);
-//         //     }
-//         // }
-//
-//         // const matrix = new THREE.Matrix4();
-//         // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
-//         if ( params.dimension == 4 ) {
-//             var D_draw = 2*Math.sqrt(
-//               Math.pow(params.radius, 2) - Math.pow(params.d4_cur - x[i][3], 2)
-//             );
-//             object.scale.set(D_draw, D_draw, D_draw);
-//             // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
-//         }
-//         // spheres.setMatrixAt( i, matrix );
-//         object.position.set( x[i][0], x[i][1], x[i][2] );
-//         if ( urlParams.has('lut') ) {
-//             if ( urlParams.get('lut') === 'velocity' ) {
-//                 spheres.setColorAt( i, lut.getColor( 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) ) ) );
-//             }
-//         }
-//         if ( i > 0 ) {
-//             // console.log(params.d4_cur)
-//             for (var j = 0; j < params.dimension - 3; j++) {
-//
-//               object.material.uniforms.xview.value[j] =
-//                 params.d4_cur;
-//               object.material.uniforms.xpart.value[j] =
-//                 x[i][j + 3];
-//             }
-//             object.material.uniforms.A.value = orientation[i];
-//         }
-//         // if (params.dimension > 3) {
-//         //   object.material.uniforms.x4p.value = x[i][j + 3];
-//         //   object.material.uniforms.x4.value = params.d4_cur;
-//         // } else {
-//         //   object.material.uniforms.x4p.value = 0.0;
-//         // }
-//     }
-//     // spheres.instanceMatrix.needsUpdate = true;
-//     // console.log(orientation[0])
-// }
-
 async function NDDEMPhysics() {
 
-    // if ( 'DEMND' in window === false ) {
-    //
-    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMND.js' );
-    //     return;
-    //
-    // }
-
-    // NDDEMLib = await DEMND(); // eslint-disable-line no-undef
     await DEMND().then( (NDDEMLib) => {
         if ( params.dimension == 3 ) {
             S = new NDDEMLib.Simulation3 (params.N_real);
@@ -503,76 +377,110 @@ async function NDDEMPhysics() {
         S.interpret_command("dimensions " + String(params.dimension) + " " + String(params.N_real));
 
         S.interpret_command("radius -1 " + String(params.radius));
-        S.interpret_command("mass -1 0.1");
+        // now need to find the mass of a particle with diameter 1
+
+        S.interpret_command("mass -1 " + String(params.particle_mass));
         S.interpret_command("auto rho");
+        S.interpret_command("auto mass");
         S.interpret_command("auto inertia");
+        S.interpret_command("auto skin");
 
         S.interpret_command("boundary 0 WALL -"+String(params.L1)+" "+String(params.L1));
-        S.interpret_command("boundary 1 WALL -"+String(params.L2)+" "+String(params.L2));
+        S.interpret_command("boundary 1 WALL "+String(-params.L2+params.table_height)+" "+String(params.L2+params.table_height));
         S.interpret_command("boundary 2 WALL -"+String(params.L3)+" "+String(params.L3));
         S.interpret_command("boundary 3 WALL -"+String(params.L4)+" "+String(params.L4));
         // S.interpret_command("body " + STLFilename);
-        S.interpret_command("gravity 0 0 -10 0");
+        S.interpret_command("gravity 0 -9.81 0 0");
         // S.interpret_command("auto location randomdrop");
 
-        let n = 1;
-        let offset = params.L1/2;
+        set_ball_positions();
 
-        S.interpret_command("location " + String(0) + " " + String(offset) + " " + String(0) + " " + String(-params.L3+params.radius) + " " + String(0.001*(Math.random()-0.5))); // first ball is the white ball
+        let tc = 20*params.dt;
+        let rest = 0.5; // super low restitution coeff to dampen out quickly
+        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 
-        for ( var k=0; k<params.pyramid_size; k++ ) {
-            let cur_pyramid_length = params.pyramid_size - k;
-            let w = k*1.825*params.radius;
-            for ( var i=0; i<cur_pyramid_length; i++ ) {
-                for ( var j=0; j<cur_pyramid_length - i; j++) {
-                    let x = i*1.82*params.radius - cur_pyramid_length*params.radius + params.radius - offset;
-                    let y = j*2.01*params.radius - (cur_pyramid_length-i)*params.radius + params.radius;// - i%2*radius;
-                    // console.log(x,y);
-                    S.interpret_command("location " + String(n) + " " + String(x) + " " + String(y) + " " + String(-params.L3+params.radius) + " " + String(w));
-                    n++;
-                    if ( k > 0 ) { S.interpret_command("location " + String(n) + " " + String(x) + " " + String(y) + " " + String(-params.L3+params.radius) + " " + String(-w)); n++;}
-
-                }
-            }
-        }
-
-        // add the cue stick
-        if ( urlParams.has('VR') || urlParams.has('vr') ) {
-            S.interpret_command("location " + String(params.N) + " 0 0 0 0")
-        }
-
-
-
-        S.interpret_command("set Kn 2e5");
-        S.interpret_command("set Kt 8e4");
-        S.interpret_command("set GammaN 75");
-        S.interpret_command("set GammaT 75");
+        S.interpret_command("set Kn " + String(vals.stiffness));
+        S.interpret_command("set Kt " + String(0.8*vals.stiffness));
+        S.interpret_command("set GammaN " + String(vals.dissipation));
+        S.interpret_command("set GammaT " + String(vals.dissipation));
         S.interpret_command("set Mu 0.1");
         S.interpret_command("set Mu_wall 0.5");
-        S.interpret_command("set damping 5");
+        S.interpret_command("set damping 2");
         S.interpret_command("set T 150");
         S.interpret_command("set dt " + String(params.dt));
-        S.interpret_command("auto skin");
+        S.interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.finalise_init () ;
     }
 }
 
-function loadSTL( ) {
+function set_ball_positions() {
+    let n = 1;
+    let offset = params.L1/2;
 
+    white_ball_initial_loc = [offset,params.table_height-params.L2+params.radius,0,0.001*(Math.random()-0.5)];
+
+    S.interpret_command("location " + String(0) + " "
+                        + String(white_ball_initial_loc[0]) + " "
+                        + String(white_ball_initial_loc[1]) + " "
+                        + String(white_ball_initial_loc[2]) + " "
+                        + String(white_ball_initial_loc[3])); // first ball is the white ball
+
+    for ( var k=0; k<params.pyramid_size; k++ ) {
+        let cur_pyramid_length = params.pyramid_size - k;
+        let w = k*1.825*params.radius;
+        for ( var i=0; i<cur_pyramid_length; i++ ) {
+            for ( var j=0; j<cur_pyramid_length - i; j++) {
+                let x = i*1.82*params.radius - cur_pyramid_length*params.radius + params.radius - offset;
+                let y = j*2.01*params.radius - (cur_pyramid_length-i)*params.radius + params.radius;// - i%2*radius;
+                S.interpret_command("location " + String(n) + " " + String(x) + " " + String(params.table_height-params.L2+params.radius) + " " + String(y) + " " + String(w));
+                n++;
+                if ( k > 0 ) { S.interpret_command("location " + String(n) + " " + String(x) + " " + String(params.table_height-params.L2+params.radius) + " " + String(y) + " " + String(-w)); n++;}
+
+            }
+        }
+    }
+
+    // add the cue stick
+    if ( params.vr ) {
+        S.interpret_command("location " + String(params.N) + " 0 0 0 0");
+
+        // let pool_cue_particle_volume = Math.PI*Math.PI*Math.pow(POOLCUE.small_end_radius,4)/2.;
+        // let pool_cue_particle_mass = params.particle_volume * params.particle_density/1e3;
+        // S.setRadius(params.N, POOLCUE.small_end_radius);
+        // S.setMass(params.N, params.particle_mass/10.);
+    }
+}
+
+function loadSTL( ) {
+    meshes = new THREE.Group;
     const loader = new NDSTLLoader();
     loader.load( [ STLFilename ], function ( solids ) {
         NDsolids = solids;
-        meshes = renderSTL(meshes, NDsolids, scene, material, params.d4_cur);
+        replace_meshes();
     } )
+}
+
+function replace_meshes() {
+    if ( NDsolids.length > 0 ) {
+        if ( meshes !== undefined ) { scene.remove( meshes ); meshes = new THREE.Group(); }
+        meshes = renderSTL(meshes, NDsolids, scene, material, params.d4.cur);
+        meshes.position.y += params.table_height;
+        scene.add( meshes );
+    }
 }
 
 function get_num_particles(L) {
     let N = 0;
     let i = 1;
     for (var n=L; n>0; n--) {
-        // console.log(n,i,i*n)
         N += i*n;
         i += 2;
     }
     return N+1; // adding the white ball
+}
+
+function clamp(a,min,max) {
+    if ( a < min ) { return min }
+    else if ( a > max ) { return max }
+    else { return a }
 }

@@ -1,4 +1,4 @@
-export let pool_cue;
+export let pool_cue, small_end_radius, small_sphere;
 
 import {
     Vector3,
@@ -13,9 +13,9 @@ import {
 export function add_pool_cue( target ) {
     pool_cue = new Group();
 
-    let small_end_radius = 0.01;
-    let large_end_radius = 0.02;
-    let length = 2;
+    small_end_radius = 0.02; // any smaller and things go very poorly (at least using the webxr fake platform with apparently large step sizes)
+    let large_end_radius = 0.06;
+    let length = 1.4;
 
     const cylinder_geometry = new CylinderGeometry( small_end_radius, large_end_radius, length, 16 );
     cylinder_geometry.applyMatrix4( new Matrix4().makeRotationX( -Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
@@ -25,7 +25,7 @@ export function add_pool_cue( target ) {
 
     const small_sphere_geometry = new SphereGeometry( small_end_radius, 32, 16 );
     const chalk = new MeshStandardMaterial( {color: 0xffffff} ); // chalk colour
-    const small_sphere = new Mesh( small_sphere_geometry, chalk );
+    small_sphere = new Mesh( small_sphere_geometry, chalk );
 
     pool_cue.add(small_sphere);
     small_sphere.position.z = -length/2.;

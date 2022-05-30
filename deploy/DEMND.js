@@ -1479,11 +1479,12 @@ var ASM_CONSTS = {
     }
 
   
-    /** @param {number} ptr
-        @param {string} type
-        @param {number|boolean=} noSafe */
-  function getValue(ptr, type = 'i8', noSafe) {
-      if (type.endsWith('*')) type = 'u32';
+    /**
+     * @param {number} ptr
+     * @param {string} type
+     */
+  function getValue(ptr, type = 'i8') {
+      if (type.endsWith('*')) type = 'i32';
       switch (type) {
         case 'i1': return HEAP8[((ptr)>>0)];
         case 'i8': return HEAP8[((ptr)>>0)];
@@ -1537,12 +1538,13 @@ var ASM_CONSTS = {
     }
 
   
-    /** @param {number} ptr
-        @param {number} value
-        @param {string} type
-        @param {number|boolean=} noSafe */
-  function setValue(ptr, value, type = 'i8', noSafe) {
-      if (type.endsWith('*')) type = 'u32';
+    /**
+     * @param {number} ptr
+     * @param {number} value
+     * @param {string} type
+     */
+  function setValue(ptr, value, type = 'i8') {
+      if (type.endsWith('*')) type = 'i32';
       switch (type) {
         case 'i1': HEAP8[((ptr)>>0)] = value; break;
         case 'i8': HEAP8[((ptr)>>0)] = value; break;
@@ -3380,8 +3382,7 @@ var ASM_CONSTS = {
         FS.createStandardStreams();
       },quit:() => {
         FS.init.initialized = false;
-        // Call musl-internal function to close all stdio streams, so nothing is
-        // left in internal buffers.
+        // force-flush all streams, so we get musl std streams printed out
         // close all of our streams
         for (var i = 0; i < FS.streams.length; i++) {
           var stream = FS.streams[i];

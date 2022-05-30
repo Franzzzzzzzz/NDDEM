@@ -17,6 +17,8 @@ public:
     void simu_finalise() {return S.finalise() ; }
     std::vector<std::vector<double>> simu_getX() {return S.getX() ; }
     std::vector<double> simu_getRadii() {return S.getRadii() ; }
+    void simu_setRadius(int id, double radius) {return S.setRadius(id, radius) ; }
+    void simu_setMass(int id, double mass) {return S.setMass(id, mass) ; }
     void simu_fixParticle(int a, v1d loc) {return S.fixParticle(a, loc) ; }
     void simu_setFrozen(int a) {return S.setFrozen(a) ; }
     std::vector<std::vector<double>> simu_getOrientation() {return S.getOrientation() ; }
