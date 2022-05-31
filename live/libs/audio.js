@@ -13,13 +13,41 @@ import {
 } from "three";
 
 let listener;
+export let normal_oscillator, tangential_oscillator;
 
 export function make_listener( target ) {
     // create an AudioListener and add it to the camera
     listener = new AudioListener();
     target.add( listener );
 
-    console.log('made an object the audio listener')
+    normal_oscillator = listener.context.createOscillator();
+	normal_oscillator.type = 'sine';
+	normal_oscillator.frequency.setValueAtTime( 256, listener.context.currentTime );
+	normal_oscillator.start( );
+
+    tangential_oscillator = listener.context.createOscillator();
+	tangential_oscillator.type = 'sawtooth';
+	tangential_oscillator.frequency.setValueAtTime( 128, listener.context.currentTime );
+	tangential_oscillator.start( );
+    // console.log('made an object the audio listener')
+}
+
+export function add_normal_sound( target ) {
+    let sound = new PositionalAudio( listener );
+    sound.setNodeSource( normal_oscillator );
+    // sound.setRefDistance( 20 );
+    // sound.setVolume( 0.5 );
+
+    target.add( sound )
+}
+
+export function add_tangential_sound( target ) {
+    let sound = new PositionalAudio( listener );
+    sound.setNodeSource( tangential_oscillator );
+    sound.setRefDistance( 20 );
+    sound.setVolume( 0.5 );
+
+    target.add( sound )
 }
 
 export function add_impact_sound ( target ) {

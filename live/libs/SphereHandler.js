@@ -124,7 +124,7 @@ export function add_pool_spheres(S,params,scene) {
         object.NDDEM_ID = i;
         object.castShadow = true;
         object.receiveShadow = true;
-        AUDIO.add_impact_sound( object );
+        // AUDIO.add_normal_sound( object );
         spheres.add(object);
     }
 
@@ -312,7 +312,15 @@ export function move_spheres(S,params,controller1,controller2) {
         }
         // spheres.setMatrixAt( i, matrix );
         object.position.set( x[i][0], x[i][1], x[i][2] );
-        if ( params.lut === 'Velocity' ) {
+        if ( object.material.type === 'ShaderMaterial' ) { // found a custom shader material
+            for (var j = 0; j < params.dimension - 3; j++) {
+              object.material.uniforms.xview.value[j] =
+                params.d4.cur;
+              object.material.uniforms.xpart.value[j] =
+                x[i][j + 3];
+            }
+            object.material.uniforms.A.value = orientation[i];
+        } else if ( params.lut === 'Velocity' ) {
             // update brightness of textured particle
             // object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
             // use LUT to set an actual colour
@@ -321,23 +329,14 @@ export function move_spheres(S,params,controller1,controller2) {
         } else if ( params.lut === 'Fluct Velocity') {
             let vel_mag = Math.sqrt(Math.pow(v[i][0],2) + Math.pow(v[i][1]- params.shear_rate*x[i][0],2) + Math.pow(v[i][2],2));
             object.material.color = lut.getColor(vel_mag);
-        }
-        if ( params.lut === 'Rotation Rate' ) {
+        } else if ( params.lut === 'Rotation Rate' ) {
             // console.log(omegaMag[i])
             // object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
             object.material.color = lut.getColor(omegaMag[i]);
-        } else if ( object.material.type === 'ShaderMaterial' ) { // found a custom shader material
-            for (var j = 0; j < params.dimension - 3; j++) {
-              object.material.uniforms.xview.value[j] =
-                params.d4.cur;
-              object.material.uniforms.xpart.value[j] =
-                x[i][j + 3];
-            }
-            object.material.uniforms.A.value = orientation[i];
         }
-        if (params.dimension > 3) {
-
-        }
+        // if (params.dimension > 3) {
+        //
+        // }
 
     }
     // spheres.instanceMatrix.needsUpdate = true;
@@ -398,6 +397,10 @@ export function randomise_particles_isotropic( params, S ) {
 export function draw_force_network(S,params,scene) {
     if ( S !== undefined ) {
         if (params.particle_opacity < 1) {
+            for (var i=0; i<forces.children.length; i++ ) {
+                forces.children[i].geometry.dispose();
+                forces.children[i].material.dispose();
+            }
             scene.remove( forces );
             forces = new Group();
 
@@ -427,6 +430,7 @@ export function draw_force_network(S,params,scene) {
                                     width*F_mag/F_mag_max,
                                     distance);
                         c.lookAt(a);
+                        // AUDIO.add_normal_sound( c );
 
                         // c.material.emissiveIntensity = F_mag/F_mag_max;
 
@@ -437,7 +441,13 @@ export function draw_force_network(S,params,scene) {
             scene.add ( forces );
         }
         else {
-            if ( forces.parent === scene ) { scene.remove(forces) }
+            if ( forces.parent === scene ) {
+                for (var i=0; i<forces.children.length; i++ ) {
+                    forces.children[i].geometry.dispose();
+                    forces.children[i].material.dispose();
+                }
+                scene.remove(forces);
+            }
         }
     }
 

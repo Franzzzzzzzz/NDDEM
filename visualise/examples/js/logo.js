@@ -166,7 +166,7 @@ function initGraphics() {
                 mesh.scale.set(s,s,s);
                 mesh.position.y = - 27.*s; // 54 is original height
 
-                var earth = new THREE.Object3D();
+                earth = new THREE.Object3D();
                 earth.add(mesh); // now located at origin
 
                 earth.position.y = -0.56;
@@ -422,8 +422,6 @@ function makeStars() {
 
 function updateSizes( t, dt ) {
     if ( earth !== undefined ) {
-        // earth.rotation.x = clock.elapsedTime/10.;
-        // earth.rotateOnAxis(  new THREE.Vector3(0, 1, 0), 0.002 ); // axis, angle
         earth.rotateOnAxis(  new THREE.Vector3(0, 1, 0), dt/10. ); // axis, angle
     };
     // cycle gravity direction
