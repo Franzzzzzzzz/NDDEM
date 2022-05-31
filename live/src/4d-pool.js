@@ -485,7 +485,6 @@ function replace_meshes() {
         meshes = renderSTL(meshes, NDsolids, scene, material, params.d4.cur);
         meshes.position.y = params.table_height;
         scene.add( meshes );
-        // console.log('replaced meshes')
     }
 }
 

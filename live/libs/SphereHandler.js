@@ -397,6 +397,10 @@ export function randomise_particles_isotropic( params, S ) {
 export function draw_force_network(S,params,scene) {
     if ( S !== undefined ) {
         if (params.particle_opacity < 1) {
+            for (var i=0; i<forces.children.length; i++ ) {
+                forces.children[i].geometry.dispose();
+                forces.children[i].material.dispose();
+            }
             scene.remove( forces );
             forces = new Group();
 
@@ -437,7 +441,13 @@ export function draw_force_network(S,params,scene) {
             scene.add ( forces );
         }
         else {
-            if ( forces.parent === scene ) { scene.remove(forces) }
+            if ( forces.parent === scene ) {
+                for (var i=0; i<forces.children.length; i++ ) {
+                    forces.children[i].geometry.dispose();
+                    forces.children[i].material.dispose();
+                }
+                scene.remove(forces);
+            }
         }
     }
 
