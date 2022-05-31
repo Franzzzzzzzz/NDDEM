@@ -22,17 +22,11 @@ let torus_axis_colour = 0x000000; // the axis
 
 let urlParams = new URLSearchParams(window.location.search);
 
-function onSelectStart() {
-
-}
-
-function onSelectEnd() {
-
-}
+function onSelectStart()  { this.userData.isSelecting = true; }
+function onSelectEnd()    { this.userData.isSelecting = false; }
 
 function onSqueezeStart() { this.userData.isSqueezing = true; }
-
-function onSqueezeEnd() { this.userData.isSqueezing = false; }
+function onSqueezeEnd()   { this.userData.isSqueezing = false; }
 
 export function add_controllers(renderer, scene, params) {
     controller1 = renderer.xr.getController( 0 );
