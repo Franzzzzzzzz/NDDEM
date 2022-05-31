@@ -168,6 +168,8 @@ async function init() {
 
     }
 
+    update_scoreboard();
+
     renderer.setAnimationLoop( function () {
        update();
        renderer.render( scene, camera );
@@ -339,7 +341,11 @@ function check_pockets() {
                 }
                 else if ( i == 11 ) {
                     console.log('sunk black ball')
-                    alert('Black ball sunk. You win!')
+                    if ( sunk_balls.length < params.N - 1 ) {
+                        alert('You need to sink all of the coloured balls before the black ball. You lose.')
+                    } else {
+                        alert('You win!')
+                    }
                     set_ball_positions();
                 }
                 else {
@@ -348,6 +354,8 @@ function check_pockets() {
                     sunk_balls.push(i)
                     S.fixParticle(i, [1.1*params.L1, params.table_height, sunk_balls.length*2*params.radius, 0])
                     S.setFrozen(i);
+
+                    update_scoreboard();
                 }
             }
         }
@@ -467,6 +475,11 @@ function replace_meshes() {
         meshes.position.y += params.table_height;
         scene.add( meshes );
     }
+}
+
+function update_scoreboard() {
+    let board = document.getElementById('N_tag');
+    board.innerHTML = String(params.N - sunk_balls.length); //+ ' to go';
 }
 
 function get_num_particles(L) {
