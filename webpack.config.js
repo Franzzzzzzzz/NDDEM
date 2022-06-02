@@ -12,6 +12,7 @@ module.exports = [{
         'rotation' : './live/src/rotation.js',
         '4d-pool' : './live/src/4d-pool.js',
         'coarse-graining' : './live/src/coarse-graining.js',
+        'rotation-matrix' : './live/src/rotation-matrix.js',
     },
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
