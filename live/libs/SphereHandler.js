@@ -479,7 +479,7 @@ export function draw_force_network(S,params,scene) {
             forces = new Group();
 
             var F = S.simu_getParticleForce(); // very poorly named
-
+            
             let width = radii[0]/2.;
             if ( 'F_mag_max' in params ) {
                 F_mag_max = params.F_mag_max;

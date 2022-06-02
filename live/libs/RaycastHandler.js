@@ -18,7 +18,8 @@ let ref_location;
 let camera;
 
 window.addEventListener( 'mousemove', onMouseMove, false );
-window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
+window.addEventListener( 'mousedown', (e) => { onSelectParticle(e,camera) }, false );
+// window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
 
 function onMouseMove( event ) {
 
@@ -44,7 +45,7 @@ export function animate_locked_particle(S, c, spheres, params) {
 
 function onSelectParticle( event, camera ) {
     // console.log(camera.getWorldDirection() )
-    if ( event.code === 'Enter' ) {
+    // if ( event.code === 'Enter' ) {
         if ( locked_particle === null ) {
             locked_particle = INTERSECTED;
             // console.log(locked_particle);
@@ -58,7 +59,7 @@ function onSelectParticle( event, camera ) {
         else {
             locked_particle = null;
         }
-    }
+    // }
 }
 
 function calculate_intersection(camera, spheres, params) {
