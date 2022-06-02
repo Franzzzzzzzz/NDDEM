@@ -343,8 +343,8 @@ function setup_CG() {
     cgparam["boundaries"]=[
         Array(params.dimension).fill(-params.L/2.),
         Array(params.dimension).fill( params.L/2.)];
-    cgparam[0][0] = params.r_max;
-    cgparam[1][0] = 4*params.L;
+    cgparam["boundaries"][0][0] = params.r_max;
+    cgparam["boundaries"][1][0] = 4*params.L;
     cgparam["window size"]=params.L/2. ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
