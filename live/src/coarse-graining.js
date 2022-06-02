@@ -15,12 +15,7 @@ var clock = new THREE.Clock();
 let camera, scene, renderer, stats, panel, controls;
 let gui;
 let S;
-let NDDEMCGLib;
 let cg_mesh, colorbar_mesh;
-let pointer;
-let v, omegaMag;
-let radii;
-let particle_volume;
 
 var params = {
     dimension: 3,
@@ -34,7 +29,7 @@ var params = {
     paused: false,
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
-    d4_cur:0,
+    d4: {cur:0},
     r_max: 0.501,
     r_min: 0.499,
     freq: 0.05,
@@ -47,6 +42,8 @@ var params = {
     cg_height: 50,
     cg_opacity: 0.8,
     cg_window_size: 1.5,
+    particle_opacity: 0.5,
+    F_mag_max: 2e4,
     aspect_ratio: 1,
 }
 
@@ -57,14 +54,14 @@ let blackbody  = new Lut("blackbody", 512); // options are rainbow, cooltowarm a
 params.average_radius = (params.r_min + params.r_max)/2.;
 params.thickness = params.average_radius;
 
-particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
 if ( params.dimension === 4) {
     params.L = 2.5;
     params.N = 300
-    particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
 }
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
@@ -142,15 +139,18 @@ async function init() {
     gui.width = 320;
 
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
-    gui.add ( params, 'cg_opacity', 0, 1).name('Opacity').listen();
+    gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
+    gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
     gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
     gui.add ( params, 'cg_window_size', 0.5, params.L/2.).name('Window size').listen().onChange( () => {
         update_cg_params(S, params);
@@ -231,9 +231,6 @@ function animate() {
             lut.setMax( maxVal);
         }
 
-
-
-
         for ( let i = 0; i < size; i ++ ) {
             var color = lut.getColor(val[i]);
             // console.log(val[i])
@@ -258,6 +255,7 @@ function animate() {
         cg_mesh.material.map = texture;
         // cg_mesh.material.opacity = parseInt(255*params.opacity);
     }
+    SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
 }
 function update_cg_params(S, params) {
@@ -285,23 +283,25 @@ function update_cg_params(S, params) {
 
 async function NDDEMCGPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //     console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    // }
+    if ( 'DEMCGND' in window === false ) {
 
-    // NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
+
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            finish_setup();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            /*S = await new NDDEMLib.Simulation4 (params.N);
-            finish_setup();*/
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
-    });
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        finish_setup();
+    } );
 
 
     function finish_setup() {
@@ -317,7 +317,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 2 WALL -0.51 0.51");
         if ( params.dimension == 4 ) {
-            S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
+            S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
         }
         S.simu_interpret_command("gravity -1000 0 " + "0 ".repeat(params.dimension - 3))
 

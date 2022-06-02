@@ -49,6 +49,31 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         .function("setExternalForce", &Simulation<4>::setExternalForce)
         .function("getTime", &Simulation<4>::getTime)
         ;
+    class_<Simulation<5>>("Simulation5")
+        .constructor<int>()
+        .function("finalise_init", &Simulation<5>::finalise_init)
+        .function("interpret_command", &Simulation<5>::interpret_command)
+        .function("step_forward", &Simulation<5>::step_forward)
+        .function("finalise", &Simulation<5>::finalise)
+        // .smart_ptr<std::shared_ptr<Simulation<3>>>("Simulation")
+        // .property("X", &Simulation<3>::getX, &Simulation<3>::setX)
+        .function("getX", &Simulation<5>::getX)
+        .function("getRadii", &Simulation<5>::getRadii)
+        .function("setRadius", &Simulation<5>::setRadius)
+        .function("setMass", &Simulation<5>::setMass)
+        .function("fixParticle", &Simulation<5>::fixParticle)
+        .function("setFrozen", &Simulation<5>::setFrozen)
+        .function("getOrientation", &Simulation<5>::getOrientation)
+        .function("getVelocity", &Simulation<5>::getVelocity)
+        .function("getRotationRate", &Simulation<5>::getRotationRate)
+        .function("getParticleForce", &Simulation<5>::getParticleForce)
+        // .function("getX2", &Simulation<3>::getX2)
+        .function("getBoundary", &Simulation<5>::getBoundary)
+        .function("setBoundary", &Simulation<5>::setBoundary)
+        .function("getWallForce", &Simulation<5>::getWallForce)
+        .function("setExternalForce", &Simulation<5>::setExternalForce)
+        .function("getTime", &Simulation<5>::getTime)
+        ;
 }
 
 // EMSCRIPTEN_BINDINGS(stl_wrappers) {

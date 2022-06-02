@@ -5,6 +5,7 @@ let v, omegaMag;
 export let ray;
 export let total_particle_volume;
 export let x;
+let F_mag_max;
 
 import { Lut } from "three/examples/jsm/math/Lut.js";
 import { r, R } from "./controllers.js"
@@ -246,9 +247,9 @@ export function update_particle_material(params, lut_folder) {
     } else if (params.view_mode === "D5") {
       lut.setMin(params.d5.cur - 2 * r);
       lut.setMax(params.d5.cur + 2 * r);
-      // object.material.color = lut.getColor(spheres[i][4]);
+      // object.material.color = lut.getColor(x[i][4]);
       // TORUS.wristband1.children[i].material.color = lut.getColor(
-        // spheres[i][4]
+        // x[i][4]
       // );
     }
 
@@ -294,24 +295,97 @@ export function move_spheres(S,params,controller1,controller2) {
         // forceMag = S.simu_getParticleStress(); // NOTE: NOT IMPLEMENTED YET
         console.warn('PARTICLE STRESSES NOT IMPLEMENTED YET')
     }
+    let R_draw;
     for ( let i = 0; i < params.N; i ++ ) {
-        var object = spheres.children[i];
-
-        // const matrix = new THREE.Matrix4();
-        // matrix.setPosition( x[i][0], x[i][1], x[i][2] );
-        if ( params.dimension == 3 ) {
-            var D_draw = 2*radii[i];
-            object.scale.set(D_draw, D_draw, D_draw);
+        let object = spheres.children[i];
+        if ( params.dimension === 3 ) {
+            R_draw = radii[i];
         }
         else if ( params.dimension == 4 ) {
-            var D_draw = 2*Math.sqrt(
+            R_draw = Math.sqrt(
               Math.pow(radii[i], 2) - Math.pow(params.d4.cur - x[i][3], 2)
             );
-            object.scale.set(D_draw, D_draw, D_draw);
-            // matrix.scale( new THREE.Vector3(D_draw,D_draw,D_draw) );
+        } else if (params.dimension == 5) {
+          R_draw = Math.sqrt(
+            Math.pow(radii[i], 2) -
+              Math.pow(params.d4.cur - x[i][3], 2) -
+              Math.pow(params.d5.cur - x[i][4], 2)
+          );
+        } else if (params.dimension == 6) {
+          R_draw = Math.sqrt(
+            Math.pow(radii[i], 2) -
+              Math.pow(params.d4.cur - x[i][3], 2) -
+              Math.pow(params.d5.cur - x[i][4], 2) -
+              Math.pow(params.d6.cur - x[i][5], 2)
+          );
+        } else if (params.dimension == 7) {
+          R_draw = Math.sqrt(
+            Math.pow(radii[i], 2) -
+              Math.pow(params.d4.cur - x[i][3], 2) -
+              Math.pow(params.d5.cur - x[i][4], 2) -
+              Math.pow(params.d6.cur - x[i][5], 2) -
+              Math.pow(params.d7.cur - x[i][6], 2)
+          );
+        } else if (params.dimension == 8) {
+          R_draw = Math.sqrt(
+            Math.pow(radii[i], 2) -
+              Math.pow(params.d4.cur - x[i][3], 2) -
+              Math.pow(params.d5.cur - x[i][4], 2) -
+              Math.pow(params.d6.cur - x[i][5], 2) -
+              Math.pow(params.d7.cur - x[i][6], 2) -
+              Math.pow(params.d8.cur - x[i][7], 2)
+          );
+        } else if (params.dimension == 10) {
+          R_draw = Math.sqrt(
+            Math.pow(radii[i], 2) -
+              Math.pow(params.d4.cur - x[i][3], 2) -
+              Math.pow(params.d5.cur - x[i][4], 2) -
+              Math.pow(params.d6.cur - x[i][5], 2) -
+              Math.pow(params.d7.cur - x[i][6], 2) -
+              Math.pow(params.d8.cur - x[i][7], 2) -
+              Math.pow(params.d9.cur - x[i][8], 2) -
+              Math.pow(params.d10.cur - x[i][9], 2)
+          );
+        } else if (params.dimension == 30) {
+          R_draw = Math.sqrt(
+            Math.pow(radii[i], 2) -
+              Math.pow(params.d4.cur - x[i][3], 2) -
+              Math.pow(params.d5.cur - x[i][4], 2) -
+              Math.pow(params.d6.cur - x[i][5], 2) -
+              Math.pow(params.d7.cur - x[i][6], 2) -
+              Math.pow(params.d8.cur - x[i][7], 2) -
+              Math.pow(params.d9.cur - x[i][8], 2) -
+              Math.pow(params.d10.cur - x[i][9], 2) -
+              Math.pow(params.d11.cur - x[i][10], 2) -
+              Math.pow(params.d12.cur - x[i][11], 2) -
+              Math.pow(params.d13.cur - x[i][12], 2) -
+              Math.pow(params.d14.cur - x[i][13], 2) -
+              Math.pow(params.d15.cur - x[i][14], 2) -
+              Math.pow(params.d16.cur - x[i][15], 2) -
+              Math.pow(params.d17.cur - x[i][16], 2) -
+              Math.pow(params.d18.cur - x[i][17], 2) -
+              Math.pow(params.d19.cur - x[i][18], 2) -
+              Math.pow(params.d20.cur - x[i][19], 2) -
+              Math.pow(params.d21.cur - x[i][20], 2) -
+              Math.pow(params.d22.cur - x[i][21], 2) -
+              Math.pow(params.d23.cur - x[i][22], 2) -
+              Math.pow(params.d24.cur - x[i][23], 2) -
+              Math.pow(params.d25.cur - x[i][24], 2) -
+              Math.pow(params.d26.cur - x[i][25], 2) -
+              Math.pow(params.d27.cur - x[i][26], 2) -
+              Math.pow(params.d28.cur - x[i][27], 2) -
+              Math.pow(params.d29.cur - x[i][28], 2) -
+              Math.pow(params.d30.cur - x[i][29], 2)
+          );
         }
-        // spheres.setMatrixAt( i, matrix );
-        object.position.set( x[i][0], x[i][1], x[i][2] );
+        if (isNaN(R_draw)) {
+            object.visible = false;
+        } else {
+            object.visible = true;
+            object.scale.setScalar(2*R_draw);
+            // spheres.setMatrixAt( i, matrix );
+            object.position.set( x[i][0], x[i][1], x[i][2] );
+        }
         if ( object.material.type === 'ShaderMaterial' ) { // found a custom shader material
             for (var j = 0; j < params.dimension - 3; j++) {
               object.material.uniforms.xview.value[j] =
@@ -407,7 +481,11 @@ export function draw_force_network(S,params,scene) {
             var F = S.simu_getParticleForce(); // very poorly named
 
             let width = radii[0]/2.;
-            let F_mag_max = 1e0;
+            if ( 'F_mag_max' in params ) {
+                F_mag_max = params.F_mag_max;
+            } else {
+                F_mag_max = 1e0;
+            }
 
             for ( let i = 0; i < F.length; i ++ ) {
             // for ( let i = 0; i < 100; i ++ ) {
@@ -421,20 +499,22 @@ export function draw_force_network(S,params,scene) {
                     let a = spheres.children[F[i][0]].position;
                     let b = spheres.children[F[i][1]].position;
                     let distance = a.distanceTo( b );
-                    if ( distance < (radii[F[i][0]] + radii[F[i][1]]) ) { // ignore periodic boundaries
-                        let mid_point = new Vector3();
-                        mid_point.addVectors(a,b);
-                        mid_point.divideScalar(2);
-                        c.position.copy( mid_point );
-                        c.scale.set(width*F_mag/F_mag_max,
-                                    width*F_mag/F_mag_max,
-                                    distance);
-                        c.lookAt(a);
-                        // AUDIO.add_normal_sound( c );
+                    if (spheres.children[F[i][0]].visible && spheres.children[F[i][1]].visible) {
+                        if ( distance < (radii[F[i][0]] + radii[F[i][1]]) ) { // ignore periodic boundaries
+                            let mid_point = new Vector3();
+                            mid_point.addVectors(a,b);
+                            mid_point.divideScalar(2);
+                            c.position.copy( mid_point );
+                            c.scale.set(width*F_mag/F_mag_max,
+                                        width*F_mag/F_mag_max,
+                                        distance);
+                            c.lookAt(a);
+                            // AUDIO.add_normal_sound( c );
 
-                        // c.material.emissiveIntensity = F_mag/F_mag_max;
+                            // c.material.emissiveIntensity = F_mag/F_mag_max;
 
-                        forces.add( c );
+                            forces.add( c );
+                        }
                     }
                 }
             }

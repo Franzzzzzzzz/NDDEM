@@ -64,25 +64,28 @@ var params = {
     show_colorbar: true,
 }
 
+if ( urlParams.has('dimension') ) {
+    params.dimension = parseInt(urlParams.get('dimension'));
+}
+
 set_derived_properties();
 
 function set_derived_properties() {
     params.average_radius = (params.r_min + params.r_max)/2.;
-    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+    if ( params.dimension === 3 ) {
+        params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+    } else if ( params.dimension === 4 ) {
+        params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    }
+
     console.log('estimate of particle volume: ' + params.particle_volume*params.N)
     params.particle_mass = params.particle_volume * params.particle_density;
-    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;
+    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./params.dimension)/2.;
 }
 
 
-if ( urlParams.has('dimension') ) {
-    params.dimension = parseInt(urlParams.get('dimension'));
-}
-if ( params.dimension === 4) {
-    params.L = 2.5;
-    params.N = 300
-    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
-}
+
+
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
@@ -127,11 +130,11 @@ async function init() {
     gui.width = 320;
 
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
@@ -204,25 +207,41 @@ function onWindowResize(){
 
 function animate() {
     requestAnimationFrame( animate );
-    SPHERES.move_spheres(S,params);
     if ( !params.paused ) {
+        SPHERES.move_spheres(S,params);
         S.simu_step_forward(5);
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
         density=S.cg_get_result(0, "RHO", 0) ;
         vavg=S.cg_get_result(0, "VAVG", 1) ;
-        stressTcxx=S.cg_get_result(0, "TC", 0) ;
-        stressTcyy=S.cg_get_result(0, "TC", 4) ;
-        stressTczz=S.cg_get_result(0, "TC", 8) ;
+        let normal_stresses = [];
+        for (let i=0; i<params.dimension; i++) {
+            let component = i*(params.dimension+1);
+            let this_stress = S.cg_get_result(0, "TC", component) ;
+            normal_stresses.push(this_stress);
+        }
+        // stressTcxx=S.cg_get_result(0, "TC", 0) ;
+        // stressTcyy=S.cg_get_result(0, "TC", 4) ;
+        // stressTczz=S.cg_get_result(0, "TC", 8) ;
         stressTcxy=S.cg_get_result(0, "TC", 1) ;
-        for (var i=0 ; i<stressTcxx.length ; i++)
+        for (var i=0 ; i<stressTcxy.length ; i++)
         {
             xloc[i]=grid[0]+i*grid[3] ;
-            pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
             shearstress[i]=-stressTcxy[i] ;
+            let this_pressure = 0;
+            for ( let j=0; j<normal_stresses.length; j++) {
+                this_pressure += normal_stresses[j][i];
+            }
+            pressure[i]=this_pressure / normal_stresses.length;
         }
-
+        // params.viscosity = 0;
+        // params.inertial_number = 0.1;
+        // params.target_pressure = Math.pow(params.shear_rate*params.average_radius/params.inertial_number,2)*params.particle_density;
+        // params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
+        // let dt = 1e-3;
+        // params.wall_mass = 1e4;//params.N*params.particle_mass;
+        // WALLS.update_damped_wall(params, S, scene, dt)
         update_graph();
         SPHERES.draw_force_network(S, params, scene);
     }
@@ -231,17 +250,25 @@ function animate() {
 
 async function NDDEMCGPhysics() {
 
+    if ( 'DEMCGND' in window === false ) {
+
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
+
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            finish_setup();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            /*S = await new NDDEMLib.Simulation4 (params.N);
-            finish_setup();*/
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
-    });
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        finish_setup();
+    } );
 
 
 
@@ -282,19 +309,20 @@ async function NDDEMCGPhysics() {
 
         var cgparam ={} ;
         cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-        cgparam["boxes"]=[20,1,1] ;
+        cgparam["boxes"]=Array(params.dimension).fill(1) ;
+        cgparam["boxes"][0] = 20; // more in first dimension
         // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
         cgparam["boundaries"]=[
-            [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-            [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
+            Array(params.dimension).fill(-params.L+params.r_max),
+            Array(params.dimension).fill( params.L-params.r_max)];
         cgparam["window size"]=2*params.average_radius ;
         cgparam["skip"]=0;
         cgparam["max time"]=1 ;
         cgparam["time average"]="None" ;
         cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-        cgparam["periodicity"]=[true,true,true];
+        cgparam["periodicity"]=Array(params.dimension).fill(true);
         cgparam["window"]="Lucy3D";
-        cgparam["dimension"]=3;
+        cgparam["dimension"]=params.dimension;
 
 
         console.log(JSON.stringify(cgparam)) ;

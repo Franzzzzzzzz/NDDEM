@@ -43,7 +43,7 @@ var params = {
     H_cur: 0,
     pressure_set_pt: 1e4,
     deviatoric_set_pt: 0,
-    d4_cur:0,
+    d4: {cur:0},
     r_max: 0.0033,
     r_min: 0.0027,
     freq: 0.05,
@@ -155,12 +155,12 @@ async function init() {
     gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );
     gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             // .onChange( function () { WALLS.update_top_wall(params, S); } );
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
@@ -271,24 +271,25 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //
-    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    //
-    // }
+    if ( 'DEMCGND' in window === false ) {
+
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
 
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            setup_NDDEM();
-            setup_CG();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            // S = await new NDDEMCGLib.Simulation4 (params.N);
-            // finish_setup();
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        setup_NDDEM();
+        setup_CG();
     } );
 }
 
@@ -307,6 +308,9 @@ function setup_NDDEM() {
     S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
     S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
     S.simu_interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
+    if ( params.dimension == 4 ) {
+        S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
+    }
     if ( params.gravity === true ) {
         S.simu_interpret_command("gravity 0 0 " + String(-9.81) + "0 ".repeat(params.dimension - 3)) }
     else {
@@ -334,22 +338,21 @@ function setup_NDDEM() {
 function setup_CG() {
     var cgparam ={} ;
     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-    cgparam["boxes"]=[1,1,1] ;
+    cgparam["boxes"]=Array(params.dimension).fill(1) ;
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"]=[
-        [-params.L/2.,-params.L/2.,-params.L/2.],
-        [ params.L/2., params.L/2., params.L/2.]] ;
-        // [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-        // [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
-
+        Array(params.dimension).fill(-params.L/2.),
+        Array(params.dimension).fill( params.L/2.)];
+    cgparam[0][0] = params.r_max;
+    cgparam[1][0] = 4*params.L;
     cgparam["window size"]=params.L/2. ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
     cgparam["fields"]=["RHO", "TC"] ;
-    cgparam["periodicity"]=[false,false,false];
+    cgparam["periodicity"]=Array(params.dimension).fill(false);
     cgparam["window"]="Lucy3D";
-    cgparam["dimension"]=3;
+    cgparam["dimension"]=params.dimension;
 
 
     // console.log(JSON.stringify(cgparam)) ;
