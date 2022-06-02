@@ -316,8 +316,8 @@ function finish_setup() {
     cgparam["boundaries"]=[
         Array(params.dimension).fill(-params.L+params.r_max),
         Array(params.dimension).fill( params.L-params.r_max)];
-    cgparam[0][0] = params.r_max;
-    cgparam[1][0] = 4*params.L;
+    cgparam["boundaries"][0][0] = params.r_max;
+    cgparam["boundaries"][1][0] = 4*params.L;
     cgparam["window size"]=2*params.average_radius ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
