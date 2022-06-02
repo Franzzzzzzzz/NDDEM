@@ -64,7 +64,7 @@ var params = {
     current_pressure: 0,
     current_shear: 0,
     current_density: 0,
-    d4_cur:0,
+    d4: {cur:0},
     r_max: 0.0033,
     r_min: 0.0027,
     freq: 0.05,
@@ -358,25 +358,25 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-	// if ( 'DEMCGND' in window === false ) {
-    //
-	// 	console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-	// 	return;
-    //
-	// }
+    if ( 'DEMCGND' in window === false ) {
 
-	// let NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
+
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            finish_setup();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log( 'N>3 not implemented yet')
-            // S = await new NDDEMLib.Simulation4 (params.N);
-            // finish_setup();
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
-    });
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        finish_setup();
+    } );
 
 
     function finish_setup() {
@@ -396,6 +396,9 @@ async function NDDEMPhysics() {
         S.simu_interpret_command("boundary 0 "+wall_type+" -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 1 "+wall_type+" -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 2 "+wall_type+" -"+String(params.L*params.aspect_ratio)+" "+String(params.L*params.aspect_ratio));
+        if ( params.dimension == 4 ) {
+            S.simu_interpret_command("boundary 3 "+wall_type+" -"+String(params.L)+" "+String(params.L));
+        }
         if ( params.dimension == 3 ) {
             if ( params.gravity ) {
                 S.simu_interpret_command("gravity 0 0 -10");
@@ -428,19 +431,23 @@ async function NDDEMPhysics() {
 
         var cgparam ={} ;
         cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-        cgparam["boxes"]=[1,1,1] ;
-        // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
+        cgparam["boxes"]=Array(params.dimension).fill(1) ;
+        // cgparam["boundaries"]=[
+        //     [-params.L+params.r_max,-params.L+params.r_max,-params.L*params.aspect_ratio+params.r_max],
+        //     [ params.L-params.r_max, params.L-params.r_max, params.L*params.aspect_ratio-params.r_max]] ;
         cgparam["boundaries"]=[
-            [-params.L+params.r_max,-params.L+params.r_max,-params.L*params.aspect_ratio+params.r_max],
-            [ params.L-params.r_max, params.L-params.r_max, params.L*params.aspect_ratio-params.r_max]] ;
+            Array(params.dimension).fill(-params.L+params.r_max),
+            Array(params.dimension).fill( params.L-params.r_max)];
+        cgparam[0][2] = -params.L*params.aspect_ratio+params.r_max;
+        cgparam[1][2] =  params.L*params.aspect_ratio-params.r_max;
         cgparam["window size"]=2*params.average_radius ;
         cgparam["skip"]=0;
         cgparam["max time"]=1 ;
         cgparam["time average"]="None" ;
         cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-        cgparam["periodicity"]=[true,true,true];
+        cgparam["periodicity"]=Array(params.dimension).fill(true);
         cgparam["window"]="Lucy3D";
-        cgparam["dimension"]=3;
+        cgparam["dimension"]=params.dimension;
 
 
         console.log(JSON.stringify(cgparam)) ;

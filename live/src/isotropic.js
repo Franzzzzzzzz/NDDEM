@@ -43,7 +43,7 @@ var params = {
     H_cur: 0,
     pressure_set_pt: 1e4,
     deviatoric_set_pt: 0,
-    d4_cur:0,
+    d4: {cur:0},
     r_max: 0.0033,
     r_min: 0.0027,
     freq: 0.05,
@@ -154,12 +154,12 @@ async function init() {
     gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress - loading' );
     gui.add( params, 'unloading_stress', 0, 1e4).name( 'Target stress - unloading' );
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             // .onChange( function () { WALLS.update_top_wall(params, S); } );
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
@@ -268,25 +268,27 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //
-    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    //
-    // }
+    if ( 'DEMCGND' in window === false ) {
+
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
 
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            setup_NDDEM();
-            setup_CG();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            // S = await new NDDEMCGLib.Simulation4 (params.N);
-            // finish_setup();
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        setup_NDDEM();
+        setup_CG();
     } );
+
 }
 
 function setup_NDDEM() {

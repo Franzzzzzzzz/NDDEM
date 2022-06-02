@@ -45,7 +45,7 @@ var params = {
     paused: false,
     g_mag: 10,
     theta: 0, // slope angle in DEGREES
-    d4_cur:0,
+    d4: {cur:0},
     r_max: 0.0033,
     r_min: 0.0027,
     new_line: false,
@@ -141,11 +141,11 @@ async function init() {
     gui.width = 320;
 
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
@@ -249,23 +249,24 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //
-    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    //
-    // }
+    if ( 'DEMCGND' in window === false ) {
+
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
 
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            finish_setup();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            // S = await new NDDEMCGLib.Simulation4 (params.N);
-            // finish_setup();
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        finish_setup();
     } );
 }
 
@@ -309,19 +310,22 @@ function finish_setup() {
 
     var cgparam ={} ;
     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-    cgparam["boxes"]=[20,1,1] ;
+    cgparam["boxes"]=Array(params.dimension).fill(1) ;
+    cgparam["boxes"][0] = 20; // more in first dimension
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"]=[
-        [ params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-        [ 4*params.L,   params.L-params.r_max, params.L-params.r_max]] ;
+        Array(params.dimension).fill(-params.L+params.r_max),
+        Array(params.dimension).fill( params.L-params.r_max)];
+    cgparam[0][0] = params.r_max;
+    cgparam[1][0] = 4*params.L;
     cgparam["window size"]=2*params.average_radius ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
     cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-    cgparam["periodicity"]=[true,true,true];
+    cgparam["periodicity"]=Array(params.dimension).fill(true);
     cgparam["window"]="Lucy3D";
-    cgparam["dimension"]=3;
+    cgparam["dimension"]=params.dimension;
 
 
     console.log(JSON.stringify(cgparam)) ;

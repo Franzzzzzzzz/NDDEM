@@ -3,6 +3,9 @@ export let axesHelper, arrow_x, arrow_y, arrow_z;
 let arrow_body, arrow_head;
 let textGeo_x, textGeo_y, textGeo_z;
 let font;
+let vertical_wall_acceleration = 0;
+let vertical_wall_velocity = 0;
+let vertical_wall_displacement = 0;
 
 import {
     BoxGeometry,
@@ -400,6 +403,18 @@ export function update_top_wall(params, S, scene, dt=0.001) {
 
 }
 
+export function update_damped_wall(params, S, scene, dt) {
+    vertical_wall_acceleration = (params.target_pressure - params.current_pressure - params.viscosity*vertical_wall_velocity)/params.wall_mass;
+
+    vertical_wall_velocity += vertical_wall_acceleration*dt;
+    vertical_wall_displacement += vertical_wall_velocity*dt;
+
+    let L_cur = params.L - vertical_wall_displacement
+
+    S.simu_setBoundary(1, [-L_cur,L_cur]) ; // Set location of the walls in y
+
+    console.log(L_cur,params.target_pressure,params.current_pressure);
+}
 
 export function update_isotropic_wall(params, S, scene, dt=0.001) {
     //params.packing_fraction = (params.N*params.particle_volume)/Math.pow(params.L,params.dimension-1)/(params.L_cur)/Math.pow(2,params.dimension)*2;

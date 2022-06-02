@@ -374,12 +374,13 @@ async function NDDEMPhysics() {
     await DEMND().then( (NDDEMLib) => {
         if ( params.dimension == 3 ) {
             S = new NDDEMLib.Simulation3 (params.N_real);
-            finish_setup();
-        }
-        else if ( params.dimension == 4 ) {
+        } else if ( params.dimension == 4 ) {
             S = new NDDEMLib.Simulation4 (params.N_real);
-            finish_setup();
+        } else if ( params.dimension == 5 ) {
+            S = new NDDEMLib.Simulation5 (params.N_real);
+
         }
+        finish_setup();
     });
 
     // overload for old DEMND instead of DEMCGND
