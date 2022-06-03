@@ -22,6 +22,7 @@ import {
     Line,
     Mesh,
     BufferGeometry,
+    CircleGeometry,
     SphereGeometry,
     CylinderGeometry,
     LineBasicMaterial,
@@ -66,19 +67,17 @@ export function add_spheres(S,params,scene) {
 
     // const matrix = new THREE.Matrix4();
     const color = new Color();
-
-    const geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
-    // const geometrySphere = new THREE.BufferGeometry().fromGeometry(
-    //   new THREE.SphereGeometry(
-    //     1,
-    //     Math.pow(2, params.quality),
-    //     Math.pow(2, params.quality)
-    //   )
-    // );
-    // spheres = new THREE.InstancedMesh( geometrySphere, material, params.N );
-    // spheres.castShadow = true;
-    // spheres.receiveShadow = true;
-    // scene.add( spheres );
+    let geometrySphere;
+    if ( params.dimension < 3 ) {
+        geometrySphere = new CircleGeometry( 0.5, Math.pow(2,params.quality) );
+        geometrySphere.applyMatrix4( new Matrix4().makeRotationZ( Math.PI / 2 ) ); //
+        geometrySphere.applyMatrix4( new Matrix4().makeRotationX( Math.PI ) ); // rotate the geometry to make the forces point in the right direction
+        // geometrySphere = new CylinderGeometry( 0.5, Math.pow(2,params.quality) );
+        // geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
+    }
+    else {
+        geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
+    }
 
     for ( let i = 0; i < params.N; i ++ ) {
         const material = NDParticleShader.clone();
@@ -298,7 +297,7 @@ export function move_spheres(S,params,controller1,controller2) {
     let R_draw;
     for ( let i = 0; i < params.N; i ++ ) {
         let object = spheres.children[i];
-        if ( params.dimension === 3 ) {
+        if ( params.dimension <= 3 ) {
             R_draw = radii[i];
         }
         else if ( params.dimension == 4 ) {
@@ -479,7 +478,7 @@ export function draw_force_network(S,params,scene) {
             forces = new Group();
 
             var F = S.simu_getParticleForce(); // very poorly named
-            
+
             let width = radii[0]/2.;
             if ( 'F_mag_max' in params ) {
                 F_mag_max = params.F_mag_max;
@@ -489,11 +488,20 @@ export function draw_force_network(S,params,scene) {
 
             for ( let i = 0; i < F.length; i ++ ) {
             // for ( let i = 0; i < 100; i ++ ) {
-                let F_mag = Math.sqrt(
-                    Math.pow(F[i][2],2) +
-                    Math.pow(F[i][3],2) +
-                    Math.pow(F[i][4],2)
-                )
+                let F_mag;
+                if ( params.dimension === 2) {
+                    F_mag = Math.sqrt(
+                        Math.pow(F[i][2],2) +
+                        Math.pow(F[i][3],2)
+                    )
+                }
+                else if ( params.dimension === 3) {
+                    F_mag = Math.sqrt(
+                        Math.pow(F[i][2],2) +
+                        Math.pow(F[i][3],2) +
+                        Math.pow(F[i][4],2)
+                    )
+                }
                 if (F_mag > 0) {
                     let c = cylinder.clone();
                     let a = spheres.children[F[i][0]].position;

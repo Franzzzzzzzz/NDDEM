@@ -18,7 +18,7 @@ let S;
 let cg_mesh, colorbar_mesh;
 
 var params = {
-    dimension: 3,
+    dimension: 2,
     L: 0.06, //system size
     N: 150,
     zoom: 1000,
@@ -42,9 +42,9 @@ var params = {
     cg_width: 50,
     cg_height: 50,
     cg_opacity: 0.8,
-    cg_window_size: 2,
+    cg_window_size: 3,
     particle_opacity: 1,
-    F_mag_max: 5,
+    F_mag_max: 1000,
     aspect_ratio: 1,
 }
 
@@ -55,11 +55,18 @@ let blackbody  = new Lut("blackbody", 512); // options are rainbow, cooltowarm a
 params.average_radius = (params.r_min + params.r_max)/2.;
 params.thickness = params.average_radius;
 
-params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
-if ( params.dimension === 4) {
+if ( params.dimension === 2) {
+    params.particle_volume = Math.PI*Math.pow(params.average_radius,2);
+}
+else if ( params.dimension === 3 ) {
+    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+}
+else if ( params.dimension === 4) {
+
     params.L = 2.5;
     params.N = 300
     params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
@@ -67,7 +74,8 @@ if ( params.dimension === 4) {
 
 params.particle_mass = params.particle_volume * params.particle_density;
 
-
+if ( urlParams.has('cg_width') ) { params.cg_width = parseInt(urlParams.get('cg_width')); }
+if ( urlParams.has('cg_height') ) { params.cg_height = parseInt(urlParams.get('cg_height')); }
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
 SPHERES.createNDParticleShader(params).then( init() );
@@ -157,7 +165,7 @@ async function init() {
     ));
     gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
     gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
-    gui.add ( params, 'cg_window_size', 0.5, 5).name('Window size (radii)').listen().onChange( () => {
+    gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
         update_cg_params(S, params);
     });
     // gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
@@ -206,7 +214,7 @@ function animate() {
             lut = rainbow;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
-            lut.setMax(params.particle_density);
+            lut.setMax(params.particle_density*100);
         }
         else if ( params.cg_field === 'Velocity' ) {
             val = S.cg_get_result(0, "VAVG", 1);
@@ -296,7 +304,10 @@ async function NDDEMCGPhysics() {
     }
 
     await DEMCGND().then( (NDDEMCGLib) => {
-        if ( params.dimension == 3 ) {
+        if ( params.dimension == 2 ) {
+            S = new NDDEMCGLib.DEMCG2D (params.N);
+        }
+        else if ( params.dimension == 3 ) {
             S = new NDDEMCGLib.DEMCG3D (params.N);
         }
         else if ( params.dimension == 4 ) {
@@ -312,7 +323,13 @@ async function NDDEMCGPhysics() {
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
-        let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        let m;
+        if ( params.dimension === 2) {
+            m = Math.PI*0.5*0.5*params.particle_density;
+        } else {
+            m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        }
+
         S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
         S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
@@ -322,11 +339,13 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-        S.simu_interpret_command("boundary 2 WALL -"+String(params.r_max)+" "+String(params.r_max));
-        if ( params.dimension == 4 ) {
+        if ( params.dimension > 2 ) {
+            S.simu_interpret_command("boundary 2 WALL -"+String(params.r_max)+" "+String(params.r_max));
+        }
+        if ( params.dimension > 3 ) {
             S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
         }
-        S.simu_interpret_command("gravity -100 0 " + "0 ".repeat(params.dimension - 3))
+        S.simu_interpret_command("gravity -100 " + "0 ".repeat(params.dimension - 2))
 
         S.simu_interpret_command("auto location randomdrop");
 
