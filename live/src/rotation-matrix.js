@@ -75,10 +75,9 @@ async function init() {
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
 
-    gui = new GUI();
-    gui.width = 320;
-
     if ( params.dimension == 4 ) {
+        gui = new GUI();
+        gui.width = 320;
         gui.add( params.d4, 'cur', -params.radius,params.radius, 0.001).name( 'D4 location').listen()
     }
 
