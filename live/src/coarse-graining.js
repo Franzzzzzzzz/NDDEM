@@ -43,7 +43,7 @@ var params = {
     cg_height: 50,
     cg_opacity: 0.8,
     cg_window_size: 3,
-    particle_opacity: 1,
+    particle_opacity: 0.5,
     F_mag_max: 1000,
     aspect_ratio: 1,
 }
@@ -76,6 +76,9 @@ params.particle_mass = params.particle_volume * params.particle_density;
 
 if ( urlParams.has('cg_width') ) { params.cg_width = parseInt(urlParams.get('cg_width')); }
 if ( urlParams.has('cg_height') ) { params.cg_height = parseInt(urlParams.get('cg_height')); }
+if ( urlParams.has('cg_opacity') ) { params.cg_opacity = urlParams.get('cg_opacity'); }
+if ( urlParams.has('particle_opacity') ) { params.particle_opacity = urlParams.get('particle_opacity'); }
+
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
 SPHERES.createNDParticleShader(params).then( init() );
@@ -160,9 +163,9 @@ async function init() {
                 }
             });
     }
-    gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+    // gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
         // lut_folder
-    ));
+    // ));
     gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
     gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
     gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
