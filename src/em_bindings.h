@@ -1,3 +1,37 @@
+EMSCRIPTEN_BINDINGS(DEMCG2D) {
+  class_<DEMCG2D>("DEMCG2D")
+    .constructor<int>()
+    .function("simu_finalise_init", &DEMCG2D::simu_finalise_init)
+    .function("simu_interpret_command", &DEMCG2D::simu_interpret_command)
+    .function("simu_step_forward", &DEMCG2D::simu_step_forward)
+    .function("simu_finalise", &DEMCG2D::simu_finalise)
+    .function("simu_getX", &DEMCG2D::simu_getX)
+    .function("simu_getRadii", &DEMCG2D::simu_getRadii)
+    .function("simu_setRadius", &DEMCG2D::simu_setRadius)
+    .function("simu_setMass", &DEMCG2D::simu_setMass)
+    .function("simu_fixParticle", &DEMCG2D::simu_fixParticle)
+    .function("simu_setFrozen", &DEMCG2D::simu_setFrozen)
+    .function("simu_getOrientation", &DEMCG2D::simu_getOrientation)
+    .function("simu_getVelocity", &DEMCG2D::simu_getVelocity)
+    .function("simu_getRotationRate", &DEMCG2D::simu_getRotationRate)
+    .function("simu_getParticleForce", &DEMCG2D::simu_getParticleForce)
+    .function("simu_getBoundary", &DEMCG2D::simu_getBoundary)
+    .function("simu_setBoundary", &DEMCG2D::simu_setBoundary)
+    .function("simu_getWallForce", &DEMCG2D::simu_getWallForce)
+    .function("simu_setExternalForce", &DEMCG2D::simu_setExternalForce)
+    .function("simu_getTime", &DEMCG2D::simu_getTime)
+
+    .function("cg_setup_CG", &DEMCG2D::cg_setup_CG )
+    .function("cg_process_timestep", &DEMCG2D::cg_process_timestep)
+    .function("cg_get_result", &DEMCG2D::cg_get_result)
+    .function("cg_get_gridinfo", &DEMCG2D::cg_get_gridinfo)
+    .function("cg_param_from_json_string", &DEMCG2D::cg_param_from_json_string)
+    .function("cg_param_get_bounds", &DEMCG2D::cg_param_get_bounds)
+    .function("cg_param_get_numts", &DEMCG2D::cg_param_get_numts)
+    .function("cg_param_read_timestep", &DEMCG2D::cg_param_read_timestep)
+    .function("cg_param_post_init", &DEMCG2D::cg_param_post_init)
+    ;
+}
 
 EMSCRIPTEN_BINDINGS(DEMCG3D) {
   class_<DEMCG3D>("DEMCG3D")
