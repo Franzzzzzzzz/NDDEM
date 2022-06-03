@@ -25,6 +25,14 @@ var params = {
     quality: 7,
 }
 
+if ( urlParams.has('dimension') ) {
+    params.dimension = parseInt(urlParams.get('dimension'));
+}
+
+if ( params.dimension === 3 ) {
+    params.N = 6;
+}
+
 SPHERES.createNDParticleShader(params).then( init() );
 
 async function init() {
@@ -126,35 +134,50 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("boundary 0 PBC -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 2 PBC -"+String(params.r_max)+" "+String(params.r_max));
-        if ( params.dimension == 4 ) {
-            S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
-        }
         S.simu_interpret_command("gravity 0 0 " + "0 ".repeat(params.dimension - 3))
 
-        S.simu_interpret_command("location 0 -0.5 1.5 0 0");
-        S.simu_interpret_command("location 1 0.5 1.5 0 0");
-        S.simu_interpret_command("location 2 1.5 1.5 0 0");
-        S.simu_interpret_command("location 3 0.5 0.5 0 0");
-        S.simu_interpret_command("location 4 1.5 0.5 0 0");
-        S.simu_interpret_command("location 5 1.5 -0.5 0 0");
-        S.simu_interpret_command("location 6 -1.5 0.5 0 0");
-        S.simu_interpret_command("location 7 -1.5 -0.5 0 0");
-        S.simu_interpret_command("location 8 -0.5 -0.5 0 0");
-        S.simu_interpret_command("location 9 -1.5 -1.5 0 0");
-        S.simu_interpret_command("location 10 -0.5 -1.5 0 0");
-        S.simu_interpret_command("location 11 0.5 -1.5 0 0");
-        S.simu_interpret_command("omega 0 0 0 0 0.1 0 0");
-        S.simu_interpret_command("omega 1 0 0.1 0 0 0 0");
-        S.simu_interpret_command("omega 2 0 0 0.1 0 0 0");
-        S.simu_interpret_command("omega 3 -0.1 0 0 0 0 0");
-        S.simu_interpret_command("omega 4 0 0 0 0 0.1 0");
-        S.simu_interpret_command("omega 5 0 0 0 0 0 0.1");
-        S.simu_interpret_command("omega 6 0 0 0 -0.1 0 0");
-        S.simu_interpret_command("omega 7 0 -0.1 0 0 0 0");
-        S.simu_interpret_command("omega 8 0.1 0 0 0 0 0");
-        S.simu_interpret_command("omega 9 0 0 -0.1 0 0 0");
-        S.simu_interpret_command("omega 10 0 0 0 0 -0.1 0");
-        S.simu_interpret_command("omega 11 0 0 0 0 0 -0.1");
+        if ( params.dimension == 4 ) {
+            S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
+
+            S.simu_interpret_command("location 0 -0.5 1.5 0 0");
+            S.simu_interpret_command("location 1 0.5 1.5 0 0");
+            S.simu_interpret_command("location 2 1.5 1.5 0 0");
+            S.simu_interpret_command("location 3 0.5 0.5 0 0");
+            S.simu_interpret_command("location 4 1.5 0.5 0 0");
+            S.simu_interpret_command("location 5 1.5 -0.5 0 0");
+            S.simu_interpret_command("location 6 -1.5 0.5 0 0");
+            S.simu_interpret_command("location 7 -1.5 -0.5 0 0");
+            S.simu_interpret_command("location 8 -0.5 -0.5 0 0");
+            S.simu_interpret_command("location 9 -1.5 -1.5 0 0");
+            S.simu_interpret_command("location 10 -0.5 -1.5 0 0");
+            S.simu_interpret_command("location 11 0.5 -1.5 0 0");
+            S.simu_interpret_command("omega 0 0 0 0 0.1 0 0");
+            S.simu_interpret_command("omega 1 0 0.1 0 0 0 0");
+            S.simu_interpret_command("omega 2 0 0 0.1 0 0 0");
+            S.simu_interpret_command("omega 3 -0.1 0 0 0 0 0");
+            S.simu_interpret_command("omega 4 0 0 0 0 0.1 0");
+            S.simu_interpret_command("omega 5 0 0 0 0 0 0.1");
+            S.simu_interpret_command("omega 6 0 0 0 -0.1 0 0");
+            S.simu_interpret_command("omega 7 0 -0.1 0 0 0 0");
+            S.simu_interpret_command("omega 8 0.1 0 0 0 0 0");
+            S.simu_interpret_command("omega 9 0 0 -0.1 0 0 0");
+            S.simu_interpret_command("omega 10 0 0 0 0 -0.1 0");
+            S.simu_interpret_command("omega 11 0 0 0 0 0 -0.1");
+        }
+        else if ( params.dimension === 3 ) {
+            S.simu_interpret_command("location 0 0 1 0");
+            S.simu_interpret_command("location 1 1 1 0");
+            S.simu_interpret_command("location 2 1 0 0");
+            S.simu_interpret_command("location 3 -1 0 0");
+            S.simu_interpret_command("location 4 -1 -1 0");
+            S.simu_interpret_command("location 5 0 -1 0");
+            S.simu_interpret_command("omega 0 0 0 0.1");
+            S.simu_interpret_command("omega 1 0 0.1 0");
+            S.simu_interpret_command("omega 2 -0.1 0 0");
+            S.simu_interpret_command("omega 3 0 0 -0.1");
+            S.simu_interpret_command("omega 4 0 -0.1 0");
+            S.simu_interpret_command("omega 5 0.1 0 0");
+        }
 
         let tc = 0.5;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
