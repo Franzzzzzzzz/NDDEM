@@ -249,12 +249,12 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
-
-        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-        return;
-
-    }
+    // if ( 'DEMCGND' in window === false ) {
+    //
+    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+    //     return;
+    //
+    // }
 
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {

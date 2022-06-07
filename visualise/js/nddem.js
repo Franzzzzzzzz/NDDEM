@@ -60,7 +60,8 @@ import("./loaders/" + params.data_type + ".js").then((module) => {
     params = output[0];
     time = output[1];
     world = output[2];
-    import("./shaders/" + params.N + "DShader.js").then((module) => {
+    // console.log(params)
+    import("../../live/libs/shaders/" + params.N + "DShader.js").then((module) => {
       NDParticleShader = module.NDDEMShader;
       build_world();
       remove_everything(); // only runs on postMessage receive
