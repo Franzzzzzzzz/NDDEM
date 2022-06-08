@@ -10,7 +10,7 @@ import * as CONTROLLERS from '../libs/controllers.js';
 
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
-console.log('hi!');
+// console.log('hi!');
 
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
