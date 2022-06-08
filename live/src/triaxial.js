@@ -425,6 +425,7 @@ async function NDDEMPhysics() {
         S.simu_interpret_command("set Mu 1.0");
         S.simu_interpret_command("set Mu_wall 0");
         S.simu_interpret_command("set T 150");
+        S.simu_interpret_command("set damping 1000"); // NOTE: ARTIFICAL DAMPING!!!
         S.simu_interpret_command("set dt " + String(tc/20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.simu_finalise_init () ;
