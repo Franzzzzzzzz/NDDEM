@@ -358,13 +358,6 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
-
-        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-        return;
-
-    }
-
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
             S = new NDDEMCGLib.DEMCG3D (params.N);
@@ -377,7 +370,6 @@ async function NDDEMPhysics() {
         }
         finish_setup();
     } );
-
 
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
