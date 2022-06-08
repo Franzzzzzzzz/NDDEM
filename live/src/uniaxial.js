@@ -329,6 +329,7 @@ function setup_NDDEM() {
     S.simu_interpret_command("set GammaT " + String(vals.dissipation));
     S.simu_interpret_command("set Mu 0.5");
     S.simu_interpret_command("set Mu_wall 0");
+    S.simu_interpret_command("set damping 1000"); // NOTE: ARTIFICAL DAMPING!!!
     S.simu_interpret_command("set T 150");
     S.simu_interpret_command("set dt " + String(tc/20));
     S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -343,8 +344,8 @@ function setup_CG() {
     cgparam["boundaries"]=[
         Array(params.dimension).fill(-params.L/2.),
         Array(params.dimension).fill( params.L/2.)];
-    cgparam["boundaries"][0][0] = params.r_max;
-    cgparam["boundaries"][1][0] = 4*params.L;
+    // cgparam["boundaries"][0][0] = params.r_max;
+    // cgparam["boundaries"][1][0] = 4*params.L;
     cgparam["window size"]=params.L/2. ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;

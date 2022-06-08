@@ -381,12 +381,13 @@ async function NDDEMPhysics() {
 
         }
         finish_setup();
-    });
 
-    // overload for old DEMND instead of DEMCGND
-    S.simu_getRadii = S.getRadii;
-    S.simu_getX = S.getX;
-    S.simu_getOrientation = S.getOrientation;
+        // overload for old DEMND instead of DEMCGND
+        S.simu_getRadii = S.getRadii;
+        S.simu_getX = S.getX;
+        S.simu_getOrientation = S.getOrientation;
+
+    });
 
 
     function finish_setup() {
