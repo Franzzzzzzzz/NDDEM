@@ -29,6 +29,7 @@ do
 done
 
 make doc_doxygen
+mv html ..
 
 cd ..
 
