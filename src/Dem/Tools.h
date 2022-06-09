@@ -32,7 +32,7 @@ v1d operator- (v1d a, cv1d &b)   ;
 v1f operator- (v1f a, cv1f &b)   ;
 v1d operator- (v1d a, const double * b) ;
 v1d operator- (const double * a, v1d b) ;
-v1d operator- (v1d a) ; 
+v1d operator- (v1d a) ;
 v1d operator/ (v1d a, double b) ;
 v1d & operator-= (v1d & a, cv1d &b) ;
 v1d & operator*= (v1d & a, double b);
@@ -100,7 +100,7 @@ static void surfacevelocity (v1d &res, cv1d &p, double * com, double * vel_com, 
 {
  if (vel_com == nullptr && omega_com == nullptr)
  {
-     res.resize(d) ; setzero(res) ; 
+     res.resize(d) ; setzero(res) ;
  }
  else if (omega_com == nullptr)
      for (int dd=0 ; dd<d ; dd++)
@@ -111,7 +111,7 @@ static void surfacevelocity (v1d &res, cv1d &p, double * com, double * vel_com, 
  {
      skewmatvecmult(res, omega_com, p-com) ;
      for (int dd=0 ; dd<d ; dd++)
-        res[dd] = vel_com[dd] - res[dd] ;  
+        res[dd] = vel_com[dd] - res[dd] ;
  }
 }
 
@@ -227,6 +227,7 @@ static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i
 ///@{
 static int savetxt(char path[], const v2d & table, char const header[]) ;
 static void savecsv (char path[], cv2d & X, cv1d &r, const vector <uint32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ; ///< Save the location and a few more informations in a CSV file.
+static void savecsv (char path[], cv2d & X, cv2d & V, cv1d &r, const vector <uint32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ; ///< Save the location and a few more informations in a CSV file.
 static void savecsv (char path[], cv2d & A) ; ///< Save the orientation in a CSV file
 static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ; ///< Save as a vtk file. Dimensions higher than 3 are stored as additional scalars. Additional informations can be passed as a vector of #TensorInfos.
 
@@ -345,6 +346,24 @@ void Tools<d>::savecsv (char path[], cv2d & X, cv1d &r, const vector <uint32_t> 
  {
   for (int j=0 ; j<dim ; j++)
     fprintf(out, "%.6g,", X[i][j]) ;
+  fprintf(out, "%g,%d,%g,%g\n", r[i],PBCFlags[i], Vmag[i], OmegaMag[i]) ;
+ }
+ fclose(out) ;
+}
+//=====================================
+template <int d>
+void Tools<d>::savecsv (char path[], cv2d & X, cv2d & V, cv1d &r, const vector <uint32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z )
+{
+ FILE *out ; int dim ;
+ out=fopen(path, "w") ; if (out==NULL) {printf("Cannot open out file\n") ; return ;}
+ dim = X[0].size() ;
+ for (int i=0 ; i<dim ; i++) fprintf(out, "x%d,", i);
+ for (int i=0 ; i<dim ; i++) fprintf(out, "v%d,", i);
+ fprintf(out, "R,PBCFlags,Vmag,Omegamag\n") ;
+ for (uint i=0 ; i<X.size() ; i++)
+ {
+  for (int j=0 ; j<dim ; j++) fprintf(out, "%.6g,", X[i][j]) ;
+  for (int j=0 ; j<dim ; j++) fprintf(out, "%.6g,", V[i][j]) ;
   fprintf(out, "%g,%d,%g,%g\n", r[i],PBCFlags[i], Vmag[i], OmegaMag[i]) ;
  }
  fclose(out) ;
