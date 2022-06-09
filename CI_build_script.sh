@@ -28,6 +28,12 @@ do
     cp ../bin/$BUILD_TARGET.wasm ../deploy/
 done
 
+make clean
+cmake ../src
+
+
 cd ..
+
+
 
 # ls deploy
