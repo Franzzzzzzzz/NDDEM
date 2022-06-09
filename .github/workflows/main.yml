@@ -28,6 +28,11 @@ jobs:
       - name: Setup Emscripten toolchain
         uses: mymindstorm/setup-emsdk@v11
 
+      - name: Install doxygen
+        uses: mattnotmitt/doxygen-action@v1.9.2
+        with:
+          enable-latex: true
+
       # Runs a single command using the runners shell
       - name: Compile everything with Emscripten
         run: sh CI_build_script.sh
