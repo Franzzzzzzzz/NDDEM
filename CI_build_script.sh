@@ -28,12 +28,8 @@ do
     cp ../bin/$BUILD_TARGET.wasm ../deploy/
 done
 
-make clean
-cmake ../src
-
+make doc_doxygen
 
 cd ..
-
-
 
 # ls deploy
