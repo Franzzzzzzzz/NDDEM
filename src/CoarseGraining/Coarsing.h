@@ -227,6 +227,7 @@ public :
     int write_matlab (string path, bool squeeze = false) ; ///< Write CG data as Matlab file
     int write_numpy (string path, bool squeeze = false) ; ///< Write CG data as numpy files (.npy) ;
     int write_numpy_npy (string path, bool squeeze) ;
+    std::pair<size_t, uint8_t*> write_numpy_locbuffer (bool squeeze) {return write_numpy_buffer(-2, squeeze) ; }
     std::pair<size_t, uint8_t*> write_numpy_buffer (int id, bool squeeze) ;
 } ;
 
@@ -249,7 +250,7 @@ int Coarsing::setWindow (double w)
         Window=new LibRect3DIntersect (&data, w, d) ;
         break ;
       case Windows::Lucy3D :
-        printf("HELLO") ; fflush(stdout) ;  
+        printf("HELLO") ; fflush(stdout) ;
         Window=new LibLucy3D (&data, w, d) ;
         break ;
       case Windows::Lucy3DFancyInt :
