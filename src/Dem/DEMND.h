@@ -74,6 +74,7 @@ public:
     std::vector <uint32_t> PBCFlags ;
     std::vector < std::vector <double> > WallForce ;
     std::vector<std::vector<double>> empty_array ;
+    std::vector < std::vector <double> > ParticleForce ;
 
     vector <uint32_t> Ghost ;
     vector <uint32_t> Ghost_dir ;
@@ -451,7 +452,7 @@ public:
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif
         } //END PARALLEL PART
-        getParticleStress() ;
+        ParticleForce = calculateParticleForce() ;
 
         // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
         for (int i=0 ; i<MP.P ; i++)
@@ -548,14 +549,23 @@ public:
   /** \brief Expose the array of radii. \ingroup API */
   std::vector<double> getRadii() { return P.r; }
 
+  /** \brief Set the radius of a specific particle. \ingroup API */
+  void setRadius(int id, double radius) { P.r[id] = radius; } // NOTE: NOT UPDATING THE MASS!!! THIS IS SUCH A BAD IDEA
+
+  /** \brief Set the mass of a specific particle. \ingroup API */
+  void setMass(int id, double mass) { P.m[id] = mass; }
+
   /** \brief Expose the array of velocities. \ingroup API */
   std::vector<std::vector<double>> getVelocity() { return V; }
 
   /** \brief Expose the array of orientation rate. \ingroup API */
   std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
 
+  /** \brief Expose the array of orientation rate. \ingroup API */
+  std::vector<std::vector<double>> getParticleForce() { return ParticleForce; }
+
   // /** \brief Expose the array of particle stress. WARNING: Not implemented! \ingroup API */
-  std::vector<std::vector<double>> getParticleStress()
+  std::vector<std::vector<double>> calculateParticleForce()
   {
     std::vector<std::vector<double>> res ;
     std::vector<double> tmpfrc ;
@@ -580,12 +590,10 @@ public:
 
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
   void fixParticle(int a, v1d loc) {
-      X[a][0] = loc[0];
-      X[a][1] = loc[1];
-      X[a][2] = loc[2];
-      V[a][0] = 0;
-      V[a][1] = 0;
-      V[a][2] = 0;
+      for (int i=0 ; i<d ; i++) {
+          X[a][i] = loc[i];
+          V[a][i] = 0;
+      }
       for (int i=0; i<(d*(d-1)/2); i++) {
           Omega[a][i] = 0;
       }

@@ -1,13 +1,16 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 import * as SPHERES from "../libs/SphereHandler.js"
 import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
+import * as CONTROLLERS from '../libs/controllers.js';
+
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
-console.log('hi!');
+// console.log('hi!');
 
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
@@ -40,7 +43,7 @@ var params = {
     H_cur: 0,
     pressure_set_pt: 1e4,
     deviatoric_set_pt: 0,
-    d4_cur:0,
+    d4: {cur:0},
     r_max: 0.0033,
     r_min: 0.0027,
     freq: 0.05,
@@ -54,6 +57,7 @@ var params = {
     omegamax: 20, // max rotation rate to colour by
     loading_active: false,
     particle_density: 2700, // kg/m^3
+    particle_opacity: 1.0,
 }
 set_derived_properties();
 
@@ -137,6 +141,12 @@ async function init() {
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
 
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        container.appendChild( VRButton.createButton( renderer ) );
+        renderer.xr.enabled = true;
+        CONTROLLERS.add_controllers(renderer, scene);
+    }
+
     let gui = new GUI();
     gui.width = 450;
 
@@ -145,15 +155,18 @@ async function init() {
     gui.add( params, 'loading_rate', 0.01, 1, 0.01).name( 'Loading rate (mm/s)' );
     gui.add( params, 'target_stress', 0, 1e4).name( 'Target stress' );
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             // .onChange( function () { WALLS.update_top_wall(params, S); } );
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
     gui.add ( params, 'lut', ['None', 'Velocity', 'Rotation Rate' ]).name('Colour by')
         .onChange( () => SPHERES.update_particle_material(params,
             // lut_folder
@@ -231,6 +244,7 @@ function animate() {
                 WALLS.update_top_wall(params, S, scene);
             }
             update_graph();
+            SPHERES.draw_force_network(S, params, scene);
         }
 
         S.simu_step_forward(5);
@@ -241,7 +255,15 @@ function animate() {
         density = S.cg_get_result(0, "RHO", 0)[0];
     }
 
-    renderer.render( scene, camera );
+    if ( urlParams.has('VR') || urlParams.has('vr') ) {
+        renderer.setAnimationLoop( function () {
+            renderer.render( scene, camera );
+        } );
+    } else {
+        // requestAnimationFrame( animate );
+    	renderer.render( scene, camera );
+    }
+    // renderer.render( scene, camera );
 
     old_time = new_time;
 
@@ -249,24 +271,25 @@ function animate() {
 
 async function NDDEMPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //
-    //     console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    //
-    // }
+    if ( 'DEMCGND' in window === false ) {
+
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
 
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            setup_NDDEM();
-            setup_CG();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            // S = await new NDDEMCGLib.Simulation4 (params.N);
-            // finish_setup();
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        setup_NDDEM();
+        setup_CG();
     } );
 }
 
@@ -285,6 +308,9 @@ function setup_NDDEM() {
     S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
     S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
     S.simu_interpret_command("boundary 2 WALL -"+String(params.L)+" "+String(params.L));
+    if ( params.dimension == 4 ) {
+        S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
+    }
     if ( params.gravity === true ) {
         S.simu_interpret_command("gravity 0 0 " + String(-9.81) + "0 ".repeat(params.dimension - 3)) }
     else {
@@ -303,6 +329,7 @@ function setup_NDDEM() {
     S.simu_interpret_command("set GammaT " + String(vals.dissipation));
     S.simu_interpret_command("set Mu 0.5");
     S.simu_interpret_command("set Mu_wall 0");
+    S.simu_interpret_command("set damping 1000"); // NOTE: ARTIFICAL DAMPING!!!
     S.simu_interpret_command("set T 150");
     S.simu_interpret_command("set dt " + String(tc/20));
     S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -312,22 +339,21 @@ function setup_NDDEM() {
 function setup_CG() {
     var cgparam ={} ;
     cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-    cgparam["boxes"]=[1,1,1] ;
+    cgparam["boxes"]=Array(params.dimension).fill(1) ;
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"]=[
-        [-params.L/2.,-params.L/2.,-params.L/2.],
-        [ params.L/2., params.L/2., params.L/2.]] ;
-        // [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-        // [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
-
+        Array(params.dimension).fill(-params.L/2.),
+        Array(params.dimension).fill( params.L/2.)];
+    // cgparam["boundaries"][0][0] = params.r_max;
+    // cgparam["boundaries"][1][0] = 4*params.L;
     cgparam["window size"]=params.L/2. ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
     cgparam["fields"]=["RHO", "TC"] ;
-    cgparam["periodicity"]=[false,false,false];
+    cgparam["periodicity"]=Array(params.dimension).fill(false);
     cgparam["window"]="Lucy3D";
-    cgparam["dimension"]=3;
+    cgparam["dimension"]=params.dimension;
 
 
     // console.log(JSON.stringify(cgparam)) ;

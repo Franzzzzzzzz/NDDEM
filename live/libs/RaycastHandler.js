@@ -18,7 +18,8 @@ let ref_location;
 let camera;
 
 window.addEventListener( 'mousemove', onMouseMove, false );
-window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
+window.addEventListener( 'mousedown', (e) => { onSelectParticle(e,camera) }, false );
+// window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
 
 function onMouseMove( event ) {
 
@@ -27,13 +28,15 @@ function onMouseMove( event ) {
 
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    // console.log(x,y)
 }
 
 export function animate_locked_particle(S, c, spheres, params) {
     camera = c
     if ( locked_particle !== null ) {
         raycaster.ray.intersectPlane( intersection_plane, ref_location);
-        ref_location.clamp( new Vector3( -params.L, -params.L, 0),
+        ref_location.clamp( new Vector3( -params.L, -params.L, 0 ),
                     new Vector3(params.L, params.L, 0) );
         S.simu_fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
     }
@@ -42,7 +45,7 @@ export function animate_locked_particle(S, c, spheres, params) {
 
 function onSelectParticle( event, camera ) {
     // console.log(camera.getWorldDirection() )
-    if ( event.code === 'Space' ) {
+    // if ( event.code === 'Enter' ) {
         if ( locked_particle === null ) {
             locked_particle = INTERSECTED;
             // console.log(locked_particle);
@@ -56,7 +59,7 @@ function onSelectParticle( event, camera ) {
         else {
             locked_particle = null;
         }
-    }
+    // }
 }
 
 function calculate_intersection(camera, spheres, params) {

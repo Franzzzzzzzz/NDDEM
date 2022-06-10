@@ -15,18 +15,13 @@ var clock = new THREE.Clock();
 let camera, scene, renderer, stats, panel, controls;
 let gui;
 let S;
-let NDDEMCGLib;
 let cg_mesh, colorbar_mesh;
-let pointer;
-let v, omegaMag;
-let radii;
-let particle_volume;
 
 var params = {
-    dimension: 3,
-    L: 5, //system size
-    N: 70,
-    zoom: 15,
+    dimension: 2,
+    L: 0.06, //system size
+    N: 150,
+    zoom: 1000,
     // packing_fraction: 0.5,
     constant_volume: true,
     axial_strain: 0,
@@ -34,9 +29,10 @@ var params = {
     paused: false,
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
-    d4_cur:0,
-    r_max: 0.501,
-    r_min: 0.499,
+    d4: {cur:0},
+    r_max: 0.0045,
+    r_min: 0.0035,
+    particle_density: 2700,
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -46,7 +42,9 @@ var params = {
     cg_width: 50,
     cg_height: 50,
     cg_opacity: 0.8,
-    cg_window_size: 1.5,
+    cg_window_size: 3,
+    particle_opacity: 0.5,
+    F_mag_max: 1000,
     aspect_ratio: 1,
 }
 
@@ -57,15 +55,29 @@ let blackbody  = new Lut("blackbody", 512); // options are rainbow, cooltowarm a
 params.average_radius = (params.r_min + params.r_max)/2.;
 params.thickness = params.average_radius;
 
-particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
-if ( params.dimension === 4) {
+if ( params.dimension === 2) {
+    params.particle_volume = Math.PI*Math.pow(params.average_radius,2);
+}
+else if ( params.dimension === 3 ) {
+    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+}
+else if ( params.dimension === 4) {
+
     params.L = 2.5;
     params.N = 300
-    particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
 }
+
+params.particle_mass = params.particle_volume * params.particle_density;
+
+if ( urlParams.has('cg_width') ) { params.cg_width = parseInt(urlParams.get('cg_width')); }
+if ( urlParams.has('cg_height') ) { params.cg_height = parseInt(urlParams.get('cg_height')); }
+if ( urlParams.has('cg_opacity') ) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
+if ( urlParams.has('particle_opacity') ) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
@@ -107,8 +119,9 @@ async function init() {
     WALLS.add_back(params, scene);
     WALLS.add_left(params, scene);
     WALLS.add_right(params, scene);
+    WALLS.add_front(params, scene);
     WALLS.back.scale.y = params.thickness;//Math.PI/2.;
-    var vert_walls = [WALLS.left,WALLS.right,WALLS.back];
+    var vert_walls = [WALLS.left,WALLS.right,WALLS.back,WALLS.front];
 
     vert_walls.forEach( function(mesh) {
         mesh.scale.x = 2*params.L + 2*params.thickness;
@@ -142,17 +155,20 @@ async function init() {
     gui.width = 320;
 
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
-    gui.add ( params, 'cg_opacity', 0, 1).name('Opacity').listen();
+    // gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    // ));
+    gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
     gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
-    gui.add ( params, 'cg_window_size', 0.5, params.L/2.).name('Window size').listen().onChange( () => {
+    gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
         update_cg_params(S, params);
     });
     // gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
@@ -201,14 +217,14 @@ function animate() {
             lut = rainbow;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
-            lut.setMax(1);
+            lut.setMax(params.particle_density*100);
         }
         else if ( params.cg_field === 'Velocity' ) {
             val = S.cg_get_result(0, "VAVG", 1);
             lut = cooltowarm;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(-maxVal);
-            lut.setMax(maxVal);
+            lut.setMin(-0.9*maxVal);
+            lut.setMax( 0.9*maxVal);
         }
         else if ( params.cg_field === 'Pressure' ) {
             const stressTcxx=S.cg_get_result(0, "TC", 0) ;
@@ -227,12 +243,9 @@ function animate() {
             val = S.cg_get_result(0, "TC", 1);
             lut = cooltowarm;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(-maxVal);
-            lut.setMax( maxVal);
+            lut.setMin(-0.9*maxVal);
+            lut.setMax( 0.9*maxVal);
         }
-
-
-
 
         for ( let i = 0; i < size; i ++ ) {
             var color = lut.getColor(val[i]);
@@ -258,6 +271,7 @@ function animate() {
         cg_mesh.material.map = texture;
         // cg_mesh.material.opacity = parseInt(255*params.opacity);
     }
+    SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
 }
 function update_cg_params(S, params) {
@@ -268,7 +282,7 @@ function update_cg_params(S, params) {
     cgparam["boundaries"]=[
         [-params.L,-params.L],
         [ params.L, params.L]] ;
-    cgparam["window size"]=params.cg_window_size ;
+    cgparam["window size"]=params.cg_window_size*params.average_radius ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
@@ -285,53 +299,84 @@ function update_cg_params(S, params) {
 
 async function NDDEMCGPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //     console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    // }
+    if ( 'DEMCGND' in window === false ) {
 
-    // NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
+
     await DEMCGND().then( (NDDEMCGLib) => {
-        if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            finish_setup();
+        if ( params.dimension == 2 ) {
+            S = new NDDEMCGLib.DEMCG2D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            /*S = await new NDDEMLib.Simulation4 (params.N);
-            finish_setup();*/
+        else if ( params.dimension == 3 ) {
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-    });
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
+        }
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        finish_setup();
+    } );
 
 
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
-        S.simu_interpret_command("mass -1 1");
+        let m;
+        if ( params.dimension === 2) {
+            m = Math.PI*0.5*0.5*params.particle_density;
+        } else {
+            m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        }
+
+        S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
         S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
         S.simu_interpret_command("auto mass");
         S.simu_interpret_command("auto inertia");
+        S.simu_interpret_command("auto skin");
 
         S.simu_interpret_command("boundary 0 WALL -"+String(params.L)+" "+String(params.L));
         S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-        S.simu_interpret_command("boundary 2 WALL -0.51 0.51");
-        if ( params.dimension == 4 ) {
-            S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
+        if ( params.dimension > 2 ) {
+            S.simu_interpret_command("boundary 2 WALL -"+String(params.r_max)+" "+String(params.r_max));
         }
-        S.simu_interpret_command("gravity -1000 0 " + "0 ".repeat(params.dimension - 3))
+        if ( params.dimension > 3 ) {
+            S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
+        }
+        S.simu_interpret_command("gravity -100 " + "0 ".repeat(params.dimension - 2))
 
         S.simu_interpret_command("auto location randomdrop");
 
-        S.simu_interpret_command("set Kn 2e5");
-        S.simu_interpret_command("set Kt 8e4");
-        S.simu_interpret_command("set GammaN 75");
-        S.simu_interpret_command("set GammaT 75");
-        S.simu_interpret_command("set Mu 1");
-        S.simu_interpret_command("set Mu_wall 0");
+        // S.simu_interpret_command("set Kn 2e5");
+        // S.simu_interpret_command("set Kt 8e4");
+        // S.simu_interpret_command("set GammaN 75");
+        // S.simu_interpret_command("set GammaT 75");
+        // S.simu_interpret_command("set Mu 1");
+        // S.simu_interpret_command("set Mu_wall 0");
+        // S.simu_interpret_command("set T 150");
+        // S.simu_interpret_command("set dt 0.0002");
+        // S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
+        // S.simu_interpret_command("auto skin");
+        // S.simu_finalise_init () ;
+
+        let tc = 1e-3;
+        let rest = 0.5; // super low restitution coeff to dampen out quickly
+        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+
+        S.simu_interpret_command("set Kn " + String(vals.stiffness));
+        S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
+        S.simu_interpret_command("set GammaN " + String(vals.dissipation));
+        S.simu_interpret_command("set GammaT " + String(vals.dissipation));
+        S.simu_interpret_command("set Mu 0.5");
+        // S.simu_interpret_command("set damping 10");
         S.simu_interpret_command("set T 150");
-        S.simu_interpret_command("set dt 0.0002");
-        S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
+        S.simu_interpret_command("set dt " + String(tc/10));
+        S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.simu_interpret_command("auto skin");
         S.simu_finalise_init () ;
 

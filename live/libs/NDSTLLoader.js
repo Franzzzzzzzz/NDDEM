@@ -7,10 +7,13 @@ import {
 	LoaderUtils,
 	Vector3,
     Mesh,
-    Group
+    Group,
+    Box3,
+    BoxGeometry,
 } from 'three';
 
 import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js";
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 
 
 /**
@@ -398,7 +401,7 @@ function calculateNormal(points) {
 
 
 function renderSTL( meshes, NDsolids, scene, material, x4 ) {
-    if ( meshes !== undefined ) { scene.remove( meshes ); meshes = new Group(); }
+
     var vertices, normals;
     var N = NDsolids[0][0][0].length; // get dimension from vertex length
 
@@ -443,22 +446,44 @@ function renderSTL( meshes, NDsolids, scene, material, x4 ) {
         geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
         let points = [];
-        for ( let i=0; i<vertices.length/3; i++ ) { points.push( new Vector3( vertices[i*3]   + Math.random()*1e-6,
-                                                                              vertices[i*3+1] + Math.random()*1e-6,
-                                                                              vertices[i*3+2] + Math.random()*1e-6
-                                                                             ) ) };
+        // for ( let i=0; i<vertices.length/3; i++ ) { points.push( new Vector3( vertices[i*3]   + Math.random()*1e-6,
+        //                                                                       vertices[i*3+1] + Math.random()*1e-6,
+        //                                                                       vertices[i*3+2] + Math.random()*1e-6
+        //                                                                      ) ) };
+        for ( let i=0; i<vertices.length/3; i++ ) {
+            points.push( new Vector3( vertices[i*3],
+                                      vertices[i*3+1],
+                                      vertices[i*3+2]
+                                    )
+                        )
+        };
 
-        if ( points.length > 3 ) { geometry = new ConvexGeometry( points ); }
+        let min_val = 0.005;
+        let WHD = new Vector3();
+        let center = new Vector3();
+        if ( points.length > 3 ) {
+            // geometry = new ConvexGeometry( points ); // causing all kinds of problems for planes
+            const box = new Box3();
+            box.setFromPoints( points );
+            box.getSize(WHD);
+            box.getCenter(center);
+            WHD.clampScalar( min_val, 1e4 ); // set a minimum width
+            geometry = new BoxGeometry( WHD.x, WHD.y, WHD.z );
+        }
+
         var this_mesh = new Mesh( geometry, material );
+        this_mesh.position.set( center.x, center.y-min_val, center.z );
         this_mesh.castShadow = true;
         this_mesh.receiveShadow = true;
+
         meshes.add(this_mesh);
     });
 
-    meshes.castShadow = true;
-    meshes.receiveShadow = true;
+    // meshes.castShadow = true;
+    // meshes.receiveShadow = true;
 
-    if ( NDsolids.length > 0 ) { scene.add( meshes );  }
+    // console.log(meshes)
+
     // console.log(meshes)
     return meshes
 }

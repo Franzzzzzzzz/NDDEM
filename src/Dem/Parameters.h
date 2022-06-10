@@ -89,7 +89,7 @@ public :
     double damping; //< Artificial rolling damping
     double skin ; ///< Skin for use in verlet list \warning Experimental
     double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental
-    ContactModels ContactModel=HOOKE ; 
+    ContactModels ContactModel=HOOKE ;
     vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
     //ExportType dumpkind ;
     //ExportData dumplist ;
@@ -214,10 +214,10 @@ public :
                  fprintf(out, "%d ", contact.ghost) ;
              if (outflags & ExportData::GHOSTDIR)
                  fprintf(out, "%d ", contact.ghostdir) ;
-             
+
              if (outflags & ExportData::BRANCHVECTOR)
              {
-                 vector <double> loc (d, 0) ; 
+                 vector <double> loc (d, 0) ;
                 if ( Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (contact.ghost & 1)==0)
                 {
                     loc=X[contact.j] ;
@@ -231,19 +231,19 @@ public :
                     uint32_t gh=contact.ghost, ghd=contact.ghostdir ; // Handle pbc in first dim
                     loc=X[contact.j] ;
                     loc[0] += Boundaries[0][2] * ((ghd&1)?-1:1) ;
-                    loc[1] += (ghd&1?-1:1)*Boundaries[0][5] ; 
+                    loc[1] += (ghd&1?-1:1)*Boundaries[0][5] ;
                     double additionaldelta = 0 ;
                     if (loc[1] > Boundaries[1][1]) {additionaldelta = -Boundaries[1][2] ;}
                     if (loc[1] < Boundaries[1][0]) {additionaldelta =  Boundaries[1][2] ;}
-                    loc[1] += additionaldelta ; 
-                    
-                    gh>>=1 ; ghd>>=1 ; 
+                    loc[1] += additionaldelta ;
+
+                    gh>>=1 ; ghd>>=1 ;
                     for (int n=1 ; gh>0 ; gh>>=1, ghd>>=1, n++)
                         if (gh&1)
                             loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
                 }
                 for (int dd = 0 ; dd<d ; dd++)
-                    fprintf(out, "%g ", X[contact.i][dd]-loc[dd]) ; 
+                    fprintf(out, "%g ", X[contact.i][dd]-loc[dd]) ;
             }
          fprintf(out, "\n") ;
          }
@@ -533,7 +533,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          else if (word =="Fn") dumplist |= ExportData::FN ;
          else if (word =="Ft") dumplist |= ExportData::FT ;
          else if (word =="Torque") dumplist |= ExportData::TORQUE ;
-         else if (word =="Branch") dumplist |= ExportData::BRANCHVECTOR ; 
+         else if (word =="Branch") dumplist |= ExportData::BRANCHVECTOR ;
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
 
@@ -562,7 +562,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["radius"]   = [&](){int id ; double radius ; in>>id>>radius ; if(id==-1) r = v1d(N,radius) ; else r[id]=radius ; printf("[INFO] Set radius of particle.\n") ;} ;
  Lvl0["mass"]     = [&](){int id ; double mass ;   in>>id>>mass   ; if(id==-1) m = v1d(N,mass  ) ; else r[id]=mass   ; printf("[INFO] Set mass of particle.\n") ;} ;
  Lvl0["gravity"]  = [&](){for (int i=0 ; i<d ; i++) {in >> g[i] ;} printf("[INFO] Changing gravity.\n") ; } ;
- Lvl0["ContactModel"] = [&](){ std::string s ; in >> s ; if (s=="Hertz") {ContactModel=ContactModels::HERTZ ;printf("[INFO] Using Hertz model\n") ;} else ContactModel=ContactModels::HOOKE ; } ; 
+ Lvl0["ContactModel"] = [&](){ std::string s ; in >> s ; if (s=="Hertz") {ContactModel=ContactModels::HERTZ ;printf("[INFO] Using Hertz model\n") ;} else ContactModel=ContactModels::HOOKE ; } ;
  Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
     Tools<d>::setzero(g) ;
     g[0] = -intensity * cos(angle / 180. * M_PI) ;
@@ -924,7 +924,14 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
     {
       char path[500] ; sprintf(path, "%s/dump-%05d.csv", Directory.c_str(), ti) ;
       Tools<d>::norm(Vmag, V) ; Tools<d>::norm(OmegaMag, Omega) ;
-      Tools<d>::savecsv(path, X, r, PBCFlags, Vmag, OmegaMag, Z) ; //These are always written for CSV, independent of the dumplist
+      if ( v.second & ExportData::VELOCITY)
+      {
+         Tools<d>::savecsv(path, X, V, r, PBCFlags, Vmag, OmegaMag, Z) ; //These are always written for CSV, independent of the dumplist
+      }
+      else
+      {
+          Tools<d>::savecsv(path, X, r, PBCFlags, Vmag, OmegaMag, Z) ; //These are always written for CSV, independent of the dumplist
+      }
       if (v.second & ExportData::ORIENTATION)
       {
         char path[500] ; sprintf(path, "%s/dumpA-%05d.csv", Directory.c_str(), ti) ;

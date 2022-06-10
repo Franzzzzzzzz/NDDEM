@@ -20,7 +20,6 @@ let NDDEMCGLib;
 let pointer;
 let v, omegaMag;
 let radii;
-let particle_volume;
 let NDsolids, material, STLFilename;
 let meshes = new THREE.Group();
 let density, vavg, stressTcxx, stressTcyy, stressTczz, stressTcxy;
@@ -38,7 +37,8 @@ document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) +
 
 var params = {
     dimension: 3,
-    L: 3.7, //system size
+    initial_packing_fraction: 0.6,
+    // L: 0.025, //system size
     N: 500,
     // packing_fraction: 0.5,
     constant_volume: true,
@@ -47,9 +47,11 @@ var params = {
     paused: false,
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
-    d4_cur:0,
-    r_max: 0.55,
-    r_min: 0.45,
+    d4: { cur:0,
+         min:0,
+         max:0 },
+    r_max: 0.0033,
+    r_min: 0.0027,
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -57,20 +59,33 @@ var params = {
     quality: 5,
     vmax: 50, // max velocity to colour by
     omegamax: 50, // max rotation rate to colour by
+    particle_density: 2700,
+    particle_opacity: 1.0,
+    show_colorbar: true,
 }
 
-params.average_radius = (params.r_min + params.r_max)/2.;
-let thickness = params.average_radius;
-
-particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
-if ( params.dimension === 4) {
-    params.L = 2.5;
-    params.N = 300
-    particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+
+set_derived_properties();
+
+function set_derived_properties() {
+    params.average_radius = (params.r_min + params.r_max)/2.;
+    if ( params.dimension === 3 ) {
+        params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+    } else if ( params.dimension === 4 ) {
+        params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    }
+
+    console.log('estimate of particle volume: ' + params.particle_volume*params.N)
+    params.particle_mass = params.particle_volume * params.particle_density;
+    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./params.dimension)/2.;
 }
+
+
+
+
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
@@ -84,7 +99,7 @@ async function init() {
 
     //
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
     camera.position.set( 0, 0, -5*params.L );
     camera.up.set(1, 0, 0);
 
@@ -99,19 +114,6 @@ async function init() {
     dirLight.position.set( 5, -5, -5 );
     dirLight.castShadow = true;
     scene.add( dirLight );
-
-    // const wall_geometry = new THREE.BoxGeometry( params.L*2 + thickness*2, thickness, params.L*2 + thickness*2 );
-    // const wall_geometry = new THREE.BoxGeometry( 1, thickness, 1 );
-    // const wall_material = new THREE.MeshLambertMaterial();
-    // wall_material.wireframe = true;
-    // const wall_material = new THREE.ShadowMaterial( )
-
-    // floor = new THREE.Mesh( wall_geometry, wall_material );
-    // floor.rotation.z = Math.PI/2.;
-    // // floor.position.x = -params.L - thickness/2.;// + params.r_min + params.r_max;
-    // floor.scale.x = 2*params.L + 2*thickness;
-    // floor.scale.z = 2*params.L + 2*thickness;
-    // scene.add( floor );
 
     SPHERES.add_spheres(S,params,scene);
 
@@ -128,17 +130,20 @@ async function init() {
     gui.width = 320;
 
     if ( params.dimension == 4 ) {
-        gui.add( params, 'd4_cur', -params.L,params.L, 0.001)
+        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
             .name( 'D4 location').listen()
             .onChange( function () {
                 if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4_cur );
+                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
                 }
             });
     }
-    gui.add ( params, 'shear_rate', 0, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
+    gui.add ( params, 'shear_rate', -100, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
         .onChange( () => update_shear_rate() );
-    gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate', 'Particle Stress' ]).name('Colour by')
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+    ));
+    gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
             .onChange( () => SPHERES.update_particle_material(params,
                 // lut_folder
             ) );
@@ -166,9 +171,12 @@ async function init() {
     animate();
 }
 
+
 function update_shear_rate() {
     S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
-    params.vmax = 1.5*params.shear_rate*params.L;
+    params.vmax = 1.5*Math.abs(params.shear_rate)*params.L;
+    params.omegamax = 1e3*Math.abs(params.shear_rate)*params.average_radius;
+    SPHERES.update_particle_material(params);
 }
 
 function checkKeys( event ) {
@@ -199,128 +207,81 @@ function onWindowResize(){
 
 function animate() {
     requestAnimationFrame( animate );
-    SPHERES.move_spheres(S,params);
     if ( !params.paused ) {
+        SPHERES.move_spheres(S,params);
         S.simu_step_forward(5);
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
         density=S.cg_get_result(0, "RHO", 0) ;
         vavg=S.cg_get_result(0, "VAVG", 1) ;
-        stressTcxx=S.cg_get_result(0, "TC", 0) ;
-        stressTcyy=S.cg_get_result(0, "TC", 4) ;
-        stressTczz=S.cg_get_result(0, "TC", 8) ;
+        let normal_stresses = [];
+        for (let i=0; i<params.dimension; i++) {
+            let component = i*(params.dimension+1);
+            let this_stress = S.cg_get_result(0, "TC", component) ;
+            normal_stresses.push(this_stress);
+        }
+        // stressTcxx=S.cg_get_result(0, "TC", 0) ;
+        // stressTcyy=S.cg_get_result(0, "TC", 4) ;
+        // stressTczz=S.cg_get_result(0, "TC", 8) ;
         stressTcxy=S.cg_get_result(0, "TC", 1) ;
-        for (var i=0 ; i<stressTcxx.length ; i++)
+        for (var i=0 ; i<stressTcxy.length ; i++)
         {
             xloc[i]=grid[0]+i*grid[3] ;
-            pressure[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
             shearstress[i]=-stressTcxy[i] ;
+            let this_pressure = 0;
+            for ( let j=0; j<normal_stresses.length; j++) {
+                this_pressure += normal_stresses[j][i];
+            }
+            pressure[i]=this_pressure / normal_stresses.length;
         }
-
+        // params.viscosity = 0;
+        // params.inertial_number = 0.1;
+        // params.target_pressure = Math.pow(params.shear_rate*params.average_radius/params.inertial_number,2)*params.particle_density;
+        // params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
+        // let dt = 1e-3;
+        // params.wall_mass = 1e4;//params.N*params.particle_mass;
+        // WALLS.update_damped_wall(params, S, scene, dt)
         update_graph();
+        SPHERES.draw_force_network(S, params, scene);
     }
     renderer.render( scene, camera );
 }
 
-
-// function add_spheres() {
-//     radii = S.simu_getRadii();
-//     spheres = new THREE.Group();
-//     scene.add(spheres);
-//
-//     const color = new THREE.Color();
-//
-//     const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,quality), Math.pow(2,quality) );
-//
-//     for ( let i = 0; i < params.N; i ++ ) {
-//         const material = NDParticleShader.clone();
-//         var object = new THREE.Mesh(geometrySphere, material);
-//         object.position.set(0,0,0);
-//         object.rotation.z = Math.PI / 2;
-//         object.NDDEM_ID = i;
-//         spheres.add(object);
-//     }
-// }
-//
-// function move_spheres() {
-//     var x = S.simu_getX();
-//     var orientation = S.simu_getOrientation();
-//     if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
-//         v = S.simu_getVelocity();
-//     }
-//     else if ( params.lut === 'Rotation Rate' ) {
-//         omegaMag = S.simu_getRotationRate();
-//     }
-//     else if ( params.lut === 'Force' ) {
-//         forceMag = S.simu_getParticleStress(); // NOTE: NOT IMPLEMENTED YET
-//     }
-//
-//     for ( let i = 0; i < params.N; i ++ ) {
-//         var object = spheres.children[i];
-//         if ( params.dimension == 3 ) {
-//             var D_draw = 2*radii[i];
-//             object.scale.set(D_draw, D_draw, D_draw);
-//         }
-//         else if ( params.dimension == 4 ) {
-//             var D_draw = 2*Math.sqrt(
-//               Math.pow(radii[i], 2) - Math.pow(params.d4_cur - x[i][3], 2)
-//             );
-//             object.scale.set(D_draw, D_draw, D_draw);
-//         }
-//         object.position.set( x[i][0], x[i][1], x[i][2] );
-//         object.material.uniforms.R.value = radii[i];
-//         if ( params.lut === 'Velocity' ) {
-//             object.material.uniforms.ambient.value = 0.5 + 1e-4*( Math.pow(v[i][0],2) + Math.pow(v[i][1],2) + Math.pow(v[i][2],2) );
-//         }
-//         if ( params.lut === 'Fluct Velocity' ) {
-//             object.material.uniforms.ambient.value = 0.5 + 1e-3*( Math.pow(v[i][0],2) + Math.pow(v[i][1] - params.shear_rate*x[i][0],2) + Math.pow(v[i][2],2) );
-//             // object.material.uniforms.ambient.value = params.shear_rate*x[i][0];
-//         }
-//         if ( params.lut === 'Rotation Rate' ) {
-//             // console.log(omegaMag[i])
-//             object.material.uniforms.ambient.value = 0.5 + 0.01*omegaMag[i];
-//         }
-//         for (var j = 0; j < params.N - 3; j++) {
-//           object.material.uniforms.xview.value[j] =
-//             params.d4_cur;
-//           object.material.uniforms.xpart.value[j] =
-//             x[i][j + 3];
-//         }
-//         object.material.uniforms.A.value = orientation[i];
-//     }
-// }
-
 async function NDDEMCGPhysics() {
 
-    // if ( 'DEMCGND' in window === false ) {
-    //     console.error( 'NDDEMCGPhysics: Couldn\'t find DEMCGND.js' );
-    //     return;
-    // }
+    if ( 'DEMCGND' in window === false ) {
 
-    // NDDEMCGLib = await DEMCGND(); // eslint-disable-line no-undef
+        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        return;
+
+    }
+
     await DEMCGND().then( (NDDEMCGLib) => {
         if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCGND (params.N);
-            finish_setup();
+            S = new NDDEMCGLib.DEMCG3D (params.N);
         }
-        else if ( params.dimension > 3 ) {
-            console.log("D>3 not available") ;
-            /*S = await new NDDEMLib.Simulation4 (params.N);
-            finish_setup();*/
+        else if ( params.dimension == 4 ) {
+            S = new NDDEMCGLib.DEMCG4D (params.N);
         }
-    });
+        else if ( params.dimension == 5 ) {
+            S = new NDDEMCGLib.DEMCG5D (params.N);
+        }
+        finish_setup();
+    } );
 
 
 
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
-        S.simu_interpret_command("mass -1 1");
+        let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
         S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
         S.simu_interpret_command("auto mass");
         S.simu_interpret_command("auto inertia");
+        S.simu_interpret_command("auto skin");
 
         S.simu_interpret_command("boundary 0 PBCLE -"+String(params.L)+" "+String(params.L)+" "+String(params.shear_rate));
         S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
@@ -332,33 +293,36 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("auto location randomdrop");
 
-        S.simu_interpret_command("set Kn 2e5");
-        S.simu_interpret_command("set Kt 8e4");
-        S.simu_interpret_command("set GammaN 75");
-        S.simu_interpret_command("set GammaT 75");
+        let tc = 1e-3;
+        let rest = 0.2; // super low restitution coeff to dampen out quickly
+        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+
+        S.simu_interpret_command("set Kn " + String(vals.stiffness));
+        S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
+        S.simu_interpret_command("set GammaN " + String(vals.dissipation));
+        S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
         S.simu_interpret_command("set T 150");
-        S.simu_interpret_command("set dt 0.0002");
-        S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
-        S.simu_interpret_command("auto skin");
+        S.simu_interpret_command("set dt " + String(tc/20));
+        S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.simu_finalise_init () ;
-
 
         var cgparam ={} ;
         cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-        cgparam["boxes"]=[20,1,1] ;
+        cgparam["boxes"]=Array(params.dimension).fill(1) ;
+        cgparam["boxes"][0] = 20; // more in first dimension
         // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
         cgparam["boundaries"]=[
-            [-params.L+params.r_max,-params.L+params.r_max,-params.L+params.r_max],
-            [ params.L-params.r_max, params.L-params.r_max, params.L-params.r_max]] ;
-        cgparam["window size"]=2 ;
+            Array(params.dimension).fill(-params.L+params.r_max),
+            Array(params.dimension).fill( params.L-params.r_max)];
+        cgparam["window size"]=2*params.average_radius ;
         cgparam["skip"]=0;
         cgparam["max time"]=1 ;
         cgparam["time average"]="None" ;
         cgparam["fields"]=["RHO", "VAVG", "TC"] ;
-        cgparam["periodicity"]=[true,true,true];
+        cgparam["periodicity"]=Array(params.dimension).fill(true);
         cgparam["window"]="Lucy3D";
-        cgparam["dimension"]=3;
+        cgparam["dimension"]=params.dimension;
 
 
         console.log(JSON.stringify(cgparam)) ;
@@ -369,14 +333,7 @@ async function NDDEMCGPhysics() {
 }
 
 function update_graph() {
-    // density = params.packing_fraction*material_density;
-    // vertical_stress_smooth = (vertical_stress + vertical_stress_smooth)/2.;
-    // console.log(vertical_stress)
-    // shear_time.push(shear);
-    // density_time.push(density);
 
-    // if (( Math.abs((pressure_time[pressure_time.length - 2] - pressure )/pressure) > 1e-2 ) || ( Math.abs((shear_time[shear_time.length - 2] - shear )/shear) > 1e-2 ) || ( Math.abs((density_time[density_time.length - 2] - density )/density) > 1e-2 )) {
-    //console.log(density,vavg)
     var maxVelocity = vavg.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
 
     Plotly.update('stats', {
@@ -402,139 +359,7 @@ function update_graph() {
             // 'y': [[shear]],
             'x': [shearstress],
     }, {}, [2])
-
-    /*Plotly.update('stats', {
-            'x': [1,2,3,4,5,6,7,8,9,10],
-            // 'y': [[shear]],
-            'y': [pressure],
-    }, [1])
-
-
-    Plotly.update('stats', {
-            'x': [1,2,3,4,5,6,7,8,9,10],
-            // 'y': [[shear]],
-            'y': [shearstress],
-    }, [2])*/
-// }
 }
-
-// function make_graph() {
-//     var data = [{
-//       type: 'scatter',
-//       mode: 'lines',
-//       x: [],
-//       y: [],
-//       name: 'Velocity',
-//       // opacity: 1,
-//       line: {
-//         width: 5,
-//         color: "black",
-//         // reversescale: false
-//       },
-//     }, {
-//       type: 'scatter',
-//       mode: 'lines',
-//       x: [],
-//       y: [],
-//       name: 'Pressure (p)',
-//       // opacity: 1,
-//       line: {
-//         width: 5,
-//         color: "blue",
-//         // reversescale: false
-//       },
-//       xaxis: 'x2'
-//     }, {
-//       type: 'scatter',
-//       mode: 'lines',
-//       x: [],
-//       y: [],
-//       name: 'Shear stress (q)',
-//       // opacity: 1,
-//       line: {
-//         // dash: 'dash',
-//         dash: "8px,8px",
-//         width: 5,
-//         color: "blue",
-//         // reversescale: false
-//       },
-//       xaxis: 'x2'
-//     }]
-//     var layout = {
-//           // height: 300,
-//           // width: 500,
-//           xaxis: {
-//             // linecolor: 'white',
-//             autotick: true,
-//             // autorange: true,
-//             // range: [-maxVelocity, maxVelocity],
-//             // range: [-1,1],
-//             automargin: true,
-//             title: 'Average velocity (m/s)',
-//             side: 'bottom'
-//             // title: 'Vertical displacement (mm)'
-//         },
-//           yaxis: {
-//             // linecolor: 'white',
-//             autotick: true,
-//             autorange: true,
-//             automargin: true,
-//             title: 'Location (mm)',
-//             // color: 'black',
-//         },
-//         xaxis2: {
-//             autotick: true,
-//             autorange: true,
-//             automargin: true,
-//             title: 'Stress (kPa)',
-//             overlaying: 'x',
-//             side: 'top',
-//             rangemode: 'tozero',
-//             color: 'blue'
-//             },
-//         legend: {
-//             x: 1,
-//             xanchor: 'right',
-//             y: 1,
-//             // bgcolor: "rgba(0,0,0,0.01)"
-//             // opacity: 0.5,
-//         },
-//         margin: {
-//             b: 100,
-//         },
-//         font: {
-//             family: 'Montserrat, Open sans',
-//         }
-//     }
-//     Plotly.newPlot('stats', data, layout);
-// }
-//
-// document.getElementById ("download_tag").addEventListener ("click", download_data, false);
-// document.getElementById ("stats").addEventListener ("mouseenter",
-//     () => {
-//         document.getElementById("download_tag").classList.remove("hidden")
-//         document.getElementById("download_tag").classList.add("visible")
-// }, false);
-// document.getElementById ("stats").addEventListener ("mouseleave",
-//     () => {
-//         document.getElementById("download_tag").classList.add("hidden")
-//         document.getElementById("download_tag").classList.remove("visible")
-// }, false);
-//
-// function download_data() {
-//     let gd = document.getElementById('stats')
-//     let data = gd.data;
-//     let header = ['Velocity (mm/s)','Pressure (kPa)','Shear stress (kPa)'];
-//     let csv = '';
-//     let ix = 0;
-//     data.forEach( trace => {
-//         csv = csv + 'Position (mm),' + header[ix] + '\n' + trace.y.map((el, i) => [el, trace.x[i]].join(",")).join('\n') + '\n';
-//         ix += 1;
-//         });
-//
-//     var link = document.getElementById("download_tag");
-//     link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8,"+csv));
-// }
 
 function make_graph() {
     let { data, layout } = LAYOUT.plotly_two_xaxis_graph('Average velocity (m/s)','Stress (Pa)','Location (mm)','Velocity','Pressure (p)','Shear stress (𝜏)');

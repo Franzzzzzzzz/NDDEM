@@ -28,6 +28,9 @@ jobs:
       - name: Setup Emscripten toolchain
         uses: mymindstorm/setup-emsdk@v11
 
+      - name: Install doxygen
+        run: sudo apt-get install -y doxygen
+
       # Runs a single command using the runners shell
       - name: Compile everything with Emscripten
         run: sh CI_build_script.sh
