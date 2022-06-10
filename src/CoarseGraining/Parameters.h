@@ -175,11 +175,16 @@ void Param::post_init()
     }
 
     if (default_density!=-1)
+    {
         for (auto &v: files)
             v.reader->set_default_density(default_density) ;
+    }
     if (default_radius!=-1)
         for (auto &v: files)
             v.reader->set_default_radius(default_radius) ;
+
+    for (auto &v: files)
+      v.reader->post_init() ;
 }
 //---------------------------------------------------
 int Param::identify_max_level()

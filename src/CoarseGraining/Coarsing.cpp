@@ -130,7 +130,7 @@ int Coarsing::grid_neighbour ()
     double dst ;
     for (int i=0 ; i<Npt ; i++)
     {
-        CGP[i].neighbors.clear() ; 
+        CGP[i].neighbors.clear() ;
         CGP[i].neighbors.push_back(i) ;
         for (int j=0 ; j<Npt ; j++)
         {
@@ -1275,9 +1275,9 @@ int Coarsing::write_numpy (string path, bool squeeze)
   uint8_t *centraldir=nullptr, *centraldirbeg=nullptr ;
 
   uint16_t nfiles = 0 ;
-  for (size_t f=0 ; f<Fidx.size() ; f++)
+  for (int f=-1 ; f<static_cast<int>(Fidx.size()) ; f++) //f==-1 is for the location array
   {
-    if (Fidx[f]<0) continue ;
+    if (f>-1 && Fidx[f]<0) continue ;
     nfiles++ ;
 
     uint32_t offset = ftell(out) ;
@@ -1288,14 +1288,25 @@ int Coarsing::write_numpy (string path, bool squeeze)
     write_short(0) ;
     write_short(0) ;
 
-    auto [numbytes, outarray] = write_numpy_buffer(f, squeeze) ;
+    size_t numbytes ;
+    uint8_t* outarray ;
+    if (f==-1)
+      std::tie(numbytes, outarray) = write_numpy_locbuffer(squeeze) ;
+    else
+      std::tie(numbytes, outarray) = write_numpy_buffer(f, squeeze) ;
     auto crc = getcrc(outarray, numbytes) ;
     write_int(crc) ; //CRC
     write_int(numbytes) ;
     write_int(numbytes) ;
-    write_short(Fname[f].length() + 4) ;
+    if (f==-1)
+      write_short(3 +4) ; //"LOC".length()=3 but this is not correct cpp.
+    else
+      write_short(Fname[f].length() + 4) ;
     write_short(20) ;
-    fwrite (Fname[f].data(), 1, Fname[f].length(), out) ;
+    if (f==-1)
+      fwrite ("LOC", 1, 3, out) ;
+    else
+      fwrite (Fname[f].data(), 1, Fname[f].length(), out) ;
     fwrite (".npy", 1, 4, out);
 
     // Not too sure why we need the extended field but ok ...
@@ -1310,13 +1321,19 @@ int Coarsing::write_numpy (string path, bool squeeze)
     // Preparing the central directory
     if (centraldir == nullptr)
     {
+      if (f==-1)
+        centraldir = static_cast<uint8_t*> (malloc(46+3+4)) ;
+      else
         centraldir = static_cast<uint8_t*> (malloc(46+Fname[f].length()+4)) ;
-        centraldirbeg = centraldir ;
+      centraldirbeg = centraldir ;
     }
     else
     {
         int off = centraldir-centraldirbeg ;
-        centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+Fname[f].length()+4));
+        if (f==-1)
+          centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+3+4));
+        else
+          centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+Fname[f].length()+4));
         centraldir = centraldirbeg + off ;
     }
     memcpy(centraldir, "\x50\x4b\x01\x02", 4) ; centraldir+=4 ;
@@ -1329,7 +1346,7 @@ int Coarsing::write_numpy (string path, bool squeeze)
     memcpy(centraldir, &crc, 4) ; centraldir +=4 ; //CRC TODO
     memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
     memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
-    uint16_t tmps = Fname[f].length() + 4 ;
+    uint16_t tmps = ((f==-1)?3:Fname[f].length()) + 4 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
     tmps=0 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
@@ -1342,7 +1359,10 @@ int Coarsing::write_numpy (string path, bool squeeze)
     *centraldir = 0x01 ; centraldir ++ ;
 
     memcpy(centraldir, &offset, 4) ; centraldir +=4 ; // OFFSET
-    memcpy(centraldir, Fname[f].data(), Fname[f].length()) ; centraldir += Fname[f].length() ;
+    if (f==-1)
+      {memcpy(centraldir, "LOC", 3) ; centraldir += 3 ;}
+    else
+      {memcpy(centraldir, Fname[f].data(), Fname[f].length()) ; centraldir += Fname[f].length() ;}
     memcpy(centraldir, ".npy", 4) ; centraldir += 4 ;
   }
 
@@ -1400,12 +1420,21 @@ vector <long unsigned int> dimensions (3+d, 0) ; // This type to please matlab
 for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
 dimensions[dimtime] = Time ;
 
-switch (Ftype[id])
+if (id == -2)
 {
-    case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ;
-    case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ;
-    case TensorOrder::TENSOR : dimensions[0]=d ; dimensions[1]=d ; break ;
-    default: printf("ERR: this should never happen. (wrong TensorOrder...)\n") ;
+  dimensions[0]=d ;
+  dimensions[1]=1 ;
+  dimensions[dimtime]=1 ;
+}
+else
+{
+  switch (Ftype[id])
+  {
+      case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ;
+      case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ;
+      case TensorOrder::TENSOR : dimensions[0]=d ; dimensions[1]=d ; break ;
+      default: printf("ERR: this should never happen. (wrong TensorOrder...)\n") ;
+  }
 }
 
 auto tmpdim = dimensions ;
@@ -1422,21 +1451,29 @@ int padding = ceil((header.length() + 6 + 4)/64.)*64 ;
 padding = padding - (header.length() + 6 + 4)-1 ;
 header += std::string (padding, ' ');
 header += "\n" ;
-
-outarray = static_cast<uint8_t*> (malloc (6+2+2+header.length() + dimensions[0]*dimensions[1]*Npt*Time*8)) ;
+if (id==-2)
+  outarray = static_cast<uint8_t*> (malloc (6+2+2+header.length() + dimensions[0]*Npt*8)) ;
+else
+  outarray = static_cast<uint8_t*> (malloc (6+2+2+header.length() + dimensions[0]*dimensions[1]*Npt*Time*8)) ;
 memcpy(outarray, "\x93NUMPY", 6) ;
 outarray[6] = 1 ; outarray[7]=0 ;
 outarray[8] = header.length()&0xff ; outarray[9]=(header.length()>>8)&0xff ;
 memcpy (outarray+10, header.data(), header.length()) ;
 numbytes = 10 + header.length() ;
-for (long unsigned int k=0 ; k<dimensions[0] ; k++)
-    for (long unsigned int j=0 ; j<dimensions[1] ; j++)
-        for (int i=0 ; i<Npt ; i++)
-            for (int t=0 ; t<Time ; t++, numbytes += 8)
-                memcpy(outarray+numbytes, &(CGP[i].fields[t][Fidx[id]+j*d+k]), 8) ;
+if (id==-2)
+  for (long unsigned int k=0 ; k<dimensions[0] ; k++)
+      for (int i=0 ; i<Npt ; i++, numbytes+=8)
+          memcpy(outarray+numbytes, &(CGP[i].location[k]), 8) ;
+else
+  for (long unsigned int k=0 ; k<dimensions[0] ; k++)
+      for (long unsigned int j=0 ; j<dimensions[1] ; j++)
+          for (int i=0 ; i<Npt ; i++)
+              for (int t=0 ; t<Time ; t++, numbytes += 8)
+                  memcpy(outarray+numbytes, &(CGP[i].fields[t][Fidx[id]+j*d+k]), 8) ;
 
 return (std::make_pair(numbytes, outarray)) ;
 }
+
 
 
 //--------------------------------------------------------

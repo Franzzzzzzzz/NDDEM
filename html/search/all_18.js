@@ -55,12 +55,13 @@ var searchData=
   ['write_5fnumber_5fwith_5fubjson_5fprefix_1542',['write_number_with_ubjson_prefix',['../classnlohmann_1_1detail_1_1binary__writer.html#a0ea6745f944c0c61672146886b4ee90f',1,'nlohmann::detail::binary_writer::write_number_with_ubjson_prefix(const NumberType n, const bool add_prefix)'],['../classnlohmann_1_1detail_1_1binary__writer.html#a0ea6745f944c0c61672146886b4ee90f',1,'nlohmann::detail::binary_writer::write_number_with_ubjson_prefix(const NumberType n, const bool add_prefix)'],['../classnlohmann_1_1detail_1_1binary__writer.html#a0ea6745f944c0c61672146886b4ee90f',1,'nlohmann::detail::binary_writer::write_number_with_ubjson_prefix(const NumberType n, const bool add_prefix)']]],
   ['write_5fnumpy_1543',['write_numpy',['../group__CoarseGraining.html#gabff6b00dee02dbc6b9b73d2068d0e051',1,'Coarsing']]],
   ['write_5fnumpy_5fbuffer_1544',['write_numpy_buffer',['../group__CoarseGraining.html#gacf3f4aa1ec6693d3b001ed1fff6908d2',1,'Coarsing']]],
-  ['write_5fnumpy_5fnpy_1545',['write_numpy_npy',['../group__CoarseGraining.html#ga17b169b0beed281d1f162067eb7d0136',1,'Coarsing']]],
-  ['write_5fubjson_1546',['write_ubjson',['../classnlohmann_1_1detail_1_1binary__writer.html#a0f6c65053d859269f88eb4ebb0cd7060',1,'nlohmann::detail::binary_writer']]],
-  ['write_5fvtk_1547',['write_vtk',['../group__CoarseGraining.html#ga588ea1777c5c0700c7f9f80b5011b225',1,'Coarsing']]],
-  ['write_5fvtkmap_1548',['write_vtkmap',['../group__Texturing.html#ga13a3f6d802cdd2d6f4141e0692862a8d',1,'Texturing']]],
-  ['writearray_1549',['writeArray',['../classXMLWriter.html#a7e6bbb46e4b9d8dd4727e74de24117c8',1,'XMLWriter::writeArray(string name, std::vector&lt; std::vector&lt; double &gt; &gt; *x, ArrayType t, EncodingType te=EncodingType::ascii)'],['../classXMLWriter.html#ae91f51309cf4c7b195f0858c3eaa2ab6',1,'XMLWriter::writeArray(string name, std::vector&lt; double &gt; *x, ArrayType t, EncodingType te=EncodingType::ascii)']]],
-  ['writeinline_1550',['writeinline',['../group__DEM.html#ga9ca7866796fbfe0eb1ef7aa853313afa',1,'Tools']]],
-  ['writeinline_5fclose_1551',['writeinline_close',['../group__DEM.html#ga62190eb5c0a1025679a212de8862b0ce',1,'Tools']]],
-  ['writets_1552',['writeTs',['../classXMLWriter.html#a6b52391c183d510aafbe0ecf604f9a19',1,'XMLWriter']]]
+  ['write_5fnumpy_5flocbuffer_1545',['write_numpy_locbuffer',['../group__CoarseGraining.html#ga9c7a261c29cae9698192f09f6febca31',1,'Coarsing']]],
+  ['write_5fnumpy_5fnpy_1546',['write_numpy_npy',['../group__CoarseGraining.html#ga17b169b0beed281d1f162067eb7d0136',1,'Coarsing']]],
+  ['write_5fubjson_1547',['write_ubjson',['../classnlohmann_1_1detail_1_1binary__writer.html#a0f6c65053d859269f88eb4ebb0cd7060',1,'nlohmann::detail::binary_writer']]],
+  ['write_5fvtk_1548',['write_vtk',['../group__CoarseGraining.html#ga588ea1777c5c0700c7f9f80b5011b225',1,'Coarsing']]],
+  ['write_5fvtkmap_1549',['write_vtkmap',['../group__Texturing.html#ga13a3f6d802cdd2d6f4141e0692862a8d',1,'Texturing']]],
+  ['writearray_1550',['writeArray',['../classXMLWriter.html#a7e6bbb46e4b9d8dd4727e74de24117c8',1,'XMLWriter::writeArray(string name, std::vector&lt; std::vector&lt; double &gt; &gt; *x, ArrayType t, EncodingType te=EncodingType::ascii)'],['../classXMLWriter.html#ae91f51309cf4c7b195f0858c3eaa2ab6',1,'XMLWriter::writeArray(string name, std::vector&lt; double &gt; *x, ArrayType t, EncodingType te=EncodingType::ascii)']]],
+  ['writeinline_1551',['writeinline',['../group__DEM.html#ga9ca7866796fbfe0eb1ef7aa853313afa',1,'Tools']]],
+  ['writeinline_5fclose_1552',['writeinline_close',['../group__DEM.html#ga62190eb5c0a1025679a212de8862b0ce',1,'Tools']]],
+  ['writets_1553',['writeTs',['../classXMLWriter.html#a6b52391c183d510aafbe0ecf604f9a19',1,'XMLWriter']]]
 ];
