@@ -144,7 +144,7 @@ public :
         //for (int i=0 ; i<d ; i++)
         // printf("%d %d %g %g %g|", d, npt[i], box[1][i], box[0][i], dx[i]) ; fflush(stdout) ;
         grid_generate() ;
-        grid_neighbour() ;
+        //grid_neighbour() ;
         set_field_struct() ;
         Window = new LibLucy3D( &data, w, d) ;
     }
