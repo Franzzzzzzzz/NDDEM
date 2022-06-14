@@ -12,7 +12,7 @@ public:
         Nparticles = radius.size() ;
         reorganised_pos.resize(dimension, nullptr) ;
         reorganised_vel.resize(dimension, nullptr) ;
-        reorganised_omega.resize(dimension, nullptr) ;
+        reorganised_omega.resize((dimension*(dimension-1))/2, nullptr) ;
         startingpoint = XML->fic.tellg() ;
     }
     ~NDDEMReader () {XML->close() ; delete(XML) ;}
