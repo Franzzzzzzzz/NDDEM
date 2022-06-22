@@ -22,12 +22,12 @@ export function make_listener( target ) {
 
     normal_oscillator = listener.context.createOscillator();
 	normal_oscillator.type = 'sine';
-	normal_oscillator.frequency.setValueAtTime( 256, listener.context.currentTime );
+	normal_oscillator.frequency.setValueAtTime( 10000, listener.context.currentTime );
 	normal_oscillator.start( );
 
     tangential_oscillator = listener.context.createOscillator();
 	tangential_oscillator.type = 'sawtooth';
-	tangential_oscillator.frequency.setValueAtTime( 128, listener.context.currentTime );
+	tangential_oscillator.frequency.setValueAtTime( 1000, listener.context.currentTime );
 	tangential_oscillator.start( );
     // console.log('made an object the audio listener')
 }

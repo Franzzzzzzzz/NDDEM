@@ -283,6 +283,7 @@ export function update_particle_material(params, lut_folder) {
 
 export function move_spheres(S,params,controller1,controller2) {
     x = S.simu_getX();
+
     let orientation = S.simu_getOrientation();
     if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
         v = S.simu_getVelocity();
