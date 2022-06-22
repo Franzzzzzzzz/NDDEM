@@ -15,7 +15,7 @@ All parts of this code have been tested on all recent versions of Windows, Mac a
 
 ## Installation instructions and documentation
 Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
- - [NDDEM solver, coarse graining and texturing server](https://franzzzzzzzz.github.io/NDDEM/CppCode/html/index.html)
+ - [NDDEM solver, coarse graining and texturing server](https://franzzzzzzzz.github.io/NDDEM/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
 

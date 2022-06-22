@@ -472,13 +472,14 @@ public:
         for (int i=0 ; i<N ; i++)
         {
             //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
-            if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; Tools<d>::setzero(V[i]) ; Tools<d>::setzero(Omega[i]) ; }
-
-            Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
-            Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
-            Tools<d>::vSubScaled(Omega[i], P.damping*P.dt, Omega[i]) ; // BENJY - add damping to Omega
-            FOld[i]=F[i] ;
-            TorqueOld[i]=Torque[i] ;
+            // if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; Tools<d>::setzero(V[i]) ; Tools<d>::setzero(Omega[i]) ; }
+            if (!P.Frozen[i]) {
+                Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
+                Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
+                Tools<d>::vSubScaled(Omega[i], P.damping*P.dt, Omega[i]) ; // BENJY - add damping to Omega
+                FOld[i]=F[i] ;
+                TorqueOld[i]=Torque[i] ;
+            }
         } // END OF PARALLEL SECTION
 
         // Benchmark::stop_clock("Verlet last");
@@ -587,6 +588,14 @@ public:
 
   /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }
+
+  /** \brief Set the velocity of a single particle \ingroup API */
+  void setVelocity(int id, v1d vel) {
+      for (int i=0 ; i<d ; i++) {
+          V[id][i] = vel[i];
+      }
+  }
+
 
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
   void fixParticle(int a, v1d loc) {

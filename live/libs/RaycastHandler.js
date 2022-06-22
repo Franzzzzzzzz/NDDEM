@@ -36,8 +36,14 @@ export function animate_locked_particle(S, c, spheres, params) {
     camera = c
     if ( locked_particle !== null ) {
         raycaster.ray.intersectPlane( intersection_plane, ref_location);
-        ref_location.clamp( new Vector3( -params.L, -params.L, 0 ),
-                    new Vector3(params.L, params.L, 0) );
+        if ( 'aspect_ratio' in params ) {
+            ref_location.clamp( new Vector3( -params.L*params.aspect_ratio,-params.L, 0 ),
+                                new Vector3(  params.L*params.aspect_ratio, params.L, 0 ) );
+
+        } else {
+            ref_location.clamp( new Vector3( -params.L, -params.L, 0),
+                                new Vector3(  params.L,  params.L, 0) );
+        }
         S.simu_fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
     }
     calculate_intersection(camera, spheres, params);

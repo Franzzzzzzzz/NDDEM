@@ -81,7 +81,7 @@ async function init() {
 
     camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 1000 );
     camera.position.set( 3*params.L1, 2*params.L1 + params.table_height, 0 );
-    // AUDIO.make_listener( camera );
+    AUDIO.make_listener( camera );
     // camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
