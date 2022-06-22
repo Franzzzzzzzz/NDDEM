@@ -13,6 +13,7 @@ module.exports = [{
         '4d-pool' : './live/src/4d-pool.js',
         'coarse-graining' : './live/src/coarse-graining.js',
         'rotation-matrix' : './live/src/rotation-matrix.js',
+        'simple-shear' : './live/src/simple-shear.js',
     },
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
