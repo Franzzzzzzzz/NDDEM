@@ -591,6 +591,14 @@ public:
   /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }
 
+  /** \brief Set the velocity of a single particle \ingroup API */
+  void setVelocity(int id, v1d vel) {
+      for (int i=0 ; i<d ; i++) {
+          V[id][i] = vel[i];
+      }
+  }
+
+
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
   void fixParticle(int a, v1d loc) {
       for (int i=0 ; i<d ; i++) {

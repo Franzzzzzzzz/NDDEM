@@ -13,6 +13,7 @@ EMSCRIPTEN_BINDINGS(DEMCG2D) {
     .function("simu_setFrozen", &DEMCG2D::simu_setFrozen)
     .function("simu_getOrientation", &DEMCG2D::simu_getOrientation)
     .function("simu_getVelocity", &DEMCG2D::simu_getVelocity)
+    .function("simu_setVelocity", &DEMCG2D::simu_setVelocity)
     .function("simu_getRotationRate", &DEMCG2D::simu_getRotationRate)
     .function("simu_getParticleForce", &DEMCG2D::simu_getParticleForce)
     .function("simu_getBoundary", &DEMCG2D::simu_getBoundary)
