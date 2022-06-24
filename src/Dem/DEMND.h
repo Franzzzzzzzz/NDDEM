@@ -562,15 +562,15 @@ public:
   std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
 
   /** \brief Expose the array of orientation rate. \ingroup API */
-  std::vector<std::vector<double>> getParticleForce() { return ParticleForce; }
+  std::vector<std::vector<double>> getParticleForce() { printf("\nA\n"); fflush(stdout) ; return ParticleForce; }
 
-  // /** \brief Expose the array of particle stress. WARNING: Not implemented! \ingroup API */
+  // /** \brief Expose the array of contact forces and velocities. \ingroup API */
   std::vector<std::vector<double>> calculateParticleForce()
   {
     std::vector<std::vector<double>> res ;
     std::vector<double> tmpfrc ;
-    tmpfrc.resize(2+d) ;
-    for (int i=0 ; i<MP.CLp.size() ; i++)
+    tmpfrc.resize(2+4*d) ;
+    for (size_t i=0 ; i<MP.CLp.size() ; i++)
     {
       for (auto it = MP.CLp[i].v.begin() ; it!=MP.CLp[i].v.end() ; it++)
       {
@@ -578,6 +578,9 @@ public:
         tmpfrc[0]=it->i ;
         tmpfrc[1]=it->j ;
         for (int j=0 ; j<d ; j++) tmpfrc[2+j]=it->infos->Fn[j] ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+d+j]=it->infos->Ft[j] ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+2*d+j]=it->infos->vn[j] ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+3*d+j]=it->infos->vt[j] ;
         res.push_back(tmpfrc) ;
       }
     }

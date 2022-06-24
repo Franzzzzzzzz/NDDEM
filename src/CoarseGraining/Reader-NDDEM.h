@@ -109,6 +109,7 @@ int NDDEMReader::read_timestep (int ts)
             return reorganised_vel[dd] ;
         case DataValue::omega:
             delta=find(names.begin(), names.end(), "Omega")-names.begin() ;
+            if (delta==names.size()) return nullptr ; 
             if (reorganised_omega[dd]==nullptr) reorganised_omega[dd] = (double *) malloc (sizeof(double)*Nparticles) ;
             for (int j=0 ; j<Nparticles ; j++) reorganised_omega[dd][j] = data[delta][j][dd] ;
             return reorganised_omega[dd] ;
