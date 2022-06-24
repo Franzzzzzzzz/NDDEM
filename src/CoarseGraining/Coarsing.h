@@ -36,6 +36,7 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include <boost/math/special_functions/factorials.hpp>
+#include <boost/math/special_functions/beta.hpp>
 #include <boost/crc.hpp>
 #include <map>
 
@@ -246,11 +247,13 @@ int Coarsing::setWindow (double w)
       case Windows::Rect3D :
          Window=new LibRect3D (&data, w, d) ;
         break ;
-      case Windows::Rect3DIntersect :
-        Window=new LibRect3DIntersect (&data, w, d) ;
+      case Windows::Sphere3DIntersect :
+        Window=new LibSphere3DIntersect (&data, w, d) ;
+        break ;
+      case Windows::SphereNDIntersect :
+        Window=new LibSphereNDIntersect (&data, w, d) ;
         break ;
       case Windows::Lucy3D :
-        printf("HELLO") ; fflush(stdout) ;
         Window=new LibLucy3D (&data, w, d) ;
         break ;
       case Windows::Lucy3DFancyInt :

@@ -1,5 +1,5 @@
 
-enum class Windows {Rect3D, Rect3DIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic} ;
+enum class Windows {Rect3D, Sphere3DIntersect, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic} ;
 
 /** \brief A window base class that needs to be specialised to a specific CG window
  */
@@ -91,9 +91,9 @@ public:
   double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) {} return 1/a ;}}
 };
 //---------------------
-class LibRect3DIntersect : public LibBase {
+class LibSphere3DIntersect : public LibBase {
 public:
-    LibRect3DIntersect(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=1./(4./3.*M_PI*w*w*w) ; }
+    LibSphere3DIntersect(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=1./(4./3.*M_PI*w*w*w) ; }
     double cst ;
     double result ;
     double distance(int id, v1d loc)
@@ -117,6 +117,108 @@ public:
             return (vol * cst / (4./3.*M_PI*r*r*r)) ;
         }
 
+    }
+    double cutoff (void) {
+        double maxr=0 ;
+        if (data->N==0) return 2*w ;
+        for (int i=0 ; i<data -> N ; i++)
+            if (maxr<data->radius[i])
+                maxr=data->radius[i] ;
+        return maxr+w ;
+    }
+    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
+    double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
+    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
+    {
+        double rp=LibBase::distance(p, loc) ;
+        double rq=LibBase::distance(q, loc) ;
+        double wpqs = window_avg (rp, rq) ;
+        double wpqf = 0 ;
+
+        v1d locp (d,0) ;
+        v1d lpq(d,0) ;
+        double normp=0, normlpq=0 ;
+        double b = 0 ;
+        for (int i=0 ; i<d ;i++)
+        {
+          lpq[i] = data->pos[i][q] - data->pos[i][p] ;
+          locp[i] = data->pos[i][p]-loc[i] ;
+          normp += locp[i]*locp[i] ;
+          normlpq += lpq[i]*lpq[i] ;
+          b += locp[i]*lpq[i] ;
+        }
+        b*=2 ;
+
+        double Delta = b*b-4*normlpq*(normp-w*w) ;
+        if (Delta<=0)
+            wpqs = 0 ;
+        else
+        {
+            double alpha1 = (-b - sqrt(Delta))/(2*normlpq) ;
+            double alpha2 = (-b + sqrt(Delta))/(2*normlpq) ;
+
+            if (alpha1<0 && alpha2>0 && alpha2<1)
+                wpqf = cst * alpha2 ;
+            else if (alpha1<0 && alpha2>1)
+                wpqf = cst ;
+            else if (alpha1>0 && alpha1<1 && alpha2>1)
+                wpqf = cst * (1-alpha1) ;
+            else if (alpha1>0 && alpha1<1 && alpha2>0 && alpha2<1) //this is a VERY small window ... ...
+                wpqf = cst*(alpha2-alpha1) ;
+            else
+                wpqf = 0 ;
+
+        }
+        return (make_pair(wpqs,wpqf)) ;
+    }
+    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
+};
+//------------------------------------------
+class LibSphereNDIntersect : public LibBase {
+public:
+    LibSphereNDIntersect(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=1./(nballvolume()* pow(w, d)) ; }
+    double nballvolume () {return pow(M_PI,d/2.)/tgamma(d/2.+1) ; }
+    double ncapvolume (double r, double h)
+    {
+      if (h<0 || h>2*r) return 0 ;
+      if (h<=r)
+      {
+        //printf("%g %g\n", 1/2. * nballvolume() * pow(r, d) * boost::math::ibeta ((d+1)/2., 1/2., (2*r*h-h*h)/(r*r)), M_PI*h*h/3*(3*r-h)) ;
+        return 1/2. * nballvolume() * pow(r, d) * boost::math::ibeta ((d+1)/2., 1/2., (2*r*h-h*h)/(r*r)) ;
+      }
+      else
+      {
+        //printf("%g %g %g %g\n", h, r, nballvolume() * pow(r, d) - 1/2. * nballvolume() * pow(r, d) * (boost::math::ibeta((d+1)/2., 1/2., (2*r*(2*r-h)-(2*r-h)*(2*r-h))/(r*r))),
+        //  4/3.*M_PI*r*r*r - M_PI*(2*r-h)*(2*r-h)/3*(3*r-(2*r-h))) ;
+        return nballvolume() * pow(r, d) - 1/2. * nballvolume() * pow(r, d) * boost::math::ibeta((d+1)/2., 1/2., (2*r*(2*r-h)-(2*r-h)*(2*r-h))/(r*r)) ; // Completement normalised beta function (1-I_x(a,b))
+      }
+    }
+    double cst ;
+    double result ;
+    double distance(int id, v1d loc)
+    {
+        double r=0 ;
+        for (int i=0 ; i<d ; i++)
+            r+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ;
+        r = sqrt(r) ;
+        double r2 = data->radius[id] ;
+        double &r1 = w ;
+        if (r>r1+r2) return 0 ;
+        else if (r<=fabs(r1-r2))
+        {
+            if (r1>r2)
+                return cst ;
+            else
+                return 1./(nballvolume()*pow(r2, d)) ;
+        }
+        else
+        {
+            double h1 = (r2+r1-r)*(r2-r1+r)/(2*r) ;
+            double h2 = (r1+r2-r)*(r1-r2+r)/(2*r) ;
+
+            double vol = ncapvolume(r1,h1) + ncapvolume(r2,h2) ;
+            return vol * cst / (nballvolume() * pow(r2,d)) ;
+        }
     }
     double cutoff (void) {
         double maxr=0 ;

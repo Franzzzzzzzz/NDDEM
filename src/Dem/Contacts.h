@@ -175,6 +175,8 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
 
+  Act.setvel(vn, vt) ;
+
   if (P->ContactModel == HERTZ)
   {
       double Rstar = (ri*rj)/(ri+rj) ;
@@ -183,7 +185,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
       kn = P->Kn * sqrtovlpR;
       kt = P->Kt * sqrtovlpR;
       gamman = P->Gamman * sqrt(Mstar * kn);
-      gammat = P->Gammat * sqrt(Mstar * kt); 
+      gammat = P->Gammat * sqrt(Mstar * kt);
   }
   else
   {
@@ -269,7 +271,8 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
   rri = -cn * (ri-ovlp/2.) ;
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) ;
   vn = cn * (Tools<d>::dot(vrel, cn)) ;
-  vt= vrel - vn ; //vt=self.vrel-vn*cn ; // BUG: from python, must be wrong
+  vt= vrel - vn ;
+  Act.setvel(vn, vt) ;
 
   double kn, kt, gamman, gammat ;
   if (P->ContactModel == HERTZ)
@@ -337,6 +340,7 @@ void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, dou
   vrel= Vi - Tools<d>::skewmatvecmult(Omegai, rri) - Vj ;
   Tools<d>::vMul (vn, cn, Tools<d>::dot(vrel,cn)) ; //vn=cn * (Tools<d>::dot(vrel,cn)) ;
   Tools<d>::vMinus(vt, vrel, vn) ; //vt= vrel - vn ;
+  Act.setvel(vn, vt) ;
 
   double kn, kt, gamman, gammat ;
   if (P->ContactModel == HERTZ)

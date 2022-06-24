@@ -239,7 +239,9 @@ return -1 ;
 Windows Param::identify_window(std::string windowstr)
 {
          if ( windowstr=="Rect3D") return Windows::Rect3D ;
-    else if ( windowstr=="Rect3DIntersect") return Windows::Rect3DIntersect ;
+    else if ( windowstr=="Rect3DIntersect")  {printf("====> DEPRECATED: misleading name, use Sphere3DIntersect instead. <=======\n") ; return Windows::Sphere3DIntersect ;}
+    else if ( windowstr=="Sphere3DIntersect") return Windows::Sphere3DIntersect ;
+    else if ( windowstr=="SphereNDIntersect") return Windows::SphereNDIntersect ;
     else if ( windowstr=="Lucy3D") return Windows::Lucy3D ;
     else if ( windowstr=="Hann3D") return Windows::Hann3D ;
     else if ( windowstr=="RectND") return Windows::RectND ;

@@ -17,8 +17,10 @@
 class Action {
 public :
     vector <double> Fn, Ft, Torquei, Torquej ;
+    vector <double> vn, vt ;
     void set (v1d a, v1d b, v1d c, v1d d) {Fn=a ; Ft=b ; Torquei=c ; Torquej=d ; }
-    void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
+    void setvel(v1d vvn, v1d vvt) {vn=vvn; vt=vvt ;}
+    void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; vn=(v1d(d,0)) ; vt=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
     //void set_fwd (v1d a, v1d b, v1d c) {Fni=a; Fti=b; Torquei=c ;}
     //  void set_rev (v1d a, v1d b, v1d c) {Fnj=a; Ftj=b; Torquej=c ;}
 } ;
@@ -69,11 +71,12 @@ public:
          owninfos = true ;
      }
      infos->Fn = a.Fn ;
-     //printf("%g %g %g\n",a.Fn[0], a.Fn[1], a.Fn[2]) ;   
+     //printf("%g %g %g\n",a.Fn[0], a.Fn[1], a.Fn[2]) ;
      infos->Ft = a.Ft ;
+     infos->vn = a.vn ;
+     infos->vt = a.vt ;
      infos->Torquei = a.Torquei ;
      infos->Torquej = a.Torquej ;
-
  } ///< Save information regarding the contact forces for later write down.
 
  int i ;  ///< Index of contacting particle.

@@ -62,8 +62,11 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::Rect3D :
     setWindow<Windows::Rect3D> (w) ;
     break ;
-  case Windows::Rect3DIntersect :
-    setWindow<Windows::Rect3DIntersect> (w) ;
+  case Windows::Sphere3DIntersect :
+    setWindow<Windows::Sphere3DIntersect> (w) ;
+    break ;
+  case Windows::SphereNDIntersect :
+    setWindow<Windows::SphereNDIntersect> (w) ;
     break ;
   case Windows::Lucy3D :
     setWindow<Windows::Lucy3D> (w) ;

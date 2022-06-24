@@ -472,14 +472,13 @@ public:
         for (int i=0 ; i<N ; i++)
         {
             //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
-            // if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; Tools<d>::setzero(V[i]) ; Tools<d>::setzero(Omega[i]) ; }
-            if (!P.Frozen[i]) {
-                Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
-                Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
-                Tools<d>::vSubScaled(Omega[i], P.damping*P.dt, Omega[i]) ; // BENJY - add damping to Omega
-                FOld[i]=F[i] ;
-                TorqueOld[i]=Torque[i] ;
-            }
+            if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; /*Tools<d>::setzero(V[i]) ; */ Tools<d>::setzero(Omega[i]) ; }
+
+            Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
+            Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
+            Tools<d>::vSubScaled(Omega[i], P.damping*P.dt, Omega[i]) ; // BENJY - add damping to Omega
+            FOld[i]=F[i] ;
+            TorqueOld[i]=Torque[i] ;
         } // END OF PARALLEL SECTION
 
         // Benchmark::stop_clock("Verlet last");
@@ -563,15 +562,15 @@ public:
   std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
 
   /** \brief Expose the array of orientation rate. \ingroup API */
-  std::vector<std::vector<double>> getParticleForce() { return ParticleForce; }
+  std::vector<std::vector<double>> getParticleForce() { printf("\nA\n"); fflush(stdout) ; return ParticleForce; }
 
-  // /** \brief Expose the array of particle stress. WARNING: Not implemented! \ingroup API */
+  // /** \brief Expose the array of contact forces and velocities. \ingroup API */
   std::vector<std::vector<double>> calculateParticleForce()
   {
     std::vector<std::vector<double>> res ;
     std::vector<double> tmpfrc ;
-    tmpfrc.resize(2+d) ;
-    for (int i=0 ; i<MP.CLp.size() ; i++)
+    tmpfrc.resize(2+4*d) ;
+    for (size_t i=0 ; i<MP.CLp.size() ; i++)
     {
       for (auto it = MP.CLp[i].v.begin() ; it!=MP.CLp[i].v.end() ; it++)
       {
@@ -579,6 +578,9 @@ public:
         tmpfrc[0]=it->i ;
         tmpfrc[1]=it->j ;
         for (int j=0 ; j<d ; j++) tmpfrc[2+j]=it->infos->Fn[j] ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+d+j]=it->infos->Ft[j] ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+2*d+j]=it->infos->vn[j] ;
+        for (int j=0 ; j<d ; j++) tmpfrc[2+3*d+j]=it->infos->vt[j] ;
         res.push_back(tmpfrc) ;
       }
     }
