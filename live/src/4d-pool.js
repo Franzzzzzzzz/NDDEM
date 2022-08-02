@@ -148,7 +148,10 @@ async function init() {
     controls.target.y = params.table_height-params.L2;
     controls.update();
 
-    isMobile = navigator.userAgentData.mobile; //resolves true/false
+    let isMobile = false
+    if ( navigator.userAgentData === undefined ) { isMobile = false; }
+    else { isMobile = navigator.userAgentData.mobile; } //resolves true/false
+    
     if ( isMobile ) {
         document.getElementById("hit_me").hidden = false;
         document.getElementById("web_instructions").hidden = true;
