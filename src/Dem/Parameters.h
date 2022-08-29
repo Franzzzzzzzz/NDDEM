@@ -16,6 +16,7 @@
 #include "Typedefs.h"
 #include "Xml.h"
 #include "Tools.h"
+#include "RigidBody.h"
 //
 #include <boost/random.hpp>
 
@@ -106,7 +107,8 @@ public :
     bool wallforcecomputed ; ///< Compute for on the wall?
     bool contactforcedump ; ///< Extract the forces between grains as well?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
-
+    RigidBodies_<d> RigidBodies ; ///< Handle all the rigid bodies
+    
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
 
 // Useful functions
@@ -611,6 +613,19 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     }
     printf("[INFO] Changing BC.\n") ;
    };
+ Lvl0["rigid"] = [&] () 
+ {
+   size_t id ; in >> id ;
+   std::vector<int> ids ; 
+   int tmp ; 
+   for (size_t i=0 ; i<id ; i++)
+   {
+     in >> tmp ; 
+     ids.push_back(tmp) ; 
+   }
+   RigidBodies.add_body(ids,X,m) ; 
+   printf("[INFO] Defining a rigid body.\n") ;
+ };
 
 // Processing
  string line ;

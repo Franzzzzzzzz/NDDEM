@@ -1,0 +1,40 @@
+# Lees Edwards Shear
+directory output/LeesEdwards/D5
+dimensions 5 19533
+
+# The order is quite important here: 1/set the density base on a particle of mass 1 and diameter 1. 2/update everyone radius 3/update the mass and inertia based on the previously defined rho and radius.
+radius -1 0.5
+mass -1 1
+auto rho
+auto radius uniform 0.4 0.6
+auto mass
+auto inertia
+auto skin
+
+boundary 0 PBCLE   0 20 1
+boundary 1 PBC   0 5
+boundary 2 PBC   0 5
+boundary 3 PBC   0 5
+boundary 4 PBC   0 5
+#boundary 5 PBC   0 5
+
+auto location randomdrop
+
+set Kn 2e5
+set Kt 8e4
+set GammaN 10
+set GammaT 10
+set Mu 0.5
+
+set T 5
+set dt 0.0001
+set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 4 Position Velocity Omega Coordination
+#set dumps VTK with 2 Velocity Ids
+set tdump 1000
+#event 0.9998 set tdump 1000
+#event 0.9999 freeze -1
+#event 1 boundary 0 PBCLE 0 10 1
+
+
+EOF

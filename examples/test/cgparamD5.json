@@ -1,0 +1,20 @@
+{
+    "file" : [{
+        "filename" : "output/LeesEdwards/D5/dump.xml",
+        "format" : "NDDEM",
+        "content" : "particles",
+        "number" : 1
+    }],
+    "skip" : 20,
+    "max time" : 20,
+    "density" : 6.07927,
+    "fields" : ["RHO", "VAVG"] ,
+    "boxes" : [20,5,5,5,5],
+    "boundaries" : [[0,0,0,0,0],[20,5,5,5,5]],
+    "periodicity" : [true,true,true,true,true],
+    "time average": "None",
+    "savefile": "output/LeesEdwards/D5/CG",
+    "saveformat": "numpy",
+    "window" : "LucyND",
+    "window size" : 1
+}
