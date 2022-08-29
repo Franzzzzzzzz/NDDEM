@@ -68,6 +68,8 @@ public:
     std::vector < std::vector <double> > Fcorr ;
     std::vector < std::vector <double> > TorqueCorr  ;
     std::vector < double > displacement ; double maxdisp[2] ;
+    
+    std::vector < std::optional<int> > RigidBodyId ; 
 
     std::vector <SpecificAction> ExternalAction ;
 
@@ -111,6 +113,7 @@ public:
         Fcorr.resize (N, std::vector <double> (d, 0)) ;
         TorqueCorr.resize (N, std::vector <double> (d*(d-1)/2, 0)) ;
         displacement.resize (N, 0) ;
+        RigidBodyId.resize(N,{}) ; 
 
         PBCFlags.resize (N, 0) ;
         WallForce.resize (2*d, std::vector <double> (d,0)) ;
@@ -143,6 +146,7 @@ public:
         xmlout = P.xmlout ;
 
         displacement[0]=P.skinsqr*2 ;
+        P.RigidBodies.allocate (RigidBodyId) ; 
 
         #ifndef NO_OPENMP
           const char* env_p = std::getenv("OMP_NUM_THREADS") ;
@@ -216,12 +220,12 @@ public:
             // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
             if (P.orientationtracking)
             {
-            v1d tmpO (d*d,0), tmpterm1 (d*d,0) ;
-            Tools<d>::skewexpand(tmpO, Omega[i]) ;
-            Tools<d>::matmult(tmpterm1, tmpO, A[i]) ;
-            for (int dd=0 ; dd<d*d ; dd++)
-                A[i][dd] -= tmpterm1[dd] * dt ;
-            Tools<d>::orthonormalise(A[i]) ;
+                v1d tmpO (d*d,0), tmpterm1 (d*d,0) ;
+                Tools<d>::skewexpand(tmpO, Omega[i]) ;
+                Tools<d>::matmult(tmpterm1, tmpO, A[i]) ;
+                for (int dd=0 ; dd<d*d ; dd++)
+                    A[i][dd] -= tmpterm1[dd] * dt ;
+                Tools<d>::orthonormalise(A[i]) ;
             }
 
             // Boundary conditions ...
@@ -234,9 +238,9 @@ public:
 
             for (int j=0 ; j<d ; j++, mask<<=1)
             {
-            if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
-            if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
-            else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+                if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
+                if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
+                else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
 
             if (P.Boundaries[0][3] == static_cast<int>(WallType::PBC_LE) && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
@@ -258,9 +262,9 @@ public:
 
         //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
-        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) //shared (stdout)
+        // ----- Contact detection ------
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) //shared (stdout)
         {
-         //int ID = 0 ; //OMP TODO
          #ifdef NO_OPENMP
          int ID = 0 ;
          #else
@@ -277,6 +281,7 @@ public:
             tmpcp.i=i ;
             for (int j=i+1 ; j<N ; j++) // Regular particles
             {
+                if (RigidBodyId[i].has_value() && RigidBodyId[j].has_value() &&  RigidBodyId[i]==RigidBodyId[j]) continue ; 
                 if (Ghost[j])
                 {
                     tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
@@ -468,6 +473,10 @@ public:
         // Benchmark::stop_clock("Forces");
         //---------- Velocity Verlet step 3 : compute the new velocities
         // Benchmark::start_clock("Verlet last");
+        
+        P.RigidBodies.process_forces(F, Torque, P.m) ;
+        
+        
         #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)
         for (int i=0 ; i<N ; i++)
         {
