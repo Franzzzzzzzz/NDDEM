@@ -21,6 +21,10 @@ public :
     void set (v1d a, v1d b, v1d c, v1d d) {Fn=a ; Ft=b ; Torquei=c ; Torquej=d ; }
     void setvel(v1d vvn, v1d vvt) {vn=vvn; vt=vvt ;}
     void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; vn=(v1d(d,0)) ; vt=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
+    
+    vector<double> Fn_el, Fn_visc, Ft_el, Ft_visc, Ft_fric ; 
+    bool Ft_isfric ;  
+    
     //void set_fwd (v1d a, v1d b, v1d c) {Fni=a; Fti=b; Torquei=c ;}
     //  void set_rev (v1d a, v1d b, v1d c) {Fnj=a; Ftj=b; Torquej=c ;}
 } ;
@@ -87,6 +91,38 @@ public:
  vector <double> tspr ; ///< Vector of tangential contact history
  Action * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested.
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
+ 
+ std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, cv2d & Boundaries, int d)
+ {
+    vector <double> loc (d, 0), branch (d, 0)  ;
+    if ( Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (ghost & 1)==0)
+    {
+        loc=X[j] ;
+        uint32_t gh=ghost, ghd=ghostdir ;
+        for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
+            if (gh&1)
+                loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
+    }
+    else
+    {
+        uint32_t gh=ghost, ghd=ghostdir ; // Handle pbc in first dim
+        loc=X[j] ;
+        loc[0] += Boundaries[0][2] * ((ghd&1)?-1:1) ;
+        loc[1] += (ghd&1?-1:1)*Boundaries[0][5] ;
+        double additionaldelta = 0 ;
+        if (loc[1] > Boundaries[1][1]) {additionaldelta = -Boundaries[1][2] ;}
+        if (loc[1] < Boundaries[1][0]) {additionaldelta =  Boundaries[1][2] ;}
+        loc[1] += additionaldelta ;
+
+        gh>>=1 ; ghd>>=1 ;
+        for (int n=1 ; gh>0 ; gh>>=1, ghd>>=1, n++)
+            if (gh&1)
+                loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
+    }
+    for (int dd = 0 ; dd<d ; dd++) branch[dd] = X[i][dd]-loc[dd] ; //j->i
+    for (int dd = 0 ; dd<d ; dd++) loc[dd] = (X[i][dd]+loc[dd])/2. ; // This location is wrong for sphere with different radius. TODO
+    return {loc, branch} ; 
+ } ///< Compute the location & branch vector of the contact
 } ;
 
 // ------------------------------------ Contact List class ----------check_ghost_LE---------------------------------

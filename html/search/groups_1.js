@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['coarse_2dgraining_3362',['Coarse-graining',['../group__CoarseGraining.html',1,'']]]
+  ['coarse_2dgraining_3390',['Coarse-graining',['../group__CoarseGraining.html',1,'']]]
 ];

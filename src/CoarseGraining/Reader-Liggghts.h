@@ -73,7 +73,7 @@ public:
     LiggghtsReader_particles(std::string ppath) : LiggghtsReader(ppath) {}
     
     bool has_id_data = false ; 
-    double * get_data (DataValue datavalue, int dd) {
+    double * get_data (DataValue datavalue, int dd, std::string name="") {
         switch(datavalue) {
             case DataValue::radius : return &(data[0][0]) ;
             case DataValue::mass : return &(data[1][0] ) ;
@@ -83,7 +83,14 @@ public:
             case DataValue::vel : return &(data[6+dd][0] ) ;
             case DataValue::omega : return &(data[9+dd][0] ) ;
             
-            default : return (nullptr) ; 
+            case DataValue::extra_named: 
+            {
+                if (name=="type") return &(data[12][0]) ; 
+                else printf("Unknown extra: arbitrary liggghts extra fields are not implemented\n");
+                return nullptr ; 
+            } break ; 
+            
+            default : return nullptr ; 
         }
     } 
     
@@ -94,7 +101,7 @@ private:
 class LiggghtsReader_contacts : public LiggghtsReader {
 public:
     LiggghtsReader_contacts(std::string ppath, Reader *d, std::map <std::string, std::string> columnmap) : LiggghtsReader(ppath), dump(dynamic_cast<LiggghtsReader_particles*>(d)) {cfmapping=columnmap;} ; 
-    double * get_data (DataValue datavalue, int dd) {
+    double * get_data (DataValue datavalue, int dd, std::string name="") {
         switch(datavalue) {
             case DataValue::id1 : return &(data[0][0]) ;
             case DataValue::id2 : return &(data[1][0] ) ;

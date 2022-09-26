@@ -3,8 +3,15 @@
 #  add_compile_definitions(LEESEDWARD)
 #endif()
 
+option(SAVE_FORCE_COMPONENTS "Allow to dump the elastic/viscous/friction etc. part of the forces." OFF)
 set (max_dimension "3" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
 add_compile_definitions(MAXDIM=${max_dimension})
+
+if(SAVE_FORCE_COMPONENTS)
+  add_definitions(-DSAVE_FORCE_COMPONENTS=1)
+else ()
+  add_definitions(-DSAVE_FORCE_COMPONENTS=0)
+endif()
 
 add_executable(DEMND DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp)
 set_property(TARGET DEMND PROPERTY CXX_STANDARD 17)

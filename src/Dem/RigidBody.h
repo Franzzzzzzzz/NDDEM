@@ -6,8 +6,13 @@ template <int d>
 class RigidBody 
 {
 public:
-  RigidBody() {com=std::vector<double>(d) ; F=std::vector<double>(d,0) ;}
-  RigidBody(std::vector<int> iid, cv2d & X, cv1d & m) 
+  RigidBody() {com=std::vector<double>(d) ; F=std::vector<double>(d,0) ; 
+    setvel=std::vector<double>(d,std::numeric_limits<double>::quiet_NaN()) ; 
+    addforce=std::vector<double>(d,0.) ;
+    cancelgravity=false ; 
+  }
+    
+  double setparticles(std::vector<int> iid, cv2d & X, cv1d & m) 
   {
     com=std::vector<double>(d,0) ;
     F=std::vector<double>(d,0) ;
@@ -22,15 +27,16 @@ public:
       mass += m[i] ; 
     }
     for (auto & v:com) v/=mass ; 
+  
+    return mass ; 
   }
   
   //variables
   std::vector<int> ids ; 
-  v1d F ; 
-  v1d com ; 
+  v1d F, com ;
+  v1d setvel, addforce ; 
   double mass ; 
-  
-  
+  bool cancelgravity ; 
 } ;
 
 template <int d>
@@ -39,9 +45,7 @@ class RigidBodies_
 public :
 
   std::vector<RigidBody<d>> RB ; 
-  
-  int add_body (std::vector<int> v, cv2d &X, cv1d &m) {RB.push_back(RigidBody<d>(v,X,m)); return 0;}
-  
+    
   int allocate (std::vector<std::optional<int>> & RigidBodyId)
   {
     for (size_t i=0 ; i<RB.size() ; i++)
@@ -56,7 +60,7 @@ public :
     return 0;
   }
   
-  int process_forces (std::vector < std::vector <double> > & F, std::vector < std::vector <double> > & Torque, cv1d m)
+  int process_forces ( std::vector <std::vector<double> > &V, std::vector < std::vector <double> > & F, std::vector < std::vector <double> > & Torque, cv1d & m, cv1d & g)
   {
     for (auto & v: RB)
     {
@@ -64,17 +68,20 @@ public :
       
       for (auto &id : v.ids) v.F += F[id] ;
       for (auto &id : v.ids)
-      { 
+      {
         for (int dd=0 ; dd<d ; dd++)
-          F[id][dd]=v.F[dd]/v.mass*m[id] ; 
+          F[id][dd]=v.addforce[dd] + v.F[dd]/v.mass*m[id] - g[dd]*(v.cancelgravity?1:0)*m[id] ; 
         Tools<d>::setzero(Torque[id]) ;  
+        for (int dd = 0 ; dd<d ; dd++)
+          if (!isnan(v.setvel[dd]))
+          {
+            F[id][dd]=0 ; 
+            V[id][dd]=v.setvel[dd] ; 
+          }
       }
     }
     return 0; 
   }
-  
-  
-  
 };
 
 

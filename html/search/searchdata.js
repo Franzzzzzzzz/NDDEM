@@ -12,7 +12,7 @@ var indexSectionsWithContent =
   9: ":bdosw",
   10: "bcijmn",
   11: "acdt",
-  12: "dt"
+  12: "dlt"
 };
 
 var indexSectionNames =

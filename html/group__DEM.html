@@ -237,7 +237,8 @@ Enumerations</h2></td></tr>
 <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a358a8122c131a31f53a9c9f0764eed40">fpq</a>, 
 <br />
 &#160;&#160;<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ab0a392357627d51f026019e16d330bdc">mpq</a>, 
-<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a9631a356d997e13176cc79bcab7603a4">mqp</a>
+<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a9631a356d997e13176cc79bcab7603a4">mqp</a>, 
+<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ac7716e6100d84eadd845a00f0f2924f3">extra_named</a>
 <br />
  }</td></tr>
 <tr class="separator:ga52b72596f946f6e47a9c5c9079071431"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -357,6 +358,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">Multiproc&lt; d &gt;::load_balance</a> ()</td></tr>
 <tr class="memdesc:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">More...</a><br /></td></tr>
 <tr class="separator:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga916e0a8d484feb9bf760575059ac0add"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">Multiproc&lt; d &gt;::contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="el" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</td></tr>
+<tr class="memdesc:ga916e0a8d484feb9bf760575059ac0add"><td class="mdescLeft">&#160;</td><td class="mdescRight">pack the contact data in a 2d array  <a href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">More...</a><br /></td></tr>
+<tr class="separator:ga916e0a8d484feb9bf760575059ac0add"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -852,6 +856,7 @@ Saving and writing functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ga52b72596f946f6e47a9c5c9079071431a358a8122c131a31f53a9c9f0764eed40"></a>fpq&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ga52b72596f946f6e47a9c5c9079071431ab0a392357627d51f026019e16d330bdc"></a>mpq&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ga52b72596f946f6e47a9c5c9079071431a9631a356d997e13176cc79bcab7603a4"></a>mqp&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ga52b72596f946f6e47a9c5c9079071431ac7716e6100d84eadd845a00f0f2924f3"></a>extra_named&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -1260,6 +1265,44 @@ template&lt;int d&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga916e0a8d484feb9bf760575059ac0add"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga916e0a8d484feb9bf760575059ac0add">&#9670;&nbsp;</a></span>contacts2array()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt; vector&lt; double &gt; &gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::contacts2array </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td>
+          <td class="paramname"><em>exp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;&#160;</td>
+          <td class="paramname"><em>X</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;&#160;</td>
+          <td class="paramname"><em>Boundaries</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>pack the contact data in a 2d array </p>
 
 </div>
 </div>

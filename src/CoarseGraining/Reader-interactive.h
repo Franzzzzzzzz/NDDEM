@@ -20,7 +20,7 @@ public:
         for (int i=12 ; i<29 ; i++) data[i].resize(Nc) ; 
     }
     
-    double * get_data(DataValue datavalue, int dd) 
+    double * get_data(DataValue datavalue, int dd, std::string name="") 
     {
      switch (datavalue)
      {

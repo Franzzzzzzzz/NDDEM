@@ -46,6 +46,8 @@ public:
     string name  ;
     TensorOrder order ;
     FieldType type ;
+    std::optional<std::string> mapping ; 
+    int datalocation ; 
   } ;
   vector<ExtaField> extrafields ;
 
@@ -57,7 +59,7 @@ public:
   int set_data (Data & cgdata) ;
   int get_num_particles () ;
   int get_num_contacts () ;
-  double * get_data(DataValue datavalue, int dd=0) ;
+  double * get_data(DataValue datavalue, int dd=0, std::string name="") ;
   void post_init () ;
 
 
@@ -190,49 +192,6 @@ void Param::post_init()
 int Param::identify_max_level()
 {
     printf("THIS FUNCTION HAS BEEN REMOVED (identify_max_level)\n") ;
-/*    if (!hascontactdata && (
-        std::find(flags.begin(), flags.end(), "TC") != flags.end() ||
-        std::find(flags.begin(), flags.end(), "MC") != flags.end() ||
-        std::find(flags.begin(), flags.end(), "mC") != flags.end() ||
-        std::find(flags.begin(), flags.end(), "qTC") != flags.end() ||
-        std::find(flags.begin(), flags.end(), "qRC") != flags.end()
-    ))
-    { printf("Contact force informations are required for one or more of the fields you requested\n") ; std::exit(3) ; }
-
-    if (std::find(flags.begin(), flags.end(), "RHO"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "VAVG" ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "ROT"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "EKT"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "EKR"  ) != flags.end())
-    maxlevel=1 ;
-
-    if (std::find(flags.begin(), flags.end(), "TK"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "MK"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "eKT"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "eKR"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "qTK"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "qRK"  ) != flags.end())
-    maxlevel = 2 ;
-
-    if (std::find(flags.begin(), flags.end(), "TC"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "MC"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "mC"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "qTC"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "qRC"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "zT"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "zR"   ) != flags.end())
-    maxlevel = 3 ;
-
-    if (std::find(flags.begin(), flags.end(), "TotalStress"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "Pressure"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "KineticPressure"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "ShearStress"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "StrainRate"  ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "VolumetricStrainRate"   ) != flags.end() ||
-        std::find(flags.begin(), flags.end(), "ShearStrainRate"   ) != flags.end())
-    maxlevel = 4 ;
-
-    return maxlevel ; */
 return -1 ;
 }
 //----------------------------------------------------------
@@ -261,6 +220,8 @@ void Param::process_extrafields (json &j)
         else if (v["type"]=="Fluctuation") typ = FieldType::Fluctuation ;
         else printf("ERR: unknown extrafields type\n") ;
         extrafields.push_back({.name=v["name"], .order=static_cast<TensorOrder>(v["tensor order"]), .type=typ}) ;
+        auto w = v.find("mapping") ;
+        if (w != v.end()) {extrafields.back().mapping=v["mapping"];}
     }
 }
 //---------------------------------------------------------
@@ -382,12 +343,34 @@ int Param::set_data(struct Data & D)
         D.mqp[dd]   = get_data(DataValue::mqp, dd) ;
     }
 
-    /*for (auto &v: extrafieldmap) //TODO
+    if (D.extra.size() == 0) // let's do the mapping of data ...
     {
-      if (D.extra.size() < v.second+1)
-        D.extra.resize(v.second+1) ;
-      D.extra[v.second] = &(data[12][0]) ;
-    }*/
+        for (auto &v: extrafields)
+        {
+            int ncomponents ; 
+            switch (v.order) {
+                case TensorOrder::SCALAR: ncomponents=1 ; break ; 
+                case TensorOrder::VECTOR: ncomponents=dim ; break ; 
+                case TensorOrder::TENSOR: ncomponents=dim*dim ; break ; 
+                default: printf("Unknown tensor order for extrafield") ; 
+            }
+            v.datalocation = D.extra.size() ; 
+            D.extra.resize(D.extra.size()+ncomponents) ; 
+        }
+    }
+    
+    for (auto &v: extrafields)
+    {
+        int ncomponents ; 
+        switch (v.order) {
+                case TensorOrder::SCALAR: ncomponents=1 ; break ; 
+                case TensorOrder::VECTOR: ncomponents=dim ; break ; 
+                case TensorOrder::TENSOR: ncomponents=dim*dim ; break ; 
+                default: printf("Unknown tensor order for extrafield") ; 
+            }
+        for (int dd=0 ; dd<ncomponents ; dd++)
+            D.extra[v.datalocation+dd] = get_data(DataValue::extra_named, dd, v.mapping.has_value()?v.mapping.value():v.name) ; 
+    }
 
 return 0 ;
 }
@@ -406,12 +389,12 @@ int Param::get_num_contacts ()
             return v.reader->get_num_contacts() ;
     return -1 ;
 }
-double * Param::get_data(DataValue datavalue, int dd)
+double * Param::get_data(DataValue datavalue, int dd, std::string name)
 {
     double * res ;
     for (auto &v: files)
     {
-        res = v.reader->get_data(datavalue, dd) ;
+        res = v.reader->get_data(datavalue, dd, name) ;
         if (res != nullptr)
             return res;
     }

@@ -49,9 +49,14 @@ return 0 ;
 int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 {
   uint64_t tmp = FIELDS.back().flag<<1 ;
-  if (order!=TensorOrder::SCALAR || type !=FieldType::Particle)
-    printf("WARN only TensorOrder::SCALAR and FieldType::Particle is currently supported for coarse-graining\n") ;
-  FIELDS.push_back({tmp, name, order, type, Pass::Pass1});
+  
+  switch(type) {
+    case FieldType::Particle : FIELDS.push_back({tmp, name, order, type, Pass::Pass1}); break ;
+    case FieldType::Fluctuation : FIELDS.push_back({tmp, name, order, type, Pass::Pass2}); break ;
+    case FieldType::Contact : FIELDS.push_back({tmp, name, order, type, Pass::Pass3}); break ;
+    default: printf("Unknown extra field type, skipping\n") ;
+  }
+
   return tmp;
 }
 
@@ -107,8 +112,7 @@ int Coarsing::grid_generate()
         //printf("%g %g %g|", box[0][i], box[1][i], dx[i]) ;
     }
 
-    /*for (auto v : nptcum)
-        printf("-%d-", v) ;
+    /*for (auto v : nptcum) printf("-%d-", v) ;
     printf("\n") ; fflush(stdout) ; */
     for (i=0,check=0 ; i<Npt ; i++)
     {
@@ -498,15 +502,19 @@ int velid=get_id("VAVG"); if (velid<0)  dovel=false ;    if (dovel   && !data.ch
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ; if (doomega && !data.check_field_availability("ROT")) {printf("Data missing for ROT\n") ; doomega=false ; }
 int radiusid = get_id("RADIUS") ; if (radiusid<0) doradius=false ; if (doradius && !data.check_field_availability("RADIUS")) {printf("Data missing for RADIUS\n") ; doradius=false ; }
 
-vector<int> extraid ;
+vector<int> extraid, extrancomp, extralocation ;
 for (auto &v: FIELDS)
 {
-  if (v.ftype == FieldType::Particle)
-  {
-    extraid.push_back(get_id(v.name)) ;
-    if (extraid.back()<0)
-      extraid.pop_back() ;
+  if (v.ftype == FieldType::Defined) continue ; 
+  extraid.push_back(get_id(v.name)) ; 
+  if (extraid.back()<0) {extraid.pop_back() ; continue ; } // Not found
+  switch(v.type) {
+    case TensorOrder::SCALAR: extrancomp.push_back(1) ; break ;
+    case TensorOrder::VECTOR: extrancomp.push_back(d) ; break ;
+    case TensorOrder::TENSOR: extrancomp.push_back(d*d) ; break ;
+    default : extraid.pop_back() ; continue ; 
   }
+  extralocation.push_back(v.datalocation) ; 
 }
 bool doextra = (extraid.size()>0)?true:false ;
 
@@ -546,8 +554,13 @@ for (i=0 ; i<data.N ; i++)
      if (doradius)
        CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
      if (doextra)
-       for (auto v: extraid)
-          *(CGf+v) += wp * dm * data.extra[v][i] ;
+       for (size_t v = 0 ; v<extraid.size() ; v++)
+         for (size_t w = 0 ; w<extrancomp[v] ; w++)
+         {
+           printf("A %d %d", extraid.size(), extrancomp[v]) ; fflush(stdout) ; 
+           *(CGf+extraid[v]+w) += wp * dm * data.extra[extralocation[v]+w][i] ;
+           printf("B") ; fflush(stdout) ; 
+         }
  }
 
 }
@@ -583,8 +596,9 @@ for (i=0 ; i<Npt ; i++)
     }
     if (doradius && rho!=0) {CGP[i].fields[cT][radiusid] /= rho ; }
     if (doextra && rho!=0)
-      for (auto v:extraid)
-        CGP[i].fields[cT][v] /= rho ;
+       for (size_t v = 0 ; v<extraid.size() ; v++)
+         for (size_t w = 0 ; w<extrancomp[v] ; w++)
+            CGP[i].fields[cT][extraid[v]+w] /= rho ;
 }
 return 0 ;
 }

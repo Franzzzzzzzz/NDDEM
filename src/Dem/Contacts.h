@@ -116,7 +116,7 @@ public:
             loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
     }///< Move ghosts through the regular periodic boundary conditions (non Lees-Edward).
-
+    
     Action Act ; ///< Resulting Action
 
 private:
@@ -196,19 +196,15 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   }
 
   //Normal force
-  Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
+  Fn=cn*(ovlp*kn) - vn*gamman ;
+  if constexpr (SAVE_FORCE_COMPONENTS)
+  {
+    Act.Fn_el = cn*(ovlp*kn) ; 
+    Act.Fn_visc = - vn*gamman ; 
+  }
+  
 
   //Tangential force computation: retrieve contact or create new contact
-  /*if (ContactCalc == BOTH || ContactCalc == FORWARD)
-  {
-    tspr=Contact.tspr_fwd ;
-    if (tspr.size()==0) tspr.resize(d,0) ;
-  }
-  else
-  {
-    tspr=Contact.tspr_rev ;
-    if (tspr.size()==0) tspr.resize(d,0) ;
-  }*/
   tspr=Contact.tspr ;
   if (tspr.size()==0) tspr.resize(d,0) ;
 
@@ -228,28 +224,17 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
     }
     else
       Tools<d>::setzero(Ft) ;
+    
+    if constexpr (SAVE_FORCE_COMPONENTS) {Act.Ft_fric = Ft ; Act.Ft_isfric=true ; } 
   }
   else
-      Tools<d>::vSubScaled(Ft, gammat, vt) ; //Ft -= (vt*Gammat) ;
-
+  {
+    if constexpr (SAVE_FORCE_COMPONENTS) {Act.Ft_el = Ft ; Act.Ft_visc=-vt*gammat ; Act.Ft_isfric=false ; }
+    Tools<d>::vSubScaled(Ft, gammat, vt) ; //Ft -= (vt*Gammat) ;
+  }
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
   Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ; //TODO check the minus sign
 
-  //Update contact history
-  //History[make_pair(i,j)]=make_pair (true, tspr) ;
-  /*switch (ContactCalc) {
-      case BOTH :
-          Contact.tspr_rev = -tspr ;
-          Act.set_rev(-Fn, -Ft, Torquej) ; //Fallthrough
-      case FORWARD:
-          Contact.tspr_fwd = tspr ;
-          Act.set_fwd(Fn, Ft, Torquei) ;
-          break ;
-      case REVERSE:
-          Contact.tspr_rev = tspr ;
-          Act.set_rev(Fn, Ft, Torquej) ;
-          break ;
-  } */
   Contact.tspr=tspr ;
   //Act.set_rev(-Fn, -Ft, Torquej) ;
   //Act.set_fwd(Fn, Ft, Torquei) ;

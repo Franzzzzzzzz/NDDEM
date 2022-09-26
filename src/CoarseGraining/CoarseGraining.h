@@ -6,6 +6,7 @@
 #include <string>
 #include <math.h>
 #include <sstream>
+#include <optional>
 
 #ifdef EMSCRIPTEN
     #include <emscripten.h>

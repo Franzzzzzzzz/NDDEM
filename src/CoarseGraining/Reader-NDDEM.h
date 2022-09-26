@@ -30,7 +30,7 @@ public:
     int get_numts() {return build_index() ; }
 
     int read_timestep (int ts)  ;
-    double * get_data(DataValue datavalue, int dd) ;
+    double * get_data(DataValue datavalue, int dd, std::string name="") ;
     int get_num_particles () {return Nparticles;}
     int get_num_contacts () {return Ncontacts;}
 
@@ -89,7 +89,7 @@ int NDDEMReader::read_timestep (int ts)
     return 0 ;
 }
 //------------------------------------------------------------------------
- double * NDDEMReader::get_data(DataValue datavalue, int dd)
+ double * NDDEMReader::get_data(DataValue datavalue, int dd, std::string name)
 {
     int delta ;
     switch (datavalue)

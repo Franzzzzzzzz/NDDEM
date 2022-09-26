@@ -219,34 +219,10 @@ public :
 
              if (outflags & ExportData::BRANCHVECTOR)
              {
-                 vector <double> loc (d, 0) ;
-                if ( Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (contact.ghost & 1)==0)
-                {
-                    loc=X[contact.j] ;
-                    uint32_t gh=contact.ghost, ghd=contact.ghostdir ;
-                    for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
-                        if (gh&1)
-                            loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
-                }
-                else
-                {
-                    uint32_t gh=contact.ghost, ghd=contact.ghostdir ; // Handle pbc in first dim
-                    loc=X[contact.j] ;
-                    loc[0] += Boundaries[0][2] * ((ghd&1)?-1:1) ;
-                    loc[1] += (ghd&1?-1:1)*Boundaries[0][5] ;
-                    double additionaldelta = 0 ;
-                    if (loc[1] > Boundaries[1][1]) {additionaldelta = -Boundaries[1][2] ;}
-                    if (loc[1] < Boundaries[1][0]) {additionaldelta =  Boundaries[1][2] ;}
-                    loc[1] += additionaldelta ;
-
-                    gh>>=1 ; ghd>>=1 ;
-                    for (int n=1 ; gh>0 ; gh>>=1, ghd>>=1, n++)
-                        if (gh&1)
-                            loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
-                }
-                for (int dd = 0 ; dd<d ; dd++)
-                    fprintf(out, "%g ", X[contact.i][dd]-loc[dd]) ;
-            }
+                auto [loc,branch] = contact.compute_branchvector(X,Boundaries, d) ; 
+               
+                for (int dd = 0 ; dd<d ; dd++) fprintf(out, "%g ", branch[dd]) ;
+             }
          fprintf(out, "\n") ;
          }
      }
@@ -268,6 +244,17 @@ public :
  *                                                                                                   *
  *                                                                                                   *
  * ***************************************************************************************************/
+double nan_or_double (istream & in)
+{
+  char c; std::string word ; 
+  if (!in.good()) return std::numeric_limits<double>::quiet_NaN();
+  while (isspace(c = in.peek())) in.get();
+  if ( !isdigit(c) && c!='-' && c!='.') { in >> word ; return std::numeric_limits<double>::quiet_NaN(); }
+  double x ; 
+  in >> x;
+  return x ; 
+}
+
 
 /// Some Infos on set_boundaries
 template <int d>
@@ -555,7 +542,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["set"] = setvalue ;
  Lvl0["auto"] = doauto ;
 
- Lvl0["directory"] = [&](){in>>Directory ; if (! std::filesystem::exists(Directory)) std::filesystem::create_directory(Directory);};
+ Lvl0["directory"] = [&](){in>>Directory ; if (! std::filesystem::exists(Directory)) std::filesystem::create_directory(Directory); };
  Lvl0["dimensions"] = [&](){int nn; int dd ; in>>dd>>nn ; if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }} ;
  Lvl0["location"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} printf("[INFO] Changing particle location.\n") ; } ;
  Lvl0["velocity"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> V[id][i] ;} printf("[INFO] Changing particle velocity.\n") ; } ;
@@ -615,15 +602,39 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
    };
  Lvl0["rigid"] = [&] () 
  {
-   size_t id ; in >> id ;
-   std::vector<int> ids ; 
-   int tmp ; 
-   for (size_t i=0 ; i<id ; i++)
+   size_t id, npart ; in >> id ;
+   if (RigidBodies.RB.size()<id+1) RigidBodies.RB.resize(id+1) ; 
+   string s ; in>>s ; 
+   
+   if (s=="set")
    {
-     in >> tmp ; 
-     ids.push_back(tmp) ; 
+      in >> npart ; 
+      std::vector<int> ids ; int tmp ; 
+      for (size_t i=0 ; i<npart ; i++)
+      {
+        in >> tmp ; 
+        ids.push_back(tmp) ; 
+      }
+      RigidBodies.RB[id].setparticles(ids, X, m) ; 
    }
-   RigidBodies.add_body(ids,X,m) ; 
+   else if (s=="gravity")
+   {
+     in >> s ;
+     if (s=="on") RigidBodies.RB[id].cancelgravity = false ; 
+     else if (s=="off") RigidBodies.RB[id].cancelgravity = true ;
+   }
+   else if (s=="addforce")
+   {
+     for (int dd=0 ; dd<d ; dd++)
+       in >> RigidBodies.RB[id].addforce[dd] ; //= nan_or_double(in) ; 
+   }
+   else if (s=="velocity")
+   {
+     for (int dd=0 ; dd<d ; dd++)
+       RigidBodies.RB[id].setvel[dd] = nan_or_double(in) ;
+     printf("%g %g\n", RigidBodies.RB[0].setvel[0], RigidBodies.RB[0].setvel[1]) ; 
+   }
+   
    printf("[INFO] Defining a rigid body.\n") ;
  };
 
@@ -635,8 +646,6 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  catch (const std::out_of_range & e) { printf("LVL0 command unknown: %s\n", line.c_str()) ; discard_line() ; }
 
 }
-
-
 //================================================================================================================================================
 
 //=====================================
@@ -1004,6 +1013,18 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
           printf("Omega Mag not implemented yet\n");
       if (v.second & ExportData::ORIENTATION) xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::ascii);
       if (v.second & ExportData::COORDINATION) xmlout->writeArray("Coordination", &Z, ArrayType::particles, EncodingType::ascii);
+      
+      if (v.second & ExportData::IDS) 
+      { 
+        auto tmp = MP.contacts2array(ExportData::IDS, X, Boundaries) ; 
+        xmlout->writeArray("ContactIds", &tmp, ArrayType::contacts, EncodingType::ascii) ;
+      }
+//         case ExportData::POSITION: res.push_back(loc) ; break ; 
+//         case ExportData::FN: res.push_back(contact.infos->Fn) ; break ;
+//         case ExportData::FT: res.push_back(contact.infos->Ft) ; break ;
+//         case ExportData::GHOSTMASK: res.push_back(contact.infos->ghost) ; break ;
+//         case ExportData::GHOSTDIR : res.push_back(contact.infos->ghostdir) ; break ;
+//         case ExportData::BRANCHVECTOR: res.push_back(branch) ; break ;
       xmlout->stopTS();
     }
 

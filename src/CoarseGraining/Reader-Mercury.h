@@ -11,7 +11,7 @@
 class MercuryReader : public Reader {
 public :
     int get_dimension() {return dimension;}
-    virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd) {return nullptr ; } 
+    virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd, [[maybe_unused]] std::string name="") {return nullptr ; } 
     
     std::string path ;
     int dimension=3 ; 
@@ -34,7 +34,7 @@ public:
     int get_numts() {return numts; }
     int get_num_particles () {return N;}
     
-    double * get_data(DataValue datavalue, int dd) 
+    double * get_data(DataValue datavalue, int dd, std::string name="" ) 
     { 
         switch(datavalue) {
             case DataValue::pos : return &(data[0+dd][0] ) ;
@@ -73,7 +73,7 @@ public:
     int get_num_particles () {return N;}
     int read_timestep (int ts) ;
     
-    double * get_data(DataValue datavalue, int dd) 
+    double * get_data(DataValue datavalue, int dd, std::string name="") 
     {
         switch(datavalue) {
             case DataValue::pos :    return &(data[0+dd][0] ) ;
