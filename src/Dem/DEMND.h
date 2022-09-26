@@ -474,7 +474,7 @@ public:
         //---------- Velocity Verlet step 3 : compute the new velocities
         // Benchmark::start_clock("Verlet last");
         
-        P.RigidBodies.process_forces(F, Torque, P.m) ;
+        P.RigidBodies.process_forces(V, F, Torque, P.m, P.g) ;
         
         
         #pragma omp parallel for default(none) shared(N) shared(P) shared(V) shared(Omega) shared(F) shared(FOld) shared(Torque) shared(TorqueOld) shared(dt)

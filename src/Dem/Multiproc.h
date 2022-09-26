@@ -66,6 +66,8 @@ public:
   vector <vector <int> > delayedwallj ; ///< Records the j id of the wall in the associated delayed action
   vector <uint> delayedwall_size ; ///< Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()
 
+  vector<vector<double>> contacts2array (ExportData exp, cv2d &X, cv2d &Boundaries) ; ///< pack the contact data in a 2d array
+  
   int P ; ///< Number of threads
 
 private:
@@ -258,6 +260,30 @@ void Multiproc<d>::load_balance()
 
   for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
   printf("\n") ; fflush(stdout) ;
+}
+//--------------------------------------------------------------------------------
+template <int d>
+vector<vector<double>> Multiproc<d>::contacts2array (ExportData exp, cv2d &X, cv2d &Boundaries)
+{
+  vector<vector<double>> res ; 
+  for (auto & clp : CLp)
+  {
+    for (auto & contact : clp.v)
+    {
+      auto [loc,branch] = contact.compute_branchvector(X,Boundaries,d) ; 
+      switch (exp) {
+        case ExportData::IDS: res.push_back({static_cast<double>(contact.i), static_cast<double>(contact.j)}) ; break ; 
+        case ExportData::POSITION: res.push_back(loc) ; break ; 
+        case ExportData::FN: res.push_back(contact.infos->Fn) ; break ;
+        case ExportData::FT: res.push_back(contact.infos->Ft) ; break ;
+        case ExportData::GHOSTMASK: res.push_back({static_cast<double>(contact.ghost)}) ; break ;
+        case ExportData::GHOSTDIR : res.push_back({static_cast<double>(contact.ghostdir)}) ; break ;
+        case ExportData::BRANCHVECTOR: res.push_back(branch) ; break ;
+        default: break ; 
+      }
+    }
+  }
+  return res ; 
 }
 #endif
 

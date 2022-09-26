@@ -16,10 +16,14 @@ boundary 1 PBC  0 5
 
 auto location randomdrop
 
-location 0 5 1
-location 1 5.5 1.5
-location 2 6 2
-rigid 3 0 1 2
+location 0 19.5 0.5
+location 1 19.5 1.5
+location 2 19.5 2.5
+location 3 19.5 3.5
+location 4 19.5 4.5
+rigid 0 set 5 0 1 2 3 4
+rigid 0 force -1 0
+rigid 0 velocity NAN 0
 
 gravity -1 0
 set Kn 2e5
@@ -35,5 +39,6 @@ set dt 0.0001
 #set dumps CSV with 1 Orientation
 set dumps VTK with 3 Ids Velocity Coordination
 set tdump 1000
-event 20 gravity -0.9 0.42
+#event 20 gravity -0.9 0.42
+#event 20 rigid 0 velocity nan 1
 EOF

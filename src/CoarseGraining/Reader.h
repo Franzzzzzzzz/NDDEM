@@ -13,7 +13,7 @@ public:
     virtual int get_numts() {return -1; }
     virtual int get_num_particles () {return -1;}
     virtual int get_num_contacts () {return -1;}
-    virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd) {return nullptr ; }
+    virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd, [[maybe_unused]] std::string name="") {return nullptr ; }
     virtual int build_index () {return -1 ;}
     virtual int read_timestep ([[maybe_unused]] int ts) {return -1 ; }
     virtual void post_init() {}

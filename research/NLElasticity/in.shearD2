@@ -1,0 +1,74 @@
+# Incline plane flow
+directory ShearD2
+#directory OutputTest
+dimensions 2 150
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 20
+boundary 1 PBC  0 10
+#boundary 2 PBC  0 3.4
+#boundary 3 PBC  0 3.4
+
+auto location randomdrop
+
+location  0 0  0 
+location  1 0  1 
+location  2 0  2 
+location  3 0  3 
+location  4 0  4
+location  5 0  5
+location  6 0  6
+location  7 0  7
+location  8 0  8
+location  9 0  9
+
+location 10 1  0 
+location 11 1  2 
+location 12 1  4
+location 13 1  6
+location 14 1  8
+
+location 15 20  0 
+location 16 20  1 
+location 17 20  2 
+location 18 20  3 
+location 19 20  4
+location 20 20  5
+location 21 20  6
+location 22 20  7
+location 23 20  8
+location 24 20  9
+
+location 25 19  0 
+location 26 19  2 
+location 27 19  4
+location 28 19  6
+location 29 19  8
+
+rigid 0 set 15  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+rigid 1 set 15 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+
+gravity -1 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 500
+set dt 0.0001
+#set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 1 Orientation
+set dumps VTK with 2 Velocity Coordination
+set tdump 10000
+#event 20 gravity -0.9 0.42
+event 20 rigid 1 velocity nan 0.1
+event 20 rigid 1 gravity off
+event 20 rigid 1 addforce -5 0
+EOF
