@@ -893,7 +893,6 @@ for (int i=0 ; i< Npt ; i++)
         CGP[i].fields[cT][Gamvdotid] = 0;
         for (int dd=0 ; dd<d ; dd++)
             CGP[i].fields[cT][Gamvdotid] += gradient[dd*d+dd] ;
-        CGP[i].fields[cT][Gamvdotid] *= (1./d) ;
      }
 
      if (doGamtau)
@@ -901,7 +900,6 @@ for (int i=0 ; i< Npt ; i++)
         double volumetric = 0;
         for (int dd=0 ; dd<d ; dd++)
             volumetric += gradient[dd*d+dd] ;
-        volumetric *= (1./d) ;
 
         CGP[i].fields[cT][Gamtauid] = 0 ;
         for (int dd=0 ; dd<d*d ; dd++)
