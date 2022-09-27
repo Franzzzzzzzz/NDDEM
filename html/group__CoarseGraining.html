@@ -144,6 +144,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga7e13704b1ecd8ad2ccc1199c024a6896"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaeaf68bc31ba9bc4c15dd019a43396181"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaeaf68bc31ba9bc4c15dd019a43396181">Data::check_field_availability</a> (string name)</td></tr>
 <tr class="separator:gaeaf68bc31ba9bc4c15dd019a43396181"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac20968d4814afc10eac54ba0d17b59a0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gac20968d4814afc10eac54ba0d17b59a0">Data::add_extra_field</a> (int length, std::string name)</td></tr>
+<tr class="separator:gac20968d4814afc10eac54ba0d17b59a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga53b1361a8c1e7001196d948f1b6a8e0f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga53b1361a8c1e7001196d948f1b6a8e0f">Coarsing::Coarsing</a> (int dd, <a class="el" href="group__DEM.html#ga424e234580ccf8a9e5e208704f5a6d78">v1i</a> nnpt, <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> bbox, int T)</td></tr>
 <tr class="separator:ga53b1361a8c1e7001196d948f1b6a8e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga91aa87766ed2287e5e53efe063c6c4b8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga91aa87766ed2287e5e53efe063c6c4b8">Coarsing::~Coarsing</a> ()</td></tr>
@@ -290,6 +292,9 @@ Variables</h2></td></tr>
 <tr class="memitem:ga37867e99d192fad94ff9a348b3812ad2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__CoarseGraining.html#gabe77423eb27f643233ef051559a64882">Pass</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga37867e99d192fad94ff9a348b3812ad2">Field::passlevel</a></td></tr>
 <tr class="memdesc:ga37867e99d192fad94ff9a348b3812ad2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identify at which moment the field gets calculated.  <a href="group__CoarseGraining.html#ga37867e99d192fad94ff9a348b3812ad2">More...</a><br /></td></tr>
 <tr class="separator:ga37867e99d192fad94ff9a348b3812ad2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaae1d3812daf05e9a5848fa20e02535c5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaae1d3812daf05e9a5848fa20e02535c5">Field::datalocation</a> = -1</td></tr>
+<tr class="memdesc:gaae1d3812daf05e9a5848fa20e02535c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">For extra fields, identify the location in the vector of extra data.  <a href="group__CoarseGraining.html#gaae1d3812daf05e9a5848fa20e02535c5">More...</a><br /></td></tr>
+<tr class="separator:gaae1d3812daf05e9a5848fa20e02535c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3be03de44986fc55905076acc5cdae2e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga3be03de44986fc55905076acc5cdae2e">Data::N</a> = 0</td></tr>
 <tr class="memdesc:ga3be03de44986fc55905076acc5cdae2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of particles.  <a href="group__CoarseGraining.html#ga3be03de44986fc55905076acc5cdae2e">More...</a><br /></td></tr>
 <tr class="separator:ga3be03de44986fc55905076acc5cdae2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -341,8 +346,10 @@ Variables</h2></td></tr>
 <tr class="memitem:gab25c53d90730b3488150cad41641c5d6"><td class="memItemLeft" align="right" valign="top">vector&lt; double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gab25c53d90730b3488150cad41641c5d6">Data::mqp</a></td></tr>
 <tr class="memdesc:gab25c53d90730b3488150cad41641c5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moment of particle 2 on 1.  <a href="group__CoarseGraining.html#gab25c53d90730b3488150cad41641c5d6">More...</a><br /></td></tr>
 <tr class="separator:gab25c53d90730b3488150cad41641c5d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab1c3d84b04699e030de2a111fb49f0e5"><td class="memItemLeft" align="right" valign="top">vector&lt; double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gab1c3d84b04699e030de2a111fb49f0e5">Data::extra</a></td></tr>
-<tr class="separator:gab1c3d84b04699e030de2a111fb49f0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7eec1fdf65eb263e154dcf601b97b65f"><td class="memItemLeft" align="right" valign="top">vector&lt; double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga7eec1fdf65eb263e154dcf601b97b65f">Data::extra</a></td></tr>
+<tr class="separator:ga7eec1fdf65eb263e154dcf601b97b65f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9f4c09259aa33bb42d9eadf687006797"><td class="memItemLeft" align="right" valign="top">vector&lt; std::tuple&lt; std::string, int, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga9f4c09259aa33bb42d9eadf687006797">Data::extrafields</a></td></tr>
+<tr class="separator:ga9f4c09259aa33bb42d9eadf687006797"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9df18dfe978391787833e3f9a4830785"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga9df18dfe978391787833e3f9a4830785">Data::Nnonper</a> =-1</td></tr>
 <tr class="memdesc:ga9df18dfe978391787833e3f9a4830785"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used if additional particles are added as images through the periodic boundary conditions.  <a href="group__CoarseGraining.html#ga9df18dfe978391787833e3f9a4830785">More...</a><br /></td></tr>
 <tr class="separator:ga9df18dfe978391787833e3f9a4830785"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -517,8 +524,44 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="gac20968d4814afc10eac54ba0d17b59a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac20968d4814afc10eac54ba0d17b59a0">&#9670;&nbsp;</a></span>add_extra_field() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Data::add_extra_field </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ga1607b8efc6c6ed9b9930d5cbf3396c51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1607b8efc6c6ed9b9930d5cbf3396c51">&#9670;&nbsp;</a></span>add_extra_field()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1607b8efc6c6ed9b9930d5cbf3396c51">&#9670;&nbsp;</a></span>add_extra_field() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1916,6 +1959,22 @@ template&lt;Windows W&gt; </div>
 
 </div>
 </div>
+<a id="gaae1d3812daf05e9a5848fa20e02535c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaae1d3812daf05e9a5848fa20e02535c5">&#9670;&nbsp;</a></span>datalocation</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Field::datalocation = -1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>For extra fields, identify the location in the vector of extra data. </p>
+
+</div>
+</div>
 <a id="gabf3938c073fe57b4515bd54897c77d69"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gabf3938c073fe57b4515bd54897c77d69">&#9670;&nbsp;</a></span>dx</h2>
 
@@ -1932,14 +1991,28 @@ template&lt;Windows W&gt; </div>
 
 </div>
 </div>
-<a id="gab1c3d84b04699e030de2a111fb49f0e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab1c3d84b04699e030de2a111fb49f0e5">&#9670;&nbsp;</a></span>extra</h2>
+<a id="ga7eec1fdf65eb263e154dcf601b97b65f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7eec1fdf65eb263e154dcf601b97b65f">&#9670;&nbsp;</a></span>extra</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">vector&lt;double *&gt; Data::extra</td>
+          <td class="memname">vector&lt;double*&gt; Data::extra</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga9f4c09259aa33bb42d9eadf687006797"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9f4c09259aa33bb42d9eadf687006797">&#9670;&nbsp;</a></span>extrafields</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;std::tuple&lt;std::string, int, int&gt; &gt; Data::extrafields</td>
         </tr>
       </table>
 </div><div class="memdoc">

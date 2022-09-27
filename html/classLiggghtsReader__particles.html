@@ -91,6 +91,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9f62ffc1221f3b5a7bc700c5adb9647e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ffed2ea42c69c7666a9bd6480107773"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLiggghtsReader__particles.html#a3ffed2ea42c69c7666a9bd6480107773">get_data</a> (<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431">DataValue</a> datavalue, int dd, std::string name=&quot;&quot;)</td></tr>
 <tr class="separator:a3ffed2ea42c69c7666a9bd6480107773"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac40a171ae6a4ee892c22deaa4713271f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLiggghtsReader__particles.html#ac40a171ae6a4ee892c22deaa4713271f">get_num_contacts</a> ()</td></tr>
+<tr class="separator:ac40a171ae6a4ee892c22deaa4713271f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classLiggghtsReader"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classLiggghtsReader')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classLiggghtsReader.html">LiggghtsReader</a></td></tr>
 <tr class="memitem:a52f0d952e0580f362aa846d47483bf4a inherit pub_methods_classLiggghtsReader"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLiggghtsReader.html#a52f0d952e0580f362aa846d47483bf4a">LiggghtsReader</a> (std::string ppath)</td></tr>
 <tr class="separator:a52f0d952e0580f362aa846d47483bf4a inherit pub_methods_classLiggghtsReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,8 +110,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad1d775f78e94b5befc021241b0f47215 inherit pub_methods_classLiggghtsReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaee490c7c2c2afd5b322d04bd2e1246 inherit pub_methods_classLiggghtsReader"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLiggghtsReader.html#aaaee490c7c2c2afd5b322d04bd2e1246">get_num_particles</a> ()</td></tr>
 <tr class="separator:aaaee490c7c2c2afd5b322d04bd2e1246 inherit pub_methods_classLiggghtsReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0911f87c4e4f23e3d5b8b8ad57057cfb inherit pub_methods_classLiggghtsReader"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLiggghtsReader.html#a0911f87c4e4f23e3d5b8b8ad57057cfb">get_num_contacts</a> ()</td></tr>
-<tr class="separator:a0911f87c4e4f23e3d5b8b8ad57057cfb inherit pub_methods_classLiggghtsReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classReader"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classReader')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classReader.html">Reader</a></td></tr>
 <tr class="memitem:adf3db4e92f60ec13062e0e30c7af3c76 inherit pub_methods_classReader"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#adf3db4e92f60ec13062e0e30c7af3c76">get_dimension</a> ()</td></tr>
 <tr class="separator:adf3db4e92f60ec13062e0e30c7af3c76 inherit pub_methods_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,10 +166,10 @@ Public Attributes</h2></td></tr>
 <tr class="inherit_header pub_attribs_classReader"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classReader')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classReader.html">Reader</a></td></tr>
 <tr class="memitem:a950f5832bcdde86759f55319da4a2a30 inherit pub_attribs_classReader"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a950f5832bcdde86759f55319da4a2a30">is_seekable</a> = false</td></tr>
 <tr class="separator:a950f5832bcdde86759f55319da4a2a30 inherit pub_attribs_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1daf0b07950e1cb086cba388b841fbc inherit pub_attribs_classReader"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#ad1daf0b07950e1cb086cba388b841fbc">is_mapped_ts</a> = false</td></tr>
-<tr class="separator:ad1daf0b07950e1cb086cba388b841fbc inherit pub_attribs_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d5fe21f9b1784e2ed50f8868022c1b1 inherit pub_attribs_classReader"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::streampos &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a1d5fe21f9b1784e2ed50f8868022c1b1">mapped_ts</a></td></tr>
-<tr class="separator:a1d5fe21f9b1784e2ed50f8868022c1b1 inherit pub_attribs_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4742239d5b59a7ae72fcb5d2462ab67c inherit pub_attribs_classReader"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a4742239d5b59a7ae72fcb5d2462ab67c">is_fullymapped</a> = false</td></tr>
+<tr class="separator:a4742239d5b59a7ae72fcb5d2462ab67c inherit pub_attribs_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbb1526f698db4c1a56ea4c4973e644e inherit pub_attribs_classReader"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::optional&lt; std::streampos &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#adbb1526f698db4c1a56ea4c4973e644e">mapped_ts</a></td></tr>
+<tr class="separator:adbb1526f698db4c1a56ea4c4973e644e inherit pub_attribs_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -276,6 +276,33 @@ Additional Inherited Members</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac40a171ae6a4ee892c22deaa4713271f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac40a171ae6a4ee892c22deaa4713271f">&#9670;&nbsp;</a></span>get_num_contacts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int LiggghtsReader_particles::get_num_contacts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classLiggghtsReader.html#a0911f87c4e4f23e3d5b8b8ad57057cfb">LiggghtsReader</a>.</p>
 
 </div>
 </div>

@@ -49,14 +49,23 @@ return 0 ;
 int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 {
   uint64_t tmp = FIELDS.back().flag<<1 ;
-  
+  int datalocation ;
+
   switch(type) {
-    case FieldType::Particle : FIELDS.push_back({tmp, name, order, type, Pass::Pass1}); break ;
-    case FieldType::Fluctuation : FIELDS.push_back({tmp, name, order, type, Pass::Pass2}); break ;
-    case FieldType::Contact : FIELDS.push_back({tmp, name, order, type, Pass::Pass3}); break ;
+    case FieldType::Particle :
+      datalocation = data.add_extra_field(1, name) ;
+      FIELDS.push_back({tmp, name, order, type, Pass::Pass1, datalocation});
+      break ;
+    case FieldType::Fluctuation :
+      datalocation = data.add_extra_field(d, name) ;
+      FIELDS.push_back({tmp, name, order, type, Pass::Pass2, datalocation});
+      break ;
+    case FieldType::Contact :
+      datalocation = data.add_extra_field(d*d, name) ;
+      FIELDS.push_back({tmp, name, order, type, Pass::Pass3, datalocation});
+      break ;
     default: printf("Unknown extra field type, skipping\n") ;
   }
-
   return tmp;
 }
 
@@ -556,11 +565,7 @@ for (i=0 ; i<data.N ; i++)
      if (doextra)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (size_t w = 0 ; w<extrancomp[v] ; w++)
-         {
-           printf("A %d %d", extraid.size(), extrancomp[v]) ; fflush(stdout) ; 
            *(CGf+extraid[v]+w) += wp * dm * data.extra[extralocation[v]+w][i] ;
-           printf("B") ; fflush(stdout) ; 
-         }
  }
 
 }
@@ -694,7 +699,8 @@ printf(" -> Pass 3 ") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
- p=data.id1[i] ; q=data.id2[i] ; if (q<=p) printf("ERR: contacts should be ordered so that p<q %d %d\n", p, q) ;
+ p=data.id1[i] ; q=data.id2[i] ; if (q<=p) {printf("ERR: contacts should be ordered so that p<q %d %d %d %d\n", p, q, i, data.Ncf) ;  fflush(stdout) ; std::exit(0) ;}
+
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
   /*rp=Window->distance(p, CGP[*j].location) ;

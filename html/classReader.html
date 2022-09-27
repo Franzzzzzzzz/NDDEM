@@ -132,10 +132,10 @@ Public Member Functions</h2></td></tr>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a950f5832bcdde86759f55319da4a2a30"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a950f5832bcdde86759f55319da4a2a30">is_seekable</a> = false</td></tr>
 <tr class="separator:a950f5832bcdde86759f55319da4a2a30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1daf0b07950e1cb086cba388b841fbc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#ad1daf0b07950e1cb086cba388b841fbc">is_mapped_ts</a> = false</td></tr>
-<tr class="separator:ad1daf0b07950e1cb086cba388b841fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d5fe21f9b1784e2ed50f8868022c1b1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::streampos &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a1d5fe21f9b1784e2ed50f8868022c1b1">mapped_ts</a></td></tr>
-<tr class="separator:a1d5fe21f9b1784e2ed50f8868022c1b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4742239d5b59a7ae72fcb5d2462ab67c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a4742239d5b59a7ae72fcb5d2462ab67c">is_fullymapped</a> = false</td></tr>
+<tr class="separator:a4742239d5b59a7ae72fcb5d2462ab67c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbb1526f698db4c1a56ea4c4973e644e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::optional&lt; std::streampos &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#adbb1526f698db4c1a56ea4c4973e644e">mapped_ts</a></td></tr>
+<tr class="separator:adbb1526f698db4c1a56ea4c4973e644e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -482,7 +482,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classMercuryReader__data__contacts.html#a1933f56aff70196e37aef0e18bc59ef4">MercuryReader_data_contacts</a>, <a class="el" href="classLiggghtsReader.html#a0911f87c4e4f23e3d5b8b8ad57057cfb">LiggghtsReader</a>, <a class="el" href="classNDDEMReader.html#ae7c80d0cf42897629956d4d1a08afa60">NDDEMReader</a>, and <a class="el" href="classInteractiveReader.html#a5f10ff52ca6b881a372a045d1b921745">InteractiveReader</a>.</p>
+<p>Reimplemented in <a class="el" href="classMercuryReader__data__contacts.html#a1933f56aff70196e37aef0e18bc59ef4">MercuryReader_data_contacts</a>, <a class="el" href="classLiggghtsReader__particles.html#ac40a171ae6a4ee892c22deaa4713271f">LiggghtsReader_particles</a>, <a class="el" href="classLiggghtsReader.html#a0911f87c4e4f23e3d5b8b8ad57057cfb">LiggghtsReader</a>, <a class="el" href="classNDDEMReader.html#ae7c80d0cf42897629956d4d1a08afa60">NDDEMReader</a>, and <a class="el" href="classInteractiveReader.html#a5f10ff52ca6b881a372a045d1b921745">InteractiveReader</a>.</p>
 
 </div>
 </div>
@@ -509,7 +509,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classMercuryReader__data__particles.html#a4134eb83870a6d7bcb6989fe84774113">MercuryReader_data_particles</a>, <a class="el" href="classLiggghtsReader.html#aaaee490c7c2c2afd5b322d04bd2e1246">LiggghtsReader</a>, <a class="el" href="classMercuryReader__vtu__particles.html#a82baae025535e3a57ced156392c47711">MercuryReader_vtu_particles</a>, <a class="el" href="classNDDEMReader.html#a4a7f933bebb401c900e3624bcd784f27">NDDEMReader</a>, and <a class="el" href="classInteractiveReader.html#ad04c5ce67ad72fd9c215977a02ebd8a2">InteractiveReader</a>.</p>
+<p>Reimplemented in <a class="el" href="classLiggghtsReader__contacts.html#af91607012b1c09dcf53626da091cde12">LiggghtsReader_contacts</a>, <a class="el" href="classMercuryReader__data__particles.html#a4134eb83870a6d7bcb6989fe84774113">MercuryReader_data_particles</a>, <a class="el" href="classLiggghtsReader.html#aaaee490c7c2c2afd5b322d04bd2e1246">LiggghtsReader</a>, <a class="el" href="classMercuryReader__vtu__particles.html#a82baae025535e3a57ced156392c47711">MercuryReader_vtu_particles</a>, <a class="el" href="classNDDEMReader.html#a4a7f933bebb401c900e3624bcd784f27">NDDEMReader</a>, and <a class="el" href="classInteractiveReader.html#ad04c5ce67ad72fd9c215977a02ebd8a2">InteractiveReader</a>.</p>
 
 </div>
 </div>
@@ -726,14 +726,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad1daf0b07950e1cb086cba388b841fbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1daf0b07950e1cb086cba388b841fbc">&#9670;&nbsp;</a></span>is_mapped_ts</h2>
+<a id="a4742239d5b59a7ae72fcb5d2462ab67c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4742239d5b59a7ae72fcb5d2462ab67c">&#9670;&nbsp;</a></span>is_fullymapped</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool Reader::is_mapped_ts = false</td>
+          <td class="memname">bool Reader::is_fullymapped = false</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -754,14 +754,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a1d5fe21f9b1784e2ed50f8868022c1b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d5fe21f9b1784e2ed50f8868022c1b1">&#9670;&nbsp;</a></span>mapped_ts</h2>
+<a id="adbb1526f698db4c1a56ea4c4973e644e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbb1526f698db4c1a56ea4c4973e644e">&#9670;&nbsp;</a></span>mapped_ts</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;std::streampos&gt; Reader::mapped_ts</td>
+          <td class="memname">std::vector&lt;std::optional&lt;std::streampos&gt; &gt; Reader::mapped_ts</td>
         </tr>
       </table>
 </div><div class="memdoc">

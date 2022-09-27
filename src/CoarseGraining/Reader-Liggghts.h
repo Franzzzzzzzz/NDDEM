@@ -93,6 +93,8 @@ public:
             default : return nullptr ; 
         }
     } 
+
+    int get_num_contacts() {return -1;}
     
 private:
     int do_post_read() ;
@@ -104,7 +106,7 @@ public:
     double * get_data (DataValue datavalue, int dd, std::string name="") {
         switch(datavalue) {
             case DataValue::id1 : return &(data[0][0]) ;
-            case DataValue::id2 : return &(data[1][0] ) ;
+            case DataValue::id2 : return &(data[1][0]) ;
             
             case DataValue::pospq : return &(data[2+dd][0] ) ;
             case DataValue::lpq   : return &(data[5+dd][0] ) ;
@@ -115,6 +117,7 @@ public:
             default : return (nullptr) ; 
         }
     }
+    int get_num_particles() {return -1;}
 private:
     LiggghtsReader_particles *dump ; 
     int do_post_read() ;

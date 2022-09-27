@@ -29,7 +29,6 @@ In the following:
     - `name`: name of the field to compute. Should be unique.
     - `type: [Particle | Contact | Fluctuation]` -- Type of field. `Particle` will be calculated during Pass 1, `Contact` and `Fluctuation` are not implemented as of 2022-09-26.
     - `tensor order: [0|1|2]` -- 0 is scalar, 1 is vector, 2 is second order tensor. 
-    - `mapping`: name of the column to use in the relevent input file, if different from name. 
     
 
 
