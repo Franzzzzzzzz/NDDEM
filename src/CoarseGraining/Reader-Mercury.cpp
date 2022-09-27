@@ -136,7 +136,7 @@ int MercuryReader_data_particles::build_index ()
       if (res==8 || res==6) 
           mapped_ts.push_back(file_in.tellg()-static_cast<std::streamoff>(line.size()+1)) ;  
   }
-  is_mapped_ts=true ; 
+  is_fullymapped=true ;
   reset() ; 
   return mapped_ts.size() ; 
 }
@@ -160,7 +160,7 @@ int MercuryReader_data_contacts::build_index ()
           }
       }
   }
-  is_mapped_ts=true ; 
+  is_fullymapped=true ;
   reset() ; 
   return mapped_ts.size() ; 
 }
@@ -202,7 +202,7 @@ int MercuryReader_data_particles::read_timestep (int ts)
       }
   }
   
-  file_in.seekg(mapped_ts[ts]) ; 
+  file_in.seekg(mapped_ts[ts].value()) ;
   
   //---- Should finally be at the right location ...
   double tmp ; 
@@ -261,7 +261,7 @@ int MercuryReader_data_contacts::read_timestep (int ts)
       }
   }
   
-  file_in.seekg(mapped_ts[ts]) ; 
+  file_in.seekg(mapped_ts[ts].value()) ;
   
   //---- Should finally be at the right location ...
   getline(file_in, line) ; if (line[0]!='#') printf("ERR: expected a hash, got '%s'.\n", line.c_str()) ;  

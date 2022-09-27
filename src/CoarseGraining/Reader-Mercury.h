@@ -63,7 +63,7 @@ public:
     MercuryReader_data_particles(std::string ppath) ; 
     int get_numts() 
     { 
-        if (!is_mapped_ts)
+        if (!is_fullymapped)
             build_index() ; 
         return mapped_ts.size() ; 
     }    

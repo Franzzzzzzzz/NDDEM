@@ -39,7 +39,7 @@ int LiggghtsReader::get_numts()
        }
    }
  } while (in->good()) ;
- if (is_seekable) is_mapped_ts = true ; 
+ if (is_seekable) is_fullymapped = true ;
  reset() ; 
  return numts ;
 }
@@ -92,31 +92,56 @@ return 0 ;
 //-------------------------------------------------------------
 int LiggghtsReader::read_timestep(int ts)
 {
- if (is_seekable && is_mapped_ts)
- {
-     if (ts > static_cast<signed int>(mapped_ts.size()))
-     {
-         printf("ERR: the requested timestep %d is above max timestep %ld.", ts, mapped_ts.size()) ; 
-         return -1 ;
-     }
-     in->seekg(mapped_ts[ts]) ;
-     curts = ts-1 ; 
-     read_timestep_impl(ts) ;  
- }
- else
- {
-     if (ts<=curts)
-     {
-         printf("WARN: file is not seekable, resetting it") ; 
-         reset() ;
-     }
-     else
-     {
-         while (ts-1>curts)
-             read_timestep_impl(ts, true) ; 
-         read_timestep_impl(ts,false) ; 
-     }
- }
+  if (ts<mapped_ts.size())
+  {
+    if (mapped_ts[ts].has_value())
+    {
+      in->seekg(mapped_ts[ts].value()) ;
+      curts = ts-1 ;
+      read_timestep_impl(ts) ;
+      return 0 ; // All good, seek the ts and read it
+    }
+  }
+
+  // any other case, manual searching (
+  if (ts<=curts)
+  {
+      printf("WARN: file is not seekable, resetting it") ;
+      reset() ;
+  }
+  else
+  {
+      while (ts-1>curts)
+          read_timestep_impl(ts, true) ;
+      read_timestep_impl(ts,false) ;
+  }
+
+//  if (is_seekable)
+//  {
+//      if (ts > static_cast<signed int>(mapped_ts.size()))
+//      {
+//          printf("ERR: the requested timestep %d is above max timestep %ld.", ts, mapped_ts.size()) ;
+//          return -1 ;
+//      }
+//      in->seekg(mapped_ts[ts]) ;
+//      curts = ts-1 ;
+//      read_timestep_impl(ts) ;
+//  }
+//  else
+//  {
+//     printf("// %d %d\n", ts, curts) ; fflush(stdout) ;
+//      if (ts<=curts)
+//      {
+//          printf("WARN: file is not seekable, resetting it") ;
+//          reset() ;
+//      }
+//      else
+//      {
+//          while (ts-1>curts)
+//              read_timestep_impl(ts, true) ;
+//          read_timestep_impl(ts,false) ;
+//      }
+//  }
  return 0 ;
 }
 //---------------------------------------------------------------------------------
@@ -124,9 +149,15 @@ int LiggghtsReader::read_timestep_impl(int ts, bool skip)
 {
  string line, word ; char blank ; int nid ;
 
+ if (is_seekable)
+ {
+  if (mapped_ts.size()<=curts+1) mapped_ts.resize(curts+2) ;
+  mapped_ts[curts+1]=in->tellg() ;
+ }
+
  getline(*in, line) ; //should be ITEM: TIMESTEP
  *in >> actualts >> blank ; curts++ ; 
- printf("{%d %d}", actualts, skip) ; 
+ printf("\rReading: %d skipping:%d", actualts, skip) ; fflush(stdout) ;
  getline(*in, line) ; //should be NUMBER OF SOMETHING
  *in >> Nitem >> blank;
  

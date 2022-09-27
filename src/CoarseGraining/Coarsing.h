@@ -87,6 +87,7 @@ struct Field {
  TensorOrder type ; ///< Tensorial order of the field: SCALAR, VECTOR or TENSOR
  FieldType ftype ; ///< Mainly used to identified the type of user defined fields
  Pass passlevel ; ///< Identify at which moment the field gets calculated
+ int datalocation = -1; ///< For extra fields, identify the location in the vector of extra data
 };
 //-------------------------
 /// Data structure handling point data and contact data
@@ -114,7 +115,8 @@ vector <double *> mpq; ///< Moment of particle 1 on 2
 vector <double *> mqp ; ///< Moment of particle 2 on 1
 
 // Exta fields if needed
-vector <double *> extra ;
+vector<double*> extra ;
+vector<std::tuple<std::string, int, int>> extrafields ;
 
 // Some useful functions
 int Nnonper=-1 ; ///< Used if additional particles are added as images through the periodic boundary conditions.
@@ -123,6 +125,12 @@ int compute_lpq (int d) ; ///< Compute lpq from contact id's and atom locations
 int periodic_atoms (int d, v2d bounds, int pbc, v1d Delta, bool omegainclude) ; ///< Copy particles through the periodic boundary conditions. Should call clean_periodic_atoms() after the full coarse-graining computation has been performed to clean the added atoms.
 int clean_periodic_atoms () {if (Nnonper==-1) printf("ERR: must call periodic_atoms before cleaning the periodic_atoms\n") ; else N=Nnonper ; return 0 ; } ///< Clean periodic atoms.
 bool check_field_availability(string name) ;
+int add_extra_field (int length, std::string name)
+{
+  extrafields.push_back({name, length, extra.size()}) ;
+  extra.resize(extra.size()+length) ;
+  return std::get<2>(extrafields.back());
+}
 } ;
 //------------------------------------------------------
 #include "WindowLibrary.h"

@@ -343,33 +343,10 @@ int Param::set_data(struct Data & D)
         D.mqp[dd]   = get_data(DataValue::mqp, dd) ;
     }
 
-    if (D.extra.size() == 0) // let's do the mapping of data ...
+    for (auto &v: D.extrafields)
     {
-        for (auto &v: extrafields)
-        {
-            int ncomponents ; 
-            switch (v.order) {
-                case TensorOrder::SCALAR: ncomponents=1 ; break ; 
-                case TensorOrder::VECTOR: ncomponents=dim ; break ; 
-                case TensorOrder::TENSOR: ncomponents=dim*dim ; break ; 
-                default: printf("Unknown tensor order for extrafield") ; 
-            }
-            v.datalocation = D.extra.size() ; 
-            D.extra.resize(D.extra.size()+ncomponents) ; 
-        }
-    }
-    
-    for (auto &v: extrafields)
-    {
-        int ncomponents ; 
-        switch (v.order) {
-                case TensorOrder::SCALAR: ncomponents=1 ; break ; 
-                case TensorOrder::VECTOR: ncomponents=dim ; break ; 
-                case TensorOrder::TENSOR: ncomponents=dim*dim ; break ; 
-                default: printf("Unknown tensor order for extrafield") ; 
-            }
-        for (int dd=0 ; dd<ncomponents ; dd++)
-            D.extra[v.datalocation+dd] = get_data(DataValue::extra_named, dd, v.mapping.has_value()?v.mapping.value():v.name) ; 
+        for (int dd=0 ; dd<std::get<1>(v) ; dd++)
+            D.extra[std::get<2>(v)+dd] = get_data(DataValue::extra_named, dd, std::get<0>(v)) ;
     }
 
 return 0 ;

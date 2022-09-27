@@ -31,17 +31,17 @@ public :
     LibLucy3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=105./(16*M_PI*w*w*w) ; }
     LibLucy3D() {} ;
     double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
-    double window(double r) {return (Lucy(r)) ;}
+    double window(double r) { return (Lucy(r)) ;}
     double cutoff (void) {return 1*w ;} // added by benjy to get rid of extra (hopefully useless) data
     //double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
-  private:
+  protected:
     double cst ;
 };
 //--------------------
 class LibLucy3DFancyInt : public LibLucy3D {
 public :
-    LibLucy3DFancyInt(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
+    LibLucy3DFancyInt (struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=105./(16*M_PI*w*w*w) ;}
     std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
     {
       double res = 0 ;
@@ -56,20 +56,19 @@ public :
 
       double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
 
-      first=prev=Lucy(LibLucy3D::distance(p,locp)) ;
+      first=prev=Lucy(distance(p,locp)) ;
       for (int i=0 ; i<Nsteps ; i++)
       {
         for (int j=0; j<d ; j++)
             locp[j] += (1./Nsteps) * lpq[j] ;
-        cur=Lucy(distance(locp,loc)) ;
+        cur=Lucy(distancevec(locp,loc)) ;
         res += (cur+prev)/2.*length ;
         prev=cur ;
       }
       //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ;
       return (make_pair(window_avg(first,cur),res)) ;
     }
-    using LibBase::distance ;
-    double distance (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ; }
+    double distancevec (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ;}
     void set_integrationsteps (int steps) {if (steps<1) printf("Less than 1 step is not meaningful.") ; if (steps>1000) printf("You've chosen a very large number of integration steps, you may want to reconsider") ; Nsteps=steps ; }
 private:
     int Nsteps = 10 ;

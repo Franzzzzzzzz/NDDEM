@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <optional>
 #include "Typedefs.h"
 
 #ifndef READER
@@ -55,8 +56,8 @@ public:
     //virtual double * get_data(DataValue, int dd) {return nullptr;}
 
     bool is_seekable = false ;
-    bool is_mapped_ts = false ;
-    std::vector <std::streampos> mapped_ts ;
+    bool is_fullymapped = false ;
+    std::vector <std::optional<std::streampos>> mapped_ts ;
 
     void build_pospqlpq_from_ids (v2d & contactarray , int idx_id1, int idx_id2, int idx_pospq, int idx_lpq,
                                   v2d & particlearray, int idx_pos, int idx_r=-1)
