@@ -211,6 +211,7 @@ void Contacts<d>::particle_particle(cv1d &Xi, cv1d &Vi, cv1d &Omegai, double ri,
 
   // Normal force
   Fn = cn * (ovlp * kn) - vn * gamman;
+  constexpr bool SAVE_FORCE_COMPONENTS = false;
   if constexpr (SAVE_FORCE_COMPONENTS)
   {
     Act.Fn_el = cn * (ovlp * kn);
