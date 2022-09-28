@@ -68,7 +68,7 @@ if(EMSCRIPTEN)
  add_executable(DEMCGND DemCgND.cpp Dem/Parameters.cpp Dem/Tools.cpp Dem/Contacts.cpp Dem/ContactList.cpp Dem/Xml.cpp Dem/Multiproc.cpp
                         CoarseGraining/Coarsing.cpp )
  set_property(TARGET DEMCGND PROPERTY CXX_STANDARD 17)
- target_compile_options(DEMCGND PUBLIC -DNO_OPENMP ${Matlab_Macro} -g -O3 -Wall -Wextra -DNOLIGGGHTS -DNOMERCURY)
+ target_compile_options(DEMCGND PUBLIC -DSAVE_FORCE_COMPONENTS=0 -DNO_OPENMP -s USE_BOOST_HEADERS=1 ${Matlab_Macro} -g -O3 -Wall -Wextra -DNOLIGGGHTS -DNOMERCURY)
  target_link_libraries(DEMCGND PUBLIC -DNO_OPENMP -g -O3 -lm -Wall -Wextra)
  set(MODULARIZE "1")
  set(EXPORT_NAME "DEMCGND")
