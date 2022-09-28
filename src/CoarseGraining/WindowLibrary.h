@@ -32,7 +32,7 @@ public :
     LibLucy3D() {} ;
     double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
     double window(double r) { return (Lucy(r)) ;}
-    double cutoff (void) {return 1*w ;} // added by benjy to get rid of extra (hopefully useless) data
+    double cutoff (void) {return 2*w ;} // added by benjy to get rid of extra (hopefully useless) data
     //double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
   protected:
