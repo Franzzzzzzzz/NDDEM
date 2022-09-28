@@ -136,8 +136,14 @@ int CoarseGraining::process_fluct_from_avg()
         if (pipeline & Pass::Pass1) C->pass_1() ;
         printf("\r") ;
     }
-    if (P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both)
+    if (P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) //Should be automatically verified when the function is called
         C->mean_time(true) ;
+
+    // Cleanup ...
+    for (auto &v: C->CGP)
+        for (auto & w: v.fields)
+            for (auto &x: w)
+                x=0 ;
     return 0 ;
 }
 //----------------------------------------------------------
