@@ -1,10 +1,10 @@
 var searchData=
 [
   ['v_1487',['v',['../classContactList.html#a905c7d876974c7a7efcebd361450185f',1,'ContactList::v()'],['../classnlohmann_1_1detail_1_1output__vector__adapter.html#a9b1ed9fba14e671ae1abb6692560ef3f',1,'nlohmann::detail::output_vector_adapter::v()'],['../classSimulation.html#a191c30360dc18bfcb50414f65837e803',1,'Simulation::V()']]],
-  ['v1d_1488',['v1d',['../group__DEM.html#ga8e41fb6765d89a47dd5dd456d6326d9a',1,'v1d():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a8e41fb6765d89a47dd5dd456d6326d9a',1,'v1d():&#160;Typedefs.h']]],
-  ['v1f_1489',['v1f',['../group__DEM.html#gac1fa172719db32254041947834b50c4c',1,'v1f():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#ac1fa172719db32254041947834b50c4c',1,'v1f():&#160;Typedefs.h']]],
-  ['v1i_1490',['v1i',['../group__DEM.html#ga58a75f1848937dbb7f84f386b8d78ee8',1,'v1i():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a58a75f1848937dbb7f84f386b8d78ee8',1,'v1i():&#160;Typedefs.h']]],
-  ['v2d_1491',['v2d',['../group__DEM.html#gacbe590dc946aa7a32a4799314e18afac',1,'v2d():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#acbe590dc946aa7a32a4799314e18afac',1,'v2d():&#160;Typedefs.h']]],
+  ['v1d_1488',['v1d',['../group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2',1,'v1d():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#ae570fe4d2fd13665912fabd3abd276b2',1,'v1d():&#160;Typedefs.h']]],
+  ['v1f_1489',['v1f',['../group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696',1,'v1f():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a5d2a6c4d8d7894c4809a547bf179b696',1,'v1f():&#160;Typedefs.h']]],
+  ['v1i_1490',['v1i',['../group__DEM.html#ga424e234580ccf8a9e5e208704f5a6d78',1,'v1i():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a424e234580ccf8a9e5e208704f5a6d78',1,'v1i():&#160;Typedefs.h']]],
+  ['v2d_1491',['v2d',['../group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f',1,'v2d():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a0635bc41e0e88fb34a49d35e69cdab8f',1,'v2d():&#160;Typedefs.h']]],
   ['v3d_1492',['v3d',['../group__DEM.html#ga72418b0e9fe3ba385caf42f544229dac',1,'v3d():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a72418b0e9fe3ba385caf42f544229dac',1,'v3d():&#160;Typedefs.h']]],
   ['vaddfew_1493',['vAddFew',['../classTools.html#a48628bbf3c0db32dd76257ee71bfcb3e',1,'Tools']]],
   ['valbinding_1494',['ValBinding',['../structemscripten_1_1internal_1_1BindingType_3_01std_1_1vector_3_01T_00_01Allocator_01_4_01_4.html#a67dc01887e39a6f41c9b50507d372f30',1,'emscripten::internal::BindingType&lt; std::vector&lt; T, Allocator &gt; &gt;::ValBinding()'],['../structemscripten_1_1internal_1_1BindingType_3_01std_1_1vector_3_01T_00_01Allocator_01_4_01_4.html#a67dc01887e39a6f41c9b50507d372f30',1,'emscripten::internal::BindingType&lt; std::vector&lt; T, Allocator &gt; &gt;::ValBinding()']]],
@@ -31,7 +31,7 @@ var searchData=
   ['void_1515',['void',['../namespacenlohmann_1_1detail.html#a59fca69799f6b9e366710cb9043aa77d',1,'nlohmann::detail']]],
   ['void_5ft_1516',['void_t',['../namespacenlohmann_1_1detail.html#a92a167c49c6697b6ffe4f79492c705e5',1,'nlohmann::detail']]],
   ['volume_1517',['Volume',['../group__DEM.html#gafbd3a536afe7b7ffd1985599854a6d25',1,'Tools::Volume()'],['../group__CoarseGraining.html#ga25e38d9847d48d3e96e0963031c097b8',1,'Volume(int d, double R):&#160;Coarsing.cpp'],['../group__CoarseGraining.html#ga25e38d9847d48d3e96e0963031c097b8',1,'Volume(int d, double R):&#160;Coarsing.cpp']]],
-  ['vrel_1518',['vrel',['../classContacts.html#a22d6128b19b88e27f700d49acad569a6',1,'Contacts']]],
+  ['vrel_1518',['vrel',['../classContacts.html#a34cb903083c19bede3521d10ae779fa6',1,'Contacts']]],
   ['vt_1519',['vt',['../classAction.html#a0f7d3ab6d26bc1e3a39cc04cb2adfe25',1,'Action::vt()'],['../classContacts.html#a5df19112b59443e91cc6833b1d63ef40',1,'Contacts::vt()']]],
   ['vtk_1520',['VTK',['../group__DEM.html#gga6bd23bde1932319c9832c0129a94b307a4f2ceadb0279c677d6419a88c7b1d220',1,'Parameters.h']]]
 ];

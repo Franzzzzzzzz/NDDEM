@@ -8,11 +8,11 @@ set (max_dimension "3" CACHE STRING "Maximum simulation dimension. Higher requir
 add_compile_definitions(MAXDIM=${max_dimension})
 
 # BENJY: Couldnt get the below to compile, hardcoded it into Contacts.h instead, sorry
-# if(SAVE_FORCE_COMPONENTS)
-#   add_definitions(-DSAVE_FORCE_COMPONENTS=1)
-# else ()
-#   add_definitions(-DSAVE_FORCE_COMPONENTS=0)
-# endif()
+if(SAVE_FORCE_COMPONENTS)
+   add_definitions(-DSAVE_FORCE_COMPONENTS=1)
+else ()
+   add_definitions(-DSAVE_FORCE_COMPONENTS=0)
+endif()
 
 add_executable(DEMND DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp)
 set_property(TARGET DEMND PROPERTY CXX_STANDARD 17)
