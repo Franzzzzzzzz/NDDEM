@@ -37,7 +37,7 @@ public:
 
     void setup_CG () ;
 
-    int process_timestep (int ts, bool allow_avg_fluct=false) ;
+    int process_timestep (int ts, bool hasdonefirstpass=false) ;
     int process_fluct_from_avg() ;
     void process_all ();
     void write () ;
@@ -91,24 +91,10 @@ void CoarseGraining::setup_CG ()
     C->cT=-1 ;
 }
 //-----------------------------------------
-int CoarseGraining::process_timestep (int ts_abs, bool allow_avg_fluct)
+int CoarseGraining::process_timestep (int ts_abs, bool hasdonefirstpass)
 {
     int ts = ts_abs - P.skipT ;
-
-    if ((P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) &&
-        (((pipeline & Pass::VelFluct) && !C->hasvelfluct) ||
-            ((pipeline & Pass::RotFluct) && !C->hasrotfluct)))
-        {
-
-            if (!allow_avg_fluct)
-            {
-                printf("ERR: single timestep cannot run when intermediary average is required") ;
-                return -1 ;
-            }
-            else
-                process_fluct_from_avg() ;
-        }
-
+   
     bool avg=false ;
     if (P.timeaverage == AverageType::Intermediate || P.timeaverage == AverageType::Both) avg=true ;
 
@@ -116,7 +102,7 @@ int CoarseGraining::process_timestep (int ts_abs, bool allow_avg_fluct)
     C->cT = ts ;
     P.set_data (C->data) ;
 
-    if (pipeline & Pass::Pass1) C->pass_1() ;
+    if (!hasdonefirstpass) if (pipeline & Pass::Pass1) C->pass_1() ;
     if (pipeline & Pass::VelFluct) C->compute_fluc_vel (avg) ;
     if (pipeline & Pass::RotFluct) C->compute_fluc_rot (avg) ;
     if (pipeline & Pass::Pass2) C->pass_2() ;
@@ -130,29 +116,32 @@ int CoarseGraining::process_fluct_from_avg()
 {
     for (int ts=0 ; ts<P.maxT ; ts++)
     {
-        P.read_timestep(ts+P.skipT) ;
+        P.read_timestep(ts+P.skipT, true) ;
         C->cT = ts ;
         P.set_data (C->data) ;
-        if (pipeline & Pass::Pass1) C->pass_1() ;
+        C->pass_1() ;
         printf("\r") ;
     }
     if (P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) //Should be automatically verified when the function is called
         C->mean_time(true) ;
-
-    // Cleanup ...
-    for (auto &v: C->CGP)
-        for (auto & w: v.fields)
-            for (auto &x: w)
-                x=0 ;
+    
     return 0 ;
 }
 //----------------------------------------------------------
 void CoarseGraining::process_all ()
 {
+    bool hasdonefirstpass = false ; 
+    if ((P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) &&
+        ((pipeline & Pass::VelFluct) || (pipeline & Pass::RotFluct)))
+    {
+        process_fluct_from_avg() ;
+        hasdonefirstpass = true ; 
+    }
+    
     for (int ts=0 ; ts<P.maxT ; ts++)
     {
         printf("\r%d ", ts) ;
-        process_timestep(ts+P.skipT, true) ;
+        process_timestep(ts+P.skipT, hasdonefirstpass) ;
     }
     if (P.timeaverage == AverageType::Final || P.timeaverage == AverageType::Both)
         C->mean_time(false) ;

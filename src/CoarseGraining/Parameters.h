@@ -55,7 +55,7 @@ public:
   bool tsread = false ;
 
   void from_json (json & j) ;
-  int read_timestep (int ts) ;
+  int read_timestep (int ts, bool particleonly=false) ;
   int set_data (Data & cgdata) ;
   int get_num_particles () ;
   int get_num_contacts () ;
@@ -114,7 +114,7 @@ void Param::from_json(json &j)
 */
 }
 //-----------------------------------------------
-int Param::read_timestep (int ts)
+int Param::read_timestep (int ts, bool particleonly)
 {
     if (curts == ts && tsread) return 0 ; //Already read and all
 

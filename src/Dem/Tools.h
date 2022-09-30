@@ -53,7 +53,6 @@ public :
   TensorType order ;
   v2d * data ;
 } ;
-
 /** \brief Static class to handle multi-dimensional mathematics, and more. It gets specialised for speed with template parameter d:dimension
  */
 
