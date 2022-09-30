@@ -95,6 +95,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html">Multiproc&lt; d &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manual multiprocessor handling for OpenMP, for max efficiency &amp; avoiding bugs &amp; race conditions, hopefully.  <a href="classMultiproc.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnumber__gen.html">number_gen&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Small class to handle number generator (ie. first:step:last syntax)  <a href="classnumber__gen.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html">Parameters&lt; d &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic class to handle the simulation set up.  <a href="classParameters.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -268,6 +271,9 @@ Functions</h2></td></tr>
 <tr class="separator:ga8fd15d6056b5281f08d50a716c625b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8c0827b1f1863fba2cdb02c9ca5c0bc2">operator&amp;</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafca03450931a610a6353b4b844cec366"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gafca03450931a610a6353b4b844cec366"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafca03450931a610a6353b4b844cec366">operator&gt;&gt;</a> (std::istream &amp;in, <a class="el" href="classnumber__gen.html">number_gen</a>&lt; T &gt; &amp;n)</td></tr>
+<tr class="separator:gafca03450931a610a6353b4b844cec366"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gadeb0a80559cc1b43095b26aaead0a7e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadeb0a80559cc1b43095b26aaead0a7e7">operator*</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, double b)</td></tr>
 <tr class="separator:gadeb0a80559cc1b43095b26aaead0a7e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga678dfbc2027eab6bb09993656de1c98c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga678dfbc2027eab6bb09993656de1c98c">operator*</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> a, float b)</td></tr>
@@ -2509,6 +2515,36 @@ template&lt;int d&gt; </div>
           <td></td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="gafca03450931a610a6353b4b844cec366"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafca03450931a610a6353b4b844cec366">&#9670;&nbsp;</a></span>operator&gt;&gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::istream&amp; operator&gt;&gt; </td>
+          <td>(</td>
+          <td class="paramtype">std::istream &amp;&#160;</td>
+          <td class="paramname"><em>in</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classnumber__gen.html">number_gen</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

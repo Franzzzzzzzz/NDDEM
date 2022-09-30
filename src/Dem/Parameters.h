@@ -31,6 +31,71 @@ inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a
 
 template <int d>
 class Multiproc ;
+
+/** \brief Small class to handle number generator (ie. first:step:last syntax) */
+template <typename T>
+class number_gen {
+public:
+    void parse (std::string s) 
+    {
+      auto res = s.find(':') ; double val ; 
+      if (res==std::string::npos)
+      {
+        val=stod(s) ; first=static_cast<T>(val) ; 
+        isconst=true ; delta=0 ; 
+        last = std::numeric_limits<T>::max() ; 
+      }
+      else
+      {
+        isconst=false ; 
+        val=stod(s) ; first=static_cast<T>(val) ; 
+        s=s.substr(res+1) ; res = s.find(':') ; 
+        if (res==std::string::npos)
+        {
+          val=stod(s) ; last=static_cast<T>(val) ; 
+          delta=1 ;
+        }
+        else
+        {
+          val=stod(s) ; delta=static_cast<T>(val) ; 
+          s=s.substr(res+1) ; 
+          val=stod(s) ; last=static_cast<T>(val) ; 
+        }
+      }
+      iter=0 ; 
+    }
+    
+    void reset () {iter = 0 ; }
+    int niter() { return isconst?1:(floor((last-first)/delta)+1) ;  }
+    T cur() {return first+delta*iter ; }
+    T operator() (bool allow=false) 
+    { 
+      if (isconst)
+      {
+        if (iter>0 && !allow) throw std::out_of_range("Passed final value"); 
+        else 
+        {
+          iter ++ ; 
+          return first ; 
+        }
+      }
+      else
+      {
+        T res = first+delta*iter ; 
+        if (res>last && !allow) 
+          throw std::out_of_range("Passed final value"); 
+        iter++ ; 
+        return res ; 
+      }
+    }
+private:
+    int iter=0 ; 
+    bool isconst = true ; 
+    T first, last, delta=1 ; 
+}; 
+template <typename T>
+std::istream & operator>> (std::istream & in, number_gen<T> & n) {std::string s; in >>s ; n.parse(s) ; return in ; }
+
 /** \brief Generic class to handle the simulation set up
  *
  */
@@ -544,7 +609,17 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
 
  Lvl0["directory"] = [&](){in>>Directory ; if (! std::filesystem::exists(Directory)) std::filesystem::create_directory(Directory); };
  Lvl0["dimensions"] = [&](){int nn; int dd ; in>>dd>>nn ; if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }} ;
- Lvl0["location"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} printf("[INFO] Changing particle location.\n") ; } ;
+ Lvl0["location"] = [&]()
+ {
+   number_gen<int> ids ; 
+   number_gen<double> locs[d] ; 
+   in >> ids ; for (int i=0 ; i<d ; i++) in >> locs[i] ;
+   try { while (1) for (int i=0, id=ids() ; i<d; i++) X[id][i]= locs[i](true) ; } catch(...) {}
+   
+   //int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} 
+   printf("[INFO] Changing particle location.\n") ; 
+  
+ } ;
  Lvl0["velocity"] = [&](){int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> V[id][i] ;} printf("[INFO] Changing particle velocity.\n") ; } ;
  Lvl0["omega"]    = [&](){int id ; in>>id ; for (int i=0 ; i<d*(d-1)/2 ; i++) {in >> Omega[id][i] ;} printf("[INFO] Changing particle angular velocity.\n") ; } ;
  Lvl0["freeze"]   = [&](){int id ; in>>id ; Frozen[id]=true ; printf("[INFO] Freezing particle.\n") ;} ;
@@ -726,7 +801,6 @@ void Parameters<d>::init_locations (char *line, v2d & X)
              X[i][dd] = rand()*(Boundaries[dd][2]-2*r[i]) + Boundaries[dd][0] + r[i] ;
          }
         }
-
     }
     else if (!strcmp(line, "insphere"))
     {

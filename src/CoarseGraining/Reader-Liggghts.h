@@ -74,6 +74,7 @@ public:
     
     bool has_id_data = false ; 
     double * get_data (DataValue datavalue, int dd, std::string name="") {
+        if (data.size()==0) return nullptr ; 
         switch(datavalue) {
             case DataValue::radius : return &(data[0][0]) ;
             case DataValue::mass : return &(data[1][0] ) ;
