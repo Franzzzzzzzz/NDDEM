@@ -16,6 +16,8 @@ boundary 3 PBC  0 3.4
 
 auto location roughinclineplane
 
+location 0 1 0.9500000000000001 0 -0.0003079251932157456
+
 gravity -1 0 0 0
 set Kn 2e5
 set Kt 8e4

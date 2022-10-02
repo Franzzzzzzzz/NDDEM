@@ -68,11 +68,11 @@ public:
     void reset () {iter = 0 ; }
     int niter() { return isconst?1:(floor((last-first)/delta)+1) ;  }
     T cur() {return first+delta*iter ; }
-    T operator() (bool allow=false) 
+    std::optional<T> operator() (bool allow=false) 
     { 
       if (isconst)
       {
-        if (iter>0 && !allow) throw std::out_of_range("Passed final value"); 
+        if (iter>0 && !allow) return {} ; 
         else 
         {
           iter ++ ; 
@@ -83,7 +83,7 @@ public:
       {
         T res = first+delta*iter ; 
         if (res>last && !allow) 
-          throw std::out_of_range("Passed final value"); 
+          return {} ;
         iter++ ; 
         return res ; 
       }
@@ -614,9 +614,18 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
    number_gen<int> ids ; 
    number_gen<double> locs[d] ; 
    in >> ids ; for (int i=0 ; i<d ; i++) in >> locs[i] ;
-   try { while (1) for (int i=0, id=ids() ; i<d; i++) X[id][i]= locs[i](true) ; } catch(...) {}
    
+   auto id=ids() ; 
+   while (id.has_value()) 
+   {
+    if (id.has_value())
+      for (int i=0 ; i<d ; i++)
+        X[id.value()][i]= locs[i](true).value() ;
+    id = ids() ; 
+   }    
+   //try { while (1) for (int i=0, id=ids() ; i<d; i++) X[id][i]= locs[i](true) ; } catch(...) {}
    //int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} 
+   //for (int i=0, id=ids(); i<d ; i++) { X[id][i]= locs[i]() ;} 
    printf("[INFO] Changing particle location.\n") ; 
   
  } ;
