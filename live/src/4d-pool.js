@@ -438,13 +438,12 @@ function set_ball_positions() {
     let offset = params.L1/2;
 
     white_ball_initial_loc = [offset,params.table_height-params.L2+params.radius,0,0.001*(Math.random()-0.5)];
-
     S.interpret_command("location " + String(0) + " "
                         + String(white_ball_initial_loc[0]) + " "
                         + String(white_ball_initial_loc[1]) + " "
                         + String(white_ball_initial_loc[2]) + " "
                         + String(white_ball_initial_loc[3])); // first ball is the white ball
-
+    
     for ( var k=0; k<params.pyramid_size; k++ ) {
         let cur_pyramid_length = params.pyramid_size - k;
         let w = k*1.825*params.radius;
