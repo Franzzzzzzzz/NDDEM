@@ -119,23 +119,31 @@ Enumerations</h2></td></tr>
 <tr class="separator:ga6bd23bde1932319c9832c0129a94b307"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga513959f26fd4469592593d8e13e8eba1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> { <br />
 &#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ab50339a10e1de285ac99d4c3990b8693">ExportData::NONE</a> =0, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a90b4ba73224408e82ade8a072a3712c1">ExportData::POSITION</a> =1, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7b4354bded455eb379e3c764806cda7b">ExportData::VELOCITY</a> =2, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1d408da87e4c838f8915be22bc56387c">ExportData::OMEGA</a> =4, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a90b4ba73224408e82ade8a072a3712c1">ExportData::POSITION</a> =0x1, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7b4354bded455eb379e3c764806cda7b">ExportData::VELOCITY</a> =0x2, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1d408da87e4c838f8915be22bc56387c">ExportData::OMEGA</a> =0x4, 
 <br />
-&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ade01cc75b9beca2d1b9ed4530d48dc04">ExportData::OMEGAMAG</a> =8, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a76b8a0c10dc65011f6062b5172cd2e2c">ExportData::ORIENTATION</a> =16, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad51ce8e1a631aeacae2cd884d48f9d73">ExportData::COORDINATION</a> =32, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5c6d0ec312d680ed011756648c9e96ea">ExportData::RADIUS</a> =64, 
+&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ade01cc75b9beca2d1b9ed4530d48dc04">ExportData::OMEGAMAG</a> =0x8, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a76b8a0c10dc65011f6062b5172cd2e2c">ExportData::ORIENTATION</a> =0x10, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad51ce8e1a631aeacae2cd884d48f9d73">ExportData::COORDINATION</a> =0x20, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5c6d0ec312d680ed011756648c9e96ea">ExportData::RADIUS</a> =0x40, 
 <br />
-&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a447abb17e794509db57d5dcb084124ec">ExportData::IDS</a> =128, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5">ExportData::FN</a> =256, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7">ExportData::FT</a> =512, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1adb5a3630bf07493c9d96388887b74016">ExportData::TORQUE</a> =1024, 
+&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a447abb17e794509db57d5dcb084124ec">ExportData::IDS</a> =0x80, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5">ExportData::FN</a> =0x100, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7">ExportData::FT</a> =0x200, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1adb5a3630bf07493c9d96388887b74016">ExportData::TORQUE</a> =0x400, 
 <br />
-&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a> =2048, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a> =4096, 
-<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a> =8192
+&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a> =0x800, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a> =0x1000, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a> =0x2000, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a4ffc0f488d9daf9003867d5fed053926">ExportData::FN_EL</a> =0x4000, 
+<br />
+&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7debec6dff88286f073a0d05c268abb3">ExportData::FN_VISC</a> =0x8000, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ac00814c424285528e5134a106fc21f7b">ExportData::FT_EL</a> =0x10000, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a8f86023c7a5f969c8aab02bbbe35a38d">ExportData::FT_VISC</a> =0x20000, 
+<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715">ExportData::FT_FRIC</a> =0x40000, 
+<br />
+&#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29">ExportData::FT_FRICTYPE</a> =0x8000
 <br />
  }</td></tr>
 <tr class="separator:ga513959f26fd4469592593d8e13e8eba1"><td class="memSeparator" colspan="2">&#160;</td></tr>

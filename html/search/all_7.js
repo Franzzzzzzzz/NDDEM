@@ -38,8 +38,8 @@ var searchData=
   ['flatten_370',['flatten',['../classnlohmann_1_1json__pointer.html#ab0d7759d0caa6a0c0187916da28e6ee7',1,'nlohmann::json_pointer::flatten()'],['../classnlohmann_1_1basic__json.html#ae91348b027208339c94dbbc6fd769929',1,'nlohmann::basic_json::flatten()']]],
   ['fluctuation_371',['Fluctuation',['../group__CoarseGraining.html#ggaa01498a3ceb2fa74dc9536c16caef1daa5e680723e822606e0438c2c1ae1bb324',1,'Coarsing.h']]],
   ['fn_372',['Fn',['../classAction.html#a7a68cb09fb64cc29d281ad709a864509',1,'Action::Fn()'],['../classContacts.html#ac51d04285b1b86f9ce3410548bc123f1',1,'Contacts::Fn()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5',1,'FN():&#160;Parameters.h']]],
-  ['fn_5fel_373',['Fn_el',['../classAction.html#a4799a0f3030052614690119da6b6ce17',1,'Action']]],
-  ['fn_5fvisc_374',['Fn_visc',['../classAction.html#a1f9bf8b93d840d4bc8acb99f708dad1f',1,'Action']]],
+  ['fn_5fel_373',['Fn_el',['../classAction.html#a4799a0f3030052614690119da6b6ce17',1,'Action::Fn_el()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a4ffc0f488d9daf9003867d5fed053926',1,'FN_EL():&#160;Parameters.h']]],
+  ['fn_5fvisc_374',['Fn_visc',['../classAction.html#a1f9bf8b93d840d4bc8acb99f708dad1f',1,'Action::Fn_visc()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7debec6dff88286f073a0d05c268abb3',1,'FN_VISC():&#160;Parameters.h']]],
   ['fname_375',['Fname',['../group__CoarseGraining.html#ga19637b8cc841bf3fd43305a844133af9',1,'Coarsing']]],
   ['fold_376',['FOld',['../classSimulation.html#a09004b85cc83d2530259200377be3ac7',1,'Simulation']]],
   ['for_377',['for',['../classnlohmann_1_1detail_1_1serializer.html#ab14b8ec1f8102aa4c7e3c349f317654e',1,'nlohmann::detail::serializer']]],
@@ -59,10 +59,11 @@ var searchData=
   ['front_391',['front',['../classnlohmann_1_1basic__json.html#ad1702349b3aeca0e518921336faa570c',1,'nlohmann::basic_json::front()'],['../classnlohmann_1_1basic__json.html#a135d1239f3189866baaede36ec0701c8',1,'nlohmann::basic_json::front() const']]],
   ['frozen_392',['Frozen',['../classParameters.html#a82fdaa5aaa3d845274989e1395013027',1,'Parameters']]],
   ['ft_393',['Ft',['../classAction.html#a45a9aad0974c7880cb45f7662f684bcd',1,'Action::Ft()'],['../classContacts.html#a3ec1269099ddf7ba0111249c142eb300',1,'Contacts::Ft()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7',1,'FT():&#160;Parameters.h']]],
-  ['ft_5fel_394',['Ft_el',['../classAction.html#a08b8672506f8071959902dfee0a5d522',1,'Action']]],
-  ['ft_5ffric_395',['Ft_fric',['../classAction.html#a579b087cfeb2d9faab9fe3eb73224756',1,'Action']]],
-  ['ft_5fisfric_396',['Ft_isfric',['../classAction.html#ab1cf95b4a425f7e56f04ac4751527c46',1,'Action']]],
-  ['ft_5fvisc_397',['Ft_visc',['../classAction.html#a6aed1c6f50e738e7ca36a4dae358f1b0',1,'Action']]],
-  ['ftc_398',['Ftc',['../classContacts.html#a5e6ee20e7b3031a79e94ec378b9b2e61',1,'Contacts']]],
-  ['ftype_399',['ftype',['../group__CoarseGraining.html#ga913254490aa820213d25ee2bb364993c',1,'Field::ftype()'],['../group__CoarseGraining.html#ga0f643d1a54232ab019aea331803f0cb1',1,'Coarsing::Ftype()']]]
+  ['ft_5fel_394',['Ft_el',['../classAction.html#a08b8672506f8071959902dfee0a5d522',1,'Action::Ft_el()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ac00814c424285528e5134a106fc21f7b',1,'FT_EL():&#160;Parameters.h']]],
+  ['ft_5ffric_395',['Ft_fric',['../classAction.html#a579b087cfeb2d9faab9fe3eb73224756',1,'Action::Ft_fric()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715',1,'FT_FRIC():&#160;Parameters.h']]],
+  ['ft_5ffrictype_396',['FT_FRICTYPE',['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29',1,'Parameters.h']]],
+  ['ft_5fisfric_397',['Ft_isfric',['../classAction.html#ab1cf95b4a425f7e56f04ac4751527c46',1,'Action']]],
+  ['ft_5fvisc_398',['Ft_visc',['../classAction.html#a6aed1c6f50e738e7ca36a4dae358f1b0',1,'Action::Ft_visc()'],['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a8f86023c7a5f969c8aab02bbbe35a38d',1,'FT_VISC():&#160;Parameters.h']]],
+  ['ftc_399',['Ftc',['../classContacts.html#a5e6ee20e7b3031a79e94ec378b9b2e61',1,'Contacts']]],
+  ['ftype_400',['ftype',['../group__CoarseGraining.html#ga913254490aa820213d25ee2bb364993c',1,'Field::ftype()'],['../group__CoarseGraining.html#ga0f643d1a54232ab019aea331803f0cb1',1,'Coarsing::Ftype()']]]
 ];
