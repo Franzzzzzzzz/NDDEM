@@ -22,10 +22,15 @@
 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
-enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x8000} ; ///< Flags for export data control
+enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000} ; ///< Flags for export data control
 enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4, PBC_LE=5} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
+inline ExportData   operator| (ExportData a, ExportData b) {auto c= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return c ; }
+inline ExportData   operator~ (ExportData a) {auto c= static_cast<ExportData>(~static_cast<int>(a)); return c ; }
+inline ExportData & operator&=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) & static_cast<int>(b)); return a ; }
+inline ExportData & operator>>= (ExportData& w, int u) {w=static_cast<ExportData>(static_cast<int>(w)>>u) ; return w ; }
+inline ExportData & operator<<= (ExportData& w, int u) {w=static_cast<ExportData>(static_cast<int>(w)<<u) ; return w ; }
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
@@ -210,7 +215,7 @@ public :
     int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
     {
      if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
-     if (outflags & ExportData::POSITION)
+     if (outflags & ExportData::CONTACTPOSITION)
      {
          for (int dd = 0 ; dd<d ; dd++)
              fprintf(out, "x%d_i, ", dd) ;
@@ -255,7 +260,7 @@ public :
          {
              if (outflags & ExportData::IDS)
                 fprintf(out, "%d %d ", contact.i, contact.j) ;
-             if (outflags & ExportData::POSITION)
+             if (outflags & ExportData::CONTACTPOSITION)
              {
                  for (auto dd : X[contact.i])
                   fprintf(out, "%g ", dd) ;
@@ -583,12 +588,12 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          }
          else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
          else if (word =="Radius") dumplist |= ExportData::RADIUS ;
-         else if (word =="Ids") dumplist |= ExportData::IDS ;
+         
+         else if (word =="Ids") dumplist |= ExportData::IDS ; // Contact properties
          else if (word =="Fn") dumplist |= ExportData::FN ;
          else if (word =="Ft") dumplist |= ExportData::FT ;
          else if (word =="Torque") dumplist |= ExportData::TORQUE ;
          else if (word =="Branch") dumplist |= ExportData::BRANCHVECTOR ;
-         
          else if (word =="Fn_el") dumplist |= ExportData::FN_EL ;
          else if (word =="Fn_visc") dumplist |= ExportData::FN_VISC ;
          else if (word =="Ft_el") dumplist |= ExportData::FT_EL ;
@@ -598,6 +603,15 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
            
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
+       
+       /*if constexpr (!SAVE_FORCE_COMPONENTS)
+       {
+         if (dumplist & (ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC | ExportData::FT_FRICTYPE))
+         {
+           printf("WARN: NDDEM was compiled without support for force subcomponents exporting. Removing from the dump output.") ; 
+           dumplist &= ~(ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC | ExportData::FT_FRICTYPE) ; 
+         }
+       }*/
 
        dumps.push_back(make_pair(dumpkind,dumplist)) ;
        }
@@ -619,18 +633,16 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["dimensions"] = [&](){int nn; int dd ; in>>dd>>nn ; if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }} ;
  Lvl0["location"] = [&]()
  {
-   number_gen<int> ids ; 
-   number_gen<double> locs[d] ; 
+   number_gen<int> ids ; number_gen<double> locs[d] ; 
    in >> ids ; for (int i=0 ; i<d ; i++) in >> locs[i] ;
    
    auto id=ids() ; 
    while (id.has_value()) 
    {
-    if (id.has_value())
-      for (int i=0 ; i<d ; i++)
-        X[id.value()][i]= locs[i](true).value() ;
+    for (int i=0 ; id.has_value() && i<d ; i++)
+      X[id.value()][i]= locs[i](true).value() ;
     id = ids() ; 
-   }    
+   }
    //try { while (1) for (int i=0, id=ids() ; i<d; i++) X[id][i]= locs[i](true) ; } catch(...) {}
    //int id ; in>>id ; for (int i=0 ; i<d ; i++) {in >> X[id][i] ;} 
    //for (int i=0, id=ids(); i<d ; i++) { X[id][i]= locs[i]() ;} 
@@ -1085,7 +1097,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
     }
 
     if (v.first == ExportType::NETCDFF)
-          printf("WARN: netcdf writing haven't been tested and therefore is not plugged in\n") ;
+          printf("WARN: netcdf writing hasn't been tested and therefore is not plugged in\n") ;
 
     if (v.first == ExportType::XML)
     {
@@ -1105,32 +1117,29 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
       if (v.second & ExportData::ORIENTATION) xmlout->writeArray("Orientation", &A, ArrayType::particles, EncodingType::ascii);
       if (v.second & ExportData::COORDINATION) xmlout->writeArray("Coordination", &Z, ArrayType::particles, EncodingType::ascii);
       
-      if (v.second & ExportData::IDS) { auto tmp = MP.contacts2array(ExportData::IDS, X, Boundaries) ; 
-        xmlout->writeArray("Ids", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::POSITION) { auto tmp = MP.contacts2array(ExportData::POSITION, X, Boundaries) ; 
-        xmlout->writeArray("Locations", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FN) { auto tmp = MP.contacts2array(ExportData::FN, X, Boundaries) ; 
-        xmlout->writeArray("Normal force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FT) { auto tmp = MP.contacts2array(ExportData::FT, X, Boundaries) ; 
-        xmlout->writeArray("Tangential force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::GHOSTMASK) { auto tmp = MP.contacts2array(ExportData::GHOSTMASK, X, Boundaries) ; 
-        xmlout->writeArray("Ghost mask", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::GHOSTDIR) { auto tmp = MP.contacts2array(ExportData::GHOSTDIR, X, Boundaries) ; 
-        xmlout->writeArray("Ghost direction", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::BRANCHVECTOR) { auto tmp = MP.contacts2array(ExportData::BRANCHVECTOR, X, Boundaries) ; 
-        xmlout->writeArray("Branch vector", &tmp, ArrayType::contacts, EncodingType::ascii) ;} 
-      if (v.second & ExportData::FN_EL) { auto tmp = MP.contacts2array(ExportData::FN_EL, X, Boundaries) ; 
-        xmlout->writeArray("Elastic normal force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FN_VISC) { auto tmp = MP.contacts2array(ExportData::FN_VISC, X, Boundaries) ; 
-        xmlout->writeArray("Viscous normal force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FT_EL) { auto tmp = MP.contacts2array(ExportData::FT_EL, X, Boundaries) ; 
-        xmlout->writeArray("Elastic tangential force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FT_VISC) { auto tmp = MP.contacts2array(ExportData::FT_VISC, X, Boundaries) ; 
-        xmlout->writeArray("Viscous tangential force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FT_FRIC) { auto tmp = MP.contacts2array(ExportData::FT_FRIC, X, Boundaries) ; 
-        xmlout->writeArray("Friction force", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
-      if (v.second & ExportData::FT_FRICTYPE) { auto tmp = MP.contacts2array(ExportData::FT_FRICTYPE, X, Boundaries) ; 
-        xmlout->writeArray("Friction activated", &tmp, ArrayType::contacts, EncodingType::ascii) ;}
+      if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
+      { 
+        auto [mapping, tmp] = MP.contacts2array(v.second, X, Boundaries) ;
+        for (auto & v:mapping)
+        {
+          switch(v.first){
+            case ExportData::IDS: xmlout->writeArray("Ids", &tmp, v.second, 2, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::CONTACTPOSITION : xmlout->writeArray("Locations", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FN : xmlout->writeArray("Normal force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FT : xmlout->writeArray("Tangential force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::BRANCHVECTOR : xmlout->writeArray("Branch vector", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FN_EL : xmlout->writeArray("Elastic normal force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FN_VISC : xmlout->writeArray("Viscous normal force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FT_EL : xmlout->writeArray("Elastic tangential force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FT_VISC : xmlout->writeArray("Visous tangential force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FT_FRIC : xmlout->writeArray("Friction force", &tmp, v.second, d, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::FT_FRICTYPE : xmlout->writeArray("Friction activated", &tmp, v.second, 1, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::GHOSTMASK : xmlout->writeArray("Ghost mask", &tmp, v.second, 1, ArrayType::contacts, EncodingType::ascii) ; break ;
+            case ExportData::GHOSTDIR : xmlout->writeArray("Ghost direction", &tmp, v.second, 1, ArrayType::contacts, EncodingType::ascii) ; break ;
+            default: break ; 
+          }
+        }
+      }
       
 //         case ExportData::POSITION: res.push_back(loc) ; break ; 
 //         case ExportData::FN: res.push_back(contact.infos->Fn) ; break ;

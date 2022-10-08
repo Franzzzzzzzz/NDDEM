@@ -99,9 +99,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">load_balance</a> ()</td></tr>
 <tr class="memdesc:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">More...</a><br /></td></tr>
 <tr class="separator:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga916e0a8d484feb9bf760575059ac0add"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="el" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</td></tr>
-<tr class="memdesc:ga916e0a8d484feb9bf760575059ac0add"><td class="mdescLeft">&#160;</td><td class="mdescRight">pack the contact data in a 2d array  <a href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">More...</a><br /></td></tr>
-<tr class="separator:ga916e0a8d484feb9bf760575059ac0add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="el" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</td></tr>
+<tr class="memdesc:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">pack the contact data in a 2d array  <a href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">More...</a><br /></td></tr>
+<tr class="separator:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -153,6 +153,8 @@ Private Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr class="memitem:a51d452b936a3c13d8ee8ceb9f2e17ea1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a51d452b936a3c13d8ee8ceb9f2e17ea1">fullcontactinfo</a></td></tr>
+<tr class="separator:a51d452b936a3c13d8ee8ceb9f2e17ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa748a5787f222e29ca5a213681d45e48"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">N</a></td></tr>
 <tr class="memdesc:aa748a5787f222e29ca5a213681d45e48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of grains.  <a href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">More...</a><br /></td></tr>
 <tr class="separator:aa748a5787f222e29ca5a213681d45e48"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -367,6 +369,30 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Records the j id of the wall in the associated delayed action. </p>
+
+</div>
+</div>
+<a id="a51d452b936a3c13d8ee8ceb9f2e17ea1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51d452b936a3c13d8ee8ceb9f2e17ea1">&#9670;&nbsp;</a></span>fullcontactinfo</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::fullcontactinfo</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

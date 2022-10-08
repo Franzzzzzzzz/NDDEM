@@ -8,13 +8,15 @@ radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
+auto radius uniform 0.4 0.6
 
-boundary 0 WALL 0 20
+boundary 0 WALL 2 18
 boundary 1 PBC  0 10.5
 #boundary 2 PBC  0 3.4
 #boundary 3 PBC  0 3.4
 
 auto location randomdrop
+boundary 0 WALL 0 20
 
 location 0:10   0 0:11 
 location 11:18  1 0:1.5:11 
@@ -33,9 +35,10 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 500
+set T 50
 set dt 0.0001
-#set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps XML with 12 Position Velocity Ids Fn Ft Branch Fn_el Fn_visc Ft_el Ft_visc Ft_fric Ft_frictype
+set dumps XML with 2 Position Velocity 
 #set dumps CSV with 1 Orientation
 set dumps VTK with 3 Ids Velocity Coordination
 set tdump 10000

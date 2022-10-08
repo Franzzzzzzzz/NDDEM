@@ -100,9 +100,12 @@ Functions</h2></td></tr>
 <tr class="memitem:gaaae3ce9a68b9ac2886c0c6178da987ad"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaaae3ce9a68b9ac2886c0c6178da987ad">Simulation&lt; d &gt;::getRotationRate</a> ()</td></tr>
 <tr class="memdesc:gaaae3ce9a68b9ac2886c0c6178da987ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of orientation rate.  <a href="group__API.html#gaaae3ce9a68b9ac2886c0c6178da987ad">More...</a><br /></td></tr>
 <tr class="separator:gaaae3ce9a68b9ac2886c0c6178da987ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac4829244be8428e67670518bf5fed479"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gac4829244be8428e67670518bf5fed479">Simulation&lt; d &gt;::getParticleForce</a> ()</td></tr>
-<tr class="memdesc:gac4829244be8428e67670518bf5fed479"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of orientation rate.  <a href="group__API.html#gac4829244be8428e67670518bf5fed479">More...</a><br /></td></tr>
-<tr class="separator:gac4829244be8428e67670518bf5fed479"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa892abc9bf2f4101a63243adb9836f2c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa892abc9bf2f4101a63243adb9836f2c">Simulation&lt; d &gt;::getContactForce</a> ()</td></tr>
+<tr class="memdesc:gaa892abc9bf2f4101a63243adb9836f2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces.  <a href="group__API.html#gaa892abc9bf2f4101a63243adb9836f2c">More...</a><br /></td></tr>
+<tr class="separator:gaa892abc9bf2f4101a63243adb9836f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1c98c8c77d3667385ed2da1c15fb8ff3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga1c98c8c77d3667385ed2da1c15fb8ff3">Simulation&lt; d &gt;::getContactInfos</a> (int flags)</td></tr>
+<tr class="memdesc:ga1c98c8c77d3667385ed2da1c15fb8ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of contact information.  <a href="group__API.html#ga1c98c8c77d3667385ed2da1c15fb8ff3">More...</a><br /></td></tr>
+<tr class="separator:ga1c98c8c77d3667385ed2da1c15fb8ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga05c66f3e96abab1dde60a1ea6fbad592"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga05c66f3e96abab1dde60a1ea6fbad592">Simulation&lt; d &gt;::setX</a> (std::vector&lt; std::vector&lt; double &gt; &gt; X_)</td></tr>
 <tr class="memdesc:ga05c66f3e96abab1dde60a1ea6fbad592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the array of locations.  <a href="group__API.html#ga05c66f3e96abab1dde60a1ea6fbad592">More...</a><br /></td></tr>
 <tr class="separator:ga05c66f3e96abab1dde60a1ea6fbad592"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,6 +267,65 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="gaa892abc9bf2f4101a63243adb9836f2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa892abc9bf2f4101a63243adb9836f2c">&#9670;&nbsp;</a></span>getContactForce()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::vector&lt;double&gt; &gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::getContactForce </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces. </p>
+
+</div>
+</div>
+<a id="ga1c98c8c77d3667385ed2da1c15fb8ff3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1c98c8c77d3667385ed2da1c15fb8ff3">&#9670;&nbsp;</a></span>getContactInfos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::vector&lt;double&gt; &gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::getContactInfos </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Expose the array of contact information. </p>
+
+</div>
+</div>
 <a id="ga3129fa33da12f5f4ae4772d35a24284b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga3129fa33da12f5f4ae4772d35a24284b">&#9670;&nbsp;</a></span>getOrientation()</h2>
 
@@ -290,35 +352,6 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Expose the array of orientation. </p>
-
-</div>
-</div>
-<a id="gac4829244be8428e67670518bf5fed479"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac4829244be8428e67670518bf5fed479">&#9670;&nbsp;</a></span>getParticleForce()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;std::vector&lt;double&gt; &gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::getParticleForce </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Expose the array of orientation rate. </p>
 
 </div>
 </div>

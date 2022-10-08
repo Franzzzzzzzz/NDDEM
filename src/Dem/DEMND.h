@@ -190,7 +190,7 @@ public:
       {
         // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
         // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
-        //bool isdumptime = (ti % P.tdump==0) ;
+        bool isdumptime = (ntt==nt-1) || (ti % P.tdump==0) ;
         //P.display_info(ti, V, Omega, F, Torque, 0, 0) ;
         if (ti%P.tinfo==0)
         {
@@ -365,7 +365,7 @@ public:
         }
 
         //Particle - particle contacts
-        #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout)
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout) shared(isdumptime)
         {
           #ifdef NO_OPENMP
             int ID = 0 ;
@@ -390,12 +390,12 @@ public:
             if (it->ghost==0)
             {
                 C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
-                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it) ;
+                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime) ;
             }
             else
             {
                 (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
-                                       X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it);//, logghosts) ;
+                                       X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
             }
 
             //if (P.contactforcedump && (ti % P.tdump==0))
@@ -457,7 +457,7 @@ public:
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif
         } //END PARALLEL PART
-        ParticleForce = calculateParticleForce() ;
+        //ParticleForce = calculateParticleForce() ;
 
         // Finish by sequencially adding the grains that were not owned by the parallel proc when computed
         for (int i=0 ; i<MP.P ; i++)
@@ -570,11 +570,24 @@ public:
   /** \brief Expose the array of orientation rate. \ingroup API */
   std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
 
-  /** \brief Expose the array of orientation rate. \ingroup API */
-  std::vector<std::vector<double>> getParticleForce() { printf("\nA\n"); fflush(stdout) ; return ParticleForce; }
+  /** \brief DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces. \ingroup API */
+  std::vector<std::vector<double>> getContactForce() 
+  {
+    auto [_, res] = MP.contacts2array (ExportData::IDS | ExportData::FN, X, P.Boundaries) ; 
+    return res; 
+  }
+  
+  /** \brief Expose the array of contact information. \ingroup API */
+  std::vector<std::vector<double>> getContactInfos(int flags) 
+  {
+    auto [_, res] = MP.contacts2array (static_cast<ExportData>(flags), X, P.Boundaries) ; 
+    return res; 
+  }
+  
+  
 
-  // /** \brief Expose the array of contact forces and velocities. \ingroup API */
-  std::vector<std::vector<double>> calculateParticleForce()
+  // /** \brief DEPRECATED Expose the array of contact forces and velocities. \ingroup API */
+  /*std::vector<std::vector<double>> calculateParticleForce()
   {
     std::vector<std::vector<double>> res ;
     std::vector<double> tmpfrc ;
@@ -595,7 +608,7 @@ public:
     }
 
     return res;
-  }
+  }*/
 
   /** \brief Set the array of locations. \ingroup API */
   void setX(std::vector < std::vector <double> > X_) { X = X_; }

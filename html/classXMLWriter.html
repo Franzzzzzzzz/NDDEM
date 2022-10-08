@@ -84,6 +84,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6b52391c183d510aafbe0ecf604f9a19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a661d0f8c2b18e17b159c8675a0ad6868"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a661d0f8c2b18e17b159c8675a0ad6868">startTS</a> (double ts)</td></tr>
 <tr class="separator:a661d0f8c2b18e17b159c8675a0ad6868"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8eb7f805745196b2067b27d3631cf3fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a8eb7f805745196b2067b27d3631cf3fa">writeArray</a> (string name, vector&lt; vector&lt; double &gt;&gt; *x, int beg, int length, <a class="el" href="Xml_8h.html#a6a03cb2a3ac6197231b65056e6b01ee9">ArrayType</a> t, <a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30">EncodingType</a> te=<a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30a5b7f33be48f19c25e1af2f96cffc569f">EncodingType::ascii</a>)</td></tr>
+<tr class="separator:a8eb7f805745196b2067b27d3631cf3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e6bbb46e4b9d8dd4727e74de24117c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a7e6bbb46e4b9d8dd4727e74de24117c8">writeArray</a> (string name, std::vector&lt; std::vector&lt; double &gt; &gt; *x, <a class="el" href="Xml_8h.html#a6a03cb2a3ac6197231b65056e6b01ee9">ArrayType</a> t, <a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30">EncodingType</a> te=<a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30a5b7f33be48f19c25e1af2f96cffc569f">EncodingType::ascii</a>)</td></tr>
 <tr class="separator:a7e6bbb46e4b9d8dd4727e74de24117c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae91f51309cf4c7b195f0858c3eaa2ab6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#ae91f51309cf4c7b195f0858c3eaa2ab6">writeArray</a> (string name, std::vector&lt; double &gt; *x, <a class="el" href="Xml_8h.html#a6a03cb2a3ac6197231b65056e6b01ee9">ArrayType</a> t, <a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30">EncodingType</a> te=<a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30a5b7f33be48f19c25e1af2f96cffc569f">EncodingType::ascii</a>)</td></tr>
@@ -483,7 +485,7 @@ template&lt;class T &gt; </div>
 </div>
 </div>
 <a id="ae91f51309cf4c7b195f0858c3eaa2ab6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae91f51309cf4c7b195f0858c3eaa2ab6">&#9670;&nbsp;</a></span>writeArray() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae91f51309cf4c7b195f0858c3eaa2ab6">&#9670;&nbsp;</a></span>writeArray() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -523,7 +525,7 @@ template&lt;class T &gt; </div>
 </div>
 </div>
 <a id="a7e6bbb46e4b9d8dd4727e74de24117c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e6bbb46e4b9d8dd4727e74de24117c8">&#9670;&nbsp;</a></span>writeArray() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e6bbb46e4b9d8dd4727e74de24117c8">&#9670;&nbsp;</a></span>writeArray() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -539,6 +541,58 @@ template&lt;class T &gt; </div>
           <td></td>
           <td class="paramtype">std::vector&lt; std::vector&lt; double &gt; &gt; *&#160;</td>
           <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Xml_8h.html#a6a03cb2a3ac6197231b65056e6b01ee9">ArrayType</a>&#160;</td>
+          <td class="paramname"><em>t</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30">EncodingType</a>&#160;</td>
+          <td class="paramname"><em>te</em> = <code><a class="el" href="Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30a5b7f33be48f19c25e1af2f96cffc569f">EncodingType::ascii</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8eb7f805745196b2067b27d3631cf3fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8eb7f805745196b2067b27d3631cf3fa">&#9670;&nbsp;</a></span>writeArray() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void XMLWriter::writeArray </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; vector&lt; double &gt;&gt; *&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>beg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

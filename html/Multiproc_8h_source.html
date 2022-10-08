@@ -132,241 +132,292 @@ $(function() {
 <div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classMultiproc.html#aec88aed3142b48dade49aa0daa32037a">   66</a></span>&#160;  vector &lt;vector &lt;int&gt; &gt; <a class="code" href="classMultiproc.html#aec88aed3142b48dade49aa0daa32037a">delayedwallj</a> ; </div>
 <div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="classMultiproc.html#a4ea378fcbc3be22a2afe8744df23d9db">   67</a></span>&#160;  vector &lt;uint&gt; <a class="code" href="classMultiproc.html#a4ea378fcbc3be22a2afe8744df23d9db">delayedwall_size</a> ; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  vector&lt;vector&lt;double&gt;&gt; contacts2array (<a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="code" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>) ; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keyword">auto</span> contacts2array (<a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="code" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>) ; </div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  </div>
 <div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">   71</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">P</a> ; </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">   74</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">N</a> ; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keywordtype">void</span> split (<span class="keywordtype">int</span> <a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>, <span class="keywordtype">int</span> P) ; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;} ;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">/*****************************************************************************************************</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="classMultiproc.html#a51d452b936a3c13d8ee8ceb9f2e17ea1">   74</a></span>&#160;  <a class="code" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> <a class="code" href="classMultiproc.html#a51d452b936a3c13d8ee8ceb9f2e17ea1">fullcontactinfo</a>; </div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">   75</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">N</a> ; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordtype">void</span> split (<span class="keywordtype">int</span> <a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>, <span class="keywordtype">int</span> P) ; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;} ;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">/*****************************************************************************************************</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment"> * IMPLEMENTATIONS                                                                                   *</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment"> * IMPLEMENTATIONS                                                                                   *</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment"> * ***************************************************************************************************/</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">   89</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">Multiproc&lt;d&gt;::disp_share</a>()</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;{</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  printf(<span class="stringliteral">&quot;Processor share [%d threads]:\n&quot;</span>, P) ;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : share)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    printf(<span class="stringliteral">&quot;%d &quot;</span>, i) ;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    printf(<span class="stringliteral">&quot;%.1f &quot;</span>, ((<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-share[i]- (share[i+1]-share[i])/2)*(share[i+1]-share[i]))/<span class="keywordtype">double</span>((<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>*<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-1)/2)*100) ;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  printf(<span class="stringliteral">&quot;\n--------\n&quot;</span>) ;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment">//=====================================================</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">  101</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">Multiproc&lt;d&gt;::split</a>(<span class="keywordtype">int</span> <a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>, <span class="keywordtype">int</span> P)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keywordtype">double</span> Delta,b1,b2 ;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keywordtype">int</span> Nprime=<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a> ;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="keywordtype">double</span> Area=<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>*(<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-1)/(2*P) ;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  Delta=Nprime*Nprime-2*Area ;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">if</span> (Delta&lt;0) {printf(<span class="stringliteral">&quot;Error: Quadratic equation has no solution(multiproc)\n&quot;</span>) ; fflush(stdout)  ;}</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  b1=(Nprime-sqrt(Delta)) ;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  b2=(Nprime+sqrt(Delta)) ;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordflow">if</span> (b1&gt;=0 &amp;&amp; b1&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b1 %d %d\n&quot;</span>, i, <span class="keywordtype">int</span>(floor(b1)), <span class="keywordtype">int</span>(floor(b2))) ;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    share[i+1]=share[i]+int(floor(b1)) ;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    Nprime -= int(floor(b1)) ;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  }</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (b2&gt;=0 &amp;&amp; b2&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b2 %d\n&quot;</span>, i, <span class="keywordtype">int</span>(floor(b2))) ;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    share[i+1]=share[i]+int(floor(b2)) ;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    Nprime -= int(floor(b2)) ;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordflow">else</span> printf(<span class="stringliteral">&quot;No solution ...&quot;</span>) ;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;}</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;share[P]=<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a> ;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;}</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment">//-------------------------------------------------</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00134"></a><span class="lineno"><a class="line" href="group__DEM.html#gafc0ea8142d7f6a344e70231626f129f2">  134</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#gafc0ea8142d7f6a344e70231626f129f2">Multiproc&lt;d&gt;::delaying</a> (<span class="keywordtype">int</span> ID, <span class="keywordtype">int</span> j, <a class="code" href="classAction.html">Action</a> &amp; act)</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;{</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  delayed_size[ID]++ ;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="keywordflow">if</span> (delayed_size[ID] &lt; delayedj[ID].size())</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  {</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    delayed[ID][delayed_size[ID]-1]=act ;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    delayedj[ID][delayed_size[ID]-1]=j ;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  }</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    delayed[ID].resize(delayed_size[ID]+100, act) ;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    delayedj[ID].resize(delayed_size[ID]+100, j) ;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="comment">//delayed[ID].push_back(act) ;</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">//delayedj[ID].push_back(j) ;</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;}</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00151"></a><span class="lineno"><a class="line" href="group__DEM.html#ga56662a7e3719219a056f8945629bed17">  151</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga56662a7e3719219a056f8945629bed17">Multiproc&lt;d&gt;::delayingwall</a> (<span class="keywordtype">int</span> ID, <span class="keywordtype">int</span> j, <a class="code" href="classAction.html">Action</a> &amp; act)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;{</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  delayedwall_size[ID]++ ;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <span class="keywordflow">if</span> (delayedwall_size[ID] &lt; delayedwallj[ID].size())</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    delayedwall[ID][delayedwall_size[ID]-1]=act ;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    delayedwallj[ID][delayedwall_size[ID]-1]=j ;</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  }</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  {</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    delayedwall[ID].resize(delayedwall_size[ID]+100, act) ;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    delayedwallj[ID].resize(delayedwall_size[ID]+100, j) ;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="comment">//delayed[ID].push_back(act) ;</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">//delayedj[ID].push_back(j) ;</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;}</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment">//---------------------------------------------</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="line" href="group__DEM.html#ga9aa57026cccdc2a995d7dffe1e370e9c">  169</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga9aa57026cccdc2a995d7dffe1e370e9c">Multiproc&lt;d&gt;::delayed_clean</a>()</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;{</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; val : delayed_size)</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    val=0 ;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;}</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00177"></a><span class="lineno"><a class="line" href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">  177</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">Multiproc&lt;d&gt;::delayedwall_clean</a>()</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;{</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; val : delayedwall_size)</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    val=0 ;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;}</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment">//--------------------------------------------</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">  186</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">Multiproc&lt;d&gt;::load_balance</a>()</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;{</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keywordflow">if</span> (P==1) return ;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keywordtype">double</span> target = std::accumulate(timing.begin(), timing.end(), 0.) / P / num_time ;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordtype">bool</span> doloadbalance = false ;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) <span class="comment">// Checking that it&#39;s worth balancing the load</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  {</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">if</span> (abs(1-timing[i]/num_time/target)&gt;0.1)</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      doloadbalance = true ;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  }</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">if</span> (!doloadbalance)</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    return ;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment"> * ***************************************************************************************************/</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">   90</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">Multiproc&lt;d&gt;::disp_share</a>()</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  printf(<span class="stringliteral">&quot;Processor share [%d threads]:\n&quot;</span>, P) ;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : share)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    printf(<span class="stringliteral">&quot;%d &quot;</span>, i) ;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    printf(<span class="stringliteral">&quot;%.1f &quot;</span>, ((<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-share[i]- (share[i+1]-share[i])/2)*(share[i+1]-share[i]))/<span class="keywordtype">double</span>((<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>*<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-1)/2)*100) ;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  printf(<span class="stringliteral">&quot;\n--------\n&quot;</span>) ;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">//=====================================================</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">  102</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">Multiproc&lt;d&gt;::split</a>(<span class="keywordtype">int</span> <a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>, <span class="keywordtype">int</span> P)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;{</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keywordtype">double</span> Delta,b1,b2 ;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keywordtype">int</span> Nprime=<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a> ;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keywordtype">double</span> Area=<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>*(<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-1)/(2*P) ;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  Delta=Nprime*Nprime-2*Area ;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordflow">if</span> (Delta&lt;0) {printf(<span class="stringliteral">&quot;Error: Quadratic equation has no solution(multiproc)\n&quot;</span>) ; fflush(stdout)  ;}</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  b1=(Nprime-sqrt(Delta)) ;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  b2=(Nprime+sqrt(Delta)) ;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">if</span> (b1&gt;=0 &amp;&amp; b1&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b1 %d %d\n&quot;</span>, i, <span class="keywordtype">int</span>(floor(b1)), <span class="keywordtype">int</span>(floor(b2))) ;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    share[i+1]=share[i]+int(floor(b1)) ;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    Nprime -= int(floor(b1)) ;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (b2&gt;=0 &amp;&amp; b2&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b2 %d\n&quot;</span>, i, <span class="keywordtype">int</span>(floor(b2))) ;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    share[i+1]=share[i]+int(floor(b2)) ;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    Nprime -= int(floor(b2)) ;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  }</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keywordflow">else</span> printf(<span class="stringliteral">&quot;No solution ...&quot;</span>) ;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;}</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;share[P]=<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a> ;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;}</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="comment">//-------------------------------------------------</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="group__DEM.html#gafc0ea8142d7f6a344e70231626f129f2">  135</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#gafc0ea8142d7f6a344e70231626f129f2">Multiproc&lt;d&gt;::delaying</a> (<span class="keywordtype">int</span> ID, <span class="keywordtype">int</span> j, <a class="code" href="classAction.html">Action</a> &amp; act)</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;{</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  delayed_size[ID]++ ;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="keywordflow">if</span> (delayed_size[ID] &lt; delayedj[ID].size())</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  {</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    delayed[ID][delayed_size[ID]-1]=act ;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    delayedj[ID][delayed_size[ID]-1]=j ;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    delayed[ID].resize(delayed_size[ID]+100, act) ;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    delayedj[ID].resize(delayed_size[ID]+100, j) ;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">//delayed[ID].push_back(act) ;</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">//delayedj[ID].push_back(j) ;</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;}</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="group__DEM.html#ga56662a7e3719219a056f8945629bed17">  152</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga56662a7e3719219a056f8945629bed17">Multiproc&lt;d&gt;::delayingwall</a> (<span class="keywordtype">int</span> ID, <span class="keywordtype">int</span> j, <a class="code" href="classAction.html">Action</a> &amp; act)</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;{</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  delayedwall_size[ID]++ ;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keywordflow">if</span> (delayedwall_size[ID] &lt; delayedwallj[ID].size())</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    delayedwall[ID][delayedwall_size[ID]-1]=act ;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    delayedwallj[ID][delayedwall_size[ID]-1]=j ;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  }</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  {</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    delayedwall[ID].resize(delayedwall_size[ID]+100, act) ;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    delayedwallj[ID].resize(delayedwall_size[ID]+100, j) ;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">//delayed[ID].push_back(act) ;</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">//delayedj[ID].push_back(j) ;</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="comment">//---------------------------------------------</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="group__DEM.html#ga9aa57026cccdc2a995d7dffe1e370e9c">  170</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga9aa57026cccdc2a995d7dffe1e370e9c">Multiproc&lt;d&gt;::delayed_clean</a>()</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; val : delayed_size)</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  {</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    val=0 ;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  }</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;}</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00178"></a><span class="lineno"><a class="line" href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">  178</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">Multiproc&lt;d&gt;::delayedwall_clean</a>()</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;{</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; val : delayedwall_size)</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  {</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    val=0 ;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;}</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment">//--------------------------------------------</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">  187</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">Multiproc&lt;d&gt;::load_balance</a>()</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;{</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keywordflow">if</span> (P==1) return ;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordtype">double</span> target = std::accumulate(timing.begin(), timing.end(), 0.) / P / num_time ;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keywordtype">bool</span> doloadbalance = false ;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) <span class="comment">// Checking that it&#39;s worth balancing the load</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  {</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">if</span> (abs(1-timing[i]/num_time/target)&gt;0.1)</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      doloadbalance = true ;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  }</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keywordflow">if</span> (!doloadbalance)</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    return ;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  vector &lt;double&gt; timeperatom ;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    timeperatom.push_back( (timing[i] / (share[i+1]-share[i])) / num_time) ;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordtype">double</span> time ;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="comment">//for (auto v: timing) printf(&quot;%g &quot;, v) ;</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  vector &lt;int&gt; newshare(P+1,0) ;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="keywordtype">int</span> curp=1 ;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> p=1 ; p&lt;P ; p++)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">//printf(&quot;%d\n&quot;, newshare.size()) ; fflush(stdout) ;</span></div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    time=0 ; newshare[p] = newshare[p-1] ;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="comment">//printf(&quot;%g\n&quot;, target) ; fflush(stdout) ;</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">while</span> (time&lt;target)</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    {</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordflow">if</span> (newshare[p] &gt;= share[curp])</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        curp++ ;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      newshare[p]++ ;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <span class="keywordflow">if</span> (newshare[p]==<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-(P-p)) break ; <span class="comment">// To ensure at least 1 particle per core, not taking any risk</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      time += timeperatom[curp-1] ;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    }</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  newshare[P] = <a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="comment">/* For testing purposes (random allocation to proc)</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="comment">  newshare[0] = 0 ; newshare[P]=N ;</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="comment">  for (int i=1; i&lt;P ; i++)</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">  {</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="comment">    do {</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="comment">    newshare[i] = newshare[i-1]+rand()%(N-newshare[i-1]-1)+1 ;</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment">  } while (newshare[i]&gt;=N-(P-i)) ;</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment">  }*/</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  printf(<span class="stringliteral">&quot;\nBalancing the load: processor migration\n&quot;</span>) ;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) printf(<span class="stringliteral">&quot;%d %ld |&quot;</span>, share[i], CLp[i].v.size() ) ;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; fflush(stdout) ;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  share=newshare ;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> temp_p, temp_w ;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  {</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.splice(temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end(), CLp[i].v) ;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.splice(temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end(), CLw[i].v) ;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="comment">//for (auto v: temp_p.v) printf(&quot;%d &quot;, v.i) ;</span></div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> p=0 ; p&lt;P ; p++)</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  {</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keyword">auto</span> itp=temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin() ;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordflow">while</span> ( itp != temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end() &amp;&amp; itp-&gt;i &lt; newshare[p+1]) itp++ ;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    CLp[p].v.splice(CLp[p].v.begin(), temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>, temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin(), itp) ;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keyword">auto</span> itw=temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin() ;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">while</span> ( itw != temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end() &amp;&amp; itw-&gt;i &lt; newshare[p+1]) itw++ ;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    CLw[p].v.splice(CLw[p].v.begin(), temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>, temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin(), itw) ;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  }</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) printf(<span class="stringliteral">&quot;%d %ld |&quot;</span>, share[i], CLp[i].v.size() ) ;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; fflush(stdout) ;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;}</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="comment">//--------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00266"></a><span class="lineno"><a class="line" href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">  266</a></span>&#160;vector&lt;vector&lt;double&gt;&gt; <a class="code" href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">Multiproc&lt;d&gt;::contacts2array</a> (<a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="code" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;{</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  vector&lt;vector&lt;double&gt;&gt; res ; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; clp : CLp)</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  {</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; contact : clp.v)</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    {</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <span class="keyword">auto</span> [loc,branch] = contact.compute_branchvector(X,<a class="code" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>,<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>) ; </div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      <span class="keywordflow">switch</span> (exp) {</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a447abb17e794509db57d5dcb084124ec">ExportData::IDS</a>: res.push_back({<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.i), <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.j)}) ; break ; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a90b4ba73224408e82ade8a072a3712c1">ExportData::POSITION</a>: res.push_back(loc) ; break ; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5">ExportData::FN</a>: res.push_back(contact.infos-&gt;Fn) ; break ;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7">ExportData::FT</a>: res.push_back(contact.infos-&gt;Ft) ; break ;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a>: res.push_back({<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.ghost)}) ; break ;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a> : res.push_back({<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.ghostdir)}) ; break ;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a>: res.push_back(branch) ; break ;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="keywordflow">default</span>: break ; </div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      }</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    }</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  }</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="keywordflow">return</span> res ; </div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;}</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  vector &lt;double&gt; timeperatom ;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    timeperatom.push_back( (timing[i] / (share[i+1]-share[i])) / num_time) ;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keywordtype">double</span> time ;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="comment">//for (auto v: timing) printf(&quot;%g &quot;, v) ;</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  vector &lt;int&gt; newshare(P+1,0) ;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordtype">int</span> curp=1 ;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> p=1 ; p&lt;P ; p++)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="comment">//printf(&quot;%d\n&quot;, newshare.size()) ; fflush(stdout) ;</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    time=0 ; newshare[p] = newshare[p-1] ;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">//printf(&quot;%g\n&quot;, target) ; fflush(stdout) ;</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">while</span> (time&lt;target)</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      <span class="keywordflow">if</span> (newshare[p] &gt;= share[curp])</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        curp++ ;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      newshare[p]++ ;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="keywordflow">if</span> (newshare[p]==<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>-(P-p)) break ; <span class="comment">// To ensure at least 1 particle per core, not taking any risk</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      time += timeperatom[curp-1] ;</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  newshare[P] = <a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="comment">/* For testing purposes (random allocation to proc)</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="comment">  newshare[0] = 0 ; newshare[P]=N ;</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">  for (int i=1; i&lt;P ; i++)</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="comment">  {</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="comment">    do {</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment">    newshare[i] = newshare[i-1]+rand()%(N-newshare[i-1]-1)+1 ;</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment">  } while (newshare[i]&gt;=N-(P-i)) ;</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="comment">  }*/</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  printf(<span class="stringliteral">&quot;\nBalancing the load: processor migration\n&quot;</span>) ;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) printf(<span class="stringliteral">&quot;%d %ld |&quot;</span>, share[i], CLp[i].v.size() ) ;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; fflush(stdout) ;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  share=newshare ;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> temp_p, temp_w ;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++)</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  {</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.splice(temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end(), CLp[i].v) ;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.splice(temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end(), CLw[i].v) ;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  }</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="comment">//for (auto v: temp_p.v) printf(&quot;%d &quot;, v.i) ;</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> p=0 ; p&lt;P ; p++)</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  {</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">auto</span> itp=temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin() ;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">while</span> ( itp != temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end() &amp;&amp; itp-&gt;i &lt; newshare[p+1]) itp++ ;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    CLp[p].v.splice(CLp[p].v.begin(), temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>, temp_p.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin(), itp) ;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keyword">auto</span> itw=temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin() ;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordflow">while</span> ( itw != temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.end() &amp;&amp; itw-&gt;i &lt; newshare[p+1]) itw++ ;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    CLw[p].v.splice(CLw[p].v.begin(), temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>, temp_w.<a class="code" href="classContactList.html#a905c7d876974c7a7efcebd361450185f">v</a>.begin(), itw) ;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  }</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) printf(<span class="stringliteral">&quot;%d %ld |&quot;</span>, share[i], CLp[i].v.size() ) ;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; fflush(stdout) ;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;}</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="comment">//--------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00267"></a><span class="lineno"><a class="line" href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">  267</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">Multiproc&lt;d&gt;::contacts2array</a> (<a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exprt, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="code" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;{</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  vector&lt;vector&lt;double&gt;&gt; res ;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  vector&lt;std::pair&lt;ExportData, int&gt;&gt; contactmapping ; </div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  </div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="keywordtype">int</span> n=0 ; </div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; clp:CLp) n+= clp.v.size() ; </div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  res.resize(n) ;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> expid= <span class="keyword">static_cast&lt;</span><a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a><span class="keyword">&gt;</span>(1) ; </div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> expall=exprt ;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  n=0 ; </div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="keywordflow">while</span> (<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(expall)&gt;0)</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  {</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordflow">if</span> (expall &amp; <span class="keyword">static_cast&lt;</span><a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a><span class="keyword">&gt;</span>(1))</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    {</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      contactmapping.push_back({expid,n}) ;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keywordflow">if</span> (expid &amp; (<a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29">ExportData::FT_FRICTYPE</a>)) </div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        n+=1 ;  </div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span> (expid &amp; (<a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a447abb17e794509db57d5dcb084124ec">ExportData::IDS</a>)) </div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        n+=2 ; </div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span> (expid &amp; (<a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38">ExportData::CONTACTPOSITION</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5">ExportData::FN</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7">ExportData::FT</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a> |</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                        <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a4ffc0f488d9daf9003867d5fed053926">ExportData::FN_EL</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7debec6dff88286f073a0d05c268abb3">ExportData::FN_VISC</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ac00814c424285528e5134a106fc21f7b">ExportData::FT_EL</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a8f86023c7a5f969c8aab02bbbe35a38d">ExportData::FT_VISC</a> | <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715">ExportData::FT_FRIC</a>)) </div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        n+=<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; </div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    }</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    </div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    expall&gt;&gt;=1 ; expid&lt;&lt;=1 ;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  }</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; v: res) v.reserve(n) ; </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  n=0 ; </div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; clp : CLp)</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; contact : clp.v)</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    {  </div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;       <a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> expid= <span class="keyword">static_cast&lt;</span><a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a><span class="keyword">&gt;</span>(1) ; </div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;       <a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> expall=exprt ;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;       <span class="keyword">auto</span> [loc,branch] = contact.compute_branchvector(X,<a class="code" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>,<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>) ; </div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;       <span class="keywordflow">while</span> (<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(expall)&gt;0)</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;       {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;         <span class="keywordflow">if</span> (expall &amp; <span class="keyword">static_cast&lt;</span><a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a><span class="keyword">&gt;</span>(1))</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;           <span class="keywordflow">switch</span> (expid)</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;           {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a447abb17e794509db57d5dcb084124ec">ExportData::IDS</a>: res[n].push_back({<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.i)}) ; res[n].push_back({<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.j)}) ; break ; </div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38">ExportData::CONTACTPOSITION</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(loc[dd]) ; break ; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5">ExportData::FN</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Fn[dd]) ; break ;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7">ExportData::FT</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Ft[dd]) ; break ;</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a>: res[n].push_back(<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.ghost)) ; break ;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a> : res[n].push_back(<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.ghostdir)) ; break ;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(branch[dd]) ; break ;</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a4ffc0f488d9daf9003867d5fed053926">ExportData::FN_EL</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Fn_el[dd]); break ; </div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7debec6dff88286f073a0d05c268abb3">ExportData::FN_VISC</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Fn_visc[dd]); break ; </div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ac00814c424285528e5134a106fc21f7b">ExportData::FT_EL</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Ft_el[dd]); break ; </div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a8f86023c7a5f969c8aab02bbbe35a38d">ExportData::FT_VISC</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Ft_visc[dd]); break ; </div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715">ExportData::FT_FRIC</a>: <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) res[n].push_back(contact.infos-&gt;Ft_fric[dd]); break ; </div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;              <span class="keywordflow">case</span> <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29">ExportData::FT_FRICTYPE</a>: res[n].push_back(<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(contact.infos-&gt;Ft_isfric)); break ;  </div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;              <span class="keywordflow">default</span>: break ;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;           }</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;           </div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        expall&gt;&gt;=1 ; expid&lt;&lt;=1 ;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      }</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      n++ ; </div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    }</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  }</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;   </div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordflow">return</span> std::make_pair(contactmapping, res) ; </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;}</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="aclassMultiproc_html_a51d452b936a3c13d8ee8ceb9f2e17ea1"><div class="ttname"><a href="classMultiproc.html#a51d452b936a3c13d8ee8ceb9f2e17ea1">Multiproc::fullcontactinfo</a></div><div class="ttdeci">v2d fullcontactinfo</div><div class="ttdef"><b>Definition:</b> Multiproc.h:74</div></div>
+<div class="ttc" id="agroup__DEM_html_ga0635bc41e0e88fb34a49d35e69cdab8f"><div class="ttname"><a href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a></div><div class="ttdeci">vector&lt; vector&lt; double &gt; &gt; v2d</div><div class="ttdef"><b>Definition:</b> Typedefs.h:10</div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a7debec6dff88286f073a0d05c268abb3"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a7debec6dff88286f073a0d05c268abb3">ExportData::FN_VISC</a></div><div class="ttdeci">@ FN_VISC</div></div>
+<div class="ttc" id="agroup__DEM_html_gaf956b204095a34f69a549ae3b9ba7f9e"><div class="ttname"><a href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">Multiproc::contacts2array</a></div><div class="ttdeci">auto contacts2array(ExportData exp, cv2d &amp;X, cv2d &amp;Boundaries)</div><div class="ttdoc">pack the contact data in a 2d array</div><div class="ttdef"><b>Definition:</b> Multiproc.h:267</div></div>
 <div class="ttc" id="aclassMultiproc_html_af2d9736090b91da23d7d07d6d9840045"><div class="ttname"><a href="classMultiproc.html#af2d9736090b91da23d7d07d6d9840045">Multiproc::timing</a></div><div class="ttdeci">vector&lt; double &gt; timing</div><div class="ttdoc">Used to record the time spent by each thread.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:57</div></div>
 <div class="ttc" id="aclassMultiproc_html_a9498815f6febd3e6fba415f001a27788"><div class="ttname"><a href="classMultiproc.html#a9498815f6febd3e6fba415f001a27788">Multiproc::delayed</a></div><div class="ttdeci">vector&lt; vector&lt; Action &gt; &gt; delayed</div><div class="ttdoc">Records the delayed Action.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:61</div></div>
 <div class="ttc" id="aclassMultiproc_html_aaca563b2f6dc09eca7082d598265934a"><div class="ttname"><a href="classMultiproc.html#aaca563b2f6dc09eca7082d598265934a">Multiproc::share</a></div><div class="ttdeci">vector&lt; int &gt; share</div><div class="ttdoc">Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:56</div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715">ExportData::FT_FRIC</a></div><div class="ttdeci">@ FT_FRIC</div></div>
 <div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a></div><div class="ttdeci">@ GHOSTMASK</div></div>
 <div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a></div><div class="ttdeci">@ GHOSTDIR</div></div>
-<div class="ttc" id="aclassParameters_html"><div class="ttname"><a href="classParameters.html">Parameters</a></div><div class="ttdoc">Generic class to handle the simulation set up.</div><div class="ttdef"><b>Definition:</b> Parameters.h:103</div></div>
+<div class="ttc" id="aclassParameters_html"><div class="ttname"><a href="classParameters.html">Parameters</a></div><div class="ttdoc">Generic class to handle the simulation set up.</div><div class="ttdef"><b>Definition:</b> Parameters.h:108</div></div>
 <div class="ttc" id="aclassMultiproc_html_aec88aed3142b48dade49aa0daa32037a"><div class="ttname"><a href="classMultiproc.html#aec88aed3142b48dade49aa0daa32037a">Multiproc::delayedwallj</a></div><div class="ttdeci">vector&lt; vector&lt; int &gt; &gt; delayedwallj</div><div class="ttdoc">Records the j id of the wall in the associated delayed action.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:66</div></div>
-<div class="ttc" id="aclassMultiproc_html_aa748a5787f222e29ca5a213681d45e48"><div class="ttname"><a href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">Multiproc::N</a></div><div class="ttdeci">int N</div><div class="ttdoc">Number of grains.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:74</div></div>
-<div class="ttc" id="agroup__DEM_html_gaac01e9375aa9f3abf33a553b9a6c5dbd"><div class="ttname"><a href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">Multiproc::load_balance</a></div><div class="ttdeci">void load_balance()</div><div class="ttdoc">Modify the atom share between threads to achieve better load balance between the threads based on the...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:186</div></div>
+<div class="ttc" id="aclassMultiproc_html_aa748a5787f222e29ca5a213681d45e48"><div class="ttname"><a href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">Multiproc::N</a></div><div class="ttdeci">int N</div><div class="ttdoc">Number of grains.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:75</div></div>
+<div class="ttc" id="agroup__DEM_html_gaac01e9375aa9f3abf33a553b9a6c5dbd"><div class="ttname"><a href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">Multiproc::load_balance</a></div><div class="ttdeci">void load_balance()</div><div class="ttdoc">Modify the atom share between threads to achieve better load balance between the threads based on the...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:187</div></div>
 <div class="ttc" id="aclassContactList_html"><div class="ttname"><a href="classContactList.html">ContactList</a></div><div class="ttdoc">Handles lists of contacts.</div><div class="ttdef"><b>Definition:</b> ContactList.h:132</div></div>
 <div class="ttc" id="aclassMultiproc_html_a2d07d31f90d99c058dd99c22e6956cfc"><div class="ttname"><a href="classMultiproc.html#a2d07d31f90d99c058dd99c22e6956cfc">Multiproc::delayedwall</a></div><div class="ttdeci">vector&lt; vector&lt; Action &gt; &gt; delayedwall</div><div class="ttdoc">Records the delayed Action.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:65</div></div>
 <div class="ttc" id="aclassMultiproc_html_a4e7773b5cad1e6e8034756a456b1bc20"><div class="ttname"><a href="classMultiproc.html#a4e7773b5cad1e6e8034756a456b1bc20">Multiproc::C</a></div><div class="ttdeci">vector&lt; Contacts&lt; d &gt; &gt; C</div><div class="ttdoc">Dummy Contacts for independent calculation per processor.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:55</div></div>
-<div class="ttc" id="agroup__DEM_html_ga9aa57026cccdc2a995d7dffe1e370e9c"><div class="ttname"><a href="group__DEM.html#ga9aa57026cccdc2a995d7dffe1e370e9c">Multiproc::delayed_clean</a></div><div class="ttdeci">void delayed_clean()</div><div class="ttdoc">Clean the record list.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:169</div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29">ExportData::FT_FRICTYPE</a></div><div class="ttdeci">@ FT_FRICTYPE</div></div>
+<div class="ttc" id="agroup__DEM_html_ga9aa57026cccdc2a995d7dffe1e370e9c"><div class="ttname"><a href="group__DEM.html#ga9aa57026cccdc2a995d7dffe1e370e9c">Multiproc::delayed_clean</a></div><div class="ttdeci">void delayed_clean()</div><div class="ttdoc">Clean the record list.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:170</div></div>
 <div class="ttc" id="agroup__Texturing_html_gae81dd62e2c6ced0fc9eb7a4ea7b1bd32"><div class="ttname"><a href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a></div><div class="ttdeci">v2d Boundaries</div></div>
 <div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a></div><div class="ttdeci">@ BRANCHVECTOR</div></div>
 <div class="ttc" id="aclassAction_html"><div class="ttname"><a href="classAction.html">Action</a></div><div class="ttdoc">Handle force and torque contact information.</div><div class="ttdef"><b>Definition:</b> ContactList.h:17</div></div>
@@ -377,27 +428,29 @@ $(function() {
 <div class="ttc" id="aclassMultiproc_html"><div class="ttname"><a href="classMultiproc.html">Multiproc</a></div><div class="ttdoc">Manual multiprocessor handling for OpenMP, for max efficiency &amp; avoiding bugs &amp; race conditions,...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:22</div></div>
 <div class="ttc" id="agroup__DEM_html_gaaee07f7198d82fae2bc0b65da1c43582"><div class="ttname"><a href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a></div><div class="ttdeci">const vector&lt; vector&lt; double &gt; &gt; cv2d</div><div class="ttdef"><b>Definition:</b> Typedefs.h:14</div></div>
 <div class="ttc" id="aclassMultiproc_html_a4ea378fcbc3be22a2afe8744df23d9db"><div class="ttname"><a href="classMultiproc.html#a4ea378fcbc3be22a2afe8744df23d9db">Multiproc::delayedwall_size</a></div><div class="ttdeci">vector&lt; uint &gt; delayedwall_size</div><div class="ttdoc">Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()</div><div class="ttdef"><b>Definition:</b> Multiproc.h:67</div></div>
-<div class="ttc" id="agroup__DEM_html_gafc0ea8142d7f6a344e70231626f129f2"><div class="ttname"><a href="group__DEM.html#gafc0ea8142d7f6a344e70231626f129f2">Multiproc::delaying</a></div><div class="ttdeci">void delaying(int ID, int j, Action &amp;act)</div><div class="ttdoc">Record the action to be added later to the relevent atom in sequencial settings, avoid potential race...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:134</div></div>
+<div class="ttc" id="agroup__DEM_html_gafc0ea8142d7f6a344e70231626f129f2"><div class="ttname"><a href="group__DEM.html#gafc0ea8142d7f6a344e70231626f129f2">Multiproc::delaying</a></div><div class="ttdeci">void delaying(int ID, int j, Action &amp;act)</div><div class="ttdoc">Record the action to be added later to the relevent atom in sequencial settings, avoid potential race...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:135</div></div>
 <div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ad9d729a2fc731c33ea1360682d73aad5">ExportData::FN</a></div><div class="ttdeci">@ FN</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga7722c8ecbb62d99aee7ce68b1752f337"><div class="ttname"><a href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a></div><div class="ttdeci">int N</div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1ac00814c424285528e5134a106fc21f7b"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1ac00814c424285528e5134a106fc21f7b">ExportData::FT_EL</a></div><div class="ttdeci">@ FT_EL</div></div>
 <div class="ttc" id="aDem_2Parameters_8h_html"><div class="ttname"><a href="Dem_2Parameters_8h.html">Parameters.h</a></div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a8f86023c7a5f969c8aab02bbbe35a38d"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a8f86023c7a5f969c8aab02bbbe35a38d">ExportData::FT_VISC</a></div><div class="ttdeci">@ FT_VISC</div></div>
 <div class="ttc" id="astructParam_html"><div class="ttname"><a href="structParam.html">Param</a></div><div class="ttdoc">Contains the parameters of the simulation &amp; CG.</div><div class="ttdef"><b>Definition:</b> IOLiggghts.h:67</div></div>
 <div class="ttc" id="aclassMultiproc_html_a05b600c1fbe8f458d43716d47c43632a"><div class="ttname"><a href="classMultiproc.html#a05b600c1fbe8f458d43716d47c43632a">Multiproc::delayed_size</a></div><div class="ttdeci">vector&lt; uint &gt; delayed_size</div><div class="ttdoc">Max length of the delayed vector for each thread. Can grow as needed on call to delaying()</div><div class="ttdef"><b>Definition:</b> Multiproc.h:63</div></div>
 <div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a1e2f86b95d78d7f8cfcbdc1a07b2fbd7">ExportData::FT</a></div><div class="ttdeci">@ FT</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
-<div class="ttc" id="agroup__DEM_html_ga902604fea6f0f763703abe9d7cd3b9a6"><div class="ttname"><a href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">Multiproc::delayedwall_clean</a></div><div class="ttdeci">void delayedwall_clean()</div><div class="ttdoc">Clean the record of the force on the wal.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:177</div></div>
+<div class="ttc" id="agroup__DEM_html_ga902604fea6f0f763703abe9d7cd3b9a6"><div class="ttname"><a href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">Multiproc::delayedwall_clean</a></div><div class="ttdeci">void delayedwall_clean()</div><div class="ttdoc">Clean the record of the force on the wal.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:178</div></div>
 <div class="ttc" id="aclassMultiproc_html_ac898635d542458c39f661d2dad616b97"><div class="ttname"><a href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">Multiproc::num_time</a></div><div class="ttdeci">int num_time</div><div class="ttdoc">Number of sample of time spent. Resets when load_balance() is called.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:58</div></div>
-<div class="ttc" id="agroup__DEM_html_ga916e0a8d484feb9bf760575059ac0add"><div class="ttname"><a href="group__DEM.html#ga916e0a8d484feb9bf760575059ac0add">Multiproc::contacts2array</a></div><div class="ttdeci">vector&lt; vector&lt; double &gt; &gt; contacts2array(ExportData exp, cv2d &amp;X, cv2d &amp;Boundaries)</div><div class="ttdoc">pack the contact data in a 2d array</div><div class="ttdef"><b>Definition:</b> Multiproc.h:266</div></div>
 <div class="ttc" id="aclassContacts_html"><div class="ttname"><a href="classContacts.html">Contacts</a></div><div class="ttdoc">Calculate contact forces.</div><div class="ttdef"><b>Definition:</b> Contacts.h:22</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:4336</div></div>
 <div class="ttc" id="aclassMultiproc_html_a3e2d638fe1f99d1124d90839ffa14285"><div class="ttname"><a href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">Multiproc::P</a></div><div class="ttdeci">int P</div><div class="ttdoc">Number of threads.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:71</div></div>
 <div class="ttc" id="aContacts_8h_html"><div class="ttname"><a href="Contacts_8h.html">Contacts.h</a></div></div>
 <div class="ttc" id="aclassMultiproc_html_a8e44ce6bab8e8f03bbc21d2616c651ea"><div class="ttname"><a href="classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea">Multiproc::CLp</a></div><div class="ttdeci">vector&lt; ContactList&lt; d &gt; &gt; CLp</div><div class="ttdoc">ContactList particle-particle for each processor.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:53</div></div>
-<div class="ttc" id="agroup__DEM_html_ga56976c11478e25728e04bf9561aff8e6"><div class="ttname"><a href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">Multiproc::disp_share</a></div><div class="ttdeci">void disp_share()</div><div class="ttdoc">Display the # of particle on each thread.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:89</div></div>
-<div class="ttc" id="agroup__DEM_html_ga56662a7e3719219a056f8945629bed17"><div class="ttname"><a href="group__DEM.html#ga56662a7e3719219a056f8945629bed17">Multiproc::delayingwall</a></div><div class="ttdeci">void delayingwall(int ID, int j, Action &amp;act)</div><div class="ttdoc">Record the action on the wall. Only usefull if the force on the wall needs to be calculated.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:151</div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a4ffc0f488d9daf9003867d5fed053926"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a4ffc0f488d9daf9003867d5fed053926">ExportData::FN_EL</a></div><div class="ttdeci">@ FN_EL</div></div>
+<div class="ttc" id="agroup__DEM_html_ga56976c11478e25728e04bf9561aff8e6"><div class="ttname"><a href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">Multiproc::disp_share</a></div><div class="ttdeci">void disp_share()</div><div class="ttdoc">Display the # of particle on each thread.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:90</div></div>
+<div class="ttc" id="agroup__DEM_html_ga56662a7e3719219a056f8945629bed17"><div class="ttname"><a href="group__DEM.html#ga56662a7e3719219a056f8945629bed17">Multiproc::delayingwall</a></div><div class="ttdeci">void delayingwall(int ID, int j, Action &amp;act)</div><div class="ttdoc">Record the action on the wall. Only usefull if the force on the wall needs to be calculated.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:152</div></div>
+<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38">ExportData::CONTACTPOSITION</a></div><div class="ttdeci">@ CONTACTPOSITION</div></div>
 <div class="ttc" id="aclassMultiproc_html_aceac9fea800bcc7589415e716cde5b02"><div class="ttname"><a href="classMultiproc.html#aceac9fea800bcc7589415e716cde5b02">Multiproc::delayedj</a></div><div class="ttdeci">vector&lt; vector&lt; int &gt; &gt; delayedj</div><div class="ttdoc">Records the j id of the particle in the associated delayed action.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:62</div></div>
-<div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1a90b4ba73224408e82ade8a072a3712c1"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a90b4ba73224408e82ade8a072a3712c1">ExportData::POSITION</a></div><div class="ttdeci">@ POSITION</div></div>
-<div class="ttc" id="agroup__DEM_html_ga7a3c3c6b021a4ecf43dbf795f2230d77"><div class="ttname"><a href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">Multiproc::split</a></div><div class="ttdeci">void split(int N, int P)</div><div class="ttdoc">Function to allocate the grains to threads taking into account the load balance in the contact detect...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:101</div></div>
+<div class="ttc" id="agroup__DEM_html_ga7a3c3c6b021a4ecf43dbf795f2230d77"><div class="ttname"><a href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">Multiproc::split</a></div><div class="ttdeci">void split(int N, int P)</div><div class="ttdoc">Function to allocate the grains to threads taking into account the load balance in the contact detect...</div><div class="ttdef"><b>Definition:</b> Multiproc.h:102</div></div>
 <div class="ttc" id="aclassMultiproc_html_af469cf9d0075a8d76d22de5980b8602f"><div class="ttname"><a href="classMultiproc.html#af469cf9d0075a8d76d22de5980b8602f">Multiproc::initialise</a></div><div class="ttdeci">void initialise(int NN, int PP, Parameters&lt; d &gt; &amp;Param)</div><div class="ttdef"><b>Definition:</b> Multiproc.h:26</div></div>
 <div class="ttc" id="aclassMultiproc_html_ab2f6b71cfb789957377af15f57c3ddc8"><div class="ttname"><a href="classMultiproc.html#ab2f6b71cfb789957377af15f57c3ddc8">Multiproc::CLw</a></div><div class="ttdeci">vector&lt; ContactList&lt; d &gt; &gt; CLw</div><div class="ttdoc">ContactList particle-wall for each processor.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:54</div></div>
 <!-- start footer part -->
