@@ -31,16 +31,16 @@ public:
     vector < double > vrel ; ///< Relative velocity
 
     void particle_particle   ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) ; ///< Force & torque between 2 particles
+                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime) ; ///< Force & torque between 2 particles
     void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
                                cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
     void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
                                cv1d & cn, cv1d & Vj, cp & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
     void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
+                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
 
     void particle_ghost_regular (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact)
+                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime)
     {
         vector <double> loc (d, 0) ;
         loc=Xj ;
@@ -50,13 +50,13 @@ public:
           if (gh&1)
             loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
         }
-        return (particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact) ) ;
+        return (particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact, isdumptime) ) ;
     } ///< Calculate the particle to regular (non Lees-Edward) ghost contact
 
 
 
     void particle_ghost_LE (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact) /*, FILE * debug = nullptr*/
+                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
     {
         vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ;
@@ -65,7 +65,7 @@ public:
         {
             loc=Xj ;
             compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ;
-            particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact) ;
+            particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact, isdumptime) ;
             //if (debug != nullptr)
             // fprintf(debug, "%g %g %g %g %g 0 %d\n", loc[0], loc[1], Vj[0], Vj[1], rj, Contact.j) ;
         }
@@ -84,7 +84,7 @@ public:
 
          gh>>=1 ; ghd>>=1 ;
          compute_normalpbcloc (loc, 1, gh, ghd) ;
-         particle_particle (Xi, Vi, Omegai, ri, mi, loc, vel, Omegaj, rj, mj, Contact) ;
+         particle_particle (Xi, Vi, Omegai, ri, mi, loc, vel, Omegaj, rj, mj, Contact, isdumptime) ;
          //if (debug != nullptr)
          //    fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], rj, n, Contact.j) ;
 
@@ -157,7 +157,7 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
 //---------------------- particle particle contact ----------------------------
 template <int d>
 void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp & Contact)
+                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp & Contact, bool isdumptime)
 {
   double kn, kt, gamman, gammat ;
   contactlength=Contact.contactlength ;
@@ -197,7 +197,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 
   //Normal force
   Fn=cn*(ovlp*kn) - vn*gamman ;
-  if constexpr (SAVE_FORCE_COMPONENTS)
+  if (isdumptime)
   {
     Act.Fn_el = cn*(ovlp*kn) ; 
     Act.Fn_visc = - vn*gamman ; 
@@ -225,11 +225,11 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
     else
       Tools<d>::setzero(Ft) ;
     
-    if constexpr (SAVE_FORCE_COMPONENTS) {Act.Ft_fric = Ft ; Act.Ft_isfric=true ; } 
+    if (isdumptime) {Act.Ft_fric = Ft ; Act.Ft_isfric=true ; } 
   }
   else
   {
-    if constexpr (SAVE_FORCE_COMPONENTS) {Act.Ft_el = Ft ; Act.Ft_visc=-vt*gammat ; Act.Ft_isfric=false ; }
+    if (isdumptime) {Act.Ft_el = Ft ; Act.Ft_visc=-vt*gammat ; Act.Ft_isfric=false ; }
     Tools<d>::vSubScaled(Ft, gammat, vt) ; //Ft -= (vt*Gammat) ;
   }
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;

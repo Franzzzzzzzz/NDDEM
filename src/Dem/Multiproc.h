@@ -66,11 +66,12 @@ public:
   vector <vector <int> > delayedwallj ; ///< Records the j id of the wall in the associated delayed action
   vector <uint> delayedwall_size ; ///< Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()
 
-  vector<vector<double>> contacts2array (ExportData exp, cv2d &X, cv2d &Boundaries) ; ///< pack the contact data in a 2d array
+  auto contacts2array (ExportData exp, cv2d &X, cv2d &Boundaries) ; ///< pack the contact data in a 2d array
   
   int P ; ///< Number of threads
 
 private:
+  v2d fullcontactinfo; 
   int N ; ///< Number of grains
   void split (int N, int P) ; ///< Function to allocate the grains to threads taking into account the load balance in the contact detection. load_balance() takes over after a few iteration have run, and is usually more efficient.
 } ;
@@ -263,27 +264,71 @@ void Multiproc<d>::load_balance()
 }
 //--------------------------------------------------------------------------------
 template <int d>
-vector<vector<double>> Multiproc<d>::contacts2array (ExportData exp, cv2d &X, cv2d &Boundaries)
+auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, cv2d &Boundaries)
 {
-  vector<vector<double>> res ; 
+  vector<vector<double>> res ;
+  vector<std::pair<ExportData, int>> contactmapping ; 
+  
+  int n=0 ; 
+  for (auto & clp:CLp) n+= clp.v.size() ; 
+  res.resize(n) ;
+  ExportData expid= static_cast<ExportData>(1) ; 
+  ExportData expall=exprt ;
+  n=0 ; 
+  while (static_cast<int>(expall)>0)
+  {
+    if (expall & static_cast<ExportData>(1))
+    {
+      contactmapping.push_back({expid,n}) ;
+      if (expid & (ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE)) 
+        n+=1 ;  
+      else if (expid & (ExportData::IDS)) 
+        n+=2 ; 
+      else if (expid & (ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR |
+                        ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC)) 
+        n+=d ; 
+    }
+    
+    expall>>=1 ; expid<<=1 ;
+  }
+  for (auto & v: res) v.reserve(n) ; 
+  
+  n=0 ; 
   for (auto & clp : CLp)
   {
     for (auto & contact : clp.v)
-    {
-      auto [loc,branch] = contact.compute_branchvector(X,Boundaries,d) ; 
-      switch (exp) {
-        case ExportData::IDS: res.push_back({static_cast<double>(contact.i), static_cast<double>(contact.j)}) ; break ; 
-        case ExportData::POSITION: res.push_back(loc) ; break ; 
-        case ExportData::FN: res.push_back(contact.infos->Fn) ; break ;
-        case ExportData::FT: res.push_back(contact.infos->Ft) ; break ;
-        case ExportData::GHOSTMASK: res.push_back({static_cast<double>(contact.ghost)}) ; break ;
-        case ExportData::GHOSTDIR : res.push_back({static_cast<double>(contact.ghostdir)}) ; break ;
-        case ExportData::BRANCHVECTOR: res.push_back(branch) ; break ;
-        default: break ; 
+    {  
+       ExportData expid= static_cast<ExportData>(1) ; 
+       ExportData expall=exprt ;
+       auto [loc,branch] = contact.compute_branchvector(X,Boundaries,d) ; 
+       while (static_cast<int>(expall)>0)
+       {
+         if (expall & static_cast<ExportData>(1))
+           switch (expid)
+           {
+              case ExportData::IDS: res[n].push_back({static_cast<double>(contact.i)}) ; res[n].push_back({static_cast<double>(contact.j)}) ; break ; 
+              case ExportData::CONTACTPOSITION: for (int dd=0 ; dd<d ; dd++) res[n].push_back(loc[dd]) ; break ; 
+              case ExportData::FN: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Fn[dd]) ; break ;
+              case ExportData::FT: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Ft[dd]) ; break ;
+              case ExportData::GHOSTMASK: res[n].push_back(static_cast<double>(contact.ghost)) ; break ;
+              case ExportData::GHOSTDIR : res[n].push_back(static_cast<double>(contact.ghostdir)) ; break ;
+              case ExportData::BRANCHVECTOR: for (int dd=0 ; dd<d ; dd++) res[n].push_back(branch[dd]) ; break ;
+              case ExportData::FN_EL: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Fn_el[dd]); break ; 
+              case ExportData::FN_VISC: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Fn_visc[dd]); break ; 
+              case ExportData::FT_EL: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Ft_el[dd]); break ; 
+              case ExportData::FT_VISC: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Ft_visc[dd]); break ; 
+              case ExportData::FT_FRIC: for (int dd=0 ; dd<d ; dd++) res[n].push_back(contact.infos->Ft_fric[dd]); break ; 
+              case ExportData::FT_FRICTYPE: res[n].push_back(static_cast<double>(contact.infos->Ft_isfric)); break ;  
+              default: break ;
+           }
+           
+        expall>>=1 ; expid<<=1 ;
       }
+      n++ ; 
     }
   }
-  return res ; 
+   
+  return std::make_pair(contactmapping, res) ; 
 }
 #endif
 

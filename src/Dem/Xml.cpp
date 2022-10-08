@@ -61,6 +61,37 @@ void XMLWriter::stopTS ()
   closebranch() ;
 }
 //----------------------------------------------------------------------------
+void XMLWriter::writeArray(string name, vector<vector<double>>*x, int beg, int length, ArrayType t, EncodingType te)
+{
+ if (t==ArrayType::particles) openbranch("particles") ; //fic << "  <particles>\n" ;
+ else if (t==ArrayType::contacts) openbranch("contacts") ; //fic << "  <contacts>\n" ;
+ else openbranch("unknown") ; //fic << "  <unknown>\n" ;
+ smallbranch("name", name) ; //fic << "   <name>" << name << "</name>\n" ;
+ if (te==EncodingType::ascii)      {smallbranch("encoding","ascii");}
+ else if (te==EncodingType::base64){smallbranch("encoding","base64");}
+
+ smallbranch("nrows", x->size()) ;
+ smallbranch("ncols", length) ;
+ openbranch("data", {make_pair("length", to_string(x->size()*length))}) ;
+
+ int n=0 ;
+ if (te==EncodingType::ascii)
+ {
+   for (auto v:*x)
+     for (int i=beg ; i<beg+length ; i++)
+     {
+         fic << v[i] << " " ;
+         n++ ;
+         if (n%25==0) fic << endl << "    " ;
+     }
+ }
+ else if (te==EncodingType::base64)
+ {
+   printf("WARN: Encode base 64 not available for 2D array with subarray in XML writing ...\n") ; 
+ }
+ closebranch() ; closebranch() ;
+}
+//----------------------------------------------------------------------------
 void XMLWriter::writeArray(string name, vector<vector<double>>*x, ArrayType t, EncodingType te)
 {
  if (t==ArrayType::particles) openbranch("particles") ; //fic << "  <particles>\n" ;
