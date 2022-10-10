@@ -20,23 +20,31 @@ export function make_listener( target ) {
     listener = new AudioListener();
     target.add( listener );
 
-    normal_oscillator = listener.context.createOscillator();
-	normal_oscillator.type = 'sine';
-	normal_oscillator.frequency.setValueAtTime( 10000, listener.context.currentTime );
-	normal_oscillator.start( );
+    // normal_oscillator = listener.context.createOscillator();
+	// normal_oscillator.type = 'sine';
+	// normal_oscillator.frequency.setValueAtTime( 256, listener.context.currentTime );
+	// normal_oscillator.start( );
 
-    tangential_oscillator = listener.context.createOscillator();
-	tangential_oscillator.type = 'sawtooth';
-	tangential_oscillator.frequency.setValueAtTime( 1000, listener.context.currentTime );
-	tangential_oscillator.start( );
+    // tangential_oscillator = listener.context.createOscillator();
+	// tangential_oscillator.type = 'sawtooth';
+	// tangential_oscillator.frequency.setValueAtTime( 1000, listener.context.currentTime );
+	// tangential_oscillator.start( );
     // console.log('made an object the audio listener')
 }
 
 export function add_normal_sound( target ) {
     let sound = new PositionalAudio( listener );
-    sound.setNodeSource( normal_oscillator );
+    let oscillator = listener.context.createOscillator();
+	oscillator.type = 'sine';
+    // every particle is unique!
+	oscillator.frequency.setValueAtTime( 100 + 900*Math.random(), listener.context.currentTime );
+	oscillator.start( );
+
+    // sound.setNodeSource( normal_oscillator );
+    sound.setNodeSource( oscillator );
+
+    sound.gain.gain.value = 0;
     // sound.setRefDistance( 20 );
-    // sound.setVolume( 0.5 );
 
     target.add( sound )
 }
