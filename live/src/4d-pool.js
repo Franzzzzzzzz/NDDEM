@@ -4,8 +4,8 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 import * as SPHERES from "../libs/SphereHandler.js"
-import * as WALLS from "../libs/WallHandler.js"
-import * as LAYOUT from '../libs/Layout.js'
+// import * as WALLS from "../libs/WallHandler.js"
+// import * as LAYOUT from '../libs/Layout.js'
 import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
 import * as CONTROLLERS from '../libs/controllers.js';
@@ -45,7 +45,8 @@ var params = {
     quality: 7,
     dt: 1e-3,
     table_height: 1.,
-    lut: 'None'
+    lut: 'None',
+    audio : false,
 }
 
 params.N = get_num_particles(params.pyramid_size);
@@ -81,7 +82,7 @@ async function init() {
 
     camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 1000 );
     camera.position.set( 3*params.L1, 2*params.L1 + params.table_height, 0 );
-    AUDIO.make_listener( camera );
+    
     // camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
@@ -144,6 +145,12 @@ async function init() {
         SPHERES.ray.scale.y = 2*params.strength;
     });
     gui.add ( params, 'track_white_ball').name('Track white ball (Space)').listen();
+    gui.add ( params, 'audio').name('Audio').listen().onChange(() => {
+        if (params.audio) {
+            AUDIO.make_listener( camera );
+            SPHERES.add_normal_sound_to_all_spheres(); }
+        // NOTE: NEED TO MAKE A DESTRUCTOR!
+    });
     const controls = new OrbitControls( camera, renderer.domElement );
     controls.target.y = params.table_height-params.L2;
     controls.update();
@@ -270,7 +277,10 @@ function add_table_legs() {
 
 function update() {
 
-    SPHERES.move_spheres(S,params);
+    SPHERES.move_spheres(S, params);
+    if ( params.audio ){
+        // SPHERES.update_sounds(S, params);
+    }
 
     if ( params.vr ) {
         params.track_white_ball = false;
@@ -389,6 +399,8 @@ async function NDDEMPhysics() {
         S.simu_getRadii = S.getRadii;
         S.simu_getX = S.getX;
         S.simu_getOrientation = S.getOrientation;
+        S.simu_getVelocity = S.getVelocity;
+        S.simu_getContactInfos = S.getContactInfos;
 
     });
 

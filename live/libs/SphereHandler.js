@@ -28,6 +28,7 @@ import {
     LineBasicMaterial,
     PointsMaterial,
     MeshStandardMaterial,
+    Int8BufferAttribute,
 } from "three";
 
 let forces = new Group();
@@ -52,6 +53,7 @@ export async function createNDParticleShader(params) {
         NDParticleShader = module.NDDEMShader;
     });
 }
+
 
 export function add_spheres(S,params,scene) {
     radii = S.simu_getRadii();
@@ -93,6 +95,80 @@ export function add_spheres(S,params,scene) {
     }
     var lut_folder;
     update_particle_material(params, lut_folder)
+}
+
+export function add_normal_sound_to_all_spheres() {
+    for ( let i = 0; i < spheres.children.length; i ++ ) {
+        if ( i < 64 ) { // :(
+            AUDIO.add_normal_sound( spheres.children[i] );
+        }
+    }
+}
+
+let active_sound_particles = [];
+
+export function update_sounds(S, params) {
+    // wipe anything from previous timestep
+    active_sound_particles.forEach((id, index, arr) => {
+        let ob = spheres.children[id];
+        // update the gain node
+        for ( let j = 0; j<ob.children.length; j ++ ) {
+            if ( ob.children[j].type === 'Audio' ) {
+                ob.children[j].gain.gain.value = 0.0;
+            }
+        }
+    });
+
+    active_sound_particles = [];
+
+    let contact_info = S.simu_getContactInfos(0x80 | 0x8000);
+    // console.log(contact_info)
+
+    for ( let i = 0; i < contact_info.length; i ++ ) {
+        let row = contact_info[i];
+        let object_ids = [row[0], row[1]];
+
+        let dissipation;
+        if ( params.dimension === 2 ) {
+            dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] );
+        } else if ( params.dimension === 3 ) {
+            dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] + row[4]*row[4] );
+        } else if ( params.dimension === 4 ) {
+            dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] + row[4]*row[4] + row[5]*row[5] );
+        }
+        object_ids.forEach((id, index, arr) => {
+            let ob = spheres.children[id];
+            if ( ob.visible ) {
+                // store a list of all particles that are being excited
+                if (active_sound_particles.indexOf(id) === -1) {
+                    active_sound_particles.push(id);
+                }
+                // update the gain node
+                for ( let j = 0; j<ob.children.length; j ++ ) {
+                    if ( ob.children[j].type === 'Audio' ) {
+                        ob.children[j].gain.gain.value = dissipation/50000.;
+                        // console.log(ob.children[j].gain.gain.value)
+                    }
+                }
+            }    
+        });
+    }
+    
+    // for ( let i = 0; i < spheres.children.length; i ++ ) {
+    //     let ob = spheres.children[i];
+    //     for ( let j = 0; j<ob.children.length; j ++ ) {
+    //         if ( ob.children[j].type === 'Audio' ) {
+    //             if ( ob.visible ) {
+    //                 ob.children[j].gain.gain.value = v[i][0]; 
+    //                 // ob.children[j].gain.gain.value = i/spheres.children.length;
+    //                 // ob.children[j].gain.gain.value = dissipation[i];
+    //             }
+    //             else {
+    //                 ob.children[j].gain.gain.value = 0;
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 export function add_pool_spheres(S,params,scene) {
@@ -285,7 +361,7 @@ export function move_spheres(S,params,controller1,controller2) {
     x = S.simu_getX();
 
     let orientation = S.simu_getOrientation();
-    if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' ) {
+    if ( params.lut === 'Velocity' || params.lut === 'Fluct Velocity' || params.audio ) {
         v = S.simu_getVelocity();
     }
     else if ( params.lut === 'Rotation Rate' ) {
