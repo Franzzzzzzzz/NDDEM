@@ -79,6 +79,11 @@ public:
      infos->Ft = a.Ft ;
      infos->vn = a.vn ;
      infos->vt = a.vt ;
+     infos->Fn_el = a.Fn_el ;
+     infos->Fn_visc = a.Fn_visc ;
+     infos->Ft_el = a.Ft_el ;
+     infos->Ft_visc = a.Ft_visc ;
+     infos->Ft_fric = a.Ft_fric ; 
      infos->Torquei = a.Torquei ;
      infos->Torquej = a.Torquej ;
  } ///< Save information regarding the contact forces for later write down.

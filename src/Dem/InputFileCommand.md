@@ -76,13 +76,9 @@ These command have a single behaviour, described here.
   - `PBCLE LOCMIN LOCMAX VELOCITY`: Lees-Edward boundary condition. Should be in dimension 0. 
   - `allother LOCMIN LOCMAX`
 
-- `dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids|Fn|Ft|Torque|Branch]`: select filename format, the last 4 format are plain text. `N` is how many fields you want out of the indicated list. Note that not all fields are available for all formats. 
-
-
-
-
-
-
+- `dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]`: select dump format and output fiels, the last 4 formats are plain text. `N` is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. Field can include:
+  - Particle data field: `[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*`
+  - Contact data fields: `[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*`. NB: if Ghost_mask>0; then the contact crosses a periodic boundary condition. 
 
 
 

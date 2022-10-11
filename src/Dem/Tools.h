@@ -43,7 +43,7 @@ v1f & operator/= (v1f & a, cv1f &b) ;
 v1d & operator/= (v1d & a, double b) ;
 v1f & operator/= (v1f & a, double b) ;
 
-enum class TensorType {SCALAR, VECTOR, TENSOR, SYMTENSOR, SKEWTENSOR, NONE} ; ///< Different types of mathematical objects
+enum class TensorType {SCALAR, VECTOR, TENSOR, SYMTENSOR, SKEWTENSOR, SCALARMASK, NONE} ; ///< Different types of mathematical objects
 /** \brief Limited use: used to transfer data to the VTK writer
  */
 class TensorInfos

@@ -8,7 +8,7 @@ radius -1 0.5
 mass -1 1
 auto rho
 auto inertia
-auto radius uniform 0.4 0.6
+#auto radius uniform 0.4 0.6
 
 boundary 0 WALL 2 18
 boundary 1 PBC  0 10.5
@@ -35,15 +35,15 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 50
+set T 500
 set dt 0.0001
 #set dumps XML with 12 Position Velocity Ids Fn Ft Branch Fn_el Fn_visc Ft_el Ft_visc Ft_fric Ft_frictype
-set dumps XML with 2 Position Velocity 
+#set dumps XML with 2 Position Velocity
 #set dumps CSV with 1 Orientation
-set dumps VTK with 3 Ids Velocity Coordination
+set dumps VTK with 5 Ghost_mask Fn Ft Fn_visc Ft_visc
 set tdump 10000
 #event 20 gravity -0.9 0.42
-event 20 rigid 1 velocity nan 0.1
-event 20 rigid 1 gravity off
-event 20 rigid 1 addforce -5 0
+#event 20 rigid 1 velocity nan 0.1
+#event 20 rigid 1 gravity off
+#event 20 rigid 1 addforce -5 0
 EOF
