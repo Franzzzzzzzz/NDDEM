@@ -39,7 +39,7 @@ var searchData=
   ['clear_124',['clear',['../group__DEM.html#gadcf9a9902d9d7202c42c1fbe7e349586',1,'Tools::clear()'],['../classTools.html#a2a204dc93b5939f9efa8778dd1e565c3',1,'Tools::clear()'],['../classnlohmann_1_1basic__json.html#a680c6cbaca83984fd7a5dd7496f86594',1,'nlohmann::basic_json::clear()']]],
   ['clear_5fsubtype_125',['clear_subtype',['../classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49',1,'nlohmann::byte_container_with_subtype']]],
   ['clear_5ftsdata_126',['clear_tsdata',['../classNDDEMReader.html#a17cf0900bba4d825686cb6f2e807ff40',1,'NDDEMReader']]],
-  ['close_127',['close',['../classXMLWriter.html#ae531e18dff8af8a7b29b0893d7063837',1,'XMLWriter::close()'],['../classXMLReader__base.html#a7b2dbb50411a79f1034fe66dc3efa473',1,'XMLReader_base::close()']]],
+  ['close_127',['close',['../classXMLWriter.html#ae531e18dff8af8a7b29b0893d7063837',1,'XMLWriter::close()'],['../classXMLReader__base.html#a7b2dbb50411a79f1034fe66dc3efa473',1,'XMLReader_base::close()'],['../namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a',1,'vtkwriter::close()']]],
   ['closebranch_128',['closebranch',['../classXMLWriter.html#a9f41f05fd570b148f066c57207d8c01a',1,'XMLWriter']]],
   ['clp_129',['CLp',['../classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea',1,'Multiproc']]],
   ['clw_130',['CLw',['../classMultiproc.html#ab2f6b71cfb789957377af15f57c3ddc8',1,'Multiproc']]],

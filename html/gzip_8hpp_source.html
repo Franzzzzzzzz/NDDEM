@@ -319,14 +319,14 @@ $(function() {
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Sink&gt;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordtype">void</span> close(Sink&amp; snk, BOOST_IOS::openmode m)</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">close</a>(Sink&amp; snk, BOOST_IOS::openmode m)</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    {</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordflow">try</span> {</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            <span class="keywordflow">if</span> (m == BOOST_IOS::out &amp;&amp; !(flags_ &amp; f_header_done))</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                this-&gt;write(snk, 0, 0);</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            <span class="comment">// Close zlib compressor.</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            base_type::close(snk, m);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            <a class="code" href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">base_type::close</a>(snk, m);</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            <span class="keywordflow">if</span> (m == BOOST_IOS::out) {</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                <span class="keywordflow">if</span> (flags_ &amp; f_header_done) {</div>
@@ -517,7 +517,7 @@ $(function() {
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;                    <span class="keywordflow">if</span> (footer_.crc() != this-&gt;crc())</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;                        boost::throw_exception(gzip_error(gzip::bad_crc));</div>
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160; </div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;                    base_type::close(snk, BOOST_IOS::out);</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;                    <a class="code" href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">base_type::close</a>(snk, BOOST_IOS::out);</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;                    state_ = s_start;</div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;                } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;                    <span class="keywordtype">int</span> c = s[result++];</div>
@@ -581,7 +581,7 @@ $(function() {
 <div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;                        state_ = s_done;</div>
 <div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;                    } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;                        peek.putback(c);</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;                        base_type::close(peek, BOOST_IOS::in);</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;                        <a class="code" href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">base_type::close</a>(peek, BOOST_IOS::in);</div>
 <div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;                        state_ = s_start;</div>
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;                        header_.reset();</div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;                        footer_.reset();</div>
@@ -600,10 +600,10 @@ $(function() {
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;    }</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160; </div>
 <div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Source&gt;</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    <span class="keywordtype">void</span> close(Source&amp; src, BOOST_IOS::openmode m)</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">close</a>(Source&amp; src, BOOST_IOS::openmode m)</div>
 <div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    {</div>
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;        <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;            base_type::close(src, m);</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;            <a class="code" href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">base_type::close</a>(src, m);</div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;        } <span class="keywordflow">catch</span> (<span class="keyword">const</span> zlib_error&amp; e) {</div>
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;            state_ = s_start;</div>
 <div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;            boost::throw_exception(gzip_error(e));</div>
@@ -828,6 +828,7 @@ $(function() {
 <div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;<span class="preprocessor">#endif // #ifndef BOOST_IOSTREAMS_GZIP_HPP_INCLUDED</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="anamespacenlohmann_1_1detail_html_a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282"><div class="ttname"><a href="namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282">nlohmann::detail::cbor_tag_handler_t::error</a></div><div class="ttdeci">@ error</div><div class="ttdoc">throw a parse_error exception in case of a tag</div></div>
+<div class="ttc" id="anamespacevtkwriter_html_aea2c67d8308f961d1b8596869aadb06a"><div class="ttname"><a href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">vtkwriter::close</a></div><div class="ttdeci">void close(FILE *out)</div><div class="ttdef"><b>Definition:</b> Vtk.h:117</div></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93">id1</a></div><div class="ttdeci">@ id1</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:4336</div></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34">id2</a></div><div class="ttdeci">@ id2</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>

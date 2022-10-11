@@ -148,7 +148,11 @@ $(function() {
 <li><code>allother LOCMIN LOCMAX</code></li>
 </ul>
 </li>
-<li><code>dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids|Fn|Ft|Torque|Branch]</code>: select filename format, the last 4 format are plain text. <code>N</code> is how many fields you want out of the indicated list. Note that not all fields are available for all formats. </li>
+<li><code>dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]</code>: select dump format and output fiels, the last 4 formats are plain text. <code>N</code> is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. <a class="el" href="structField.html" title="Contains Field informations.">Field</a> can include:<ul>
+<li>Particle data field: <code>[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*</code></li>
+<li>Contact data fields: <code>[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*</code>. NB: if Ghost_mask&gt;0; then the contact crosses a periodic boundary condition. </li>
+</ul>
+</li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

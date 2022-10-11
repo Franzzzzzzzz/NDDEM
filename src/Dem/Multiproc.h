@@ -279,14 +279,13 @@ auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, cv2d &Boundaries)
   {
     if (expall & static_cast<ExportData>(1))
     {
-      contactmapping.push_back({expid,n}) ;
       if (expid & (ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE)) 
-        n+=1 ;  
+      { contactmapping.push_back({expid,n}) ; n+=1 ; }
       else if (expid & (ExportData::IDS)) 
-        n+=2 ; 
+      { contactmapping.push_back({expid,n}) ; n+=2 ; }
       else if (expid & (ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR |
                         ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC)) 
-        n+=d ; 
+      { contactmapping.push_back({expid,n}) ; n+=d ;} 
     }
     
     expall>>=1 ; expid<<=1 ;

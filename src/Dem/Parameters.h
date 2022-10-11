@@ -14,8 +14,9 @@
 #include <boost/variant.hpp>
 #include <filesystem>
 #include "Typedefs.h"
-#include "Xml.h"
 #include "Tools.h"
+#include "Xml.h"
+#include "Vtk.h"
 #include "RigidBody.h"
 //
 #include <boost/random.hpp>
@@ -600,10 +601,13 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          else if (word =="Ft_visc") dumplist |= ExportData::FT_VISC ;
          else if (word =="Ft_fric") dumplist |= ExportData::FT_FRIC ;
          else if (word =="Ft_frictype") dumplist |= ExportData::FT_FRICTYPE ;
+         else if (word =="Ghost_mask") dumplist |= ExportData::GHOSTMASK ;
+         else if (word =="Ghost_direction") dumplist |= ExportData::GHOSTDIR;
            
          else printf("Unknown asked data %s\n", word.c_str()) ;
        }
        
+       if (dumplist & (ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC)) dumplist |= ExportData::IDS ; 
        /*if constexpr (!SAVE_FORCE_COMPONENTS)
        {
          if (dumplist & (ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC | ExportData::FT_FRICTYPE))
@@ -1080,20 +1084,62 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
     {
         v2d tmp ;
         char path[500] ; sprintf(path, "%s/dump-%05d.vtk", Directory.c_str(), ti) ;
+        
+        FILE * out = vtkwriter::open (path, d) ; 
+        vtkwriter::write_points(out, X, d) ; 
+        
+        vector<std::pair<ExportData, int>> mapping ; 
+        vector<vector<double>> contactdata ; 
+        if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
+        {
+          std::tie(mapping, contactdata) = MP.contacts2array(v.second, X, Boundaries) ;
+          if (mapping[0].first != ExportData::IDS) printf("ERR: something went wrong in writing contact data in the vtk file %X\n", mapping[0].first) ; 
+          vtkwriter::write_contactlines (out, contactdata) ; 
+        }
+        
+        vtkwriter::start_pointdata(out, X) ; 
+        vtkwriter::write_dimension_data(out, X, r, d) ; 
+                
         vector <TensorInfos> val;
-        if (v.second & ExportData::VELOCITY) val.push_back({"Velocity", TensorType::VECTOR, &V}) ;
-        if (v.second & ExportData::OMEGA)    val.push_back({"Omega", TensorType::SKEWTENSOR, &Omega}) ;
-        if (v.second & ExportData::OMEGAMAG)  {tmp.push_back(OmegaMag) ; val.push_back({"OmegaMag", TensorType::SCALAR, &tmp}) ;}
-        if (v.second & ExportData::ORIENTATION) val.push_back({"ORIENTATION", TensorType::TENSOR, &A}) ;
-        if (v.second & ExportData::RADIUS) {tmp.push_back(r) ; val.push_back({"RADIUS", TensorType::SCALAR, &tmp}) ;}
-        if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; val.push_back({"Coordination", TensorType::SCALAR, &tmp}) ;  }
+        if (v.second & ExportData::VELOCITY) vtkwriter::write_data(out, {"Velocity", TensorType::VECTOR, &V}, d) ;
+        if (v.second & ExportData::OMEGA)    vtkwriter::write_data(out, {"Omega", TensorType::SKEWTENSOR, &Omega}, d) ;
+        if (v.second & ExportData::OMEGAMAG)  {tmp.push_back(OmegaMag) ; vtkwriter::write_data(out, {"OmegaMag", TensorType::SCALAR, &tmp}, d) ;}
+        if (v.second & ExportData::ORIENTATION) vtkwriter::write_data(out, {"ORIENTATION", TensorType::TENSOR, &A}, d) ;
+        if (v.second & ExportData::RADIUS) {tmp.push_back(r) ; vtkwriter::write_data(out, {"RADIUS", TensorType::SCALAR, &tmp}, d) ;}
+        if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; vtkwriter::write_data(out, {"Coordination", TensorType::SCALAR, &tmp}, d) ;  }
         if (v.second & ExportData::IDS) {
             vector<double> tmpid (N, 0) ;
             for (int i=0 ; i<N ; i++)
                 tmpid[i]=i ;
-            tmp.push_back(tmpid) ; val.push_back({"Id", TensorType::SCALAR, &tmp}) ;
+            tmp.push_back(tmpid) ; vtkwriter::write_data(out, {"Id", TensorType::SCALAR, &tmp}, d) ;
         }
-        Tools<d>::savevtk(path, N, Boundaries, X, r, val) ;
+        
+        if (mapping.size()>1)
+        { 
+          vtkwriter::start_celldata(out, X.size(), contactdata.size());
+          
+          for (auto & v:mapping)
+          {
+            switch(v.first){
+              case ExportData::CONTACTPOSITION : vtkwriter::write_celldata (out, "Locations", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FN : vtkwriter::write_celldata (out, "NormalForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FT : vtkwriter::write_celldata (out, "TangentialForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::BRANCHVECTOR : vtkwriter::write_celldata (out, "BranchVector", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FN_EL : vtkwriter::write_celldata (out, "ElasticNormalForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FN_VISC : vtkwriter::write_celldata (out, "ViscousNormalForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FT_EL : vtkwriter::write_celldata (out, "ElasticTangentialForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FT_VISC : vtkwriter::write_celldata (out, "VisousTangentialForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FT_FRIC : vtkwriter::write_celldata (out, "FrictionForce", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::FT_FRICTYPE : vtkwriter::write_celldata (out, "FrictionActivated", contactdata, TensorType::VECTOR, v.second, N, d) ; break ; 
+              case ExportData::GHOSTMASK : vtkwriter::write_celldata (out, "GhostMask", contactdata, TensorType::SCALARMASK, v.second, N, d) ; break ; 
+              case ExportData::GHOSTDIR : vtkwriter::write_celldata (out, "GhostDirection", contactdata, TensorType::SCALARMASK, v.second, N, d) ; break ; 
+              default: break ; 
+            }
+          }
+        }       
+        
+        vtkwriter::close(out) ; 
+        //Tools<d>::savevtk(path, N, Boundaries, X, r, {}) ;
     }
 
     if (v.first == ExportType::NETCDFF)

@@ -398,8 +398,7 @@ public:
                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
             }
 
-            //if (P.contactforcedump && (ti % P.tdump==0))
-                it->saveinfo(C.Act) ;
+            if (isdumptime) it->saveinfo(C.Act) ;
 
             Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
             Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
