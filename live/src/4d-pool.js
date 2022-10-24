@@ -279,7 +279,7 @@ function update() {
 
     SPHERES.move_spheres(S, params);
     if ( params.audio ){
-        // SPHERES.update_sounds(S, params);
+        SPHERES.update_sounds(S, params);
     }
 
     if ( params.vr ) {
