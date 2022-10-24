@@ -25,70 +25,70 @@ module.exports = [{
           title: 'NDDEM Uniaxial compression',
           favicon: "./visualise/resources/favicon.ico",
           template: "live/plotly-template.html",
-          filename: "live/uniaxial.html",
+          filename: "uniaxial.html",
           chunks: ['uniaxial']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Triaxial compression',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/plotly-template.html",
-            filename: "live/triaxial.html",
+            filename: "triaxial.html",
             chunks: ['triaxial']
         }),
         new HtmlWebpackPlugin({
             title: "NDDEM Isotropic compression",
             favicon: "./visualise/resources/favicon.ico",
             template: "live/plotly-template.html",
-            filename: "live/isotropic.html",
+            filename: "isotropic.html",
             chunks: ['isotropic']
         }),        
         new HtmlWebpackPlugin({
             title: 'NDDEM Simple Shear',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/template.html",
-            filename: "live/simple-shear-2d.html",
+            filename: "simple-shear-2d.html",
             chunks: ['simple-shear']
         }),
         new HtmlWebpackPlugin({
             title: "NDDEM Inclined plane",
             favicon: "./visualise/resources/favicon.ico",
             template: "live/plotly-template.html",
-            filename: "live/inclined-plane.html",
+            filename: "inclined-plane.html",
             chunks: ['inclined-plane']
         }),
         new HtmlWebpackPlugin({
             title: "NDDEM Lees Edwards",
             favicon: "./visualise/resources/favicon.ico",
             template: "live/plotly-template.html",
-            filename: "live/lees-edwards.html",
+            filename: "lees-edwards.html",
             chunks: ['lees-edwards']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Rotation',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/template.html",
-            filename: "live/rotation.html",
+            filename: "rotation.html",
             chunks: ['rotation']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM 4D Pool',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/pool-template.html",
-            filename: "live/4d-pool.html",
+            filename: "4d-pool.html",
             chunks: ['4d-pool']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Coarse Graining',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/template.html",
-            filename: "live/coarse-graining.html",
+            filename: "coarse-graining.html",
             chunks: ['coarse-graining']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Rotation Matrix',
             favicon: "./visualise/resources/favicon.ico",
-            template: "live/template.html",
-            filename: "live/rotation-matrix.html",
+            template: "./live/template.html",
+            filename: "rotation-matrix.html",
             chunks: ['rotation-matrix']
         }),
       ],

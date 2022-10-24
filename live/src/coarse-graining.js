@@ -1,3 +1,5 @@
+import css from "../css/main.css";
+
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -40,7 +42,7 @@ var params = {
     d4: {cur:0},
     r_max: 0.0045,
     r_min: 0.0035,
-    particle_density: 2700,
+    particle_density: 1,
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -52,7 +54,7 @@ var params = {
     cg_opacity: 0.8,
     cg_window_size: 3,
     particle_opacity: 0.5,
-    F_mag_max: 1000,
+    F_mag_max: 0.005,
     aspect_ratio: 1,
 }
 
@@ -211,7 +213,7 @@ function animate() {
     SPHERES.move_spheres(S,params);
     RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
     if ( !params.paused ) {
-        S.simu_step_forward(5);
+        S.simu_step_forward(15);
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
@@ -356,7 +358,7 @@ async function NDDEMCGPhysics() {
         if ( params.dimension > 3 ) {
             S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
         }
-        S.simu_interpret_command("gravity -100 " + "0 ".repeat(params.dimension - 2))
+        S.simu_interpret_command("gravity -1 " + "0 ".repeat(params.dimension - 2))
 
         S.simu_interpret_command("auto location randomdrop");
 
@@ -372,7 +374,7 @@ async function NDDEMCGPhysics() {
         // S.simu_interpret_command("auto skin");
         // S.simu_finalise_init () ;
 
-        let tc = 1e-3;
+        let tc = 1e-2;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 
@@ -381,9 +383,9 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
-        // S.simu_interpret_command("set damping 10");
+        S.simu_interpret_command("set damping 0.001");
         S.simu_interpret_command("set T 150");
-        S.simu_interpret_command("set dt " + String(tc/10));
+        S.simu_interpret_command("set dt " + String(tc/20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         S.simu_interpret_command("auto skin");
         S.simu_finalise_init () ;

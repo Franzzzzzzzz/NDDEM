@@ -1,3 +1,5 @@
+import css from "../css/main.css";
+
 // import { DEMCGND } from "../../deploy/DEMCGND.js";
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
