@@ -481,10 +481,10 @@ public:
         {
             //printf("%10g %10g %10g\n%10g %10g %10g\n%10g %10g %10g\n\n", A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][6], A[0][7], A[0][8]) ;
             if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; /*Tools<d>::setzero(V[i]) ; */ Tools<d>::setzero(Omega[i]) ; }
-
+            
             Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
             Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
-            if ( P.damping > 0.0 ) { 
+            if ( !P.Frozen[i] && P.damping > 0.0 ) { 
                 Tools<d>::vSubScaled(Omega[i], P.damping, Omega[i]) ; // BENJY - add damping to Omega
                 Tools<d>::vSubScaled(V[i], P.damping, V[i]) ; // BENJY - add damping to velocity
             }
