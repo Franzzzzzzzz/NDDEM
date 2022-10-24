@@ -1,3 +1,5 @@
+import css from "../css/main.css";
+
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -104,7 +106,7 @@ async function init() {
 
     SPHERES.add_pool_spheres(S,params,scene);
 
-    STLFilename = './stls/4d-pool.stl'; // this one has crap pockets
+    STLFilename = '../live/stls/4d-pool.stl'; // this one has crap pockets
     // STLFilename = './stls/4d-pool-no-holes.stl';
     // const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
         // t.encoding = THREE.sRGBEncoding;
@@ -206,10 +208,6 @@ function hit_white_ball() {
     var work = params.strength;
     var force = work/params.dt;
     S.setExternalForce(0, 1, [force*direction.x,0,force*direction.z,force*direction.d4]);
-
-    // JUST TESTING HOW SOUNDS WORK!
-    // how the hell to integrate this with the rest of the code?!?? there aren't really 'collision' events...
-    // SPHERES.spheres.children[0].children[0].play();
 }
 
 function onSelectParticle( event ) {
@@ -437,7 +435,7 @@ async function NDDEMPhysics() {
         S.interpret_command("set GammaT " + String(vals.dissipation));
         S.interpret_command("set Mu 0.1");
         S.interpret_command("set Mu_wall 0.5");
-        S.interpret_command("set damping 2");
+        S.interpret_command("set damping 6e-4");
         S.interpret_command("set T 150");
         S.interpret_command("set dt " + String(params.dt));
         S.interpret_command("set tdump 1000000"); // how often to calculate wall forces

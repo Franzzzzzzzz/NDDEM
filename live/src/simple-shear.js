@@ -1,3 +1,5 @@
+import css from "../css/main.css";
+
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -41,8 +43,7 @@ var params = {
     particle_density: 2700,
     // freq: 0.05,
     // new_line: false,
-    shear_rate: 1e-2,
-    // shear_rate: {'Medium':0.2},
+    shear_rate: 1e-1,
     // lut: 'None',
     lut: 'White',
     cg_field: 'Density',
@@ -54,7 +55,7 @@ var params = {
     particle_opacity: 0.5,
     F_mag_max: 1e1,
     audio: false,
-    audio_cutoff : 2e-2,
+    audio_sensitivity : 1,
 }
 
 let rainbow    = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
@@ -187,7 +188,7 @@ async function init() {
     gui.add ( params, 'shear_rate', {Slow : 1e-2, Medium: 1e-1, Fast: 1e0}).name('Shear rate').listen().onChange( update_wall_particle_velocities );
     
     
-    gui.add ( params, 'audio_cutoff', 0, 1e-1, 1e-5).name('Audio cutoff');
+    gui.add ( params, 'audio_sensitivity', 1, 1e3, 1).name('Audio sensitivity');
     gui.add ( params, 'audio').name('Audio').listen().onChange(() => {
         if ( AUDIO.listener === undefined ) {
             AUDIO.make_listener( camera );

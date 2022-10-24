@@ -217,8 +217,10 @@ export function update_fixed_sounds(S, params) {
         let contact_info = S.simu_getContactInfos(0x80 | 0x20000);
         let total_dissipation = 0;
         for ( let i = 0; i< params.N; i++ ) {
-            spheres.children[i].material.emissiveIntensity = 0;
-            spheres.children[i].material.needsUpdate = true;
+            if ( spheres.children[i].material.emissiveIntensity !== 0 ) {
+                spheres.children[i].material.emissiveIntensity = 0;
+                spheres.children[i].material.needsUpdate = true;
+            }
         }
         for ( let i = 0; i < contact_info.length; i ++ ) {
             let row = contact_info[i];
@@ -235,8 +237,8 @@ export function update_fixed_sounds(S, params) {
             // dissipation = Math.log10(dissipation)/5e3;
             // dissipation = isFinite(dissipation) ? dissipation : 0.0; // remove non-finite values
             // let cutoff = 2e-2;
-            if ( dissipation > params.audio_cutoff ) {
-                spheres.children[row[0]].material.emissiveIntensity += dissipation/params.audio_cutoff; // make them glow
+            if ( dissipation > 1./params.audio_sensitivity ) {
+                spheres.children[row[0]].material.emissiveIntensity += dissipation*params.audio_sensitivity; // make them glow
                 total_dissipation += dissipation;
             }
             
@@ -246,7 +248,13 @@ export function update_fixed_sounds(S, params) {
         AUDIO.fixed_sound_source.children[0].gain.gain.value = total_dissipation/params.N;
     }
     else { 
-        AUDIO.fixed_sound_source.children[0].gain.gain.value = 0;
+        if ( AUDIO.fixed_sound_source.children[0].gain.gain.value !== 0 ) {
+            AUDIO.fixed_sound_source.children[0].gain.gain.value = 0;
+            for ( let i = 0; i< params.N; i++ ) {
+                spheres.children[i].material.emissiveIntensity = 0;
+                spheres.children[i].material.needsUpdate = true;
+            }
+        }
     }
 }
 
