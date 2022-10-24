@@ -214,10 +214,11 @@ export function update_sounds(S, params) {
 
 export function update_fixed_sounds(S, params) {
     if ( params.audio ) {
-        let contact_info = S.simu_getContactInfos(0x80 | 0x8000);
+        let contact_info = S.simu_getContactInfos(0x80 | 0x20000);
         let total_dissipation = 0;
         for ( let i = 0; i< params.N; i++ ) {
             spheres.children[i].material.emissiveIntensity = 0;
+            spheres.children[i].material.needsUpdate = true;
         }
         for ( let i = 0; i < contact_info.length; i ++ ) {
             let row = contact_info[i];
@@ -231,19 +232,18 @@ export function update_fixed_sounds(S, params) {
             } else if ( params.dimension === 4 ) {
                 dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] + row[4]*row[4] + row[5]*row[5] );
             }
-            // console.log(dissipation)
-            spheres.children[row[0]].material.emissiveIntensity = dissipation; // make them glow
-            spheres.children[row[1]].material.emissiveIntensity = dissipation; // make them glow
-
-
             // dissipation = Math.log10(dissipation)/5e3;
             // dissipation = isFinite(dissipation) ? dissipation : 0.0; // remove non-finite values
-            let cutoff = 5e3;
-            let sound = dissipation > cutoff ? dissipation : 0;
-            total_dissipation += sound;
+            // let cutoff = 2e-2;
+            if ( dissipation > params.audio_cutoff ) {
+                spheres.children[row[0]].material.emissiveIntensity += dissipation/params.audio_cutoff; // make them glow
+                total_dissipation += dissipation;
+            }
+            
         }
         // console.log(total_dissipation/params.N/1e5);
-        AUDIO.fixed_sound_source.children[0].gain.gain.value = total_dissipation/params.N/1e5;
+        
+        AUDIO.fixed_sound_source.children[0].gain.gain.value = total_dissipation/params.N;
     }
     else { 
         AUDIO.fixed_sound_source.children[0].gain.gain.value = 0;
@@ -368,10 +368,11 @@ export function update_particle_material(params, lut_folder) {
     else {
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
-            object.material = new MeshStandardMaterial();
+            object.material = new MeshStandardMaterial({ color : 0xaaaaaa });
+            object.material.emissiveIntensity = 0;
             object.material.transparent = true;
             object.material.opacity = params.particle_opacity;
-            object.material.emissive = new Color( 0xFFFFFF );
+            object.material.emissive = new Color( 0xFF0000 );
         }
     }
     if ( params.lut === 'Velocity' ) {

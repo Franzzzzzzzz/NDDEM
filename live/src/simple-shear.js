@@ -29,19 +29,20 @@ let cg_mesh, colorbar_mesh;
 var params = {
     dimension: 2,
     L: 16*0.004, //system size
-    initial_density: 0.88,
+    initial_density: 0.90,
     zoom: 1000,
     aspect_ratio: 2,
     // paused: false,
     // g_mag: 1e3,
     // theta: 0, // slope angle in DEGREES
     d4: {cur:0},
-    r_max: 0.0045,
-    r_min: 0.0035,
+    r_max: 0.005,
+    r_min: 0.003,
     particle_density: 2700,
     // freq: 0.05,
     // new_line: false,
-    shear_rate: 2,
+    shear_rate: 1e-2,
+    // shear_rate: {'Medium':0.2},
     // lut: 'None',
     lut: 'White',
     cg_field: 'Density',
@@ -51,8 +52,9 @@ var params = {
     cg_opacity: 0.8,
     cg_window_size: 3,
     particle_opacity: 0.5,
-    F_mag_max: 5e4,
+    F_mag_max: 1e1,
     audio: false,
+    audio_cutoff : 2e-2,
 }
 
 let rainbow    = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
@@ -181,16 +183,11 @@ async function init() {
     gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
         update_cg_params(S, params);
     });
-    gui.add ( params, 'shear_rate', 0, 10, 0.1).name('Shear rate').listen().onChange( update_wall_particle_velocities );
-    // gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
-        // params.cg_height = params.cg_width;
-        // update_cg_params(S, params);
-    // });
-    // gui.add ( params, 'paused').name('Paused').listen();
-
-    // const controls = new OrbitControls( camera, renderer.domElement );
-    // controls.update();
-
+    // gui.add ( params, 'shear_rate', 0, 2, 0.001).name('Shear rate').listen().onChange( update_wall_particle_velocities );
+    gui.add ( params, 'shear_rate', {Slow : 1e-2, Medium: 1e-1, Fast: 1e0}).name('Shear rate').listen().onChange( update_wall_particle_velocities );
+    
+    
+    gui.add ( params, 'audio_cutoff', 0, 1e-1, 1e-5).name('Audio cutoff');
     gui.add ( params, 'audio').name('Audio').listen().onChange(() => {
         if ( AUDIO.listener === undefined ) {
             AUDIO.make_listener( camera );
@@ -378,11 +375,11 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("boundary 0 PBC -"+String(params.aspect_ratio*params.L)+" "+String(params.aspect_ratio*params.L));
         S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
         
-        S.simu_interpret_command("gravity 0 -1000 ");
+        // S.simu_interpret_command("gravity 0 -1 ");
 
         S.simu_interpret_command("auto location randomdrop");
 
-        let tc = 1e-4;
+        let tc = 1e-2;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 
@@ -391,7 +388,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
-        S.simu_interpret_command("set damping " + String(0.1/tc));
+        S.simu_interpret_command("set damping 0.01");
         S.simu_interpret_command("set T 1000000");
         S.simu_interpret_command("set dt " + String(tc/20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -423,6 +420,7 @@ async function NDDEMCGPhysics() {
 }
 
 function update_wall_particle_velocities() {
+    console.log(params.shear_rate)
     let n_wall = Math.ceil(2*params.aspect_ratio*params.L/(params.average_radius*2));
         for ( var i=0; i<n_wall; i++ ) {
             S.simu_setVelocity(i,[params.shear_rate*2*params.L,0]);
