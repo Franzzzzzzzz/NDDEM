@@ -33,6 +33,8 @@ import {
 
 let forces = new Group();
 
+let debug_sound = false;
+
 const cylinder_geometry = new CylinderGeometry( 1, 1, 1, 16 );
 cylinder_geometry.applyMatrix4( new Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
 const cylinder_material = new MeshStandardMaterial( {color: 0xffffff} );
@@ -61,7 +63,7 @@ export function add_spheres(S,params,scene) {
     for ( let i=0; i<radii.length; i++ ) {
         total_particle_volume += 4./3.*Math.PI*Math.pow(radii[i],3);
     }
-    console.log('Actual particle volume: ' + total_particle_volume);
+    console.log('Actual particle volume (assuming 3D particles): ' + total_particle_volume);
     spheres = new Group();
     scene.add(spheres);
     // const material = new THREE.MeshStandardMaterial();
@@ -98,11 +100,37 @@ export function add_spheres(S,params,scene) {
 }
 
 export function add_normal_sound_to_all_spheres() {
-    for ( let i = 0; i < spheres.children.length; i ++ ) {
-        if ( i < 64 ) { // :(
+    if ( spheres.children.length > 100 ) { 
+        for ( let i = 0; i < spheres.children.length; i ++ ) {
+
+            if ( i >= 100 && i < 164 ) { // :(
+                AUDIO.add_normal_sound( spheres.children[i] );
+            }
+            if ( debug_sound ) {
+                spheres.children[i].material.emissive = new Color( 0x0000FF );
+                spheres.children[i].material.color = new Color( 0xFF0000 );
+            }
+        }
+    } else {
+        for ( let i = 0; i < spheres.children.length; i ++ ) {
             AUDIO.add_normal_sound( spheres.children[i] );
         }
     }
+}
+
+export function mute_sounds() {
+    // wipe anything from previous timestep
+    active_sound_particles.forEach((id, index, arr) => {
+        let ob = spheres.children[id];
+        // update the gain node
+        for ( let j = 0; j<ob.children.length; j ++ ) {
+            if ( debug_sound) { ob.material.emissiveIntensity = 0; }
+
+            if ( ob.children[j].type === 'Audio' ) {
+                ob.children[j].gain.gain.value = 0.0;
+            }
+        }
+    });
 }
 
 let active_sound_particles = [];
@@ -113,6 +141,8 @@ export function update_sounds(S, params) {
         let ob = spheres.children[id];
         // update the gain node
         for ( let j = 0; j<ob.children.length; j ++ ) {
+            if ( debug_sound) { ob.material.emissiveIntensity = 0; }
+
             if ( ob.children[j].type === 'Audio' ) {
                 ob.children[j].gain.gain.value = 0.0;
             }
@@ -136,6 +166,11 @@ export function update_sounds(S, params) {
         } else if ( params.dimension === 4 ) {
             dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] + row[4]*row[4] + row[5]*row[5] );
         }
+
+        dissipation = Math.log10(dissipation)/1e3;
+        dissipation = isFinite(dissipation) ? dissipation : 0.0; // remove non-finite values
+        // console.log(dissipation)
+
         object_ids.forEach((id, index, arr) => {
             let ob = spheres.children[id];
             if ( ob.visible ) {
@@ -146,7 +181,13 @@ export function update_sounds(S, params) {
                 // update the gain node
                 for ( let j = 0; j<ob.children.length; j ++ ) {
                     if ( ob.children[j].type === 'Audio' ) {
-                        ob.children[j].gain.gain.value = dissipation/50000.;
+                        if ( debug_sound ) {
+                            if ( ob.material.type === 'ShaderMaterial' ) {
+                                ob.material.uniforms.ambient.value = dissipation;
+                            }
+                        }
+
+                        ob.children[j].gain.gain.value = dissipation;
                         // console.log(ob.children[j].gain.gain.value)
                     }
                 }
@@ -169,6 +210,44 @@ export function update_sounds(S, params) {
     //         }
     //     }
     // }
+}
+
+export function update_fixed_sounds(S, params) {
+    if ( params.audio ) {
+        let contact_info = S.simu_getContactInfos(0x80 | 0x8000);
+        let total_dissipation = 0;
+        for ( let i = 0; i< params.N; i++ ) {
+            spheres.children[i].material.emissiveIntensity = 0;
+        }
+        for ( let i = 0; i < contact_info.length; i ++ ) {
+            let row = contact_info[i];
+            let object_ids = [row[0], row[1]];
+
+            let dissipation;
+            if ( params.dimension === 2 ) {
+                dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] );
+            } else if ( params.dimension === 3 ) {
+                dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] + row[4]*row[4] );
+            } else if ( params.dimension === 4 ) {
+                dissipation = Math.sqrt( row[2]*row[2] + row[3]*row[3] + row[4]*row[4] + row[5]*row[5] );
+            }
+            // console.log(dissipation)
+            spheres.children[row[0]].material.emissiveIntensity = dissipation; // make them glow
+            spheres.children[row[1]].material.emissiveIntensity = dissipation; // make them glow
+
+
+            // dissipation = Math.log10(dissipation)/5e3;
+            // dissipation = isFinite(dissipation) ? dissipation : 0.0; // remove non-finite values
+            let cutoff = 5e3;
+            let sound = dissipation > cutoff ? dissipation : 0;
+            total_dissipation += sound;
+        }
+        // console.log(total_dissipation/params.N/1e5);
+        AUDIO.fixed_sound_source.children[0].gain.gain.value = total_dissipation/params.N/1e5;
+    }
+    else { 
+        AUDIO.fixed_sound_source.children[0].gain.gain.value = 0;
+    }
 }
 
 export function add_pool_spheres(S,params,scene) {
@@ -274,6 +353,7 @@ export function move_spheres_on_torus(params,target) {
 
 export function update_particle_material(params, lut_folder) {
     if ( params.particle_opacity === undefined ) { params.particle_opacity = 1; }
+    console.log(params.lut)
     if ( params.lut === 'None' ) {
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
@@ -281,6 +361,8 @@ export function update_particle_material(params, lut_folder) {
             if ( params.particle_opacity < 1 ) { object.material.transparent = true; }
             // object.material.opacity = params.particle_opacity;
             object.material.uniforms.opacity.value = params.particle_opacity;
+            object.material.uniforms.R.value = radii[i];
+            // console.log(radii[i])
         }
     }
     else {
@@ -289,6 +371,7 @@ export function update_particle_material(params, lut_folder) {
             object.material = new MeshStandardMaterial();
             object.material.transparent = true;
             object.material.opacity = params.particle_opacity;
+            object.material.emissive = new Color( 0xFFFFFF );
         }
     }
     if ( params.lut === 'Velocity' ) {
@@ -484,9 +567,6 @@ export function move_spheres(S,params,controller1,controller2) {
             // object.material.uniforms.ambient.value = 0.5 + 0.1*omegaMag[i];
             object.material.color = lut.getColor(omegaMag[i]);
         }
-        // if (params.dimension > 3) {
-        //
-        // }
 
     }
     // spheres.instanceMatrix.needsUpdate = true;
@@ -555,7 +635,7 @@ export function draw_force_network(S,params,scene) {
             forces = new Group();
 
             //var F = S.simu_getContactForce(); // very poorly named
-            var F = S.simu_getContactInfos(0x80 | 0x100)
+            var F = S.simu_getContactInfos(0x80 | 0x100);
             
             let width = radii[0]/2.;
             if ( 'F_mag_max' in params ) {

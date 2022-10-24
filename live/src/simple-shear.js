@@ -10,6 +10,14 @@ import * as LAYOUT from '../libs/Layout.js'
 import * as RAYCAST from '../libs/RaycastHandler.js';
 import * as AUDIO from '../libs/audio.js';
 
+let info_div = document.createElement("div")
+info_div.innerHTML = "Click on a particle to grab it"
+info_div.style.color = "white";
+info_div.style.position = "absolute";
+info_div.style.left = "20px";
+info_div.style.top = "20px";
+document.body.appendChild(info_div);
+
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
 
@@ -24,10 +32,6 @@ var params = {
     initial_density: 0.88,
     zoom: 1000,
     aspect_ratio: 2,
-    // packing_fraction: 0.5,
-    // constant_volume: true,
-    // axial_strain: 0,
-    // volumetric_strain: 0,
     // paused: false,
     // g_mag: 1e3,
     // theta: 0, // slope angle in DEGREES
@@ -38,6 +42,7 @@ var params = {
     // freq: 0.05,
     // new_line: false,
     shear_rate: 2,
+    // lut: 'None',
     lut: 'White',
     cg_field: 'Density',
     quality: 5,
@@ -187,10 +192,14 @@ async function init() {
     // controls.update();
 
     gui.add ( params, 'audio').name('Audio').listen().onChange(() => {
-        if (params.audio) {
+        if ( AUDIO.listener === undefined ) {
             AUDIO.make_listener( camera );
-            SPHERES.add_normal_sound_to_all_spheres(); }
-        // NOTE: NEED TO MAKE A DESTRUCTOR!
+            AUDIO.add_fixed_sound_source ( [0,0,0] );
+            // SPHERES.add_normal_sound_to_all_spheres();
+        } else {
+            // AUDIO.remove_listener( camera ); // doesn't do anything at the moment...
+            // SPHERES.mute_sounds();
+        }
     });
 
     window.addEventListener( 'resize', onWindowResize, false );
@@ -214,15 +223,15 @@ function onWindowResize(){
 function animate() {
     requestAnimationFrame( animate );
     SPHERES.move_spheres(S,params);
-    if ( params.audio ){
-        SPHERES.update_sounds(S, params);
+    if ( AUDIO.listener !== undefined ){
+        SPHERES.update_fixed_sounds(S, params);
     }
     RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
     if ( !params.paused ) {
         // let v = S.simu_getVelocity();
         // console.log(v);
 
-        S.simu_step_forward(5);
+        S.simu_step_forward(15);
         if ( params.cg_opacity > 0 ) {
             cg_mesh.visible = true;
             S.cg_param_read_timestep(0) ;
@@ -382,9 +391,9 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
-        // S.simu_interpret_command("set damping 10");
+        S.simu_interpret_command("set damping " + String(0.1/tc));
         S.simu_interpret_command("set T 1000000");
-        S.simu_interpret_command("set dt " + String(tc/10));
+        S.simu_interpret_command("set dt " + String(tc/20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         // S.simu_interpret_command("auto skin");
 
@@ -394,19 +403,14 @@ async function NDDEMCGPhysics() {
             let d = params.average_radius - params.aspect_ratio**params.L + i*params.average_radius*2; // location in x1 of these particles
             console.log("radius " + String(i) + " " + String(params.average_radius));
             S.simu_interpret_command("location " + String(i) + " " + String(d) + " " + String(-params.L));
-            // S.simu_interpret_command("radius " + String(i) + " " + String(params.average_radius));
+
             S.simu_setRadius(i,params.average_radius);
             S.simu_setVelocity(i,[params.shear_rate*2*params.L,0]);
             S.simu_setFrozen(i);
-            // S.simu_interpret_command("freeze "   + String(i));
-            // S.simu_interpret_command("velocity " + String(i) + " " + String(params.shear_rate*2*params.L) + " 10000");
 
             S.simu_interpret_command("location " + String(n_wall+i) + " " + String(d) + " " + String(params.L));
-            // S.simu_interpret_command("radius " + String(i) + " " + String(params.average_radius));
-            // S.simu_interpret_command("freeze "   + String(n_wall+i));
             S.simu_setFrozen(n_wall+i);
             S.simu_setRadius(n_wall+i,params.average_radius);
-            // S.simu_interpret_command("velocity " + String(n_wall+i) + " " + String(-params.shear_rate*params.L) + " 0");
         }
 
         S.simu_finalise_init () ;

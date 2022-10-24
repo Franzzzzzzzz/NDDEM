@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>4D Pool</title>
+		<title><%= htmlWebpackPlugin.options.title %></title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <link rel="icon" type="image/x-icon" href="../visualise/resources/favicon.ico">
@@ -99,7 +99,5 @@
         <div id="hit_me">Shoot</div>
         <div id="web_instructions">Press Enter to shoot.</div>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-		<script type="module" src='./deploy/4d-pool-bundle.js'></script>
 	</body>
 </html>

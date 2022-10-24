@@ -52,7 +52,7 @@ export function animate_locked_particle(S, c, spheres, params) {
 function onSelectParticle( event, camera ) {
     // console.log(camera.getWorldDirection() )
     // if ( event.code === 'Enter' ) {
-        if ( locked_particle === null ) {
+        if ( locked_particle === null  && INTERSECTED !== null ) {
             locked_particle = INTERSECTED;
             // console.log(locked_particle);
             ref_location = locked_particle.position;

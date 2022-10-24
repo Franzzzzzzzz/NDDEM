@@ -484,7 +484,11 @@ public:
 
             Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
             Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
-            Tools<d>::vSubScaled(Omega[i], P.damping*P.dt, Omega[i]) ; // BENJY - add damping to Omega
+            if ( P.damping > 0.0 ) { 
+                Tools<d>::vSubScaled(Omega[i], P.damping, Omega[i]) ; // BENJY - add damping to Omega
+                Tools<d>::vSubScaled(V[i], P.damping, V[i]) ; // BENJY - add damping to velocity
+            }
+            
             FOld[i]=F[i] ;
             TorqueOld[i]=Torque[i] ;
         } // END OF PARALLEL SECTION

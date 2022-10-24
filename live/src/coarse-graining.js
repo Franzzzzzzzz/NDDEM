@@ -9,6 +9,14 @@ import * as LAYOUT from '../libs/Layout.js'
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 import * as RAYCAST from '../libs/RaycastHandler.js';
 
+let info_div = document.createElement("div")
+info_div.innerHTML = "Click on a particle to grab it"
+info_div.style.color = "white";
+info_div.style.position = "absolute";
+info_div.style.left = "20px";
+info_div.style.top = "20px";
+document.body.appendChild(info_div);
+
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
 
