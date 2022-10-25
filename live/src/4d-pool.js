@@ -106,7 +106,7 @@ async function init() {
 
     SPHERES.add_pool_spheres(S,params,scene);
 
-    STLFilename = '../live/stls/4d-pool.stl'; // this one has crap pockets
+    STLFilename = '../stls/4d-pool.stl'; // this one has crap pockets
     // STLFilename = './stls/4d-pool-no-holes.stl';
     // const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
         // t.encoding = THREE.sRGBEncoding;
