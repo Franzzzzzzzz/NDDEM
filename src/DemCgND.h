@@ -98,6 +98,7 @@ public:
     void simu_setFrozen(int a) {return S.setFrozen(a) ; }
     std::vector<std::vector<double>> simu_getOrientation() {return S.getOrientation() ; }
     std::vector<std::vector<double>> simu_getVelocity() {return S.getVelocity() ; }
+    void simu_setVelocity(int id, v1d vel) {return S.setVelocity(id, vel) ; }
     std::vector<std::vector<double>> simu_getContactForce() {return S.getContactForce() ; }
     std::vector<std::vector<double>> simu_getContactInfos(int flags) {return S.getContactInfos(flags) ; }
     std::vector<double> simu_getRotationRate() {return S.getRotationRate() ; }
@@ -174,6 +175,7 @@ public:
     void simu_setFrozen(int a) {return S.setFrozen(a) ; }
     std::vector<std::vector<double>> simu_getOrientation() {return S.getOrientation() ; }
     std::vector<std::vector<double>> simu_getVelocity() {return S.getVelocity() ; }
+    void simu_setVelocity(int id, v1d vel) {return S.setVelocity(id, vel) ; }
     std::vector<std::vector<double>> simu_getContactForce() {return S.getContactForce() ; }
     std::vector<std::vector<double>> simu_getContactInfos(int flags) {return S.getContactInfos(flags) ; }
     std::vector<double> simu_getRotationRate() {return S.getRotationRate() ; }
@@ -250,6 +252,7 @@ public:
     void simu_setFrozen(int a) {return S.setFrozen(a) ; }
     std::vector<std::vector<double>> simu_getOrientation() {return S.getOrientation() ; }
     std::vector<std::vector<double>> simu_getVelocity() {return S.getVelocity() ; }
+    void simu_setVelocity(int id, v1d vel) {return S.setVelocity(id, vel) ; }
     std::vector<std::vector<double>> simu_getContactForce() {return S.getContactForce() ; }
     std::vector<std::vector<double>> simu_getContactInfos(int flags) {return S.getContactInfos(flags) ; }
     std::vector<double> simu_getRotationRate() {return S.getRotationRate() ; }
