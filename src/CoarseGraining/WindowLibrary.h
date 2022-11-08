@@ -54,7 +54,7 @@ public :
         locp[i] = data->pos[i][p] ;
       }
 
-      double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
+      //double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
 
       first=prev=Lucy(distance(p,loc)) ;
       for (int i=0 ; i<Nsteps ; i++)
@@ -62,10 +62,11 @@ public :
         for (int j=0; j<d ; j++)
             locp[j] += (1./Nsteps) * lpq[j] ;
         cur=Lucy(distancevec(locp,loc)) ;
-        res += (cur+prev)/2.*length ;
+        res += (cur+prev)/(2*Nsteps) ;
+        //printf("%g | %g | %g %g %g\n", res, cur, distance(q,locp), Lucy(distance(p,loc)), Lucy(distance(q,loc))) ;
         prev=cur ;
       }
-      //printf("%g %g \n", res, LibLucy3D::window_int(r1,r2)) ;
+      //printf("%g %g \n", res, LibLucy3D::window_int(distance(p,loc),distance(q,loc))) ;
       return (make_pair(window_avg(first,cur),res)) ;
     }
     double distancevec (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ;}
