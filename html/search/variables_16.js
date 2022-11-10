@@ -1,12 +1,13 @@
 var searchData=
 [
-  ['w_2918',['w',['../structnlohmann_1_1detail_1_1dtoa__impl_1_1boundaries.html#ad1668c60aeade5f2557fafed8b8aee1a',1,'nlohmann::detail::dtoa_impl::boundaries::w()'],['../classLibBase.html#adf7b633f5b2ad77c6546eca4eaeb43bd',1,'LibBase::w()']]],
-  ['wallforce_2919',['WallForce',['../classSimulation.html#aef49d4beef65281ea392a0e5806d7399',1,'Simulation']]],
-  ['wallforcecompute_2920',['wallforcecompute',['../classParameters.html#a50a403a968417aa50f428bdcaf7581de',1,'Parameters']]],
-  ['wallforcecomputed_2921',['wallforcecomputed',['../classParameters.html#ad631e4d71f90aac5f32768e2c42d2bbd',1,'Parameters']]],
-  ['wallforcerequested_2922',['wallforcerequested',['../classParameters.html#a66ec2ef259871fe9b3336cfa0211e57f',1,'Parameters']]],
-  ['width_2923',['width',['../classTinyPngOut.html#a83c481322fbbd1c267ef42afee64c535',1,'TinyPngOut']]],
-  ['window_2924',['window',['../structParam.html#a8fa06a4cbbc45ac5d40d2cc3f43a1b2d',1,'Param::window()'],['../group__CoarseGraining.html#ga6bb37c3aaa9384284e20cfd762164810',1,'Coarsing::Window()']]],
-  ['windowsize_2925',['windowsize',['../structParam.html#a4e971e57dae4aa248525dbaf2b1aad1d',1,'Param']]],
-  ['windowstr_2926',['windowstr',['../structParam.html#a0371acb7176a308f4445f8268f8485aa',1,'Param']]]
+  ['w_3037',['w',['../structnlohmann_1_1detail_1_1dtoa__impl_1_1boundaries.html#ad1668c60aeade5f2557fafed8b8aee1a',1,'nlohmann::detail::dtoa_impl::boundaries::w()'],['../classLibBase.html#adf7b633f5b2ad77c6546eca4eaeb43bd',1,'LibBase::w()']]],
+  ['wallforce_3038',['WallForce',['../classSimulation.html#aef49d4beef65281ea392a0e5806d7399',1,'Simulation']]],
+  ['wallforcecompute_3039',['wallforcecompute',['../classParameters.html#a50a403a968417aa50f428bdcaf7581de',1,'Parameters']]],
+  ['wallforcecomputed_3040',['wallforcecomputed',['../classParameters.html#ad631e4d71f90aac5f32768e2c42d2bbd',1,'Parameters']]],
+  ['wallforcerequested_3041',['wallforcerequested',['../classParameters.html#a66ec2ef259871fe9b3336cfa0211e57f',1,'Parameters']]],
+  ['width_3042',['width',['../classTinyPngOut.html#a83c481322fbbd1c267ef42afee64c535',1,'TinyPngOut']]],
+  ['window_3043',['Window',['../group__CoarseGraining.html#ga6bb37c3aaa9384284e20cfd762164810',1,'Coarsing']]],
+  ['window_3044',['window',['../structParam.html#a8fa06a4cbbc45ac5d40d2cc3f43a1b2d',1,'Param']]],
+  ['windowsize_3045',['windowsize',['../structParam.html#a4e971e57dae4aa248525dbaf2b1aad1d',1,'Param']]],
+  ['windowstr_3046',['windowstr',['../structParam.html#a0371acb7176a308f4445f8268f8485aa',1,'Param']]]
 ];
