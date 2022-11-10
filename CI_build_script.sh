@@ -19,7 +19,7 @@ npm run build
 cd build
 
 embuilder build boost_headers zlib
-emcmake cmake ../src
+emcmake cmake ../src -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
 for BUILD_TARGET in DEMND CoarseGraining DEMCGND
 do
