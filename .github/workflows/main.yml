@@ -27,6 +27,9 @@ jobs:
 
       - name: Setup Emscripten toolchain
         uses: mymindstorm/setup-emsdk@v11
+        with:
+          # Make sure to set a version number!
+          version: 3.1.25
 
       - name: Install doxygen
         run: sudo apt-get install -y doxygen
