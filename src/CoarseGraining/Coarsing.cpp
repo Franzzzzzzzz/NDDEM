@@ -871,9 +871,9 @@ for (int i=0 ; i< Npt ; i++)
               gradient[k*d+l] = 0 ;
           else if ((i/nptcum[l]) % npt[l] == 0 ) //forward difference
               gradient[k*d+l] = (CGP[i+nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ;
-          else if ((i/nptcum[l]) % npt[l] == (npt[l]-1)) //central difference
+          else if ((i/nptcum[l]) % npt[l] == (npt[l]-1)) //backward difference
               gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i].fields[cT][VAVGid+k])/dx[l] ;
-          else // backward difference
+          else // central difference
               gradient[k*d+l] = (CGP[i-nptcum[l]].fields[cT][VAVGid+k]-CGP[i+nptcum[l]].fields[cT][VAVGid+k])/(2*dx[l]) ;
          }
 
@@ -920,10 +920,11 @@ for (int i=0 ; i< Npt ; i++)
         double volumetric = 0;
         for (int dd=0 ; dd<d ; dd++)
             volumetric += gradient[dd*d+dd] ;
+        volumetric /= d ;
 
         CGP[i].fields[cT][Gamtauid] = 0 ;
         for (int dd=0 ; dd<d*d ; dd++)
-            CGP[i].fields[cT][Gamtauid] = (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ;
+            CGP[i].fields[cT][Gamtauid] += (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ;
         CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ;
      }
 
