@@ -34,6 +34,9 @@ jobs:
       - name: Install doxygen
         run: sudo apt-get install -y doxygen
 
+      - name: Check gcc version
+        run: gcc -v
+
       # Runs a single command using the runners shell
       - name: Compile everything with Emscripten
         run: sh CI_build_script.sh
