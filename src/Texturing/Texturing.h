@@ -17,7 +17,7 @@
 #include <thread>
 #include <regex>
 #include <limits>
-#include <experimental/filesystem>
+#include <filesystem>
 
 extern bool blenderrender ;
 
@@ -136,10 +136,10 @@ int Texturing<d>::initialise (map <string,string> args)
  set_grid (atoi(args["resolution"].c_str())) ;
 
  //Get all the relevent files in the Directory, sort them and identify the timesteps
- experimental::filesystem::directory_iterator D(BasePath + Directory) ;
+ std::filesystem::directory_iterator D(BasePath + Directory) ;
  vector <string> tmpfilelst ;
  vector <std::pair<int,string>> filelistloc, filelistA ;
- for (auto& p : experimental::filesystem::directory_iterator(BasePath+Directory)) tmpfilelst.push_back(p.path().string()) ;
+ for (auto& p : std::filesystem::directory_iterator(BasePath+Directory)) tmpfilelst.push_back(p.path().string()) ;
  regex exprloc{".*dump-([0-9]+).csv"};
  regex exprA{".*dumpA-([0-9]+).csv"};
  smatch what;
@@ -238,7 +238,7 @@ View.clear() ;
 RenderedAlready.clear() ;
 for (auto & u : FileList)
     for (auto & v: u)
-        experimental::filesystem::remove(v.c_str()) ;
+        std::filesystem::remove(v.c_str()) ;
 
 return 0 ;
 }
@@ -351,7 +351,7 @@ template <int d>
 void Texturing<d>::spaceloop (v1d View, uint tsint, int nrotate, int dim)
 {
 //printf("S") ; fflush(stdout) ;
-for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
+for (auto & v : FileList[dim]) std::filesystem::remove(v.c_str()) ;
 FileList[dim].clear() ;
 
 auto Viewdec = View ;
@@ -376,7 +376,7 @@ template <int d>
 void Texturing<d>::timeloop (v1d View, uint tsint, int nrotate)
 {
 int dim=FileList.size()-1 ;
-for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
+for (auto & v : FileList[dim]) std::filesystem::remove(v.c_str()) ;
 
 FileList[dim].clear() ;
 uint timeidxinit=tsint ;
@@ -398,7 +398,7 @@ template <int d>
 void Texturing<d>::hereandnow (v1d View, uint tsint, int nrotate)
 {
 int dim=FileList.size()-1 ;
-for (auto & v : FileList[dim]) experimental::filesystem::remove(v.c_str()) ;
+for (auto & v : FileList[dim]) std::filesystem::remove(v.c_str()) ;
 
 FileList[dim].clear() ;
 //uint timeidxinit=tsint ;

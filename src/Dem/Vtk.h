@@ -42,10 +42,11 @@ int start_celldata (FILE *out, int N, int Ncf)
   return 0 ; 
 }
 //------------------------------------------------------------------------------  
-int write_dimension_data (FILE *out, cv2d &X, cv1d &r, int d)
+int write_dimension_data (FILE *out, cv2d &X, cv1d &r, int d, vector < vector <double> > Boundaries)
 {
  vector <float> projectioncenter  ;
-  
+ for (int i=3 ; i<d ; i++) projectioncenter.push_back((Boundaries[i][1]+Boundaries[i][0])/2) ;
+
  for (uint j=3 ; j<X[0].size() ; j++)
  {
    fprintf(out, "\nSCALARS Dimension%d float 1 \nLOOKUP_TABLE default \n", j) ;
