@@ -80,7 +80,7 @@ $(function() {
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
-<code>#include &lt;boost/variant.hpp&gt;</code><br />
+<code>#include &lt;variant&gt;</code><br />
 <code>#include &lt;filesystem&gt;</code><br />
 <code>#include &quot;<a class="el" href="Dem_2Typedefs_8h_source.html">Typedefs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Dem_2Tools_8h_source.html">Tools.h</a>&quot;</code><br />
@@ -183,8 +183,8 @@ Functions</h2></td></tr>
 <tr class="separator:gafca03450931a610a6353b4b844cec366"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5626ad74bb85dfadb7bf028465071cd1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Dem_2Parameters_8h.html#a5626ad74bb85dfadb7bf028465071cd1">nan_or_double</a> (istream &amp;in)</td></tr>
 <tr class="separator:a5626ad74bb85dfadb7bf028465071cd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a579aef10f14adfad26daf5de8c961701"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Dem_2Parameters_8h.html#a579aef10f14adfad26daf5de8c961701">operator&gt;&gt;</a> (std::istream &amp;in, boost::variant&lt; int &amp;, double &amp;, bool &amp; &gt; v)</td></tr>
-<tr class="separator:a579aef10f14adfad26daf5de8c961701"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ae0801154d2060c54fb68eeadc8b9ac"><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Dem_2Parameters_8h.html#a5ae0801154d2060c54fb68eeadc8b9ac">operator&gt;&gt;</a> (std::istream &amp;in, std::variant&lt; int *, double *, bool * &gt; v)</td></tr>
+<tr class="separator:a5ae0801154d2060c54fb68eeadc8b9ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a5626ad74bb85dfadb7bf028465071cd1"></a>
@@ -205,8 +205,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a579aef10f14adfad26daf5de8c961701"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a579aef10f14adfad26daf5de8c961701">&#9670;&nbsp;</a></span>operator&gt;&gt;()</h2>
+<a id="a5ae0801154d2060c54fb68eeadc8b9ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ae0801154d2060c54fb68eeadc8b9ac">&#9670;&nbsp;</a></span>operator&gt;&gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -220,7 +220,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">boost::variant&lt; int &amp;, double &amp;, bool &amp; &gt;&#160;</td>
+          <td class="paramtype">std::variant&lt; int *, double *, bool * &gt;&#160;</td>
           <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>

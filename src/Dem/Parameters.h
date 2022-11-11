@@ -11,7 +11,8 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <boost/variant.hpp>
+//#include <boost/variant.hpp>
+#include <variant>
 #include <filesystem>
 #include "Typedefs.h"
 #include "Tools.h"
@@ -474,13 +475,14 @@ void Parameters<d>::check_events(float time, v2d & X, v2d & V, v2d & Omega)
 
 }
 //------------------------------------------------------
-std::istream& operator>>(std::istream& in, boost::variant<int&,double&,bool&> v)
+std::istream& operator>>(std::istream& in, std::variant<int*,double*,bool*> v)
 {
-  switch(v.which())
+  printf("SETTING variable %d\n", v.index());
+  switch(v.index())
   {
-    case 0: in >> boost::get<int&>(v) ; break ;
-    case 1: in >> boost::get<double&>(v); break ;
-    case 2: in >> boost::get<bool&>(v); break ;
+    case 0: in >> *(std::get<int*>(v)) ; break ;
+    case 1: in >> *(std::get<double*>(v)); break ;
+    case 2: in >> *(std::get<bool*>(v)); break ;
   }
   return(in) ;}
 //------------------------------------------------------
@@ -493,21 +495,21 @@ void Parameters<d>::interpret_command (string &in, v2d & X, v2d & V, v2d & Omega
 template <int d>
 void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
 {
-  map <string, boost::variant<int&,double&,bool&>> SetValueMap = {
-     {"Kn",Kn},
-     {"Kt",Kt},
-     {"GammaN",Gamman},
-     {"GammaT",Gammat},
-     {"rho",rho},
-     {"Mu",Mu},
-     {"Mu_wall",Mu_wall},
-     {"damping",damping},
-     {"T",T},
-     {"tdump",tdump},
-     {"orientationtracking",orientationtracking},
-     {"tinfo",tinfo},
-     {"dt",dt},
-     {"skin", skin},
+  map <string, std::variant<int*,double*,bool*>> SetValueMap = {
+     {"Kn",&Kn},
+     {"Kt",&Kt},
+     {"GammaN",&Gamman},
+     {"GammaT",&Gammat},
+     {"rho",&rho},
+     {"Mu",&Mu},
+     {"Mu_wall",&Mu_wall},
+     {"damping",&damping},
+     {"T",&T},
+     {"tdump",&tdump},
+     {"orientationtracking",&orientationtracking},
+     {"tinfo",&tinfo},
+     {"dt",&dt},
+     {"skin", &skin},
   } ;
 
 // Lambda definitions
@@ -1098,7 +1100,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         }
         
         vtkwriter::start_pointdata(out, X) ; 
-        vtkwriter::write_dimension_data(out, X, r, d) ; 
+        vtkwriter::write_dimension_data(out, X, r, d, Boundaries) ;
                 
         vector <TensorInfos> val;
         if (v.second & ExportData::VELOCITY) vtkwriter::write_data(out, {"Velocity", TensorType::VECTOR, &V}, d) ;

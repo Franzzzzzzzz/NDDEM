@@ -16,8 +16,6 @@ boundary 3 PBC  0 3.4
 
 auto location roughinclineplane
 
-location 0 1 0.9500000000000001 0 -0.0003079251932157456
-
 gravity -1 0 0 0
 set Kn 2e5
 set Kt 8e4
@@ -30,7 +28,7 @@ set T 50
 set dt 0.0001
 #set dumps XML with 4 Position Velocity Omega Coordination
 set dumps CSV with 1 Orientation
-set dumps VTK with 0
+set dumps VTK with 1 Velocity
 #set dumps CONTACTFORCES with 4 Ids Fn Ft Torque
 set tdump 1000
 event 20 gravity -0.9 0.42 0 0
