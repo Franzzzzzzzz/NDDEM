@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -27,9 +27,15 @@ jobs:
 
       - name: Setup Emscripten toolchain
         uses: mymindstorm/setup-emsdk@v11
+        with:
+          # Make sure to set a version number!
+          version: 3.1.25
 
       - name: Install doxygen
         run: sudo apt-get install -y doxygen
+
+      - name: Check gcc version
+        run: gcc -v
 
       # Runs a single command using the runners shell
       - name: Compile everything with Emscripten
