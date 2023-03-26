@@ -19,9 +19,12 @@
 #include "Xml.h"
 #include "Vtk.h"
 #include "RigidBody.h"
+#include "Mesh.h"
+#include "json.hpp"
 //
 #include <boost/random.hpp>
 
+using json = nlohmann::json;
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
 enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000} ; ///< Flags for export data control
@@ -180,6 +183,7 @@ public :
     bool contactforcedump ; ///< Extract the forces between grains as well?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
     RigidBodies_<d> RigidBodies ; ///< Handle all the rigid bodies
+    vector <Mesh<d>> Meshes ; 
     
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
 
@@ -477,7 +481,7 @@ void Parameters<d>::check_events(float time, v2d & X, v2d & V, v2d & Omega)
 //------------------------------------------------------
 std::istream& operator>>(std::istream& in, std::variant<int*,double*,bool*> v)
 {
-  printf("SETTING variable %d\n", v.index());
+  printf("SETTING variable %ld\n", v.index());
   switch(v.index())
   {
     case 0: in >> *(std::get<int*>(v)) ; break ;
@@ -747,7 +751,29 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
    
    printf("[INFO] Defining a rigid body.\n") ;
  };
-
+ Lvl0["mesh"] = [&] () 
+ {
+   string s ; in>>s ; 
+   std::ifstream i(s.c_str());
+   if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
+   json j;
+   try 
+   { 
+     i >> j; 
+     if (j["Dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["Dimension"].get<int>(),d) ; return ;}
+     for (auto & v: j["Objects"])
+     {
+       Mesh<d> m(v["Dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()) ;  
+       //Meshes.push_back(v["Dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()) ;  
+     }
+   }
+   catch(...)
+   {
+        printf("This is not a legal json file, here is what we already got:\n") ;
+        cout << j ;
+        return ; 
+   }
+ };
 // Processing
  string line ;
  in>>line;
@@ -1095,7 +1121,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
         {
           std::tie(mapping, contactdata) = MP.contacts2array(v.second, X, Boundaries) ;
-          if (mapping[0].first != ExportData::IDS) printf("ERR: something went wrong in writing contact data in the vtk file %X\n", mapping[0].first) ; 
+          if (mapping[0].first != ExportData::IDS) printf("ERR: something went wrong in writing contact data in the vtk file %X\n", static_cast<unsigned int>(mapping[0].first)) ; 
           vtkwriter::write_contactlines (out, contactdata) ; 
         }
         

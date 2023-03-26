@@ -130,7 +130,7 @@ public:
  } ///< Compute the location & branch vector of the contact
 } ;
 
-// ------------------------------------ Contact List class ----------check_ghost_LE---------------------------------
+// ------------------------------------ Contact List class -------------------------------------------
 /** \brief Handles lists of contacts
  */
 template <int d>
