@@ -77,7 +77,7 @@ $(function() {
 <p>output adapter for basic_string  
  <a href="classnlohmann_1_1detail_1_1output__string__adapter.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="json_8hpp_source.html">json.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a>&gt;</code></p>
 <div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Inheritance diagram for nlohmann::detail::output_string_adapter&lt; CharType, StringType &gt;:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -87,11 +87,18 @@ $(function() {
   <img src="classnlohmann_1_1detail_1_1output__string__adapter.png" usemap="#nlohmann::detail::output_5Fstring_5Fadapter_3C_20CharType_2C_20StringType_20_3E_map" alt=""/>
   <map id="nlohmann::detail::output_5Fstring_5Fadapter_3C_20CharType_2C_20StringType_20_3E_map" name="nlohmann::detail::output_5Fstring_5Fadapter_3C_20CharType_2C_20StringType_20_3E_map">
 <area href="structnlohmann_1_1detail_1_1output__adapter__protocol.html" title="abstract output adapter interface" alt="nlohmann::detail::output_adapter_protocol&lt; CharType &gt;" shape="rect" coords="0,0,380,24"/>
+<area href="structnlohmann_1_1detail_1_1output__adapter__protocol.html" title="abstract output adapter interface" alt="nlohmann::detail::output_adapter_protocol&lt; CharType &gt;" shape="rect" coords="390,0,770,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:af3a49ecd0d23fe56ac21e13d8752abc7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#af3a49ecd0d23fe56ac21e13d8752abc7">output_string_adapter</a> (StringType &amp;s) noexcept</td></tr>
+<tr class="separator:af3a49ecd0d23fe56ac21e13d8752abc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d76cc6c88ddbc196a63fcfcac9ee7d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#a2d76cc6c88ddbc196a63fcfcac9ee7d1">write_character</a> (CharType c) override</td></tr>
+<tr class="separator:a2d76cc6c88ddbc196a63fcfcac9ee7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5ea4da075305d225dfd84ad997e8747"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#ab5ea4da075305d225dfd84ad997e8747">write_characters</a> (const CharType *s, std::size_t length) override</td></tr>
+<tr class="separator:ab5ea4da075305d225dfd84ad997e8747"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3a49ecd0d23fe56ac21e13d8752abc7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#af3a49ecd0d23fe56ac21e13d8752abc7">output_string_adapter</a> (StringType &amp;s) noexcept</td></tr>
 <tr class="separator:af3a49ecd0d23fe56ac21e13d8752abc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d76cc6c88ddbc196a63fcfcac9ee7d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#a2d76cc6c88ddbc196a63fcfcac9ee7d1">write_character</a> (CharType c) override</td></tr>
@@ -111,11 +118,23 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab2a6b7a5b86c612df2d99d2970380456 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2235c8f3da8dfe5b26cb030f6886811a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#a2235c8f3da8dfe5b26cb030f6886811a">operator=</a> (<a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
 <tr class="separator:a2235c8f3da8dfe5b26cb030f6886811a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad71cdc057030f8a775a191face25061a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#ad71cdc057030f8a775a191face25061a">~output_adapter_protocol</a> ()=default</td></tr>
+<tr class="separator:ad71cdc057030f8a775a191face25061a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd96245615e3b648e59e4a27bdfa67e0 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#afd96245615e3b648e59e4a27bdfa67e0">output_adapter_protocol</a> ()=default</td></tr>
+<tr class="separator:afd96245615e3b648e59e4a27bdfa67e0 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf6ef7a244c32162fe98d9773f31fa8a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#adf6ef7a244c32162fe98d9773f31fa8a">output_adapter_protocol</a> (const <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;)=default</td></tr>
+<tr class="separator:adf6ef7a244c32162fe98d9773f31fa8a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9527a27ddd468e4360a3530cbd9c35a6 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#a9527a27ddd468e4360a3530cbd9c35a6">output_adapter_protocol</a> (<a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:a9527a27ddd468e4360a3530cbd9c35a6 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2a6b7a5b86c612df2d99d2970380456 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#ab2a6b7a5b86c612df2d99d2970380456">operator=</a> (const <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;)=default</td></tr>
+<tr class="separator:ab2a6b7a5b86c612df2d99d2970380456 inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2235c8f3da8dfe5b26cb030f6886811a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#a2235c8f3da8dfe5b26cb030f6886811a">operator=</a> (<a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:a2235c8f3da8dfe5b26cb030f6886811a inherit pub_methods_structnlohmann_1_1detail_1_1output__adapter__protocol"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:ae57cf7d5c5ec641e25860bb9fb8e6cb9"><td class="memItemLeft" align="right" valign="top">StringType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#ae57cf7d5c5ec641e25860bb9fb8e6cb9">str</a></td></tr>
-<tr class="separator:ae57cf7d5c5ec641e25860bb9fb8e6cb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac370c65658bcae507e4332d5bd67d21f"><td class="memItemLeft" align="right" valign="top">StringType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html#ac370c65658bcae507e4332d5bd67d21f">str</a></td></tr>
+<tr class="separator:ac370c65658bcae507e4332d5bd67d21f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename CharType, typename StringType = std::basic_string&lt;CharType&gt;&gt;<br />
@@ -124,7 +143,35 @@ class nlohmann::detail::output_string_adapter&lt; CharType, StringType &gt;</h3>
 <p>output adapter for basic_string </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="af3a49ecd0d23fe56ac21e13d8752abc7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3a49ecd0d23fe56ac21e13d8752abc7">&#9670;&nbsp;</a></span>output_string_adapter()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af3a49ecd0d23fe56ac21e13d8752abc7">&#9670;&nbsp;</a></span>output_string_adapter() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType , typename StringType  = std::basic_string&lt;CharType&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html">nlohmann::detail::output_string_adapter</a>&lt; CharType, StringType &gt;::<a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html">output_string_adapter</a> </td>
+          <td>(</td>
+          <td class="paramtype">StringType &amp;&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af3a49ecd0d23fe56ac21e13d8752abc7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3a49ecd0d23fe56ac21e13d8752abc7">&#9670;&nbsp;</a></span>output_string_adapter() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -153,7 +200,37 @@ template&lt;typename CharType , typename StringType  = std::basic_string&lt;Char
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a2d76cc6c88ddbc196a63fcfcac9ee7d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d76cc6c88ddbc196a63fcfcac9ee7d1">&#9670;&nbsp;</a></span>write_character()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d76cc6c88ddbc196a63fcfcac9ee7d1">&#9670;&nbsp;</a></span>write_character() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType , typename StringType  = std::basic_string&lt;CharType&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html">nlohmann::detail::output_string_adapter</a>&lt; CharType, StringType &gt;::write_character </td>
+          <td>(</td>
+          <td class="paramtype">CharType&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#a3381896fe1be557f591de2e917cdc7d5">nlohmann::detail::output_adapter_protocol&lt; CharType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a2d76cc6c88ddbc196a63fcfcac9ee7d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d76cc6c88ddbc196a63fcfcac9ee7d1">&#9670;&nbsp;</a></span>write_character() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +260,47 @@ template&lt;typename CharType , typename StringType  = std::basic_string&lt;Char
 </div>
 </div>
 <a id="ab5ea4da075305d225dfd84ad997e8747"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5ea4da075305d225dfd84ad997e8747">&#9670;&nbsp;</a></span>write_characters()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5ea4da075305d225dfd84ad997e8747">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType , typename StringType  = std::basic_string&lt;CharType&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html">nlohmann::detail::output_string_adapter</a>&lt; CharType, StringType &gt;::write_characters </td>
+          <td>(</td>
+          <td class="paramtype">const CharType *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#a2f410a164e0eda17cf6561114b0eee4a">nlohmann::detail::output_adapter_protocol&lt; CharType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ab5ea4da075305d225dfd84ad997e8747"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5ea4da075305d225dfd84ad997e8747">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,8 +340,8 @@ template&lt;typename CharType , typename StringType  = std::basic_string&lt;Char
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="ae57cf7d5c5ec641e25860bb9fb8e6cb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae57cf7d5c5ec641e25860bb9fb8e6cb9">&#9670;&nbsp;</a></span>str</h2>
+<a id="ac370c65658bcae507e4332d5bd67d21f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac370c65658bcae507e4332d5bd67d21f">&#9670;&nbsp;</a></span>str</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -235,7 +352,7 @@ template&lt;typename CharType , typename StringType  = std::basic_string&lt;Char
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">StringType&amp; <a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html">nlohmann::detail::output_string_adapter</a>&lt; CharType, StringType &gt;::str</td>
+          <td class="memname">StringType &amp; <a class="el" href="classnlohmann_1_1detail_1_1output__string__adapter.html">nlohmann::detail::output_string_adapter</a>&lt; CharType, StringType &gt;::str</td>
         </tr>
       </table>
   </td>
@@ -248,7 +365,7 @@ template&lt;typename CharType , typename StringType  = std::basic_string&lt;Char
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/runner/work/NDDEM/NDDEM/src/CoarseGraining/<a class="el" href="json_8hpp_source.html">json.hpp</a></li>
+<li>/home/runner/work/NDDEM/NDDEM/src/Dem/<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

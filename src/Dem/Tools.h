@@ -89,6 +89,7 @@ static double normdiff (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ;
 static double normsq (const vector <double> & a) {double res=0 ; for (int i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; } ///< Norm squared
 static double normdiffsq (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (res) ; } ///< Norm squared of a vector difference \f$|a-b|^2\f$
 static void orthonormalise (v1d & A) ; ///< Orthonormalise A using the Gram-Shmidt process, in place
+static double det (cv2d & M) ; ///< compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)
 static double skewnorm (cv1d & a) {double res=0 ; for (int i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; } ///<Norm of a skew-symetric matrix
 static double skewnormsq (cv1d & a) {double res=0 ; for (int i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (res) ; } ///< Norm squared of a skew-symetrix matrix
 static double dot (cv1d & a, cv1d & b) {double res=0; for (int i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; } ///< Dot product
@@ -113,6 +114,7 @@ static void surfacevelocity (v1d &res, cv1d &p, double * com, double * vel_com, 
         res[dd] = vel_com[dd] - res[dd] ;
  }
 }
+
 
 static void setgravity(v2d & a, v1d &g, v1d &m) {for (uint i=0 ; i<a.size() ; i++) a[i]=g*m[i] ; } ///< Set the gravity. \f$\vec a_i = m_i * \vec g \f$
 static v1d randomize_vec (cv1d v) ; ///< Produce a random vector
@@ -686,8 +688,8 @@ void Tools<d>::unitvec (vector <double> & v, int n)
 }
 //-----------------------------------
 template <int d>
- void Tools<d>::orthonormalise (v1d & A) //Gram-Schmidt process
- {
+void Tools<d>::orthonormalise (v1d & A) //Gram-Schmidt process
+{
      static int first = 0 ; // cycle through the base vector as first vector (to be impartial, random would probably be better but hey ...
 
      // Let's get the base vectors first
@@ -708,8 +710,29 @@ template <int d>
              A[j*d+(i%d)] = base[i-first][j] ;
 
      //first++ ; if (first>=d) first=0 ;
+}
+//-----------------------------------
+template <int d>
+double Tools<d>::det (cv2d &M)
+{
+ double res=1 ;
+ vector<vector<double>>submatrix ;
+ submatrix.resize(d-1, vector<double>(d-1)) ;  
+ for (int i=0 ; i<d ; i++)
+ {
+   for (int j=0 ; j<d ; j++)
+     for (int k=0 ; k<d-1 ; k++)
+     {
+       if (j==i) continue ; 
+       submatrix[k][j-(j>i?1:0)]=M[k][j] ; 
+     }
+   res *= ((i+d-1)%2?-1:1) * M[d-1][i] * Tools<d-1>::det(submatrix) ;
  }
-
+ return res ; 
+}
+template <> double Tools<2>::det(cv2d &M) { return M[0][0]*M[1][1]-M[1][0]-M[0][1] ; }
+template <> double Tools<1>::det(cv2d &M) { return M[0][0] ; }
+template <> double Tools<0>::det([[maybe_unused]] cv2d &M) { return 1. ;} // Should never be called. 
 //==================================
 template <int d>
 double Tools<d>::Volume (double R)

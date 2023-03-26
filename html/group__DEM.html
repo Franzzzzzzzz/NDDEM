@@ -126,6 +126,8 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:gab701e3ac61a85b337ec5c1abaad6742d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gab701e3ac61a85b337ec5c1abaad6742d">json</a> = <a class="el" href="namespacenlohmann.html#a9cc9a3033850a092f791d86854d117fc">nlohmann::json</a></td></tr>
+<tr class="separator:gab701e3ac61a85b337ec5c1abaad6742d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga69aa29b598b851b0640aa225a9e5d61d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga69aa29b598b851b0640aa225a9e5d61d">uint</a> = unsigned int</td></tr>
 <tr class="separator:ga69aa29b598b851b0640aa225a9e5d61d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae570fe4d2fd13665912fabd3abd276b2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> = vector&lt; double &gt;</td></tr>
@@ -478,6 +480,9 @@ Variables</h2></td></tr>
 <tr class="memitem:ga1a8e5f27dfca54cbdcebe441dae4d31e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga1a8e5f27dfca54cbdcebe441dae4d31e">Tools&lt; d &gt;::orthonormalise</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;A)</td></tr>
 <tr class="memdesc:ga1a8e5f27dfca54cbdcebe441dae4d31e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Orthonormalise A using the Gram-Shmidt process, in place.  <a href="group__DEM.html#ga1a8e5f27dfca54cbdcebe441dae4d31e">More...</a><br /></td></tr>
 <tr class="separator:ga1a8e5f27dfca54cbdcebe441dae4d31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">Tools&lt; d &gt;::det</a> (<a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;M)</td></tr>
+<tr class="memdesc:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)  <a href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">More...</a><br /></td></tr>
+<tr class="separator:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafefafd3fbcebb8b8f1bd6dc12017a11c">Tools&lt; d &gt;::unitvec</a> (int n)</td></tr>
 <tr class="memdesc:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct &amp; return a unit vector.  <a href="group__DEM.html#gafefafd3fbcebb8b8f1bd6dc12017a11c">More...</a><br /></td></tr>
 <tr class="separator:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -494,13 +499,13 @@ Variables</h2></td></tr>
 <tr class="memdesc:ga6afb94a90c262e1f3c56b77446b8e7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a 2D-matrix, returns a 1D vector with the norms of the individual vectors.  <a href="group__DEM.html#ga6afb94a90c262e1f3c56b77446b8e7ab">More...</a><br /></td></tr>
 <tr class="separator:ga6afb94a90c262e1f3c56b77446b8e7ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">Tools&lt; d &gt;::normdiff</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
-<tr class="memdesc:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_0.png"/>.  <a href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">More...</a><br /></td></tr>
+<tr class="memdesc:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_1.png"/>.  <a href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">More...</a><br /></td></tr>
 <tr class="separator:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga92a4a1e02af06e8f2f3d662374606623"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga92a4a1e02af06e8f2f3d662374606623">Tools&lt; d &gt;::normsq</a> (const vector&lt; double &gt; &amp;a)</td></tr>
 <tr class="memdesc:ga92a4a1e02af06e8f2f3d662374606623"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared.  <a href="group__DEM.html#ga92a4a1e02af06e8f2f3d662374606623">More...</a><br /></td></tr>
 <tr class="separator:ga92a4a1e02af06e8f2f3d662374606623"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6a0f473f0c13f047ab489d924b27630d"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">Tools&lt; d &gt;::normdiffsq</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
-<tr class="memdesc:ga6a0f473f0c13f047ab489d924b27630d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_1.png"/>.  <a href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">More...</a><br /></td></tr>
+<tr class="memdesc:ga6a0f473f0c13f047ab489d924b27630d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_2.png"/>.  <a href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">More...</a><br /></td></tr>
 <tr class="separator:ga6a0f473f0c13f047ab489d924b27630d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4b9f05b9049cdeba112378742e7787e0"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4b9f05b9049cdeba112378742e7787e0">Tools&lt; d &gt;::skewnorm</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a)</td></tr>
 <tr class="memdesc:ga4b9f05b9049cdeba112378742e7787e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a skew-symetric matrix.  <a href="group__DEM.html#ga4b9f05b9049cdeba112378742e7787e0">More...</a><br /></td></tr>
@@ -520,7 +525,7 @@ Variables</h2></td></tr>
 <tr class="memitem:gae580a0c4104608d38bc3b07d31a03180"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae580a0c4104608d38bc3b07d31a03180">Tools&lt; d &gt;::surfacevelocity</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;p, double *com, double *vel_com, double *omega_com)</td></tr>
 <tr class="separator:gae580a0c4104608d38bc3b07d31a03180"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">Tools&lt; d &gt;::setgravity</a> (<a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;a, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;g, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;m)</td></tr>
-<tr class="memdesc:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_2.png"/>.  <a href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">More...</a><br /></td></tr>
+<tr class="memdesc:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_3.png"/>.  <a href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">More...</a><br /></td></tr>
 <tr class="separator:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Matrix operations, usually operating on flattened matrices, cf. the description for more information on matrix storage</h2></td></tr>
@@ -790,6 +795,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="group__DEM.html#ga8e600930c2fdf4b04114320045fbfdf9">cv3d</a> =  const vector&lt;vector&lt;vector&lt;double&gt; &gt;&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="gab701e3ac61a85b337ec5c1abaad6742d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab701e3ac61a85b337ec5c1abaad6742d">&#9670;&nbsp;</a></span>json</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="group__DEM.html#gab701e3ac61a85b337ec5c1abaad6742d">json</a> =  <a class="el" href="namespacenlohmann.html#a9cc9a3033850a092f791d86854d117fc">nlohmann::json</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1530,6 +1549,36 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">&#9670;&nbsp;</a></span>det()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::det </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;&#160;</td>
+          <td class="paramname"><em>M</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage) </p>
+
+</div>
+</div>
 <a id="ga56976c11478e25728e04bf9561aff8e6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga56976c11478e25728e04bf9561aff8e6">&#9670;&nbsp;</a></span>disp_share()</h2>
 
@@ -2048,7 +2097,7 @@ template&lt;int d&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_0.png"/>. </p>
+<p>Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_1.png"/>. </p>
 
 </div>
 </div>
@@ -2088,7 +2137,7 @@ template&lt;int d&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_1.png"/>. </p>
+<p>Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_2.png"/>. </p>
 
 </div>
 </div>
@@ -3782,7 +3831,7 @@ template&lt;int d&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_2.png"/>. </p>
+<p>Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_3.png"/>. </p>
 
 </div>
 </div>
