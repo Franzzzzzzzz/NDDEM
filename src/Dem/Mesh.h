@@ -50,9 +50,9 @@ public:
   }
   
   //------------------------------------------------------
-  mesh_distance (cv1d Xo, double r)
+  void mesh_distance (cv1d Xo, double r) // TODO WORK IN PROGRESS
   {
-    std::vector<double> dotproducts (d) ; 
+    /*std::vector<double> dotproducts (d) ;
     auto X = Xo-origin ;
     double dstsqr=0 ; 
     
@@ -64,6 +64,8 @@ public:
     if (dstsqr<r*r) //Potential contact
     {
       double Xl = Tools<d>::norm(X) ; 
+      std::vector<double> coefficient(d) ;
+      double coefficient_sum = 0 ;
       for (int i=0 ; i<dimensionality ; i++)
       {
         dotproducts[i] = Tools<d>::dot(mixedbase[i], X) ; 
@@ -74,12 +76,13 @@ public:
       }
       if (coefficient_sum>=0 && coefficient_sum<=1) // Seems like we got a contact!
       {
+        std::vector<double> contact_point (d, 0) ;
         for (int i=0 ; i<dimensionality ; i++)
           contact_point += coefficient[i]*mixedbase[i] ; 
-        cn = X - contact_point ;
+        std::vector<double> cn = X - contact_point ;
         cn /= Tools<d>::norm(cn) ; 
       }
-    }
+    }*/
   }
   
   int dimensionality ; 
