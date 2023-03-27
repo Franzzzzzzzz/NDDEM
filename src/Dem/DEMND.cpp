@@ -107,7 +107,7 @@ int main (int argc, char *argv[])
 //      case 25: templatedmain<25> (argv) ; break ;
      default : printf("DEMND was not compiled with support for dimension %d. Please recompile modifying the main function to support that dimension.\n", dd); std::exit(1) ;
  }
-printf("b") ;
+
 return 0 ;
 }
 

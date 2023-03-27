@@ -715,7 +715,7 @@ void Tools<d>::orthonormalise (v1d & A) //Gram-Schmidt process
 template <int d>
 double Tools<d>::det (cv2d &M)
 {
- double res=1 ;
+ double res=0 ;
  vector<vector<double>>submatrix ;
  submatrix.resize(d-1, vector<double>(d-1)) ;  
  for (int i=0 ; i<d ; i++)
@@ -726,11 +726,11 @@ double Tools<d>::det (cv2d &M)
        if (j==i) continue ; 
        submatrix[k][j-(j>i?1:0)]=M[k][j] ; 
      }
-   res *= ((i+d-1)%2?-1:1) * M[d-1][i] * Tools<d-1>::det(submatrix) ;
+   res += ((i+d-1)%2?-1:1) * M[d-1][i] * Tools<d-1>::det(submatrix) ;
  }
  return res ; 
 }
-template <> double Tools<2>::det(cv2d &M) { return M[0][0]*M[1][1]-M[1][0]-M[0][1] ; }
+template <> double Tools<2>::det(cv2d &M) { return M[0][0]*M[1][1]-M[1][0]*M[0][1] ; }
 template <> double Tools<1>::det(cv2d &M) { return M[0][0] ; }
 template <> double Tools<0>::det([[maybe_unused]] cv2d &M) { return 1. ;} // Should never be called. 
 //==================================
