@@ -271,7 +271,7 @@ public:
          int ID = omp_get_thread_num();
          double timebeg = omp_get_wtime();
          #endif
-         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ;
+         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; //ContactList<d> & CLm = MP.CLm[ID] ; 
          cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
          CLp.reset() ; CLw.reset();
 
@@ -338,6 +338,17 @@ public:
                             CLw.insert(tmpcp) ;
                         }
                     }
+            }
+            
+            for (size_t j=0 ; j<P.Meshes.size() ; j++) //TODO Meshes incompatible with PBC
+            {
+                //std::tie<double,int,std::vector<double>>(tmpcp.contactlength, tmpcp.j, tmpcp.contactpoint) = P.Meshes[j].contactdetection(X[i], P.r[i]) ;
+                if (tmpcp.contactlength < P.skin) 
+                {
+                    tmpcp.j |= (j<<8) ;
+                    //CLm.insert(tmpcp) ; 
+                }
+                
             }
         }
         CLp.finalise() ;

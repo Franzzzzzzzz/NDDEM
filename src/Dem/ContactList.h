@@ -130,6 +130,27 @@ public:
  } ///< Compute the location & branch vector of the contact
 } ;
 
+/** \brief Contact properties for mesh contacts, specialising cp. */
+class cpm : public cp {
+public: 
+    cpm (int ii, int jj, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action){} ///< New contact creation
+    ~cpm () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
+    cpm & operator= (const cpm & c)
+    {
+     i=c.i ;
+     if (c.i<0) return *this ; //is a deleted element, just keep moving
+     j=c.j ; // copy everything else if it is not a deleted element
+     ghost=c.ghost ;
+     ghostdir=c.ghostdir ;
+     tspr=c.tspr ;
+     contactlength=c.contactlength ;
+     contactpoint = c.contactpoint ; 
+     infos=c.infos ;
+     return *this ;
+    } ///< Affect contact.
+    vector <double> contactpoint; ///< Location of the contact, used only for Mesh at this point, to avoid recalculating. 
+} ; 
+
 // ------------------------------------ Contact List class -------------------------------------------
 /** \brief Handles lists of contacts
  */
