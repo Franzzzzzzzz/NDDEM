@@ -50,13 +50,13 @@ public:
   }
   
   //------------------------------------------------------
-  void mesh_distance (cv1d Xo, double r) // TODO WORK IN PROGRESS
+  std::tuple<double, int, std::vector<double>> contactdetection (cv1d Xo, double r) // TODO WORK IN PROGRESS
   {
-    /*std::vector<double> dotproducts (d) ;
+    std::vector<double> dotproducts (d) ;
     auto X = Xo-origin ;
     double dstsqr=0 ; 
     
-    for (int i=dimensionality ; i<d ; i++)
+    /*for (int i=dimensionality ; i<d ; i++)
     {
       dotproducts[i]=Tools<d>::dot(mixedbase[i], X) ; 
       dstsqr+= dotproducts[i] ; 
