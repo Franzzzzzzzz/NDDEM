@@ -28,7 +28,6 @@ using json = nlohmann::json;
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
 enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000} ; ///< Flags for export data control
-enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4, PBC_LE=5} ; ///< Wall types
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData   operator| (ExportData a, ExportData b) {auto c= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return c ; }

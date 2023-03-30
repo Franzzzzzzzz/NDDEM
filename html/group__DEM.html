@@ -90,6 +90,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html">ContactList&lt; d &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles lists of contacts.  <a href="classContactList.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactListMesh.html">ContactListMesh&lt; d &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles lists of contacts with meshes.  <a href="classContactListMesh.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContacts.html">Contacts&lt; d &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate contact forces.  <a href="classContacts.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -200,17 +203,6 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:ga513959f26fd4469592593d8e13e8eba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac5ecf92a792f505a64533e107971ae35"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac5ecf92a792f505a64533e107971ae35">WallType</a> { <br />
-&#160;&#160;<a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a817a7e6f14396060c4e915adcaefb88e">PBC</a> =0
-, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a48d536b2de1195d0c9f6ea8ab884085e">WALL</a> =1
-, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35aec0ee4a392a3223b0d108d177aaa8bd7">MOVINGWALL</a> =2
-, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a6f7cea7381e843e2ee0338b4a92b0d43">SPHERE</a> =3
-, <br />
-&#160;&#160;<a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a6ef552336b9209dafccffb492dd3a80e">ROTATINGSPHERE</a> =4
-, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35ace8a104fadb84b89419953ea49da01b3">PBC_LE</a> =5
-<br />
- }</td></tr>
-<tr class="separator:gac5ecf92a792f505a64533e107971ae35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga687cdefe1dea4afccff21e37ca3ce7c6"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga687cdefe1dea4afccff21e37ca3ce7c6">TensorType</a> { <br />
 &#160;&#160;<a class="el" href="group__DEM.html#gga687cdefe1dea4afccff21e37ca3ce7c6a8f3d9a4b6a7b7f2c7afa61ca113d0db9">SCALAR</a>
 , <a class="el" href="group__DEM.html#gga687cdefe1dea4afccff21e37ca3ce7c6a87752381b583740610f1dfeb07fdad7e">VECTOR</a>
@@ -265,6 +257,17 @@ Enumerations</h2></td></tr>
 , <a class="el" href="group__DEM.html#gga823000505b0f0b93416074a98e1b7078a2b65c81040f82876138e37991162eb62">HERTZ</a>
  }</td></tr>
 <tr class="separator:ga823000505b0f0b93416074a98e1b7078"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac5ecf92a792f505a64533e107971ae35"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac5ecf92a792f505a64533e107971ae35">WallType</a> { <br />
+&#160;&#160;<a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a817a7e6f14396060c4e915adcaefb88e">PBC</a> =0
+, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a48d536b2de1195d0c9f6ea8ab884085e">WALL</a> =1
+, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35aec0ee4a392a3223b0d108d177aaa8bd7">MOVINGWALL</a> =2
+, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a6f7cea7381e843e2ee0338b4a92b0d43">SPHERE</a> =3
+, <br />
+&#160;&#160;<a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a6ef552336b9209dafccffb492dd3a80e">ROTATINGSPHERE</a> =4
+, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35ace8a104fadb84b89419953ea49da01b3">PBC_LE</a> =5
+<br />
+ }</td></tr>
+<tr class="separator:gac5ecf92a792f505a64533e107971ae35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -354,6 +357,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gac6ec0fa8e9ed0091fcc834e5d76a078f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac6ec0fa8e9ed0091fcc834e5d76a078f">ContactList&lt; d &gt;::insert</a> (const <a class="el" href="classcp.html">cp</a> &amp;a)</td></tr>
 <tr class="memdesc:gac6ec0fa8e9ed0091fcc834e5d76a078f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#gac6ec0fa8e9ed0091fcc834e5d76a078f">More...</a><br /></td></tr>
 <tr class="separator:gac6ec0fa8e9ed0091fcc834e5d76a078f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga07d2f5a609c8d23adaa13cf70dac45ea"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga07d2f5a609c8d23adaa13cf70dac45ea">ContactListMesh&lt; d &gt;::insert</a> (const <a class="el" href="classcpm.html">cpm</a> &amp;a)</td></tr>
+<tr class="memdesc:ga07d2f5a609c8d23adaa13cf70dac45ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#ga07d2f5a609c8d23adaa13cf70dac45ea">More...</a><br /></td></tr>
+<tr class="separator:ga07d2f5a609c8d23adaa13cf70dac45ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa329c3fd8d07842e65e8229ba79584e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaa329c3fd8d07842e65e8229ba79584e4">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a> &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
 <tr class="memdesc:gaa329c3fd8d07842e65e8229ba79584e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#gaa329c3fd8d07842e65e8229ba79584e4">More...</a><br /></td></tr>
 <tr class="separator:gaa329c3fd8d07842e65e8229ba79584e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1793,7 +1799,7 @@ template&lt;int d&gt; </div>
 </div>
 </div>
 <a id="gac6ec0fa8e9ed0091fcc834e5d76a078f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac6ec0fa8e9ed0091fcc834e5d76a078f">&#9670;&nbsp;</a></span>insert()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#gac6ec0fa8e9ed0091fcc834e5d76a078f">&#9670;&nbsp;</a></span>insert() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1804,6 +1810,28 @@ template&lt;int d&gt; </div>
           <td class="memname">int <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classcp.html">cp</a> &amp;&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal. </p>
+
+</div>
+</div>
+<a id="ga07d2f5a609c8d23adaa13cf70dac45ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga07d2f5a609c8d23adaa13cf70dac45ea">&#9670;&nbsp;</a></span>insert() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classContactListMesh.html">ContactListMesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::insert </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classcpm.html">cpm</a> &amp;&#160;</td>
           <td class="paramname"><em>a</em></td><td>)</td>
           <td></td>
         </tr>

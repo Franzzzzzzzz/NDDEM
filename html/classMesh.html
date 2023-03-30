@@ -74,10 +74,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a687e62127eb3f1108002d99416d95014"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#a687e62127eb3f1108002d99416d95014">Mesh</a> (int dim, std::vector&lt; std::vector&lt; double &gt;&gt; vertices)</td></tr>
-<tr class="separator:a687e62127eb3f1108002d99416d95014"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83e8b838511a129c151ac059afefee4c"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; double, int, std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#a83e8b838511a129c151ac059afefee4c">contactdetection</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> Xo, double r)</td></tr>
-<tr class="separator:a83e8b838511a129c151ac059afefee4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7c489ab01c2c3407a6b6210d01fdcfd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#ac7c489ab01c2c3407a6b6210d01fdcfd">Mesh</a> (int dim, std::vector&lt; std::vector&lt; double &gt;&gt; vertices, bool compute_submeshes=true)</td></tr>
+<tr class="separator:ac7c489ab01c2c3407a6b6210d01fdcfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -85,15 +83,17 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a3df3578d0bd33fb7d4ba212b4d71954a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe2cd2a75ca521a370fe38dc6ba0b66d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#abe2cd2a75ca521a370fe38dc6ba0b66d">origin</a></td></tr>
 <tr class="separator:abe2cd2a75ca521a370fe38dc6ba0b66d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab640cfeaa235e72b201388d5a514b35a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#ab640cfeaa235e72b201388d5a514b35a">norms</a></td></tr>
+<tr class="separator:ab640cfeaa235e72b201388d5a514b35a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1063d2c0f2732d3c253522e5298aab9f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#a1063d2c0f2732d3c253522e5298aab9f">mixedbase</a></td></tr>
 <tr class="memdesc:a1063d2c0f2732d3c253522e5298aab9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mixed based: first n=dimensionality vectors are neither normalised nor unit vectors, while they d-n last vectors are.  <a href="classMesh.html#a1063d2c0f2732d3c253522e5298aab9f">More...</a><br /></td></tr>
 <tr class="separator:a1063d2c0f2732d3c253522e5298aab9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb47fd00c428c2b5c8d159566b12a205"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classMesh.html">Mesh</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#aeb47fd00c428c2b5c8d159566b12a205">submeshes</a></td></tr>
-<tr class="separator:aeb47fd00c428c2b5c8d159566b12a205"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af77c4b95b7d72faa89102d14098b6948"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; <a class="el" href="classMesh.html">Mesh</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMesh.html#af77c4b95b7d72faa89102d14098b6948">submeshes</a></td></tr>
+<tr class="separator:af77c4b95b7d72faa89102d14098b6948"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a687e62127eb3f1108002d99416d95014"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a687e62127eb3f1108002d99416d95014">&#9670;&nbsp;</a></span>Mesh()</h2>
+<a id="ac7c489ab01c2c3407a6b6210d01fdcfd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7c489ab01c2c3407a6b6210d01fdcfd">&#9670;&nbsp;</a></span>Mesh()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,46 +113,13 @@ template&lt;int d&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt;&#160;</td>
-          <td class="paramname"><em>vertices</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a83e8b838511a129c151ac059afefee4c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a83e8b838511a129c151ac059afefee4c">&#9670;&nbsp;</a></span>contactdetection()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::tuple&lt;double, int, std::vector&lt;double&gt; &gt; <a class="el" href="classMesh.html">Mesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::contactdetection </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a>&#160;</td>
-          <td class="paramname"><em>Xo</em>, </td>
+          <td class="paramname"><em>vertices</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>r</em>&#160;</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>compute_submeshes</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -204,6 +171,22 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="ab640cfeaa235e72b201388d5a514b35a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab640cfeaa235e72b201388d5a514b35a">&#9670;&nbsp;</a></span>norms</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; <a class="el" href="classMesh.html">Mesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::norms</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="abe2cd2a75ca521a370fe38dc6ba0b66d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abe2cd2a75ca521a370fe38dc6ba0b66d">&#9670;&nbsp;</a></span>origin</h2>
 
@@ -220,8 +203,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="aeb47fd00c428c2b5c8d159566b12a205"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb47fd00c428c2b5c8d159566b12a205">&#9670;&nbsp;</a></span>submeshes</h2>
+<a id="af77c4b95b7d72faa89102d14098b6948"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af77c4b95b7d72faa89102d14098b6948">&#9670;&nbsp;</a></span>submeshes</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -229,7 +212,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="classMesh.html">Mesh</a>&gt; <a class="el" href="classMesh.html">Mesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::submeshes</td>
+          <td class="memname">std::vector&lt;std::vector&lt;<a class="el" href="classMesh.html">Mesh</a>&gt; &gt; <a class="el" href="classMesh.html">Mesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::submeshes</td>
         </tr>
       </table>
 </div><div class="memdoc">

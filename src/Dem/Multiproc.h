@@ -52,6 +52,7 @@ public:
 
   vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
   vector <ContactList<d>> CLw ; ///< ContactList particle-wall for each processor
+  vector <ContactListMesh<d>> CLm ; ///< ContactList particle-mesh for each processor
   vector <Contacts<d>> C ; ///< Dummy Contacts for independent calculation per processor
   vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=d+1. 
   vector <double> timing ; ///< Used to record the time spent by each thread. 
