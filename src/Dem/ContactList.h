@@ -51,6 +51,7 @@ class cp
 {
 public:
  cp (int ii, int jj, int d, double ctlength, Action * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} ///< New contact creation
+ cp(const cp& v) { *this=v ; }
  ~cp () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
  cp & operator= (const cp & c)
  {
@@ -133,22 +134,18 @@ public:
 /** \brief Contact properties for mesh contacts, specialising cp. */
 class cpm : public cp {
 public: 
-    cpm (int ii, int jj, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action){} ///< New contact creation
+    cpm (int ii, int jj, int sid, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
+    cpm(const cpm& v): cp(v) {*this=v ;}
     ~cpm () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
     cpm & operator= (const cpm & c)
     {
-     i=c.i ;
-     if (c.i<0) return *this ; //is a deleted element, just keep moving
-     j=c.j ; // copy everything else if it is not a deleted element
-     ghost=c.ghost ;
-     ghostdir=c.ghostdir ;
-     tspr=c.tspr ;
-     contactlength=c.contactlength ;
-     contactpoint = c.contactpoint ; 
-     infos=c.infos ;
+     cp::operator=(c);
+     contactpoint = c.contactpoint ;
+     submeshid = c.submeshid ; 
      return *this ;
     } ///< Affect contact.
     vector <double> contactpoint; ///< Location of the contact, used only for Mesh at this point, to avoid recalculating. 
+    int submeshid ; 
 } ; 
 
 // ------------------------------------ Contact List class -------------------------------------------
@@ -161,7 +158,7 @@ public:
  ContactList () {check_ghost=&ContactList::check_ghost_LE;}
  void reset() {it = v.begin() ;}  ///< Go to the contact list beginning
  int insert(const cp& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
- void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which open.
+ void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which opened.
  list <cp> v ; ///< Contains the list of contact
  Action * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
@@ -181,6 +178,70 @@ private:
 
 inline bool operator< (const cp &a, const cp &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; } ///< The contact list is order in increasing order of index i, and for two identical i in increasing order of j.
 inline bool operator== (const cp &a, const cp &b) {return (a.i==b.i && a.j==b.j) ; } ///< Contact equivalence is based solely on the index of objects in contact i and j.
+
+//-------------------------------------------------
+/** \brief Handles lists of contacts with meshes
+ */
+template <int d>
+class ContactListMesh
+{
+public:
+ list <cpm> v ;    
+ Action * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
+ void reset() {it = v.begin() ;} ///< Go to the contact list beginning
+ void finalise () { while (it!=v.end()) it=v.erase(it) ; }
+ int insert(const cpm& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
+ int cid=0 ; ///< \deprecated not used for anything anymore I think.
+ 
+ bool check_mesh_dst_contact (Mesh<d> &mesh, cv1d & Xo, double r, cpm & c)
+ {
+  std::vector<double> dotproducts (d) ;
+  auto X = Xo-mesh.origin ;
+  double dstsqr=0 ; 
+   
+  for (int i=mesh.dimensionality ; i<d ; i++)
+  {
+    dotproducts[i]=Tools<d>::dot(mesh.mixedbase[i], X) ; 
+    dstsqr+= dotproducts[i] ; 
+  }
+  if (dstsqr<r*r) //Potential contact
+  {
+    double Xl = Tools<d>::norm(X) ; 
+    std::vector<double> coefficient(d) ;
+    double coefficient_sum = 0 ;
+    for (int i=0 ; i<mesh.dimensionality ; i++)
+    {
+      dotproducts[i] = Tools<d>::dot(mesh.mixedbase[i], X) ; 
+      coefficient[i] = dotproducts[i]/mesh.norms[i]/Xl ; 
+      if (coefficient[i]<0 || coefficient[i]>1) goto submeshesprocessing ;  // We are outside        
+      coefficient_sum += coefficient[i] ; 
+      if (coefficient_sum>1) goto submeshesprocessing ;  
+    }
+    if (coefficient_sum>=0 && coefficient_sum<=1) // Seems like we got a contact!
+    {
+      c.contactlength = sqrt(dstsqr) ;
+      Tools<d>::setzero(c.contactpoint) ; 
+      for (int i=0 ; i<mesh.dimensionality ; i++)
+        c.contactpoint += mesh.mixedbase[i]*coefficient[i] ; 
+      return true ; 
+    }
+  }
+  
+  submeshesprocessing:                  // yeah yeah, using goto ... sue me
+  if (mesh.submeshes.size()>0)
+      for (int i=mesh.dimensionality-1 ; i>0 ; i--)
+          for (size_t j=0 ; j<mesh.submeshes[i].size() ; j++)
+          {
+              bool res = check_mesh_dst_contact(mesh.submeshes[i][j], Xo, r, c) ; 
+              if (res) return true ; 
+          }
+  return false ; 
+ }
+  
+private: 
+ list<cpm>::iterator it ;  ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
+ Action def ; ///< Default action
+} ; 
 
 
 /*****************************************************************************************************
@@ -206,6 +267,28 @@ int ContactList<d>::insert(const cp &a)
             it->contactlength=a.contactlength ;
             it->ghost=a.ghost ;
             it->ghostdir=a.ghostdir ;
+            it++ ;
+        }
+        else {it=v.insert(it,a) ; it++ ; }
+    }
+    return (cid++) ;
+}
+//----------------------------------------------
+template <int d>
+int ContactListMesh<d>::insert(const cpm &a)
+{
+    while (it!=v.end() && (*it) < a)
+    { it= v.erase(it) ; }
+    if (it==v.end()) {v.push_back(a) ; it=v.end() ; }
+    else
+    {
+        if ((*it)==a)
+        {
+            it->contactlength=a.contactlength ;
+            it->ghost=a.ghost ;
+            it->ghostdir=a.ghostdir ;
+            it->contactpoint = a.contactpoint ; 
+            it->submeshid = a.submeshid ; 
             it++ ;
         }
         else {it=v.insert(it,a) ; it++ ; }
