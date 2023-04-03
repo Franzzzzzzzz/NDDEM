@@ -15,7 +15,12 @@ npm run build
 # cd visualise
 # npm install
 
+# clean old install
+rm -rf build/*
+rm -rf deploy/*
+
 # now compile with emscripten
+
 cd build
 
 embuilder build boost_headers zlib

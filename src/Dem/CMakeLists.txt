@@ -24,7 +24,7 @@ if(EMSCRIPTEN)
     DEMND
     PROPERTIES
     LINK_FLAGS
-    "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMND' -s EXTRA_EXPORTED_RUNTIME_METHODS=[getValue]"
+    "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMND' -s EXPORTED_RUNTIME_METHODS=[getValue]"
  )
 else()
  target_compile_options(DEMND PUBLIC -g -O3 -fopenmp -Wall -Wextra)
