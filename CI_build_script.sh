@@ -16,8 +16,8 @@ npm run build
 # npm install
 
 # clean old install
-rm -rf build/*
-rm -rf deploy/*
+# rm -rf build/*
+# rm -rf deploy/*
 
 # now compile with emscripten
 
