@@ -62,6 +62,7 @@ public:
      ghostdir=c.ghostdir ;
      tspr=c.tspr ;
      contactlength=c.contactlength ;
+     owninfos = c.owninfos ; 
      infos=c.infos ;
      return *this ;
  } ///< Affect contact.
@@ -136,7 +137,7 @@ class cpm : public cp {
 public: 
     cpm (int ii, int jj, int sid, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
     cpm(const cpm& v): cp(v) {*this=v ;}
-    ~cpm () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
+    ~cpm () {} ///< Remove & clean contact
     cpm & operator= (const cpm & c)
     {
      cp::operator=(c);
