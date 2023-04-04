@@ -16,6 +16,7 @@ module.exports = [{
         'coarse-graining' : './live/src/coarse-graining.js',
         'rotation-matrix' : './live/src/rotation-matrix.js',
         'simple-shear' : './live/src/simple-shear.js',
+        'hopper' : './live/src/hopper.js',
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -48,6 +49,13 @@ module.exports = [{
             template: "live/template.html",
             filename: "simple-shear-2d.html",
             chunks: ['simple-shear']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Hopper',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/template.html",
+            filename: "hopper-2d.html",
+            chunks: ['hopper']
         }),
         new HtmlWebpackPlugin({
             title: "NDDEM Inclined plane",
