@@ -62,6 +62,7 @@ public:
      ghostdir=c.ghostdir ;
      tspr=c.tspr ;
      contactlength=c.contactlength ;
+     owninfos = c.owninfos ; 
      infos=c.infos ;
      return *this ;
  } ///< Affect contact.
@@ -136,7 +137,7 @@ class cpm : public cp {
 public: 
     cpm (int ii, int jj, int sid, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
     cpm(const cpm& v): cp(v) {*this=v ;}
-    ~cpm () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
+    ~cpm () {} ///< Remove & clean contact
     cpm & operator= (const cpm & c)
     {
      cp::operator=(c);
@@ -194,25 +195,42 @@ public:
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
  
  bool check_mesh_dst_contact (Mesh<d> &mesh, cv1d & Xo, double r, cpm & c)
- {
+ {     
   std::vector<double> dotproducts (d) ;
   auto X = Xo-mesh.origin ;
+  
+  // Treating the special case of having a single point
+  if (mesh.dimensionality == 0)
+  {
+      double dst=Tools<d>::norm(X) ; 
+      if (dst<r) // We got a contact
+      {
+          c.contactlength = dst ; 
+          c.contactpoint=mesh.origin ; 
+          return true ; 
+      }
+      return false ; // There can't be any submesh for a 0-dimensionality mesh
+  }
+  
+  // All other cases. 
   double dstsqr=0 ; 
-   
-  for (int i=mesh.dimensionality ; i<d ; i++)
+  //printf("%g %g %g ", X[0], X[1], X[2]) ; 
+  for (int i=0; i<d-mesh.dimensionality ; i++)
   {
     dotproducts[i]=Tools<d>::dot(mesh.mixedbase[i], X) ; 
-    dstsqr+= dotproducts[i] ; 
+    dstsqr+= dotproducts[i]*dotproducts[i] ; 
+    //if (mesh.dimensionality==2)  printf("%g %g %g %g|", mesh.mixedbase[i][0], mesh.mixedbase[i][1], mesh.mixedbase[i][2], dotproducts[i]) ; 
   }
   if (dstsqr<r*r) //Potential contact
   {
-    double Xl = Tools<d>::norm(X) ; 
     std::vector<double> coefficient(d) ;
     double coefficient_sum = 0 ;
-    for (int i=0 ; i<mesh.dimensionality ; i++)
+    //printf("-> %g | [%g %g %g | %g %g %g | %g %g %g] ", sqrt(dstsqr), mesh.mixedbase[0][0], mesh.mixedbase[0][1], mesh.mixedbase[0][2], mesh.mixedbase[1][0], mesh.mixedbase[1][1], mesh.mixedbase[1][2],mesh.mixedbase[2][0], mesh.mixedbase[2][1], mesh.mixedbase[2][2]) ; 
+    for (int i=d-mesh.dimensionality ; i<d ; i++)
     {
       dotproducts[i] = Tools<d>::dot(mesh.mixedbase[i], X) ; 
-      coefficient[i] = dotproducts[i]/mesh.norms[i]/Xl ; 
+      coefficient[i] = dotproducts[i]/mesh.norms[i]/mesh.norms[i] ; 
+      //printf("/%d %g ", i, coefficient[i]) ; fflush(stdout) ; 
       if (coefficient[i]<0 || coefficient[i]>1) goto submeshesprocessing ;  // We are outside        
       coefficient_sum += coefficient[i] ; 
       if (coefficient_sum>1) goto submeshesprocessing ;  
@@ -220,13 +238,13 @@ public:
     if (coefficient_sum>=0 && coefficient_sum<=1) // Seems like we got a contact!
     {
       c.contactlength = sqrt(dstsqr) ;
-      Tools<d>::setzero(c.contactpoint) ; 
-      for (int i=0 ; i<mesh.dimensionality ; i++)
+      c.contactpoint=mesh.origin ; 
+      for (int i=d-mesh.dimensionality ; i<d ; i++)
         c.contactpoint += mesh.mixedbase[i]*coefficient[i] ; 
       return true ; 
     }
   }
-  
+  //printf("\n") ; 
   submeshesprocessing:                  // yeah yeah, using goto ... sue me
   if (mesh.submeshes.size()>0)
       for (int i=mesh.dimensionality-1 ; i>0 ; i--)

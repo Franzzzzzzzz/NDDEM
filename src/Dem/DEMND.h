@@ -263,7 +263,7 @@ public:
         //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
         // ----- Contact detection ------
-        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) //shared (stdout)
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout)
         {
          #ifdef NO_OPENMP
          int ID = 0 ;
@@ -271,13 +271,15 @@ public:
          int ID = omp_get_thread_num();
          double timebeg = omp_get_wtime();
          #endif
-         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
          cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
          cpm tmpcpm(0,0,0,d,0,nullptr) ; 
-         CLp.reset() ; CLw.reset();
+         
+         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
+         CLp.reset() ; CLw.reset(); CLm.reset() ; 
 
          for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
          {
+            // Contact detection between particles
             tmpcp.setinfo(CLp.default_action());
             tmpcp.i=i ;
             for (int j=i+1 ; j<N ; j++) // Regular particles
@@ -301,6 +303,7 @@ public:
                 }
             }
 
+            // Contact detection between particles and walls
             tmpcp.setinfo(CLw.default_action());
             tmpcp.i=i ;
             for (size_t j=0 ; j<P.Boundaries.size() ; j++) // Wall contacts
@@ -341,18 +344,22 @@ public:
                     }
             }
             
+            // Contact detection between particles and meshes
+            tmpcpm.setinfo(CLm.default_action()) ; 
+            tmpcpm.i=i ;
             for (size_t j=0 ; j<P.Meshes.size() ; j++) //TODO Meshes incompatible with PBC
             {
                 bool a= CLm.check_mesh_dst_contact(P.Meshes[j], X[i], P.r[i], tmpcpm) ;
-                if (a && tmpcp.contactlength < P.skin) 
+                //printf("%d %g %g |", a, tmpcpm.contactlength, P.skin) ; 
+                if (a && tmpcpm.contactlength < P.skin) 
                 {
                     CLm.insert(tmpcpm) ; 
                 }
-                
             }
         }
         CLp.finalise() ;
         CLw.finalise() ;
+        CLm.finalise() ;
         #ifndef NO_OPENMP
         MP.timing[ID] += omp_get_wtime()-timebeg;
         #endif
@@ -384,18 +391,11 @@ public:
             int ID = omp_get_thread_num();
             double timebeg = omp_get_wtime();
           #endif
-            ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; Contacts<d> & C =MP.C[ID] ;
+            ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
+            Contacts<d> & C =MP.C[ID] ;
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ;
 
-            // TESTING
-            /*FILE * logghosts=nullptr ;
-            if (ti % P.tdump==0)
-            {
-                char name[500] ;
-                sprintf(name, "Output/Ghost-%d.txt",ti) ;
-                logghosts = fopen(name, "w") ;
-            }*/
-
+            // Particle-particle contacts
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
             if (it->ghost==0)
@@ -426,10 +426,7 @@ public:
             //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
 
-            // TESTING
-            /*if (logghosts != nullptr)
-                fclose(logghosts) ; */
-
+            // Particle wall contacts
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
                 if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::SPHERE))
@@ -463,6 +460,16 @@ public:
 
                 if ( P.wallforcecompute || ( P.wallforcerequested && !P.wallforcecomputed ) ) MP.delayingwall(ID, it->j, C.Act) ;
             }
+            
+            // Particle mesh contacts
+            for (auto it = CLm.v.begin() ; it != CLm.v.end() ; it++)
+            {
+                C.particle_mesh ( X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i], *it) ;
+                
+                Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+                Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+            }
+            
             #ifndef NO_OPENMP
             MP.timing[ID] += omp_get_wtime()-timebeg;
             #endif

@@ -33,6 +33,7 @@ public:
     disp_share() ;
     CLp.resize(P,ContactList<d>()) ;
     CLw.resize(P,ContactList<d>()) ;
+    CLm.resize(P,ContactListMesh<d>()) ; 
     C.resize(P, Contacts<d>(Param)) ;
     delayed.resize(P) ;
     delayedj.resize(P) ;

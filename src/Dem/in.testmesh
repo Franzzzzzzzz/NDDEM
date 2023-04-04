@@ -1,0 +1,35 @@
+# Incline plane flow
+directory Output
+dimensions 3 1
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL  0 5
+boundary 1 WALL  0 5
+boundary 2 WALL  0 5
+#boundary 3 WALL  0 5
+
+#auto location randomdrop
+location 0 2 2 2.1
+
+gravity 0 0 -1
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+mesh Mesh.json
+
+set T 30
+set dt 0.0001
+#set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 1 Orientation
+set dumps VTK with 0
+set tdump 10000
+event 10 gravity 0.05 0.05 -0.95
+EOF
