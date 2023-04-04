@@ -2,7 +2,7 @@
   "dimension": 2,
   "objects": [
     {
-    "dimensionality": 3,
+    "dimensionality": 1,
     "vertices": [
       [0,1,2,3],
       [1,2,3,4]]
