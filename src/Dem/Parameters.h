@@ -756,22 +756,22 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
    std::ifstream i(s.c_str());
    if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
    json j;
-   try 
+   //try 
    { 
      i >> j; 
-     if (j["Dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["Dimension"].get<int>(),d) ; return ;}
-     for (auto & v: j["Objects"])
+     if (j["dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["dimension"].get<int>(),d) ; return ;}
+     for (auto & v: j["objects"])
      {
-       Mesh<d> m(v["Dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()) ;  
-       //Meshes.push_back(v["Dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()) ;  
+       Meshes.push_back({v["dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()}) ;  
+       printf("[INFO] Mesh object added.\n") ; 
      }
    }
-   catch(...)
+   /*catch(...)
    {
         printf("This is not a legal json file, here is what we already got:\n") ;
         cout << j ;
         return ; 
-   }
+   }*/
  };
 // Processing
  string line ;

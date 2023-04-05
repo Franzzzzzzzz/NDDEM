@@ -381,6 +381,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga616bad462dc80b245963788fcd183ca3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga616bad462dc80b245963788fcd183ca3">Contacts&lt; d &gt;::particle_movingwall</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Omegai, double ri, double mi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="classContacts.html#ac1a086e64dbb4057ce6a2c455f0dbc18">cn</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vj, <a class="el" href="classcp.html">cp</a> &amp;<a class="el" href="group__CoarseGraining.html#ggaa01498a3ceb2fa74dc9536c16caef1daa9c1d0d502acdb7e7eed8d86d264f55b5">Contact</a>)</td></tr>
 <tr class="memdesc:ga616bad462dc80b245963788fcd183ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Force &amp; torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.  <a href="group__DEM.html#ga616bad462dc80b245963788fcd183ca3">More...</a><br /></td></tr>
 <tr class="separator:ga616bad462dc80b245963788fcd183ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf9b8cff25e992031d372e70ab6fc8a14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf9b8cff25e992031d372e70ab6fc8a14">Contacts&lt; d &gt;::particle_mesh</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Xi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Omegai, double ri, double mi, <a class="el" href="classcpm.html">cpm</a> &amp;<a class="el" href="group__CoarseGraining.html#ggaa01498a3ceb2fa74dc9536c16caef1daa9c1d0d502acdb7e7eed8d86d264f55b5">Contact</a>)</td></tr>
+<tr class="memdesc:gaf9b8cff25e992031d372e70ab6fc8a14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Force &amp; torque between particle and mesh.  <a href="group__DEM.html#gaf9b8cff25e992031d372e70ab6fc8a14">More...</a><br /></td></tr>
+<tr class="separator:gaf9b8cff25e992031d372e70ab6fc8a14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga56976c11478e25728e04bf9561aff8e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">Multiproc&lt; d &gt;::disp_share</a> ()</td></tr>
 <tr class="memdesc:ga56976c11478e25728e04bf9561aff8e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Display the # of particle on each thread.  <a href="group__DEM.html#ga56976c11478e25728e04bf9561aff8e6">More...</a><br /></td></tr>
 <tr class="separator:ga56976c11478e25728e04bf9561aff8e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -3283,6 +3286,62 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Orthonormalise A using the Gram-Shmidt process, in place. </p>
+
+</div>
+</div>
+<a id="gaf9b8cff25e992031d372e70ab6fc8a14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf9b8cff25e992031d372e70ab6fc8a14">&#9670;&nbsp;</a></span>particle_mesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classContacts.html">Contacts</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::particle_mesh </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
+          <td class="paramname"><em>Xi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
+          <td class="paramname"><em>Vi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
+          <td class="paramname"><em>Omegai</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>ri</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>mi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcpm.html">cpm</a> &amp;&#160;</td>
+          <td class="paramname"><em>Contact</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Force &amp; torque between particle and mesh. </p>
 
 </div>
 </div>
