@@ -2,16 +2,37 @@
   "dimension": 3,
   "objects": [
     {
-    "dimensionality": 2,
+    "dimensionality": 3,
     "vertices": [
       [1,1,1],
       [4,1,1],
-      [1,4,1]]
+      [1,4,1],
+      [1,1,4]]
+    }, {
+    "dimensionality": 3,
+    "vertices": [
+      [2,2,2],
+      [5,2,2],
+      [2,5,2],
+      [2,2,5]]
+    },{
+    "dimensionality": 0,
+    "vertices": [
+      [3,3,3]]
+    },{
+    "dimensionality": 2,
+    "vertices": [
+      [0,0,0],
+      [5,1,1],
+      [5,2,2]]
+    },
+    {
+    "dimensionality": 1,
+    "vertices": [
+      [5,5,5],
+      [4,4,6]]
     }
   ]
 }
-
-
-
 
 
