@@ -1,0 +1,37 @@
+# Incline plane flow
+directory OutputD4
+dimensions 4 200
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL  3 10
+boundary 1 WALL  0 5
+boundary 2 WALL  0 5
+boundary 3 WALL  -2.5 2.5
+
+auto location randomdrop
+
+gravity -1 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+mesh file Mesh-D4.json
+mesh rotate    -0.5000   -0.5000   -0.5000   -0.5000    0.5000    0.5000   -0.5000   -0.5000    0.5000   -0.5000    0.5000   -0.5000    0.5000   -0.5000   -0.5000    0.5000
+mesh translate 2.5 2.5 2.5 0
+mesh export Mesh_out.json
+
+set T 50
+set dt 0.0001
+#set dumps XML with 4 Position Velocity Omega Coordination
+#set dumps CSV with 1 Orientation
+set dumps VTK with 0
+set tdump 1000
+event 15 boundary 0 WALL 0 10
+EOF

@@ -247,7 +247,7 @@ public:
   //printf("\n") ; 
   submeshesprocessing:                  // yeah yeah, using goto ... sue me
   if (mesh.submeshes.size()>0)
-      for (int i=mesh.dimensionality-1 ; i>0 ; i--)
+      for (int i=mesh.dimensionality-1 ; i>=0 ; i--)
           for (size_t j=0 ; j<mesh.submeshes[i].size() ; j++)
           {
               bool res = check_mesh_dst_contact(mesh.submeshes[i][j], Xo, r, c) ; 
