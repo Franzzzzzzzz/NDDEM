@@ -1,0 +1,26 @@
+{
+  "dimension": 3,
+  "objects": [
+    {
+      "dimensionality": 2,
+      "vertices": [ 
+        [0,0,0],
+        [0,2,0],
+        [0,0,2]]
+    },{
+      "dimensionality": 2,
+      "vertices": [ 
+        [0,0,0],
+        [2,0,0],
+        [0,0,2]]
+    },{
+      "dimensionality": 2,
+      "vertices": [ 
+        [0,0,0],
+        [0,2,0],
+        [2,0,0]]
+    }
+  ]
+}
+
+

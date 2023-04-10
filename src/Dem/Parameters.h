@@ -753,25 +753,58 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["mesh"] = [&] () 
  {
    string s ; in>>s ; 
-   std::ifstream i(s.c_str());
-   if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
-   json j;
-   //try 
-   { 
-     i >> j; 
-     if (j["dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["dimension"].get<int>(),d) ; return ;}
-     for (auto & v: j["objects"])
-     {
-       Meshes.push_back({v["dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()}) ;  
-       printf("[INFO] Mesh object added.\n") ; 
-     }
-   }
-   /*catch(...)
+   
+   if (s=="file")
    {
-        printf("This is not a legal json file, here is what we already got:\n") ;
-        cout << j ;
-        return ; 
-   }*/
+    in >> s ; 
+    std::ifstream i(s.c_str());
+    if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
+    json j;
+    //try 
+    { 
+      i >> j; 
+      if (j["dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["dimension"].get<int>(),d) ; return ;}
+      for (auto & v: j["objects"])
+      {
+        Meshes.push_back({v["dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()}) ;  
+        printf("[INFO] Mesh object added.\n") ; 
+      }
+    }
+   }
+   else if (s=="translate")
+   {
+     std::vector<double> t(d,0) ; 
+     for (int i=0 ; i<d ; i++) in>>t[i] ; 
+     for (auto &v: Meshes) v.translate(t) ; 
+   }
+   else if (s=="rotate")
+   {
+     std::vector<double> r(d*d, 0) ; 
+     for (int i=0 ; i<d*d ; i++) in >> r[i] ; 
+     for (auto &v: Meshes) v.rotate(r) ; 
+   }
+   else if (s=="export")
+   {
+     in >> s ; 
+     FILE * out = fopen(s.c_str(), "w") ; 
+     if (out==NULL) printf("[WARN] Cannot open file to export mesh") ; 
+     else
+     {
+       fprintf(out, "{\n \"dimension\": %d, \n \"objects\":[\n", d) ; 
+       for (size_t i=0 ; i<Meshes.size() ; i++)
+       {
+         auto res = Meshes[i].export_json() ; 
+         fprintf(out, "%s", res.c_str()) ;
+         if (i<Meshes.size()-1) fprintf(out, ",\n") ; 
+       }
+       fprintf(out, "\n]}") ; 
+       fclose(out) ; 
+     }
+     Meshes[0].disp() ; 
+   }
+   else
+     printf("[WARN] Unknown mesh subcommand\n") ; 
+   
  };
 // Processing
  string line ;

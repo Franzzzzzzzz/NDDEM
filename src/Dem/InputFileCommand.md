@@ -76,7 +76,11 @@ These command have a single behaviour, described here.
   - `PBCLE LOCMIN LOCMAX VELOCITY`: Lees-Edward boundary condition. Should be in dimension 0. 
   - `allother LOCMIN LOCMAX`
 - `rigid`: TODO (in development) ...
-- `mesh filename.json`: load a mesh file in json format. (in development)
+- `mesh [file|translate|rotate|export] ...`
+  - `file filename.json`: load a mesh file in json format. (in development)
+  - `translate X0 X1 ... XN`: translate all the meshes by the given vector
+  - `rotate X00 X01 ... X0N X10 ... XNN`: rotate all the meshes by the given rotation vector. Center of rotation is the mesh origin (first point)
+  - `export filename.json`: write all the current meshes in a json file
   
 - `dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]`: select dump format and output fiels, the last 4 formats are plain text. `N` is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. Field can include:
   - Particle data field: `[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*`
