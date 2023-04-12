@@ -42,7 +42,7 @@ let q_controller = new PIDcontroller(1e-5, 5e-6, 0);
 // }
 
 const wall_geometry = new BoxGeometry(1, 1, 1);
-const wall_material = new MeshLambertMaterial();
+export const wall_material = new MeshLambertMaterial();
 wall_material.wireframe = true;
 
 const arrow_colour = 0xDDDDDD;
