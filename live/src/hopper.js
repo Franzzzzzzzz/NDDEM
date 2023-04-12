@@ -1,4 +1,5 @@
 import css from "../css/main.css";
+import mesh from "../meshes/2d-hopper.json";
 
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -59,7 +60,7 @@ var params = {
     cg_opacity: 0.8,
     cg_window_size: 3,
     particle_opacity: 0.5,
-    F_mag_max: 0.005,
+    F_mag_max: 0.05,
     aspect_ratio: 1,
 }
 
@@ -223,6 +224,11 @@ function update_walls(){
     WALLS.front.position.x = params.W/2. + params.thickness;
     WALLS.back.position.x = -params.W/2. - params.thickness;
     S.simu_interpret_command("boundary 0 WALL -"+String(params.W/2.)+" "+String(params.W/2.));
+    S.simu_interpret_command('mesh remove 1');
+    S.simu_interpret_command('mesh remove 0');
+
+    S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
+
 
 
     WALLS.left.scale.x = Math.sqrt(Math.pow(params.H,2) + Math.pow(params.W/2. - params.D/2.,2)) + 2*params.thickness;
@@ -398,29 +404,16 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("boundary 0 WALL -"+String(params.W/2.)+" "+String(params.W/2.));
         S.simu_interpret_command("boundary 1 PBC -"+String(2*params.average_radius+params.L)+" "+String(params.L));
-        if ( params.dimension > 2 ) {
-            S.simu_interpret_command("boundary 2 WALL -"+String(params.r_max)+" "+String(params.r_max));
-        }
-        if ( params.dimension > 3 ) {
-            S.simu_interpret_command("boundary 3 WALL -"+String(params.L)+" "+String(params.L));
-        }
-        S.simu_interpret_command("gravity 0 -9.81 " + "0 ".repeat(params.dimension - 2))
+
+        S.simu_interpret_command("gravity 0 -9.81 ");
 
         S.simu_interpret_command("auto location randomdrop");
 
-        // S.simu_interpret_command("set Kn 2e5");
-        // S.simu_interpret_command("set Kt 8e4");
-        // S.simu_interpret_command("set GammaN 75");
-        // S.simu_interpret_command("set GammaT 75");
-        // S.simu_interpret_command("set Mu 1");
-        // S.simu_interpret_command("set Mu_wall 0");
-        // S.simu_interpret_command("set T 150");
-        // S.simu_interpret_command("set dt 0.0002");
-        // S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
-        // S.simu_interpret_command("auto skin");
-        // S.simu_finalise_init () ;
-
-        let tc = 1e-2;
+        S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
+        // S.simu_interpret_command("mesh string {}")
+        console.log("mesh string " + JSON.stringify(mesh));
+        
+        let tc = 5e-3;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 

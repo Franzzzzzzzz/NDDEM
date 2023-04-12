@@ -753,17 +753,23 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["mesh"] = [&] () 
  {
    string s ; in>>s ; 
-   
+   json j;
    if (s=="file" || s=="string")
    {
-     if (s=="file") in >> s ;
-     else std::getline(in, s) ;
-    std::ifstream i(s.c_str());
-    if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
-    json j;
+     if (s=="file") 
+     {
+      in >> s ;
+      std::ifstream i(s.c_str());
+      if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
+      i >> j; 
+     }
+     else 
+     {
+      std::getline(in, s) ;
+      j=json::parse(s) ; 
+     }
     //try 
     { 
-      i >> j; 
       if (j["dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["dimension"].get<int>(),d) ; return ;}
       for (auto & v: j["objects"])
       {
@@ -783,6 +789,12 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      std::vector<double> r(d*d, 0) ; 
      for (int i=0 ; i<d*d ; i++) in >> r[i] ; 
      for (auto &v: Meshes) v.rotate(r) ; 
+   }
+   else if (s=="remove")
+   {
+    int id ; 
+    in >> id ;
+    Meshes.erase(Meshes.begin()+id) ; 
    }
    else if (s=="export")
    {
