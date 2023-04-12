@@ -754,9 +754,10 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  {
    string s ; in>>s ; 
    
-   if (s=="file")
+   if (s=="file" || s=="string")
    {
-    in >> s ; 
+     if (s=="file") in >> s ;
+     else std::getline(in, s) ;
     std::ifstream i(s.c_str());
     if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; return ; }
     json j;
