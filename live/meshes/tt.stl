@@ -1,0 +1,32 @@
+solid 3
+    facet normal 0 0 0
+        outer loop
+            vertex 0 6 0
+            vertex 9 0 0
+            vertex 9 6 0
+        endloop
+    endfacet
+    facet normal 0 0 0
+        outer loop
+            vertex 9 0 0
+            vertex 0 6 0
+            vertex 0 0 0
+        endloop
+    endfacet
+endsolid
+solid 3
+    facet normal 0 0 0
+        outer loop
+            vertex 0 6 5
+            vertex 9 0 5
+            vertex 9 6 5
+        endloop
+    endfacet
+    facet normal 0 0 0
+        outer loop
+            vertex 9 0 5
+            vertex 0 6 5
+            vertex 0 0 5
+        endloop
+    endfacet
+endsolid
