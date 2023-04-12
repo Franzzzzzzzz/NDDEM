@@ -94,7 +94,7 @@ $(function() {
 <li><code>GammaT</code>: tangential dissipation</li>
 <li><code>Mu</code>: friction coefficient between grains</li>
 <li><code>Mu_wall</code>: friction coefficient between wall and grains</li>
-<li><code>damping</code>: ????</li>
+<li><code>damping</code>: global damping coefficient</li>
 <li><code>orientationtracking</code>: calculate grain orientation or not (expect a true or false value)</li>
 <li><code>skin</code>: skin size [DO NOT USE]</li>
 </ul>
@@ -153,6 +153,7 @@ $(function() {
 <li><code>file filename.json</code>: load a mesh file in json format. (in development)</li>
 <li><code>translate X0 X1 ... XN</code>: translate all the meshes by the given vector</li>
 <li><code>rotate X00 X01 ... X0N X10 ... XNN</code>: rotate all the meshes by the given rotation vector. Center of rotation is the mesh origin (first point)</li>
+<li><code>erase ID</code>: erase the mesh with the given ID</li>
 <li><code>export filename.json</code>: write all the current meshes in a json file</li>
 </ul>
 </li>
