@@ -33,7 +33,7 @@ var params = {
     W: 0.2, // system width
     H: 0.15, // height of inclined part of hopper
     D: 0.03, // width of hopper outlet
-    N: 500,
+    N: 450,
     zoom: 500,
     mu: 0.5,
     mu_wall: 0.5,
@@ -138,6 +138,8 @@ async function init() {
     WALLS.back.scale.y = params.thickness;//Math.PI/2.;
     // var horiz_walls = [WALLS.right];
 
+    WALLS.wall_material.wireframe = false;
+
     update_walls();
 
     let geometry = new THREE.PlaneGeometry( 2*params.L, 2*params.L );
@@ -189,6 +191,9 @@ async function init() {
         // update_cg_params(S, params);
     // });
     // gui.add ( params, 'paused').name('Paused').listen();
+    gui.add ( params, 'H', 0, 2*params.L).name('Outlet height').listen().onChange( () => {
+        update_walls();
+    });
     let gui_D = gui.add ( params, 'D', 0, params.W).name('Outlet width').listen().onChange( () => {
         update_walls();
     });
@@ -197,6 +202,7 @@ async function init() {
         if (params.D > params.W) { params.D = params.W }
         gui_D.max(params.W);
     });
+
     
     gui.add ( params, 'mu', 0, 1).name('&mu;').listen().onChange( () => {
         S.simu_interpret_command("set Mu " + String(params.mu));
@@ -216,12 +222,12 @@ function update_walls(){
     var vert_walls = [WALLS.back,WALLS.front];
 
     vert_walls.forEach( function(mesh) {
-        mesh.scale.x = 2*params.L - params.H;// + 2*params.thickness;
+        mesh.scale.x = 2*params.L - params.H + 2*params.thickness;
         mesh.position.y = params.H/2.;
     });
     
-    WALLS.front.position.x = params.W/2. + params.thickness;
-    WALLS.back.position.x = -params.W/2. - params.thickness;
+    WALLS.front.position.x = params.W/2. + params.thickness/2.;
+    WALLS.back.position.x = -params.W/2. - params.thickness/2.;
     S.simu_interpret_command("boundary 0 WALL -"+String(params.W/2.)+" "+String(params.W/2.));
     S.simu_interpret_command('mesh remove 1');
     S.simu_interpret_command('mesh remove 0');
@@ -229,16 +235,16 @@ function update_walls(){
     S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
 
 
+    let alpha = Math.atan(params.H/(params.W/2. - params.D/2.));
+    WALLS.left.scale.x = Math.sqrt(Math.pow(params.H,2) + Math.pow(params.W/2. - params.D/2.,2));// + 2*params.thickness;
+    WALLS.left.position.x = params.D/4. + params.W/4. + Math.sin(alpha)*params.thickness/2.;
+    WALLS.left.position.y = -params.L + params.H/2. - params.thickness/2.;
+    WALLS.left.rotation.z = alpha;
 
-    WALLS.left.scale.x = Math.sqrt(Math.pow(params.H,2) + Math.pow(params.W/2. - params.D/2.,2)) + 2*params.thickness;
-    WALLS.left.position.x = params.D/4. + params.W/4. + params.thickness;
-    WALLS.left.position.y = -params.L + params.H/2.;
-    WALLS.left.rotation.z = Math.atan(params.H/(params.W/2. - params.D/2.));
-
-    WALLS.right.scale.x = Math.sqrt(Math.pow(params.H,2) + Math.pow(params.W/2. - params.D/2.,2)) + 2*params.thickness;
-    WALLS.right.position.x = -params.D/4. - params.W/4. - params.thickness;
-    WALLS.right.position.y = -params.L + params.H/2.;
-    WALLS.right.rotation.z = -Math.atan(params.H/(params.W/2. - params.D/2.));
+    WALLS.right.scale.x = Math.sqrt(Math.pow(params.H,2) + Math.pow(params.W/2. - params.D/2.,2));// + 2*params.thickness;
+    WALLS.right.position.x = -params.D/4. - params.W/4. - Math.sin(alpha)*params.thickness/2.;
+    WALLS.right.position.y = -params.L + params.H/2. - params.thickness/2.;
+    WALLS.right.rotation.z = -alpha;
 }
 
 function onWindowResize(){
@@ -402,7 +408,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("auto skin");
 
         S.simu_interpret_command("boundary 0 WALL -"+String(params.W/2.)+" "+String(params.W/2.));
-        S.simu_interpret_command("boundary 1 PBC -"+String(2*params.average_radius+params.L)+" "+String(params.L));
+        S.simu_interpret_command("boundary 1 PBC -"+String(6*params.average_radius+params.L)+" "+String(params.L));
 
         S.simu_interpret_command("gravity 0 -9.81 ");
 
