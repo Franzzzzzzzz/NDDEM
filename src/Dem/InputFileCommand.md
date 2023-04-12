@@ -29,7 +29,7 @@ First indentation level keyword must be followed by one of the second level inde
   - `GammaT`: tangential dissipation
   - `Mu`: friction coefficient between grains
   - `Mu_wall`: friction coefficient between wall and grains
-  - `damping`: ????
+  - `damping`: global damping coefficient
   - `orientationtracking`: calculate grain orientation or not (expect a true or false value)
   - `skin`: skin size [DO NOT USE]
 
@@ -80,6 +80,7 @@ These command have a single behaviour, described here.
   - `file filename.json`: load a mesh file in json format. (in development)
   - `translate X0 X1 ... XN`: translate all the meshes by the given vector
   - `rotate X00 X01 ... X0N X10 ... XNN`: rotate all the meshes by the given rotation vector. Center of rotation is the mesh origin (first point)
+  - `erase ID`: erase the mesh with the given ID
   - `export filename.json`: write all the current meshes in a json file
   
 - `dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]`: select dump format and output fiels, the last 4 formats are plain text. `N` is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. Field can include:

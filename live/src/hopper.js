@@ -1,5 +1,4 @@
 import css from "../css/main.css";
-import mesh from "../meshes/2d-hopper.json";
 
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -410,8 +409,6 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("auto location randomdrop");
 
         S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
-        // S.simu_interpret_command("mesh string {}")
-        console.log("mesh string " + JSON.stringify(mesh));
         
         let tc = 5e-3;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
