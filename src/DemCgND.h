@@ -30,6 +30,8 @@ public:
     std::vector<std::vector<double>> simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
     double simu_getTime() {return S.getTime() ; }
+    double simu_getGravityAngle() {return S.getGravityAngle() ; }
+
 
     //CoarseGraining
     void cg_setup_CG () {
@@ -107,6 +109,7 @@ public:
     std::vector<std::vector<double>> simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
     double simu_getTime() {return S.getTime() ; }
+    double simu_getGravityAngle() {return S.getGravityAngle() ; }
 
     //CoarseGraining
     void cg_setup_CG () {
@@ -184,6 +187,7 @@ public:
     std::vector<std::vector<double>> simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
     double simu_getTime() {return S.getTime() ; }
+    double simu_getGravityAngle() {return S.getGravityAngle() ; }
 
     //CoarseGraining
     void cg_setup_CG () {
@@ -261,6 +265,7 @@ public:
     std::vector<std::vector<double>> simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
     double simu_getTime() {return S.getTime() ; }
+    double simu_getGravityAngle() {return S.getGravityAngle() ; }
 
     //CoarseGraining
     void cg_setup_CG () {
