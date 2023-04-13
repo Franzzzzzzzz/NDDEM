@@ -182,7 +182,8 @@ public :
     bool contactforcedump ; ///< Extract the forces between grains as well?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
     RigidBodies_<d> RigidBodies ; ///< Handle all the rigid bodies
-    vector <Mesh<d>> Meshes ; 
+    vector <Mesh<d>> Meshes ;
+    double gravityrotateangle = 0.0; 
     
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
 
@@ -199,7 +200,7 @@ public :
 
     void do_nothing (double time __attribute__((unused))) {return;}
     double grav_intensity = 10, grav_omega=1 ; int grav_rotdim[2]={0,1} ;
-    void do_gravityrotate (double time) {g[grav_rotdim[0]]=grav_intensity*cos(time*grav_omega); g[grav_rotdim[1]]=grav_intensity*sin(time*grav_omega); return;}
+    void do_gravityrotate (double deltatime) {gravityrotateangle += deltatime*grav_omega; g[grav_rotdim[0]]=grav_intensity*cos(gravityrotateangle); g[grav_rotdim[1]]=grav_intensity*sin(gravityrotateangle); return;}
     void (Parameters::*update_gravity) (double time) = &Parameters::do_nothing ;
 
     void load_datafile (char path[], v2d & X, v2d & V, v2d & Omega) ; ///< Load and parse input script

@@ -106,8 +106,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac83e130a84555a33d30d9ef09402497c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06e126d3a37c952d69742063ce8de745"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a06e126d3a37c952d69742063ce8de745">do_nothing</a> (double time __attribute__((unused)))</td></tr>
 <tr class="separator:a06e126d3a37c952d69742063ce8de745"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a059beac18299d3fd1519871564e493"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a5a059beac18299d3fd1519871564e493">do_gravityrotate</a> (double time)</td></tr>
-<tr class="separator:a5a059beac18299d3fd1519871564e493"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36a63137cb89840a35c3c8e1ffeb49b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a36a63137cb89840a35c3c8e1ffeb49b6">do_gravityrotate</a> (double deltatime)</td></tr>
+<tr class="separator:a36a63137cb89840a35c3c8e1ffeb49b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c27d0ee94ac521382bfbe4b2f9513b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a0c27d0ee94ac521382bfbe4b2f9513b6">load_datafile</a> (char path[], <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;X, <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;V, <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;Omega)</td></tr>
 <tr class="memdesc:a0c27d0ee94ac521382bfbe4b2f9513b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load and parse input script.  <a href="classParameters.html#a0c27d0ee94ac521382bfbe4b2f9513b6">More...</a><br /></td></tr>
 <tr class="separator:a0c27d0ee94ac521382bfbe4b2f9513b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -244,6 +244,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a5978769dfdb3e594fa2f7e72b042968d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c4645659b35a8d070ae740d4a4db40c"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="classMesh.html">Mesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a9c4645659b35a8d070ae740d4a4db40c">Meshes</a></td></tr>
 <tr class="separator:a9c4645659b35a8d070ae740d4a4db40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af43121e14122354ec96ec1406b6867c5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#af43121e14122354ec96ec1406b6867c5">gravityrotateangle</a> = 0.0</td></tr>
+<tr class="separator:af43121e14122354ec96ec1406b6867c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cc4b7ccfd25fb68a5432be0ab99533c"><td class="memItemLeft" align="right" valign="top">multimap&lt; float, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a9cc4b7ccfd25fb68a5432be0ab99533c">events</a></td></tr>
 <tr class="memdesc:a9cc4b7ccfd25fb68a5432be0ab99533c"><td class="mdescLeft">&#160;</td><td class="mdescRight">For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.  <a href="classParameters.html#a9cc4b7ccfd25fb68a5432be0ab99533c">More...</a><br /></td></tr>
 <tr class="separator:a9cc4b7ccfd25fb68a5432be0ab99533c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -446,8 +448,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="a5a059beac18299d3fd1519871564e493"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a059beac18299d3fd1519871564e493">&#9670;&nbsp;</a></span>do_gravityrotate()</h2>
+<a id="a36a63137cb89840a35c3c8e1ffeb49b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36a63137cb89840a35c3c8e1ffeb49b6">&#9670;&nbsp;</a></span>do_gravityrotate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -461,7 +463,7 @@ template&lt;int d&gt; </div>
           <td class="memname">void <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::do_gravityrotate </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>time</em></td><td>)</td>
+          <td class="paramname"><em>deltatime</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1405,6 +1407,22 @@ template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">int <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::grav_rotdim[2] ={0,1}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af43121e14122354ec96ec1406b6867c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af43121e14122354ec96ec1406b6867c5">&#9670;&nbsp;</a></span>gravityrotateangle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::gravityrotateangle = 0.0</td>
         </tr>
       </table>
 </div><div class="memdoc">

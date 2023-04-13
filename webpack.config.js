@@ -12,6 +12,7 @@ module.exports = [{
         'inclined-plane' : './live/src/inclined-plane.js',
         'lees-edwards' : './live/src/lees-edwards.js',
         'rotation' : './live/src/rotation.js',
+        'rotating-drum-2d' : './live/src/rotating-drum-2d.js',
         '4d-pool' : './live/src/4d-pool.js',
         'coarse-graining' : './live/src/coarse-graining.js',
         'rotation-matrix' : './live/src/rotation-matrix.js',
@@ -77,6 +78,13 @@ module.exports = [{
             template: "live/template.html",
             filename: "rotation.html",
             chunks: ['rotation']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM 2D Rotating Drum',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/template.html",
+            filename: "rotating-drum-2d.html",
+            chunks: ['rotating-drum-2d']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM 4D Pool',

@@ -33,7 +33,7 @@ var params = {
     W: 0.2, // system width
     H: 0.15, // height of inclined part of hopper
     D: 0.03, // width of hopper outlet
-    N: 450,
+    N: 500,
     zoom: 500,
     mu: 0.5,
     mu_wall: 0.5,
@@ -45,8 +45,8 @@ var params = {
     g_mag: 1e3,
     theta: 0, // hopper angle in DEGREES
     d4: {cur:0},
-    r_max: 0.0055,
-    r_min: 0.0045,
+    r_max: 0.0045,
+    r_min: 0.0035,
     particle_density: 1,
     freq: 0.05,
     new_line: false,
@@ -426,7 +426,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu " + String(params.mu));
         S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
-        S.simu_interpret_command("set damping 0.001");
+        S.simu_interpret_command("set damping 0.01");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc/20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
