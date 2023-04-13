@@ -10,6 +10,7 @@ import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
 // import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 // import * as RAYCAST from '../libs/RaycastHandler.js';
+import * as CGHANDLER from '../libs/CGHandler.js';
 
 // let info_div = document.createElement("div")
 // info_div.innerHTML = "Click on a particle to grab it"
@@ -25,7 +26,6 @@ var urlParams = new URLSearchParams(window.location.search);
 let camera, scene, renderer, stats, panel, controls;
 let gui;
 let S;
-let cg_mesh;//, colorbar_mesh;
 
 var params = {
     dimension: 2,
@@ -142,13 +142,7 @@ async function init() {
 
     update_walls();
 
-    let geometry = new THREE.PlaneGeometry( 2*params.L, 2*params.L );
-    let material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-    material.transparent = true;
-    cg_mesh = new THREE.Mesh( geometry, material );
-    cg_mesh.position.z = -1;
-    // cg_mesh.position.x = -params;
-    scene.add( cg_mesh );
+    CGHANDLER.add_cg_mesh(2*params.L, 2*params.L, scene);
 
     // geometry = new THREE.PlaneGeometry( 2*params.L, 0.1*params.L );
     // material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
@@ -266,64 +260,7 @@ function animate() {
     // RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
     if ( !params.paused ) {
         S.simu_step_forward(15);
-        S.cg_param_read_timestep(0) ;
-        S.cg_process_timestep(0,false) ;
-        var grid = S.cg_get_gridinfo();
-        const size = params.cg_width * params.cg_height;
-        const data = new Uint8Array( 4 * size );
-        const opacity = parseInt(255 * params.cg_opacity);
-        let val;
-        let lut;
-        if ( params.cg_field === 'Density' ) {
-            val = S.cg_get_result(0, "RHO", 0);
-            lut = rainbow;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(0);
-            lut.setMax(params.particle_density*100);
-        }
-        else if ( params.cg_field === 'Velocity' ) {
-            val = S.cg_get_result(0, "VAVG", 1);
-            lut = cooltowarm;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(-0.9*maxVal);
-            lut.setMax( 0.9*maxVal);
-        }
-        else if ( params.cg_field === 'Pressure' ) {
-            const stressTcxx=S.cg_get_result(0, "TC", 0) ;
-            const stressTcyy=S.cg_get_result(0, "TC", 3) ;
-            const stressTczz=S.cg_get_result(0, "TC", 6) ;
-            val = new Array(stressTcxx.length);
-            for (var i=0 ; i<stressTcxx.length ; i++)
-            {
-                val[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
-            }
-            lut = rainbow;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(0);
-            lut.setMax(0.9*maxVal);
-        } else if ( params.cg_field === 'Shear stress' ) {
-            val = S.cg_get_result(0, "TC", 1);
-            lut = cooltowarm;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(-0.9*maxVal);
-            lut.setMax( 0.9*maxVal);
-        }
-
-        for ( let i = 0; i < size; i ++ ) {
-            var color = lut.getColor(val[i]);
-            // console.log(val[i])
-            const r = Math.floor( color.r * 255 );
-            const g = Math.floor( color.g * 255 );
-            const b = Math.floor( color.b * 255 );
-            const stride = i * 4;
-            data[ stride     ] = r;//parseInt(val[i]/maxVal*255);
-            data[ stride + 1 ] = g;
-            data[ stride + 2 ] = b;
-            if ( val[i] === 0 ) {
-                data[ stride + 3 ] = 0;
-            } else {
-                data[ stride + 3 ] = opacity;
-            }
+        CGHANDLER.update_2d_cg_field(S,params);
 
         for ( let i=0; i<SPHERES.spheres.children.length; i++) {
             if (Math.abs(SPHERES.x[i][0]) > params.W/2. ) {
@@ -331,13 +268,6 @@ function animate() {
                 S.simu_fixParticle(i,[(Math.random()-0.5)*params.W, params.L]); // put at inlet
             }
         }
-        }
-        const texture = new THREE.DataTexture( data, params.cg_width, params.cg_height );
-        // texture.magFilter = THREE.LinearFilter; // smooth the data artifically
-        texture.needsUpdate = true;
-        cg_mesh.material.map = texture;
-        // cg_mesh.material.opacity = parseInt(255*params.opacity);
-
     }
     SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
