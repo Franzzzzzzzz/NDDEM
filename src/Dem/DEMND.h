@@ -464,6 +464,7 @@ public:
             // Particle mesh contacts
             for (auto it = CLm.v.begin() ; it != CLm.v.end() ; it++)
             {
+                //printf("@ %g | %g %g %g | %d \n", it->contactlength, it->contactpoint[0], it->contactpoint[1], it->contactpoint[2], it->submeshid) ; fflush(stdout) ; 
                 C.particle_mesh ( X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i], *it) ;
                 
                 Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;

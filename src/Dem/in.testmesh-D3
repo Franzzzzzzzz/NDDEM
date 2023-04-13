@@ -14,6 +14,7 @@ boundary 2 WALL  0 5
 #boundary 3 WALL  0 5
 
 auto location randomdrop
+#location 0 3.1 2.3 2.5
 
 gravity -1 0 0
 set Kn 2e5
@@ -22,9 +23,9 @@ set GammaN 75
 set GammaT 75
 set Mu 0.5
 
-mesh file Mesh.json
-mesh rotate    -0.5774   -0.5774   -0.5774    0.5774    0.2113   -0.7887    0.5774   -0.7887    0.2113
-mesh translate 2.5 2.5 2.5
+mesh file Mesh-D3.json
+#mesh rotate    -0.5774   -0.5774   -0.5774    0.5774    0.2113   -0.7887    0.5774   -0.7887    0.2113
+#mesh translate 2.5 2.5 2.5
 mesh export Mesh_out.json
 
 set T 50
@@ -33,5 +34,5 @@ set dt 0.0001
 #set dumps CSV with 1 Orientation
 set dumps VTK with 0
 set tdump 1000
-event 15 boundary 0 WALL 0 10
+event 15 boundary 0 WALL 1 10
 EOF

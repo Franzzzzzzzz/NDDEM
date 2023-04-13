@@ -207,15 +207,56 @@ public:
       {
           c.contactlength = dst ; 
           c.contactpoint=mesh.origin ; 
+          c.submeshid=mesh.dimensionality ; 
           return true ; 
       }
       return false ; // There can't be any submesh for a 0-dimensionality mesh
   }
   
   // All other cases. 
-  double dstsqr=0 ; 
-  //printf("%g %g %g ", X[0], X[1], X[2]) ; 
-  for (int i=0; i<d-mesh.dimensionality ; i++)
+  double dstsqr=0 ;
+  std::vector<double> coefficient (d, 0) ; 
+  for (int i=0 ; i<d-mesh.dimensionality ; i++)
+  {
+      for (int dd=0 ; dd<d ; dd++)
+          coefficient[i] += mesh.invertbase[i*d+dd]*X[dd] ; 
+      dstsqr += coefficient[i]*coefficient[i] ; 
+      if (dstsqr > r*r) goto submeshesprocessing ;       
+  }
+  if (dstsqr<r*r)
+  {
+    double coefficient_sum = 0 ; 
+    for (int i=d-mesh.dimensionality ; i<d ; i++)
+    {
+      for (int dd=0 ; dd<d ; dd++)
+          coefficient[i] += mesh.invertbase[i*d+dd]*X[dd] ;
+      if (coefficient[i]<0 || coefficient[i]>1) goto submeshesprocessing ; 
+      coefficient_sum+=coefficient[i] ; 
+      if (coefficient_sum > 1) goto submeshesprocessing ; 
+    }
+    if (coefficient_sum < 1)
+    {
+      c.contactlength = sqrt(dstsqr) ;
+      c.contactpoint=mesh.origin ; 
+      c.submeshid=mesh.dimensionality ; 
+      for (int i=d-mesh.dimensionality ; i<d ; i++)
+        for (int dd=0 ; dd<d ; dd++)
+          c.contactpoint[dd] += mesh.mixedbase[i*d+dd]*coefficient[i] ;
+      //for (int i=0 ; i<d-mesh.dimensionality ; i++) printf("%g ", coefficient[i]) ;
+      //printf("#") ; 
+      //for (int i=d-mesh.dimensionality ; i<d; i++) printf("%g ", coefficient[i]) ; 
+      
+      //Tools<d>::print(mesh.mixedbase) ; 
+      
+      return true ;
+    }
+  }
+  
+  
+  
+  
+  
+  /*for (int i=0; i<d-mesh.dimensionality ; i++)
   {
     dotproducts[i]=Tools<d>::dot(mesh.mixedbase[i], X) ; 
     dstsqr+= dotproducts[i]*dotproducts[i] ; 
@@ -243,8 +284,8 @@ public:
         c.contactpoint += mesh.mixedbase[i]*coefficient[i] ; 
       return true ; 
     }
-  }
-  //printf("\n") ; 
+  }*/
+  
   submeshesprocessing:                  // yeah yeah, using goto ... sue me
   if (mesh.submeshes.size()>0)
       for (int i=mesh.dimensionality-1 ; i>=0 ; i--)

@@ -814,7 +814,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
        fprintf(out, "\n]}") ; 
        fclose(out) ; 
      }
-     Meshes[0].disp() ; 
+     //for (auto & v: Meshes) v.disp() ; 
    }
    else
      printf("[WARN] Unknown mesh subcommand\n") ; 

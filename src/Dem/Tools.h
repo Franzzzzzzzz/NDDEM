@@ -89,7 +89,6 @@ static double normdiff (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ;
 static double normsq (const vector <double> & a) {double res=0 ; for (int i=0 ; i<d ; i++) res+=a[i]*a[i] ; return (res) ; } ///< Norm squared
 static double normdiffsq (cv1d & a, cv1d & b) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(a[i]-b[i])*(a[i]-b[i]) ; return (res) ; } ///< Norm squared of a vector difference \f$|a-b|^2\f$
 static void orthonormalise (v1d & A) ; ///< Orthonormalise A using the Gram-Shmidt process, in place
-static double det (cv2d & M) ; ///< compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)
 static double skewnorm (cv1d & a) {double res=0 ; for (int i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (sqrt(res)) ; } ///<Norm of a skew-symetric matrix
 static double skewnormsq (cv1d & a) {double res=0 ; for (int i=0 ; i<d*(d-1)/2 ; i++) res+=a[i]*a[i] ; return (res) ; } ///< Norm squared of a skew-symetrix matrix
 static double dot (cv1d & a, cv1d & b) {double res=0; for (int i=0 ; i<d ; i++) res+=a[i]*b[i] ; return (res) ; } ///< Dot product
@@ -222,6 +221,9 @@ static v1d  wedgeproduct (cv1d &a, cv1d &b) ; ///< Wedge product of vectors
 static void wedgeproduct (v1d &res, cv1d &a, cv1d &b) ; ///< Wedge product in-place
 static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(i/d)*d+i%d] = a[(i%d)*d+(i/d)] ; return b ; } ///< Transposition
 static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } ///< Transpose in-place
+static double det (cv2d & M) ; ///< compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)
+static double det (cv1d & M) ; ///< compute the matrix determinant (probably quite slow, but shouldn't really really matters for the usage)
+static v1d inverse (cv1d & M) ; ///< compute the matrix inverse (very slow and redundant calculation of the determinant for the comatrix, but shouldn't really really matters for the usage)
 ///@}
 
 /** @name Saving and writing functions */
@@ -231,6 +233,8 @@ static void savecsv (char path[], cv2d & X, cv1d &r, const vector <uint32_t> & P
 static void savecsv (char path[], cv2d & X, cv2d & V, cv1d &r, const vector <uint32_t> & PBCFlags, cv1d & Vmag, cv1d & OmegaMag, [[maybe_unused]] cv1d & Z) ; ///< Save the location and a few more informations in a CSV file.
 static void savecsv (char path[], cv2d & A) ; ///< Save the orientation in a CSV file
 static void savevtk (char path[], int N, cv2d & Boundaries, cv2d & X, cv1d & r, vector <TensorInfos> data) ; ///< Save as a vtk file. Dimensions higher than 3 are stored as additional scalars. Additional informations can be passed as a vector of #TensorInfos.
+
+static void print (cv1d M) {printf("[") ; if (M.size()==d*d) for (int i=0 ; i<d ; i++) { for (int j=0 ; j<d ; j++) printf("%g ", M[i*d+j]) ; printf("\n") ; } else for (auto v: M) printf("%g ", v) ; printf("]") ; }
 
 static int write1D (char path[], v1d table) ;
 static int writeinline(initializer_list< v1d >) ;
@@ -732,7 +736,48 @@ double Tools<d>::det (cv2d &M)
 }
 template <> double Tools<2>::det(cv2d &M) { return M[0][0]*M[1][1]-M[1][0]*M[0][1] ; }
 template <> double Tools<1>::det(cv2d &M) { return M[0][0] ; }
-template <> double Tools<0>::det([[maybe_unused]] cv2d &M) { return 1. ;} // Should never be called. 
+//----------------
+template <int d>
+double Tools<d>::det (cv1d &M)
+{
+ double res=0 ;
+ vector<double> submatrix ;
+ submatrix.resize((d-1)*(d-1)) ;  
+ for (int i=0 ; i<d ; i++)
+ {
+   for (int j=0 ; j<d ; j++)
+     for (int k=0 ; k<d-1 ; k++)
+     {
+       if (j==i) continue ; 
+       submatrix[k*(d-1)+ j-(j>i?1:0)]=M[k*d+j] ; 
+     }
+   res += ((i+d-1)%2?-1:1) * M[(d-1)*d+i] * Tools<d-1>::det(submatrix) ;
+ }
+ return res ; 
+}
+template <> double Tools<2>::det(cv1d &M) { return M[0]*M[3]-M[1]*M[2] ; }
+template <> double Tools<1>::det(cv1d &M) { return M[0] ; }
+//==================================
+template <int d>
+vector<double> Tools<d>::inverse (cv1d &M)
+{
+  vector<double> res (d*d,0) ;
+  vector<double> submatrix (d*d,0) ; 
+  for (int i=0 ; i<d ; i++)
+    for (int j=0 ; j<d ; j++)
+    {
+      submatrix = M ; 
+      for (int dd=0 ; dd<d ; dd++)
+        submatrix[i*d+dd]=(dd==j?1:0) ; 
+      res[i*d+j]=Tools<d>::det(submatrix) ; 
+    }
+  double determinant = Tools<d>::det(M) ; 
+  for (int i=0 ; i<d*d ; i++)
+    res[i] /= determinant ; 
+  Tools<d>::transpose_inplace(res) ; 
+  return res ; 
+}
+
 //==================================
 template <int d>
 double Tools<d>::Volume (double R)

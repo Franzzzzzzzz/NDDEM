@@ -481,6 +481,8 @@ Variables</h2></td></tr>
 <tr class="separator:ga9ca7866796fbfe0eb1ef7aa853313afa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga62190eb5c0a1025679a212de8862b0ce"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga62190eb5c0a1025679a212de8862b0ce">Tools&lt; d &gt;::writeinline_close</a> (void)</td></tr>
 <tr class="separator:ga62190eb5c0a1025679a212de8862b0ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadbd756fdbe3b81079e5b1da8feae4dfc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadbd756fdbe3b81079e5b1da8feae4dfc">Tools&lt; d &gt;::print</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> M)</td></tr>
+<tr class="separator:gadbd756fdbe3b81079e5b1da8feae4dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Vector and matrix initialisation and normalisation</h2></td></tr>
 <tr class="memitem:gaf6db3cfb6f2cf2f90c42f5bb0180e1ff"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf6db3cfb6f2cf2f90c42f5bb0180e1ff">Tools&lt; d &gt;::randomize_vec</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> v)</td></tr>
@@ -492,9 +494,6 @@ Variables</h2></td></tr>
 <tr class="memitem:ga1a8e5f27dfca54cbdcebe441dae4d31e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga1a8e5f27dfca54cbdcebe441dae4d31e">Tools&lt; d &gt;::orthonormalise</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;A)</td></tr>
 <tr class="memdesc:ga1a8e5f27dfca54cbdcebe441dae4d31e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Orthonormalise A using the Gram-Shmidt process, in place.  <a href="group__DEM.html#ga1a8e5f27dfca54cbdcebe441dae4d31e">More...</a><br /></td></tr>
 <tr class="separator:ga1a8e5f27dfca54cbdcebe441dae4d31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">Tools&lt; d &gt;::det</a> (<a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;M)</td></tr>
-<tr class="memdesc:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)  <a href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">More...</a><br /></td></tr>
-<tr class="separator:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafefafd3fbcebb8b8f1bd6dc12017a11c">Tools&lt; d &gt;::unitvec</a> (int n)</td></tr>
 <tr class="memdesc:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct &amp; return a unit vector.  <a href="group__DEM.html#gafefafd3fbcebb8b8f1bd6dc12017a11c">More...</a><br /></td></tr>
 <tr class="separator:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -580,6 +579,15 @@ Variables</h2></td></tr>
 <tr class="memitem:ga339cd5ee6b24f337a7f7be086a639546"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga339cd5ee6b24f337a7f7be086a639546">Tools&lt; d &gt;::wedgeproduct</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="memdesc:ga339cd5ee6b24f337a7f7be086a639546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wedge product in-place.  <a href="group__DEM.html#ga339cd5ee6b24f337a7f7be086a639546">More...</a><br /></td></tr>
 <tr class="separator:ga339cd5ee6b24f337a7f7be086a639546"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">Tools&lt; d &gt;::det</a> (<a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;M)</td></tr>
+<tr class="memdesc:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)  <a href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">More...</a><br /></td></tr>
+<tr class="separator:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga567c478cb6490ecbebb51b1eca3daebe"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga567c478cb6490ecbebb51b1eca3daebe">Tools&lt; d &gt;::det</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M)</td></tr>
+<tr class="memdesc:ga567c478cb6490ecbebb51b1eca3daebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix determinant (probably quite slow, but shouldn't really really matters for the usage)  <a href="group__DEM.html#ga567c478cb6490ecbebb51b1eca3daebe">More...</a><br /></td></tr>
+<tr class="separator:ga567c478cb6490ecbebb51b1eca3daebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga99ce0f2023777fee64aa1d05b72353ed"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga99ce0f2023777fee64aa1d05b72353ed">Tools&lt; d &gt;::inverse</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M)</td></tr>
+<tr class="memdesc:ga99ce0f2023777fee64aa1d05b72353ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix inverse (very slow and redundant calculation of the determinant for the comatrix, but shouldn't really really matters for the usage)  <a href="group__DEM.html#ga99ce0f2023777fee64aa1d05b72353ed">More...</a><br /></td></tr>
+<tr class="separator:ga99ce0f2023777fee64aa1d05b72353ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4701bf110c37993ad9615e4555a29d2f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4701bf110c37993ad9615e4555a29d2f">Tools&lt; d &gt;::transpose</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a)</td></tr>
 <tr class="memdesc:ga4701bf110c37993ad9615e4555a29d2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transposition.  <a href="group__DEM.html#ga4701bf110c37993ad9615e4555a29d2f">More...</a><br /></td></tr>
 <tr class="separator:ga4701bf110c37993ad9615e4555a29d2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1561,8 +1569,38 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="ga567c478cb6490ecbebb51b1eca3daebe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga567c478cb6490ecbebb51b1eca3daebe">&#9670;&nbsp;</a></span>det() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::det </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
+          <td class="paramname"><em>M</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>compute the matrix determinant (probably quite slow, but shouldn't really really matters for the usage) </p>
+
+</div>
+</div>
 <a id="ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">&#9670;&nbsp;</a></span>det()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">&#9670;&nbsp;</a></span>det() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1842,6 +1880,36 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal. </p>
+
+</div>
+</div>
+<a id="ga99ce0f2023777fee64aa1d05b72353ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga99ce0f2023777fee64aa1d05b72353ed">&#9670;&nbsp;</a></span>inverse()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt; double &gt; <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::inverse </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
+          <td class="paramname"><em>M</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>compute the matrix inverse (very slow and redundant calculation of the determinant for the comatrix, but shouldn't really really matters for the usage) </p>
 
 </div>
 </div>
@@ -3552,6 +3620,34 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Force &amp; torque between a particle and a wall. </p>
+
+</div>
+</div>
+<a id="gadbd756fdbe3b81079e5b1da8feae4dfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadbd756fdbe3b81079e5b1da8feae4dfc">&#9670;&nbsp;</a></span>print()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::print </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a>&#160;</td>
+          <td class="paramname"><em>M</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
