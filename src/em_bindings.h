@@ -22,6 +22,7 @@ EMSCRIPTEN_BINDINGS(DEMCG2D) {
     .function("simu_getWallForce", &DEMCG2D::simu_getWallForce)
     .function("simu_setExternalForce", &DEMCG2D::simu_setExternalForce)
     .function("simu_getTime", &DEMCG2D::simu_getTime)
+    .function("simu_getGravityAngle", &DEMCG2D::simu_getGravityAngle)
 
     .function("cg_setup_CG", &DEMCG2D::cg_setup_CG )
     .function("cg_process_timestep", &DEMCG2D::cg_process_timestep)
@@ -59,6 +60,7 @@ EMSCRIPTEN_BINDINGS(DEMCG3D) {
     .function("simu_getWallForce", &DEMCG3D::simu_getWallForce)
     .function("simu_setExternalForce", &DEMCG3D::simu_setExternalForce)
     .function("simu_getTime", &DEMCG3D::simu_getTime)
+    .function("simu_getGravityAngle", &DEMCG3D::simu_getGravityAngle)
 
     .function("cg_setup_CG", &DEMCG3D::cg_setup_CG )
     .function("cg_process_timestep", &DEMCG3D::cg_process_timestep)
@@ -96,6 +98,7 @@ EMSCRIPTEN_BINDINGS(DEMCG4D) {
     .function("simu_getWallForce", &DEMCG4D::simu_getWallForce)
     .function("simu_setExternalForce", &DEMCG4D::simu_setExternalForce)
     .function("simu_getTime", &DEMCG4D::simu_getTime)
+    .function("simu_getGravityAngle", &DEMCG4D::simu_getGravityAngle)
 
     .function("cg_setup_CG", &DEMCG4D::cg_setup_CG )
     .function("cg_process_timestep", &DEMCG4D::cg_process_timestep)
@@ -133,6 +136,7 @@ EMSCRIPTEN_BINDINGS(DEMCG5D) {
     .function("simu_getWallForce", &DEMCG5D::simu_getWallForce)
     .function("simu_setExternalForce", &DEMCG5D::simu_setExternalForce)
     .function("simu_getTime", &DEMCG5D::simu_getTime)
+    .function("simu_getGravityAngle", &DEMCG5D::simu_getGravityAngle)
 
     .function("cg_setup_CG", &DEMCG5D::cg_setup_CG )
     .function("cg_process_timestep", &DEMCG5D::cg_process_timestep)

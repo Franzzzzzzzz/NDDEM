@@ -258,7 +258,7 @@ public:
         } // END PARALLEL SECTION
         P.perform_MOVINGWALL() ;
         P.perform_PBCLE_move() ;
-        std::invoke (P.update_gravity, &P, t) ;
+        std::invoke (P.update_gravity, &P, dt) ;
 
         //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
@@ -660,6 +660,9 @@ public:
 
   /** \brief Expose the current time. \ingroup API */
   double getTime() { return t; }
+
+  /** \brief Expose the current gravity angle. \ingroup API */
+  double getGravityAngle() { return P.gravityrotateangle; }
 
 
   /** \brief Expose the array of orientation. \ingroup API */
