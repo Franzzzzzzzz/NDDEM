@@ -25,7 +25,7 @@ window.addEventListener( 'mousemove', onMouseMove, false );
 window.addEventListener( 'mousedown', (e) => { onSelectParticle(e,camera) }, false );
 window.addEventListener( 'mouseup', (e) => { onDeselectParticle() }, false );
 
-window.addEventListener( 'touchmove', onMouseMove, false );
+window.addEventListener( 'touchmove', onTouchMove, false );
 window.addEventListener( 'touchstart', (e) => { onSelectParticle(e,camera) }, false );
 window.addEventListener( 'touchend', (e) => { onDeselectParticle() }, false );
 
@@ -42,6 +42,21 @@ function onMouseMove( event ) {
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
+}
+
+function onTouchMove( event ) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    let new_x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
+    let new_y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
+    let dt = Date.now() - last_time;
+    vel = [100*(new_y-mouse.y)/dt,100*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
+    mouse.x = new_x;
+    mouse.y = new_y;
+    last_time = Date.now();
+    console.log(mouse)
+
 }
 
 export function animate_locked_particle(S, c, spheres, params) {

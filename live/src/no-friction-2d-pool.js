@@ -12,7 +12,7 @@ import * as RAYCAST from '../libs/RaycastHandler.js';
 // import * as CGHANDLER from '../libs/CGHandler.js';
 
 let info_div = document.createElement("div")
-info_div.innerHTML = "Touch the particle to grab it"
+info_div.innerHTML = "Throw the particle"
 info_div.style.color = "white";
 info_div.style.position = "absolute";
 info_div.style.left = "20px";
