@@ -72,7 +72,7 @@ These command have a single behaviour, described here.
 - `boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE] LOCMIN LOCMAX extrainfo`: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:
   - `MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY`
   - `SPHERE ?????`: not sure how the syntax work ??????
-  - `ROTATINGSPHERE ?????`: not sure how the syntax work ??????
+  - `ROTATINGSPHERE RADIUS X1 ... XD R12 R13 ... R1D R23 ... R_D-1_D`: Rotating sphere of radius RADIUS, center at the X location, rotation matrix given by the R components (upper right corner of the skew-symetric rotation matrix). 
   - `PBCLE LOCMIN LOCMAX VELOCITY`: Lees-Edward boundary condition. Should be in dimension 0. 
   - `allother LOCMIN LOCMAX`
 - `rigid`: TODO (in development) ...
