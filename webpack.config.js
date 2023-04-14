@@ -14,6 +14,7 @@ module.exports = [{
         'rotation' : './live/src/rotation.js',
         'rotating-drum-2d' : './live/src/rotating-drum-2d.js',
         '4d-pool' : './live/src/4d-pool.js',
+        'no-friction-2d-pool' : './live/src/no-friction-2d-pool.js',
         'coarse-graining' : './live/src/coarse-graining.js',
         'rotation-matrix' : './live/src/rotation-matrix.js',
         'simple-shear' : './live/src/simple-shear.js',
@@ -92,6 +93,13 @@ module.exports = [{
             template: "live/pool-template.html",
             filename: "4d-pool.html",
             chunks: ['4d-pool']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM 2D Pool',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/template.html",
+            filename: "no-friction-2d-pool.html",
+            chunks: ['no-friction-2d-pool']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Coarse Graining',

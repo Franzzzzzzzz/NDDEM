@@ -16,20 +16,32 @@ let last_intersection = null;
 let locked_particle = null;
 let ref_location;
 let camera;
+let vel = [];
+let last_time = Date.now();
+
+let data_points
 
 window.addEventListener( 'mousemove', onMouseMove, false );
 window.addEventListener( 'mousedown', (e) => { onSelectParticle(e,camera) }, false );
+window.addEventListener( 'mouseup', (e) => { onDeselectParticle() }, false );
+
+window.addEventListener( 'touchmove', onMouseMove, false );
+window.addEventListener( 'touchstart', (e) => { onSelectParticle(e,camera) }, false );
+window.addEventListener( 'touchend', (e) => { onDeselectParticle() }, false );
+
 // window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
 
 function onMouseMove( event ) {
 
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
-
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    // console.log(x,y)
+    let new_x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    let new_y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    let dt = Date.now() - last_time;
+    vel = [100*(new_y-mouse.y)/dt,100*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
+    mouse.x = new_x;
+    mouse.y = new_y;
+    last_time = Date.now();
 }
 
 export function animate_locked_particle(S, c, spheres, params) {
@@ -44,7 +56,11 @@ export function animate_locked_particle(S, c, spheres, params) {
             ref_location.clamp( new Vector3( -params.L, -params.L, 0),
                                 new Vector3(  params.L,  params.L, 0) );
         }
+        // vel = [ref_location.x - locked_particle.position.x,ref_location.x - locked_particle.position.x];
+        // console.log(vel);
         S.simu_fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
+        if ( vel.length > 0 ) { S.simu_setVelocity(locked_particle.NDDEM_ID,vel); }
+
     }
     calculate_intersection(camera, spheres, params);
 }
@@ -66,6 +82,10 @@ function onSelectParticle( event, camera ) {
             locked_particle = null;
         }
     // }
+}
+
+function onDeselectParticle( ) {
+    locked_particle = null;
 }
 
 function calculate_intersection(camera, spheres, params) {
@@ -103,5 +123,34 @@ function calculate_intersection(camera, spheres, params) {
             }
             INTERSECTED = null;
         }
+    }
+}
+
+export function add_ghosts(scene, N=1000, radius=0.005, color=0xeeeeee) {
+    data_points = new THREE.Group();
+    data_points.nchildren = N;
+    data_points.last_updated = 0;
+    
+    // let fg_mat = new THREE.PointsMaterial({ color: 0xeeeeee });
+    let fg_mat = new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide });
+    let fg_geom = new THREE.CircleGeometry(radius, 8);
+    let data_point = new THREE.Mesh(fg_geom, fg_mat);
+    data_point.position.set(1e10, 1e10, 0); // don't show to begin with
+
+    for (let i = 0; i < data_points.nchildren; i++) {
+        data_points.add(data_point.clone());
+    }
+    scene.add(data_points);
+}
+
+
+export function update_ghosts() {
+    // console.log(data_points.last_updated)
+    if ( ref_location !== undefined ) {
+        data_points.children[data_points.last_updated].position.x = ref_location.x;
+        data_points.children[data_points.last_updated].position.y = ref_location.y;
+
+        data_points.last_updated += 1;
+        if (data_points.last_updated == data_points.nchildren - 1) { data_points.last_updated = 0; }
     }
 }
