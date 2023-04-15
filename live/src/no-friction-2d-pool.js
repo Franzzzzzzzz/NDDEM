@@ -15,9 +15,26 @@ let info_div = document.createElement("div")
 info_div.innerHTML = "Throw the particle"
 info_div.style.color = "white";
 info_div.style.position = "absolute";
-info_div.style.left = "20px";
-info_div.style.top = "20px";
+info_div.style.left = "15px";
+info_div.style.top = "15px";
+info_div.style.padding = "10px";
+
 document.body.appendChild(info_div);
+
+let reset_div = document.createElement("div")
+reset_div.innerHTML = "Reset"
+reset_div.style.color = "black";
+reset_div.style.backgroundColor = "white";
+reset_div.style.borderRadius = "5px";
+reset_div.style.position = "absolute";
+reset_div.style.right = "15px";
+reset_div.style.top = "15px";
+reset_div.style.padding = "10px";
+// reset_div.onclick( reset_particle );
+document.body.appendChild(reset_div);
+
+reset_div.addEventListener("click", reset_particle);
+
 
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
@@ -31,11 +48,6 @@ var params = {
     L: 0.06, //system size
     N: 1,
     zoom: 500,
-    // packing_fraction: 0.5,
-    constant_volume: true,
-    axial_strain: 0,
-    volumetric_strain: 0,
-    paused: false,
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
     d4: {cur:0},
@@ -54,9 +66,10 @@ var params = {
     cg_window_size: 3,
     particle_opacity: 1,
     F_mag_max: 0.005,
-    aspect_ratio: 2,
+    aspect_ratio: undefined,
 }
 
+params.aspect_ratio = window.innerHeight / window.innerWidth;
 
 params.average_radius = (params.r_min + params.r_max)/2.;
 params.thickness = params.average_radius;
@@ -163,14 +176,19 @@ function animate() {
     SPHERES.move_spheres(S,params);
     RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
 
-    if ( !params.paused ) {
-        S.simu_step_forward(15);
-        // CGHANDLER.update_2d_cg_field(S,params);
-        RAYCAST.update_ghosts();
-    }
+    S.simu_step_forward(5);
+    // CGHANDLER.update_2d_cg_field(S,params);
+    RAYCAST.update_ghosts();
     // SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
-    
+    if ( Math.abs(SPHERES.spheres.children[0].position.x) > params.L*params.aspect_ratio ) {S.simu_fixParticle(0,[0,0]); }
+    if ( Math.abs(SPHERES.spheres.children[0].position.y) > params.L ) {S.simu_fixParticle(0,[0,0]); }
+}
+
+function reset_particle(){
+    S.simu_fixParticle(0,[0,0]);
+    S.simu_setVelocity(0,[0,0]);
+    RAYCAST.reset_ghosts();
 }
 
 async function NDDEMCGPhysics() {

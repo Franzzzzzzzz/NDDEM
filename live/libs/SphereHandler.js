@@ -84,7 +84,8 @@ export function add_spheres(S,params,scene) {
     }
 
     for ( let i = 0; i < params.N; i ++ ) {
-        const material = NDParticleShader.clone();
+        // const material = NDParticleShader.clone();
+        const material = new MeshStandardMaterial();
         var object = new Mesh(geometrySphere, material);
         object.position.set(0,0,0);
         object.rotation.z = Math.PI / 2;

@@ -38,7 +38,7 @@ function onMouseMove( event ) {
     let new_x = ( event.clientX / window.innerWidth ) * 2 - 1;
     let new_y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     let dt = Date.now() - last_time;
-    vel = [100*(new_y-mouse.y)/dt,100*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
+    vel = [200*(new_y-mouse.y)/dt,200*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
@@ -51,16 +51,15 @@ function onTouchMove( event ) {
     let new_x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
     let new_y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
     let dt = Date.now() - last_time;
-    vel = [100*(new_y-mouse.y)/dt,100*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
+    vel = [200*(new_y-mouse.y)/dt,200*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
-    console.log(mouse)
-
 }
 
 export function animate_locked_particle(S, c, spheres, params) {
     camera = c
+    calculate_intersection(camera, spheres, params);
     if ( locked_particle !== null ) {
         raycaster.ray.intersectPlane( intersection_plane, ref_location);
         if ( 'aspect_ratio' in params ) {
@@ -77,7 +76,7 @@ export function animate_locked_particle(S, c, spheres, params) {
         if ( vel.length > 0 ) { S.simu_setVelocity(locked_particle.NDDEM_ID,vel); }
 
     }
-    calculate_intersection(camera, spheres, params);
+    
 }
 
 function onSelectParticle( event, camera ) {
@@ -109,6 +108,7 @@ function calculate_intersection(camera, spheres, params) {
 
     const intersects = raycaster.intersectObjects( spheres.children );
     if ( intersects.length > 0 ) { // if found something
+        // console.log(intersects);
         if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
                 if ( INTERSECTED !== null ) {
                     // INTERSECTED.material.uniforms.ambient.value = 1.0;
@@ -158,10 +158,17 @@ export function add_ghosts(scene, N=1000, radius=0.005, color=0xeeeeee) {
     scene.add(data_points);
 }
 
+export function reset_ghosts(){
+    for (let i = 0; i < data_points.nchildren; i++) {
+        data_points.children[i].position.set(1e10,1e10,0);
+    }
+    onDeselectParticle();
+    // INTERSECTED = 0;
+}
+
 
 export function update_ghosts() {
-    // console.log(data_points.last_updated)
-    if ( ref_location !== undefined ) {
+    if ( ref_location !== undefined && locked_particle === null) {
         data_points.children[data_points.last_updated].position.x = ref_location.x;
         data_points.children[data_points.last_updated].position.y = ref_location.y;
 
