@@ -80,9 +80,11 @@ export function animate_locked_particle(S, c, spheres, params) {
 }
 
 function onSelectParticle( event, camera ) {
+    
     // console.log(camera.getWorldDirection() )
     // if ( event.code === 'Enter' ) {
         if ( locked_particle === null  && INTERSECTED !== null ) {
+            reset_ghosts();
             locked_particle = INTERSECTED;
             // console.log(locked_particle);
             ref_location = locked_particle.position;
@@ -95,6 +97,7 @@ function onSelectParticle( event, camera ) {
         else {
             locked_particle = null;
         }
+        
     // }
 }
 
@@ -159,10 +162,12 @@ export function add_ghosts(scene, N=1000, radius=0.005, color=0xeeeeee) {
 }
 
 export function reset_ghosts(){
-    for (let i = 0; i < data_points.nchildren; i++) {
-        data_points.children[i].position.set(1e10,1e10,0);
+    if ( data_points !== undefined ) {
+        for (let i = 0; i < data_points.nchildren; i++) {
+            data_points.children[i].position.set(1e10,1e10,0);
+        }
+        // onDeselectParticle();
     }
-    onDeselectParticle();
     // INTERSECTED = 0;
 }
 
