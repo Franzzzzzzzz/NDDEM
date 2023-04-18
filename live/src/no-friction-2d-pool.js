@@ -12,7 +12,7 @@ import * as RAYCAST from '../libs/RaycastHandler.js';
 // import * as CGHANDLER from '../libs/CGHandler.js';
 
 let info_div = document.createElement("div")
-info_div.innerHTML = "Throw the particle"
+info_div.innerHTML = "Throw the ball"
 info_div.style.color = "white";
 info_div.style.position = "absolute";
 info_div.style.left = "15px";
@@ -47,7 +47,7 @@ var params = {
     dimension: 2,
     L: 0.06, //system size
     N: 1,
-    zoom: 500,
+    zoom: 1.4,
     g_mag: 1e3,
     theta: 0, // slope angle in DEGREES
     d4: {cur:0},
@@ -92,12 +92,12 @@ async function init() {
     await NDDEMCGPhysics();
 
     // camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    var aspect = window.innerWidth / window.innerHeight;
+    // var aspect = window.innerWidth / window.innerHeight;
     camera = new THREE.OrthographicCamera(
-        (-100 * aspect) / params.zoom,
-        (100 * aspect) / params.zoom,
-        100 / params.zoom,
-        -100 / params.zoom,
+        -params.L*params.zoom,
+        params.L*params.zoom,
+        params.L*params.zoom*params.aspect_ratio,
+        -params.L*params.zoom*params.aspect_ratio,
         -1000,
         1000
     );
@@ -161,13 +161,17 @@ function onWindowResize(){
 
     // camera.aspect = window.innerWidth / window.innerHeight;
     // camera.updateProjectionMatrix();
-    var aspect = window.innerWidth / window.innerHeight;
+    // var aspect = window.innerWidth / window.innerHeight;
     // camera.left = -params.zoom * aspect;
     // camera.right = params.zoom * aspect;
     // camera.bottom = -params.zoom;
     // camera.top = params.zoom;
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    // camera.left = -params.L*params.zoom;
+    // camera.right = params.L*params.zoom;
+    // camera.top = params.L*params.zoom*params.aspect_ratio;
+    // camera.bottom = -params.L*params.zoom*params.aspect_ratio;
+    // renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
 
