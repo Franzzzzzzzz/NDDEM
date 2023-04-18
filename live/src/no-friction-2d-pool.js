@@ -192,6 +192,7 @@ function animate() {
 function reset_particle(){
     S.simu_fixParticle(0,[0,0]);
     S.simu_setVelocity(0,[0,0]);
+    S.simu_setExternalForce(0,[0,0]);
     RAYCAST.reset_ghosts();
 }
 
