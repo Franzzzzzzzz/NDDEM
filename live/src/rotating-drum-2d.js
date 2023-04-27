@@ -22,7 +22,7 @@ let S;
 
 var params = {
     dimension: 2,
-    Fr : 0.5,
+    // Fr : 0.5,
     R: 0.1, // drum radius
     N: 500,
     // packing_fraction: 0.5,
@@ -30,7 +30,7 @@ var params = {
     paused: false,
     r_min: 0.0025,
     r_max: 0.0035,
-    omega: 2, // rotation rate
+    omega: 10, // rotation rate
     lut: 'White',
     cg_field: 'Density',
     quality: 5,
@@ -42,7 +42,7 @@ var params = {
     omegamax: 20, // max rotation rate to colour by
     particle_density : 2700,
     zoom : 1000,
-    mu_wall : 1,
+    mu_wall : 0.5,
     mu : 0.5,
     F_mag_max: 50,
     particle_opacity : 0.95,
@@ -129,11 +129,23 @@ async function init() {
 
     gui.width = 300;
 
-    gui.add( params, 'Fr', 0,0.5)
-        .name( 'Froude number').listen()
+    // gui.add( params, 'Fr', 0,10)
+    //     // .name( 'Froude number').listen()
+    //     .name( 'Rotation rate').listen()
+    //     .onChange( () => {
+    //         // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
+    //         // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
+    //         S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega*params.R) + " 0 0"); // add a sphere!
+    //     } );
+    gui.add( params, 'mu', 0,1)
+        .name( 'Particle Friction').listen()
         .onChange( () => {
-            params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
-            S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
+            S.simu_interpret_command("set Mu " + String(params.mu));
+        } );
+    gui.add( params, 'mu_wall', 0,1)
+        .name( 'Wall Friction').listen()
+        .onChange( () => {
+            S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
         } );
 
     gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
@@ -207,12 +219,13 @@ function finish_setup() {
         S.simu_interpret_command("boundary "+String(i)+" WALL -"+4*String(params.R)+" "+4*String(params.R));
     }
 
-    S.simu_interpret_command("boundary "+String(params.dimension)+" SPHERE "+String(params.R)+" 0 0 0 0 0"); // add a sphere!
+    S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega*params.R) + " 0 0"); // add a sphere!
 
     // S.simu_interpret_command("auto location randomsquare");
     // S.simu_interpret_command("auto location randomdrop");
     S.simu_interpret_command("auto location insphere");
-    S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1"); // intensity, omega, rotdim0, rotdim1
+    // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1"); // intensity, omega, rotdim0, rotdim1
+    S.simu_interpret_command("gravity -9.81 0"); // intensity, omega, rotdim0, rotdim1
 
     let tc = 2e-3;
     let rest = 0.5; // super low restitution coeff to dampen out quickly
