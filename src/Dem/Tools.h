@@ -105,7 +105,10 @@ static void surfacevelocity (v1d &res, cv1d &p, double * com, double * vel_com, 
      for (int dd=0 ; dd<d ; dd++)
          res[dd] = vel_com[dd] ;
  else if (vel_com == nullptr)
-     skewmatvecmult(res, omega_com, p-com) ;
+ {
+    skewmatvecmult(res, omega_com, p-com) ;
+    //printf("{%g %g %g %g %g}", omega_com[0], (p-com)[0], (p-com)[1], res[0], res[1]) ;
+ }
  else
  {
      skewmatvecmult(res, omega_com, p-com) ;
@@ -562,6 +565,7 @@ void Tools<d>::skewmatvecmult (v1d & r, cv1d & M, cv1d & v)
 {
  for (int i=0 ; i<d ; i++)
  {
+     r[i]=0 ;
      for (int j=0 ; j<d ; j++)
      {
          if (j==i) continue ;
@@ -574,6 +578,7 @@ void Tools<d>::skewmatvecmult (v1d & r, const double * M, cv1d & v)
 {
  for (int i=0 ; i<d ; i++)
  {
+     r[i]=0 ;
      for (int j=0 ; j<d ; j++)
      {
          if (j==i) continue ;
@@ -606,6 +611,7 @@ void Tools<d>::skewmatsquare(v1d & r, cv1d & A)
     for (int i=0 ; i<d ; i++)
         for (int j=i ; j<d ; j++)
         {
+         r[i*d+j]=0 ;
          for (int k=0 ; k<d ; k++)
              r[i*d+j]+=A[MIndexAS[i][k]]*A[MIndexAS[k][j]]*MSigns[i][k]*MSigns[k][j] ;
         }

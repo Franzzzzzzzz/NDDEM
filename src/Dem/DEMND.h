@@ -442,6 +442,7 @@ public:
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;
+                    //printf("%g | %g %g | %g %g | %g %g\n", P.Boundaries[it->j/2][4+2], (X[it->i]+tmpcn*(-P.r[it->i]))[0], (X[it->i]+tmpcn*(-P.r[it->i]))[1], P.Boundaries[it->j/2][4], P.Boundaries[it->j/2][5], tmpvel[0], tmpvel[1]) ; fflush(stdout) ;
                     C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, tmpvel, *it) ;
                 }
                 else
