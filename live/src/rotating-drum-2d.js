@@ -135,7 +135,7 @@ async function init() {
         .onChange( () => {
             // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
             // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
-            S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega) + " 0 0"); // add a sphere!
+            S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(-params.omega) + " 0 0"); // add a sphere!
         } );
     gui.add( params, 'mu', 0,1)
         .name( 'Particle Friction').listen()
@@ -219,7 +219,7 @@ function finish_setup() {
         S.simu_interpret_command("boundary "+String(i)+" WALL -"+4*String(params.R)+" "+4*String(params.R));
     }
 
-    S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega) + " 0 0"); // add a sphere!
+    S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(-params.omega) + " 0 0"); // add a sphere!
 
     // S.simu_interpret_command("auto location randomsquare");
     // S.simu_interpret_command("auto location randomdrop");
