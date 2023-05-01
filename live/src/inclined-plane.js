@@ -324,7 +324,7 @@ function finish_setup() {
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
-    cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+    cgparam["fields"]=["RHO", "VAVG", "TC","Pressure","ShearStress"] ;
     cgparam["periodicity"]=Array(params.dimension).fill(true);
     cgparam["window"]="Lucy3D";
     cgparam["dimension"]=params.dimension;

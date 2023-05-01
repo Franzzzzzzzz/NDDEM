@@ -242,7 +242,7 @@ function update_cg_params(S, params) {
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
-    cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+    cgparam["fields"]=["RHO", "VAVG", "TC","Pressure","ShearStress"] ;
     cgparam["periodicity"]=[false,false];
     cgparam["window"]="Lucy2D";
     cgparam["dimension"]=2;
