@@ -24,20 +24,20 @@ var params = {
     dimension: 2,
     // Fr : 0.5,
     R: 0.1, // drum radius
-    N: 500,
+    N: 400,
     // packing_fraction: 0.5,
     gravity: false,
     paused: false,
-    r_min: 0.0025,
-    r_max: 0.0035,
+    r_min: 0.001,
+    r_max: 0.005,
     omega: 10, // rotation rate
     lut: 'White',
-    cg_field: 'Density',
+    cg_field: 'Size',
     quality: 5,
     cg_width: 50,
     cg_height: 50,
     cg_opacity: 0.8,
-    cg_window_size: 3,
+    cg_window_size: 5,
     vmax: 20, // max velocity to colour by
     omegamax: 20, // max rotation rate to colour by
     particle_density : 2700,
@@ -129,14 +129,14 @@ async function init() {
 
     gui.width = 300;
 
-    // gui.add( params, 'Fr', 0,10)
-    //     // .name( 'Froude number').listen()
-    //     .name( 'Rotation rate').listen()
-    //     .onChange( () => {
-    //         // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
-    //         // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
-    //         S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega*params.R) + " 0 0"); // add a sphere!
-    //     } );
+    gui.add( params, 'omega', 0,25)
+        // .name( 'Froude number').listen()
+        .name( 'Rotation rate').listen()
+        .onChange( () => {
+            // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
+            // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
+            S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega) + " 0 0"); // add a sphere!
+        } );
     gui.add( params, 'mu', 0,1)
         .name( 'Particle Friction').listen()
         .onChange( () => {
@@ -149,10 +149,10 @@ async function init() {
         } );
 
     gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
-    gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
-    gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
-        update_cg_params(S, params);
-    });
+    gui.add ( params, 'cg_field', ['Density', 'Size', 'Velocity', 'Pressure', 'Shear stress','Kinetic Pressure']).name('Field').listen();
+    // gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
+    //     update_cg_params(S, params);
+    // });
     // controls = new OrbitControls( camera, renderer.domElement );
     // controls.update();
 
@@ -177,7 +177,7 @@ function animate() {
     requestAnimationFrame( animate );
     SPHERES.move_spheres(S,params);
     
-    S.simu_step_forward(15);
+    S.simu_step_forward(25);
     CGHANDLER.update_2d_cg_field(S,params);
     
     // let angle = -S.simu_getGravityAngle() + Math.PI/2.;
@@ -219,7 +219,7 @@ function finish_setup() {
         S.simu_interpret_command("boundary "+String(i)+" WALL -"+4*String(params.R)+" "+4*String(params.R));
     }
 
-    S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega*params.R) + " 0 0"); // add a sphere!
+    S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(params.omega) + " 0 0"); // add a sphere!
 
     // S.simu_interpret_command("auto location randomsquare");
     // S.simu_interpret_command("auto location randomdrop");
@@ -259,7 +259,7 @@ function update_cg_params(S, params) {
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
-    cgparam["fields"]=["RHO", "VAVG", "TC"] ;
+    cgparam["fields"]=["RHO", "VAVG", "TC", "Pressure", "KineticPressure","RADIUS"] ;
     cgparam["periodicity"]=[false,false];
     cgparam["window"]="Lucy2D";
     cgparam["dimension"]=2;

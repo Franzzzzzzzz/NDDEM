@@ -348,7 +348,7 @@ function setup_CG() {
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
     cgparam["time average"]="None" ;
-    cgparam["fields"]=["RHO", "TC"] ;
+    cgparam["fields"]=["RHO", "TC","Pressure","ShearStress"] ;
     cgparam["periodicity"]=[false,false,false];
     cgparam["window"]="Lucy3D";
     cgparam["dimension"]=3;

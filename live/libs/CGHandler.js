@@ -2,8 +2,9 @@ import { Lut } from './Lut.js';
 
 let cg_mesh;
 
-let sequential = new Lut('inferno', 512); // options are rainbow, cooltowarm and blackbody
-let divergent  = new Lut('bwr', 512); // options are rainbow, cooltowarm and blackbody
+let sequential = new Lut('inferno', 512);
+let divergent  = new Lut('bkr', 512);
+let grainsize  = new Lut('grainsize', 512);
 
 export function add_cg_mesh(width, height, scene) {
     let geometry = new THREE.PlaneGeometry( width, height );
@@ -29,6 +30,12 @@ export function update_2d_cg_field(S, params) {
         let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
         lut.setMin(0);
         lut.setMax(params.particle_density*100);
+    } else if ( params.cg_field === 'Size' ) {
+        val = S.cg_get_result(0, "RADIUS", 0);
+        lut = grainsize;
+        // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+        lut.setMin(params.r_min);
+        lut.setMax(params.r_max);
     }
     else if ( params.cg_field === 'Velocity' ) {
         val = S.cg_get_result(0, "VAVG", 1);
@@ -38,18 +45,33 @@ export function update_2d_cg_field(S, params) {
         lut.setMax( 0.9*maxVal);
     }
     else if ( params.cg_field === 'Pressure' ) {
-        const stressTcxx=S.cg_get_result(0, "TC", 0) ;
-        const stressTcyy=S.cg_get_result(0, "TC", 3) ;
-        const stressTczz=S.cg_get_result(0, "TC", 6) ;
-        val = new Array(stressTcxx.length);
-        for (var i=0 ; i<stressTcxx.length ; i++)
-        {
-            val[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
-        }
+        // const stressTcxx=S.cg_get_result(0, "TC", 0) ;
+        // const stressTcyy=S.cg_get_result(0, "TC", 3) ;
+        // const stressTczz=S.cg_get_result(0, "TC", 6) ;
+        // val = new Array(stressTcxx.length);
+        // for (var i=0 ; i<stressTcxx.length ; i++)
+        // {
+        //     val[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
+        // }
+        val=S.cg_get_result(0, "Pressure", 0) ;
         lut = sequential;
         let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
         lut.setMin(0);
-        lut.setMax(0.9*maxVal);
+        lut.setMax( 0.9*maxVal);
+    }else if ( params.cg_field === 'Kinetic Pressure' ) {
+        // const stressTcxx=S.cg_get_result(0, "TC", 0) ;
+        // const stressTcyy=S.cg_get_result(0, "TC", 3) ;
+        // const stressTczz=S.cg_get_result(0, "TC", 6) ;
+        // val = new Array(stressTcxx.length);
+        // for (var i=0 ; i<stressTcxx.length ; i++)
+        // {
+        //     val[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
+        // }
+        val=S.cg_get_result(0, "KineticPressure", 0) ;
+        lut = divergent;
+        let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+        lut.setMin(-0.9*maxVal);
+        lut.setMax( 0.9*maxVal);
     } else if ( params.cg_field === 'Shear stress' ) {
         val = S.cg_get_result(0, "TC", 1);
         lut = divergent;
@@ -60,7 +82,6 @@ export function update_2d_cg_field(S, params) {
     // console.log(lut);
     for ( let i = 0; i < size; i ++ ) {
         var color = lut.getColor(val[i]);
-
         
         const r = Math.floor( color.r * 255 );
         const g = Math.floor( color.g * 255 );
