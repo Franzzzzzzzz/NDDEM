@@ -5,6 +5,7 @@ let cg_mesh;
 let sequential = new Lut('inferno', 512);
 let divergent  = new Lut('bkr', 512);
 let grainsize  = new Lut('grainsize', 512);
+let angular  = new Lut('virino', 512);
 
 export function add_cg_mesh(width, height, scene) {
     let geometry = new THREE.PlaneGeometry( width, height );
@@ -25,10 +26,11 @@ export function update_2d_cg_field(S, params) {
         const opacity = parseInt(255 * params.cg_opacity);
         let val;
         let lut;
+        let alpha; // variable opacity level
         if ( params.cg_field === 'Density' ) {
             val = S.cg_get_result(0, "RHO", 0);
             lut = sequential;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+            // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax(params.particle_density*100);
         } else if ( params.cg_field === 'Size' ) {
@@ -39,11 +41,17 @@ export function update_2d_cg_field(S, params) {
             lut.setMax(params.r_max);
         }
         else if ( params.cg_field === 'Velocity' ) {
-            val = S.cg_get_result(0, "VAVG", 1);
-            lut = divergent;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(-0.9*maxVal);
-            lut.setMax( 0.9*maxVal);
+            let vx = S.cg_get_result(0, "VAVG", 0);
+            let vy = S.cg_get_result(0, "VAVG", 1);
+            val = atan2vec(vx,vy);
+            let U = norm(vx,vy);
+            lut = angular;
+            let maxU = U.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+            alpha = divide_vec(U,maxU); // let it saturate a bit
+            // lut.setMin(-0.9*maxVal);
+            // lut.setMax( 0.9*maxVal);
+            lut.setMin(-Math.PI);
+            lut.setMax( Math.PI);
         }
         else if ( params.cg_field === 'Pressure' ) {
             // const stressTcxx=S.cg_get_result(0, "TC", 0) ;
@@ -86,7 +94,13 @@ export function update_2d_cg_field(S, params) {
             if ( val[i] === 0 ) {
                 data[ stride + 3 ] = 0;
             } else {
-                data[ stride + 3 ] = opacity;
+                if ( alpha === undefined ) {
+                    data[ stride + 3 ] = opacity;
+                } else {
+                    // console.log(alpha)
+                    // console.log(alpha[i]);
+                    data[ stride + 3 ] = parseInt(255 * Math.pow(alpha[i]*params.cg_opacity,0.2));
+                }
             }
 
 
@@ -106,4 +120,17 @@ export function update_2d_cg_field(S, params) {
         texture.needsUpdate = true;
         cg_mesh.material.map = texture;
     }
+}
+
+function addvector(a,b){
+    return a.map((e,i) => e + b[i]);
+}
+function norm(a,b){
+    return a.map((e,i) => Math.sqrt(e*e * b[i]*b[i]));
+}
+function atan2vec(a,b){
+    return a.map((e,i) => Math.atan2(e,b[i]));
+}
+function divide_vec(a,b){
+    return a.map((e,i) => e/b);
 }
