@@ -7,7 +7,7 @@ export let total_particle_volume;
 export let x;
 let F_mag_max;
 
-import { Lut } from "three/examples/jsm/math/Lut.js";
+import { Lut } from "../libs/Lut.js";
 import { r, R } from "./controllers.js"
 import * as AUDIO from '../libs/audio.js';
 
@@ -38,7 +38,7 @@ let debug_sound = false;
 const cylinder_geometry = new CylinderGeometry( 1, 1, 1, 16 );
 cylinder_geometry.applyMatrix4( new Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
 const cylinder_material = new MeshStandardMaterial( {color: 0xffffff} );
-cylinder_material.emissive = new Color( 0x0000ff );
+// cylinder_material.emissive = new Color( 0x0000ff );
 cylinder_material.transparent = false;
 const cylinder = new Mesh( cylinder_geometry, cylinder_material );
 
@@ -56,6 +56,10 @@ export async function createNDParticleShader(params) {
     });
 }
 
+
+export function update_cylinder_colour( colour ) {
+    cylinder.material.color = new Color( colour );
+}
 
 export function add_spheres(S,params,scene) {
     radii = S.simu_getRadii();
@@ -392,16 +396,22 @@ export function update_particle_material(params, lut_folder) {
         lut.setMin(0);
         lut.setMax( params.vmax/2. );
     } else if ( params.lut === 'Size' ) {
-        lut = new Lut("cooltowarm", 512);
-        // lut.setMin(params.r_min);
-        // lut.setMax(params.r_max);
+        lut = new Lut("grainsize", 512);
+        lut.setMin(params.r_min);
+        lut.setMax(params.r_max);
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
-            // object.material.color = lut.getColor(radii[i]);
-            object.material.color = lut.getColor( 1 - (radii[i] - params.r_min)/(params.r_max - params.r_min) )
+            object.material.color = lut.getColor(radii[i]);
+            // object.material.color = lut.getColor( 1 - (radii[i] - params.r_min)/(params.r_max - params.r_min) )
         }
     } else if ( params.lut === 'White' ) {
         // do nothing, they're already white
+    } else if ( params.lut === 'Black' ) {
+        let black = new THREE.Color( 0x000000 );
+        for ( let i = 0; i < params.N; i ++ ) {
+            var object = spheres.children[i];
+            object.material.color = black;
+        }
     } else if (params.lut === "Rotation Rate") {
       lut.setMin(0);
       lut.setMax(params.omegamax);

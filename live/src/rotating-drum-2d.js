@@ -10,9 +10,14 @@ import * as SPHERES from "../libs/SphereHandler.js"
 import * as CGHANDLER from '../libs/CGHandler.js';
 
 
-var urlParams = new URLSearchParams(window.location.search);
+let urlParams = new URLSearchParams(window.location.search);
 
 if ( !urlParams.has('lut') ) { urlParams.set('lut','Size') }
+
+// Your existing code unmodified...
+let Fr_div = document.createElement('div');
+Fr_div.style.cssText = 'position:absolute;color:white;top:10px;left:10px;font-size:24px;z-index:10000';
+document.body.appendChild(Fr_div);
 
 
 let camera, scene, renderer, stats, panel, controls;
@@ -24,20 +29,20 @@ var params = {
     dimension: 2,
     // Fr : 0.5,
     R: 0.1, // drum radius
-    N: 400,
+    N: 500,
     // packing_fraction: 0.5,
     gravity: false,
     paused: false,
-    r_min: 0.001,
-    r_max: 0.005,
-    omega: 10, // rotation rate
-    lut: 'White',
+    r_min: 0.002,
+    r_max: 0.004,
+    omega: 12.1, // rotation rate
+    lut: 'Size',
     cg_field: 'Size',
     quality: 5,
     cg_width: 50,
     cg_height: 50,
     cg_opacity: 0.8,
-    cg_window_size: 5,
+    cg_window_size: 3,
     vmax: 20, // max velocity to colour by
     omegamax: 20, // max rotation rate to colour by
     particle_density : 2700,
@@ -48,14 +53,26 @@ var params = {
     particle_opacity : 0.95,
 }
 
+let phi_s = 0.5; // volumetric concentration of small particles
+let target_nu = 0.8;
+let filling_fraction = 0.5;
+let V_solid = filling_fraction*target_nu*Math.PI*params.R*params.R;
+let V_small = phi_s*V_solid;
+let V_large = (1-phi_s)*V_solid;
+let N_small = Math.floor(V_small/(Math.PI*params.r_min*params.r_min));
+let N_large = Math.floor(V_large/(Math.PI*params.r_max*params.r_max));
+params.N = N_small + N_large;
+params.number_ratio = N_small/params.N;
+
 params.average_radius = (params.r_min + params.r_max)/2.;
 
 params.particle_volume = Math.PI*Math.pow(params.average_radius,2);
 params.particle_mass = params.particle_volume*params.particle_density
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
+if ( urlParams.has('cg_opacity') ) { params.cg_opacity = parseInt(urlParams.get('cg_opacity')); }
 
-
+SPHERES.update_cylinder_colour( 0x000000 );
 SPHERES.createNDParticleShader(params).then( init() );
 
 async function init() {
@@ -75,7 +92,7 @@ async function init() {
     camera.lookAt(0,0,0);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xffffff );
+    scene.background = new THREE.Color( 0x000000 );
 
     // const axesHelper = new THREE.AxesHelper( 50 );
     // scene.add( axesHelper );
@@ -91,7 +108,7 @@ async function init() {
     scene.add( dirLight );
 
     const wall_geometry = new THREE.CircleGeometry( params.R, 100 );
-    const wall_material = new THREE.MeshLambertMaterial({color: 0x000000, side: THREE.DoubleSide});
+    const wall_material = new THREE.MeshLambertMaterial({color: 0xffffff, side: THREE.DoubleSide});
     // wall_material.wireframe = true;
 
     boundary = new THREE.Mesh( wall_geometry, wall_material );
@@ -135,6 +152,7 @@ async function init() {
         .onChange( () => {
             // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
             // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
+            update_Fr();
             S.simu_interpret_command("boundary "+String(params.dimension)+" ROTATINGSPHERE "+String(params.R)+" 0 0 " + String(-params.omega) + " 0 0"); // add a sphere!
         } );
     gui.add( params, 'mu', 0,1)
@@ -158,9 +176,15 @@ async function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-
+    update_Fr();
     // update_walls();
     animate();
+}
+
+function update_Fr() {
+    // Fr = omega^2*R/g
+    params.Fr  = params.omega*params.omega*params.R/9.81/2; // WHY IS THERE A FACTOR OF TWO HERE?!?!???
+    Fr_div.innerHTML = 'Fr = ' + params.Fr.toPrecision(2);
 }
 
 
@@ -177,7 +201,7 @@ function animate() {
     requestAnimationFrame( animate );
     SPHERES.move_spheres(S,params);
     
-    S.simu_step_forward(25);
+    S.simu_step_forward(15);
     CGHANDLER.update_2d_cg_field(S,params);
     
     // let angle = -S.simu_getGravityAngle() + Math.PI/2.;
@@ -209,8 +233,9 @@ function finish_setup() {
     let m = Math.PI*0.5*0.5*params.particle_density;
     S.simu_interpret_command("mass -1 " + String(m));
     S.simu_interpret_command("auto rho");
-    S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
-    // S.simu_interpret_command("auto radius bidisperse "+params.r_min+" "+params.r_max+" 0.5");
+    // S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+    // console.log(number_ratio)
+    S.simu_interpret_command("auto radius bidisperse "+params.r_min+" "+params.r_max+" "+params.number_ratio);
     S.simu_interpret_command("auto mass");
     S.simu_interpret_command("auto inertia");
     S.simu_interpret_command("auto skin");
