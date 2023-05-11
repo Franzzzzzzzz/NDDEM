@@ -24,6 +24,7 @@ let camera, scene, renderer, stats, panel, controls;
 let gui;
 let boundary;
 let S;
+let dt;
 
 var params = {
     dimension: 2,
@@ -51,6 +52,11 @@ var params = {
     mu : 0.5,
     F_mag_max: 50,
     particle_opacity : 0.95,
+    lifters: {
+        number: 0,
+        width: 0.05,
+        prev_num: 0,
+    }
 }
 
 let phi_s = 0.5; // volumetric concentration of small particles
@@ -146,7 +152,7 @@ async function init() {
 
     gui.width = 300;
 
-    gui.add( params, 'omega', 0,25)
+    gui.add( params, 'omega', 0,20)
         // .name( 'Froude number').listen()
         .name( 'Rotation rate').listen()
         .onChange( () => {
@@ -165,6 +171,12 @@ async function init() {
         .onChange( () => {
             S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
         } );
+    // gui.add( params.lifters, 'number', 0,12,1)
+    //     .name( 'Number of lifters').listen()
+    //     .onChange( update_lifters);
+    // gui.add( params.lifters, 'width', 0,params.R/2.)
+    //     .name( 'Lifter width').listen()
+    //     .onChange( update_lifters);
 
     gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
     gui.add ( params, 'cg_field', ['Density', 'Size', 'Velocity', 'Pressure', 'Shear stress','Kinetic Pressure']).name('Field').listen();
@@ -179,6 +191,35 @@ async function init() {
     update_Fr();
     // update_walls();
     animate();
+}
+
+function update_lifters(){
+    // clear anything from previously
+    for ( let i = 0; i<params.lifters.prev_num; i++){
+        S.simu_interpret_command('mesh remove 0');
+    }
+
+    let vertices = [];
+    let theta = 0;
+    let dtheta = 2*Math.PI/params.lifters.number;
+    for (let i=0;i<params.lifters.number;i++){
+        vertices.push([[                       params.R*Math.cos(theta),                        params.R*Math.sin(theta)],
+                       [(params.R-params.lifters.width)*Math.cos(theta), (params.R-params.lifters.width)*Math.sin(theta)]]);
+        theta += dtheta;
+    }
+    let header = 'mesh string {"dimension":2,"objects":[';
+    let footer = ']}';
+    let body = '';
+    for (let i=0;i<vertices.length;i++){
+        body += '{"dimensionality":1,"vertices":' + JSON.stringify(vertices[i]) + '},';
+    }
+
+    // console.log(header + body.slice(0, -1) + footer);
+
+    S.simu_interpret_command(header + body.slice(0, -1) + footer);
+    params.lifters.prev_num = params.lifters.number;
+    // S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
+
 }
 
 function update_Fr() {
@@ -208,6 +249,7 @@ function animate() {
     // SPHERES.spheres.setRotationFromAxisAngle ( new THREE.Vector3(0,0,1), angle );
     // camera.up.set(0, 0, 0);
     // controls.update();
+    S.simu_interpret_command('mesh rotate ' + String(-params.omega*25*dt) + " 0 0");
     SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
 }
@@ -255,6 +297,7 @@ function finish_setup() {
     let tc = 2e-3;
     let rest = 0.5; // super low restitution coeff to dampen out quickly
     let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+    dt = tc/10;
 
     S.simu_interpret_command("set Kn " + String(vals.stiffness));
     S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
@@ -264,7 +307,7 @@ function finish_setup() {
     S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
     // S.simu_interpret_command("set damping 0.001");
     S.simu_interpret_command("set T 150");
-    S.simu_interpret_command("set dt " + String(tc/10));
+    S.simu_interpret_command("set dt " + String(dt));
     S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
     S.simu_interpret_command("auto skin");
     S.simu_finalise_init () ;

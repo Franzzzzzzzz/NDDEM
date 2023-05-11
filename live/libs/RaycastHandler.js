@@ -51,7 +51,7 @@ function onTouchMove( event ) {
     let new_x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
     let new_y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
     let dt = Date.now() - last_time;
-    vel = [200*(new_y-mouse.y)/dt,200*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
+    vel = [200*(new_y-mouse.y)/dt,200*(new_x - mouse.x)/dt]; // HACK: NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
@@ -63,17 +63,23 @@ export function animate_locked_particle(S, c, spheres, params) {
     if ( locked_particle !== null ) {
         raycaster.ray.intersectPlane( intersection_plane, ref_location);
         if ( 'aspect_ratio' in params ) {
-            ref_location.clamp( new Vector3( -params.L*params.aspect_ratio,-params.L, 0 ),
-                                new Vector3(  params.L*params.aspect_ratio, params.L, 0 ) );
+            ref_location.clamp( new Vector3( -params.L*params.aspect_ratio+params.r_max,-params.L+params.r_max, 0 ),
+                                new Vector3(  params.L*params.aspect_ratio-params.r_max, params.L-params.r_max, 0 ) );
 
         } else {
-            ref_location.clamp( new Vector3( -params.L, -params.L, 0),
-                                new Vector3(  params.L,  params.L, 0) );
+            ref_location.clamp( new Vector3( -params.L+params.r_max, -params.L+params.r_max, 0),
+                                new Vector3(  params.L-params.r_max,  params.L-params.r_max, 0) );
         }
         // vel = [ref_location.x - locked_particle.position.x,ref_location.x - locked_particle.position.x];
         // console.log(vel);
         S.simu_fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
-        if ( vel.length > 0 ) { S.simu_setVelocity(locked_particle.NDDEM_ID,vel); }
+        if ( vel.length > 0 ) {
+            let max_mag = 1; // HACK: TOTALLY ARBITRARY
+            let vel_mag = Math.sqrt(vel[0]*vel[0] + vel[1]*vel[1]);
+            let limited_vel_mag = Math.min(vel_mag, max_mag);
+            let limited_vel = [limited_vel_mag*vel[0]/vel_mag, limited_vel_mag*vel[1]/vel_mag];
+            S.simu_setVelocity(locked_particle.NDDEM_ID,limited_vel);
+        }
 
     }
     

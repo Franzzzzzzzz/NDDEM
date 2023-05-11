@@ -134,8 +134,9 @@ async function init() {
     WALLS.back.scale.x = 2*params.L + 2*params.thickness;
     WALLS.front.scale.x = 2*params.L + 2*params.thickness;
 
-    WALLS.back.position.x = -params.L*params.aspect_ratio - params.thickness;
-    WALLS.front.position.x = params.L*params.aspect_ratio + params.thickness;
+    WALLS.back.position.x = -params.L*params.aspect_ratio - params.thickness/2.;
+    WALLS.front.position.x = params.L*params.aspect_ratio + params.thickness/2.;
+
         // mesh.scale.z = 2*params.L + 2*params.thickness;
     // });
     WALLS.wall_material.wireframe = false;
@@ -192,7 +193,7 @@ function animate() {
 function reset_particle(){
     S.simu_fixParticle(0,[0,0]);
     S.simu_setVelocity(0,[0,0]);
-    S.simu_setExternalForce(0,[0,0]);
+    // S.simu_setExternalForce(0,[0,0]);
     RAYCAST.reset_ghosts();
 }
 
