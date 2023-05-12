@@ -14,7 +14,7 @@ let camera_direction = new Vector3();
 let INTERSECTED = null;
 let last_intersection = null;
 let locked_particle = null;
-let ref_location;
+let ref_location, old_ref_location;
 let camera;
 let vel = [];
 let last_time = Date.now();
@@ -38,7 +38,7 @@ function onMouseMove( event ) {
     let new_x = ( event.clientX / window.innerWidth ) * 2 - 1;
     let new_y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     let dt = Date.now() - last_time;
-    vel = [200*(new_y-mouse.y)/dt,200*(new_x - mouse.x)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
+    vel = [200*(mouse.x - new_x)/dt,200*(new_y - mouse.y)/dt]; // NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
@@ -51,7 +51,7 @@ function onTouchMove( event ) {
     let new_x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
     let new_y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
     let dt = Date.now() - last_time;
-    vel = [200*(new_y-mouse.y)/dt,200*(new_x - mouse.x)/dt]; // HACK: NEED TO SCALE FROM PIXELS TO METERS
+    vel = [200*(mouse.x - new_x)/dt,200*(new_y - mouse.y)/dt]; // HACK: NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
@@ -74,7 +74,7 @@ export function animate_locked_particle(S, c, spheres, params) {
         // console.log(vel);
         S.simu_fixParticle(locked_particle.NDDEM_ID,[ref_location.x, ref_location.y, ref_location.z]);
         if ( vel.length > 0 ) {
-            let max_mag = 1; // HACK: TOTALLY ARBITRARY
+            let max_mag = 5; // HACK: TOTALLY ARBITRARY
             let vel_mag = Math.sqrt(vel[0]*vel[0] + vel[1]*vel[1]);
             let limited_vel_mag = Math.min(vel_mag, max_mag);
             let limited_vel = [limited_vel_mag*vel[0]/vel_mag, limited_vel_mag*vel[1]/vel_mag];
@@ -154,10 +154,14 @@ export function add_ghosts(scene, N=1000, radius=0.005, color=0xeeeeee) {
     data_points = new THREE.Group();
     data_points.nchildren = N;
     data_points.last_updated = 0;
+    data_points.prev_updated = 0;
     
-    // let fg_mat = new THREE.PointsMaterial({ color: 0xeeeeee });
-    let fg_mat = new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide });
-    let fg_geom = new THREE.CircleGeometry(radius, 8);
+    let fg_mat = new THREE.PointsMaterial({ color: color, side: THREE.DoubleSide });
+    // let fg_mat = new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide });
+    // let fg_geom = new THREE.CircleGeometry(radius, 8);
+    let fg_geom = new THREE.CylinderGeometry(radius/5., radius/5., 1, 4);
+    fg_geom.applyMatrix4( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
+
     let data_point = new THREE.Mesh(fg_geom, fg_mat);
     data_point.position.set(1e10, 1e10, 0); // don't show to begin with
 
@@ -171,19 +175,35 @@ export function reset_ghosts(){
     if ( data_points !== undefined ) {
         for (let i = 0; i < data_points.nchildren; i++) {
             data_points.children[i].position.set(1e10,1e10,0);
+            data_points.children[i].scale.z = 0;
         }
         // onDeselectParticle();
     }
+    ref_location = undefined;
+    old_ref_location = undefined;
     // INTERSECTED = 0;
 }
 
 
 export function update_ghosts() {
     if ( ref_location !== undefined && locked_particle === null) {
-        data_points.children[data_points.last_updated].position.x = ref_location.x;
-        data_points.children[data_points.last_updated].position.y = ref_location.y;
+        if ( old_ref_location === undefined) { old_ref_location = ref_location.clone(); }
+        else { 
+            data_points.children[data_points.last_updated].position.x = (ref_location.x + old_ref_location.x)/2.;
+            data_points.children[data_points.last_updated].position.y = (ref_location.y + old_ref_location.y)/2.;
 
-        data_points.last_updated += 1;
-        if (data_points.last_updated == data_points.nchildren - 1) { data_points.last_updated = 0; }
+            let l = ref_location.distanceTo(old_ref_location);
+            // console.log(l);
+            data_points.children[data_points.last_updated].scale.z = l;
+            data_points.children[data_points.last_updated].lookAt(ref_location);
+
+            // console.log(data_points.children[data_points.last_updated]);
+
+            data_points.prev_updated = data_points.last_updated;
+            data_points.last_updated += 1;
+
+            old_ref_location = ref_location.clone();
+            if (data_points.last_updated == data_points.nchildren - 1) { data_points.last_updated = 0; }
+        }
     }
 }

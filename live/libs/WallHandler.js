@@ -48,6 +48,21 @@ wall_material.wireframe = true;
 const arrow_colour = 0xDDDDDD;
 const arrow_material = new MeshLambertMaterial({ color: arrow_colour });
 
+export function add_circle_wall(params, scene) { 
+    if (left !== undefined) { scene.remove(left); }
+    const circle_geometry = new THREE.RingGeometry( params.R+params.r_max, params.R+params.r_max+params.thickness, 100, 1 );
+    left = new THREE.Mesh( circle_geometry, wall_material );
+    left.rotation.x = Math.PI;
+    scene.add( left );
+}
+
+export function remove_all_walls(scene) {
+    let walls = [left, right, floor, roof, front, back];
+    walls.forEach(wall => {
+        if (wall !== undefined) { scene.remove(wall); }
+    })
+}
+
 export function add_left(params, scene) {
     if (left !== undefined) { scene.remove(left); }
     left = new Mesh(wall_geometry, wall_material);
