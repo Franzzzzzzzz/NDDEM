@@ -133,7 +133,9 @@ public :
         orientationtracking(true),
         wallforcecompute(false),
         wallforcerequested(false),
-        wallforcecomputed(false)
+        wallforcecomputed(false),
+        graddesc_gamma(0.1),
+        graddesc_tol(1e-5)
         {
          reset_ND(NN) ;
         } ///< Set the default values for all parameters. Calls to setup parameter function should be provided after initialisation of this class.
@@ -179,6 +181,8 @@ public :
     bool wallforcecompute ; ///< Compute for on the wall?
     bool wallforcerequested ; ///< Compute for on the wall?
     bool wallforcecomputed ; ///< Compute for on the wall?
+    double graddesc_gamma ; ///< Decay rate parameters for the gradient descent algorithm
+    double graddesc_tol ; ///< Tolerance for the gradient descent algorithm
     bool contactforcedump ; ///< Extract the forces between grains as well?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
     RigidBodies_<d> RigidBodies ; ///< Handle all the rigid bodies
@@ -514,6 +518,8 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      {"tinfo",&tinfo},
      {"dt",&dt},
      {"skin", &skin},
+     {"gradientdescent_gamma", &graddesc_gamma},
+     {"gradientdescent_tol", &graddesc_tol}
   } ;
 
 // Lambda definitions
@@ -687,6 +693,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     else if (!strcmp(line, "SPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::SPHERE) ; Boundaries[id].resize(4+d,0) ; }
     else if (!strcmp(line, "ROTATINGSPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::ROTATINGSPHERE) ; Boundaries[id].resize(4+d+d*(d-1)/2,0) ; }
     else if (!strcmp(line, "PBCLE")) {Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(6,0) ; }
+    else if (!strcmp(line, "ELLIPSE")) {Boundaries[id][3]=static_cast<int>(WallType::ELLIPSE) ; Boundaries[id].resize(5,0) ; }
     else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
     in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
     Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
@@ -711,6 +718,11 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
         assert((id==0)) ;
         in >> Boundaries[id][4] ;
         Boundaries[id][5] = 0 ;
+    }
+    else if (Boundaries[id][3] == static_cast<int>(WallType::ELLIPSE))
+    {
+      assert((d==2)) ; 
+      in >> Boundaries[id][4] ; in>> Boundaries[id][5] ;
     }
     printf("[INFO] Changing BC.\n") ;
    };

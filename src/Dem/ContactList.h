@@ -132,7 +132,7 @@ public:
  } ///< Compute the location & branch vector of the contact
 } ;
 
-/** \brief Contact properties for mesh contacts, specialising cp. */
+/** \brief Contact properties for mesh contacts (mainly), including contact point location, specialising cp. */
 class cpm : public cp {
 public: 
     cpm (int ii, int jj, int sid, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation

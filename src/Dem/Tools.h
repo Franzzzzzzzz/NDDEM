@@ -53,6 +53,39 @@ public :
   TensorType order ;
   v2d * data ;
 } ;
+
+
+/** \brief Dimension specific mathematics */
+class Tools_2D
+{
+public:
+  static std::tuple<double,double> contact_ellipse_disk (std::vector<double> & X, 
+                                                  double a, double b, double cx, double cy, //Ellipse parameters
+                                                  double gamma=0.1, double tol=1e-5)
+  {
+  auto d0=[&](double u){return sqrt((X[0]-cx-a*cos(u))*(X[0]-cx-a*cos(u))+(X[1]-cy-b*sin(u))*(X[1]-cy-b*sin(u)));} ; 
+  auto d1=[&](double u){return (2*a*(X[0]-cx-a*cos(u))*sin(u)-2*b*cos(u)*(X[1]-cy-b*sin(u)));} ; 
+  //d2=@(u) (-(-b*cos(u))*(2*b*cos(u))+cos(u)*(2*a*(x-cx-a*cos(u)))+(a*sin(u))*(2*a*sin(u))--sin(u)*(2*b*(y-cy-b*sin(u)))) ;
+
+  //Gradient descent 
+  int n=0 ; double delta=1 ;
+  double to=atan2(X[1],X[0]), tn ; 
+  while (delta>tol) 
+  {
+    tn= to - gamma * d1(to) ; 
+    delta=fabs(tn-to) ; 
+    to=tn ;
+    n++ ; 
+    if (n>1000) {printf("ERR: maximum number of iteration reached in gradient descent. gradientdescent_gamma is probabmy too large\n") ; break ;}
+  }
+  
+  return {to, d0(to)} ; 
+  }
+  
+} ; 
+
+
+
 /** \brief Static class to handle multi-dimensional mathematics, and more. It gets specialised for speed with template parameter d:dimension
  */
 

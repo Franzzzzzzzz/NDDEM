@@ -342,6 +342,23 @@ public:
                             CLw.insert(tmpcp) ;
                         }
                     }
+                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::ELLIPSE))
+                    {
+                        static_assert((sizeof(double)==8)) ;
+                        
+                        double tparam ; 
+                        std::tie(tparam, tmpcp.contactlength) = Tools_2D::contact_ellipse_disk (X[i], P.Boundaries[j][0], P.Boundaries[j][1], P.Boundaries[j][4], P.Boundaries[j][5], P.graddesc_gamma, P.graddesc_tol) ; 
+                        if (tmpcp.contactlength<P.skin)
+                        {
+                            tmpcp.j=2*j ;
+                            #pragma GCC diagnostic push
+                            #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+                            tmpcp.ghost = *(reinterpret_cast<uint32_t*>(&tparam)) ;
+                            tmpcp.ghostdir=*(reinterpret_cast<uint64_t*>(&tparam))>>32 ;      //ugly bit punning, I'm so sorry...
+                            #pragma GCC diagnostic pop
+                            CLw.insert(tmpcp) ;
+                        }                       
+                    }
             }
             
             // Contact detection between particles and meshes
@@ -445,6 +462,20 @@ public:
                     //printf("%g | %g %g | %g %g | %g %g\n", P.Boundaries[it->j/2][4+2], (X[it->i]+tmpcn*(-P.r[it->i]))[0], (X[it->i]+tmpcn*(-P.r[it->i]))[1], P.Boundaries[it->j/2][4], P.Boundaries[it->j/2][5], tmpvel[0], tmpvel[1]) ; fflush(stdout) ;
                     C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, tmpvel, *it) ;
                 }
+                else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ELLIPSE))
+                {
+                    assert((d==2)) ; 
+                    std::vector<double> tmpcn(2) ;                     
+                    #pragma GCC diagnostic push
+                    #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+                    uint64_t c=((uint64_t)(it->ghostdir) <<32 | (uint64_t)(it->ghost)) ;
+                    double tparam = *reinterpret_cast<double*>(&c) ; 
+                    #pragma GCC diagnostic pop
+                    tmpcn[0]=X[it->i][0]-(P.Boundaries[it->j/2][4]+P.Boundaries[it->j/2][0]*cos(tparam)) ; 
+                    tmpcn[1]=X[it->i][1]-(P.Boundaries[it->j/2][5]+P.Boundaries[it->j/2][1]*sin(tparam)) ; 
+                    tmpcn/=sqrt(tmpcn[0]*tmpcn[0]+tmpcn[1]*tmpcn[1]);
+                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;
+                }
                 else
                 {
 
@@ -545,6 +576,8 @@ public:
 
             Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
             }
+            
+            //fprintf(stderr, "%g %g\n", X[0][0], X[0][1]) ; 
         }
 
         if (P.wallforcecompute || P.wallforcecomputed) MP.delayedwall_clean() ;
