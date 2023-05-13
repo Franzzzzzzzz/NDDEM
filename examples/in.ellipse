@@ -1,0 +1,33 @@
+# Incline plane flow
+#directory /Users/FGuillard/Dropbox/DEM_ND/Samples/LonelyD2
+directory Output
+dimensions 2 1
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL -10 10
+boundary 1 WALL -10 10
+boundary 2 ELLIPSE 7 5 0 0
+
+location 0 0 0
+velocity 0 0.1 0.1
+
+gravity 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+set gradientdescent_gamma 0.01
+
+set T 5000
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+#set dumps MAT with 0
+#set dumps VTK with 0
+set tdump 1000
+EOF
