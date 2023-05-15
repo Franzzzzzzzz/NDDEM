@@ -43,11 +43,10 @@ boundary_select.style.padding = "5px 10px";
 boundary_select.style.border_radius = "11px";
 boundary_select.style.text_align = "center";
 let options = [
-               'Ellipse',
-                   'Square',
-               'Circle',
+               'Square',
                'Triangle',
-
+               'Circle',
+               'Ellipse',
             ];
 //Create and append the options
 for (var i = 0; i < options.length; i++) {
@@ -353,8 +352,8 @@ function finish_setup() {
         S.simu_interpret_command("boundary 0 WALL -"+String(2*params.L)+" "+String(2*params.L));
         S.simu_interpret_command("boundary 1 WALL -"+String(2*params.L)+" "+String(2*params.L));
         S.simu_interpret_command("boundary "+String(params.dimension)+" ELLIPSE "+String(params.L)+ " " + String(params.L*params.ellipse_ratio) + " 0 0"); // radius x, radius y, centre x, centre y
-        S.simu_interpret_command("set gradientdescent_gamma 6e-9");
-        S.simu_interpret_command("set gradientdescent_tol 1e-11");
+        S.simu_interpret_command("set gradientdescent_gamma 100");
+        S.simu_interpret_command("set gradientdescent_tol 1e-5");
     } else if ( boundary_select.value === "Triangle" ) {
         params.H = Math.sqrt(3*params.L*params.L);
         S.simu_interpret_command("location 0 0 "+String(-params.H/6.));
