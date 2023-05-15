@@ -156,7 +156,8 @@ async function init() {
     scene.add( dirLight );
 
     SPHERES.add_spheres(S,params,scene);
-
+    
+    RAYCAST.add_raycaster_listeners(S, camera, params);
     RAYCAST.add_ghosts(scene, 2000, params.average_radius/4., 0xeeeeee);
 
 
@@ -198,7 +199,7 @@ function onWindowResize(){
 function animate() {
     requestAnimationFrame( animate );
     SPHERES.move_spheres(S,params);
-    RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
+    // RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
 
     S.simu_step_forward(50);
     // CGHANDLER.update_2d_cg_field(S,params);
