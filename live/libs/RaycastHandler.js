@@ -6,6 +6,8 @@ import {
     Color
 } from "three";
 
+import { spheres } from "./SphereHandler";
+
 const raycaster = new Raycaster();
 const mouse = new Vector2();
 let intersection_plane = new Plane();
@@ -15,23 +17,29 @@ let INTERSECTED = null;
 let last_intersection = null;
 let locked_particle = null;
 let ref_location, old_ref_location;
-let camera;
+let S, camera, params;
 let vel = [];
 let last_time = Date.now();
 
 let data_points
 
-window.addEventListener( 'mousemove', onMouseMove, false );
-window.addEventListener( 'mousedown', (e) => { onSelectParticle(e,camera) }, false );
-window.addEventListener( 'mouseup', (e) => { onDeselectParticle() }, false );
+export function add_raycaster_listeners(s, c, p) {
+    S = s;
+    camera = c;
+    params = p;
+    window.addEventListener( 'mousemove', onMouseMove, false );
+    window.addEventListener( 'mousedown', (e) => { onSelectParticleMouse(e) }, false );
+    window.addEventListener( 'mouseup', (e) => { onDeselectParticle() }, false );
 
-window.addEventListener( 'touchmove', onTouchMove, false );
-window.addEventListener( 'touchstart', (e) => { onSelectParticle(e,camera) }, false );
-window.addEventListener( 'touchend', (e) => { onDeselectParticle() }, false );
+    window.addEventListener( 'touchmove', onTouchMove, false );
+    window.addEventListener( 'touchstart', (e) => { onSelectParticleTouch(e) }, false );
+    window.addEventListener( 'touchend', (e) => { onDeselectParticle() }, false );
+}
 
 // window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
 
 function onMouseMove( event ) {
+    // event.preventDefault();
 
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
@@ -42,12 +50,19 @@ function onMouseMove( event ) {
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
+
+    calculate_intersection(mouse);
+
+    animate_locked_particle();
 }
 
 function onTouchMove( event ) {
+    // event.preventDefault();
+    // console.debug('touch move')
 
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
+    
     let new_x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
     let new_y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
     let dt = Date.now() - last_time;
@@ -55,11 +70,14 @@ function onTouchMove( event ) {
     mouse.x = new_x;
     mouse.y = new_y;
     last_time = Date.now();
+
+    calculate_intersection(mouse);
+
+    animate_locked_particle();
 }
 
-export function animate_locked_particle(S, c, spheres, params) {
-    camera = c
-    calculate_intersection(camera, spheres, params);
+export function animate_locked_particle() {
+
     if ( locked_particle !== null ) {
         raycaster.ray.intersectPlane( intersection_plane, ref_location);
         if ( params.boundary === undefined ) { // lazy version
@@ -115,39 +133,69 @@ export function animate_locked_particle(S, c, spheres, params) {
     
 }
 
-function onSelectParticle( event, camera ) {
-    
-    // console.log(camera.getWorldDirection() )
-    // if ( event.code === 'Enter' ) {
-        if ( locked_particle === null  && INTERSECTED !== null ) {
-            reset_ghosts();
-            locked_particle = INTERSECTED;
-            // console.log(locked_particle);
-            ref_location = locked_particle.position;
+function onSelectParticleMouse( event ) {
+    // console.debug('select particle');
+    // console.debug(locked_particle, INTERSECTED)
 
-            camera.getWorldDirection( camera_direction ); // update camera direction
-            // set the plane for the particle to move along to be orthogonal to the camera
-            intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
-                                                              locked_particle.position );
-        }
-        else {
-            locked_particle = null;
-        }
+
+    // if no particle is currently caught but I AM intersecting with something
+    if ( locked_particle === null  && INTERSECTED !== null ) {
+        // console.log('CAUGHT')
+        reset_ghosts();
+        locked_particle = INTERSECTED;
+        // console.log(locked_particle);
+        ref_location = locked_particle.position;
+
+        camera.getWorldDirection( camera_direction ); // update camera direction
+        // set the plane for the particle to move along to be orthogonal to the camera
+        intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
+                                                            locked_particle.position );
+    }
+    else {
+        locked_particle = null;
+    }
+        
+    // }
+}
+
+function onSelectParticleTouch( event ) {
+    // console.debug('select particle by touch');
+    // console.debug(locked_particle, INTERSECTED)
+    mouse.x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
+    calculate_intersection(mouse)
+    // if no particle is currently caught but I AM intersecting with something
+    if ( locked_particle === null  && INTERSECTED !== null ) {
+        // console.log('CAUGHT')
+        reset_ghosts();
+        locked_particle = INTERSECTED;
+        // console.log(locked_particle);
+        ref_location = locked_particle.position;
+
+        camera.getWorldDirection( camera_direction ); // update camera direction
+        // set the plane for the particle to move along to be orthogonal to the camera
+        intersection_plane.setFromNormalAndCoplanarPoint( camera_direction,
+                                                            locked_particle.position );
+    }
+    else {
+        locked_particle = null;
+    }
         
     // }
 }
 
 function onDeselectParticle( ) {
+    // console.debug('deselect particle');
     locked_particle = null;
 }
 
-function calculate_intersection(camera, spheres, params) {
+function calculate_intersection(coords) {
     // update the picking ray with the camera and mouse position
-    raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera( coords, camera );
 
     const intersects = raycaster.intersectObjects( spheres.children );
     if ( intersects.length > 0 ) { // if found something
-        // console.log(intersects);
+        
         if ( INTERSECTED != intersects[ 0 ].object ) { // if not the same as last time
                 if ( INTERSECTED !== null ) {
                     // INTERSECTED.material.uniforms.ambient.value = 1.0;
@@ -178,6 +226,7 @@ function calculate_intersection(camera, spheres, params) {
             INTERSECTED = null;
         }
     }
+    // console.debug(INTERSECTED);
 }
 
 export function add_ghosts(scene, N=1000, radius=0.005, color=0xeeeeee) {

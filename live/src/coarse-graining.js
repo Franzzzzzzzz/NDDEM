@@ -182,6 +182,8 @@ async function init() {
     // controls.update();
 
     window.addEventListener( 'resize', onWindowResize, false );
+    RAYCAST.add_raycaster_listeners(S, camera, params);
+
 
     animate();
 }
@@ -202,7 +204,7 @@ function onWindowResize(){
 function animate() {
     requestAnimationFrame( animate );
     SPHERES.move_spheres(S,params);
-    RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
+    // RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
     if ( !params.paused ) {
         S.simu_step_forward(15);
         CGHANDLER.update_2d_cg_field(S,params);
