@@ -23,10 +23,13 @@ let last_time = Date.now();
 
 let data_points
 
-export function add_raycaster_listeners(s, c, p) {
+export function update_world(s, c, p) {
     S = s;
     camera = c;
     params = p;
+}
+
+// export function add_raycaster_listeners() {
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'mousedown', (e) => { onSelectParticleMouse(e) }, false );
     window.addEventListener( 'mouseup', (e) => { onDeselectParticle() }, false );
@@ -34,7 +37,7 @@ export function add_raycaster_listeners(s, c, p) {
     window.addEventListener( 'touchmove', onTouchMove, false );
     window.addEventListener( 'touchstart', (e) => { onSelectParticleTouch(e) }, false );
     window.addEventListener( 'touchend', (e) => { onDeselectParticle() }, false );
-}
+// }
 
 // window.addEventListener( 'keypress', (e) => { onSelectParticle(e,camera) }, false );
 
@@ -51,9 +54,10 @@ function onMouseMove( event ) {
     mouse.y = new_y;
     last_time = Date.now();
 
-    calculate_intersection(mouse);
-
-    animate_locked_particle();
+    if ( camera !== undefined ) {
+        calculate_intersection(mouse);
+        animate_locked_particle();
+    }
 }
 
 function onTouchMove( event ) {

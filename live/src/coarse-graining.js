@@ -182,7 +182,7 @@ async function init() {
     // controls.update();
 
     window.addEventListener( 'resize', onWindowResize, false );
-    RAYCAST.add_raycaster_listeners(S, camera, params);
+    RAYCAST.update_world(S, camera, params);
 
 
     animate();
