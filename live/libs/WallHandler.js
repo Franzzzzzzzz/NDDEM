@@ -50,7 +50,7 @@ const arrow_material = new MeshLambertMaterial({ color: arrow_colour });
 
 export function add_circle_wall(params, scene) { 
     if (left !== undefined) { scene.remove(left); }
-    const circle_geometry = new THREE.RingGeometry( params.R+params.r_max, params.R+params.r_max+params.thickness, 100, 1 );
+    const circle_geometry = new THREE.RingGeometry( params.R, params.R+params.thickness, 100, 1 );
     left = new THREE.Mesh( circle_geometry, wall_material );
     left.rotation.x = Math.PI;
     scene.add( left );
