@@ -62,13 +62,40 @@ export function animate_locked_particle(S, c, spheres, params) {
     calculate_intersection(camera, spheres, params);
     if ( locked_particle !== null ) {
         raycaster.ray.intersectPlane( intersection_plane, ref_location);
-        if ( 'aspect_ratio' in params ) {
-            ref_location.clamp( new Vector3( -params.L*params.aspect_ratio+params.r_max,-params.L+params.r_max, 0 ),
-                                new Vector3(  params.L*params.aspect_ratio-params.r_max, params.L-params.r_max, 0 ) );
+        if ( params.boundary === undefined ) { // lazy version
+            if ( 'aspect_ratio' in params ) {
+                ref_location.clamp( new Vector3( -params.L*params.aspect_ratio+params.r_max,-params.L+params.r_max, 0 ),
+                                    new Vector3(  params.L*params.aspect_ratio-params.r_max, params.L-params.r_max, 0 ) );
 
-        } else {
-            ref_location.clamp( new Vector3( -params.L+params.r_max, -params.L+params.r_max, 0),
-                                new Vector3(  params.L-params.r_max,  params.L-params.r_max, 0) );
+            } else {
+                ref_location.clamp( new Vector3( -params.L+params.r_max, -params.L+params.r_max, 0),
+                                    new Vector3(  params.L-params.r_max,  params.L-params.r_max, 0) );
+            }
+        } else { // if explicit boundary is defined
+            if ( params.boundary === 'Square' ) {
+                ref_location.clamp( new Vector3( -params.L+params.r_max, -params.L+params.r_max, 0),
+                                    new Vector3(  params.L-params.r_max,  params.L-params.r_max, 0) );
+            } else if ( params.boundary === 'Triangle' ) {
+                ref_location.y = THREE.MathUtils.clamp(ref_location.y, -params.H/2.+params.r_max, params.H/2.-params.r_max );
+                // let x_max = (params.L - ref_location.y)/2.0;
+                let x_max = -params.L*ref_location.y/params.H + params.L/2.;
+                ref_location.x = THREE.MathUtils.clamp(ref_location.x, -x_max+params.r_max, x_max-params.r_max );
+                // console.log(ref_location);
+            } else if ( params.boundary === 'Circle' ) {
+                let r_cur = Math.sqrt(ref_location.x*ref_location.x + ref_location.y*ref_location.y);
+                if ( r_cur > params.R - params.r_max ) {
+                    ref_location.x *= (params.R - params.r_max)/r_cur;
+                    ref_location.y *= (params.R - params.r_max)/r_cur;
+                }
+            } else if ( params.boundary === 'Ellipse' ) {
+                let l1 = params.R - params.r_max;
+                let l2 = params.R*params.ellipse_ratio - params.r_max;
+                let l_cur = Math.sqrt(ref_location.x*ref_location.x/l1/l1 + ref_location.y*ref_location.y/l2/l2);
+                if ( l_cur > 1 ) {
+                    ref_location.x /= l_cur;///l1;
+                    ref_location.y /= l_cur;//l2;
+                }
+            }
         }
         // vel = [ref_location.x - locked_particle.position.x,ref_location.x - locked_particle.position.x];
         // console.log(vel);
@@ -76,9 +103,12 @@ export function animate_locked_particle(S, c, spheres, params) {
         if ( vel.length > 0 ) {
             let max_mag = 5; // HACK: TOTALLY ARBITRARY
             let vel_mag = Math.sqrt(vel[0]*vel[0] + vel[1]*vel[1]);
-            let limited_vel_mag = Math.min(vel_mag, max_mag);
-            let limited_vel = [limited_vel_mag*vel[0]/vel_mag, limited_vel_mag*vel[1]/vel_mag];
-            S.simu_setVelocity(locked_particle.NDDEM_ID,limited_vel);
+            if ( vel_mag > 0.0 ) {
+                let limited_vel_mag = Math.min(vel_mag, max_mag);
+                let limited_vel = [limited_vel_mag*vel[0]/vel_mag, limited_vel_mag*vel[1]/vel_mag];
+                S.simu_setVelocity(locked_particle.NDDEM_ID,limited_vel);
+                // console.log(limited_vel)
+            }
         }
 
     }

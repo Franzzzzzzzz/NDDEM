@@ -42,10 +42,12 @@ boundary_select.style.font_size = "large";
 boundary_select.style.padding = "5px 10px";
 boundary_select.style.border_radius = "11px";
 boundary_select.style.text_align = "center";
-let options = ['Square',
+let options = [
+               'Ellipse',
+                   'Square',
                'Circle',
                'Triangle',
-            //    'Ellipse'
+
             ];
 //Create and append the options
 for (var i = 0; i < options.length; i++) {
@@ -76,7 +78,7 @@ var params = {
     d4: {cur:0},
     r_max: 0.005,
     r_min: 0.005,
-    particle_density: 1,
+    particle_density: 2700,
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -90,6 +92,8 @@ var params = {
     particle_opacity: 1,
     F_mag_max: 0.005,
     aspect_ratio: undefined,
+    ellipse_ratio: 0.75,
+    boundary : 'Square',
 }
 
 // params.aspect_ratio = window.innerHeight / window.innerWidth;
@@ -207,6 +211,8 @@ function animate() {
 }
 
 function update_boundary() {
+    params.boundary = boundary_select.value; // yay duplication!
+
     if ( S !== undefined ) {
         S.simu_finalise();
         reset_particle();
@@ -250,11 +256,9 @@ function update_boundary() {
         WALLS.add_circle_wall(params, scene);
         console.log(WALLS.left);
     } else if ( boundary_select.value === 'Triangle' ) {
-        let H = Math.sqrt(3*params.L*params.L);
-
         WALLS.add_left(params, scene); // this is the bottom wall
         WALLS.left.scale.x = 2*params.L + params.thickness;
-        WALLS.left.position.y = -H/2.;
+        WALLS.left.position.y = -params.H/2.;
        
         WALLS.add_back(params, scene); // this is the slanted wall on the right
         WALLS.back.scale.x = 2*params.L + params.thickness;
@@ -269,7 +273,10 @@ function update_boundary() {
         WALLS.front.position.y = 0;
         
     } else if ( boundary_select.value === 'Ellipse' ) {
-
+        params.R = params.L;
+        WALLS.add_circle_wall(params, scene);
+        WALLS.left.scale.y = params.ellipse_ratio;
+        console.log(WALLS.left);
     }
     WALLS.wall_material.wireframe = false;
     reset_particle();
@@ -343,13 +350,17 @@ function finish_setup() {
         S.simu_interpret_command("boundary 0 WALL -"+String(2*params.L)+" "+String(2*params.L));
         S.simu_interpret_command("boundary 1 WALL -"+String(2*params.L)+" "+String(2*params.L));
     } else if ( boundary_select.value === "Ellipse" ) {
-
+        S.simu_interpret_command("boundary 0 WALL -"+String(2*params.L)+" "+String(2*params.L));
+        S.simu_interpret_command("boundary 1 WALL -"+String(2*params.L)+" "+String(2*params.L));
+        S.simu_interpret_command("boundary "+String(params.dimension)+" ELLIPSE "+String(params.L)+ " " + String(params.L*params.ellipse_ratio) + " 0 0"); // radius x, radius y, centre x, centre y
+        S.simu_interpret_command("set gradientdescent_gamma 6e-9");
+        S.simu_interpret_command("set gradientdescent_tol 1e-11");
     } else if ( boundary_select.value === "Triangle" ) {
-        let H = Math.sqrt(3*params.L*params.L);
-        S.simu_interpret_command("location 0 0 "+String(-H/6.));
-        S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(-params.L)+','+String(-H/2.)+'],[0,'+String(H/2)+']]},{"dimensionality":1,"vertices":[['+String(params.L)+','+String(-H/2.)+'],[0,'+String(H/2.)+']]}]}');
+        params.H = Math.sqrt(3*params.L*params.L);
+        S.simu_interpret_command("location 0 0 "+String(-params.H/6.));
+        S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(-params.L)+','+String(-params.H/2.)+'],[0,'+String(params.H/2)+']]},{"dimensionality":1,"vertices":[['+String(params.L)+','+String(-params.H/2.)+'],[0,'+String(params.H/2.)+']]}]}');
         S.simu_interpret_command("boundary 0 WALL -"+String(10*params.L)+" "+String(10*params.L));
-        S.simu_interpret_command("boundary 1 WALL -"+String(H/2.)+" "+String(10*params.L));
+        S.simu_interpret_command("boundary 1 WALL -"+String(params.H/2.)+" "+String(10*params.L));
     }
 
     S.simu_finalise_init () ;
