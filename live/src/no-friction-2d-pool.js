@@ -143,9 +143,6 @@ async function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111111 );
 
-    update_boundary();
-
-
     const hemiLight = new THREE.HemisphereLight();
     hemiLight.intensity = 0.35;
     scene.add( hemiLight );
@@ -155,9 +152,10 @@ async function init() {
     dirLight.castShadow = true;
     scene.add( dirLight );
 
+    update_boundary();
     SPHERES.add_spheres(S,params,scene);
-    
-    RAYCAST.add_raycaster_listeners(S, camera, params);
+
+    RAYCAST.update_world(S, camera, params)
     RAYCAST.add_ghosts(scene, 2000, params.average_radius/4., 0xeeeeee);
 
 
@@ -235,7 +233,7 @@ function update_boundary() {
     WALLS.remove_all_walls(scene);
 
     if ( boundary_select.value === "Square" ) {
-        console.log(scene);
+        // console.log(scene);
         WALLS.add_back(params, scene);
         WALLS.add_left(params, scene);
         WALLS.add_right(params, scene);
@@ -254,20 +252,19 @@ function update_boundary() {
     } else if ( boundary_select.value === 'Circle' ) {
         params.R = params.L;
         WALLS.add_circle_wall(params, scene);
-        console.log(WALLS.left);
     } else if ( boundary_select.value === 'Triangle' ) {
         WALLS.add_left(params, scene); // this is the bottom wall
-        WALLS.left.scale.x = 2*params.L + params.thickness;
+        WALLS.left.scale.x = 2*params.L + 0.5*params.thickness;
         WALLS.left.position.y = -params.H/2.;
        
         WALLS.add_back(params, scene); // this is the slanted wall on the right
-        WALLS.back.scale.x = 2*params.L + params.thickness;
+        WALLS.back.scale.x = 2*params.L + 0.5*params.thickness;
         WALLS.back.rotateZ(Math.PI/6.);
         WALLS.back.position.x = params.L/2.;
         WALLS.back.position.y = 0;
 
         WALLS.add_front(params, scene); // this is the slanted wall on the right
-        WALLS.front.scale.x = 2*params.L + params.thickness;
+        WALLS.front.scale.x = 2*params.L + 0.5*params.thickness;
         WALLS.front.rotateZ(-Math.PI/6.);
         WALLS.front.position.x = -params.L/2.;
         WALLS.front.position.y = 0;
@@ -276,10 +273,10 @@ function update_boundary() {
         params.R = params.L;
         WALLS.add_circle_wall(params, scene);
         WALLS.left.scale.y = params.ellipse_ratio;
-        console.log(WALLS.left);
     }
     WALLS.wall_material.wireframe = false;
     reset_particle();
+    RAYCAST.update_world(S, camera, params);
 }
 
 function reset_particle(){
