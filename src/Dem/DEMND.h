@@ -236,7 +236,7 @@ public:
             Ghost[i]=0 ; Ghost_dir[i]=0 ;
             uint32_t mask=1 ;
 
-            for (int j=0 ; j<d ; j++, mask<<=1)
+            for (size_t j=0 ; j<P.Boundaries.size() ; j++, mask<<=1)
             {
                 if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
                 if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
@@ -305,7 +305,7 @@ public:
 
             // Contact detection between particles and walls
             tmpcp.setinfo(CLw.default_action());
-            tmpcp.i=i ;
+            tmpcp.i=i ; tmpcp.ghost=0 ;
             for (size_t j=0 ; j<P.Boundaries.size() ; j++) // Wall contacts
             {
                     if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
@@ -422,6 +422,7 @@ public:
             }
             else
             {
+                printf("%d\n", it->ghost) ; fflush(stdout) ; 
                 (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
             }
