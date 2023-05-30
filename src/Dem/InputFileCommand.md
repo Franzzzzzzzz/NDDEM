@@ -73,11 +73,12 @@ These command have a single behaviour, described here.
 - `ContactModel [Hooke|Hertz]`: set contact model. 
 - `boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo`: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:
   - `MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY`
-  - `SPHERE ?????`: not sure how the syntax work ??????
+  - `SPHERE RADIUS X1 ... XD`: sphere of radius RADIUS, center at the X location
   - `ROTATINGSPHERE RADIUS X1 ... XD R12 R13 ... R1D R23 ... R_D-1_D`: Rotating sphere of radius RADIUS, center at the X location, rotation matrix given by the R components (upper right corner of the skew-symetric rotation matrix). 
   - `PBCLE LOCMIN LOCMAX VELOCITY`: Lees-Edward boundary condition. Should be in dimension 0. 
   - `ELLIPSE RX RY CX CY`: Ellipse wall (dim 2 only)
   - `allother LOCMIN LOCMAX`
+  - Special command: `boundary DIM REMOVE` Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution. 
 - `rigid`: TODO (in development) ...
 - `mesh [file|translate|rotate|export] ...`
   - `file filename.json`: load a mesh file in json format. (in development)

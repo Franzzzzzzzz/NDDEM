@@ -45,9 +45,9 @@ public:
     }
   void disp_share(); ///< Display the # of particle on each thread. 
   bool ismine (int ID, int j) {if (j>=share[ID] && j<share[ID+1]) return true ; return false ; } ///< Check if a particle j belongs to the thread ID. 
-  void delaying (int ID, int j, Action & act) ; ///< Record the action to be added later to the relevent atom in sequencial settings, avoid potential race condition if an action was added to an atom that is not owned by the thread. This is for a particle-particle contact
+  void delaying (int ID, int j, Action<d> & act) ; ///< Record the action to be added later to the relevent atom in sequencial settings, avoid potential race condition if an action was added to an atom that is not owned by the thread. This is for a particle-particle contact
   void delayed_clean() ; ///< Clean the record list. 
-  void delayingwall (int ID, int j, Action & act) ; ///< Record the action on the wall. Only usefull if the force on the wall needs to be calculated
+  void delayingwall (int ID, int j, Action<d> & act) ; ///< Record the action on the wall. Only usefull if the force on the wall needs to be calculated
   void delayedwall_clean() ; ///< Clean the record of the force on the wal. 
   void load_balance() ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations. 
 
@@ -60,11 +60,11 @@ public:
   int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
 
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
-  vector <vector <Action> > delayed ; ///< Records the delayed Action
+  vector <vector <Action<d>> > delayed ; ///< Records the delayed Action
   vector <vector <int> > delayedj ; ///< Records the j id of the particle in the associated delayed action
   vector <uint> delayed_size ; ///< Max length of the delayed vector for each thread. Can grow as needed on call to delaying()
 
-  vector <vector <Action> > delayedwall ; ///< Records the delayed Action
+  vector <vector <Action<d>> > delayedwall ; ///< Records the delayed Action
   vector <vector <int> > delayedwallj ; ///< Records the j id of the wall in the associated delayed action
   vector <uint> delayedwall_size ; ///< Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()
 
@@ -134,7 +134,7 @@ share[P]=N ;
 
 //-------------------------------------------------
 template <int d>
-void Multiproc<d>::delaying (int ID, int j, Action & act)
+void Multiproc<d>::delaying (int ID, int j, Action<d> & act)
 {
   delayed_size[ID]++ ;
   if (delayed_size[ID] < delayedj[ID].size())
@@ -151,7 +151,7 @@ void Multiproc<d>::delaying (int ID, int j, Action & act)
   }
 }
 template <int d>
-void Multiproc<d>::delayingwall (int ID, int j, Action & act)
+void Multiproc<d>::delayingwall (int ID, int j, Action<d> & act)
 {
   delayedwall_size[ID]++ ;
   if (delayedwall_size[ID] < delayedwallj[ID].size())
@@ -301,7 +301,7 @@ auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, cv2d &Boundaries)
     {  
        ExportData expid= static_cast<ExportData>(1) ; 
        ExportData expall=exprt ;
-       auto [loc,branch] = contact.compute_branchvector(X,Boundaries,d) ; 
+       auto [loc,branch] = contact.compute_branchvector(X,Boundaries) ; 
        while (static_cast<int>(expall)>0)
        {
          if (expall & static_cast<ExportData>(1))

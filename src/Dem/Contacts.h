@@ -31,17 +31,17 @@ public:
     vector < double > vrel ; ///< Relative velocity
 
     void particle_particle   ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime) ; ///< Force & torque between 2 particles
+                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) ; ///< Force & torque between 2 particles
     void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                               cv1d & cn, cp & Contact) ; ///< Force & torque between a particle and a wall
+                               cv1d & cn, cp<d> & Contact) ; ///< Force & torque between a particle and a wall
     void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                               cv1d & cn, cv1d & Vj, cp & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
-    void particle_mesh       ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm & Contact) ; ///< Force & torque between particle and mesh
+                               cv1d & cn, cv1d & Vj, cp<d> & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
+    void particle_mesh       ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm<d> & Contact) ; ///< Force & torque between particle and mesh
     void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
+                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
 
     void particle_ghost_regular (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime)
+                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime)
     {
         vector <double> loc (d, 0) ;
         loc=Xj ;
@@ -57,7 +57,7 @@ public:
 
 
     void particle_ghost_LE (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
+                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
     {
         vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ;
@@ -118,7 +118,7 @@ public:
         }
     }///< Move ghosts through the regular periodic boundary conditions (non Lees-Edward).
     
-    Action Act ; ///< Resulting Action
+    Action<d> Act ; ///< Resulting Action
 
 private:
   /** Temporary variables for internal use, to avoid reallocation at each call */
@@ -158,13 +158,13 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
 //---------------------- particle particle contact ----------------------------
 template <int d>
 void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp & Contact, bool isdumptime)
+                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime)
 {
   double kn, kt, gamman, gammat ;
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;
-  if (ovlp<=0) {Act.setzero(d) ; return ;}
+  if (ovlp<=0) {Act.setzero() ; return ;}
   //printf("%g %g %g %g\n", ri, rj, Xi[2], Xj[2]) ; fflush(stdout) ;
   Tools<d>::vMinus(cn, Xi, Xj) ; //cn=(Xi-Xj) ;
   cn /= contactlength ;
@@ -246,12 +246,12 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 //---------------------- particle wall contact ----------------------------
 template <int d>
 void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                  cv1d & cn, cp & Contact)
+                                  cv1d & cn, cp<d> & Contact)
                                   //int j, int orient, cp & Contact)
 {
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
-  if (ovlp<=0) {Act.setzero(d) ; return ;}
+  if (ovlp<=0) {Act.setzero() ; return ;}
 
   //Relative velocity at contact
   rri = -cn * (ri-ovlp/2.) ;
@@ -314,12 +314,12 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
 //---------------------- particle moving wall contact ----------------------------
 template <int d>
 void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                                        cv1d & cn, cv1d & Vj, cp & Contact)
+                                        cv1d & cn, cv1d & Vj, cp<d> & Contact)
 {
   contactlength=Contact.contactlength ;
 
   ovlp=ri-contactlength ;
-  if (ovlp<=0) {Act.setzero(d) ; return ;}
+  if (ovlp<=0) {Act.setzero() ; return ;}
 
   //Relative velocity at contact
   Tools<d>::vMul(rri, cn, ovlp/2.-ri) ; // rri = -cn * (ri-ovlp/2.) ;
@@ -381,12 +381,12 @@ void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, dou
 
 //------------------------- Particle mesh contact --------------------------------------
 template <int d>
-void Contacts<d>::particle_mesh ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm & Contact)
+void Contacts<d>::particle_mesh ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm<d> & Contact)
 {
   contactlength=Contact.contactlength ;
 
   ovlp=ri-contactlength ;
-  if (ovlp<=0) {Act.setzero(d) ; return ;}
+  if (ovlp<=0) {Act.setzero() ; return ;}
   Tools<d>::vMinus(cn, Xi, Contact.contactpoint) ; //cn=(Xi-Xj) ;
   cn /= contactlength ;
 

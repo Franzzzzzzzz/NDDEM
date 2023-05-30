@@ -299,7 +299,7 @@ public :
 
              if (outflags & ExportData::BRANCHVECTOR)
              {
-                auto [loc,branch] = contact.compute_branchvector(X,Boundaries, d) ; 
+                auto [loc,branch] = contact.compute_branchvector(X,Boundaries) ; 
                
                 for (int dd = 0 ; dd<d ; dd++) fprintf(out, "%g ", branch[dd]) ;
              }
@@ -694,6 +694,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     else if (!strcmp(line, "ROTATINGSPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::ROTATINGSPHERE) ; Boundaries[id].resize(4+d+d*(d-1)/2,0) ; }
     else if (!strcmp(line, "PBCLE")) {Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(6,0) ; }
     else if (!strcmp(line, "ELLIPSE")) {Boundaries[id][3]=static_cast<int>(WallType::ELLIPSE) ; Boundaries[id].resize(5,0) ; }
+    else if (!strcmp(line, "REMOVE")) { Boundaries.erase(Boundaries.begin() + id); return ; }
     else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
     in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
     Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
@@ -923,8 +924,11 @@ void Parameters<d>::init_locations (char *line, v2d & X)
     }
     else if (!strcmp(line, "insphere"))
     {
-        printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
-
+        //printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
+        auto w = std::find_if(Boundaries.begin(), Boundaries.end(), [](auto u){return (u[3]==static_cast<int>(WallType::SPHERE) || u[3]==static_cast<int>(WallType::ROTATINGSPHERE)) ; }) ; 
+        if ( w== Boundaries.end()) {printf("ERR: the spherical wall cannot be found\n") ; fflush(stdout) ; } 
+        int id = w-Boundaries.begin() ; 
+        
         for (int i=0 ; i<N ; i++)
         {
          double dst=0 ;
@@ -933,10 +937,10 @@ void Parameters<d>::init_locations (char *line, v2d & X)
             dst=0 ;
             for(int dd=0 ; dd < d ; dd++)
             {
-              X[i][dd] = (rand()*Boundaries[d][0]*2-Boundaries[d][0]) + Boundaries[d][4+dd] ;
-              dst += (Boundaries[d][4+dd]-X[i][dd])*(Boundaries[d][4+dd]-X[i][dd]) ;
+              X[i][dd] = (rand()*Boundaries[id][0]*2-Boundaries[id][0]) + Boundaries[id][4+dd] ; 
+              dst += (Boundaries[id][4+dd]-X[i][dd])*(Boundaries[id][4+dd]-X[i][dd]) ;
             }
-         } while ( sqrt(dst) > Boundaries[d][0]-r[i]) ;
+         } while ( sqrt(dst) > (Boundaries[id][0]-2*r[i])) ;
         }
     }
     else if (!strcmp(line, "roughinclineplane"))

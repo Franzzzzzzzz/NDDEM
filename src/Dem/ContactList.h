@@ -14,13 +14,19 @@
 // ------------------------------------ Action class -------------------------------------------
 /** \brief Handle force and torque contact information
  * */
+template <int d>
 class Action {
 public :
+    Action() : Fn(d,0), Ft(d,0), Torquei(d*(d-1)/2,0), Torquej(d*(d-1)/2,0), vn(d,0), vt(d,0) {} 
     vector <double> Fn, Ft, Torquei, Torquej ;
     vector <double> vn, vt ;
-    void set (v1d a, v1d b, v1d c, v1d d) {Fn=a ; Ft=b ; Torquei=c ; Torquej=d ; }
+    void set (v1d a, v1d b, v1d c, v1d dd) {Fn=a ; Ft=b ; Torquei=c ; Torquej=dd ; }
     void setvel(v1d vvn, v1d vvt) {vn=vvn; vt=vvt ;}
-    void setzero (int d) {Fn=(v1d(d,0)) ; Ft=(v1d(d,0)) ; vn=(v1d(d,0)) ; vt=(v1d(d,0)) ; Torquei=(v1d(d*(d-1)/2,0)) ; Torquej=(v1d(d*(d-1)/2)) ; }
+    void setzero () 
+    {
+        for (int dd=0 ; dd<d ; dd++) Fn[dd]=Ft[dd]=vn[dd]=vt[dd]=0 ;    
+        for (int dd=0 ; dd<d*(d-1)/2 ; dd++) Torquei[dd]=Torquej[dd]=0 ;    
+    }
     
     vector<double> Fn_el, Fn_visc, Ft_el, Ft_visc, Ft_fric ; 
     bool Ft_isfric ;  
@@ -30,7 +36,8 @@ public :
 } ;
 /** \brief Action on a specific particle for a specific duration
  * */
-class SpecificAction: public Action {
+template <int d>
+class SpecificAction: public Action<d> {
 public :
     int id ;
     int duration ;
@@ -47,10 +54,11 @@ public :
  *  \warning The number of dimensions is limited to sizeof(uint32_t) because of these ghost, as they are using 32 bit datatype. There is a risk of overflowing the datatype if using PBC at higher than 32 dimensions, or if using a PBC in dimension 32 (since the last bit could be interpreted as a sign bit). Walls in dimensions higher than 32 may be ok, but without guarantee.
  *  \todo Ghosts should be improved in order to use either a bitset datatype, or a custom datatype, to avoid the limitation to sizeof(uint32_t) in the number of dimension.
  */
+template <int d>
 class cp
 {
 public:
- cp (int ii, int jj, int d, double ctlength, Action * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} ///< New contact creation
+ cp (int ii, int jj, double ctlength, Action<d> * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} ///< New contact creation
  cp(const cp& v) { *this=v ; }
  ~cp () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
  cp & operator= (const cp & c)
@@ -67,13 +75,13 @@ public:
      return *this ;
  } ///< Affect contact.
 
- Action & getinfo () {return *infos ; } ///< Returning stored information \warning Poorly tested
+ Action<d> & getinfo () {return *infos ; } ///< Returning stored information \warning Poorly tested
  //void setinfo (Action & a) {if (!infos) infos = new Action ; *infos=a ; }
- void setinfo (Action * a) {infos=a ; } ///< Set information for contact force.
- void saveinfo (Action & a) {
+ void setinfo (Action<d> * a) {infos=a ; } ///< Set information for contact force.
+ void saveinfo (Action<d> & a) {
      if (!owninfos)
      {
-         infos = new Action ;
+         infos = new Action<d> ;
          owninfos = true ;
      }
      infos->Fn = a.Fn ;
@@ -96,10 +104,10 @@ public:
  uint32_t ghost ; ///< Contain ghost information about ghost contact, cf detailed description
  uint32_t ghostdir ; ///< Contain ghost information about ghost direction, cf detailed description
  vector <double> tspr ; ///< Vector of tangential contact history
- Action * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested.
+ Action<d> * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested.
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
  
- std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, cv2d & Boundaries, int d)
+ std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, cv2d & Boundaries)
  {
     vector <double> loc (d, 0), branch (d, 0)  ;
     if ( Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (ghost & 1)==0)
@@ -133,14 +141,15 @@ public:
 } ;
 
 /** \brief Contact properties for mesh contacts (mainly), including contact point location, specialising cp. */
-class cpm : public cp {
+template <int d>
+class cpm : public cp<d> {
 public: 
-    cpm (int ii, int jj, int sid, int d, double ctlength, Action * default_action) : cp(ii,jj,d,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
-    cpm(const cpm& v): cp(v) {*this=v ;}
+    cpm (int ii, int jj, int sid, double ctlength, Action<d> * default_action) : cp<d>(ii,jj,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
+    cpm(const cpm& v): cp<d>(v) {*this=v ;}
     ~cpm () {} ///< Remove & clean contact
     cpm & operator= (const cpm & c)
     {
-     cp::operator=(c);
+     cp<d>::operator=(c);
      contactpoint = c.contactpoint ;
      submeshid = c.submeshid ; 
      return *this ;
@@ -158,27 +167,29 @@ class ContactList
 public:
  ContactList () {check_ghost=&ContactList::check_ghost_LE;}
  void reset() {it = v.begin() ;}  ///< Go to the contact list beginning
- int insert(const cp& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
+ int insert(const cp<d>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which opened.
- list <cp> v ; ///< Contains the list of contact
- Action * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
+ list <cp<d>> v ; ///< Contains the list of contact
+ Action<d> * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
 
  //void check_ghost    (uint32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
- void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact) ; ///< \deprecated Measure distance between a ghost and a particle
- void check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+ void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact) ; ///< \deprecated Measure distance between a ghost and a particle
+ void check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp,
                    int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.
- void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
- void (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, cp &,int startd, double partialsum, bitdim mask) ;
+ void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
+ void (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, cp<d> &,int startd, double partialsum, bitdim mask) ;
  void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
 
 private:
- list<cp>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
- Action def ; ///< Default action
+ typename list<cp<d>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
+ Action<d> def ; ///< Default action
 };
 
-inline bool operator< (const cp &a, const cp &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; } ///< The contact list is order in increasing order of index i, and for two identical i in increasing order of j.
-inline bool operator== (const cp &a, const cp &b) {return (a.i==b.i && a.j==b.j) ; } ///< Contact equivalence is based solely on the index of objects in contact i and j.
+template <int d>
+inline bool operator< (const cp<d> &a, const cp<d> &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; } ///< The contact list is order in increasing order of index i, and for two identical i in increasing order of j.
+template <int d>
+inline bool operator== (const cp<d> &a, const cp<d> &b) {return (a.i==b.i && a.j==b.j) ; } ///< Contact equivalence is based solely on the index of objects in contact i and j.
 
 //-------------------------------------------------
 /** \brief Handles lists of contacts with meshes
@@ -187,14 +198,14 @@ template <int d>
 class ContactListMesh
 {
 public:
- list <cpm> v ;    
- Action * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
+ list <cpm<d>> v ;    
+ Action<d> * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
  void reset() {it = v.begin() ;} ///< Go to the contact list beginning
  void finalise () { while (it!=v.end()) it=v.erase(it) ; }
- int insert(const cpm& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
+ int insert(const cpm<d>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
  
- bool check_mesh_dst_contact (Mesh<d> &mesh, cv1d & Xo, double r, cpm & c)
+ bool check_mesh_dst_contact (Mesh<d> &mesh, cv1d & Xo, double r, cpm<d> & c)
  {     
   std::vector<double> dotproducts (d) ;
   auto X = Xo-mesh.origin ;
@@ -298,8 +309,8 @@ public:
  }
   
 private: 
- list<cpm>::iterator it ;  ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
- Action def ; ///< Default action
+ typename list<cpm<d>>::iterator it ;  ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
+ Action<d> def ; ///< Default action
 } ; 
 
 
@@ -314,7 +325,7 @@ private:
  * ***************************************************************************************************/
 
 template <int d>
-int ContactList<d>::insert(const cp &a)
+int ContactList<d>::insert(const cp<d> &a)
 {
     while (it!=v.end() && (*it) < a)
     { it= v.erase(it) ; }
@@ -334,7 +345,7 @@ int ContactList<d>::insert(const cp &a)
 }
 //----------------------------------------------
 template <int d>
-int ContactListMesh<d>::insert(const cpm &a)
+int ContactListMesh<d>::insert(const cpm<d> &a)
 {
     while (it!=v.end() && (*it) < a)
     { it= v.erase(it) ; }
@@ -357,7 +368,7 @@ int ContactListMesh<d>::insert(const cpm &a)
 
 //-----------------------------------Fastest version so far ...
 template <int d>
-void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp,
                                  int startd, double partialsum, bitdim mask)
 {
     double sum=partialsum ;
@@ -385,7 +396,7 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, c
 
 //--------------------------------------------------------------------
 template <int d>
-void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & tmpcp,
+void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp,
                                      [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
     if (P.Boundaries[0][3] != static_cast<int>(WallType::PBC_LE))
@@ -427,7 +438,7 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
 
 //----------------------------------------
 template <int d>
-void ContactList<d>::check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp & contact)
+void ContactList<d>::check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact)
 {
   if (gst==0) return ;
   else
