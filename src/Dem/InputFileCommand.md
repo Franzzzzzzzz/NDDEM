@@ -47,7 +47,7 @@ First indentation level keyword must be followed by one of the second level inde
     - `roughinclineplane`: stick grain along the plane of normal [1,0,0 ...] to create roughness.
     - `rhoughinclineplane2`: ????? not quite sure what this does anymore. 
     - `quasicristal`: ????? not quite sure what this does anymore. 
-  - `radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS`: set the particle radius from a distribution.
+  - `radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]`: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.
   - `skin`: set the skin size. Should be used after the particle radius has been set. 
   
 - `rigid N`: handles rigid bodies number N

@@ -1050,7 +1050,12 @@ void Parameters<d>::init_radii (char line[], v1d & r)
   {
     s >> minr ; s >> maxr ;
     s >> fraction ;
-    for (auto & v : r) v = (rand()<fraction?minr:maxr) ;
+
+    double Vs=Tools<d>::Volume(minr) ;
+    double Vl=Tools<d>::Volume(maxr) ;
+    double f = fraction*Vs/((1-fraction)*Vl+fraction*Vs) ;
+
+    for (auto & v : r) v = (rand()<fraction?maxr:minr) ;
   }
   else
     printf("WARN: unknown radius distribution automatic creation. Nothing done ...\n") ;
