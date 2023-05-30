@@ -264,10 +264,13 @@ var menudata={children:[
 {text:"b",url:"globals_defs.html#index_b"},
 {text:"c",url:"globals_defs_c.html#index_c"},
 {text:"d",url:"globals_defs_d.html#index_d"},
+{text:"e",url:"globals_defs_e.html#index_e"},
 {text:"f",url:"globals_defs_f.html#index_f"},
 {text:"i",url:"globals_defs_i.html#index_i"},
 {text:"j",url:"globals_defs_j.html#index_j"},
 {text:"m",url:"globals_defs_m.html#index_m"},
 {text:"n",url:"globals_defs_n.html#index_n"},
 {text:"o",url:"globals_defs_o.html#index_o"},
-{text:"p",url:"globals_defs_p.html#index_p"}]}]}]}]}
+{text:"p",url:"globals_defs_p.html#index_p"},
+{text:"s",url:"globals_defs_s.html#index_s"},
+{text:"x",url:"globals_defs_x.html#index_x"}]}]}]}]}

@@ -1,5 +1,36 @@
+#include "Preprocessor_macros.h"
+
+#define EMFUNCTION(val,name) function( #name, &Simulation<val>::name)
+#define EMMACRO(r,state) EMMACRO2(BOOST_PP_TUPLE_ELEM(2, 0, state))
+#define EMMACRO2(dim) \
+    class_<Simulation<dim>>("Simulation" XSTR(dim))\
+        .constructor<int>()\
+        .EMFUNCTION(dim,finalise_init)\
+        .EMFUNCTION(dim,interpret_command)\
+        .EMFUNCTION(dim,step_forward)\
+        .EMFUNCTION(dim,finalise)\
+        .EMFUNCTION(dim,getX)\
+        .EMFUNCTION(dim,getRadii)\
+        .EMFUNCTION(dim,setRadius)\
+        .EMFUNCTION(dim,setMass)\
+        .EMFUNCTION(dim,fixParticle)\
+        .EMFUNCTION(dim,setFrozen)\
+        .EMFUNCTION(dim,getOrientation)\
+        .EMFUNCTION(dim,getVelocity)\
+        .EMFUNCTION(dim,setVelocity)\
+        .EMFUNCTION(dim,getRotationRate)\
+        .EMFUNCTION(dim,getContactForce)\
+        .EMFUNCTION(dim,getContactInfos)\
+        .EMFUNCTION(dim,getBoundary)\
+        .EMFUNCTION(dim,setBoundary)\
+        .EMFUNCTION(dim,getWallForce)\
+        .EMFUNCTION(dim,setExternalForce)\
+        .EMFUNCTION(dim,getTime)\
+        ;
+
 EMSCRIPTEN_BINDINGS(my_class_example) {
-    class_<Simulation<2>>("Simulation2")
+    BOOST_PP_FOR((1, MAXDIM), PRED, OP, EMMACRO)
+    /*class_<Simulation<2>>("Simulation2")
         .constructor<int>()
         .function("finalise_init", &Simulation<2>::finalise_init)
         .function("interpret_command", &Simulation<2>::interpret_command)
@@ -103,7 +134,8 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
         .function("getWallForce", &Simulation<5>::getWallForce)
         .function("setExternalForce", &Simulation<5>::setExternalForce)
         .function("getTime", &Simulation<5>::getTime)
-        ;
+        ;*/
+        
 }
 
 // EMSCRIPTEN_BINDINGS(stl_wrappers) {

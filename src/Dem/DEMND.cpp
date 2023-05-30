@@ -9,26 +9,10 @@
 //#define OMP_NUM_THREADS 2
 
 // Preprocessing command to compile only enough dimensions as needed. 
-#include <boost/preprocessor/arithmetic/inc.hpp>
-#include <boost/preprocessor/comparison/not_equal.hpp>
-#include <boost/preprocessor/repetition/for.hpp>
-#include <boost/preprocessor/tuple/elem.hpp>
-
 #ifndef MAXDIM 
 #define MAXDIM 4
 #endif
-#define PRED(r, state) \
-   BOOST_PP_NOT_EQUAL( \
-      BOOST_PP_TUPLE_ELEM(2, 0, state), \
-      BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(2, 1, state)) \
-   ) \
-   /**/
-#define OP(r, state) \
-   ( \
-      BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(2, 0, state)), \
-      BOOST_PP_TUPLE_ELEM(2, 1, state) \
-   ) \
-   /**/
+#include "Preprocessor_macros.h"
 #define MACRO(r, state) \
     case BOOST_PP_TUPLE_ELEM(2, 0, state): templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state)>(argv);break;
 

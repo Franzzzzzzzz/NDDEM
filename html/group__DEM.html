@@ -123,10 +123,6 @@ Macros</h2></td></tr>
 <tr class="separator:gaca1eb50c0246e57e18361504f3d6645f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga674c1a85fb1c09ec56b0b8f6319e7b97"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga674c1a85fb1c09ec56b0b8f6319e7b97">MAXDIM</a>&#160;&#160;&#160;4</td></tr>
 <tr class="separator:ga674c1a85fb1c09ec56b0b8f6319e7b97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5da803deb7aec50c7a72145c8d874c4f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5da803deb7aec50c7a72145c8d874c4f">PRED</a>(r,  state)</td></tr>
-<tr class="separator:ga5da803deb7aec50c7a72145c8d874c4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacc1c7ab9edfe0576554dd8bba8c2638e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gacc1c7ab9edfe0576554dd8bba8c2638e">OP</a>(r,  state)</td></tr>
-<tr class="separator:gacc1c7ab9edfe0576554dd8bba8c2638e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga13cacf0f3ae321bc32ab52b569781178"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga13cacf0f3ae321bc32ab52b569781178">MACRO</a>(r,  state)&#160;&#160;&#160;    case BOOST_PP_TUPLE_ELEM(2, 0, state): <a class="el" href="group__DEM.html#ga4b5412d14b03c046affaa81b692a1ad7">templatedmain</a>&lt;BOOST_PP_TUPLE_ELEM(2, 0, state)&gt;(argv);break;</td></tr>
 <tr class="separator:ga13cacf0f3ae321bc32ab52b569781178"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5258e9af3e7909deddd2706490deb113"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5258e9af3e7909deddd2706490deb113">MAXDEFDIM</a>&#160;&#160;&#160;30</td></tr>
@@ -690,70 +686,6 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="gacc1c7ab9edfe0576554dd8bba8c2638e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacc1c7ab9edfe0576554dd8bba8c2638e">&#9670;&nbsp;</a></span>OP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define OP</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">r, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">state&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">   ( \</div>
-<div class="line">      BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(2, 0, state)), \</div>
-<div class="line">      BOOST_PP_TUPLE_ELEM(2, 1, state) \</div>
-<div class="line">   ) \</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="ga5da803deb7aec50c7a72145c8d874c4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5da803deb7aec50c7a72145c8d874c4f">&#9670;&nbsp;</a></span>PRED</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PRED</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">r, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">state&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">   BOOST_PP_NOT_EQUAL( \</div>
-<div class="line">      BOOST_PP_TUPLE_ELEM(2, 0, state), \</div>
-<div class="line">      BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(2, 1, state)) \</div>
-<div class="line">   ) \</div>
-</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>

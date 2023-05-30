@@ -1,10 +1,12 @@
 #include "Dem/DEMND.h"
 #include "CoarseGraining/CoarseGraining.h"
 
-class DEMCG2D {
+
+template <int dim>
+class DEMCGXD {
 public:
-    DEMCG2D(int n) : S(n) {}
-    Simulation<2> S ;
+    DEMCGXD(int n) : S(n) {}
+    Simulation<dim> S ;
     CoarseGraining CG ;
 
     // function passing
@@ -80,6 +82,12 @@ private:
 
 } ;
 
+using DEMCG2D = DEMCGXD<2> ; 
+using DEMCG3D = DEMCGXD<3> ; 
+using DEMCG4D = DEMCGXD<4> ; 
+using DEMCG5D = DEMCGXD<5> ; 
+
+/*
 class DEMCG3D {
 public:
     DEMCG3D(int n) : S(n) {}
@@ -312,7 +320,7 @@ private:
     std::vector<std::vector<double>> fpq ;
     std::vector<double> id1, id2 ;
 
-} ;
+} ;*/
 
 #ifdef EMSCRIPTEN
     #include "em_bindings.h"

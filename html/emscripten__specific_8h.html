@@ -68,12 +68,14 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">emscripten_specific.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &quot;<a class="el" href="Preprocessor__macros_8h_source.html">Preprocessor_macros.h</a>&quot;</code><br />
+</div>
 <p><a href="emscripten__specific_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -90,11 +92,120 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceemscripten_1_1internal"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceemscripten_1_1internal.html">emscripten::internal</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a0ae6f97ee5d50488c0c319b42f351e55"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="emscripten__specific_8h.html#a0ae6f97ee5d50488c0c319b42f351e55">EMFUNCTION</a>(val,  name)&#160;&#160;&#160;function( #name, &amp;<a class="el" href="classSimulation.html">Simulation</a>&lt;val&gt;::name)</td></tr>
+<tr class="separator:a0ae6f97ee5d50488c0c319b42f351e55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a341da5683935cc131139b5171f390695"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="emscripten__specific_8h.html#a341da5683935cc131139b5171f390695">EMMACRO</a>(r,  state)&#160;&#160;&#160;<a class="el" href="emscripten__specific_8h.html#a08e8db96ae1a36a2430999a33346acb2">EMMACRO2</a>(BOOST_PP_TUPLE_ELEM(2, 0, state))</td></tr>
+<tr class="separator:a341da5683935cc131139b5171f390695"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08e8db96ae1a36a2430999a33346acb2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="emscripten__specific_8h.html#a08e8db96ae1a36a2430999a33346acb2">EMMACRO2</a>(dim)</td></tr>
+<tr class="separator:a08e8db96ae1a36a2430999a33346acb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a608a767c2e9fe42ddddc3c8751ba5e19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="emscripten__specific_8h.html#a608a767c2e9fe42ddddc3c8751ba5e19">EMSCRIPTEN_BINDINGS</a> (my_class_example)</td></tr>
 <tr class="separator:a608a767c2e9fe42ddddc3c8751ba5e19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a0ae6f97ee5d50488c0c319b42f351e55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ae6f97ee5d50488c0c319b42f351e55">&#9670;&nbsp;</a></span>EMFUNCTION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EMFUNCTION</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">val, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;function( #name, &amp;<a class="el" href="classSimulation.html">Simulation</a>&lt;val&gt;::name)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a341da5683935cc131139b5171f390695"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a341da5683935cc131139b5171f390695">&#9670;&nbsp;</a></span>EMMACRO</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EMMACRO</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">r, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">state&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="emscripten__specific_8h.html#a08e8db96ae1a36a2430999a33346acb2">EMMACRO2</a>(BOOST_PP_TUPLE_ELEM(2, 0, state))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a08e8db96ae1a36a2430999a33346acb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08e8db96ae1a36a2430999a33346acb2">&#9670;&nbsp;</a></span>EMMACRO2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EMMACRO2</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">dim</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    class_&lt;Simulation&lt;dim&gt;&gt;(<span class="stringliteral">&quot;Simulation&quot;</span> <a class="code" href="Preprocessor__macros_8h.html#afd0d88bc7a3fb393df04cdd260c553b3">XSTR</a>(dim))\</div>
+<div class="line">        .constructor&lt;int&gt;()\</div>
+<div class="line">        .EMFUNCTION(dim,finalise_init)\</div>
+<div class="line">        .EMFUNCTION(dim,interpret_command)\</div>
+<div class="line">        .EMFUNCTION(dim,step_forward)\</div>
+<div class="line">        .EMFUNCTION(dim,finalise)\</div>
+<div class="line">        .EMFUNCTION(dim,getX)\</div>
+<div class="line">        .EMFUNCTION(dim,getRadii)\</div>
+<div class="line">        .EMFUNCTION(dim,setRadius)\</div>
+<div class="line">        .EMFUNCTION(dim,setMass)\</div>
+<div class="line">        .EMFUNCTION(dim,fixParticle)\</div>
+<div class="line">        .EMFUNCTION(dim,setFrozen)\</div>
+<div class="line">        .EMFUNCTION(dim,getOrientation)\</div>
+<div class="line">        .EMFUNCTION(dim,getVelocity)\</div>
+<div class="line">        .EMFUNCTION(dim,setVelocity)\</div>
+<div class="line">        .EMFUNCTION(dim,getRotationRate)\</div>
+<div class="line">        .EMFUNCTION(dim,getContactForce)\</div>
+<div class="line">        .EMFUNCTION(dim,getContactInfos)\</div>
+<div class="line">        .EMFUNCTION(dim,getBoundary)\</div>
+<div class="line">        .EMFUNCTION(dim,setBoundary)\</div>
+<div class="line">        .EMFUNCTION(dim,getWallForce)\</div>
+<div class="line">        .EMFUNCTION(dim,setExternalForce)\</div>
+<div class="line">        .EMFUNCTION(dim,getTime)\</div>
+<div class="line">        ;</div>
+<div class="ttc" id="aPreprocessor__macros_8h_html_afd0d88bc7a3fb393df04cdd260c553b3"><div class="ttname"><a href="Preprocessor__macros_8h.html#afd0d88bc7a3fb393df04cdd260c553b3">XSTR</a></div><div class="ttdeci">#define XSTR(a)</div><div class="ttdef"><b>Definition:</b> Preprocessor_macros.h:18</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a608a767c2e9fe42ddddc3c8751ba5e19"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a608a767c2e9fe42ddddc3c8751ba5e19">&#9670;&nbsp;</a></span>EMSCRIPTEN_BINDINGS()</h2>
