@@ -1055,7 +1055,8 @@ void Parameters<d>::init_radii (char line[], v1d & r)
     double Vl=Tools<d>::Volume(maxr) ;
     double f = fraction*Vs/((1-fraction)*Vl+fraction*Vs) ;
 
-    for (auto & v : r) v = (rand()<fraction?maxr:minr) ;
+    for (auto & v : r) v = (rand()<f?maxr:minr) ;
+
   }
   else
     printf("WARN: unknown radius distribution automatic creation. Nothing done ...\n") ;
