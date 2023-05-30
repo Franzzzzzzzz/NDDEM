@@ -144,11 +144,12 @@ $(function() {
 <li><code>ContactModel [Hooke|Hertz]</code>: set contact model.</li>
 <li><code>boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo</code>: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:<ul>
 <li><code>MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY</code></li>
-<li><code>SPHERE ?????</code>: not sure how the syntax work ??????</li>
+<li><code>SPHERE RADIUS X1 ... XD</code>: sphere of radius RADIUS, center at the X location</li>
 <li><code>ROTATINGSPHERE RADIUS X1 ... XD R12 R13 ... R1D R23 ... R_D-1_D</code>: Rotating sphere of radius RADIUS, center at the X location, rotation matrix given by the R components (upper right corner of the skew-symetric rotation matrix).</li>
 <li><code>PBCLE LOCMIN LOCMAX VELOCITY</code>: Lees-Edward boundary condition. Should be in dimension 0.</li>
 <li><code>ELLIPSE RX RY CX CY</code>: Ellipse wall (dim 2 only)</li>
 <li><code>allother LOCMIN LOCMAX</code></li>
+<li>Special command: <code>boundary DIM REMOVE</code> Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution.</li>
 </ul>
 </li>
 <li><code>rigid</code>: TODO (in development) ...</li>

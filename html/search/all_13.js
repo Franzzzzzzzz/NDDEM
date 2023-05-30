@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['r_1296',['r',['../classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53',1,'Parameters']]],
-  ['r_1297',['R',['../classTexturing.html#ab7bed15777c17b0233b37ebff1063844',1,'Texturing']]],
+  ['r_1296',['R',['../classTexturing.html#ab7bed15777c17b0233b37ebff1063844',1,'Texturing']]],
+  ['r_1297',['r',['../classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53',1,'Parameters']]],
   ['radius_1298',['RADIUS',['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5c6d0ec312d680ed011756648c9e96ea',1,'Parameters.h']]],
   ['radius_1299',['Radius',['../classReader.html#a679846d260ede5b522da376bab63be3b',1,'Reader::Radius()'],['../classDatafile.html#a38f108fe0a0d9721f0b6b27c5424ac0a',1,'Datafile::Radius()']]],
   ['radius_1300',['radius',['../classNDDEMReader.html#ade81335d2515aa1845d1d3846e6a038d',1,'NDDEMReader::radius()'],['../structParam.html#acf711c388136804ad6854a47bc9ff423',1,'Param::radius()'],['../group__CoarseGraining.html#ga306d608be378bca19975baaea028d560',1,'Data::radius()'],['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a',1,'radius():&#160;Typedefs.h'],['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a',1,'radius():&#160;Typedefs.h']]],

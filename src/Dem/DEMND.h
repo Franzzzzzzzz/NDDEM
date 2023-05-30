@@ -71,7 +71,7 @@ public:
     
     std::vector < std::optional<int> > RigidBodyId ; 
 
-    std::vector <SpecificAction> ExternalAction ;
+    std::vector <SpecificAction<d>> ExternalAction ;
 
     std::vector <uint32_t> PBCFlags ;
     std::vector < std::vector <double> > WallForce ;
@@ -271,8 +271,8 @@ public:
          int ID = omp_get_thread_num();
          double timebeg = omp_get_wtime();
          #endif
-         cp tmpcp(0,0,d,0,nullptr) ; double sum=0 ;
-         cpm tmpcpm(0,0,0,d,0,nullptr) ; 
+         cp<d> tmpcp(0,0,0,nullptr) ; double sum=0 ;
+         cpm<d> tmpcpm(0,0,0,0,nullptr) ; 
          
          ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
          CLp.reset() ; CLw.reset(); CLm.reset() ; 
