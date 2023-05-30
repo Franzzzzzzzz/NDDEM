@@ -61,7 +61,7 @@ add_subdirectory(NrrdIO-1.11.0-src)
 add_subdirectory(CoarseGraining)
 #add_subdirectory(Texturing)
 
-set (max_dimension "4" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
+set (max_dimension "5" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
 add_compile_definitions(MAXDIM=${max_dimension})
 
 if(EMSCRIPTEN)
