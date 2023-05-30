@@ -1,4 +1,52 @@
-EMSCRIPTEN_BINDINGS(DEMCG2D) {
+#include "Dem/Preprocessor_macros.h"
+
+#define EMFUNCTION(val,name) function( #name, &DEMCG##val##D::name)
+#define EMMACRO(r,state) EMMACRO2(BOOST_PP_TUPLE_ELEM(2, 0, state))
+#define EMMACRO2(dim) EMMACRO3(dim)
+#define EMMACRO3(dim) \
+EMSCRIPTEN_BINDINGS(DEMCG##dim##D) {\
+  class_<DEMCGXD<dim>>("DEMCG" #dim "D") \
+    .constructor<int>() \
+    .EMFUNCTION(dim, simu_finalise_init)\
+    .EMFUNCTION(dim, simu_interpret_command)\
+    .EMFUNCTION(dim, simu_step_forward)\
+    .EMFUNCTION(dim, simu_finalise)\
+    .EMFUNCTION(dim, simu_getX)\
+    .EMFUNCTION(dim, simu_getRadii)\
+    .EMFUNCTION(dim, simu_setRadius)\
+    .EMFUNCTION(dim, simu_setMass)\
+    .EMFUNCTION(dim, simu_fixParticle)\
+    .EMFUNCTION(dim, simu_setFrozen)\
+    .EMFUNCTION(dim, simu_getOrientation)\
+    .EMFUNCTION(dim, simu_getVelocity)\
+    .EMFUNCTION(dim, simu_setVelocity)\
+    .EMFUNCTION(dim, simu_getRotationRate)\
+    .EMFUNCTION(dim, simu_getContactForce)\
+    .EMFUNCTION(dim, simu_getContactInfos)\
+    .EMFUNCTION(dim, simu_getBoundary)\
+    .EMFUNCTION(dim, simu_setBoundary)\
+    .EMFUNCTION(dim, simu_getWallForce)\
+    .EMFUNCTION(dim, simu_setExternalForce)\
+    .EMFUNCTION(dim, simu_getTime)\
+    .EMFUNCTION(dim, simu_getGravityAngle)\
+    .EMFUNCTION(dim, cg_setup_CG)\
+                                              \
+    .EMFUNCTION(dim, cg_process_timestep)\
+    .EMFUNCTION(dim, cg_get_result)\
+    .EMFUNCTION(dim, cg_get_gridinfo)\
+    .EMFUNCTION(dim, cg_param_from_json_string)\
+    .EMFUNCTION(dim, cg_param_get_bounds)\
+    .EMFUNCTION(dim, cg_param_get_numts)\
+    .EMFUNCTION(dim, cg_param_read_timestep)\
+    .EMFUNCTION(dim, cg_param_post_init)\
+    ; \
+}
+
+BOOST_PP_FOR((2, MAXDIM), PRED, OP, EMMACRO)
+
+
+
+/*EMSCRIPTEN_BINDINGS(DEMCG2D) {
   class_<DEMCG2D>("DEMCG2D")
     .constructor<int>()
     .function("simu_finalise_init", &DEMCG2D::simu_finalise_init)
@@ -149,7 +197,7 @@ EMSCRIPTEN_BINDINGS(DEMCG5D) {
     .function("cg_param_post_init", &DEMCG5D::cg_param_post_init)
     ;
 }
-
+*/
 
 
 // EMSCRIPTEN_BINDINGS(stl_wrappers) {
