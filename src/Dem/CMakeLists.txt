@@ -4,7 +4,7 @@
 #endif()
 
 #option(SAVE_FORCE_COMPONENTS "Allow to dump the elastic/viscous/friction etc. part of the forces." OFF)
-set (max_dimension "3" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
+set (max_dimension "5" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
 add_compile_definitions(MAXDIM=${max_dimension})
 
 #if(SAVE_FORCE_COMPONENTS)
