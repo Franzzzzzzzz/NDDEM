@@ -133,7 +133,7 @@ module.exports = [{
                 use: ["style-loader", "css-loader"],
             },
             {
-                test: /\.(ico|webmanifest)$/,
+                test: /\.(ico|webmanifest|stl)$/,
                 exclude: /node_modules/,
                 use: ["file-loader?name=[name].[ext]"] // ?name=[name].[ext] is only necessary to preserve the original file name
               },
