@@ -1,29 +1,30 @@
-directory Output
+directory output/rotatingSphere2D
 dimensions 2 500
 
 
-radius -1 0.0025
-mass -1 1
+radius -1 0.5
+mass -1 2119.5
 auto rho
-auto radius uniform 0.0025 0.0035
+auto radius bidisperse 0.002 0.004 0.8
 auto mass
 auto inertia
 auto skin
 
-boundary 0 WALL  -10 10
-boundary 1 WALL  -10 10
-boundary 2 ROTATINGSPHERE 0.1 0 0 1
+boundary 0 WALL  -0.1 0.1
+boundary 1 WALL  -0.1 0.1
+boundary 2 ROTATINGSPHERE 0.1 0 0 12.1
 
 auto location insphere
 gravity -9.81 0
 
-set Kn 2e5
-set Kt 8e4
-set GammaN 75
-set GammaT 75
+set Kn 98766
+set Kt 79012
+set GammaN 26
+set GammaT 26
 set Mu 0.5
 
 set T 150
-set dt 0.0001
-set dumps VTK with 2 Radius Omega
-set tdump 1000
+set dt 0.0002
+#set dumps VTK with 2 Radius Omega
+set dumps CSV with 1 Radius
+set tdump 10000

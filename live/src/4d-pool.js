@@ -1,4 +1,5 @@
 import css from "../css/main.css";
+import STLFilename from "../meshes/4d-pool.stl";
 
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -21,7 +22,7 @@ let camera, scene, renderer;
 let gui;
 let S;
 let x;
-let NDsolids, material, STLFilename;
+let NDsolids, material;
 let meshes;
 var direction = new THREE.Vector3();
 var raycaster = new THREE.Raycaster();
@@ -106,7 +107,7 @@ async function init() {
 
     SPHERES.add_pool_spheres(S,params,scene);
 
-    STLFilename = '../stls/4d-pool.stl'; // this one has crap pockets
+    // STLFilename = '../stls/4d-pool.stl'; // this one has crap pockets
     // STLFilename = './stls/4d-pool-no-holes.stl';
     // const texture = new THREE.TextureLoader().load( 'textures/golfball.jpg', function(t) {
         // t.encoding = THREE.sRGBEncoding;
