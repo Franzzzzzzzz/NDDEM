@@ -1,5 +1,10 @@
+# Exit on first error
+set -e
+
+# Make some folders
 mkdir build
 mkdir deploy
+mkdir live/deploy
 mkdir Samples
 mkdir Textures
 
@@ -26,12 +31,16 @@ cd build
 embuilder build boost_headers zlib
 emcmake cmake ../src
 
-for BUILD_TARGET in DEMND CoarseGraining DEMCGND
-do
-    emmake make $BUILD_TARGET
-    cp ../bin/$BUILD_TARGET.js ../deploy/
-    cp ../bin/$BUILD_TARGET.wasm ../deploy/
-done
+emmake make DEMND
+cp ../bin/DEMND.js ../deploy/
+cp ../bin/DEMND.wasm ../deploy/
+
+emmake make CoarseGraining
+cp ../bin/CoarseGraining.js ../deploy/
+cp ../bin/CoarseGraining.wasm ../deploy/
+
+emmake make DEMCGND
+cp ../bin/DEMCGND.js ../deploy/
 
 make doc_doxygen
 mv html ..
