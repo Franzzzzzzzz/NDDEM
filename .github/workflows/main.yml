@@ -32,7 +32,7 @@ jobs:
           version: 3.1.25
 
       - name: Install doxygen and necessary packages
-        run: sudo apt-get install -y doxygen texlive 
+        run: sudo apt-get install -y doxygen texlive texlive-font-utils
 
       - name: Check gcc version
         run: gcc -v
