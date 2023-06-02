@@ -12,7 +12,6 @@ examples/Output
 node_modules
 /build
 /deploy
-/live/deploy
 visualise/deploy
 Samples
 Textures
