@@ -84,6 +84,8 @@ function setup() {
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 if ( urlParams.has('cg_opacity') ) { params.cg_opacity = parseInt(urlParams.get('cg_opacity')); }
+if ( urlParams.has('size_ratio') ) { params.size_ratio = parseFloat(urlParams.get('size_ratio')); }
+if ( urlParams.has('density_ratio') ) { params.density_ratio = parseFloat(urlParams.get('density_ratio')); }
 
 SPHERES.update_cylinder_colour( 0x000000 );
 SPHERES.createNDParticleShader(params).then( init() );
