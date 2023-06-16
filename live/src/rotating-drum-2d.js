@@ -30,12 +30,12 @@ var params = {
     dimension: 2,
     // Fr : 0.5,
     R: 0.1, // drum radius
-    N: 500,
+    // N: 500,
     // packing_fraction: 0.5,
     gravity: false,
     paused: false,
-    r_min: 0.002,
-    r_max: 0.004,
+    // r_min: 0.002,
+    r_max: 0.0035,
     omega: 12.1, // rotation rate
     lut: 'Size',
     cg_field: 'Size',
@@ -56,24 +56,31 @@ var params = {
         number: 0,
         width: 0.05,
         prev_num: 0,
-    }
+    },
+    phi_s : 0.5, // volumetric concentration of small particles
+    filling_fraction : 0.5, // how full the drum is
+    size_ratio : 1.5, // ratio of small to large particle size
+    density_ratio : 1, // ratio of small to large particle density
 }
 
-let phi_s = 0.5; // volumetric concentration of small particles
-let target_nu = 0.8;
-let filling_fraction = 0.5;
-let V_solid = filling_fraction*target_nu*Math.PI*params.R*params.R;
-let V_small = phi_s*V_solid;
-let V_large = (1-phi_s)*V_solid;
-let N_small = Math.floor(V_small/(Math.PI*params.r_min*params.r_min));
-let N_large = Math.floor(V_large/(Math.PI*params.r_max*params.r_max));
-params.N = N_small + N_large;
-params.number_ratio = N_small/params.N;
+function setup() {
+    let target_nu = 0.8;
+    let V_solid = params.filling_fraction*target_nu*Math.PI*params.R*params.R;
+    let V_small = params.phi_s*V_solid;
+    let V_large = (1-params.phi_s)*V_solid;
+    params.r_min = params.r_max/params.size_ratio;
+    params.N_small = Math.floor(V_small/(Math.PI*params.r_min*params.r_min));
+    params.N_large = Math.floor(V_large/(Math.PI*params.r_max*params.r_max));
+    params.N = params.N_small + params.N_large;
+    params.number_ratio = params.N_small/params.N;
 
-params.average_radius = (params.r_min + params.r_max)/2.;
+    params.average_radius = (params.r_min + params.r_max)/2.;
 
-params.particle_volume = Math.PI*Math.pow(params.average_radius,2);
-params.particle_mass = params.particle_volume*params.particle_density
+    params.particle_volume = Math.PI*Math.pow(params.average_radius,2);
+    params.particle_mass = params.particle_volume*params.particle_density
+
+    params.F_mag_max = 50*params.density_ratio;
+}
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 if ( urlParams.has('cg_opacity') ) { params.cg_opacity = parseInt(urlParams.get('cg_opacity')); }
@@ -81,7 +88,17 @@ if ( urlParams.has('cg_opacity') ) { params.cg_opacity = parseInt(urlParams.get(
 SPHERES.update_cylinder_colour( 0x000000 );
 SPHERES.createNDParticleShader(params).then( init() );
 
+async function reset_particles() {
+    setup();
+    await NDDEMPhysics();
+    scene.remove(SPHERES.spheres);
+    SPHERES.wipe();
+    SPHERES.add_spheres(S,params,scene);
+}
+
 async function init() {
+    setup();
+
     await NDDEMPhysics();
 
     var aspect = window.innerWidth / window.innerHeight;
@@ -171,6 +188,28 @@ async function init() {
         .onChange( () => {
             S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
         } );
+    gui.add( params, 'filling_fraction', 0,1)
+        .name( 'Filling Fraction').listen()
+        .onChange( () => {
+            reset_particles();
+        } );
+    gui.add( params, 'phi_s', 0,1)
+        .name( 'Small particle conc').listen()
+        .onChange( () => {
+            reset_particles();
+        } );
+    gui.add( params, 'size_ratio', 1,3,0.01)
+        .name( 'Size ratio').listen()
+        .onChange( () => {
+            reset_particles();
+        } );
+    gui.add( params, 'density_ratio', 0.1,10)
+        .name( 'Density ratio').listen()
+        .onChange( () => {
+            reset_particles();
+        } );
+    
+
     // gui.add( params.lifters, 'number', 0,12,1)
     //     .name( 'Number of lifters').listen()
     //     .onChange( update_lifters);
@@ -252,6 +291,16 @@ function animate() {
     S.simu_interpret_command('mesh rotate ' + String(-params.omega*25*dt) + " 0 0");
     SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
+    put_particles_back();
+}
+
+function put_particles_back(){
+    for ( let i = 0; i<params.N; i++){
+        let dist = Math.sqrt(SPHERES.x[i][0]*SPHERES.x[i][0] + SPHERES.x[i][1]*SPHERES.x[i][1]);
+        if ( dist > params.R ) { // if particle is outside of the circle 
+            S.simu_interpret_command("location " + String(i) + " 0 0"); // put it back at the origin
+        }
+    }
 }
 
 async function NDDEMPhysics() {
@@ -271,14 +320,26 @@ async function NDDEMPhysics() {
 
 function finish_setup() {
     S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-    S.simu_interpret_command("radius -1 0.5");
-    let m = Math.PI*0.5*0.5*params.particle_density;
-    S.simu_interpret_command("mass -1 " + String(m));
-    S.simu_interpret_command("auto rho");
+    // S.simu_interpret_command("radius -1 0.5");
+    // let m = Math.PI*0.5*0.5*params.particle_density;
+    // S.simu_interpret_command("mass -1 " + String(m));
+    // S.simu_interpret_command("auto rho");
     // S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
     // console.log(number_ratio)
-    S.simu_interpret_command("auto radius bidisperse "+params.r_min+" "+params.r_max+" "+params.number_ratio);
-    S.simu_interpret_command("auto mass");
+    // S.simu_interpret_command("auto radius bidisperse "+params.r_min+" "+params.r_max+" "+params.number_ratio);
+    let m_small = Math.PI*params.r_min*params.r_min*params.particle_density*params.density_ratio;
+    let m_large = Math.PI*params.r_max*params.r_max*params.particle_density;
+    let min_mass = Math.min(m_small,m_large);
+    for ( let i=0; i<params.N_small; i++ ) {
+        S.simu_setRadius(i,params.r_min);
+        S.simu_setMass(i,m_small);
+    }
+    for ( let i=params.N_small; i<params.N; i++ ) {
+        S.simu_setRadius(i,params.r_max);
+        S.simu_setMass(i,m_large);
+    }
+    // S.simu_interpret_command("auto mass");
+    S.simu_interpret_command("auto rho");
     S.simu_interpret_command("auto inertia");
     S.simu_interpret_command("auto skin");
 
@@ -294,9 +355,9 @@ function finish_setup() {
     // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1"); // intensity, omega, rotdim0, rotdim1
     S.simu_interpret_command("gravity -9.81 0"); // intensity, omega, rotdim0, rotdim1
 
-    let tc = 2e-3;
+    let tc = 1e-3;
     let rest = 0.5; // super low restitution coeff to dampen out quickly
-    let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+    let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, min_mass)
     dt = tc/10;
 
     S.simu_interpret_command("set Kn " + String(vals.stiffness));

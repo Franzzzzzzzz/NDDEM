@@ -26,7 +26,7 @@ var NDDEMShader = new ShaderMaterial({
     "varying vec3 vColor;", // colour at vertex (output)
     "varying vec3 vNormal;", // normal at vertex (output)
 
-    "bool isnan( float val ) { return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true; }",
+    // "bool isnan( float val ) { return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true; }",
 
     "void main() {",
     "vNormal = normal;", // for directional lighting
