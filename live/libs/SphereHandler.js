@@ -50,6 +50,12 @@ ray = new Line(
     new LineBasicMaterial( { color: 0xffffff })
 );
 
+export function wipe() {
+    radii = undefined;
+    spheres = undefined;
+    x = undefined;
+}
+
 export async function createNDParticleShader(params) {
     import("./shaders/" + params.dimension + "DShader.js").then((module) => {
         NDParticleShader = module.NDDEMShader;
