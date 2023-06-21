@@ -1,5 +1,5 @@
 import css from "../css/main.css";
-import plotly from "plotly.js-dist";
+import Plotly from "plotly.js-dist";
 
 // import { DEMCGND } from "../../deploy/DEMCGND.js";
 import * as THREE from "three";
