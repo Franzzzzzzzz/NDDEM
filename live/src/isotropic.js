@@ -1,4 +1,5 @@
 import css from "../css/main.css";
+import plotly from "plotly.js-dist";
 
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
