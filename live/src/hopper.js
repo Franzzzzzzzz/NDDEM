@@ -96,7 +96,7 @@ if ( urlParams.has('particle_opacity') ) { params.particle_opacity = parseFloat(
 
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 

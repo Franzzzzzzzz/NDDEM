@@ -70,7 +70,7 @@ params.particle_mass = params.particle_volume * params.particle_density;
 
 let sunk_balls = [];
 
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 // SPHERES.createNDParticleShader(params);
 
 // const startButton = document.getElementById( 'startButton' );

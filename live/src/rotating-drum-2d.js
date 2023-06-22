@@ -88,7 +88,7 @@ if ( urlParams.has('size_ratio') ) { params.size_ratio = parseFloat(urlParams.ge
 if ( urlParams.has('density_ratio') ) { params.density_ratio = parseFloat(urlParams.get('density_ratio')); }
 
 SPHERES.update_cylinder_colour( 0x000000 );
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function reset_particles() {
     setup();
