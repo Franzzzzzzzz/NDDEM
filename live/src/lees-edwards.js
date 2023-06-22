@@ -14,25 +14,11 @@ var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
 
 let camera, scene, renderer, stats, panel, controls;
-let position;
 let gui;
-let spheres;
-let floor;
 let S;
-let NDDEMCGLib;
-let pointer;
-let v, omegaMag;
-let radii;
-let NDsolids, material, STLFilename;
-let meshes = new THREE.Group();
 let density, vavg, stressTcxx, stressTcyy, stressTczz, stressTcxy;
 let pressure=[], shearstress=[], xloc=[] ;
 let show_stats = true;
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-let intersection_plane = new THREE.Plane();
-let camera_direction = new THREE.Vector3();
 
 let graph_fraction = 0.5;
 document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
@@ -70,41 +56,51 @@ var params = {
 if ( urlParams.has('dimension') ) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
+if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
 set_derived_properties();
 
 function set_derived_properties() {
-    params.average_radius = (params.r_min + params.r_max)/2.;
-    if ( params.dimension === 3 ) {
-        params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
-    } else if ( params.dimension === 4 ) {
-        params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    if ( params.dimension == 2 ) {
+        params.initial_packing_fraction = 0.8;
+        params.F_mag_max = 1e3;
     }
+
+    params.average_radius = (params.r_min + params.r_max)/2.;
+    params.particle_volume = SPHERES.get_particle_volume(params.dimension, params.average_radius);
 
     console.log('estimate of particle volume: ' + params.particle_volume*params.N)
     params.particle_mass = params.particle_volume * params.particle_density;
     params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./params.dimension)/2.;
 }
 
-
-
-
-
-if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
-
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 
     await NDDEMCGPhysics();
-    // physics.main(params.dimensions, params.N, inputfile)
-    position = new THREE.Vector3();
 
-    //
-
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
-    camera.position.set( 0, 0, -5*params.L );
-    camera.up.set(1, 0, 0);
+    if ( params.dimension == 2 ) {
+        var aspect = window.innerWidth / window.innerHeight * graph_fraction;
+        let offset = 1.2;
+        camera = new THREE.OrthographicCamera(
+            -params.L*aspect*offset, params.L*aspect*offset,
+            -params.L*offset, params.L*offset,
+            // -1*aspect, 1*aspect, -1, 1,
+            -1000,
+            1000
+        );
+        camera.position.set( 0, 0, 5*params.L );
+        // camera.up.set(0, 0, 1);
+        camera.lookAt(0,0,0);
+        camera.rotateZ(-Math.PI/2);
+        // camera.up.set(0, 0, 1);
+    }
+    else {
+        camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
+        camera.position.set( 0, 0, -5*params.L );
+        camera.up.set(1, 0, 0);
+    }
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111 );
@@ -124,7 +120,6 @@ async function init() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
     renderer.shadowMap.enabled = true;
-    renderer.outputEncoding = THREE.sRGBEncoding;
 
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
@@ -132,39 +127,17 @@ async function init() {
     gui = new GUI();
     gui.width = 320;
 
-    if ( params.dimension == 4 ) {
-        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
-            .name( 'D4 location').listen()
-            .onChange( function () {
-                if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
-                }
-            });
-    }
     gui.add ( params, 'shear_rate', -100, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
-        .onChange( () => update_shear_rate() );
-    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
-        // lut_folder
-    ));
+        .onChange(update_shear_rate);
+    gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange(update_shear_rate);
     gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
-            .onChange( () => SPHERES.update_particle_material(params,
-                // lut_folder
-            ) );
+            .onChange(update_shear_rate);
     gui.add ( params, 'paused').name('Paused').listen();
-    // gui.add ( params, 'new_line').name('New loading path').listen()
-    //     .onChange( () => {
-    //         var data = [{
-    //                       type: 'scatter',
-    //                       mode: 'lines',
-    //                       x: [], y: [],
-    //                       line: { width: 5 },
-    //                       name: 'Load path ' + String(document.getElementById('stats').data.length+1)
-    //                     }]
-    //         Plotly.addTraces('stats', data);
-    //         params.new_line = false;
-    //     });
-    controls = new OrbitControls( camera, container );
-    controls.update();
+    
+    if ( params.dimension > 2 ) { 
+        controls = new OrbitControls( camera, container );
+        controls.update();
+    }
 
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'keypress', checkKeys, false );
@@ -261,13 +234,13 @@ async function NDDEMCGPhysics() {
     }
 
     await DEMCGND().then( (NDDEMCGLib) => {
-        if ( params.dimension == 3 ) {
+        if ( params.dimension == 2 ) {
+            S = new NDDEMCGLib.DEMCG2D (params.N);
+        } else if ( params.dimension == 3 ) {
             S = new NDDEMCGLib.DEMCG3D (params.N);
-        }
-        else if ( params.dimension == 4 ) {
+        }  else if ( params.dimension == 4 ) {
             S = new NDDEMCGLib.DEMCG4D (params.N);
-        }
-        else if ( params.dimension == 5 ) {
+        } else if ( params.dimension == 5 ) {
             S = new NDDEMCGLib.DEMCG5D (params.N);
         }
         finish_setup();
@@ -278,7 +251,7 @@ async function NDDEMCGPhysics() {
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
-        let m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+        let m = params.particle_density * SPHERES.get_particle_volume(params.dimension, 0.5);
         S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
         S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
@@ -288,11 +261,13 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("boundary 0 PBCLE -"+String(params.L)+" "+String(params.L)+" "+String(params.shear_rate));
         S.simu_interpret_command("boundary 1 PBC -"+String(params.L)+" "+String(params.L));
-        S.simu_interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
-        if ( params.dimension == 4 ) {
+        if ( params.dimension >= 3 ) {
+            S.simu_interpret_command("boundary 2 PBC -"+String(params.L)+" "+String(params.L));
+        }
+        if ( params.dimension >= 4 ) {
             S.simu_interpret_command("boundary 3 PBC -"+String(params.L)+" "+String(params.L));
         }
-        S.simu_interpret_command("gravity 0 0 " + "0 ".repeat(params.dimension - 3))
+        S.simu_interpret_command("gravity" + " 0".repeat(params.dimension))
 
         S.simu_interpret_command("auto location randomdrop");
 
@@ -318,7 +293,7 @@ async function NDDEMCGPhysics() {
         cgparam["boundaries"]=[
             Array(params.dimension).fill(-params.L+params.r_max),
             Array(params.dimension).fill( params.L-params.r_max)];
-        cgparam["window size"]=2*params.average_radius ;
+        cgparam["window size"]=6*params.average_radius ;
         cgparam["skip"]=0;
         cgparam["max time"]=1 ;
         cgparam["time average"]="None" ;
@@ -328,7 +303,7 @@ async function NDDEMCGPhysics() {
         cgparam["dimension"]=params.dimension;
 
 
-        console.log(JSON.stringify(cgparam)) ;
+        // console.log(JSON.stringify(cgparam)) ;
         S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
         S.cg_setup_CG() ;
 

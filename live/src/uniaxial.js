@@ -106,7 +106,7 @@ if ( params.dimension === 4) {
 }
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 
@@ -139,7 +139,6 @@ async function init() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
     renderer.shadowMap.enabled = true;
-    renderer.outputEncoding = THREE.sRGBEncoding;
 
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
