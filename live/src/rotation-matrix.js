@@ -35,7 +35,7 @@ if ( params.dimension === 3 ) {
     params.N = 6;
 }
 
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 

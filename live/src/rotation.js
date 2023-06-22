@@ -122,7 +122,7 @@ params.roof = params.L;
 //     L = Math.pow(solid_volume/params.packing_fraction,1./3.)
 // }
 
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 
