@@ -89,7 +89,7 @@ if ( params.dimension === 4) {
 
 var quality = 5;
 
-SPHERES.createNDParticleShader(params).then( init() );
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 

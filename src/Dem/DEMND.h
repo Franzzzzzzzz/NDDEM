@@ -422,7 +422,7 @@ public:
             }
             else
             {
-                printf("%d\n", it->ghost) ; fflush(stdout) ; 
+                // printf("%d\n", it->ghost) ; fflush(stdout) ; 
                 (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
             }
