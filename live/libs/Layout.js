@@ -22,11 +22,11 @@ export function add_plotly_download_tag(header) {
         let csv = '';
         if ( dimension === 2 ) {
             data.forEach( trace => {
-                csv = csv + header + trace.x.map((el, i) => [el.toFixed(4), trace.y[i].toFixed(4)].join(",")).join('\n') + '\n'
+                csv += header + trace.x.map((el, i) => [el.toFixed(4), trace.y[i].toFixed(4)].join(",")).join('\n') + '\n'
                 });
         } else if ( dimension === 3 ) {
             data.forEach( trace => {
-                csv = csv + header + trace.x.map((el, i) => [el.toFixed(4), trace.y[i].toFixed(4),trace.z[i].toFixed(4)].join(",")).join('\n') + '\n'
+                csv += header + trace.x.map((el, i) => [el.toFixed(4), trace.y[i].toFixed(4),trace.z[i].toFixed(4)].join(",")).join('\n') + '\n'
                 });
         }
         var link = document.getElementById("download_tag");
@@ -257,4 +257,66 @@ export function plotly_two_xaxis_graph(xlabel1, xlabel2, ylabel, trace0, trace1,
     }]
     add_plotly_download_tag(xlabel1 + ',' + xlabel2 + ',' + ylabel);
     return { data, layout }
+}
+
+export function plotly_2d_graph(xlabel, ylabel, traces) {
+  let layout = {
+      showlegend : true,
+        // height: 300,
+        // width: 500,
+        xaxis: {
+          // linecolor: 'white',
+          autotick: true,
+          // autorange: true,
+          // range: [-maxVelocity, maxVelocity],
+          // range: [-1,1],
+          automargin: true,
+          title: xlabel, //'Average velocity (m/s)',
+          side: 'bottom'
+          // title: 'Vertical displacement (mm)'
+      },
+        yaxis: {
+          // linecolor: 'white',
+          autotick: true,
+          autorange: true,
+          automargin: true,
+          title: ylabel,//'Location (mm)',
+          // color: 'black',
+      },
+      legend: {
+          x: 1,
+          xanchor: 'right',
+          y: 1,
+          // bgcolor: "rgba(0,0,0,0.01)"
+          // opacity: 0.5,
+      },
+      margin: {
+          b: 100,
+      },
+      font: {
+          family: 'Montserrat, Open sans',
+      }
+  }
+
+  let data = [];
+  // let colors = ['black',];
+  traces.forEach((t,i) => {
+    data.push({
+      type: 'scatter',
+      mode: 'lines',
+      x: [],
+      y: [],
+      hoverinfo: 'skip',
+      name: t,
+      // opacity: 1,
+      line: {
+        width: 5,
+        // color: colors[i],
+        // reversescale: false
+      },
+    })
+  });
+
+  add_plotly_download_tag(xlabel + ',' + ylabel);
+  return { data, layout }
 }

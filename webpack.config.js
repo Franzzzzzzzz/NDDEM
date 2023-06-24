@@ -19,6 +19,7 @@ module.exports = [{
         'rotation-matrix' : './live/src/rotation-matrix.js',
         'simple-shear' : './live/src/simple-shear.js',
         'hopper' : './live/src/hopper.js',
+        'intruder' : './live/src/intruder.js',
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -114,6 +115,13 @@ module.exports = [{
             template: "./live/template.html",
             filename: "rotation-matrix.html",
             chunks: ['rotation-matrix']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Intruder',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "intruder.html",
+            chunks: ['intruder']
         }),
       ],
     output: {

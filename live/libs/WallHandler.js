@@ -3,8 +3,7 @@ export let axesHelper, arrow_x, arrow_y, arrow_z;
 let arrow_body, arrow_head;
 let textGeo_x, textGeo_y, textGeo_z;
 let font;
-let vertical_wall_acceleration = 0;
-let vertical_wall_velocity = 0;
+
 let vertical_wall_displacement = 0;
 
 import {
@@ -28,6 +27,7 @@ loader.load("../resources/helvetiker_bold.typeface.json", function (f) { font = 
 let p_controller = new PIDcontroller(1e-5, 5e-6, 0);
 let q_controller = new PIDcontroller(1e-5, 5e-6, 0);
 
+let damped_wall_controller = new PIDcontroller(1e-4, 1e-5, 0);
 // let radial_controller = new PIDcontroller(1e-3,0,0);
 // let y_controller = new PIDcontroller(1e-3,0,0);
 // let z_controller = new PIDcontroller(1e-3,0,0);
@@ -418,17 +418,18 @@ export function update_top_wall(params, S, scene, dt = 0.001) {
 
 }
 
-export function update_damped_wall(params, S, scene, dt) {
-    vertical_wall_acceleration = (params.target_pressure - params.current_pressure - params.viscosity * vertical_wall_velocity) / params.wall_mass;
+export function update_damped_wall(current, target, params, S, dt, axis=1) {
+    let delta_L = damped_wall_controller.update(target, current, dt);
+    vertical_wall_displacement += delta_L;
+    let L_cur = params.L - vertical_wall_displacement;
+    
+    if ( axis == 0 && params.aspect_ratio !== undefined ) {
+        S.simu_setBoundary(axis, [-L_cur*params.aspect_ratio, L_cur*params.aspect_ratio]); // Set location of the walls in y
+    } else {
+        S.simu_setBoundary(axis, [-L_cur, L_cur]); // Set location of the walls in y
+    }
 
-    vertical_wall_velocity += vertical_wall_acceleration * dt;
-    vertical_wall_displacement += vertical_wall_velocity * dt;
-
-    let L_cur = params.L - vertical_wall_displacement
-
-    S.simu_setBoundary(1, [-L_cur, L_cur]); // Set location of the walls in y
-
-    console.log(L_cur, params.target_pressure, params.current_pressure);
+    // console.log(axis, L_cur, current, target);
 }
 
 export function update_isotropic_wall(params, S, scene, dt = 0.001) {

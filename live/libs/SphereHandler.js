@@ -56,6 +56,10 @@ export function wipe() {
     x = undefined;
 }
 
+export function update_radii(S) {
+    radii = S.simu_getRadii();
+}
+
 // export async function createNDParticleShader(params) {
 //     import("./shaders/" + params.dimension + "DShader.js").then((module) => {
 //         NDParticleShader = module.NDDEMShader;
@@ -66,7 +70,7 @@ export async function createNDParticleShader(params) {
     return new Promise((resolve) => {
       import("./shaders/" + params.dimension + "DShader.js").then((module) => {
         NDParticleShader = module.NDDEMShader;
-        console.log('SET ND PARTICLE SHADER');
+        // console.log('SET ND PARTICLE SHADER');
         resolve();
       });
     });
@@ -78,7 +82,7 @@ export function update_cylinder_colour( colour ) {
 }
 
 export async function add_spheres(S,params,scene) {
-    console.log('Adding spheres to scene');
+    // console.log('Adding spheres to scene');
     await add_actual_spheres(S,params,scene);
     update_particle_material(params);
 }
@@ -687,7 +691,7 @@ export function draw_force_network(S,params,scene) {
             forces = new Group();
 
             //var F = S.simu_getContactForce(); // very poorly named
-            var F = S.simu_getContactInfos(0x80 | 0x100);
+            let F = S.simu_getContactInfos(0x80 | 0x100);
             
             let width = radii[0]/2.;
             if ( 'F_mag_max' in params ) {
@@ -754,7 +758,7 @@ export function draw_force_network(S,params,scene) {
 export function get_particle_volume(dimension, radius) {
     let volume;
     if ( dimension === 1 ) {
-        volume = 2*radius;
+        volume = 2.*radius;
     } else if ( dimension === 2 ) {
         volume = Math.PI*Math.pow(radius,2);
     } else if ( dimension === 3 ) {

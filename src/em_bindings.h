@@ -27,6 +27,7 @@ EMSCRIPTEN_BINDINGS(DEMCG##dim##D) {\
     .EMFUNCTION(dim, simu_setBoundary)\
     .EMFUNCTION(dim, simu_getWallForce)\
     .EMFUNCTION(dim, simu_setExternalForce)\
+    .EMFUNCTION(dim, simu_setAngularVelocity)\
     .EMFUNCTION(dim, simu_getTime)\
     .EMFUNCTION(dim, simu_getGravityAngle)\
     .EMFUNCTION(dim, cg_setup_CG)\

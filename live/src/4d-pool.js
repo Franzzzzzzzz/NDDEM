@@ -71,10 +71,6 @@ params.particle_mass = params.particle_volume * params.particle_density;
 let sunk_balls = [];
 
 SPHERES.createNDParticleShader(params).then( init );
-// SPHERES.createNDParticleShader(params);
-
-// const startButton = document.getElementById( 'startButton' );
-// startButton.addEventListener( 'click', init );
 
 async function init() {
 
@@ -85,8 +81,6 @@ async function init() {
 
     camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 1000 );
     camera.position.set( 3*params.L1, 2*params.L1 + params.table_height, 0 );
-    
-    // camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
 
