@@ -4,11 +4,11 @@
 set -e
 
 # Make some folders
-mkdir build
-mkdir deploy
-mkdir live/deploy
-mkdir Samples
-mkdir Textures
+mkdir -p build
+mkdir -p deploy
+mkdir -p live/deploy
+mkdir -p Samples
+mkdir -p Textures
 
 # set up the live visualisation compilation and deploy with webpack
 npm i -D webpack webpack-cli

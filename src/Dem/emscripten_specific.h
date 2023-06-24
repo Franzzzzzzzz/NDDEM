@@ -19,6 +19,7 @@
         .EMFUNCTION(dim,getVelocity)\
         .EMFUNCTION(dim,setVelocity)\
         .EMFUNCTION(dim,getRotationRate)\
+        .EMFUNCTION(dim,setAngularVelocity)\
         .EMFUNCTION(dim,getContactForce)\
         .EMFUNCTION(dim,getContactInfos)\
         .EMFUNCTION(dim,getBoundary)\

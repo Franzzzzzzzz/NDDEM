@@ -118,7 +118,7 @@ params.right = params.L;
 params.floor = -params.L * params.aspect_ratio;
 params.roof = params.L * params.aspect_ratio;
 
-SPHERES.createNDParticleShader(params).then(init);
+SPHERES.createNDParticleShader(params).then( init );
 
 async function init() {
 

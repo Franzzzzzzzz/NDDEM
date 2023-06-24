@@ -17,24 +17,15 @@ var clock = new THREE.Clock();
 let camera, scene, renderer, stats, panel, controls;
 let physics, position;
 let gui;
-let spheres;
 let floor;
 let S;
-let NDDEMLib;
-let pointer;
-let v, omegaMag;
-let radii;
+let grid;
 let particle_volume;
 let NDsolids, material, STLFilename;
 let meshes = new THREE.Group();
 let density, vavg, stressTcxx, stressTcyy, stressTczz, stressTcxy;
 let pressure=[], shearstress=[], xloc=[] ;
 let show_stats = true;
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-let intersection_plane = new THREE.Plane();
-let camera_direction = new THREE.Vector3();
 
 let graph_fraction = 0.5;
 document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
@@ -69,9 +60,6 @@ function set_derived_properties() {
 
 }
 
-let counter = 0;
-var grid;
-
 params.average_radius = (params.r_min + params.r_max)/2.;
 let thickness = params.average_radius;
 
@@ -84,10 +72,6 @@ if ( params.dimension === 4) {
     params.N = 300
     particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
 }
-
-// const lut = new Lut( 'blackbody', 512 );
-
-var quality = 5;
 
 SPHERES.createNDParticleShader(params).then( init );
 

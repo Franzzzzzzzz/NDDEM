@@ -31,6 +31,7 @@ public:
     void simu_setBoundary(int a, std::vector<double> loc) {return S.setBoundary(a,loc);}
     std::vector<std::vector<double>> simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
+    void simu_setAngularVelocity(int id, v1d omega) {return S.setAngularVelocity(id,omega) ; }
     double simu_getTime() {return S.getTime() ; }
     double simu_getGravityAngle() {return S.getGravityAngle() ; }
 

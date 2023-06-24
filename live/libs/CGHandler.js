@@ -122,6 +122,18 @@ export function update_2d_cg_field(S, params) {
     }
 }
 
+export function get_mean_pressure(S, params) {
+    if ( params.cg_opacity === 0 ) {
+        S.cg_param_read_timestep(0) ;
+        S.cg_process_timestep(0,false) ;
+    }
+    let p =S.cg_get_result(0, "Pressure", 0) ;
+    // console.log(p);
+    // let mean_p = nanmean(p);
+    let mean_p = p.reduce((a, b) => a + b, 0) / p.length;
+    return mean_p;
+}
+
 function addvector(a,b){
     return a.map((e,i) => e + b[i]);
 }
@@ -134,3 +146,15 @@ function atan2vec(a,b){
 function divide_vec(a,b){
     return a.map((e,i) => e/b);
 }
+// function nanmean(array) {
+//     // Filter out NaN values
+//     const filteredArray = array.filter((value) => !isNaN(value));
+  
+//     // Calculate the sum of filtered values
+//     const sum = filteredArray.reduce((acc, value) => acc + value, 0);
+  
+//     // Calculate the mean
+//     const mean = sum / filteredArray.length;
+  
+//     return mean;
+//   }

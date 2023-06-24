@@ -24,6 +24,10 @@ let graph_fraction = 0.5;
 document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
 document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
 
+let I_div = document.createElement('div');
+I_div.style.cssText = 'position:absolute;color:white;bottom:10px;right:10px;font-size:24px;z-index:10000';
+document.body.appendChild(I_div);
+
 var params = {
     dimension: 3,
     initial_packing_fraction: 0.6,
@@ -49,8 +53,10 @@ var params = {
     vmax: 50, // max velocity to colour by
     omegamax: 50, // max rotation rate to colour by
     particle_density: 2700,
-    particle_opacity: 1.0,
+    particle_opacity: 0.8,
     show_colorbar: true,
+    target_pressure: 100,
+    current_pressure: 0,
 }
 
 if ( urlParams.has('dimension') ) {
@@ -127,8 +133,9 @@ async function init() {
     gui = new GUI();
     gui.width = 320;
 
-    gui.add ( params, 'shear_rate', -100, 100, 0.1).name('Shear rate (1/s) (W/S)').listen()
+    gui.add ( params, 'shear_rate', -10, 10, 0.1).name('Shear rate (1/s) (W/S)').listen()
         .onChange(update_shear_rate);
+    gui.add ( params, 'target_pressure', 10, 1000, 0.1).name('Target pressure (kPa)').listen().onChange(update_shear_rate);
     gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange(update_shear_rate);
     gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
             .onChange(update_shear_rate);
@@ -142,6 +149,8 @@ async function init() {
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'keypress', checkKeys, false );
 
+    update_I();
+
     if ( show_stats ) { make_graph(); }
 
     animate();
@@ -149,6 +158,7 @@ async function init() {
 
 
 function update_shear_rate() {
+    update_I();
     S.simu_setBoundary(0, [-params.L,params.L,params.shear_rate]);
     params.vmax = 1.5*Math.abs(params.shear_rate)*params.L;
     params.omegamax = 1e3*Math.abs(params.shear_rate)*params.average_radius;
@@ -164,6 +174,12 @@ function checkKeys( event ) {
         params.shear_rate -= 0.1;
         update_shear_rate();
         }
+}
+
+function update_I() {
+    // I = |gamma_dot| * d / sqrt(P/rho)
+    params.I  = Math.abs(params.shear_rate) * params.average_radius / Math.sqrt(params.target_pressure/params.particle_density);
+    I_div.innerHTML = 'I = ' + params.I.toPrecision(4);
 }
 
 function onWindowResize(){
@@ -185,7 +201,7 @@ function animate() {
     requestAnimationFrame( animate );
     if ( !params.paused ) {
         SPHERES.move_spheres(S,params);
-        S.simu_step_forward(5);
+        S.simu_step_forward(10);
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
@@ -211,13 +227,14 @@ function animate() {
             }
             pressure[i]=this_pressure / normal_stresses.length;
         }
-        // params.viscosity = 0;
+        params.viscosity = 1e6;
         // params.inertial_number = 0.1;
         // params.target_pressure = Math.pow(params.shear_rate*params.average_radius/params.inertial_number,2)*params.particle_density;
-        // params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
+        params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
         // let dt = 1e-3;
-        // params.wall_mass = 1e4;//params.N*params.particle_mass;
-        // WALLS.update_damped_wall(params, S, scene, dt)
+        params.wall_mass = params.N*params.particle_mass;
+        WALLS.update_damped_wall(params, S, 5*1e-3/20.);
+        
         update_graph();
         SPHERES.draw_force_network(S, params, scene);
     }

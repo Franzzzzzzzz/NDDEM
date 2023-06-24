@@ -677,6 +677,13 @@ public:
       }
   }
 
+  /** \brief Set the angular velocity of a single particle \ingroup API */
+  void setAngularVelocity(int id, v1d omega) {
+      for (int i=0; i<(d*(d-1)/2); i++) {
+          Omega[id][i] = omega[i];
+      }
+  }
+
 
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
   void fixParticle(int a, v1d loc) {
