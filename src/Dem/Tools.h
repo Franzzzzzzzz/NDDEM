@@ -69,14 +69,14 @@ public:
 
   //Gradient descent 
   int n=0 ; double delta=1 ;
-  double to=atan2(X[1],X[0]), tn ; 
+  double to=atan2(X[1]-cy,X[0]-cx), tn ;
   while (delta>tol) 
   {
     tn= to - gamma * d1(to) ; 
     delta=fabs(tn-to) ; 
     to=tn ;
     n++ ; 
-    if (n>1000) {printf("ERR: maximum number of iteration reached in gradient descent. gradientdescent_gamma is probabmy too large\n") ; break ;}
+    if (n>1000) {printf("ERR: maximum number of iteration reached in gradient descent. gradientdescent_gamma is probably too large\n") ; break ;}
   }
   
   return {to, d0(to)} ; 
