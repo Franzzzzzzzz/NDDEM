@@ -578,7 +578,7 @@ public:
             Tools<d>::savetxt(path, WallForce, ( char const *)("Force on the various walls")) ;
             }
             
-            //fprintf(stderr, "%g %g\n", X[0][0], X[0][1]) ; 
+            //fprintf(stderr, "%g %g\n", X[0][0], X[0][1]) ;
         }
 
         if (P.wallforcecompute || P.wallforcecomputed) MP.delayedwall_clean() ;
