@@ -124,7 +124,8 @@ async function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     // renderer.outputEncoding = THREE.sRGBEncoding;
-    document.body.appendChild( renderer.domElement );
+    var container = document.getElementById( 'canvas' );
+    container.appendChild( renderer.domElement );
 
     if ( params.vr ) {
         document.body.appendChild( VRButton.createButton( renderer ) );
