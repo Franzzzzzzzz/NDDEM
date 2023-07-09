@@ -4,15 +4,13 @@
 src/Dem/DEMND
 src/Dem/xml2vtk
 src/Texturing/Texturing
-src/build/
 cggui/node_modules
 cggui/cpptest
 visualise/node_modules
 examples/Output
 node_modules
-/build
-/deploy
-visualise/deploy
+build
+deploy
 Samples
 Textures
 testing
@@ -22,3 +20,5 @@ __pycache__
 Scripts/MuI_20200210.m*
 .vscode
 chromedriver-mobile
+live/tests_output
+Output

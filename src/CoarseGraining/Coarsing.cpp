@@ -337,7 +337,7 @@ struct Field * Coarsing::get_field(string nm)
 //===================================================
 int Coarsing::compute_fluc_vel (bool usetimeavg)
 {
-  printf(" -> VelFluct") ; fflush(stdout) ;
+  // printf(" -> VelFluct") ; fflush(stdout) ;
   v1d vavg (d,0) ;
   data.vel_fluc.resize(d, std::vector <double> (data.N, 0.0)) ;
 
@@ -361,7 +361,7 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
 int Coarsing::compute_fluc_rot (bool usetimeavg)
 {
   static bool messagefirst=true ;
-  printf(" -> RotVelFluct") ; fflush(stdout) ;
+  // printf(" -> RotVelFluct") ; fflush(stdout) ;
   v1d omegaavg (d,0) ;
   data.rot_fluc.resize(d, v1d (data.N, 0)) ;
   int idrot=get_id("ROT") ;
@@ -532,7 +532,7 @@ bool doextra = (extraid.size()>0)?true:false ;
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
 vector<double> totweight(data.N,0) ;
 
-printf(" -> Pass 1") ; fflush(stdout) ;
+// printf(" -> Pass 1") ; fflush(stdout) ;
 
 for (i=0 ; i<data.N ; i++)
 {
@@ -632,7 +632,7 @@ if (!hasrotfluct && (doeKR||doMK||doqRK))
     doeKR = doMK = doqRK = false ;
   }
 
-printf(" -> Pass 2") ; fflush(stdout) ;
+// printf(" -> Pass 2") ; fflush(stdout) ;
 for (i=0 ; i<data.N ; i++)
 {
  if (isnan(data.pos[0][i])) continue ;
@@ -665,7 +665,7 @@ for (i=0 ; i<data.N ; i++)
  }
 }
 // Intermediate pass (cg points): devide by rho when needed
-printf(" -> subpass 2") ; fflush(stdout) ;
+// printf(" -> subpass 2") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     double tworho ;
@@ -695,7 +695,7 @@ int TCid=get_id("TC") ; if (TCid<0) doTC=false ; if (doTC && !data.check_field_a
 int MCid=get_id("MC") ; if (MCid<0) doMC=false ; if (doMC && !data.check_field_availability("MC")) {printf("Data missing for MC\n") ; doMC=false ; }
 int mCid=get_id("mC") ; if (mCid<0) domC=false ; if (domC && !data.check_field_availability("mC")) {printf("Data missing for mC\n") ; domC=false ; }
 double sum=0 ; int p, q, id ; //double rp, rq ; double wpqs, wpqf ;
-printf(" -> Pass 3 ") ; fflush(stdout) ;
+// printf(" -> Pass 3 ") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
@@ -744,7 +744,7 @@ for (i=0 ; i<data.Ncf ; i++)
 }
 
 //Last intermediate pass
-printf(" -> subpass 3") ; fflush(stdout) ;
+// printf(" -> subpass 3") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
@@ -762,7 +762,7 @@ bool doqTC=true, doqRC=true ;
 int qTCid=get_id("qTC") ; if (qTCid<0) doqTC=false ; if (qTCid && !data.check_field_availability("qTC")) {printf("Data missing for qTC\n") ; doqTC=false ; }
 int qRCid=get_id("qRC") ; if (qRCid<0) doqRC=false ; if (qRCid && !data.check_field_availability("qRC")) {printf("Data missing for qRC\n") ; doqRC=false ; }
 double sum=0 ; int p, q, id ; //double rp, rq ; double wpqs, wpqf ;
-printf(" -> Pass 4 ") ; fflush(stdout) ;
+// printf(" -> Pass 4 ") ; fflush(stdout) ;
 for (i=0 ; i<data.Ncf ; i++)
 {
  id=find_closest_pq(i) ;
@@ -793,7 +793,7 @@ for (i=0 ; i<data.Ncf ; i++)
 }
 
 //Last intermediate pass
-printf(" -> subpass 4") ; fflush(stdout) ;
+// printf(" -> subpass 4") ; fflush(stdout) ;
 for (i=0 ; i<Npt ; i++)
 {
     if (doqTC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qTCid] *= 0.5 ;
@@ -825,7 +825,7 @@ vector <double> gradient ;
 if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) gradient.resize(d*d,0) ;
 if ((doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }
 
-printf(" -> Pass 5 ") ; fflush(stdout) ;
+// printf(" -> Pass 5 ") ; fflush(stdout) ;
 
 for (int i=0 ; i< Npt ; i++)
 {

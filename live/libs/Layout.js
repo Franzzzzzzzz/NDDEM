@@ -307,10 +307,13 @@ export function plotly_2d_graph(xlabel, ylabel, traces) {
       x: [],
       y: [],
       hoverinfo: 'skip',
+      fill: "toself",
+      fillcolor: 'black',
       name: t,
       // opacity: 1,
       line: {
-        width: 5,
+        // width: 5,
+        color: 'black'
         // color: colors[i],
         // reversescale: false
       },
@@ -318,5 +321,92 @@ export function plotly_2d_graph(xlabel, ylabel, traces) {
   });
 
   add_plotly_download_tag(xlabel + ',' + ylabel);
+  return { data, layout }
+}
+
+export function plotly_2x2_graphs(xlabels, ylabels, traces) {
+  let off = 0.05;
+  let layout = {
+      grid: {
+        rows: 2,
+        columns: 2,
+        pattern: 'independent',
+        subplots:[['',''], ['','xy']],
+        // roworder:'bottom to top'
+      },
+      showlegend : true,
+      polar: {
+        gridcell : 0,
+        sector: [0,180],
+        domain: {
+          x: [0, 0.5-off],
+          y: [0.5+off, 1]
+        },
+      },
+      polar2: {
+        sector: [0,180],
+        gridcell : 1,
+        domain: {
+          x: [0, 0.5-off],
+          y: [0, 0.5-off]
+        },
+      },
+      polar3: {
+        sector: [0,180],
+        gridcell : 2,
+        domain: {
+          x: [0.5+off, 1],
+          y: [0.5+off, 1]
+        },
+      },
+      // axis: {
+      //   domain: {
+      //     x: [0.5+off, 1],
+      //     y: [0, 0.5-off]
+      //   },
+      // },
+      legend: {
+          x: 1,
+          xanchor: 'right',
+          y: 1,
+      },
+      margin: {
+          b: 100,
+      },
+      font: {
+          family: 'Montserrat, Open sans',
+      }
+  }
+
+  let data = [];
+  // let colors = ['black',];
+  traces.forEach((t,i) => {
+    // console.log('xaxis' + String(i+1))
+    data.push({
+      gridcell: i,
+      type: 'scatterpolar',
+      mode: 'lines',
+      r: [],
+      theta: [],
+      thetaunit: "radians",
+      hoverinfo: 'skip',
+      name: t,
+      // xaxis: 'x' + String(i+1),
+      // yaxis: 'y' + String(i+1),
+      // opacity: 1,
+      subplot: 'polar' + String(i+1),
+      line: {
+        width: 5,
+        // color: colors[i],
+        // reversescale: false
+      },
+    })
+  });
+  data[3].type = 'scatter';
+  // data[3].subplot = 'axis';
+  data[3].x = [];
+  data[3].y = [];
+
+  add_plotly_download_tag(xlabels + ',' + ylabels);
   return { data, layout }
 }
