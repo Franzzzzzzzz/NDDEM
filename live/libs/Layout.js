@@ -324,7 +324,7 @@ export function plotly_2d_graph(xlabel, ylabel, traces) {
   return { data, layout }
 }
 
-export function plotly_2x2_graphs(xlabels, ylabels, traces) {
+export function plotly_2x2_graphs() {
   let off = 0.05;
   let layout = {
       grid: {
@@ -334,10 +334,11 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
         subplots:[['',''], ['','xy']],
         // roworder:'bottom to top'
       },
-      showlegend : true,
       polar: {
-        title: {
-          text: 'AA',
+        radialaxis: {
+          title: 'Branch vector orientation',
+          x: 0,
+          xanchor: 'right',
         },
         gridcell : 0,
         sector: [0,180],
@@ -347,6 +348,9 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
         },
       },
       polar2: {
+        radialaxis: {
+          title: 'Normal force orientation',
+        },
         sector: [0,180],
         gridcell : 1,
         domain: {
@@ -355,6 +359,9 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
         },
       },
       polar3: {
+        radialaxis: {
+          title: 'Tangential force orientation',
+        },
         sector: [0,180],
         gridcell : 2,
         domain: {
@@ -362,10 +369,11 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
           y: [0.5+off, 1]
         },
       },
+      showlegend : true,
       legend: {
-          // x: 1,
-          // xanchor: 'right',
-          // y: 1,
+          x: 1,
+          xanchor: 'right',
+          y: 0.5,
           bgcolor: 'rgba(255, 255, 255, 0.2)'
       },
       margin: {
@@ -376,12 +384,13 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
       }
   }
 
+  let colors = ['red', 'blue', 'green', 'orange', 'black'];
   let data = [];
-  // let colors = ['black','black','blue'];
+  let traces = ['Branch vector', 'Normal force', 'Tangential force'];
   traces.forEach((t,i) => {
-    // console.log('xaxis' + String(i+1))
     data.push({
       gridcell: i,
+      showlegend: false,
       type: 'scatterpolar',
       mode: 'lines',
       r: [],
@@ -389,18 +398,16 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
       thetaunit: "radians",
       hoverinfo: 'skip',
       name: t,
-      // xaxis: 'x' + String(i+1),
-      // yaxis: 'y' + String(i+1),
-      // opacity: 1,
       subplot: 'polar' + String(i+1),
       line: {
         width: 5,
-        // color: colors[i],
-        // reversescale: false
+        // color: 'black',
+        color: colors[i+1],
       },
     })
     data.push({
       gridcell: i,
+      showlegend: false,
       type: 'scatterpolar',
       mode: 'lines',
       r: [],
@@ -408,26 +415,37 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
       thetaunit: "radians",
       hoverinfo: 'skip',
       // name: t,
-      // xaxis: 'x' + String(i+1),
-      // yaxis: 'y' + String(i+1),
-      // opacity: 1,
       subplot: 'polar' + String(i+1),
       line: {
         dash: 'dot',
         width: 3,
-        color: 'black'
-        // color: colors[i],
-        // reversescale: false
+        // color: 'black',
+        color: colors[i+1],
       },
     })
   });
-  data[6].type = 'scatter';
-  data[6].x = [];
-  data[6].y = [];
-  data[7].type = 'scatter';
-  data[7].x = [];
-  data[7].y = [];
+  traces = ['Macroscopic friction','Branch vector anisotropy','Normal force anisotropy','Tangential force anisotropy','Rothenburg & Bathurst (1989)'];
+  traces.forEach((t,i) => {
+    data.push({
+      gridcell: 3,
+      type: 'scatter',
+      mode: 'lines',
+      x: [],
+      y: [],
+      hoverinfo: 'skip',
+      name: t,
+      line: {
+        width: 1,
+        color: colors[i]
+      },
+    })
+  });
 
+  data[6].line.width = 5;
+  data[10].line.width = 5;
+
+  let xlabels = 'TEST'
+  let ylabels = 'TEST'
   add_plotly_download_tag(xlabels + ',' + ylabels);
   return { data, layout }
 }
