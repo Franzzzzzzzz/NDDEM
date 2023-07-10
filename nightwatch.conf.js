@@ -48,8 +48,8 @@ module.exports = {
 
       screenshots: {
         enabled: false,
-        path: 'screens',
-        on_failure: false
+        // path: 'screens',
+        on_failure: true
       },
 
       desiredCapabilities: {
