@@ -426,9 +426,6 @@ async function update_graph() {
     let Fn_hist = histogram(Fn_theta, theta_edge);
     let Ft_hist = histogram(Ft_theta, theta_edge);
 
-    let p = fitCosineCyclic( theta_center, branch_hist );
-    console.log(p);
-
     Plotly.update('stats', {
             'r': [branch_hist],
             'theta': [theta_center],
@@ -492,45 +489,3 @@ function edge_to_center(edge) {
     }
     return result
 }
- 
-// Function to fit a cosine function to the data with cyclic x values
-function fitCosineCyclic(xValues, data) {
-    const n = data.length;
-  
-    // Calculate the sum of x, y, cos(x), sin(x), cos^2(x), and sin^2(x)
-    let sumX = 0;
-    let sumY = 0;
-    let sumCosX = 0;
-    let sumSinX = 0;
-    let sumCosX2 = 0;
-    let sumSinX2 = 0;
-  
-    for (let i = 0; i < n; i++) {
-      const x = xValues[i];
-      const y = data[i];
-      const cosX = Math.cos(x);
-      const sinX = Math.sin(x);
-  
-      sumX += x;
-      sumY += y;
-      sumCosX += cosX;
-      sumSinX += sinX;
-      sumCosX2 += cosX * cosX;
-      sumSinX2 += sinX * sinX;
-    }
-  
-    // Calculate the coefficients a and b
-    const a = (n * sumCosX * sumY - sumX * sumCosX2) / (n * sumCosX2 - sumCosX * sumCosX);
-    const b = (sumY - a * sumCosX) / n;
-  
-    // Generate the predicted values using the fitted coefficients
-    const predicted = [];
-    for (let i = 0; i < n; i++) {
-      const x = xValues[i];
-      const predictedY = a * Math.cos(x) + b;
-      predicted.push(predictedY);
-    }
-  
-    return predicted;
-}
-  
