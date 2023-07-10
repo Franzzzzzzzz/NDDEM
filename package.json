@@ -5,7 +5,7 @@
     "watch": "webpack --watch",
     "start": "webpack build && webpack serve",
     "build": "webpack",
-    "test": "webpack build && webpack serve && npx nightwatch --env chrome,firefox"
+    "test": "webpack build && webpack serve & sleep 5 && npx nightwatch --env chrome,firefox; kill $!"
   },
   "dependencies": {
     "@tweenjs/tween.js": "^19.0.0",

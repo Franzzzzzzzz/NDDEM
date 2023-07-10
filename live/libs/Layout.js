@@ -334,8 +334,9 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
         subplots:[['',''], ['','xy']],
         // roworder:'bottom to top'
       },
-      showlegend : true,
+      showlegend : false,
       polar: {
+        title: 'AA',
         gridcell : 0,
         sector: [0,180],
         domain: {
@@ -359,17 +360,11 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
           y: [0.5+off, 1]
         },
       },
-      // axis: {
-      //   domain: {
-      //     x: [0.5+off, 1],
-      //     y: [0, 0.5-off]
-      //   },
+      // legend: {
+      //     x: 1,
+      //     xanchor: 'right',
+      //     y: 1,
       // },
-      legend: {
-          x: 1,
-          xanchor: 'right',
-          y: 1,
-      },
       margin: {
           b: 100,
       },
@@ -379,7 +374,7 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
   }
 
   let data = [];
-  // let colors = ['black',];
+  // let colors = ['black','black','blue'];
   traces.forEach((t,i) => {
     // console.log('xaxis' + String(i+1))
     data.push({
@@ -401,11 +396,33 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
         // reversescale: false
       },
     })
+    data.push({
+      gridcell: i,
+      type: 'scatterpolar',
+      mode: 'lines',
+      r: [],
+      theta: [],
+      thetaunit: "radians",
+      hoverinfo: 'skip',
+      name: t,
+      // xaxis: 'x' + String(i+1),
+      // yaxis: 'y' + String(i+1),
+      // opacity: 1,
+      subplot: 'polar' + String(i+1),
+      line: {
+        dash: 'dot',
+        width: 5,
+        // color: colors[i],
+        // reversescale: false
+      },
+    })
   });
-  data[3].type = 'scatter';
-  // data[3].subplot = 'axis';
-  data[3].x = [];
-  data[3].y = [];
+  data[6].type = 'scatter';
+  data[6].x = [];
+  data[6].y = [];
+  data[7].type = 'scatter';
+  data[7].x = [];
+  data[7].y = [];
 
   add_plotly_download_tag(xlabels + ',' + ylabels);
   return { data, layout }
