@@ -42,10 +42,10 @@ let S;
 
 var params = {
     dimension: 2,
-    L: 16*0.004, //system size
-    initial_density: 0.90,
-    zoom: 1.2,
-    aspect_ratio: 2,
+    L: 22*0.004, //system size
+    initial_density: 0.75,
+    zoom: 0.75,
+    aspect_ratio: 1,
     // paused: false,
     // g_mag: 1e3,
     // theta: 0, // slope angle in DEGREES
@@ -56,7 +56,7 @@ var params = {
     friction: 0.5,
     // freq: 0.05,
     // new_line: false,
-    shear_rate: 1e1,
+    shear_rate: 1,
     // lut: 'None',
     lut: 'White',
     cg_field: 'Density',
@@ -66,11 +66,10 @@ var params = {
     cg_opacity: 0.8,
     cg_window_size: 3,
     particle_opacity: 0.5,
-    target_pressure: 100,
-    F_mag_max: 5e3,
+    target_pressure: 1e4,
+    F_mag_max: 2e1,
     audio: false,
     audio_sensitivity : 1,
-    target_pressure: 100,
     current_pressure: 0,
 }
 
@@ -194,10 +193,10 @@ async function init() {
     gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
         update_cg_params(S, params);
     });
-    // gui.add ( params, 'shear_rate', 0, 2, 0.001).name('Shear rate').listen().onChange( update_wall_particle_velocities );
-    gui.add ( params, 'shear_rate', {Slow : 1e-2, Medium: 1e-1, Fast: 1e0}).name('Shear rate').listen().onChange( update_shear_rate );
+    gui.add ( params, 'shear_rate', -1, 1).name('Shear rate').listen().onChange( update_shear_rate );
+    // gui.add ( params, 'shear_rate', {Back : -1, Slow: 1e-1, Forward: 1}).name('Shear rate').listen().onChange( update_shear_rate );
     gui.add ( params, 'friction', 0,2).name('Interparticle friction').listen().onChange( () => {S.simu_interpret_command("set Mu " + String(params.friction))} );
-    gui.add ( params, 'target_pressure', 10, 1000, 0.1).name('Target pressure (kPa)').listen().onChange(update_shear_rate);
+    // gui.add ( params, 'target_pressure', 1e4, 1e6, 1e4).name('Target pressure (Pa)').listen().onChange(update_shear_rate);
 
     
     gui.add ( params, 'audio_sensitivity', 1, 1e3, 1).name('Audio sensitivity');
@@ -216,6 +215,7 @@ async function init() {
 
     make_graph();
     animate();
+    update_I();
 }
 
 function onWindowResize(){
@@ -246,11 +246,11 @@ function animate() {
         CGHANDLER.update_2d_cg_field(S,params);
         SPHERES.draw_force_network(S, params, scene);
         update_pressure();
-        // if ( count % 10 == 0 ) { 
-            // count += 1;
         update_graph();
-        // WALLS.update_damped_wall(params, S, 5*1e-3/20.);
-        // }
+        // console.log(S.simu_getTime())
+        if ( S.simu_getTime() > 0.1 ) {
+            WALLS.update_damped_wall(params.current_pressure, params.target_pressure, params, S, 15*1e-2/20.);
+        }
         
     }
     
@@ -273,7 +273,7 @@ function update_pressure() {
     // stressTcyy=S.cg_get_result(0, "TC", 4) ;
     // stressTczz=S.cg_get_result(0, "TC", 8) ;
     stressTcxy=S.cg_get_result(0, "TC", 1) ;
-    for (var i=0 ; i<stressTcxy.length ; i++)
+    for (var i=0 ; i<stressTcxy.length ; i++) // for all grid points
     {
         xloc[i]=grid[0]+i*grid[3] ;
         shearstress[i]=-stressTcxy[i] ;
@@ -281,12 +281,16 @@ function update_pressure() {
         for ( let j=0; j<normal_stresses.length; j++) {
             this_pressure += normal_stresses[j][i];
         }
-        pressure[i]=this_pressure / normal_stresses.length;
+        pressure[i]=this_pressure / normal_stresses.length; // get isotropic pressure
     }
-    params.viscosity = 1e6;
+    
+    // params.viscosity = 1e6;
     // params.inertial_number = 0.1;
     // params.target_pressure = Math.pow(params.shear_rate*params.average_radius/params.inertial_number,2)*params.particle_density;
     params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
+    params.current_shearstress = shearstress.reduce((a, b) => a + b, 0) / shearstress.length; // average shear stress
+
+    
     // let dt = 1e-3;
 }
 
@@ -362,7 +366,7 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("auto location randomdrop");
 
-        let tc = 1e-3;
+        let tc = 1e-2;
         let rest = 0.2; // super low restitution coeff to dampen out quickly
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
 
@@ -371,6 +375,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu " + String(params.friction));
+        S.simu_interpret_command("set damping 0.001");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc/20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -420,7 +425,7 @@ async function update_graph() {
         }
     }
     
-    let theta_edge = linspace(0, Math.PI, 21);
+    let theta_edge = linspace(0, Math.PI, 11);
     let theta_center = edge_to_center(theta_edge);
     let branch_hist = histogram(branch_theta, theta_edge);
     let Fn_hist = histogram(Fn_theta, theta_edge);
@@ -469,15 +474,18 @@ async function update_graph() {
         'theta': [theta_center],
     }, {}, [5])
 
-    Plotly.update('stats', {
-        'x': [Ft_hist],
-        'y': [theta_center],
-    }, {}, [6])
+    // console.log(S.simu_getTime())
+    // console.log(params.current_shearstress,params.current_pressure)
+    let t = S.simu_getTime();
+    Plotly.extendTraces('stats', {
+        'x': [[t],[t],[t],[t],[t]],
+        'y': [[params.current_shearstress/params.current_pressure],[-branch_a],[-Fn_a],[Ft_a],[0.5*(-branch_a-Fn_a+Ft_a)]],
+    }, [6,7,8,9,10])
 
 }
 
 function make_graph() {
-    let { data, layout } = LAYOUT.plotly_2x2_graphs(['a','b','c','d'],['e','f','g','h'],['Branch vectors','Normal forces','Tangential forces','τ/σ<sub>y</sub>']);
+    let { data, layout } = LAYOUT.plotly_2x2_graphs();
     Plotly.newPlot('stats', data, layout);
 }
 
@@ -520,28 +528,16 @@ function edge_to_center(edge) {
  
 // Function to fit a cosine function to the data with cyclic x values
 function fitCosineCyclic(xValues, data) {
-    const n = data.length;
-  
-    // Calculate the sum of x, y, cos(x), sin(x)
-    // let sumX = 0.0;
-    // let sumY = 0.0;
     let A = 0.0;
     let B = 0.0;
   
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < data.length; i++) {
         const x = xValues[i];
         const y = data[i];
-        // sumY += y;
+        
         A += y*Math.cos(2*x);
         B += y*Math.sin(2*x);
     }
-    // // and now symmetric part
-    // for (let i = 0; i < n; i++) {
-    //     const x = xValues[i] + Math.PI;
-    //     const y = data[i];
-    //     A += y*Math.cos(2*x);
-    //     B += y*Math.sin(2*x);
-    // }
   
     // Calculate the coefficients a and b
     const b = arcctg(A/B)/2;
@@ -549,16 +545,16 @@ function fitCosineCyclic(xValues, data) {
   
     // Generate the predicted values using the fitted coefficients
     const predicted = [];
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < data.length; i++) {
       const x = xValues[i];
       const predictedY = (1 + a*Math.cos(2*(x - b))) / (2*Math.PI);
       predicted.push(predictedY);
     }
   
     // Return the fit results
-    // let mean_value = sumY/parseFloat(n);
-    // console.log(b/mean_value);
     return [a,b,predicted];
 }
 
-function arcctg(x) { return Math.PI / 2 - Math.atan(x); }
+function arcctg(x) {
+    return Math.PI / 2 - Math.atan(x);
+}
