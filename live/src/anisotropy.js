@@ -61,7 +61,7 @@ var params = {
     lut: 'White',
     cg_field: 'Density',
     quality: 5,
-    cg_width: 50,
+    cg_width: 25,
     cg_height: 25,
     cg_opacity: 0.8,
     cg_window_size: 3,
@@ -296,8 +296,8 @@ function update_cg_params(S, params) {
     cgparam["boxes"]=[params.cg_width,params.cg_height] ;
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"]=[
-        [-params.L*params.aspect_ratio,-params.L],
-        [ params.L*params.aspect_ratio, params.L]] ;
+        [-params.L,-params.L*params.aspect_ratio],
+        [ params.L, params.L*params.aspect_ratio]] ;
     cgparam["window size"]=params.cg_window_size*params.average_radius ;
     cgparam["skip"]=0;
     cgparam["max time"]=1 ;
@@ -426,25 +426,53 @@ async function update_graph() {
     let Fn_hist = histogram(Fn_theta, theta_edge);
     let Ft_hist = histogram(Ft_theta, theta_edge);
 
+    let branch_mean = branch_hist.reduce( (a,b) => a+b ) / branch_hist.length;
+    let Fn_mean = Fn_hist.reduce( (a,b) => a+b ) / Fn_hist.length;
+    let Ft_mean = Ft_hist.reduce( (a,b) => a+b ) / Ft_hist.length;
+    
+    branch_hist = branch_hist.map( x => x/branch_mean/Math.PI/2. ); 
+    Fn_hist = Fn_hist.map( x => x/Fn_mean/Math.PI/2. ); 
+    Ft_hist = Ft_hist.map( x => x/Ft_mean/Math.PI/2. ); 
+
+    let [branch_a,branch_b,branch_pred] = fitCosineCyclic( theta_center, branch_hist );
+    let [Fn_a,Fn_b,Fn_pred]             = fitCosineCyclic( theta_center, Fn_hist );
+    let [Ft_a,Ft_b,Ft_pred]             = fitCosineCyclic( theta_center, Ft_hist );
+    // console.log(a,b);
+
     Plotly.update('stats', {
-            'r': [branch_hist],
-            'theta': [theta_center],
+        'r': [branch_hist],
+        'theta': [theta_center],
     }, {}, [0]);
 
     Plotly.update('stats', {
-            'r': [Fn_hist],
-            'theta': [theta_center],
-    }, {}, [1])
+        'r': [branch_pred],
+        'theta': [theta_center],
+    }, {}, [1]);
+
+    Plotly.update('stats', {
+        'r': [Fn_hist],
+        'theta': [theta_center],
+    }, {}, [2])
+
+    Plotly.update('stats', {
+        'r': [Fn_pred],
+        'theta': [theta_center],
+    }, {}, [3])
 
     Plotly.update('stats', {
         'r': [Ft_hist],
         'theta': [theta_center],
-}, {}, [2])
+    }, {}, [4])
 
-Plotly.update('stats', {
-    'x': [Ft_hist],
-    'y': [theta_center],
-}, {}, [3])
+    Plotly.update('stats', {
+        'r': [Ft_pred],
+        'theta': [theta_center],
+    }, {}, [5])
+
+    Plotly.update('stats', {
+        'x': [Ft_hist],
+        'y': [theta_center],
+    }, {}, [6])
 
 }
 
@@ -489,3 +517,48 @@ function edge_to_center(edge) {
     }
     return result
 }
+ 
+// Function to fit a cosine function to the data with cyclic x values
+function fitCosineCyclic(xValues, data) {
+    const n = data.length;
+  
+    // Calculate the sum of x, y, cos(x), sin(x)
+    // let sumX = 0.0;
+    // let sumY = 0.0;
+    let A = 0.0;
+    let B = 0.0;
+  
+    for (let i = 0; i < n; i++) {
+        const x = xValues[i];
+        const y = data[i];
+        // sumY += y;
+        A += y*Math.cos(2*x);
+        B += y*Math.sin(2*x);
+    }
+    // // and now symmetric part
+    // for (let i = 0; i < n; i++) {
+    //     const x = xValues[i] + Math.PI;
+    //     const y = data[i];
+    //     A += y*Math.cos(2*x);
+    //     B += y*Math.sin(2*x);
+    // }
+  
+    // Calculate the coefficients a and b
+    const b = arcctg(A/B)/2;
+    const a = 2*A/Math.cos(2*b);
+  
+    // Generate the predicted values using the fitted coefficients
+    const predicted = [];
+    for (let i = 0; i < n; i++) {
+      const x = xValues[i];
+      const predictedY = (1 + a*Math.cos(2*(x - b))) / (2*Math.PI);
+      predicted.push(predictedY);
+    }
+  
+    // Return the fit results
+    // let mean_value = sumY/parseFloat(n);
+    // console.log(b/mean_value);
+    return [a,b,predicted];
+}
+
+function arcctg(x) { return Math.PI / 2 - Math.atan(x); }
