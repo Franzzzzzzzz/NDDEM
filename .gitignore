@@ -4,13 +4,15 @@
 src/Dem/DEMND
 src/Dem/xml2vtk
 src/Texturing/Texturing
+src/build/
 cggui/node_modules
 cggui/cpptest
 visualise/node_modules
 examples/Output
 node_modules
-build
-deploy
+/build
+/deploy
+visualise/deploy
 Samples
 Textures
 testing

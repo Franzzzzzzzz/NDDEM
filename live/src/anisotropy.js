@@ -443,6 +443,7 @@ async function update_graph() {
     let [Fn_a,Fn_b,Fn_pred]             = fitCosineCyclic( theta_center, Fn_hist );
     let [Ft_a,Ft_b,Ft_pred]             = fitCosineCyclic( theta_center, Ft_hist );
     // console.log(a,b);
+    
 
     Plotly.update('stats', {
         'r': [branch_hist],
