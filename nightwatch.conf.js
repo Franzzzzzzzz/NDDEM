@@ -37,7 +37,8 @@ module.exports = {
   output_folder : 'live/tests_output',
 
   test_workers: {
-    enabled: true
+    enabled: true,
+    workes: 'auto'
   },
 
   test_settings: {
@@ -60,6 +61,20 @@ module.exports = {
         server_path: ''
       },
       
+    },
+    
+    firefox: {
+      desiredCapabilities: {
+        browserName: 'firefox'
+      },
+      webdriver: {
+        start_process: true,
+        server_path: require('geckodriver').path, // Path to geckodriver executable
+        port: 4445,
+        cli_args: [
+          // Add any desired command line arguments for Firefox
+        ]
+      }
     },
     
     chrome: {
