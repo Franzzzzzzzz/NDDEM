@@ -32,6 +32,7 @@ jobs:
         keep_files: true
         publish_branch: gh-pages2 
         user_name: "nightwatch-test-results"
+        user_email: "benjy.marks@sydney.edu.au"
 
     - name: Upload screenshots
       if: always()

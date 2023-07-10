@@ -334,9 +334,11 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
         subplots:[['',''], ['','xy']],
         // roworder:'bottom to top'
       },
-      showlegend : false,
+      showlegend : true,
       polar: {
-        title: 'AA',
+        title: {
+          text: 'AA',
+        },
         gridcell : 0,
         sector: [0,180],
         domain: {
@@ -360,11 +362,12 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
           y: [0.5+off, 1]
         },
       },
-      // legend: {
-      //     x: 1,
-      //     xanchor: 'right',
-      //     y: 1,
-      // },
+      legend: {
+          // x: 1,
+          // xanchor: 'right',
+          // y: 1,
+          bgcolor: 'rgba(255, 255, 255, 0.2)'
+      },
       margin: {
           b: 100,
       },
@@ -404,14 +407,14 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
       theta: [],
       thetaunit: "radians",
       hoverinfo: 'skip',
-      name: t,
+      // name: t,
       // xaxis: 'x' + String(i+1),
       // yaxis: 'y' + String(i+1),
       // opacity: 1,
       subplot: 'polar' + String(i+1),
       line: {
         dash: 'dot',
-        width: 5,
+        width: 3,
         // color: colors[i],
         // reversescale: false
       },
