@@ -48,8 +48,8 @@ module.exports = {
 
       screenshots: {
         enabled: false,
-        path: 'live/screens',
-        on_failure: false
+        // path: 'screens',
+        on_failure: true
       },
 
       desiredCapabilities: {
@@ -62,7 +62,7 @@ module.exports = {
       },
       
     },
-    
+
     firefox: {
       desiredCapabilities: {
         browserName: 'firefox'
