@@ -415,6 +415,7 @@ export function plotly_2x2_graphs(xlabels, ylabels, traces) {
       line: {
         dash: 'dot',
         width: 3,
+        color: 'black'
         // color: colors[i],
         // reversescale: false
       },
