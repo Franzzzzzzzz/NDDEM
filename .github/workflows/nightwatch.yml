@@ -25,13 +25,13 @@ jobs:
       
     - name: "Publish test results"
       if: always()
-      uses: peaceiris/actions-gh-pages@v3.7.3
+      uses: peaceiris/actions-gh-pages@v3
       with: 
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: './tests_output/nightwatch-html-report'
         keep_files: true
-        user_name: "gravityvi"
-        user_email: "ravisawlani04@gmail.com"
+        publish_branch: gh-pages2 
+        user_name: "nightwatch-test-results"
 
     - name: Upload screenshots
       if: always()
