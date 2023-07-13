@@ -28,7 +28,7 @@ document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
 document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
 
 let I_div = document.createElement('div');
-I_div.style.cssText = 'position:absolute;color:white;bottom:10px;right:10px;font-size:24px;z-index:10000';
+I_div.style.cssText = 'position:absolute;color:white;bottom:10px;right:10px;font-size:24px;z-index:10000;';
 document.body.appendChild(I_div);
 
 var urlParams = new URLSearchParams(window.location.search);
@@ -42,7 +42,7 @@ let S;
 
 var params = {
     dimension: 2,
-    L: 22*0.004, //system size
+    L: 20*0.004, //system size
     initial_density: 0.75,
     zoom: 0.75,
     aspect_ratio: 1,
@@ -242,7 +242,7 @@ function animate() {
         // let v = S.simu_getVelocity();
         // console.log(v);
         SPHERES.move_spheres(S,params);
-        S.simu_step_forward(15);
+        S.simu_step_forward(20);
         CGHANDLER.update_2d_cg_field(S,params);
         SPHERES.draw_force_network(S, params, scene);
         update_pressure();
@@ -411,68 +411,96 @@ function update_I() {
 }
 
 async function update_graph() {
-    let branch_theta = [];
-    let Fn_theta = [];
-    let Ft_theta = [];
+    let numBins = 15;
+    let branches = [];
+    let Fns = [];
+    let Fts = [];
+
     for ( let c = 0; c < SPHERES.F.length; c++ ) {
         let i = SPHERES.F[c][0];
         let j = SPHERES.F[c][1];
 
         if ( SPHERES.F[c][2] !== 0 && SPHERES.F[c][3] !== 0 ) { // lots of results with zero force
-            branch_theta.push(Math.atan2(SPHERES.x[i][0] - SPHERES.x[j][0],SPHERES.x[i][1] - SPHERES.x[j][1]));
-            Fn_theta.push(Math.atan2(SPHERES.F[c][2],SPHERES.F[c][3]));
-            Ft_theta.push(Math.atan2(SPHERES.F[c][4],SPHERES.F[c][5]));
+            // branch_theta.push(Math.atan2(SPHERES.x[i][0] - SPHERES.x[j][0],SPHERES.x[i][1] - SPHERES.x[j][1]));
+            // Fn_theta.push(Math.atan2(SPHERES.F[c][2],SPHERES.F[c][3]));
+            // Ft_theta.push(Math.atan2(SPHERES.F[c][4],SPHERES.F[c][5]));
+            branches.push([SPHERES.x[i][0] - SPHERES.x[j][0],SPHERES.x[i][1] - SPHERES.x[j][1]]);
+            Fns.push([SPHERES.F[c][2],SPHERES.F[c][3]]);
+
+            let sign = crossProductSign([SPHERES.x[i][0] - SPHERES.x[j][0],SPHERES.x[i][1] - SPHERES.x[j][1]],
+                                        [SPHERES.F[c][4],SPHERES.F[c][5]]);
+            Fts.push([SPHERES.F[c][4],SPHERES.F[c][5],sign]);
         }
     }
+
+    // let branch_hist = calculateAngularAverage(branches, numBins);
+    let branch_hist = calculateAngularCount(branches, numBins);
+    let Fn_hist = calculateAngularAverage(Fns, numBins, false);
     
-    let theta_edge = linspace(0, Math.PI, 11);
+
+    branch_hist = branch_hist.concat(branch_hist); // double up data
+    Fn_hist = Fn_hist.concat(Fn_hist); // double up data
+    
+    let theta_edge = linspace(0, 2*Math.PI, 2*numBins+1);
     let theta_center = edge_to_center(theta_edge);
-    let branch_hist = histogram(branch_theta, theta_edge);
-    let Fn_hist = histogram(Fn_theta, theta_edge);
-    let Ft_hist = histogram(Ft_theta, theta_edge);
-
-    let branch_mean = branch_hist.reduce( (a,b) => a+b ) / branch_hist.length;
-    let Fn_mean = Fn_hist.reduce( (a,b) => a+b ) / Fn_hist.length;
-    let Ft_mean = Ft_hist.reduce( (a,b) => a+b ) / Ft_hist.length;
+    let dtheta = theta_edge[1] - theta_edge[0];
     
-    branch_hist = branch_hist.map( x => x/branch_mean/Math.PI/2. ); 
-    Fn_hist = Fn_hist.map( x => x/Fn_mean/Math.PI/2. ); 
-    Ft_hist = Ft_hist.map( x => x/Ft_mean/Math.PI/2. ); 
-
-    let [branch_a,branch_b,branch_pred] = fitCosineCyclic( theta_center, branch_hist );
-    let [Fn_a,Fn_b,Fn_pred]             = fitCosineCyclic( theta_center, Fn_hist );
-    let [Ft_a,Ft_b,Ft_pred]             = fitCosineCyclic( theta_center, Ft_hist );
-    // console.log(a,b);
+    let branch_sum = branch_hist.reduce( (a,b) => a+b );
+    let f0 = Fn_hist.reduce( (a,b) => a+b ) / Fn_hist.length;
+    // let Ft_mean = Ft_hist.reduce( (a,b) => a+b ) / Ft_hist.length;
     
+    branch_hist = branch_hist.map( x => x/branch_sum/dtheta ); // WHY 1.1????
+    Fn_hist = Fn_hist.map( x => x/f0 ); 
+    
+    let Ft_hist = calculateAngularAverage(Fts, numBins, true);
+    Ft_hist = Ft_hist.concat(Ft_hist); // double up data
+    Ft_hist = Ft_hist.map( x => x/f0 ); 
+
+    // console.log(branch_hist.reduce( (a,b) => a+b*dtheta ))
+
+    let [a,a_n,a_t,theta_a,theta_n,theta_t,pred_a,pred_n,pred_t] = fitCosineCyclic( theta_edge, branch_hist, Fn_hist, Ft_hist );
+    // console.log(branches)
+    // console.log(branch_hist)
+
+    branch_hist = branch_hist.concat(branch_hist[0]); // make cyclic
+    Fn_hist = Fn_hist.concat(Fn_hist[0]); // make cyclic
+    Ft_hist = Ft_hist.concat(Ft_hist[0]); // make cyclic
+    theta_center = theta_center.concat(theta_center[0]); // make cyclic
+
+    // Fn_hist = Fn_hist.map( x => Math.abs(x) ); 
+    Ft_hist = Ft_hist.map( x => Math.abs(x) );
+    // pred_n = pred_n.map( x => Math.abs(x) ); 
+    pred_t = pred_t.map( x => Math.abs(x) ); 
+    // console.log(theta_center[0],theta_center[theta_center.length-1]);
 
     Plotly.update('stats', {
-        'r': [branch_hist],
         'theta': [theta_center],
+        'r': [branch_hist],
     }, {}, [0]);
 
     Plotly.update('stats', {
-        'r': [branch_pred],
         'theta': [theta_center],
+        'r': [pred_a],
     }, {}, [1]);
 
     Plotly.update('stats', {
-        'r': [Fn_hist],
         'theta': [theta_center],
+        'r': [Fn_hist],
     }, {}, [2])
 
     Plotly.update('stats', {
-        'r': [Fn_pred],
         'theta': [theta_center],
+        'r': [pred_n],
     }, {}, [3])
 
     Plotly.update('stats', {
-        'r': [Ft_hist],
         'theta': [theta_center],
+        'r': [Ft_hist],
     }, {}, [4])
 
     Plotly.update('stats', {
-        'r': [Ft_pred],
         'theta': [theta_center],
+        'r': [pred_t],
     }, {}, [5])
 
     // console.log(S.simu_getTime())
@@ -480,7 +508,7 @@ async function update_graph() {
     let t = S.simu_getTime();
     Plotly.extendTraces('stats', {
         'x': [[t],[t],[t],[t],[t]],
-        'y': [[params.current_shearstress/params.current_pressure],[-branch_a],[-Fn_a],[Ft_a],[0.5*(-branch_a-Fn_a+Ft_a)]],
+        'y': [[Math.abs(params.current_shearstress/params.current_pressure)],[a],[a_n],[a_t],[0.5*(a+a_n+a_t)/(1+a*a_n/2.)]],
     }, [6,7,8,9,10])
 
 }
@@ -526,36 +554,112 @@ function edge_to_center(edge) {
     }
     return result
 }
+
+function calculateAngularCount(vectors, numBins) {
+    // Create an array to store the sum and count of magnitudes in each bin
+    // const binData = Array(numBins).fill().map(() => ({ sum: 0, count: 0 }));
+    const binData = Array(numBins).fill(0);
+  
+    // Iterate through each vector
+    for (const vector of vectors) {
+        // Calculate the angle of the vector
+        const angle = Math.PI/2. - Math.atan(vector[0]/vector[1]); // want it in range 0 to pi
+        // console.log(vector)
+        // Map the angle to the corresponding bin index
+        const binIndex = Math.floor((angle / (Math.PI)) * numBins);
+        // console.log(binIndex)
+
+        binData[binIndex] += 1;
+    }
+    // console.log(binData);
+    return binData
+    
+}
+
+function calculateAngularAverage(vectors, numBins, shear=false) {
+  // Create an array to store the sum and count of magnitudes in each bin
+  const binData = Array(numBins).fill().map(() => ({ sum: 0, count: 0 }));
+
+  // Iterate through each vector
+  for (const vector of vectors) {
+    // Calculate the angle of the vector
+    const angle = Math.PI/2. - Math.atan(vector[0]/vector[1]); // want it in range 0 to pi
+
+    // Map the angle to the corresponding bin index
+    const binIndex = Math.floor((angle / (Math.PI)) * numBins);
+    
+    // Calculate the magnitude of the vector
+    let magnitude = Math.sqrt(vector[0] ** 2 + vector[1] ** 2);
+    
+    if ( shear !== false ) {
+        magnitude *= vector[2];
+    }
+    
+    // Update the sum and count of magnitudes in the bin
+    binData[binIndex].sum += magnitude;
+    binData[binIndex].count++;
+  }
+
+  // Calculate the mean value of the magnitudes in each bin
+  const binMeans = binData.map(bin => bin.count > 0 ? bin.sum / bin.count : 0);
+
+  return binMeans;
+}
  
 // Function to fit a cosine function to the data with cyclic x values
-function fitCosineCyclic(xValues, data) {
-    let A = 0.0;
-    let B = 0.0;
+function fitCosineCyclic(xValues,E,f_n,f_t) {
+    let A_a = 0.0;
+    let B_a = 0.0;
+    let A_n = 0.0;
+    let B_n = 0.0;
+    let A_t = 0.0;
+    let B_t = 0.0;
+    let dx = xValues[1] - xValues[0];
   
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < E.length; i++) {
         const x = xValues[i];
-        const y = data[i];
-        
-        A += y*Math.cos(2*x);
-        B += y*Math.sin(2*x);
+        const cos2x_dx = Math.cos(2*x)*dx;
+        const sin2x_dx = Math.sin(2*x)*dx;
+        A_a +=   E[i]*cos2x_dx;
+        B_a +=   E[i]*sin2x_dx;
+        A_n += f_n[i]*cos2x_dx;
+        B_n += f_n[i]*sin2x_dx;
+        A_t += f_t[i]*cos2x_dx;
+        B_t += f_t[i]*sin2x_dx;
     }
   
-    // Calculate the coefficients a and b
-    const b = arcctg(A/B)/2;
-    const a = 2*A/Math.cos(2*b);
+    // Calculate the coefficients
+    const theta_a = Math.atan(B_a/A_a)/2.;
+    const a   = 2*A_a/Math.cos(2*theta_a);
+
+    const theta_n = Math.atan(B_n/A_n)/2.;
+    const a_n = A_n/Math.cos(2*theta_n)/Math.PI;
+
+    const theta_t = Math.atan(-A_t/B_t)/2.;
+    const a_t = -A_t/Math.sin(2*theta_t)/Math.PI;
   
     // Generate the predicted values using the fitted coefficients
-    const predicted = [];
-    for (let i = 0; i < data.length; i++) {
+    const pred_a = [];
+    const pred_n = [];
+    const pred_t = [];
+    for (let i = 0; i < E.length; i++) {
       const x = xValues[i];
-      const predictedY = (1 + a*Math.cos(2*(x - b))) / (2*Math.PI);
-      predicted.push(predictedY);
+      pred_a.push( (1 +   a*Math.cos(2*(x - theta_a))) / (2*Math.PI) );
+      pred_n.push(  1 + a_n*Math.cos(2*(x - theta_n))                );
+      pred_t.push(      a_t*Math.sin(2*(x - theta_t))                );
     }
   
     // Return the fit results
-    return [a,b,predicted];
+    return [Math.abs(a),Math.abs(a_n),Math.abs(a_t),theta_a,theta_n,theta_t,pred_a,pred_n,pred_t];
 }
 
-function arcctg(x) {
-    return Math.PI / 2 - Math.atan(x);
+function crossProductSign(vector1, vector2) {
+    const crossProduct = vector1[0] * vector2[1] - vector1[1] * vector2[0];
+    if (crossProduct > 0) {
+        return 1; // Positive sign
+    } else if (crossProduct < 0) {
+        return -1; // Negative sign
+    } else {
+        return 0; // Zero sign (vectors are parallel or collinear)
+    }
 }
