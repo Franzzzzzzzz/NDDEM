@@ -325,7 +325,9 @@ export function plotly_2d_graph(xlabel, ylabel, traces) {
 }
 
 export function plotly_2x2_graphs() {
-  let off = 0.05;
+  let xoff = 0.05;
+  let yoff = 0.15;
+  
   let layout = {
       grid: {
         rows: 2,
@@ -336,37 +338,52 @@ export function plotly_2x2_graphs() {
       },
       polar: {
         radialaxis: {
-          title: 'Branch vector orientation',
+          title: 'Contact orientation',
           x: 0,
           xanchor: 'right',
+          rangemode: 'tozero',
+        },
+        angularaxis: {
+          rotation: 90,
+          direction: "clockwise"
         },
         gridcell : 0,
-        sector: [0,180],
+        // sector: [0,180],
         domain: {
-          x: [0, 0.5-off],
-          y: [0.5+off, 1]
+          x: [0, 0.5-xoff],
+          y: [0.5+yoff, 1]
         },
       },
       polar2: {
         radialaxis: {
           title: 'Normal force orientation',
+          rangemode: 'tozero',
         },
-        sector: [0,180],
+        angularaxis: {
+          rotation: 90,
+          direction: "clockwise"
+        },
+        // sector: [0,180],
         gridcell : 1,
         domain: {
-          x: [0, 0.5-off],
-          y: [0, 0.5-off]
+          x: [0, 0.5-xoff],
+          y: [0, 0.5-yoff]
         },
       },
       polar3: {
         radialaxis: {
           title: 'Tangential force orientation',
+          rangemode: 'tozero',
         },
-        sector: [0,180],
+        angularaxis: {
+          rotation: 90,
+          direction: "clockwise"
+        },
+        // sector: [0,180],
         gridcell : 2,
         domain: {
-          x: [0.5+off, 1],
-          y: [0.5+off, 1]
+          x: [0.5+xoff, 1],
+          y: [0.5+yoff, 1]
         },
       },
       showlegend : true,
@@ -400,7 +417,7 @@ export function plotly_2x2_graphs() {
       name: t,
       subplot: 'polar' + String(i+1),
       line: {
-        width: 5,
+        width: 1,
         // color: 'black',
         color: colors[i+1],
       },
@@ -418,13 +435,13 @@ export function plotly_2x2_graphs() {
       subplot: 'polar' + String(i+1),
       line: {
         dash: 'dot',
-        width: 3,
+        width: 5,
         // color: 'black',
         color: colors[i+1],
       },
     })
   });
-  traces = ['Macroscopic friction','Branch vector anisotropy','Normal force anisotropy','Tangential force anisotropy','Rothenburg & Bathurst (1989)'];
+  traces = ['Macroscopic friction','Contact anisotropy','Normal force anisotropy','Tangential force anisotropy','Rothenburg & Bathurst (1989)'];
   traces.forEach((t,i) => {
     data.push({
       gridcell: 3,
