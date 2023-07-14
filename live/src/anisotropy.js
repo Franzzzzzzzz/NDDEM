@@ -15,13 +15,13 @@ import * as AUDIO from '../libs/audio.js';
 import * as CGHANDLER from '../libs/CGHandler.js';
 
 
-let info_div = document.createElement("div")
-info_div.innerHTML = "Click on a particle to grab it"
-info_div.style.color = "white";
-info_div.style.position = "absolute";
-info_div.style.left = "20px";
-info_div.style.top = "20px";
-document.body.appendChild(info_div);
+// let info_div = document.createElement("div")
+// info_div.innerHTML = "Click on a particle to grab it"
+// info_div.style.color = "white";
+// info_div.style.position = "absolute";
+// info_div.style.left = "20px";
+// info_div.style.top = "20px";
+// document.body.appendChild(info_div);
 
 let graph_fraction = 0.5;
 document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
@@ -222,13 +222,13 @@ function onWindowResize(){
 
     // camera.aspect = window.innerWidth / window.innerHeight;
     // camera.updateProjectionMatrix();
-    var aspect = window.innerWidth / window.innerHeight;
-    camera.left = (-100 * aspect) / params.zoom;
-    camera.right = (100 * aspect) / params.zoom;
-    camera.bottom = 100 / params.zoom;
-    camera.top = -100 / params.zoom;
-    camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    var aspect = window.innerWidth / window.innerHeight /2.;
+    camera.left = -params.L*params.aspect_ratio*aspect/params.zoom;
+    camera.right = params.L*params.aspect_ratio*aspect/params.zoom;
+    camera.bottom = -params.L*params.aspect_ratio/params.zoom;
+    camera.top = params.L*params.aspect_ratio/params.zoom;
+
+    renderer.setSize( window.innerWidth/2., window.innerHeight );
 }
 
 function animate() {
@@ -514,8 +514,8 @@ async function update_graph() {
 }
 
 function make_graph() {
-    let { data, layout } = LAYOUT.plotly_2x2_graphs();
-    Plotly.newPlot('stats', data, layout);
+    let { data, layout, config } = LAYOUT.plotly_2x2_graphs();
+    Plotly.newPlot('stats', data, layout, config);
 }
 
 function histogram(numbers, binEdges) {

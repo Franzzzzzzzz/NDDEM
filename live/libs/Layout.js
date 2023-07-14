@@ -405,8 +405,8 @@ export function plotly_2x2_graphs() {
             size: 16,
         },
         showarrow: false,
-        align: 'center',
-        x: 0.095,
+        xanchor: 'center',
+        x: (0.5-xoff)/2,
         y: 1.1,
         xref: 'paper',
         yref: 'paper',
@@ -417,8 +417,8 @@ export function plotly_2x2_graphs() {
             size: 16,
         },
         showarrow: false,
-        align: 'center',
-        x: 0.96,
+        xanchor: 'center',
+        x: 0.75+xoff/2.,
         y: 1.1,
         xref: 'paper',
         yref: 'paper',
@@ -429,8 +429,8 @@ export function plotly_2x2_graphs() {
             size: 16,
         },
         showarrow: false,
-        align: 'center',
-        x: 0.08,
+        xanchor: 'center',
+        x: (0.5-xoff)/2,
         y: 0.43,
         xref: 'paper',
         yref: 'paper',
@@ -501,5 +501,8 @@ export function plotly_2x2_graphs() {
   let xlabels = 'TEST'
   let ylabels = 'TEST'
   add_plotly_download_tag(xlabels + ',' + ylabels);
-  return { data, layout }
+
+  var config = {responsive: true}
+
+  return { data, layout, config }
 }
