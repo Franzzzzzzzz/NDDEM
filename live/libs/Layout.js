@@ -338,7 +338,7 @@ export function plotly_2x2_graphs() {
       },
       polar: {
         radialaxis: {
-          title: 'Contact orientation',
+          // title: 'Contact orientation',
           x: 0,
           xanchor: 'right',
           rangemode: 'tozero',
@@ -356,7 +356,7 @@ export function plotly_2x2_graphs() {
       },
       polar2: {
         radialaxis: {
-          title: 'Normal force orientation',
+          // title: 'Normal force orientation',
           rangemode: 'tozero',
         },
         angularaxis: {
@@ -372,7 +372,7 @@ export function plotly_2x2_graphs() {
       },
       polar3: {
         radialaxis: {
-          title: 'Tangential force orientation',
+          // title: 'Tangential force orientation',
           rangemode: 'tozero',
         },
         angularaxis: {
@@ -398,7 +398,44 @@ export function plotly_2x2_graphs() {
       },
       font: {
           family: 'Montserrat, Open sans',
-      }
+      },
+      annotations: [{
+        text: "Contact orientation",
+        font: {
+            size: 16,
+        },
+        showarrow: false,
+        align: 'center',
+        x: 0.095,
+        y: 1.1,
+        xref: 'paper',
+        yref: 'paper',
+      },
+      {
+        text: "Tangential force orientation",
+        font: {
+            size: 16,
+        },
+        showarrow: false,
+        align: 'center',
+        x: 0.96,
+        y: 1.1,
+        xref: 'paper',
+        yref: 'paper',
+      },
+      {
+        text: "Normal force orientation",
+        font: {
+            size: 16,
+        },
+        showarrow: false,
+        align: 'center',
+        x: 0.08,
+        y: 0.43,
+        xref: 'paper',
+        yref: 'paper',
+      },
+      ]
   }
 
   let colors = ['red', 'blue', 'green', 'orange', 'black'];
