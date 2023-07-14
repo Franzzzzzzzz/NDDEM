@@ -31,8 +31,10 @@ jobs:
           # Make sure to set a version number!
           version: 3.1.25
 
-      - name: Install doxygen and necessary packages
+      - name: Update packages
         run: sudo apt-get update
+
+      - name: Install doxygen and necessary packages
         run: sudo apt-get install -y doxygen texlive texlive-font-utils
 
       - name: Check gcc version
