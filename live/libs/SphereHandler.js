@@ -102,7 +102,7 @@ function add_actual_spheres(S,params,scene) {
             // geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
         }
         else {
-            geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
+            geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
         }
 
         for ( let i = 0; i < params.N; i ++ ) {
