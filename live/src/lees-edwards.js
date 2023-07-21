@@ -55,7 +55,7 @@ var params = {
     particle_density: 2700,
     particle_opacity: 0.8,
     show_colorbar: true,
-    target_pressure: 100,
+    target_pressure: 1e4,
     current_pressure: 0,
 }
 
@@ -135,7 +135,7 @@ async function init() {
 
     gui.add ( params, 'shear_rate', -10, 10, 0.1).name('Shear rate (1/s) (W/S)').listen()
         .onChange(update_shear_rate);
-    gui.add ( params, 'target_pressure', 10, 1000, 0.1).name('Target pressure (kPa)').listen().onChange(update_shear_rate);
+    gui.add ( params, 'target_pressure', 1e3, 1e4).name('Target pressure (Pa)').listen().onChange(update_shear_rate);
     gui.add ( params, 'particle_opacity',0,1).name('Particle opacity').listen().onChange(update_shear_rate);
     gui.add ( params, 'lut', ['None', 'Velocity', 'Fluct Velocity', 'Rotation Rate' ]).name('Colour by')
             .onChange(update_shear_rate);
@@ -201,7 +201,7 @@ function animate() {
     requestAnimationFrame( animate );
     if ( !params.paused ) {
         SPHERES.move_spheres(S,params);
-        S.simu_step_forward(10);
+        S.simu_step_forward(5);
         S.cg_param_read_timestep(0) ;
         S.cg_process_timestep(0,false) ;
         var grid = S.cg_get_gridinfo();
@@ -233,7 +233,7 @@ function animate() {
         params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
         // let dt = 1e-3;
         params.wall_mass = params.N*params.particle_mass;
-        WALLS.update_damped_wall(params, S, 5*1e-3/20.);
+        WALLS.update_damped_wall(params.current_pressure, params.target_pressure, params, S, 5*1e-3/20.);
         
         update_graph();
         SPHERES.draw_force_network(S, params, scene);

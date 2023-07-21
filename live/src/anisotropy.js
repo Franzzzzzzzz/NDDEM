@@ -63,7 +63,7 @@ var params = {
     quality: 5,
     cg_width: 25,
     cg_height: 25,
-    cg_opacity: 0.8,
+    cg_opacity: 0,
     cg_window_size: 3,
     particle_opacity: 0.5,
     target_pressure: 1e4,
@@ -242,7 +242,7 @@ function animate() {
         // let v = S.simu_getVelocity();
         // console.log(v);
         SPHERES.move_spheres(S,params);
-        S.simu_step_forward(20);
+        S.simu_step_forward(5);
         CGHANDLER.update_2d_cg_field(S,params);
         SPHERES.draw_force_network(S, params, scene);
         update_pressure();
