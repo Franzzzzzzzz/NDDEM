@@ -18,7 +18,7 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 
 ### Usage
 1. Navigate to the main github directory and run `node server.js` or `python server.py` or `./Texturing/TexturingServer` to start a web server which will be used to serve local files.
-2. Open `visualise/index.html` in chrome or firefox. Supermedium is recommended if you want to use VR.
+2. Open `visualise/index.html` in chrome or firefox.
 3. Visualisation flags can either be hardcoded in `index.html` or can be set via the URL, for example: `index.html?fname=SpinnerD5&view_mode=rotations2`
 
 ### Flags:
@@ -46,5 +46,3 @@ This should work under `python2` or `python3`, with no additional dependencies, 
 - `texture_path`: If using the `TexturingServer`, optionally set a different path to look for textures. Helps if you have premade a bunch of textures for some different cases.
 - `data_type`: `default`, `binary`, `mercury` or `liggghts`. If included, this flag loads data from a different data source. You can convert NDDEM csv to binary data using the included script `binarise_output.py` in the `scripts` folder.
 - `stats`: include this flag to show some statistics in the top left corner. If things are running slowly/poorly this can really help!
-
-An example command that works for me, when the TexturingServer is running: `http://localhost:54321/visualise/index.html?fname=D5Cristal/&view_mode=D4&colour_scheme=inverted&time=350&rate=5`
