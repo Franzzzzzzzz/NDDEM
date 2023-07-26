@@ -34,7 +34,6 @@
 #include "Typedefs.h"
 #include <boost/random.hpp>
 #include <fstream>
-#include <filesystem>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/crc.hpp>
@@ -93,9 +92,9 @@ struct Field {
 /// Data structure handling point data and contact data
 struct Data {
 public:
-    Data () : mass(NULL), Imom(NULL), id1(NULL), id2(NULL) {}
+    Data () : radius(nullptr), mass(nullptr), Imom(nullptr), id1(nullptr), id2(nullptr) {}
 int N = 0 ; ///< Number of particles
-double * radius; ///<Particle radius
+double * radius ; ///<Particle radius
 double * mass ; ///< Particle masses
 double *Imom ; ///< Particle moment of inertia
 vector <double *> pos ; ///< Particle positions

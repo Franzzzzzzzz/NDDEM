@@ -3,7 +3,7 @@
 
 using json = nlohmann::json;
 
-enum FileFormat {NDDEM, Liggghts, MercuryData, MercuryVTU, Interactive} ;
+enum FileFormat {NDDEM, Liggghts, MercuryData, MercuryVTU, Yade, Interactive} ;
 enum FileType {both, particles, contacts} ;
 //enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, fpq, mpq, mqp} ;
 
@@ -31,10 +31,8 @@ public:
 
   //----- Files
   struct File {
-      std::string path ;
       FileFormat fileformat;
       FileType filetype ;
-      int numfiles ;
       std::map <std::string, std::string> mapping ;
       Reader * reader   ;
       //~File() {if (reader != nullptr) {reader->close() ; delete (reader) ; }}
@@ -227,10 +225,31 @@ void Param::process_extrafields (json &j)
 //---------------------------------------------------------
 void Param::process_file (json &j2)
 {
-    for (auto j: j2)
+    for (size_t f=0 ; f<j2.size() ; f++)
     {
+        auto & j =j2[f] ; 
+        
+        // Treat actions first if the tag is present
+       auto v = j.find("action") ;
+        if (v != j.end())
+        {
+            if ( *v == "remove")
+            {
+                files.erase(files.begin()+f) ;
+                continue ; 
+            }
+            else if (*v == "edit")
+                files.erase(files.begin()+f) ;
+            else if (*v == "donothing")
+                continue ; 
+            else if (*v == "create") 
+                ; // do nothing
+            else
+                printf("WARN: Unknown action command on process_file\n") ; 
+        }         
+        
         FileType content = FileType::particles ;
-        auto v = j.find("content") ;
+        v = j.find("content") ;
         if (v != j.end())
         { if ( *v == "particles") content = FileType::particles ;
         else if (*v == "contacts") content = FileType::contacts ;
@@ -246,29 +265,31 @@ void Param::process_file (json &j2)
         else if (*v == "NDDEM") format = FileFormat::NDDEM ;
         else if (*v == "mercury_legacy") format = FileFormat::MercuryData ;
         else if (*v == "mercury_vtu") format = FileFormat::MercuryVTU ;
+        else if (*v == "yade") format = FileFormat::Yade ; 
         else if (*v == "interactive") format = FileFormat::Interactive ;
         else {printf("ERR: unknown file format.\n") ; return ;}
         }
         else { printf("ERR: the key 'format' is required when defining a file. \n") ; return ; }
 
-        int number = 1 ;
-        v = j.find("number") ;
-        if (v != j.end()) number = *v ;
-
+        
         std::map <std::string, std::string> mapping ;
         v = j.find("mapping") ;
         if (v != j.end()) mapping= v->get<std::map <std::string, std::string>>();
 
-        files.push_back({.path=j["filename"], .fileformat=format, .filetype=content, .numfiles=number, .mapping=mapping, .reader = nullptr}) ;
-
-        if (files.back().fileformat == FileFormat::Liggghts)
+        files.insert(files.begin()+f, {.fileformat=format, .filetype=content, .mapping=mapping, .reader = nullptr,}) ;
+     
+        if (files[f].fileformat == FileFormat::NDDEM)
+            files[f].reader = new NDDEMReader (j["filename"]);
+        else if (files[f].fileformat == FileFormat::Interactive)
+            files[f].reader = new InteractiveReader ();
+        #ifndef NOTALLFORMATS
+        else if (files[f].fileformat == FileFormat::Liggghts)
         {
-            #ifndef NOLIGGGHTS
-            if (files.back().filetype == FileType::both)
-                files.back().reader = new LiggghtsReader (files.back().path) ;
-            else if (files.back().filetype == FileType::particles)
-                files.back().reader = new LiggghtsReader_particles (files.back().path) ;
-            else if (files.back().filetype == FileType::contacts)
+            if (files[f].filetype == FileType::both)
+                files[f].reader = new LiggghtsReader (j["filename"]) ;
+            else if (files[f].filetype == FileType::particles)
+                files[f].reader = new LiggghtsReader_particles (j["filename"]) ;
+            else if (files[f].filetype == FileType::contacts)
             {
                 std::vector<File>::iterator it ;
                 for (it = files.begin() ; it<files.end() ; it++)
@@ -280,36 +301,48 @@ void Param::process_file (json &j2)
                     files.pop_back() ;
                     continue ;
                 }
-                files.back().reader = new LiggghtsReader_contacts (files.back().path, it->reader, files.back().mapping) ;
+                files[f].reader = new LiggghtsReader_contacts (j["filename"], it->reader, files[f].mapping) ;
             }
-            #else
-            printf("The file has been compiled without Liggghts file format support\n") ;
-            #endif
         }
-        else if (files.back().fileformat == FileFormat::NDDEM)
-            files.back().reader = new NDDEMReader (files.back().path);
-        #ifndef NOMERCURY
-        else if (files.back().fileformat == FileFormat::MercuryData)
+        else if (files[f].fileformat == FileFormat::MercuryData)
         {
-            if (files.back().filetype == FileType::particles)
-                files.back().reader = new MercuryReader_data_particles (files.back().path) ;
-            else if (files.back().filetype == FileType::contacts) // TODO
-            {}//files.back().reader = new MercuryReader_contacts (files.back().path) ;
+            if (files[f].filetype == FileType::particles)
+                files[f].reader = new MercuryReader_data_particles (j["filename"]) ;
+            else if (files[f].filetype == FileType::contacts) // TODO
+            {}//files[f].reader = new MercuryReader_contacts (files[f].path) ;
             else
                 printf("ERR: no Mercury file format support FileType::both.\n") ;
         }
-        else if (files.back().fileformat == FileFormat::MercuryVTU)
+        else if (files[f].fileformat == FileFormat::MercuryVTU)
         {
-            if (files.back().filetype == FileType::particles)
-                files.back().reader = new MercuryReader_vtu_particles (files.back().path, number) ;
-            //else if (files.back().filetype == FileType::contacts) // TODO
-            //{}//files.back().reader = new MercuryReader_contacts (files.back().path) ;
+            if (files[f].filetype == FileType::particles)
+                files[f].reader = new MercuryReader_vtu_particles (j["filename"]) ;
+            //else if (files[f].filetype == FileType::contacts) // TODO
+            //{}//files[f].reader = new MercuryReader_contacts (files[f].path) ;
             else
                 printf("ERR: no Mercury VTU file format support FileType::contacts and FileType::both.\n") ;
         }
+        else if (files[f].fileformat == FileFormat::Yade)
+        {
+            files[f].reader = new YadeReader() ; 
+        }
         #endif
-        else if (files.back().fileformat == FileFormat::Interactive)
-            files.back().reader = new InteractiveReader ();
+        else
+        {
+            printf("Coarse graining has not been compiled with the requested file format") ;
+        }
+        
+        bool multifile = false ; 
+        files[f].reader->path = j["filename"] ; 
+        v = j.find("initial") ;
+        if (v != j.end()) {multifile = true ; files[f].reader->filenumbering.initial = v->get<double>() ; }
+        v = j.find("delta") ;
+        if (v != j.end()) {multifile = true ; files[f].reader->filenumbering.delta = v->get<double>() ; }
+
+        if (multifile && files[f].reader->path.find('%') == std::string::npos)
+            printf("WARN: you have provided file initial or delta numbering, but there is no pattern in your filename, which is surprising\n") ; 
+        if (files[f].reader->path.find('%') != std::string::npos) files[f].reader->filenumbering.ismultifile = true ;         
+        
     }
 }
 //------------------
@@ -348,8 +381,7 @@ int Param::set_data(struct Data & D)
         for (int dd=0 ; dd<std::get<1>(v) ; dd++)
             D.extra[std::get<2>(v)+dd] = get_data(DataValue::extra_named, dd, std::get<0>(v)) ;
     }
-
-return 0 ;
+    return 0 ;
 }
 //------------------------------------------------------------------------
 int Param::get_num_particles ()

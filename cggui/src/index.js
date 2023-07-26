@@ -1,5 +1,6 @@
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Volume';
+import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray';
@@ -22,9 +23,10 @@ import vtkMouseCameraTrackballZoomManipulator from '@kitware/vtk.js/Interaction/
 import vtkGestureCameraManipulator from '@kitware/vtk.js/Interaction/Manipulators/GestureCameraManipulator';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
-import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
+import vtkAnnotatedCubeActor from '@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor';
 
-
+//import './popup.css'
+import './popupform.css'
 import controlPanel from './controlPanel.html';
 import { VtkDataTypes } from '@kitware/vtk.js/Common/Core/DataArray/Constants'
 import noUiSlider from 'nouislider';
@@ -42,9 +44,12 @@ const renderer = fullScreenRenderer.getRenderer();
 const renderWindow = fullScreenRenderer.getRenderWindow();
 
 fullScreenRenderer.addController(controlPanel);
+fullScreenRenderer.getControlContainer().style.width="40%" ;
 
 var dispts = 0 ;
 var defaultdensity = -1 ; 
+
+var worker = new Worker("worker.js");
 
 // ----------------------------------------------------------------------------
 // Example code
@@ -115,8 +120,6 @@ actor.getProperty().setSpecularPower(8.0);
     imageData.getPointData().setScalars(scalars);
 
 mapper.setInputData(imageData);
-
-
 renderer.addVolume(actor);
 
 
@@ -124,6 +127,7 @@ renderer.addVolume(actor);
 const interactor = renderWindow.getInteractor();
 interactor.setDesiredUpdateRate(15.0);
 const interactorStyle = vtkInteractorStyleManipulator.newInstance();
+
 interactorStyle.removeAllMouseManipulators();
 const manipulator1 = vtkMouseCameraTrackballPanManipulator.newInstance() ;
 manipulator1.setButton(2) ; 
@@ -140,121 +144,71 @@ const manipulator4 =vtkMouseCameraTrackballRotateManipulator.newInstance(); //sh
 manipulator4.setButton(1) ; 
 interactorStyle.addMouseManipulator(manipulator4);
 interactorStyle.addGestureManipulator(vtkGestureCameraManipulator.newInstance());
+
+interactorStyle.setCenterOfRotation(1,1,1) ; 
+console.log(interactorStyle.getCenterOfRotation()) ; 
 renderWindow.getInteractor().setInteractorStyle(interactorStyle);
 
-// const axes = vtkAxesActor.newInstance({ pickable: true });
-// const orientationWidget = vtkOrientationMarkerWidget.newInstance({
-//   actor: axes,
-//   interactor: interactor,
-// });
-// orientationWidget.setViewportCorner(
-//   vtkOrientationMarkerWidget.Corners.BOTTOM_LEFT
-// );
-// orientationWidget.setEnabled(true) ; 
-// orientationWidget.setMinPixelSize(100);
-// orientationWidget.setMaxPixelSize(300);
-// renderer
-//   .getActiveCamera()
-//   .onModified(orientationWidget.updateMarkerOrientation);
+// create axes
+const axes = vtkAnnotatedCubeActor.newInstance();
+axes.setDefaultStyle({
+  text: 'X+',
+  fontStyle: 'bold',
+  fontFamily: 'Arial',
+  fontColor: 'black',
+  fontSizeScale: (res) => res / 2,
+  faceColor: '#ff0000',
+  faceRotation: 0,
+  edgeThickness: 0.1,
+  edgeColor: 'black',
+  resolution: 400,
+});
+axes.setXPlusFaceProperty({ text: '+X' });
+axes.setXMinusFaceProperty({
+  text: 'X-',
+  faceColor: '#ff0000'
+});
+axes.setYPlusFaceProperty({
+  text: 'Y+',
+  faceColor: '#ffff00',
+});
+axes.setYMinusFaceProperty({
+  text: 'Y-',
+  faceColor: '#ffff00',
+  fontColor: 'black',
+});
+axes.setZPlusFaceProperty({
+  text: 'Z+', 
+  faceColor: '#00ff00',
+  edgeColor: 'black',
+});
+axes.setZMinusFaceProperty({ 
+  text: '-Z', 
+  faceColor: '#00ff00',
+  edgeColor: 'black',    
+});
+
+// create orientation widget
+const orientationWidget = vtkOrientationMarkerWidget.newInstance({
+  actor: axes,
+  interactor: renderWindow.getInteractor(),
+});
+orientationWidget.setEnabled(true);
+orientationWidget.setViewportCorner(
+  vtkOrientationMarkerWidget.Corners.BOTTOM_LEFT
+);
+//orientationWidget.setViewportSize(0.15);
+//orientationWidget.setMinPixelSize(100);
+//orientationWidget.setMaxPixelSize(300);
+
 
 clipPlane1.setNormal([1,0,0]);
 clipPlane1.setOrigin([0,0,0]);
 mapper.addClippingPlane(clipPlane1);
 
-renderWindow.render();
-
-
-
 renderer.resetCamera();
 renderer.getActiveCamera().elevation(70);
 renderWindow.render();
-
-/*document.querySelector('.plane1Position').addEventListener('input', (e) => {
-  clipPlane1Position = Number(e.target.value);
-  const clipPlane1Origin = [
-    clipPlane1Position * clipPlane1Normal[0],
-    clipPlane1Position * clipPlane1Normal[1],
-    clipPlane1Position * clipPlane1Normal[2],
-  ];import controlPanel from './controller.html';
-  clipPlane1.setOrigin(clipPlane1Origin);
-  renderWindow.render();
-});
-
-document.querySelector('.plane1Rotation').addEventListener('input', (e) => {
-  const changedDegree = Number(e.target.value) - clipPlane1RotationAngle;
-  clipPlane1RotationAngle = Number(e.target.value);
-  vtkMatrixBuilder
-    .buildFromDegree()
-    .rotate(changedDegree, rotationNormal)
-    .apply(clipPlane1Normal);
-  clipPlane1.setNormal(clipPlane1Normal);
-  renderWindow.render();
-});
-
-document.querySelector('.plane2Position').addEventListener('input', (e) => {
-  clipPlane2Position = Number(e.target.value);
-  const clipPlane2Origin = [
-    clipPlane2Position * clipPlane2Normal[0],
-    clipPlane2Position * clipPlane2Normal[1],
-    clipPlane2Position * clipPlane2Normal[2],
-  ];
-  clipPlane2.setOrigin(clipPlane2Origin);
-  renderWindow.render();
-});
-
-document.querySelector('.plane2Rotation').addEventListener('input', (e) => {
-  const changedDegree = Number(e.target.value) - clipPlane2RotationAngle;
-  clipPlane2RotationAngle = Number(e.target.value);
-  vtkMatrixBuilder
-    .buildFromDegree()
-    .rotate(changedDegree, rotationNormal)
-    .apply(clipPlane2Normal);
-  clipPlane2.setNormal(clipPlane2Normal);
-  renderWindow.render();
-});*/
-
-// -----------------------------------------------------------
-// Make some variables global so that you can inspect and
-// modify objects in your browser's developer console:
-// -----------------------------------------------------------
-
-// global.source = reader;
-// global.mapper = mapper;
-// global.actor = actor;
-// global.renderer = renderer;
-// global.renderWindow = renderWindow;
-// global.clipPlane1 = clipPlane1;
-// global.clipPlane2 = clipPlane2;
-
-/*var fileHandle;
-
-var worker = new Worker("worker.js");
-
-document.querySelector('.butfile').addEventListener('click', async () => {
-    
-    var file = document.getElementById('filename').files[0];
-    worker.postMessage([ file ]);
-});
-
-
-let CGLiggghts ; 
-let CGAPI ; 
-async function CGLigghts_em ()
-{
-CGLiggghts = await CoarseGraining_Liggghts();
-global.CGLiggghts = CGLiggghts;
-console.log(CGLiggghts) ; 
-CGAPI = await new CGLiggghts.CGAPI() ;
-CGAPI.parse('{"particles": "dump.testSegre006","forces": "dump.forceSegre006","fields" : ["RHO", "VAVG", "TC", "TK"],"savefile": "Segre006", "saveformat": ["vtk", "mat", "numpy"],"periodicity": [true, true, false],"boundaries": [[-0.0075, -0.0075, 0],[0.0075, 0.0075, 0.015]], "boxes": [1,1,20],"skip": 150,"max time": 350,"time average": true,"window size": 0.0015,"window": "Lucy3DFancyInt","mapping": {  "id1": "c_cout[1]",  "id2": "c_cout[2]",  "per": "c_cout[3]", "fx": "c_cout[4]",  "fy": "c_cout[5]", "fz": "c_cout[6]"}}') ;   
-CGAPI.initialize() ; 
-CGAPI.skip_ts() ; 
-CGAPI.read_ts() ;
-CGAPI.process_full() ; 
-    
-}
-
-CGLigghts_em() ;*/
-
 
 //===============================================================
 // Gui handling
@@ -275,7 +229,7 @@ for (i = 0; i < coll.length; i++) {
 } 
 
 // ---------- time multi-slider
-var timeslider=document.getElementById('slider') ; 
+var timeslider=document.getElementById('timeslider') ; 
 noUiSlider.create(timeslider, {
     start: [20, 80],
     connect: true,
@@ -307,26 +261,173 @@ noUiSlider.create(dispslider, {
         density: 5
     }
 });
-
-//--------------------- File handling -------------------------------------
-var naddedfiles=0  ; 
+var lst_param = ['RHO', 'TotalStress', 'Pressure', 'KineticPressure', 'ShearStress', 'VolumetricStrainRate', 'ShearStrainRate', 'RotationalVelocity', 'RotationalVelocityMag', "EKT", "zT", "VAVG", "EKR", "zR", "TC", "eKT", "qTK", "TK", "eKR", "qTC", "StrainRate", "ROT", "mC", "MC", "qRK", "MK", "qRC", "I", 
+"window", "windowsize", "xgrid", "ygrid", "zgrid", "xmin", "xmax", "xper", "ymin", "ymax", "yper", "zmin", "zmax", "zper", "timeaverage", "timeslider"] ; 
+//==============================================================================
+//--------------------- File handling ------------------------------------------
+var curfile = 0 ; 
+var isedit = false ; 
 document.querySelector('.addfile').addEventListener('click', async () => {
-    naddedfiles ++ ;
-    document.getElementById("remfile").hidden=false ; 
-    if (naddedfiles>2) {naddedfiles=2 ; return ; }
-    var idstr = "file"+naddedfiles ; 
-    document.getElementById(idstr).hidden=false ; 
+    curfile ++ ; 
+    document.getElementById("addfileform").style.display = "block";
+    document.getElementById("filename"+String(curfile)).hidden = false ; 
 });
-document.getElementById('remfile').addEventListener('click', async () => {
-    if (naddedfiles<0) {naddedfiles=0 ; document.getElementById("remfile").hidden=true ;  return ;}
-    var idstr = "file"+naddedfiles ; 
-    document.getElementById(idstr).hidden=true ; 
-    naddedfiles -- ;
-    if (naddedfiles==0) {document.getElementById("remfile").hidden=true ; }
+
+function filenameupdate (filelist)
+{
+    document.getElementById("updatefile").style.visibility = "visible";
+    document.getElementById("filetype").hidden=false ; 
+    let pattern=null ; 
+    if (filelist.length>1)
+    {
+        document.getElementById("file_multifile").hidden=false ; 
+        let numbers = [] ; 
+        for (let i=0 ; i<filelist.length ; i++)
+        {
+            const matches = filelist[i].name.match(/\d+(\.\d+)?/g); // Extract numbers from file name
+            // If numbers are found
+            if (matches && matches.length > 0) 
+            {
+                numbers[i]=matches.map(Number)[matches.length -1] ; 
+                console.log(filelist[0].name, String(numbers[i])) ; 
+                if (pattern === null) {
+                    if (matches[matches.length-1].includes(".")) pattern="%f" ;
+                    else pattern="%d" ; 
+                    document.getElementById("file_pattern").value = filelist[0].name.replace(String(numbers[i]), pattern) ; 
+                }
+            }
+            else
+                console.log("Invalid file selection") ; 
+        }
+        document.getElementById("file_initial").value=Math.min(...numbers) ; 
+        document.getElementById("file_delta").value=(Math.max(...numbers)-Math.min(...numbers))/(filelist.length-1); 
+    }
+    else
+        document.getElementById("file_pattern").value=filelist[0].name ; 
+}
+
+document.getElementById("filename1").addEventListener('change', async() =>
+{ 
+    var filelist = document.getElementById("filename1").files ;
+    filenameupdate(filelist) ; 
 });
+document.getElementById("filename2").addEventListener('change', async() =>
+{ 
+    var filelist = document.getElementById("filename2").files ;
+    filenameupdate(filelist) ; 
+});
+
+document.getElementById("cancelfile").addEventListener('click', async() =>
+{
+    //document.getElementById("filename"+String(curfile)).value="" ; 
+    document.getElementById("filetype").hidden=true ; 
+    document.getElementById("file_multifile").hidden=true ;
+    document.getElementById("file_delta").value="" ; 
+    document.getElementById("file_initial").value="" ;
+    document.getElementById("file_pattern").value="" ; 
+    document.getElementById("updatefile").style.visibility = "hidden";
+    document.getElementById("filename1").hidden=true ; 
+    document.getElementById("filename2").hidden=true ; 
+    document.getElementById("addfileform").style.display = "None";
+    curfile -- ; 
+}) ; 
+
+document.getElementById("updatefile").addEventListener('click', async() => {
+    var name = "file" + String(curfile) ; 
+    document.getElementById(name+"_number").innerHTML = document.getElementById("filename"+String(curfile)).files.length + " file(s)" ; 
+    document.getElementById(name+"_type").value=document.getElementById("filetype").value ; 
+    document.getElementById(name+"_delta").value=document.getElementById("file_delta").value ; 
+    document.getElementById(name+"_initial").value=document.getElementById("file_initial").value ;
+    document.getElementById(name+"_pattern").value=document.getElementById("file_pattern").value ;
+    if (document.getElementById("filename"+String(curfile)).files.length>1)
+    {
+        document.getElementById(name+"_delta").hidden=false ; 
+        document.getElementById(name+"_initial").hidden=false ;
+        document.getElementById(name+"_delta_label").hidden=false ; 
+        document.getElementById(name+"_initial_label").hidden=false ;
+    }
+    else
+    {
+        document.getElementById(name+"_delta").hidden=true ; 
+        document.getElementById(name+"_initial").hidden=true ;
+        document.getElementById(name+"_delta_label").hidden=true ; 
+        document.getElementById(name+"_initial_label").hidden=true ;
+    }
+    document.getElementById(name+"_info").hidden=false ; 
+    if (curfile==1)
+        document.getElementById("remove"+name).visible==true ; 
+    else 
+        document.getElementById("remove"+name).visible==false ; 
+    document.getElementById("addfileform").style.display = "None"; 
+    
+    var data=build_file_json() ;
+    for(i=0 ; i<data["file"].length ; i++) data["file"][i]["action"]="donothing" ; 
+    if (isedit) data.file[curfile-1]["action"]="edit" ; 
+    else data["file"][curfile-1]["action"]="create" ; 
+    
+    console.log(data)
+    worker.postMessage([ 'initialise', data, document.getElementById("filename1").files, document.getElementById("filename2").files])
+    isedit=false ;
+}) ; 
+
+function fileformedit() 
+{
+    var name = "file" + String(curfile) ;
+    document.getElementById("filename"+String(curfile)).hidden=false ; 
+    document.getElementById("filetype").value=document.getElementById(name+"_type").value ; 
+    if (document.getElementById(name+"_delta").hidden == false)
+    {
+        document.getElementById("file_multifile").hidden=false ;
+        document.getElementById("file_delta").value=document.getElementById(name+"_delta").value ; 
+        document.getElementById("file_initial").value=document.getElementById(name+"_initial").value ;
+        document.getElementById("file_pattern").value=document.getElementById(name+"_pattern").value ;
+    }
+    document.getElementById("updatefile").hidden=false ;
+}
+document.getElementById("editfile1").addEventListener('click', async() => {
+    curfile = 1 ; isedit=true ; 
+    fileformedit() ; 
+    document.getElementById("addfileform").style.display = "block"; 
+}) ; 
+document.getElementById("editfile2").addEventListener('click', async() => {
+    curfile = 2 ; isedit=true ;
+    fileformedit() ; 
+    document.getElementById("addfileform").style.display = "block"; 
+}) ; 
+
+document.getElementById("drop_zone").addEventListener('drop', async(ev) => {
+    console.log("File(s) dropped");
+    ev.preventDefault();
+
+  if (ev.dataTransfer.items) {
+    // Use DataTransferItemList interface to access the file(s)
+    [...ev.dataTransfer.items].forEach((item, i) => {
+      // If dropped items aren't files, reject them
+      if (item.kind === "file") {
+        const file = item.getAsFile();
+        console.log(`… file[${i}].name = ${file.name}`);
+      }
+    });
+  } else {
+    // Use DataTransfer interface to access the file(s)
+    [...ev.dataTransfer.files].forEach((file, i) => {
+      console.log(`… file[${i}].name = ${file.name}`);
+    });
+  }
+  document.getElementById("indrop").hidden=true ; 
+}) ; 
+document.getElementById("drop_zone").addEventListener('dragover', async(ev) => {
+ev.preventDefault();
+document.getElementById("indrop").hidden=false ; 
+}) ; 
+document.getElementById("drop_zone").addEventListener('dragleave', async(ev) => {
+ev.preventDefault();
+document.getElementById("indrop").hidden=true ; 
+}) ; 
+
 //-----
 var ncolumnmapping=0 ; 
-document.getElementById('addcolumn').addEventListener('click', async () => {
+/*document.getElementById('addcolumn').addEventListener('click', async () => {
     ncolumnmapping++ ; 
     var fragment = document.createDocumentFragment();
     var l0 = document.createElement("br")
@@ -335,7 +436,7 @@ document.getElementById('addcolumn').addEventListener('click', async () => {
     l1.type="text" ; l1.id="columnname"+ncolumnmapping ; l1.placeholder="Column name"
     fragment.appendChild(l1) ; 
     var l01 = document.createElement("span")
-    l01.textContent="=>" /*"&rarr;"*/ ; l01.id="columnseparator"+ncolumnmapping ; 
+    l01.textContent="=>" ; l01.id="columnseparator"+ncolumnmapping ; 
     fragment.appendChild(l01) ; 
     
     var l2 = document.createElement("select")
@@ -349,7 +450,7 @@ document.getElementById('addcolumn').addEventListener('click', async () => {
         l2.options.add(l3)
     }) ; 
     var l4 = document.createElement("button")
-    l4.textContent="X"/*&#2717;"*/ ; l4.id="columnbutton"+ncolumnmapping ;
+    l4.textContent="X";  l4.id="columnbutton"+ncolumnmapping ;
     var l44 = ncolumnmapping ; 
     l4.addEventListener('click', async() => {
         document.getElementById("columnspacing"+l44).remove();
@@ -363,8 +464,8 @@ document.getElementById('addcolumn').addEventListener('click', async () => {
     
     
     document.getElementById('columnmapping').appendChild(fragment) ;
-});
-//----------
+});*/
+//======================= Handle change in any of the parameters ====================================================
 document.getElementById('RHO').addEventListener('change', async () => {
     if (document.getElementById('RHO').checked==false)
         alert('The density is needed for most field calculation. It is strongly recommended to keep it checked') ; 
@@ -374,31 +475,77 @@ function setstresseschecked() {
         document.getElementById('TK').checked=true ; 
 }
 function setvelocitychecked() { document.getElementById('VAVG').checked=true ; }
-document.getElementById('TotalStress').addEventListener('change', async () => { if (document.getElementById('TotalStress').checked==true) setstresseschecked() ; });
-document.getElementById('Pressure').addEventListener('change', async () => { if (document.getElementById('Pressure').checked==true) setstresseschecked() ; });
-document.getElementById('KineticPressure').addEventListener('change', async () => {if (document.getElementById('KineticPressure').checked==true) setstresseschecked() ; });
-document.getElementById('ShearStress').addEventListener('change', async () => { if (document.getElementById('ShearStress').checked==true) setstresseschecked() ; });
+document.getElementById('TotalStress').addEventListener('change', async () => { if (document.getElementById('TotalStress').checked==true) setstresseschecked() ; update_parameters ()});
+document.getElementById('Pressure').addEventListener('change', async () => { if (document.getElementById('Pressure').checked==true) setstresseschecked() ; update_parameters ()});
+document.getElementById('KineticPressure').addEventListener('change', async () => {if (document.getElementById('KineticPressure').checked==true) setstresseschecked() ; update_parameters ()});
+document.getElementById('ShearStress').addEventListener('change', async () => { if (document.getElementById('ShearStress').checked==true) setstresseschecked() ; update_parameters ()});
+document.getElementById('VolumetricStrainRate').addEventListener('change', async () => { if (document.getElementById('VolumetricStrainRate').checked==true) setvelocitychecked() ; update_parameters () });
+document.getElementById('ShearStrainRate').addEventListener('change', async () => { if (document.getElementById('ShearStrainRate').checked==true) setvelocitychecked() ; update_parameters ()});
+document.getElementById('RotationalVelocity').addEventListener('change', async () => { if (document.getElementById('RotationalVelocity').checked==true) setvelocitychecked() ; update_parameters () });
+document.getElementById('RotationalVelocityMag').addEventListener('change', async () => { if (document.getElementById('RotationalVelocityMag').checked==true) setvelocitychecked() ; update_parameters ()});
 
-document.getElementById('VolumetricStrainRate').addEventListener('change', async () => { if (document.getElementById('VolumetricStrainRate').checked==true) setvelocitychecked() ; });
-document.getElementById('ShearStrainRate').addEventListener('change', async () => { if (document.getElementById('ShearStrainRate').checked==true) setvelocitychecked() ; });
-document.getElementById('RotationalVelocity').addEventListener('change', async () => { if (document.getElementById('RotationalVelocity').checked==true) setvelocitychecked() ; });
-document.getElementById('RotationalVelocityMag').addEventListener('change', async () => { if (document.getElementById('RotationalVelocityMag').checked==true) setvelocitychecked() ; });
-//---------------------
-function generateallparameters () {
-    var data = {}
-    
+
+var lst_param = ['RHO', 'TotalStress', 'Pressure', 'KineticPressure', 'ShearStress', 'VolumetricStrainRate', 'ShearStrainRate', 'RotationalVelocity', 'RotationalVelocityMag', "EKT", "zT", "VAVG", "EKR", "zR", "TC", "eKT", "qTK", "TK", "eKR", "qTC", "StrainRate", "ROT", "mC", "MC", "qRK", "MK", "qRC", "I", 
+"window", "windowsize", "xgrid", "ygrid", "zgrid", "xmin", "xmax", "xper", "ymin", "ymax", "yper", "zmin", "zmax", "zper", "timeaverage", "timeslider"] ; 
+for (var i=0; i<lst_param.length; i++)
+{
+    document.getElementById(lst_param[i]).addEventListener('change', async () => {update_parameters ()}) ; 
+}
+/*document.getElementById("EKT" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("zT"  ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("VAVG").addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("EKR" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("zR"  ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("TC"  ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("eKT" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("qTK" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("TK"  ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("eKR" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("qTC" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("StrainRate").addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("ROT").addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("mC" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("MC" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("qRK").addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("MK" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("qRC").addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("I"  ).addEventListener('change', async () => {update_parameters()}) 
+
+document.getElementById("window"     ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("windowsize" ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("xgrid"      ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("ygrid"      ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("zgrid"      ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("xmin"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("xmax"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("xper"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("ymin"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("ymax"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("yper"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("zmin"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("zmax"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("zper"       ).addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("timeaverage").addEventListener('change', async () => {update_parameters()}) 
+document.getElementById("timeslider" ).addEventListener('change', async () => {update_parameters()}) */
+// ========================================= BUILDING THE JSON data ========================================
+function build_file_json() 
+{
+    var data = {}    
     var files = []
+    
+    var naddedfiles = 0; 
+    if (document.getElementById("file2_info").hidden==false) naddedfiles=2 ;
+    else if (document.getElementById("file1_info").hidden==false) naddedfiles=1 ;
+    
     for (var fic = 1 ; fic <=naddedfiles ; fic++)
     {
-        files[fic-1] = {} ; 
-        var filelist = document.getElementById("filename"+fic) ; 
-        files[fic-1]["number"] = filelist.files.length ;
-        var tmp = filelist.files[0].name ;
-        if (filelist.files.length>1) tmp.replace(/[0-9]+/i,"%d") ; 
-        files[fic-1]["filename"] = tmp ; 
+        files[fic-1] = {} ;
         
-        files[fic-1]["filename"] = document.getElementById("filename"+fic).value ; 
-        var filetype = document.getElementById("filetype"+fic).value ; 
+        files[fic-1]["filename"] = document.getElementById("file"+String(fic)+"_pattern").value ; 
+        files[fic-1]["initial"] = Number(document.getElementById("file"+String(fic)+"_initial").value) ; 
+        files[fic-1]["delta"] = Number(document.getElementById("file"+String(fic)+"_delta").value) ; 
+        
+        var filetype = document.getElementById("file"+String(fic)+"_type").value ; 
         if (filetype=="LiggghtsParticles")
         {
             files[fic-1]["content"] = "particles" ; 
@@ -408,6 +555,11 @@ function generateallparameters () {
         {
             files[fic-1]["content"] = "particles" ; 
             files[fic-1]["format"] = "mercury_vtu" ; 
+        }
+        else if (filetype == "Yade")
+        {
+            files[fic-1]["content"] = "particles" ; 
+            files[fic-1]["format"] = "yade" ; 
         }
         else if (filetype == "LiggghtsContacts")
         {
@@ -427,7 +579,7 @@ function generateallparameters () {
         else
             console.log("This should never happen: unknown file format") ; 
         
-        if (ncolumnmapping>0 && fic==2)
+        /*if (ncolumnmapping>0 && fic==2)
         {
             files[fic-1]["mapping"]={} ; 
             for (var column=1 ; column <= ncolumnmapping ; column++) 
@@ -436,10 +588,15 @@ function generateallparameters () {
                     files[fic-1]["mapping"][document.getElementById("columnselect"+column).value] = document.getElementById("columnname"+column).value ; 
                 } catch (e) {continue ;}
             }
-        }
+        }*/
     }
     data["file"]=files ; 
-    
+    return data ; 
+}
+
+function build_parameter_json()
+{
+    var data = {}
     data["boxes"] = [parseInt(document.getElementById("xgrid").value), parseInt(document.getElementById("ygrid").value), parseInt(document.getElementById("zgrid").value)] ;
     data["boundaries"] = [[parseFloat(document.getElementById("xmin").value), parseFloat(document.getElementById("ymin").value), parseFloat(document.getElementById("zmin").value)], 
                           [parseFloat(document.getElementById("xmax").value), parseFloat(document.getElementById("ymax").value), parseFloat(document.getElementById("zmax").value)]] ;
@@ -459,15 +616,30 @@ function generateallparameters () {
     var fieldlst= ["RHO", "I", "VAVG",  "TC", "TK", "ROT", "MC", "MK" , "mC", "EKT", "eKT", "EKR", "eKR", "qTC", "qTK", "qRC", "qRK", "zT" , "zR", "TotalStress", "Pressure", "KineticPressure", "ShearStress", "StrainRate", "VolumetricStrainRate", "ShearStrainRate", "RotationalVelocity", "RotationalVelocityMag"] ;    
     data["fields"]=[]
     fieldlst.forEach(name => {if (document.getElementById(name).checked==true) data["fields"].push(name);}) ; 
+        
+    if (defaultdensity != -1) data["density"]=defaultdensity ; 
     
-    slider.noUiSlider.get();
-    
+    return data ; 
+}
+
+function build_save_json()
+{
+    var data={}
     var select = document.getElementById('saveformat');
     data["saveformat"] = [...document.getElementById('saveformat').selectedOptions].map(option => option.value);
     data["save"] = document.getElementById('savefile').value; 
     
-    if (defaultdensity != -1)
-        data["density"]=defaultdensity ; 
+    return data ; 
+}
+
+
+function generateallparameters () {
+    var data = {}
+
+    var d1=build_file_json() ; 
+    var d2=build_parameter_json() ;
+    var d3=build_save_json() ; 
+    data = Object.assign({}, d1, d2, d3);
     
     console.log(data) ; 
     return (data) ; 
@@ -528,27 +700,23 @@ document.getElementById('loadjsonfile').addEventListener('change', function() {
 
     }}) ; 
 //------------------
-var worker = new Worker("worker.js");
+
 var initialised=false ; 
 var updated=false
-document.getElementById('updatefile').addEventListener('click', async () => {
-    var data=generateallparameters() ;
-    if (naddedfiles == 1) 
-    {
-        worker.postMessage([ 'initialise', data, document.getElementById("filename1").files]);
-    }
-    else if (naddedfiles==2)
-        worker.postMessage([ 'initialise', data, document.getElementById("filename1").files[0], document.getElementById("filename2").files[0]]);
-});
 
-document.getElementById('applyparam').addEventListener('click', async () => {
+function update_parameters ()
+{
+    var data=build_parameter_json() 
+    worker.postMessage(['setparameters', data]) ;
+}
+
+/*document.getElementById('applyparam').addEventListener('click', async () => {
     var data=generateallparameters() ;
     if (initialised == false)
         alert("You need first to update the file(s) in the first tab.") ; 
     else
-        worker.postMessage(['setparameters', data]) ;
     updated=false ; 
-});
+});*/
 
 document.getElementById('updateCG').addEventListener('click', async () => {
     var ts=parseInt(dispslider.noUiSlider.get()) ; 
@@ -601,6 +769,8 @@ document.getElementById('component').addEventListener('change', async() => {
 
 document.getElementById('resetcam').addEventListener('click', async() => {
     renderer.resetCamera();
+    renderer.getActiveCamera().setViewUp(0,0,1) ; 
+    interactorStyle.setCenterOfRotation(renderer.getActiveCamera().getFocalPoint()) ;
     renderWindow.render();
 }) ; 
 
@@ -608,11 +778,11 @@ document.getElementById('cliptype').addEventListener('change', async() => {
     var field = document.getElementById('cliptype').value; 
     
     document.getElementById("xmin").value
-document.getElementById("ymin").value
-document.getElementById("zmin").value
-document.getElementById("xmax").value
-document.getElementById("ymax").value
-document.getElementById("zmax").value
+    document.getElementById("ymin").value
+    document.getElementById("zmin").value
+    document.getElementById("xmax").value
+    document.getElementById("ymax").value
+    document.getElementById("zmax").value
     
     if (field==0)
     {
@@ -699,12 +869,18 @@ worker.onmessage = function (e)
      timeslider.noUiSlider.set([0,e.data[1]-1]) ;
      dispslider.noUiSlider.updateOptions({range: {'min': 0,'max': e.data[1]-1}}) ; 
      dispslider.noUiSlider.set([0]) ;
+     
+     for (var i=0; i<lst_param.length; i++)
+        document.getElementById(lst_param[i]).disabled=false ; 
+     update_parameters();
+     
      initialised=true; 
  }
  else if (e.data[0] == 'parametrised')
  {
     document.getElementById('updateCG').disabled=false ; 
     var select=document.getElementById('displayedfield') ; 
+    while (select.children.length > 0) select.removeChild(select.children[0])
     e.data[1].forEach(element => {
         var opt = document.createElement('option');
         opt.value = element; opt.innerHTML = element;
@@ -720,11 +896,6 @@ worker.onmessage = function (e)
  }
  else if (e.data[0] == 'resultobtained')
  {
-     console.log(e.data[1]) ; 
-     console.log(e.data[2]) ; 
-
-    var test=[] ; 
-    for (i=0 ; i<27 ; i++) test[i]=(26-i)/27*255 ;
     var scalars = vtkDataArray.newInstance({
         values: e.data[1],
         numberOfComponents: 1, // number of channels (grayscale)
@@ -737,6 +908,7 @@ worker.onmessage = function (e)
     img.setOrigin(e.data[2][0], e.data[2][1], e.data[2][2]);
     img.setSpacing(e.data[2][3], e.data[2][4], e.data[2][5]);
     img.setExtent(0, e.data[2][6]-1, 0, e.data[2][7]-1, 0, e.data[2][8]-1);
+    //img.setExtent(e.data[2][0], e.data[2][0]+(e.data[2][6]-1)*e.data[2][3], e.data[2][1], e.data[2][1]+(e.data[2][7]-1)*e.data[2][4], e.data[2][2], e.data[2][2]+(e.data[2][8]-1)*e.data[2][5]); 
     img.getPointData().setScalars(scalars);
     
     if (document.getElementById('lockcscale').checked)
@@ -758,6 +930,5 @@ worker.onmessage = function (e)
     //renderer.resetCamera();
     renderWindow.render();
  }
-    
     
 }

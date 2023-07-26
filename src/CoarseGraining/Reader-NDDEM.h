@@ -35,8 +35,6 @@ public:
     int get_num_contacts () {return Ncontacts;}
 
     int build_index() {index = XML->read_index() ; return index.size() ; }
-
-    int curts = -1 ;
     double actualts=0 ;
 
 private:

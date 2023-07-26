@@ -1,10 +1,10 @@
 #include "Reader-Mercury.h"
 
-MercuryReader_vtu_particles::MercuryReader_vtu_particles(std::string ppath, int numtstmp)
+MercuryReader_vtu_particles::MercuryReader_vtu_particles(std::string ppath)
 {
   // VTU has to be multiple files ...
   path = ppath ;
-  numts=numtstmp ; 
+  numts=1 ; //TODO 
   std::size_t found = path.find_last_of(".");
   if (path.substr(found+1)!="vtu")
      printf("WARN: Unexpected MercuryReader_particles file extension\n") ;  

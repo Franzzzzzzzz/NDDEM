@@ -13,38 +13,35 @@ onmessage = async function(e) {
     {
         await initialise() ;
         isinitialised=true ; 
+        CGlib.FS.mkdir('/work'); 
+    }
+    else if (isinitialised && e.data[0]=='initialise')
+    {
+        CGlib.FS.unmount('/work') ; 
     }
     
+    try {
     if (e.data[0] == 'initialise')
-    {
-        nbfile = e.data[1]["file"].length ; 
-        var data = {}
-        data["file"] = e.data[1]["file"] ; 
-        
-        CGlib.FS.mkdir('/work');
-        for (var i=0 ; i<nbfile ; i++)
+    {   
+        for (var i=0 ; i<2 ; i++)
         {
-            console.log(e.data[1]["file"][i].filename) ;
+            if (e.data[2+i].length==0) continue ; 
             CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/work');
-            var name = data["file"][i].filename.split(/(\\|\/)/g).pop()
-            data["file"][i].filename = '/work/'+name ; 
-            if (e.data[2+i].length>1)
-                data["file"][i].filename=data["file"][i].filename.replace(/[0-9]+/i,"%d") ; 
+            var name = e.data[1]["file"][i].filename.split(/(\\|\/)/g).pop()
+            e.data[1]["file"][i].filename = '/work/'+name ; 
         }
-        console.log(data) ; 
-        var cstring = JSON.stringify(data) ; 
+        
+        var cstring = JSON.stringify(e.data[1]) ; 
         CG.param_from_json_string (cstring) ;
         CG.param_from_json_string ("{}") ;
         var nts= CG.param_get_numts(0) ;
         console.log(nts) ; 
         var bounds = CG.param_get_bounds(0) ;
+        console.log(bounds) ; 
         postMessage(['initialised', nts, bounds]) ; 
     }
     else if (e.data[0] == 'setparameters')
     {
-        delete e.data[1]['file'] ; 
-        delete e.data[1]['saveformat'] ; 
-        delete e.data[1]['save'] ; 
         var cstring = JSON.stringify(e.data[1]) ; 
         console.log(cstring) ; 
         CG.param_from_json_string(cstring) ; 
@@ -54,8 +51,11 @@ onmessage = async function(e) {
     }
     else if (e.data[0] == 'processts')
     {
+        console.log(e.data[1])
         CG.process_timestep(e.data[1], false) ;
+        console.log("B")
         postMessage(['tsprocessed', e.data[1]]) ; 
+        console.log("C")
         
     }
     else if(e.data[0] == 'getresult')
@@ -64,7 +64,12 @@ onmessage = async function(e) {
         var res2=CG.get_gridinfo() ;
         postMessage(["resultobtained", res, res2]) ; 
     }
-    
+    }
+    catch (error) {
+  console.error(error);
+  // Expected output: ReferenceError: nonExistentFunction is not defined
+  // (Note: the exact output may be browser-dependent)
+}
     
     /*void param_from_json_string (std::string param)  { json jsonparam =json::parse(param) ; return P.from_json(jsonparam) ; }
     std::vector<std::vector<double>> param_get_bounds

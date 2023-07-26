@@ -26,6 +26,7 @@
 #include "Reader-NDDEM.h"
 #include "Reader-interactive.h"
 #include "Reader-Mercury.h"
+#include "Reader-Yade.h"
 #include "Parameters.h"
 
 class CoarseGraining {
@@ -97,8 +98,7 @@ int CoarseGraining::process_timestep (int ts_abs, bool hasdonefirstpass)
    
     bool avg=false ;
     if (P.timeaverage == AverageType::Intermediate || P.timeaverage == AverageType::Both) avg=true ;
-
-    P.read_timestep(ts+P.skipT) ;
+    P.read_timestep(ts+P.skipT) ; 
     C->cT = ts ;
     P.set_data (C->data) ;
 

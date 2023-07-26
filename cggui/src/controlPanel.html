@@ -1,26 +1,37 @@
+
+<div id="drop_zone">
+<div id="indrop" style="margin:-10px;width:100%;height:100%;position:absolute;background-color:yellow;opacity:30%;z-index=1; text-align:center; valign:center;" hidden><br><br><img src="upload.png" width="20%"></div>
+
 <button type="button" class="collapsible">Files</button>
 <div class="content">
-    <button type="button" class="addfile">Add file</button>
-    <button type="button" id="remfile" hidden>Remove file</button>&nbsp;&nbsp;
-    <button type="button" id="updatefile" hidden>Update</button>
-<!--    <button type="button" id="testing">TEST</button> -->
-    <div id="file1" class="box" hidden>
-        <input type="file" id="filename1" multiple="multiple" onChange="document.getElementById('updatefile').hidden=false;"><br>
-        <select name="filetype1" id="filetype1">
-            <option value="LiggghtsParticles">Liggghts particles</option>
-            <option value="MercuryVTUParticles">Mercury VTU particles</option>
-            <option value="NDDEM">NDDEM</option>
-        </select>
+    <button type="button" class="addfile">Add file with particle data</button>
+    
+    <div id="file1_info" style="border-style:solid; " hidden>
+        <table width="95%">
+            <tr><th rowspan=4>File 1:&nbsp;&nbsp;&nbsp;</th><td><label for="file1_pattern">File name/pattern:</label> </td>
+                <td> <input type="text" id="file1_pattern" disabled size="16"/></td>
+                <td style="text-align:center;"> <span id="file1_number" >0 files</span> </td></tr>
+            <tr><td><label for="file1_type">File type:</label> </td><td> <input type="text" id="file1_type" disabled size="16"/></td>
+                <td><button type="button" id="editfile1" style="width:100%;">edit</button></td></tr>
+            <tr><td><label for="file1_initial" id="file1_initial_label">First file number:</label> </td><td> <input type="text" id="file1_initial" disabled size="16"/></td>
+                <td><button type="button" id="removefile1" style="width:100%;" >remove</button></td></tr>
+            <tr><td><label for="file1_delta" id="file1_delta_label">File deltas:</label> </td><td> <input type="text" id="file1_delta" disabled size="16"/></td></tr>
+        </table>
     </div>
-    <div id="file2" class="box" hidden>
-        <input type="file" id="filename2" onChange="document.getElementById('updatefile').hidden=false;"><br>
-        <select name="filetype2" id="filetype2">
-            <option value="LiggghtsContacts">Liggghts contacts</option>
-            <option value="MercuryVTUContacts">Mercury VTU contacts</option>
-        </select>
-        <button type="button" id="addcolumn">Add column mapping</button>
-        <span id="columnmapping"></span><br>
+    
+    <div id="file2_info" style="border-style:solid; " hidden>
+        <table width="95%">
+            <tr><th rowspan=4>File 2:&nbsp;&nbsp;&nbsp;</th><td><label for="file2_pattern">File name/pattern:</label> </td>
+                <td> <input type="text" id="file2_pattern" disabled size="16"/></td>
+                <td style="text-align:center;"> <span id="file2_number" >0 files</span> </td></tr>
+            <tr><td><label for="file2_type">File type:</label> </td><td> <input type="text" id="file2_type" disabled size="16"/></td>
+                <td><button type="button" id="editfile2" style="width:100%;">edit</button></td></tr>
+            <tr><td><label for="file1_initial" id="file2_initial_label">First file number:</label> </td><td> <input type="text" id="file2_initial" disabled size="16"/></td>
+                <td><button type="button" id="removefile2" style="width:100%;" >remove</button></td></tr>
+            <tr><td><label for="file2_delta" id="file2_delta_label">File deltas:</label> </td><td> <input type="text" id="file2_delta" disabled size="16"/></td></tr>
+        </table>
     </div>
+
 </div>
 
 
@@ -28,54 +39,54 @@
 <div class="content">
     <table border="1"><tr><th>Basic</th><th>Derived</th><th>Advanced</th><th>Expert</th></tr>
     <tr>
-        <td><input type="checkbox" id="RHO" name="RHO" checked="true"><label for="RHO">Density (rho)</label></td>
-        <td><input type="checkbox" id="TotalStress" name="TotalStress"><label for="TotalStress">Total stress</label></td>
-        <td><input type="checkbox" id="EKT" name="EKT"><label for="EKT">Kinetic energy</label></td>
-        <td><input type="checkbox" id="zT" name="zT"><label for="zT">zT</label></td>
+        <td><input type="checkbox" disabled id="RHO" name="RHO" checked="true"><label for="RHO">Density (rho)</label></td>
+        <td><input type="checkbox" disabled id="TotalStress" name="TotalStress"><label for="TotalStress">Total stress</label></td>
+        <td><input type="checkbox" disabled id="EKT" name="EKT"><label for="EKT">Kinetic energy</label></td>
+        <td><input type="checkbox" disabled id="zT" name="zT"><label for="zT">zT</label></td>
     
     </tr><tr>
-        <td><input type="checkbox" id="VAVG" name="VAVG"><label for="VAVG">Velocity</label></td>
-        <td><input type="checkbox" id="Pressure" name="Pressure"><label for="Pressure">Pressure</label></td>
-        <td><input type="checkbox" id="EKR" name="EKR"><label for="EKR">Rotation energy</label></td>
-        <td><input type="checkbox" id="zR" name="zR"><label for="zR">zR</label></td>
+        <td><input type="checkbox" disabled id="VAVG" name="VAVG"><label for="VAVG">Velocity</label></td>
+        <td><input type="checkbox" disabled id="Pressure" name="Pressure"><label for="Pressure">Pressure</label></td>
+        <td><input type="checkbox" disabled id="EKR" name="EKR"><label for="EKR">Rotation energy</label></td>
+        <td><input type="checkbox" disabled id="zR" name="zR"><label for="zR">zR</label></td>
     
     </tr><tr>
-        <td><input type="checkbox" id="TC" name="TC"><label for="TC">Contact stress</label></td>
-        <td><input type="checkbox" id="KineticPressure" name="KineticPressure"><label for="KineticPressure">Kinetic pressure</label></td>  
-        <td><input type="checkbox" id="eKT" name="eKT"><label for="eKT">Kinetic energy fluctuation</label></td>
-        <td><input type="checkbox" id="qTK" name="qTK"><label for="qTK">qTK</label></td>
+        <td><input type="checkbox" disabled id="TC" name="TC"><label for="TC">Contact stress</label></td>
+        <td><input type="checkbox" disabled id="KineticPressure" name="KineticPressure"><label for="KineticPressure">Kinetic pressure</label></td>  
+        <td><input type="checkbox" disabled id="eKT" name="eKT"><label for="eKT">Kinetic energy fluctuation</label></td>
+        <td><input type="checkbox" disabled id="qTK" name="qTK"><label for="qTK">qTK</label></td>
     
     </tr><tr>
-        <td><input type="checkbox" id="TK" name="TK"><label for="TK">Kinetic stress</label></td>
-        <td><input type="checkbox" id="ShearStress" name="ShearStress"><label for="ShearStress">Shear stress</label></td>        
-        <td><input type="checkbox" id="eKR" name="eKR"><label for="eKR">Rotation energy fluctuation</label></td>
-        <td><input type="checkbox" id="qTC" name="qTC"><label for="qTC">qTC</label></td>
-    
-    </tr><tr>
-        <td></td>
-        <td><input type="checkbox" id="StrainRate" name="StrainRate"><label for="StrainRate">Strain rate</label></td>
-        <td><input type="checkbox" id="ROT" name="ROT"><label for="ROT">Rotation</label></td>
-        <td><input type="checkbox" id="mC" name="mC"><label for="mC">mC</label></td>
+        <td><input type="checkbox" disabled id="TK" name="TK"><label for="TK">Kinetic stress</label></td>
+        <td><input type="checkbox" disabled id="ShearStress" name="ShearStress"><label for="ShearStress">Shear stress</label></td>        
+        <td><input type="checkbox" disabled id="eKR" name="eKR"><label for="eKR">Rotation energy fluctuation</label></td>
+        <td><input type="checkbox" disabled id="qTC" name="qTC"><label for="qTC">qTC</label></td>
     
     </tr><tr>
         <td></td>
-        <td><input type="checkbox" id="VolumetricStrainRate" name="VolumetricStrainRate"><label for="VolumetricStrainRate">Volumetric strain rate</label></td>
-        <td><input type="checkbox" id="MC" name="MC"><label for="MC">Contact torque</label></td>
-        <td><input type="checkbox" id="qRK" name="qRK"><label for="qRK">qRK</label></td>
+        <td><input type="checkbox" disabled id="StrainRate" name="StrainRate"><label for="StrainRate">Strain rate</label></td>
+        <td><input type="checkbox" disabled id="ROT" name="ROT"><label for="ROT">Rotation</label></td>
+        <td><input type="checkbox" disabled id="mC" name="mC"><label for="mC">mC</label></td>
     
     </tr><tr>
         <td></td>
-        <td><input type="checkbox" id="ShearStrainRate" name="ShearStrainRate"><label for="ShearStrainRate">Shear strain rate</label></td>
-        <td><input type="checkbox" id="MK" name="MK"><label for="MK">Kinetic torque</label></td>
-        <td><input type="checkbox" id="qRC" name="qRC"><label for="qRC">qRC</label></td>
+        <td><input type="checkbox" disabled id="VolumetricStrainRate" name="VolumetricStrainRate"><label for="VolumetricStrainRate">Volumetric strain rate</label></td>
+        <td><input type="checkbox" disabled id="MC" name="MC"><label for="MC">Contact torque</label></td>
+        <td><input type="checkbox" disabled id="qRK" name="qRK"><label for="qRK">qRK</label></td>
+    
     </tr><tr>
         <td></td>
-        <td><input type="checkbox" id="RotationalVelocity" name="RotationalVelocity"><label for="RotationalVelocity">Rotational velocity</label></td>
-        <td><input type="checkbox" id="I" name="I"><label for="I">Moment of inertia</label></td>
+        <td><input type="checkbox" disabled id="ShearStrainRate" name="ShearStrainRate"><label for="ShearStrainRate">Shear strain rate</label></td>
+        <td><input type="checkbox" disabled id="MK" name="MK"><label for="MK">Kinetic torque</label></td>
+        <td><input type="checkbox" disabled id="qRC" name="qRC"><label for="qRC">qRC</label></td>
+    </tr><tr>
+        <td></td>
+        <td><input type="checkbox" disabled id="RotationalVelocity" name="RotationalVelocity"><label for="RotationalVelocity">Rotational velocity</label></td>
+        <td><input type="checkbox" disabled id="I" name="I"><label for="I">Moment of inertia</label></td>
         <td></td>
     </tr><tr>
         <td></td>
-        <td><input type="checkbox" id="RotationalVelocityMag" name="RotationalVelocityMag"><label for="RotationalVelocityMag">Rotational velocity magnitude</label></td>
+        <td><input type="checkbox" disabled id="RotationalVelocityMag" name="RotationalVelocityMag"><label for="RotationalVelocityMag">Rotational velocity magnitude</label></td>
         <td></td>
         <td></td>
     </tr></table>
@@ -84,7 +95,7 @@
 <button type="button" class="collapsible">Window property</button>
 <div class="content">
     <label for="window">Function</label>
-    <select name="window" id="window">
+    <select name="window" id="window" disabled>
         <option value="Lucy3D">Lucy 3D</option>
         <option value="Lucy3DFancyInt">Lucy 3D fancy integration</option>
         <option value="Hann3D">Hanning 3D</option>
@@ -93,46 +104,46 @@
 <!--         Future: LucyND_Periodic -->
     </select><br>
     <label for="windowsize">Window size:</label>
-    <input type="number" id="windowsize" name="windowsize" step="0.05" value="1" style="width:20%;"> 
+    <input type="number" id="windowsize" disabled name="windowsize" step="0.05" value="1" style="width:20%;"> 
 </div> 
 
 <button type="button" class="collapsible">Grid</button>
 <div class="content">
     <label for="xgrid">Grid points</label>
-    <input type="number" id="xgrid" name="xgrid" step="1" value="3" min="1" style="width:10%;"> 
-    <input type="number" id="ygrid" name="ygrid" step="1" value="3" min="1" style="width:10%;"> 
-    <input type="number" id="zgrid" name="zgrid" step="1" value="3" min="1" style="width:10%;"> <br>
+    <input type="number" id="xgrid" disabled name="xgrid" step="1" value="3" min="1" style="width:10%;"> 
+    <input type="number" id="ygrid" disabled name="ygrid" step="1" value="3" min="1" style="width:10%;"> 
+    <input type="number" id="zgrid" disabled name="zgrid" step="1" value="3" min="1" style="width:10%;"> <br>
 
     <label for="xmin">X boundaries</label>
-    <input type="number" id="xmin" name="xmin" step="0.05" value="0" style="width:10%;"> 
-    <input type="number" id="xmax" name="xmax" step="0.05" value="1" style="width:10%;">
+    <input type="number" id="xmin" disabled name="xmin" step="0.05" value="0" style="width:10%;"> 
+    <input type="number" id="xmax" disabled name="xmax" step="0.05" value="1" style="width:10%;">
     <label for="zper">X periodic?</label>
-    <input type="checkbox" id="xper" name="xper"><br>
+    <input type="checkbox" id="xper" disabled name="xper"><br>
     
     <label for="ymin">Y boundaries</label>
-    <input type="number" id="ymin" name="ymin" step="0.05" value="0" style="width:10%;"> 
-    <input type="number" id="ymax" name="ymax" step="0.05" value="1" style="width:10%;">
+    <input type="number" id="ymin" disabled name="ymin" step="0.05" value="0" style="width:10%;"> 
+    <input type="number" id="ymax" disabled name="ymax" step="0.05" value="1" style="width:10%;">
     <label for="zper">Y periodic?</label>
-    <input type="checkbox" id="yper" name="yper"><br>
+    <input type="checkbox" id="yper" disabled name="yper"><br>
     
     
     <label for="zmin">Z boundaries</label>
-    <input type="number" id="zmin" name="zmin" step="0.05" value="0" style="width:10%;"> 
-    <input type="number" id="zmax" name="zmax" step="0.05" value="1" style="width:10%;">
+    <input type="number" id="zmin" disabled name="zmin" step="0.05" value="0" style="width:10%;"> 
+    <input type="number" id="zmax" disabled name="zmax" step="0.05" value="1" style="width:10%;">
     <label for="zper">Z periodic?</label>
-    <input type="checkbox" id="zper" name="zper">
+    <input type="checkbox" id="zper" disabled name="zper">
 </div>
 
 <button type="button" class="collapsible">Time</button>
 <div class="content">
     <label for="timeaverage">Time averaging version:</label>
-    <select name="timeaverage" id="timeaverage">
+    <select name="timeaverage" disabled id="timeaverage">
         <option value="None">None</option>
         <option value="Final">Final</option>
         <option value="Intermediate">Intermediate</option>
         <option value="Intermediate and Final">Both</option>
     </select><br>
-    <div id="slider" style="width:80%;margin: auto; margin-top: 8px;"></div><br><br>
+    <label for="timeslider"> To process: <div id="timeslider" disabled style="width:80%;margin: auto; margin-top: 8px;"></div><br><br>
 
 </div>
 
@@ -153,42 +164,72 @@
 
 <button type="button" class="collapsible">Interact with the GUI</button>
 <div class="content">
-    <button type="button" id="applyparam">Push parameters</button>&nbsp;&nbsp;
+<!--     <button type="button" id="applyparam">Push parameters</button>&nbsp;&nbsp; -->
     <button type="button" id="updateCG" disabled>Update</button>
     <input type="checkbox" id="autoupdate" name="autoupdate"><label for="autoupdate">auto?</label>&nbsp;&nbsp;
     <button type="button" id="resetcam">Reset cam</button>
-    <br>
-    <table width="100%" style="margin-top:10px;"><tr><td width="10%">
-    <label for="displayedfield">Field: </label><select name="displayedfield" id="displayedfield" style="width:20%;"><br>
-    </select>
-    <select name="component" id="component">
-        <option value="0" ></option>
-        <option value="1" hidden>xy</option>
-        <option value="2" hidden>xz</option>
-        <option value="3" hidden>yx</option>
-        <option value="4" hidden>yy</option>
-        <option value="5" hidden>yz</option>
-        <option value="6" hidden>zx</option>
-        <option value="7" hidden>zy</option>
-        <option value="8" hidden>zz</option>
-    </select><br></td><td width="60%" style="text-align:right;"><span style="margin-right:80px;">
-        <input type="number" id="cmin" name="cmin" step="0.05" value="0" style="width:8%;"> 
-        <img src="Inferno.png" width="50%" style="vertical-align:middle;">
-        <input type="number" id="cmax" name="cmax" step="0.05" value="0" style="width:8%;">
-        <input type="checkbox" id="lockcscale" name="lockcscale"><label for="lockcscale" id="lockcscalelbl">&#128275;</label></span>
-    </td></tr></table>
-    Time: <div id="dispslider" style="width:80%;margin: auto; margin-top: -10px;"></div><br><br><br>
-    
-    <label for="cliptype">Cutting plane: </label>
+    <hr width="100%"/>
+    <table width="100%" style="margin-top:10px;">
+        <tr>
+            <td width="10%">
+                <label for="displayedfield">Field: </label>
+                <select name="displayedfield" id="displayedfield" style="width:5em;"></select>
+                <select name="component" id="component">
+                    <option value="0" ></option>
+                    <option value="1" hidden>xy</option>
+                    <option value="2" hidden>xz</option>
+                    <option value="3" hidden>yx</option>
+                    <option value="4" hidden>yy</option>
+                    <option value="5" hidden>yz</option>
+                    <option value="6" hidden>zx</option>
+                    <option value="7" hidden>zy</option>
+                    <option value="8" hidden>zz</option>
+                </select>
+            </td>
+            <td width="50%" style="text-align:right;"><span style="margin-right:80px;">
+                <input type="number" id="cmin" name="cmin" step="0.05" value="0" style="width:4em;"> 
+                <img src="Inferno.png" width="50%" style="vertical-align:middle;">
+                <input type="number" id="cmax" name="cmax" step="0.05" value="0" style="width:4em;">
+                <input type="checkbox" id="lockcscale" name="lockcscale"><label for="lockcscale" id="lockcscalelbl">&#128275;</label></span>
+            </td>
+        </tr>
+    </table>
+    <hr width="100%"/>
+    <label for="cliptype">Cutting plane: </label> 
     <select name="cliptype" id="cliptype">
         <option value="0" default>None</option>
         <option value="x">x</option>
         <option value="y">y</option>
         <option value="z">z</option>
-    </select>
-    &nbsp;&nbsp; 
+    </select> &nbsp;&nbsp;&nbsp;
     <span id="cliprangemin"> 0 </span>
     <input type="range" min="0" max="1" value="0.5" step=0.001 id="cliprange" disabled>
-    <span id="cliprangemax"> 1 </span>
+    <span id="cliprangemax"> 1 </span><br>
+    <hr width="100%"/>
+    Time:&nbsp;&nbsp;&nbsp;<div id="dispslider" style="width:70%;margin: auto; margin-top: -10px;"></div><br><br><br>
     
+
+    
+</div>
+</div>
+
+<!-- POPUP for file input  -->
+<div class="form-popup" id="addfileform">
+<h3 style="text-align:center;"> Add file(s) to process </h3>
+<input type="file" id="filename1" multiple="multiple" hidden><input type="file" id="filename2" multiple="multiple" hidden><br>
+<select name="filetype" id="filetype" hidden>
+    <option value="LiggghtsParticles">Liggghts (particles)</option>
+    <option value="Yade">Yade (particles)</option>
+    <option value="MercuryVTUParticles">Mercury VTU (particles)</option>
+    <option value="NDDEM">NDDEM (particles and contacts)</option>
+</select><br>
+<div id="file_multifile" hidden>
+    <br>
+    <div style="display:flex;justify-content: space-between;"><label for="file_initial" width="50%">First file number:</label> <input type="text" id="file_initial" size="16"/></div>
+    <div style="display:flex;justify-content: space-between;"><label for="file_delta">File deltas:</label> <input type="text" id="file_delta" size="16"/></div>
+    <div style="display:flex;justify-content: space-between;"><label for="file_pattern">File pattern:</label> <input type="text" id="file_pattern" size="16"/></div>
+</div>
+<br>
+<div style="display:flex;justify-content: space-between;"><button type="button" id="updatefile" style="visibility:hidden;">Apply</button>
+<button type="button" id="cancelfile">Cancel</button></div>
 </div>

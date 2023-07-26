@@ -35,7 +35,7 @@ public:
 
     std::istream *in = nullptr ;
 
-    int curts = -1, actualts=0 ; 
+    int actualts=0 ; 
     int Nitem ; 
 
     std::vector <std::string> fields ;
