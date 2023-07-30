@@ -11,7 +11,28 @@ class Reader {
 public:
     virtual std::vector<std::vector<double>> get_bounds() {return {} ; }
     virtual int get_dimension () {return 3 ;}
-    virtual int get_numts() {return -1; }
+    virtual int get_numts() 
+    {
+        if (filenumbering.numts != -1) return filenumbering.numts ; 
+        if (filenumbering.ismultifile)
+        {             
+            filenumbering.numts=0 ; 
+            FILE * in ; 
+            in=fopen(getpath(filenumbering.numts).c_str(), "r") ;  
+            while ( in != nullptr )
+            {
+                printf(".") ; 
+                filenumbering.numts++ ; 
+                fclose(in) ; 
+                //printf("%s\n", getpath(filenumbering.numts).c_str()) ; 
+                in=fopen(getpath(filenumbering.numts).c_str(), "r") ;  
+            }
+            printf("Found %d files\n", filenumbering.numts) ; 
+            return filenumbering.numts ; 
+        }
+        else
+            return -1; 
+    }
     virtual int get_num_particles () {return -1;}
     virtual int get_num_contacts () {return -1;}
     virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd, [[maybe_unused]] std::string name="") {return nullptr ; }
@@ -52,7 +73,7 @@ public:
         else
             return Density;
     }
-
+    
     //virtual double * get_data(DataValue, int dd) {return nullptr;}
 
     bool is_seekable = false ;
@@ -108,6 +129,37 @@ public:
 
     }
 
+    // Filebuilder
+    std::string path ; 
+    int curts=-1 ; 
+    struct {
+        double initial = 0 ; 
+        double delta = 1 ;
+        int numts = -1 ;
+        bool ismultifile = false ;  
+    } filenumbering ; 
+    std::string getpath (int ts) 
+    {
+        char * tmp = nullptr ; 
+        size_t pos = path.find('%') ;
+        for ( ; !isalpha(path[pos]) ; pos++) ;
+        if (path[pos]=='e' || path[pos]=='f' || path[pos]=='g' || path[pos]=='E' || path[pos]=='F' || path[pos]=='G') 
+        {
+            int len = snprintf(NULL, 0, path.c_str(), filenumbering.initial+filenumbering.delta*ts) ; 
+            tmp = (char*) malloc(len) ;
+            sprintf(tmp, path.c_str(), filenumbering.initial+filenumbering.delta*ts) ; 
+        }
+        else if (path[pos]=='d'|| path[pos]=='i' || path[pos]=='u' || path[pos]=='h' || path[pos]=='l' || path[pos]=='j' || path[pos]=='z')
+        {
+            int len = snprintf(NULL, 0, path.c_str(), static_cast<long long int>(filenumbering.initial+filenumbering.delta*ts)) ; 
+            tmp = (char*) malloc(len+1) ;
+            sprintf(tmp, path.c_str(), static_cast<long long int>(filenumbering.initial+filenumbering.delta*ts)) ;             
+        }
+        else printf("ERR: unknown format specifier in file path: %c.\n", path[pos]) ; 
+        std::string res = tmp ; 
+        free(tmp) ; 
+        return res ;
+    }
 
 
 

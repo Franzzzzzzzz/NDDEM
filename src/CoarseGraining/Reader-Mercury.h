@@ -13,7 +13,6 @@ public :
     int get_dimension() {return dimension;}
     virtual double * get_data([[maybe_unused]] DataValue datavalue, [[maybe_unused]] int dd, [[maybe_unused]] std::string name="") {return nullptr ; } 
     
-    std::string path ;
     int dimension=3 ; 
     std::ifstream file_in ; 
     
@@ -23,14 +22,12 @@ public :
         file_in.seekg(0); 
         curts=0 ; 
     }
-protected:
-    int curts=-1 ;
 } ; 
 
 //----------------------------------------------------------
 class MercuryReader_vtu_particles: public MercuryReader {
 public:
-    MercuryReader_vtu_particles(std::string ppath, int numtstmp) ; 
+    MercuryReader_vtu_particles(std::string ppath) ; 
     int get_numts() {return numts; }
     int get_num_particles () {return N;}
     
@@ -47,9 +44,7 @@ public:
     } 
     
     int read_timestep (int ts) ;
-    
-    std::string getpath (int ts) {char tmp[5000] ;  std::string res ; sprintf(tmp, path.c_str(), ts) ; res = tmp ; return res ;}
-    
+      
     v2d data ; 
 private :
     int numts = -1 ; 

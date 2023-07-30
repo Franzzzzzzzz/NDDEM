@@ -78,6 +78,13 @@ $(function() {
 : <a class="el" href="classnlohmann_1_1basic__json.html#a5c99855f3e35ff35558cb46139b785f8">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iterator__input__adapter.html#ace7ba18b59cde50cbc53687034f649be">nlohmann::detail::iterator_input_adapter&lt; IteratorType &gt;</a>
 , <a class="el" href="classnlohmann_1_1json__pointer.html#a649252bda4a2e75a0915b11a25d8bcc3">nlohmann::json_pointer&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a79e5967db0fbf4f54eb4e8ca68372ada">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#a277d3d115dc7b30bb35902cbcf2eb7b4">pugi::xml_node</a>
+, <a class="el" href="classpugi_1_1xml__object__range.html#a20315bea60ace6b9e31edfb8d377dbe7">pugi::xml_object_range&lt; It &gt;</a>
+, <a class="el" href="classpugi_1_1xml__text.html#a79c46cb685d1ee7e34963bc26111d75e">pugi::xml_text</a>
+, <a class="el" href="classpugi_1_1xpath__node__set.html#ace9fdd96911230e401a492bbcf4663cb">pugi::xpath_node_set</a>
+, <a class="el" href="classxpath__node__set__raw.html#a95e517f4bb3d9d79f2f0a4c6c0ce42e5">xpath_node_set_raw</a>
+, <a class="el" href="classxpath__string.html#a46087349c9a2d297ea127018949bc012">xpath_string</a>
 </li>
 <li>encodebase64f()
 : <a class="el" href="classXMLWriter.html#aa17a12d2739f6b9e3ad966f0c14e8969">XMLWriter</a>
@@ -86,8 +93,13 @@ $(function() {
 : <a class="el" href="classXMLWriter.html#a4e6535e4361269744d8363de5d62a4f6">XMLWriter</a>
 </li>
 <li>end()
-: <a class="el" href="classnlohmann_1_1basic__json.html#a931267ec3f09eb67e4382f321b2c52bc">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
+: <a class="el" href="classnlohmann_1_1basic__json.html#a82b5b96f86879a3bac0c713d33178551">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html#a90091f8492d23576edef72c5e8b9d4cf">nlohmann::detail::iteration_proxy&lt; IteratorType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__node.html#aafa1deeb5fe928d07cd7caebbf975527">pugi::xml_node</a>
+, <a class="el" href="classpugi_1_1xml__object__range.html#ac719fcaad171adb58b90b7f8973cbd9a">pugi::xml_object_range&lt; It &gt;</a>
+, <a class="el" href="classpugi_1_1xml__tree__walker.html#a7ce500c6b0d3a0446d17daa57f9b4622">pugi::xml_tree_walker</a>
+, <a class="el" href="classpugi_1_1xpath__node__set.html#a419c1c6546d28f4fff0fa010480d0fa6">pugi::xpath_node_set</a>
+, <a class="el" href="classxpath__node__set__raw.html#a44198ae887e8ed414e6bf0cb7df17658">xpath_node_set_raw</a>
 </li>
 <li>end_array()
 : <a class="el" href="classnlohmann_1_1detail_1_1json__sax__acceptor.html#a22ef94ca5476a9563dcaca15b7d6e654">nlohmann::detail::json_sax_acceptor&lt; BasicJsonType &gt;</a>
@@ -104,6 +116,48 @@ $(function() {
 <li>erase()
 : <a class="el" href="classnlohmann_1_1basic__json.html#a494632b69bbe1d0153d3bedad0901b8e">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 , <a class="el" href="structnlohmann_1_1ordered__map.html#a583c8976bbf0c137ff8e2439878f3058">nlohmann::ordered_map&lt; Key, T, IgnoredLess, Allocator &gt;</a>
+</li>
+<li>error()
+: <a class="el" href="structxpath__parser.html#ad17156b91b468a75af0d3dcbb672a700">xpath_parser</a>
+</li>
+<li>error_oom()
+: <a class="el" href="structxpath__parser.html#a72e60f73dc6a4b8a68e07700ec42b51c">xpath_parser</a>
+</li>
+<li>error_rec()
+: <a class="el" href="structxpath__parser.html#a0b6fc1d3997b77fc267dc829083bff79">xpath_parser</a>
+</li>
+<li>eval_boolean()
+: <a class="el" href="classxpath__ast__node.html#ab7f965a92023bc2704b8e6fd9f3d7c14">xpath_ast_node</a>
+</li>
+<li>eval_node_set()
+: <a class="el" href="classxpath__ast__node.html#a68cace396dd4eeae67ecfcd34a3a8285">xpath_ast_node</a>
+</li>
+<li>eval_number()
+: <a class="el" href="classxpath__ast__node.html#a92dd7048e28d486bc7f382d1fc6f1de6">xpath_ast_node</a>
+</li>
+<li>eval_once()
+: <a class="el" href="classxpath__ast__node.html#a35ad012fc33cf3dc51468a67c04aac54">xpath_ast_node</a>
+</li>
+<li>eval_string()
+: <a class="el" href="classxpath__ast__node.html#a6b675237a590548b68d0e0b97518b6df">xpath_ast_node</a>
+</li>
+<li>eval_string_concat()
+: <a class="el" href="classxpath__ast__node.html#aaf931a091af0fb91c25e90b205363b4e">xpath_ast_node</a>
+</li>
+<li>evaluate_boolean()
+: <a class="el" href="classpugi_1_1xpath__query.html#a37a4e364ecf350d767c0a3b157afb5b1">pugi::xpath_query</a>
+</li>
+<li>evaluate_node()
+: <a class="el" href="classpugi_1_1xpath__query.html#a2808124d59c31fc41d5650956d85d139">pugi::xpath_query</a>
+</li>
+<li>evaluate_node_set()
+: <a class="el" href="classpugi_1_1xpath__query.html#a5043f9148553f25c017bfd815a509bd8">pugi::xpath_query</a>
+</li>
+<li>evaluate_number()
+: <a class="el" href="classpugi_1_1xpath__query.html#ab644fecda1ceac6591bea63468c5ef4a">pugi::xpath_query</a>
+</li>
+<li>evaluate_string()
+: <a class="el" href="classpugi_1_1xpath__query.html#affdae688f5475eebe37023adf10a9f2c">pugi::xpath_query</a>
 </li>
 <li>exception()
 : <a class="el" href="classnlohmann_1_1detail_1_1exception.html#ae323ad0d53bc724414c2233164e65657">nlohmann::detail::exception</a>

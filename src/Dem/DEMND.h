@@ -466,7 +466,7 @@ public:
                 else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ELLIPSE))
                 {
                     assert((d==2)) ; 
-                    std::vector<double> tmpcn(2) ;                     
+                    std::vector<double> tmpcn(2) ; 
                     #pragma GCC diagnostic push
                     #pragma GCC diagnostic ignored "-Wstrict-aliasing"
                     uint64_t c=((uint64_t)(it->ghostdir) <<32 | (uint64_t)(it->ghost)) ;

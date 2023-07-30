@@ -205,8 +205,8 @@ $(function() {
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;     <span class="keywordflow">if</span> (regex_match(a, what, exprloc)) filelistloc.push_back(make_pair(stoi(what[1].str()), a)) ;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;     <span class="keywordflow">if</span> (regex_match(a, what, exprA)) filelistA.push_back(make_pair(stoi(what[1].str()), a)) ;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; std::sort(filelistloc.begin(), filelistloc.end()) ;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; std::sort(filelistA.begin()  , filelistA.end()  ) ;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; <a class="code" href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">std::sort</a>(filelistloc.begin(), filelistloc.end()) ;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; <a class="code" href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">std::sort</a>(filelistA.begin()  , filelistA.end()  ) ;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; TsName.resize(filelistloc.size(), 0) ;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; <span class="keywordflow">for</span> (<a class="code" href="group__DEM.html#ga69aa29b598b851b0640aa225a9e5d61d">uint</a> i=0 ; i&lt;filelistloc.size() ; i++) TsName[i]=filelistloc[i].first ;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
@@ -823,6 +823,7 @@ $(function() {
 <div class="ttc" id="agroup__Texturing_html_gafd780c295423d56be7135aa67234a27a"><div class="ttname"><a href="group__Texturing.html#gafd780c295423d56be7135aa67234a27a">filepathname</a></div><div class="ttdeci">void filepathname(char *path, int n, int time, cv1d View)</div><div class="ttdoc">Filename generator.</div></div>
 <div class="ttc" id="aio_8h_html"><div class="ttname"><a href="io_8h.html">io.h</a></div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:4337</div></div>
+<div class="ttc" id="apugixml_8cpp_html_a09a6af504e5bf26365ccb2d1c707ca48"><div class="ttname"><a href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a></div><div class="ttdeci">PUGI_IMPL_FN void sort(I begin, I end, const Pred &amp;pred)</div><div class="ttdef"><b>Definition:</b> pugixml.cpp:7707</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -67,6 +67,9 @@ $(function() {
 <li>object()
 : <a class="el" href="classnlohmann_1_1basic__json.html#a9a4df356e05415438fadf8a15e583903">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 </li>
+<li>offset_debug()
+: <a class="el" href="classpugi_1_1xml__node.html#a3ea448a2641ee222bde36fca5a3e2f0f">pugi::xml_node</a>
+</li>
 <li>open()
 : <a class="el" href="classDatafile.html#ae3fba436dbce1567908a419a1fa58878">Datafile</a>
 , <a class="el" href="classLiggghtsReader.html#a945bd223976844cdfd8279c5e0b1578c">LiggghtsReader</a>
@@ -77,6 +80,10 @@ $(function() {
 <li>opencf()
 : <a class="el" href="classDatafile.html#ad795adb1b37eef1ad15fca264c2411a6">Datafile</a>
 </li>
+<li>operator bool()
+: <a class="el" href="structpugi_1_1xml__parse__result.html#ae4743c3f8e684714c4a7202eda03bbdd">pugi::xml_parse_result</a>
+, <a class="el" href="structpugi_1_1xpath__parse__result.html#a81ad8f6a6cdf9466f6ed19200bbd80fa">pugi::xpath_parse_result</a>
+</li>
 <li>operator output_adapter_t&lt; CharType &gt;()
 : <a class="el" href="classnlohmann_1_1detail_1_1output__adapter.html#a5fdac7aec8ade2f4bb0b5df30550d90c">nlohmann::detail::output_adapter&lt; CharType, StringType &gt;</a>
 </li>
@@ -86,20 +93,47 @@ $(function() {
 <li>operator std::string()
 : <a class="el" href="classnlohmann_1_1json__pointer.html#ae9015c658f99cf3d48a8563accc79988">nlohmann::json_pointer&lt; BasicJsonType &gt;</a>
 </li>
+<li>operator unspecified_bool_type()
+: <a class="el" href="classpugi_1_1xml__attribute.html#ae74d33d7fd97d5ba9ec7ca3b968a2fc4">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#a372ae87dd5a61442f090e200784c4239">pugi::xml_node</a>
+, <a class="el" href="classpugi_1_1xml__text.html#a4bddc8c2fa9ddc1d202ba9f5af8e4844">pugi::xml_text</a>
+, <a class="el" href="classpugi_1_1xpath__node.html#a29465672ce5042b2528600bdbde235ce">pugi::xpath_node</a>
+, <a class="el" href="classpugi_1_1xpath__query.html#aac5fb4d42498e3a8d933043e90464eff">pugi::xpath_query</a>
+</li>
 <li>operator value_t()
 : <a class="el" href="classnlohmann_1_1basic__json.html#a6d4b8df10ecc533a50823e8805f4a873">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 </li>
 <li>operator ValueType()
 : <a class="el" href="classnlohmann_1_1basic__json.html#ada1463d8d7ba77865f28f5e83dec7f33">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 </li>
+<li>operator!()
+: <a class="el" href="classpugi_1_1xml__attribute.html#a233644dde49a2692b7aab82aa7f76f7c">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#a111f8c9b0c0d0f65b444d70eadd60edb">pugi::xml_node</a>
+, <a class="el" href="classpugi_1_1xml__text.html#a26ed22884f9d0f5f20c10c2375033ac6">pugi::xml_text</a>
+, <a class="el" href="classpugi_1_1xpath__node.html#a76d98036e525424a8af231e4a5e0d947">pugi::xpath_node</a>
+, <a class="el" href="classpugi_1_1xpath__query.html#a1467068f24ec6dedb0147e509a2c25c4">pugi::xpath_query</a>
+</li>
 <li>operator!=()
 : <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a760bf39cc5477bc663d8bb3c44aabf6a">nlohmann::byte_container_with_subtype&lt; BinaryType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a190077df326c10886020bbcfaa169b20">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html#a646dbb2b1842f44f42ee1e14245b8595">nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a0ab90376d68a2f634c73ae324d07c29e">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__attribute__iterator.html#a6066107dfafa7845068bdf52b0bb85e6">pugi::xml_attribute_iterator</a>
+, <a class="el" href="classpugi_1_1xml__named__node__iterator.html#ae81bb53a8f21622af86904e21f73c348">pugi::xml_named_node_iterator</a>
+, <a class="el" href="classpugi_1_1xml__node.html#a29b474c0fed40d410d1d0187c78cbf43">pugi::xml_node</a>
+, <a class="el" href="classpugi_1_1xml__node__iterator.html#a5ad434db44866a3515b73413157b10c6">pugi::xml_node_iterator</a>
+, <a class="el" href="classpugi_1_1xpath__node.html#a236954c08697be0c5a5263a9776cbc40">pugi::xpath_node</a>
+, <a class="el" href="classxpath__string.html#a8976b1e54152b806a13996a6140499b4">xpath_string</a>
 </li>
 <li>operator()()
-: <a class="el" href="structnlohmann_1_1detail_1_1from__json__fn.html#a6d14a74e1043072c77892534572d2973">nlohmann::detail::from_json_fn</a>
+: <a class="el" href="structdocument__order__comparator.html#ad9c64802ceb792edf2c10aaa7530d0a8">document_order_comparator</a>
+, <a class="el" href="structequal__to.html#a6cb8f069b02593f2e8bbe7f3960e47b9">equal_to</a>
+, <a class="el" href="structless.html#a68b5bb53559da9444217a81dac510f7d">less</a>
+, <a class="el" href="structless__equal.html#ad2b3a8483fdbe64d26a15df8a1e7cc9a">less_equal</a>
+, <a class="el" href="structnamespace__uri__predicate.html#abeb31bcbfaa60f9cee21a4dc6cb59073">namespace_uri_predicate</a>
+, <a class="el" href="structnlohmann_1_1detail_1_1from__json__fn.html#a6d14a74e1043072c77892534572d2973">nlohmann::detail::from_json_fn</a>
 , <a class="el" href="structnlohmann_1_1detail_1_1to__json__fn.html#aecfb5114c8a737fc89d98589482795b8">nlohmann::detail::to_json_fn</a>
+, <a class="el" href="structnot__equal__to.html#ab47f9ee4aea1fefab4250ca11ef4e388">not_equal_to</a>
 , <a class="el" href="classnumber__gen.html#a34f748f7745f793997ffeb0ca30d0ea2">number_gen&lt; T &gt;</a>
 , <a class="el" href="structstd_1_1hash_3_01nlohmann_1_1json_01_4.html#aec1567d1fa47dbe5b77954dce3a55b64">std::hash&lt; nlohmann::json &gt;</a>
 , <a class="el" href="structstd_1_1less_3_1_1nlohmann_1_1detail_1_1value__t_01_4.html#a10d3fea50edf7b15ead8f4ceeb006000">std::less&lt;::nlohmann::detail::value_t &gt;</a>
@@ -108,6 +142,9 @@ $(function() {
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a5ca57856d9bba54a5fc51cee891de827">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html#a10accadf05a172fdc69a016bec201e81">nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__ref.html#aa3100e41472dba02ab78ccc1607e44ab">nlohmann::detail::json_ref&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute__iterator.html#a6c7da2f1c394e0a2367cb66c7bfef096">pugi::xml_attribute_iterator</a>
+, <a class="el" href="classpugi_1_1xml__named__node__iterator.html#a722752eb2adbefb4edc0506b258e9928">pugi::xml_named_node_iterator</a>
+, <a class="el" href="classpugi_1_1xml__node__iterator.html#af992a5f74091268713e9d1ca9b16208d">pugi::xml_node_iterator</a>
 </li>
 <li>operator+()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a8ef76aeb5a5032768f0f61f48ac189c0">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
@@ -118,10 +155,13 @@ $(function() {
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a7d2397773b2dce42f30f0375a6a1d850">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html#adf4db2aef31822f3a179435158a4de11">nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__reverse__iterator.html#a26caf0069a50ce4ecb010a1453e883fc">nlohmann::detail::json_reverse_iterator&lt; Base &gt;</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1primitive__iterator__t.html#aa011863621357b3cf891670bf63a48b1">nlohmann::detail::primitive_iterator_t</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1primitive__iterator__t.html#ad26511012fc88f3ec5d9e1cb708732fd">nlohmann::detail::primitive_iterator_t</a>
+, <a class="el" href="classpugi_1_1xml__attribute__iterator.html#acc4578d31f9d4c582396d60b1bace4b9">pugi::xml_attribute_iterator</a>
+, <a class="el" href="classpugi_1_1xml__named__node__iterator.html#a3504c7d0e20faffcc77c5562568ba8ed">pugi::xml_named_node_iterator</a>
+, <a class="el" href="classpugi_1_1xml__node__iterator.html#ac5a300197d8ad6358d0e14329ff09842">pugi::xml_node_iterator</a>
 </li>
 <li>operator+=()
-: <a class="el" href="classnlohmann_1_1basic__json.html#ac48302a8b4f8c2a6e30c2a7bff6abc49">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
+: <a class="el" href="classnlohmann_1_1basic__json.html#a40226d9c84fcb9cb948ae0c27b842c57">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a3eef94f9d167046e7f773aeb6b78090c">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__reverse__iterator.html#a4e5d0a3bee433104ef87366e00536e01">nlohmann::detail::json_reverse_iterator&lt; Base &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1primitive__iterator__t.html#aee01535df0b3b40137d9241029a9a203">nlohmann::detail::primitive_iterator_t</a>
@@ -133,7 +173,10 @@ $(function() {
 <li>operator--()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a1fc43e764467b8ea4a4cdd01f629d757">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__reverse__iterator.html#a2c170f51371538da2c8f4094305da3d3">nlohmann::detail::json_reverse_iterator&lt; Base &gt;</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1primitive__iterator__t.html#aef3b5dfeb2cb04dc9d0a024fc1898b98">nlohmann::detail::primitive_iterator_t</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1primitive__iterator__t.html#abecbf0c73c7fe963a699738065177bc3">nlohmann::detail::primitive_iterator_t</a>
+, <a class="el" href="classpugi_1_1xml__attribute__iterator.html#ab82aed83d718aa9507379064848579ab">pugi::xml_attribute_iterator</a>
+, <a class="el" href="classpugi_1_1xml__named__node__iterator.html#a98ee4b012a25bd4edf70e81236368583">pugi::xml_named_node_iterator</a>
+, <a class="el" href="classpugi_1_1xml__node__iterator.html#a14d69fc054cfc70613609eba46cb00ce">pugi::xml_node_iterator</a>
 </li>
 <li>operator-=()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#abcc9d51bc52f2e8483bbe4018f05e978">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
@@ -142,49 +185,84 @@ $(function() {
 <li>operator-&gt;()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a6da3d2b34528aff328f3dcb513076dec">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__ref.html#adb652774a67829876449dc0b30637456">nlohmann::detail::json_ref&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute__iterator.html#a6c51c52d4bdd03f80014aaf8de7112b8">pugi::xml_attribute_iterator</a>
+, <a class="el" href="classpugi_1_1xml__named__node__iterator.html#aa5dafe8a8de6e15f51b48535f1e64929">pugi::xml_named_node_iterator</a>
+, <a class="el" href="classpugi_1_1xml__node__iterator.html#ad12f80e11ed1c81b2fb090cd0dea5d70">pugi::xml_node_iterator</a>
 </li>
 <li>operator/=()
 : <a class="el" href="classnlohmann_1_1json__pointer.html#a7395bd0af29ac23fd3f21543c935cdfa">nlohmann::json_pointer&lt; BasicJsonType &gt;</a>
 </li>
 <li>operator&lt;()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a0d14cd76203e00bdcef6a64a5d055cc7">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a896ba92069ffc9d0459a08565ccd53c4">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#af0b065f7e790b8691fc74f406541d6ec">pugi::xml_node</a>
 </li>
 <li>operator&lt;=()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#ac6f71b36d7c87e427d1fee83f2600fad">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a07a856e255cc260ebca346aad5d55a06">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#ada4630cbd0813fa650b39d8968620f5a">pugi::xml_node</a>
 </li>
 <li>operator=()
 : <a class="el" href="classcp.html#a1375dd6c25e708b9988bcc1ccd390321">cp&lt; d &gt;</a>
 , <a class="el" href="classcpm.html#a993b092b99a1871494065a857dc53ffc">cpm&lt; d &gt;</a>
 , <a class="el" href="classnlohmann_1_1basic__json.html#a1ae937c299f347a9dcb7f31a8e57762b">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1binary__reader.html#a35abcd6b3231a4c9d651f9c0eb610c96">nlohmann::detail::binary_reader&lt; BasicJsonType, InputAdapterType, SAX &gt;</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1file__input__adapter.html#ad59bbc7e3f23dd74475c5cb818784e42">nlohmann::detail::file_input_adapter</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1binary__reader.html#ad3dc8b0f8ef6035465c14ed7dcbb67d4">nlohmann::detail::binary_reader&lt; BasicJsonType, InputAdapterType, SAX &gt;</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1file__input__adapter.html#acfd616c651d601a1dfc7fbdd6973f716">nlohmann::detail::file_input_adapter</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1input__stream__adapter.html#a3577dff99cc91968557b52959b0363e4">nlohmann::detail::input_stream_adapter</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#ae3dc277c25007ac952d57f9a1972ce79">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a7159ed1cfe7c423a2baef8bea0c94509">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__ref.html#a98956ba676b1ae16b62346f9c4fb752e">nlohmann::detail::json_ref&lt; BasicJsonType &gt;</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1json__sax__dom__callback__parser.html#a5c9603e79a71713f5e8cf12cba837dbb">nlohmann::detail::json_sax_dom_callback_parser&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1json__sax__dom__callback__parser.html#a60753ffbec958de15de807852e62cde8">nlohmann::detail::json_sax_dom_callback_parser&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__sax__dom__parser.html#aff928a07e40e4efb16b3ff9384f4401c">nlohmann::detail::json_sax_dom_parser&lt; BasicJsonType &gt;</a>
-, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#a1383bb59c5efd4f9370ca3ee4ad1a4ba">nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt;</a>
+, <a class="el" href="classnlohmann_1_1detail_1_1lexer.html#af7e7002d4bb66e9104d752791b8070f8">nlohmann::detail::lexer&lt; BasicJsonType, InputAdapterType &gt;</a>
 , <a class="el" href="structnlohmann_1_1detail_1_1nonesuch.html#a78ca022a1b4defe4f7ba662843602231">nlohmann::detail::nonesuch</a>
 , <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#a2235c8f3da8dfe5b26cb030f6886811a">nlohmann::detail::output_adapter_protocol&lt; CharType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1serializer.html#acaafe3436ee5fb74777eb4132a88c513">nlohmann::detail::serializer&lt; BasicJsonType &gt;</a>
 , <a class="el" href="structnlohmann_1_1json__sax.html#ac74584e3dc41f2465e69b37d7d2bf694">nlohmann::json_sax&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a297736b0fcb5a826a7588cd57c6a6ae1">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__document.html#af8e921993cb396b96e1e3c025d21b469">pugi::xml_document</a>
+, <a class="el" href="classpugi_1_1xml__text.html#a599caf816bcffda85ca04be72b153937">pugi::xml_text</a>
+, <a class="el" href="classpugi_1_1xpath__node__set.html#a0a2dc179d4c8008fe830ce19554a8113">pugi::xpath_node_set</a>
+, <a class="el" href="classpugi_1_1xpath__query.html#abc67091b5d96ed2107dc3ba4f5735a60">pugi::xpath_query</a>
+, <a class="el" href="classpugi_1_1xpath__variable.html#a0cd0e1223e99c0baf46488cfd2079961">pugi::xpath_variable</a>
+, <a class="el" href="classpugi_1_1xpath__variable__set.html#a01b2824caad84258c8931217081b8971">pugi::xpath_variable_set</a>
+, <a class="el" href="classxml__buffered__writer.html#a0aab8cdf0db6269840a0b16319bdb985">xml_buffered_writer</a>
+, <a class="el" href="classxpath__ast__node.html#a60fddea92b095c2b8705f12f7309e6aa">xpath_ast_node</a>
 </li>
 <li>operator==()
 : <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#aee67fde9d3d571a07d5bb35df21c0555">nlohmann::byte_container_with_subtype&lt; BinaryType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#aaddab83c2b4023cb0f0fdbc757c54f65">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html#af2b78a8b9c9276b07c928b21bb1e2d54">nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a8b73b3641f9408ba08899c1e01bb19c5">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__attribute__iterator.html#a63a156242c4bd6c80346e226d8e51d05">pugi::xml_attribute_iterator</a>
+, <a class="el" href="classpugi_1_1xml__named__node__iterator.html#a99990c277131e2325517c991aefc1506">pugi::xml_named_node_iterator</a>
+, <a class="el" href="classpugi_1_1xml__node.html#ad4609833c585e801c35b8b7ed5927f9f">pugi::xml_node</a>
+, <a class="el" href="classpugi_1_1xml__node__iterator.html#a18306ae4b9d5c54d5ed249f10591a214">pugi::xml_node_iterator</a>
+, <a class="el" href="classpugi_1_1xpath__node.html#a27ba89fe4ac4dcb6d63f0e7f3852edfa">pugi::xpath_node</a>
+, <a class="el" href="structxpath__lexer__string.html#a6f8de9b104eef39a7d901d25363cc158">xpath_lexer_string</a>
+, <a class="el" href="classxpath__string.html#ac42c0dd15445de88c09dfdeed93d5660">xpath_string</a>
 </li>
 <li>operator&gt;()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#aaf3620b8dfa4bed8a9ac2b51dd55dbd7">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#a211fbd6ecd46853807686b0b706e813a">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#acda31b85c8b44b3e43625c1f0cc3d820">pugi::xml_node</a>
 </li>
 <li>operator&gt;=()
 : <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#a634f85da575cb60b012a687efa26e11a">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
+, <a class="el" href="classpugi_1_1xml__attribute.html#aaefb5ec965e515ee8b4d75c5c8ab13b0">pugi::xml_attribute</a>
+, <a class="el" href="classpugi_1_1xml__node.html#a29a04e90cd3050689b6ab6e980b2803b">pugi::xml_node</a>
 </li>
 <li>operator[]()
-: <a class="el" href="classnlohmann_1_1basic__json.html#a0d3deaa73b3644b4da3f8ef3172cd8d2">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
+: <a class="el" href="classnlohmann_1_1basic__json.html#a0a691c29eb7c4acd91ccb498a79cd3ee">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1iter__impl.html#ac0b9276f1102ed4b9cd3f5f56287e3ce">nlohmann::detail::iter_impl&lt; BasicJsonType &gt;</a>
 , <a class="el" href="classnlohmann_1_1detail_1_1json__reverse__iterator.html#a8ed9e445e03c49c46612eb7f7d55bb61">nlohmann::detail::json_reverse_iterator&lt; Base &gt;</a>
 , <a class="el" href="structnlohmann_1_1ordered__map.html#ae7a1ca8c1e234837d137471f73ae6012">nlohmann::ordered_map&lt; Key, T, IgnoredLess, Allocator &gt;</a>
+, <a class="el" href="classpugi_1_1xpath__node__set.html#a3d1ccc6c2f0ffee0bf5010efd7c34ffd">pugi::xpath_node_set</a>
+</li>
+<li>optimize()
+: <a class="el" href="classxpath__ast__node.html#a950534fc7de08fe40d897ebea84c1d6d">xpath_ast_node</a>
+</li>
+<li>optimize_self()
+: <a class="el" href="classxpath__ast__node.html#a3eb089927cabd867a3a9d1b723aece0d">xpath_ast_node</a>
 </li>
 <li>ordered_map()
 : <a class="el" href="structnlohmann_1_1ordered__map.html#a87938c10b76510dac00412d2cb5fd1e4">nlohmann::ordered_map&lt; Key, T, IgnoredLess, Allocator &gt;</a>
@@ -199,10 +277,10 @@ $(function() {
 : <a class="el" href="classnlohmann_1_1detail_1_1out__of__range.html#ab5fe402019dba957558499502f0fd731">nlohmann::detail::out_of_range</a>
 </li>
 <li>output_adapter()
-: <a class="el" href="classnlohmann_1_1detail_1_1output__adapter.html#a6ad59d1ec534383b430cd7ef8a518539">nlohmann::detail::output_adapter&lt; CharType, StringType &gt;</a>
+: <a class="el" href="classnlohmann_1_1detail_1_1output__adapter.html#a05a30a77b568fd84676078d938cbd484">nlohmann::detail::output_adapter&lt; CharType, StringType &gt;</a>
 </li>
 <li>output_adapter_protocol()
-: <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#afd96245615e3b648e59e4a27bdfa67e0">nlohmann::detail::output_adapter_protocol&lt; CharType &gt;</a>
+: <a class="el" href="structnlohmann_1_1detail_1_1output__adapter__protocol.html#adf6ef7a244c32162fe98d9773f31fa8a">nlohmann::detail::output_adapter_protocol&lt; CharType &gt;</a>
 </li>
 <li>output_stream_adapter()
 : <a class="el" href="classnlohmann_1_1detail_1_1output__stream__adapter.html#ae44ed343cb1a716248547f48dd045b6a">nlohmann::detail::output_stream_adapter&lt; CharType &gt;</a>

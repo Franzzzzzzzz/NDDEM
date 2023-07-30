@@ -85,6 +85,7 @@ $(function() {
 <area href="classLiggghtsReader.html" alt="LiggghtsReader" shape="rect" coords="198,56,386,80"/>
 <area href="classMercuryReader.html" alt="MercuryReader" shape="rect" coords="693,56,881,80"/>
 <area href="classNDDEMReader.html" alt="NDDEMReader" shape="rect" coords="891,56,1079,80"/>
+<area href="classYadeReader.html" alt="YadeReader" shape="rect" coords="1089,56,1277,80"/>
 <area href="classLiggghtsReader__contacts.html" alt="LiggghtsReader_contacts" shape="rect" coords="99,112,287,136"/>
 <area href="classLiggghtsReader__particles.html" alt="LiggghtsReader_particles" shape="rect" coords="297,112,485,136"/>
 <area href="classMercuryReader__data__contacts.html" alt="MercuryReader_data_contacts" shape="rect" coords="495,112,683,136"/>
@@ -127,6 +128,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a90fbb1afbb6f77688170e0dc500e8d52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8db0570cda7f061f56cd7173e9099516"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a8db0570cda7f061f56cd7173e9099516">clean_contacts</a> (<a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;contactarray, int <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93">id1</a>, int <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34">id2</a>, int idx_lpq, <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;particlearray, int idx_r)</td></tr>
 <tr class="separator:a8db0570cda7f061f56cd7173e9099516"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c292c3c557fb29afc9954e02383953a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a7c292c3c557fb29afc9954e02383953a">getpath</a> (int ts)</td></tr>
+<tr class="separator:a7c292c3c557fb29afc9954e02383953a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -136,6 +139,21 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a4742239d5b59a7ae72fcb5d2462ab67c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbb1526f698db4c1a56ea4c4973e644e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::optional&lt; std::streampos &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#adbb1526f698db4c1a56ea4c4973e644e">mapped_ts</a></td></tr>
 <tr class="separator:adbb1526f698db4c1a56ea4c4973e644e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a193d05da38524ffb275af65e9c55c712"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a193d05da38524ffb275af65e9c55c712">path</a></td></tr>
+<tr class="separator:a193d05da38524ffb275af65e9c55c712"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a656496d748c6f92e87670f333a828a6f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a656496d748c6f92e87670f333a828a6f">curts</a> =-1</td></tr>
+<tr class="separator:a656496d748c6f92e87670f333a828a6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdcad79d2b707b0b4b98a1e12c0dc023"><td class="memItemLeft" >struct {</td></tr>
+<tr class="memitem:a755e8876bbb33d9bf816eafac770cdc9"><td class="memItemLeft" >&#160;&#160;&#160;double&#160;&#160;&#160;<a class="el" href="classReader.html#aae7050815dd824441ddceba8ad43ee2f">initial</a> = 0</td></tr>
+<tr class="separator:a755e8876bbb33d9bf816eafac770cdc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19cad365b47552cb2795065e3b61f955"><td class="memItemLeft" >&#160;&#160;&#160;double&#160;&#160;&#160;<a class="el" href="classReader.html#ae3e3a4f3ab05910bb77f0951e4e97584">delta</a> = 1</td></tr>
+<tr class="separator:a19cad365b47552cb2795065e3b61f955"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a339559aa15ada3683cadb907186fd598"><td class="memItemLeft" >&#160;&#160;&#160;int&#160;&#160;&#160;<a class="el" href="classReader.html#a6f41f0d8f91bbcc8a19b88ca09a79bb1">numts</a> = -1</td></tr>
+<tr class="separator:a339559aa15ada3683cadb907186fd598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af00c294f3c4663a6ff1436183f27052e"><td class="memItemLeft" >&#160;&#160;&#160;bool&#160;&#160;&#160;<a class="el" href="classReader.html#aa5ee1a40b9cc040b5dc447921f00e18f">ismultifile</a> = false</td></tr>
+<tr class="separator:af00c294f3c4663a6ff1436183f27052e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdcad79d2b707b0b4b98a1e12c0dc023"><td class="memItemLeft" valign="top">}&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#acdcad79d2b707b0b4b98a1e12c0dc023">filenumbering</a></td></tr>
+<tr class="separator:acdcad79d2b707b0b4b98a1e12c0dc023"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -334,7 +352,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classNDDEMReader.html#aeb3b3d819a8f8ff63bae19002c2078ab">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__particles.html#a05a827baa1173bbb2047abe0e6ecc3d4">MercuryReader_data_particles</a>, and <a class="el" href="classLiggghtsReader.html#a92c925116e05f904115f649925ba6fe3">LiggghtsReader</a>.</p>
+<p>Reimplemented in <a class="el" href="classYadeReader.html#a1e484a581e9be68302f3d0d2814b2b3c">YadeReader</a>, <a class="el" href="classNDDEMReader.html#aeb3b3d819a8f8ff63bae19002c2078ab">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__particles.html#a05a827baa1173bbb2047abe0e6ecc3d4">MercuryReader_data_particles</a>, and <a class="el" href="classLiggghtsReader.html#a92c925116e05f904115f649925ba6fe3">LiggghtsReader</a>.</p>
 
 </div>
 </div>
@@ -482,7 +500,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classNDDEMReader.html#ae7c80d0cf42897629956d4d1a08afa60">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__contacts.html#a1933f56aff70196e37aef0e18bc59ef4">MercuryReader_data_contacts</a>, <a class="el" href="classLiggghtsReader__particles.html#ac40a171ae6a4ee892c22deaa4713271f">LiggghtsReader_particles</a>, <a class="el" href="classLiggghtsReader.html#a0911f87c4e4f23e3d5b8b8ad57057cfb">LiggghtsReader</a>, and <a class="el" href="classInteractiveReader.html#a5f10ff52ca6b881a372a045d1b921745">InteractiveReader</a>.</p>
+<p>Reimplemented in <a class="el" href="classYadeReader.html#a131cb4fe1c79df3952841b34b84ef251">YadeReader</a>, <a class="el" href="classNDDEMReader.html#ae7c80d0cf42897629956d4d1a08afa60">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__contacts.html#a1933f56aff70196e37aef0e18bc59ef4">MercuryReader_data_contacts</a>, <a class="el" href="classLiggghtsReader__particles.html#ac40a171ae6a4ee892c22deaa4713271f">LiggghtsReader_particles</a>, <a class="el" href="classLiggghtsReader.html#a0911f87c4e4f23e3d5b8b8ad57057cfb">LiggghtsReader</a>, and <a class="el" href="classInteractiveReader.html#a5f10ff52ca6b881a372a045d1b921745">InteractiveReader</a>.</p>
 
 </div>
 </div>
@@ -509,7 +527,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classNDDEMReader.html#a4a7f933bebb401c900e3624bcd784f27">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__particles.html#a4134eb83870a6d7bcb6989fe84774113">MercuryReader_data_particles</a>, <a class="el" href="classMercuryReader__vtu__particles.html#a82baae025535e3a57ced156392c47711">MercuryReader_vtu_particles</a>, <a class="el" href="classLiggghtsReader__contacts.html#af91607012b1c09dcf53626da091cde12">LiggghtsReader_contacts</a>, <a class="el" href="classLiggghtsReader.html#aaaee490c7c2c2afd5b322d04bd2e1246">LiggghtsReader</a>, and <a class="el" href="classInteractiveReader.html#ad04c5ce67ad72fd9c215977a02ebd8a2">InteractiveReader</a>.</p>
+<p>Reimplemented in <a class="el" href="classYadeReader.html#a2cf25f19b43b9bbc99b043804502df42">YadeReader</a>, <a class="el" href="classNDDEMReader.html#a4a7f933bebb401c900e3624bcd784f27">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__particles.html#a4134eb83870a6d7bcb6989fe84774113">MercuryReader_data_particles</a>, <a class="el" href="classMercuryReader__vtu__particles.html#a82baae025535e3a57ced156392c47711">MercuryReader_vtu_particles</a>, <a class="el" href="classLiggghtsReader__contacts.html#af91607012b1c09dcf53626da091cde12">LiggghtsReader_contacts</a>, <a class="el" href="classLiggghtsReader.html#aaaee490c7c2c2afd5b322d04bd2e1246">LiggghtsReader</a>, and <a class="el" href="classInteractiveReader.html#ad04c5ce67ad72fd9c215977a02ebd8a2">InteractiveReader</a>.</p>
 
 </div>
 </div>
@@ -536,7 +554,33 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classNDDEMReader.html#a8d6be96c4946bbc47a696127da284bcf">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__particles.html#aff7f34d684d419238293303f4f5196d7">MercuryReader_data_particles</a>, <a class="el" href="classMercuryReader__vtu__particles.html#a16ebd85605ec223646e48d40093b0fc4">MercuryReader_vtu_particles</a>, <a class="el" href="classLiggghtsReader.html#a6b6ca6f8533d1189678bd93e851d8eb5">LiggghtsReader</a>, and <a class="el" href="classInteractiveReader.html#a5cd56a475b477d668efb9e59ff69e598">InteractiveReader</a>.</p>
+<p>Reimplemented in <a class="el" href="classYadeReader.html#a9b7c10429ccfd7e31c43c9049156e1fe">YadeReader</a>, <a class="el" href="classNDDEMReader.html#a8d6be96c4946bbc47a696127da284bcf">NDDEMReader</a>, <a class="el" href="classMercuryReader__data__particles.html#aff7f34d684d419238293303f4f5196d7">MercuryReader_data_particles</a>, <a class="el" href="classMercuryReader__vtu__particles.html#a16ebd85605ec223646e48d40093b0fc4">MercuryReader_vtu_particles</a>, <a class="el" href="classLiggghtsReader.html#a6b6ca6f8533d1189678bd93e851d8eb5">LiggghtsReader</a>, and <a class="el" href="classInteractiveReader.html#a5cd56a475b477d668efb9e59ff69e598">InteractiveReader</a>.</p>
+
+</div>
+</div>
+<a id="a7c292c3c557fb29afc9954e02383953a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c292c3c557fb29afc9954e02383953a">&#9670;&nbsp;</a></span>getpath()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string Reader::getpath </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ts</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -682,6 +726,34 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a656496d748c6f92e87670f333a828a6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a656496d748c6f92e87670f333a828a6f">&#9670;&nbsp;</a></span>curts</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Reader::curts =-1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3e3a4f3ab05910bb77f0951e4e97584"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3e3a4f3ab05910bb77f0951e4e97584">&#9670;&nbsp;</a></span>delta</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Reader::delta = 1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aefaa372af939643579e5b6379cff6a11"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aefaa372af939643579e5b6379cff6a11">&#9670;&nbsp;</a></span>Density</h2>
 
@@ -704,6 +776,20 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="acdcad79d2b707b0b4b98a1e12c0dc023"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdcad79d2b707b0b4b98a1e12c0dc023">&#9670;&nbsp;</a></span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... }  Reader::filenumbering</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a6ff4edfffc5e5f9c6a74b95eba272de6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ff4edfffc5e5f9c6a74b95eba272de6">&#9670;&nbsp;</a></span>index</h2>
 
@@ -722,6 +808,20 @@ Private Attributes</h2></td></tr>
 <span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aae7050815dd824441ddceba8ad43ee2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae7050815dd824441ddceba8ad43ee2f">&#9670;&nbsp;</a></span>initial</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Reader::initial = 0</td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 </div>
@@ -754,6 +854,20 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="aa5ee1a40b9cc040b5dc447921f00e18f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5ee1a40b9cc040b5dc447921f00e18f">&#9670;&nbsp;</a></span>ismultifile</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Reader::ismultifile = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="adbb1526f698db4c1a56ea4c4973e644e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adbb1526f698db4c1a56ea4c4973e644e">&#9670;&nbsp;</a></span>mapped_ts</h2>
 
@@ -762,6 +876,34 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;std::optional&lt;std::streampos&gt; &gt; Reader::mapped_ts</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6f41f0d8f91bbcc8a19b88ca09a79bb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f41f0d8f91bbcc8a19b88ca09a79bb1">&#9670;&nbsp;</a></span>numts</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Reader::numts = -1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a193d05da38524ffb275af65e9c55c712"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a193d05da38524ffb275af65e9c55c712">&#9670;&nbsp;</a></span>path</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string Reader::path</td>
         </tr>
       </table>
 </div><div class="memdoc">

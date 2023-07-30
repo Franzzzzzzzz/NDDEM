@@ -527,6 +527,17 @@ for (auto &v: FIELDS)
 }
 bool doextra = (extraid.size()>0)?true:false ;
 
+// Clearing stuff
+if (dorho) for (int i=0 ; i<Npt ; CGP[i].fields[cT][rhoid]=0, i++) ;
+if (doI)   for (int i=0 ; i<Npt ; CGP[i].fields[cT][Iid]=0, i++) ;
+if (dovel) for (int dd=0 ; dd<d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][velid+dd]=0, i++) ;
+if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][omegaid+dd]=0, i++) ;
+if (doradius) for (int i=0 ; i<Npt ; CGP[i].fields[cT][radiusid]=0, i++) ;
+if (doextra)
+    for (size_t v = 0 ; v<extraid.size() ; v++)
+      for (size_t w = 0 ; w<extrancomp[v] ; w++)
+        for (int i=0 ; i<Npt ; CGP[i].fields[cT][extraid[v]+w]=0, i++) ;
+
 //printf("Starting pass 1...\r") ; fflush(stdout) ;
 
 double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
@@ -558,7 +569,7 @@ for (i=0 ; i<data.N ; i++)
        for (dd=0 ; dd<d ; dd++)
          *(CGf+velid+dd) += wp * dm * dv[dd] ;
      if (doomega)
-       for (dd=0 ; dd<d ; dd++)
+       for (dd=0 ; dd<d*(d-1)/2 ; dd++)
          *(CGf+omegaid+dd) += wp * dm * dom[dd] * dI ;
      if (doradius)
        CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
