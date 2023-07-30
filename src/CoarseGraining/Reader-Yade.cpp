@@ -3,6 +3,7 @@
 //========================================
 int YadeReader::read_timestep(int ts)
 {
+  printf("%d %d\n",ts, curts) ;  
   if (ts==curts) return -1 ;
   
   auto filepath = getpath(ts) ;

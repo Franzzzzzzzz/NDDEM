@@ -77,10 +77,8 @@ void CoarseGraining::setup_CG ()
         delete C ;
 
     C = new Coarsing (P.dim, P.boxes, P.boundaries, P.maxT) ;
-    printf("%d\n", P.maxT) ;
     for (auto i : P.extrafields)
         C->add_extra_field(i.name, i.order, i.type) ;
-    printf("%d \n", static_cast<int>(P.window)) ;
     if (P.window == Windows::LucyND_Periodic)
         C->setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta) ;
     else

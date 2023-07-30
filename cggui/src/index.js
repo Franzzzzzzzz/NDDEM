@@ -23,7 +23,7 @@ import vtkMouseCameraTrackballZoomManipulator from '@kitware/vtk.js/Interaction/
 import vtkGestureCameraManipulator from '@kitware/vtk.js/Interaction/Manipulators/GestureCameraManipulator';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
-import vtkAnnotatedCubeActor from '@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor';
+import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
 
 //import './popup.css'
 import './popupform.css'
@@ -150,44 +150,26 @@ console.log(interactorStyle.getCenterOfRotation()) ;
 renderWindow.getInteractor().setInteractorStyle(interactorStyle);
 
 // create axes
-const axes = vtkAnnotatedCubeActor.newInstance();
-axes.setDefaultStyle({
-  text: 'X+',
-  fontStyle: 'bold',
-  fontFamily: 'Arial',
-  fontColor: 'black',
-  fontSizeScale: (res) => res / 2,
-  faceColor: '#ff0000',
-  faceRotation: 0,
-  edgeThickness: 0.1,
-  edgeColor: 'black',
-  resolution: 400,
-});
-axes.setXPlusFaceProperty({ text: '+X' });
-axes.setXMinusFaceProperty({
-  text: 'X-',
-  faceColor: '#ff0000'
-});
-axes.setYPlusFaceProperty({
-  text: 'Y+',
-  faceColor: '#ffff00',
-});
-axes.setYMinusFaceProperty({
-  text: 'Y-',
-  faceColor: '#ffff00',
-  fontColor: 'black',
-});
-axes.setZPlusFaceProperty({
-  text: 'Z+', 
-  faceColor: '#00ff00',
-  edgeColor: 'black',
-});
-axes.setZMinusFaceProperty({ 
-  text: '-Z', 
-  faceColor: '#00ff00',
-  edgeColor: 'black',    
-});
-
+// const axes = vtkAnnotatedCubeActor.newInstance();
+// axes.setDefaultStyle({
+//   text: 'X+',
+//   fontStyle: 'bold',
+//   fontFamily: 'Arial',
+//   fontColor: 'black',
+//   fontSizeScale: (res) => res / 2,
+//   faceColor: '#ff0000',
+//   faceRotation: 0,
+//   edgeThickness: 0.1,
+//   edgeColor: 'black',
+//   resolution: 400,
+// });
+// axes.setXPlusFaceProperty ({ text: 'X+', faceRotation: 270 });
+// axes.setXMinusFaceProperty({ text: 'X-', faceColor: '#ff0000', faceRotation: 90});
+// axes.setYPlusFaceProperty ({ text: 'Y+', faceColor: '#ffff00', faceRotation: 0});
+// axes.setYMinusFaceProperty({ text: 'Y-', faceColor: '#ffff00', faceRotation: 180});
+// axes.setZPlusFaceProperty ({ text: 'Z+', faceColor: '#00ff00'});
+// axes.setZMinusFaceProperty({ text: '-Z', faceColor: '#00ff00'});
+const axes = vtkAxesActor.newInstance();
 // create orientation widget
 const orientationWidget = vtkOrientationMarkerWidget.newInstance({
   actor: axes,
@@ -197,9 +179,9 @@ orientationWidget.setEnabled(true);
 orientationWidget.setViewportCorner(
   vtkOrientationMarkerWidget.Corners.BOTTOM_LEFT
 );
-//orientationWidget.setViewportSize(0.15);
-//orientationWidget.setMinPixelSize(100);
-//orientationWidget.setMaxPixelSize(300);
+orientationWidget.setViewportSize(0.15);
+orientationWidget.setMinPixelSize(100);
+orientationWidget.setMaxPixelSize(300);
 
 
 clipPlane1.setNormal([1,0,0]);
@@ -208,6 +190,8 @@ mapper.addClippingPlane(clipPlane1);
 
 renderer.resetCamera();
 renderer.getActiveCamera().elevation(70);
+renderer.getActiveCamera().setViewUp(0,0,1)
+orientationWidget.updateMarkerOrientation()
 renderWindow.render();
 
 //===============================================================
@@ -770,19 +754,19 @@ document.getElementById('component').addEventListener('change', async() => {
 document.getElementById('resetcam').addEventListener('click', async() => {
     renderer.resetCamera();
     renderer.getActiveCamera().setViewUp(0,0,1) ; 
+    orientationWidget.updateMarkerOrientation()
     interactorStyle.setCenterOfRotation(renderer.getActiveCamera().getFocalPoint()) ;
     renderWindow.render();
 }) ; 
-
+// document.getElementById('camxplus').addEventListener('click', async() => {
+//     renderer.getActiveCamera().setOrientationWXYZ(0,0,0,0)
+//     renderer.getActiveCamera().setViewUp(0,0,1) ; 
+//     renderer.resetCamera();
+//     orientationWidget.updateMarkerOrientation()
+//     renderWindow.render();
+// }) ; 
 document.getElementById('cliptype').addEventListener('change', async() => {
     var field = document.getElementById('cliptype').value; 
-    
-    document.getElementById("xmin").value
-    document.getElementById("ymin").value
-    document.getElementById("zmin").value
-    document.getElementById("xmax").value
-    document.getElementById("ymax").value
-    document.getElementById("zmax").value
     
     if (field==0)
     {
@@ -795,22 +779,37 @@ document.getElementById('cliptype').addEventListener('change', async() => {
     {
         console.log(field) ; 
         document.getElementById('cliprange').disabled=false ; 
-        document.getElementById('cliprange').min = document.getElementById(field+"min").value ; 
-        document.getElementById('cliprange').max = document.getElementById(field+"max").value ; 
+        document.getElementById('cliprange').min = document.getElementById(field[0]+"min").value ; 
+        document.getElementById('cliprange').max = document.getElementById(field[0]+"max").value ; 
         document.getElementById('cliprange').value = (parseFloat(document.getElementById('cliprange').max)+parseFloat(document.getElementById('cliprange').min))/2
-        document.getElementById('cliprangemin').innerHTML = document.getElementById('cliprange').min ;
-        document.getElementById('cliprangemax').innerHTML = document.getElementById('cliprange').max ;
-        if (field=="x")
+        document.getElementById('cliprangemin').innerHTML = parseFloat(document.getElementById('cliprange').min).toFixed(3) ;
+        document.getElementById('cliprangemax').innerHTML = parseFloat(document.getElementById('cliprange').max).toFixed(3) ;
+        if (field=="x+")
         {
-            clipPlane1.setNormal([1,0,0]);
+            clipPlane1.setNormal([-1,0,0]);
             clipPlane1.setOrigin([parseFloat(document.getElementById('cliprange').value),0,0]);
         }
-        else if (field=="y")
+        else if (field=="x-")
+        {
+            clipPlane1.setNormal([+1,0,0]);
+            clipPlane1.setOrigin([parseFloat(document.getElementById('cliprange').value),0,0]);
+        }
+        else if (field=="y+")
+        {
+            clipPlane1.setNormal([0,-1,0]);
+            clipPlane1.setOrigin([0, parseFloat(document.getElementById('cliprange').value),0]);
+        }
+        else if (field=="y-")
         {
             clipPlane1.setNormal([0,1,0]);
             clipPlane1.setOrigin([0,parseFloat(document.getElementById('cliprange').value),0]);
         }
-        else
+        else if (field=="z+")
+        {
+            clipPlane1.setNormal([0,0,-1]);
+            clipPlane1.setOrigin([0,0,parseFloat(document.getElementById('cliprange').value)]);
+        }
+        else if (field=="z-")
         {
             clipPlane1.setNormal([0,0,1]);
             clipPlane1.setOrigin([0,0,parseFloat(document.getElementById('cliprange').value)]);
@@ -821,9 +820,9 @@ document.getElementById('cliptype').addEventListener('change', async() => {
 
 document.getElementById('cliprange').addEventListener('change', async() => {
     var field = document.getElementById('cliptype').value; 
-    if (field=="x")
+    if (field=="x+" || field=="x-")
         clipPlane1.setOrigin([parseFloat(document.getElementById('cliprange').value),0,0]);
-    else if (field=="y")
+    else if (field=="y+" || field=="y-")
         clipPlane1.setOrigin([0,parseFloat(document.getElementById('cliprange').value),0]);
     else
         clipPlane1.setOrigin([0,0,parseFloat(document.getElementById('cliprange').value)]);
@@ -886,7 +885,21 @@ worker.onmessage = function (e)
         opt.value = element; opt.innerHTML = element;
         select.appendChild(opt);
     }) ; 
- }
+    
+    if (document.getElementById("autoupdate").checked)
+    {
+        var ev = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            });
+        document.getElementById('updateCG').dispatchEvent(ev);
+        renderer.resetCamera();
+        renderer.getActiveCamera().setViewUp(0,0,1) ; 
+        interactorStyle.setCenterOfRotation(renderer.getActiveCamera().getFocalPoint()) ;
+        renderWindow.render();
+    }     
+}
  else if (e.data[0] == 'tsprocessed')
  {
     updated=true ; 

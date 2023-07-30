@@ -110,9 +110,9 @@
 <button type="button" class="collapsible">Grid</button>
 <div class="content">
     <label for="xgrid">Grid points</label>
-    <input type="number" id="xgrid" disabled name="xgrid" step="1" value="3" min="1" style="width:10%;"> 
-    <input type="number" id="ygrid" disabled name="ygrid" step="1" value="3" min="1" style="width:10%;"> 
-    <input type="number" id="zgrid" disabled name="zgrid" step="1" value="3" min="1" style="width:10%;"> <br>
+    <input type="number" id="xgrid" disabled name="xgrid" step="1" value="5" min="1" style="width:10%;"> 
+    <input type="number" id="ygrid" disabled name="ygrid" step="1" value="5" min="1" style="width:10%;"> 
+    <input type="number" id="zgrid" disabled name="zgrid" step="1" value="5" min="1" style="width:10%;"> <br>
 
     <label for="xmin">X boundaries</label>
     <input type="number" id="xmin" disabled name="xmin" step="0.05" value="0" style="width:10%;"> 
@@ -165,9 +165,15 @@
 <button type="button" class="collapsible">Interact with the GUI</button>
 <div class="content">
 <!--     <button type="button" id="applyparam">Push parameters</button>&nbsp;&nbsp; -->
-    <button type="button" id="updateCG" disabled>Update</button>
-    <input type="checkbox" id="autoupdate" name="autoupdate"><label for="autoupdate">auto?</label>&nbsp;&nbsp;
+    <button type="button" id="updateCG" disabled hidden>Update</button>
+    <input type="checkbox" id="autoupdate" name="autoupdate" hidden checked><!--<label for="autoupdate">auto?</label>&nbsp;&nbsp;-->
     <button type="button" id="resetcam">Reset cam</button>
+   <!-- <img src="pqXPlus.svg" width="24px" class="axis" id="camxplus">
+    <img src="pqXMinus.svg" width="24px" class="axis" id="camxminus">
+    <img src="pqYPlus.svg" width="24px" class="axis" id="camyplus">
+    <img src="pqYMinus.svg" width="24px" class="axis" id="camyminus">
+    <img src="pqZPlus.svg" width="24px" class="axis" id="camzplus">
+    <img src="pqZMinus.svg" width="24px" class="axis" id="camzminus">-->
     <hr width="100%"/>
     <table width="100%" style="margin-top:10px;">
         <tr>
@@ -198,9 +204,12 @@
     <label for="cliptype">Cutting plane: </label> 
     <select name="cliptype" id="cliptype">
         <option value="0" default>None</option>
-        <option value="x">x</option>
-        <option value="y">y</option>
-        <option value="z">z</option>
+        <option value="x+">x+</option>
+        <option value="x-">x-</option>
+        <option value="y+">y+</option>
+        <option value="y-">y-</option>
+        <option value="z+">z+</option>
+        <option value="z-">z-</option>
     </select> &nbsp;&nbsp;&nbsp;
     <span id="cliprangemin"> 0 </span>
     <input type="range" min="0" max="1" value="0.5" step=0.001 id="cliprange" disabled>

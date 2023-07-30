@@ -38,3 +38,17 @@
   padding: 5px;
   margin: 5px ; 
 }
+
+.axis {
+  border: 1px solid gray;
+  border-radius: 5px ; 
+  background: #e8e8e8 ;
+  vertical-align: bottom;
+  margin-top: 2px ; 
+}
+.axis:hover {
+  background: #d0d0d0 ;
+}
+.axis:active {
+  background: #a0a0a0 ;
+}
