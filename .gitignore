@@ -20,3 +20,7 @@ bin
 *.stackdump
 __pycache__
 Scripts/MuI_20200210.m*
+.vscode
+chromedriver-mobile
+live/tests_output
+Output

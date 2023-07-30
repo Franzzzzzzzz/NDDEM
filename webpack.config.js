@@ -20,6 +20,7 @@ module.exports = [{
         'simple-shear' : './live/src/simple-shear.js',
         'hopper' : './live/src/hopper.js',
         'intruder' : './live/src/intruder.js',
+        'anisotropy' : './live/src/anisotropy.js',
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -122,6 +123,13 @@ module.exports = [{
             template: "live/plotly-template.html",
             filename: "intruder.html",
             chunks: ['intruder']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Anisotropy',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "anisotropy.html",
+            chunks: ['anisotropy']
         }),
       ],
     output: {

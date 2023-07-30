@@ -118,7 +118,7 @@ int CoarseGraining::process_fluct_from_avg()
         C->cT = ts ;
         P.set_data (C->data) ;
         C->pass_1() ;
-        printf("\r") ;
+        // printf("\r") ;
     }
     if (P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) //Should be automatically verified when the function is called
         C->mean_time(true) ;
@@ -138,7 +138,7 @@ void CoarseGraining::process_all ()
     
     for (int ts=0 ; ts<P.maxT ; ts++)
     {
-        printf("\r%d ", ts) ;
+        // printf("\r%d ", ts) ;
         process_timestep(ts+P.skipT, hasdonefirstpass) ;
     }
     if (P.timeaverage == AverageType::Final || P.timeaverage == AverageType::Both)

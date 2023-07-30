@@ -307,10 +307,13 @@ export function plotly_2d_graph(xlabel, ylabel, traces) {
       x: [],
       y: [],
       hoverinfo: 'skip',
+      fill: "toself",
+      fillcolor: 'black',
       name: t,
       // opacity: 1,
       line: {
-        width: 5,
+        // width: 5,
+        color: 'black'
         // color: colors[i],
         // reversescale: false
       },
@@ -319,4 +322,187 @@ export function plotly_2d_graph(xlabel, ylabel, traces) {
 
   add_plotly_download_tag(xlabel + ',' + ylabel);
   return { data, layout }
+}
+
+export function plotly_2x2_graphs() {
+  let xoff = 0.05;
+  let yoff = 0.15;
+  
+  let layout = {
+      grid: {
+        rows: 2,
+        columns: 2,
+        pattern: 'independent',
+        subplots:[['',''], ['','xy']],
+        // roworder:'bottom to top'
+      },
+      polar: {
+        radialaxis: {
+          // title: 'Contact orientation',
+          x: 0,
+          xanchor: 'right',
+          rangemode: 'tozero',
+        },
+        angularaxis: {
+          rotation: 90,
+          direction: "clockwise"
+        },
+        gridcell : 0,
+        // sector: [0,180],
+        domain: {
+          x: [0, 0.5-xoff],
+          y: [0.5+yoff, 1]
+        },
+      },
+      polar2: {
+        radialaxis: {
+          // title: 'Normal force orientation',
+          rangemode: 'tozero',
+        },
+        angularaxis: {
+          rotation: 90,
+          direction: "clockwise"
+        },
+        // sector: [0,180],
+        gridcell : 1,
+        domain: {
+          x: [0, 0.5-xoff],
+          y: [0, 0.5-yoff]
+        },
+      },
+      polar3: {
+        radialaxis: {
+          // title: 'Tangential force orientation',
+          rangemode: 'tozero',
+        },
+        angularaxis: {
+          rotation: 90,
+          direction: "clockwise"
+        },
+        // sector: [0,180],
+        gridcell : 2,
+        domain: {
+          x: [0.5+xoff, 1],
+          y: [0.5+yoff, 1]
+        },
+      },
+      showlegend : true,
+      legend: {
+          x: 1,
+          xanchor: 'right',
+          y: 0.5,
+          bgcolor: 'rgba(255, 255, 255, 0.2)'
+      },
+      margin: {
+          b: 100,
+      },
+      font: {
+          family: 'Montserrat, Open sans',
+      },
+      annotations: [{
+        text: "Contact orientation",
+        font: {
+            size: 16,
+        },
+        showarrow: false,
+        xanchor: 'center',
+        x: (0.5-xoff)/2,
+        y: 1.1,
+        xref: 'paper',
+        yref: 'paper',
+      },
+      {
+        text: "Tangential force orientation",
+        font: {
+            size: 16,
+        },
+        showarrow: false,
+        xanchor: 'center',
+        x: 0.75+xoff/2.,
+        y: 1.1,
+        xref: 'paper',
+        yref: 'paper',
+      },
+      {
+        text: "Normal force orientation",
+        font: {
+            size: 16,
+        },
+        showarrow: false,
+        xanchor: 'center',
+        x: (0.5-xoff)/2,
+        y: 0.43,
+        xref: 'paper',
+        yref: 'paper',
+      },
+      ]
+  }
+
+  let colors = ['red', 'blue', 'green', 'orange', 'black'];
+  let data = [];
+  let traces = ['Branch vector', 'Normal force', 'Tangential force'];
+  traces.forEach((t,i) => {
+    data.push({
+      gridcell: i,
+      showlegend: false,
+      type: 'scatterpolar',
+      mode: 'lines',
+      r: [],
+      theta: [],
+      thetaunit: "radians",
+      hoverinfo: 'skip',
+      name: t,
+      subplot: 'polar' + String(i+1),
+      line: {
+        width: 1,
+        // color: 'black',
+        color: colors[i+1],
+      },
+    })
+    data.push({
+      gridcell: i,
+      showlegend: false,
+      type: 'scatterpolar',
+      mode: 'lines',
+      r: [],
+      theta: [],
+      thetaunit: "radians",
+      hoverinfo: 'skip',
+      // name: t,
+      subplot: 'polar' + String(i+1),
+      line: {
+        dash: 'dot',
+        width: 5,
+        // color: 'black',
+        color: colors[i+1],
+      },
+    })
+  });
+  traces = ['Macroscopic friction','Contact anisotropy','Normal force anisotropy','Tangential force anisotropy','Rothenburg & Bathurst (1989)'];
+  traces.forEach((t,i) => {
+    data.push({
+      gridcell: 3,
+      type: 'scatter',
+      mode: 'lines',
+      x: [],
+      y: [],
+      hoverinfo: 'skip',
+      name: t,
+      line: {
+        width: 1,
+        color: colors[i]
+      },
+    })
+  });
+
+  data[6].line.width = 5;
+  data[10].line.width = 5;
+
+  let xlabels = 'TEST'
+  let ylabels = 'TEST'
+  add_plotly_download_tag(xlabels + ',' + ylabels);
+
+  var config = {responsive: true}
+
+  return { data, layout, config }
 }

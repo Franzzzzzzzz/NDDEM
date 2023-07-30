@@ -1,0 +1,61 @@
+name: Nightwatch Tests
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+        cache: 'npm'
+    - run: npm ci
+    - run: mkdir -p screens logs
+    - run: sudo apt-get install xvfb
+    - name: Run Nightwatch tests
+      run: xvfb-run --auto-servernum npm run test
+      
+    - name: "Publish test results"
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with: 
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: './tests_output/nightwatch-html-report'
+        keep_files: true
+        publish_branch: gh-pages2 
+        user_name: "nightwatch-test-results"
+        user_email: "benjy.marks@sydney.edu.au"
+
+    - name: Upload screenshots
+      if: always()
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        name: Screenshots
+        path: screens/
+        retention-days: 1
+
+    - name: Display structure of downloaded files
+      if: always()
+      run: ls -R
+      working-directory: screens/
+
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        name: Logs
+        path: logs/
+        retention-days: 1
+
+    - name: Display structure of log files
+      if: always()
+      run: ls -R
+      working-directory: logs/

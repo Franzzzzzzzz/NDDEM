@@ -5,6 +5,7 @@ let v, omegaMag;
 export let ray;
 export let total_particle_volume;
 export let x;
+export let F;
 let F_mag_max;
 
 import { Lut } from "../libs/Lut.js";
@@ -14,40 +15,29 @@ import * as AUDIO from '../libs/audio.js';
 // import { Lut } from './js/Lut.js'
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
-import {
-    Vector3,
-    Matrix4,
-    Group,
-    Color,
-    Line,
-    Mesh,
-    BufferGeometry,
-    CircleGeometry,
-    SphereGeometry,
-    CylinderGeometry,
-    LineBasicMaterial,
-    PointsMaterial,
-    MeshStandardMaterial,
-    Int8BufferAttribute,
-} from "three";
+let contact_flags = 0x80 | 0x100; // IDs and normal forces by default
 
-let forces = new Group();
+export function update_contact_flags(flags) {
+    contact_flags = flags;
+}
+
+let forces = new THREE.Group();
 
 let debug_sound = false;
 
-const cylinder_geometry = new CylinderGeometry( 1, 1, 1, 16 );
-cylinder_geometry.applyMatrix4( new Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
-const cylinder_material = new MeshStandardMaterial( {color: 0xffffff} );
+const cylinder_geometry = new THREE.CylinderGeometry( 1, 1, 1, 16 );
+cylinder_geometry.applyMatrix4( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) ); // rotate the geometry to make the forces point in the right direction
+const cylinder_material = new THREE.MeshStandardMaterial( {color: 0xffffff} );
 // cylinder_material.emissive = new Color( 0x0000ff );
 cylinder_material.transparent = false;
-const cylinder = new Mesh( cylinder_geometry, cylinder_material );
+const cylinder = new THREE.Mesh( cylinder_geometry, cylinder_material );
 
-ray = new Line(
-    new BufferGeometry().setFromPoints([
-        new Vector3(0,-3,0),
-        new Vector3(0,0,0),
+ray = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0,-3,0),
+        new THREE.Vector3(0,0,0),
     ]),
-    new LineBasicMaterial( { color: 0xffffff })
+    new THREE.LineBasicMaterial( { color: 0xffffff })
 );
 
 export function wipe() {
@@ -78,7 +68,7 @@ export async function createNDParticleShader(params) {
 
 
 export function update_cylinder_colour( colour ) {
-    cylinder.material.color = new Color( colour );
+    cylinder.material.color = new THREE.Color( colour );
 }
 
 export async function add_spheres(S,params,scene) {
@@ -96,29 +86,29 @@ function add_actual_spheres(S,params,scene) {
             total_particle_volume += get_particle_volume(params.dimension, radii[i]);
         }
         // console.log('Actual particle volume (assuming 3D particles): ' + total_particle_volume);
-        spheres = new Group();
+        spheres = new THREE.Group();
         scene.add(spheres);
         // const material = new THREE.MeshStandardMaterial();
 
 
         // const matrix = new THREE.Matrix4();
-        const color = new Color();
+        const color = new THREE.Color();
         let geometrySphere;
         if ( params.dimension < 3 ) {
-            geometrySphere = new CircleGeometry( 0.5, Math.pow(2,params.quality) );
-            geometrySphere.applyMatrix4( new Matrix4().makeRotationZ( Math.PI / 2 ) ); //
-            geometrySphere.applyMatrix4( new Matrix4().makeRotationX( Math.PI ) ); // rotate the geometry to make the forces point in the right direction
+            geometrySphere = new THREE.CircleGeometry( 0.5, Math.pow(2,params.quality) );
+            geometrySphere.applyMatrix4( new THREE.Matrix4().makeRotationZ( Math.PI / 2 ) ); //
+            geometrySphere.applyMatrix4( new THREE.Matrix4().makeRotationX( Math.PI ) ); // rotate the geometry to make the forces point in the right direction
             // geometrySphere = new CylinderGeometry( 0.5, Math.pow(2,params.quality) );
             // geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
         }
         else {
-            geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
+            geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
         }
 
         for ( let i = 0; i < params.N; i ++ ) {
             // const material = NDParticleShader.clone();
-            const material = new MeshStandardMaterial();
-            var object = new Mesh(geometrySphere, material);
+            const material = new THREE.MeshStandardMaterial();
+            var object = new THREE.Mesh(geometrySphere, material);
             object.position.set(0,0,0);
             object.rotation.z = Math.PI / 2;
             object.NDDEM_ID = i;
@@ -140,8 +130,8 @@ export function add_normal_sound_to_all_spheres() {
                 AUDIO.add_normal_sound( spheres.children[i] );
             }
             if ( debug_sound ) {
-                spheres.children[i].material.emissive = new Color( 0x0000FF );
-                spheres.children[i].material.color = new Color( 0xFF0000 );
+                spheres.children[i].material.emissive = new THREE.Color( 0x0000FF );
+                spheres.children[i].material.color = new THREE.Color( 0xFF0000 );
             }
         }
     } else {
@@ -294,18 +284,18 @@ export function update_fixed_sounds(S, params) {
 export function add_pool_spheres(S,params,scene) {
     radii = S.simu_getRadii();
 
-    spheres = new Group();
+    spheres = new THREE.Group();
     scene.add(spheres);
 
-    const geometrySphere = new SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
+    const geometrySphere = new THREE.SphereGeometry( 0.5, Math.pow(2,params.quality), Math.pow(2,params.quality) );
 
     for ( let i = 0; i < params.N; i ++ ) {
         if ( i == 0 ) {
-            var material = new MeshStandardMaterial( {
+            var material = new THREE.MeshStandardMaterial( {
                 color: 0xaaaaaa });
         }
         else if ( i === 11 ) {
-            var material = new MeshStandardMaterial( {
+            var material = new THREE.MeshStandardMaterial( {
                 color: 0x060606 });
         }
         else {
@@ -314,7 +304,7 @@ export function add_pool_spheres(S,params,scene) {
             material.uniforms.banding.value = 1 + 2*(i%3);
             // material.uniforms.opacity.value = 1;
         }
-        var object = new Mesh(geometrySphere, material);
+        var object = new THREE.Mesh(geometrySphere, material);
         object.position.set(0,0,0);
         object.rotation.z = Math.PI / 2;
         object.NDDEM_ID = i;
@@ -340,14 +330,14 @@ export function add_pool_spheres(S,params,scene) {
 }
 
 export function add_spheres_to_torus(params,target) {
-    const pointsGeometry = new SphereGeometry(
+    const pointsGeometry = new THREE.SphereGeometry(
         1,
         Math.max(Math.pow(2, params.quality - 2), 4),
         Math.max(Math.pow(2, params.quality - 2), 4)
     );
 
     var scale = 20; // size of particles on tori
-    let group = new Group();
+    let group = new THREE.Group();
 
     for ( let i = 0; i < params.N; i ++ ) {
         let color;
@@ -355,8 +345,8 @@ export function add_spheres_to_torus(params,target) {
         else if ( i === 11 ) { color = 0x060606 }
         else if ( i%3 ) { color = 0x00ff00 }
         else { color = 0xff0000 }
-        var pointsMaterial = new PointsMaterial({ color: color });
-        var object = new Mesh(pointsGeometry, pointsMaterial);
+        var pointsMaterial = new THREE.PointsMaterial({ color: color });
+        var object = new THREE.Mesh(pointsGeometry, pointsMaterial);
 
         object.scale.set(R / scale, R / scale, R / scale);
 
@@ -410,11 +400,11 @@ export function update_particle_material(params) {
     else {
         for ( let i = 0; i < params.N; i ++ ) {
             var object = spheres.children[i];
-            object.material = new MeshStandardMaterial({ color : 0xaaaaaa });
+            object.material = new THREE.MeshStandardMaterial({ color : 0xaaaaaa });
             object.material.emissiveIntensity = 0;
             object.material.transparent = true;
             object.material.opacity = params.particle_opacity;
-            object.material.emissive = new Color( 0xFF0000 );
+            object.material.emissive = new THREE.Color( 0xFF0000 );
         }
     }
     if ( params.lut === 'Velocity' ) {
@@ -688,10 +678,10 @@ export function draw_force_network(S,params,scene) {
                 forces.children[i].material.dispose();
             }
             scene.remove( forces );
-            forces = new Group();
+            forces = new THREE.Group();
 
             //var F = S.simu_getContactForce(); // very poorly named
-            let F = S.simu_getContactInfos(0x80 | 0x100);
+            F = S.simu_getContactInfos(contact_flags);
             
             let width = radii[0]/2.;
             if ( 'F_mag_max' in params ) {
@@ -723,7 +713,7 @@ export function draw_force_network(S,params,scene) {
                     let distance = a.distanceTo( b );
                     if (spheres.children[F[i][0]].visible && spheres.children[F[i][1]].visible) {
                         if ( distance < (radii[F[i][0]] + radii[F[i][1]]) ) { // ignore periodic boundaries
-                            let mid_point = new Vector3();
+                            let mid_point = new THREE.Vector3();
                             mid_point.addVectors(a,b);
                             mid_point.divideScalar(2);
                             c.position.copy( mid_point );
