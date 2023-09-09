@@ -1,50 +1,61 @@
 html * {
     font-family: 'Montserrat', sans-serif;
 }
+
 body {
     margin: 0;
     overflow: hidden;
 }
+
 .flex-container {
     display: flex;
     flex-direction: row;
 }
+
 #stats {
     width: 50%;
     height: 100vh;
     margin: 0;
     padding: 0;
 }
+
 #canvas {
     width: 50%;
     height: 100%;
     /* disable selection */
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10 and IE 11 */
-    user-select: none; /* Standard syntax */
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
 }
 
 .dg .c {
     width: 45% !important;
 }
+
 .dg .property-name {
     width: 55% !important;
 }
+
 #scigem_tag {
-    position:absolute;
-    bottom:5pt;
-    left:5pt;
+    position: absolute;
+    bottom: 5pt;
+    left: 5pt;
     font-size: 8pt;
     z-index: 99;
 }
+
 #download_tag {
-    position:absolute;
-    top:5pt;
-    left:5pt;
+    position: absolute;
+    top: 5pt;
+    left: 5pt;
     font-size: 14pt;
     z-index: 99;
     color: #bbb;
 }
+
 #download_tag:hover {
     color: #777;
 }
@@ -56,17 +67,37 @@ a {
 }
 
 .visible {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity 0.25s linear;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.25s linear;
 }
+
 .hidden {
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s 0.25s, opacity 0.25s linear;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.25s, opacity 0.25s linear;
 }
 
 .lil-gui {
-	--number-color: #fc2eff;
+    --number-color: #fc2eff;
     --string-color: #fc2eff;
+}
+
+#info_div {
+    color: white;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+#cb {}
+
+#colorbar {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    width: 200px;
+    height: 20px;
+    color: white;
+    display: flex;
 }

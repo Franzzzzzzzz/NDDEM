@@ -1,4 +1,5 @@
 import { Lut } from './Lut.js';
+import * as COLORBAR from './colorbar.js';
 
 let cg_mesh;
 
@@ -80,6 +81,10 @@ export function update_2d_cg_field(S, params) {
             lut.setMin(-0.9*maxVal);
             lut.setMax( 0.9*maxVal);
         }
+        
+        // update colorbar
+        COLORBAR.renderColorbar(lut);
+
         // console.log(lut);
         for ( let i = 0; i < size; i ++ ) {
             var color = lut.getColor(val[i]);
