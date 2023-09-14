@@ -31,9 +31,9 @@ export function renderColorbar(lut) {
     // Create the labels
     let m, M;
     if (Number.isInteger(lut.getMin())) { m = lut.getMin() }
-    else { m = parseFloat(lut.getMin()).toFixed(2); }
+    else { m = parseFloat(lut.getMin()).toPrecision(2); }
     if (Number.isInteger(lut.getMax())) { M = lut.getMax() }
-    else { M = parseFloat(lut.getMax()).toFixed(2); }
+    else { M = parseFloat(lut.getMax()).toPrecision(2); }
     minLabel.textContent = m;
     minLabel.style.marginRight = '10px';
 
