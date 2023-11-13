@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['emfunction_5076',['EMFUNCTION',['../emscripten__specific_8h.html#a0ae6f97ee5d50488c0c319b42f351e55',1,'emscripten_specific.h']]],
-  ['emmacro_5077',['EMMACRO',['../emscripten__specific_8h.html#a341da5683935cc131139b5171f390695',1,'emscripten_specific.h']]],
-  ['emmacro2_5078',['EMMACRO2',['../emscripten__specific_8h.html#a08e8db96ae1a36a2430999a33346acb2',1,'emscripten_specific.h']]]
+  ['deflateinit_5191',['deflateInit',['../zlib_8h.html#ae7440c1c5a8becba6dbf410275dc0a5c',1,'zlib.h']]],
+  ['deflateinit2_5192',['deflateInit2',['../zlib_8h.html#a59b575a521efe7ea0d3b9dd3c8d315c1',1,'zlib.h']]]
 ];

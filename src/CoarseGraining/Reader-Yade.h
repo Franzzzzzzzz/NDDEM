@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
-#include <zlib.h>
+#include "zlib.h"
 
 class YadeReader : public Reader {
 public:

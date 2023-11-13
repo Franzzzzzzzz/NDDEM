@@ -21,6 +21,7 @@ module.exports = [{
         'hopper' : './live/src/hopper.js',
         'intruder' : './live/src/intruder.js',
         'anisotropy' : './live/src/anisotropy.js',
+        'dam-break' : './live/src/dam-break.js',
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -130,6 +131,13 @@ module.exports = [{
             template: "live/plotly-template.html",
             filename: "anisotropy.html",
             chunks: ['anisotropy']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Dam Break',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/template.html",
+            filename: "dam-break.html",
+            chunks: ['dam-break']
         }),
       ],
     output: {
