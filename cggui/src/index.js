@@ -592,7 +592,7 @@ function build_parameter_json()
     var times=timeslider.noUiSlider.get() ; 
     data["skip"]=parseInt(times[0]) ; 
     data["max time"]=parseInt(times[1])-parseInt(times[0]) ;
-    dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]}}) ; 
+    dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]-1}}) ; 
     dispslider.noUiSlider.set(data["skip"]) ; 
     
     data["time average"]=document.getElementById("timeaverage").value ; 
@@ -668,7 +668,7 @@ document.getElementById('loadjsonfile').addEventListener('change', function() {
         timeslider.noUiSlider.set([data["skip"], data["skip"]+data["max time"]]) ;
         document.getElementById("timeaverage").value = data["time average"] ;
         
-        dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]}}) ; 
+        dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]-1}}) ; 
         dispslider.noUiSlider.set(data["skip"]) ; 
         
         if (data["density"])
@@ -841,6 +841,24 @@ dispslider.noUiSlider.on('change', function() {
         document.getElementById('updateCG').dispatchEvent(ev);
     }
 });
+
+document.getElementById("cmin").addEventListener('change', async() => {
+    var imgmin = parseFloat(document.getElementById('cmin').value) ; 
+    var imgmax = parseFloat(document.getElementById('cmax').value) ; 
+    lookupTable.setMappingRange(...[imgmin,imgmax]);
+    lookupTable.updateRange();
+    //renderer.resetCamera();
+    renderWindow.render();
+}) ; 
+
+document.getElementById("cmax").addEventListener('change', async() => {
+    var imgmin = parseFloat(document.getElementById('cmin').value) ; 
+    var imgmax = parseFloat(document.getElementById('cmax').value) ; 
+    lookupTable.setMappingRange(...[imgmin,imgmax]);
+    lookupTable.updateRange();
+    //renderer.resetCamera();
+    renderWindow.render();
+}) ; 
 
 document.getElementById('lockcscale').addEventListener('change', async () => {
     if (document.getElementById('lockcscale').checked) 
