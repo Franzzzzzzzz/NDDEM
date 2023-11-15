@@ -1,14 +1,12 @@
 import css from "../css/main.css";
 
-import * as THREE from "three";
+// import * as THREE from "three";
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
-
 import * as SPHERES from "../libs/SphereHandler.js"
 // import * as WALLS from "../libs/WallHandler.js"
 // import * as LAYOUT from '../libs/Layout.js'
 import * as CGHANDLER from '../libs/CGHandler.js';
-
 
 let urlParams = new URLSearchParams(window.location.search);
 
@@ -19,8 +17,11 @@ let Fr_div = document.createElement('div');
 Fr_div.style.cssText = 'position:absolute;color:white;top:10px;left:10px;font-size:24px;z-index:10000';
 document.body.appendChild(Fr_div);
 
+// import Stats from 'three/examples/jsm/libs/stats.module'
+// const stats = new Stats()
+// document.body.appendChild(stats.dom)
 
-let camera, scene, renderer, stats, panel, controls;
+let camera, scene, renderer, panel, controls;
 let gui;
 let boundary;
 let S;
@@ -280,6 +281,7 @@ function onWindowResize(){
 }
 
 function animate() {
+    
     requestAnimationFrame( animate );
     SPHERES.move_spheres(S,params);
     
@@ -294,6 +296,8 @@ function animate() {
     SPHERES.draw_force_network(S, params, scene);
     renderer.render( scene, camera );
     put_particles_back();
+
+    // stats.update()
 }
 
 function put_particles_back(){

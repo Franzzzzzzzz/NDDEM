@@ -30,6 +30,7 @@ EMSCRIPTEN_BINDINGS(DEMCG##dim##D) {\
     .EMFUNCTION(dim, simu_setAngularVelocity)\
     .EMFUNCTION(dim, simu_getTime)\
     .EMFUNCTION(dim, simu_getGravityAngle)\
+    .EMFUNCTION(dim, simu_randomDrop)\
     .EMFUNCTION(dim, cg_setup_CG)\
                                               \
     .EMFUNCTION(dim, cg_process_timestep)\

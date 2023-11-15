@@ -746,6 +746,23 @@ public:
       ExternalAction[ExternalAction.size()-1].set(force, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
   }
 
+  void randomDrop()
+  {
+    unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
+    boost::random::mt19937 rng(seed);
+    boost::random::uniform_01<boost::mt19937> rand(rng) ;
+    for (int i=0 ; i<N ; i++)
+        {
+         for(int dd=0 ; dd < d ; dd++)
+         {
+           if (P.Boundaries[dd][3]==0)
+             X[i][dd] = rand()*P.Boundaries[dd][2] + P.Boundaries[dd][0] ;
+           else
+             X[i][dd] = rand()*(P.Boundaries[dd][2]-2*P.r[i]) + P.Boundaries[dd][0] + P.r[i] ;
+         }
+    }
+  }
+
 } ;
 
 #ifdef EMSCRIPTEN
