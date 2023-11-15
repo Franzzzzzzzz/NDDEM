@@ -752,14 +752,31 @@ $(function() {
 <div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;      ExternalAction[ExternalAction.size()-1].set(force, <a class="code" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0), <a class="code" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>*(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1)/2,0), <a class="code" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>*(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1)/2,0)) ;</div>
 <div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;  }</div>
 <div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160; </div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;} ;</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160; </div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;<span class="preprocessor">#ifdef EMSCRIPTEN</span></div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;<span class="preprocessor">#ifdef USEBINDINGS</span></div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="emscripten__specific_8h.html">emscripten_specific.h</a>&quot;</span></div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160; </div>
+<div class="line"><a name="l00749"></a><span class="lineno"><a class="line" href="classSimulation.html#a49c0ea3881c08d52c37992739fd5e71e">  749</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classSimulation.html#a49c0ea3881c08d52c37992739fd5e71e">randomDrop</a>()</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;  {</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">int</span> seed = 5489UL ; </div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    boost::random::mt19937 rng(seed);</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    boost::random::uniform_01&lt;boost::mt19937&gt; rand(rng) ;</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a> ; i++)</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;        {</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> dd=0 ; dd &lt; <a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;         {</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;           <span class="keywordflow">if</span> (P.<a class="code" href="classParameters.html#ab50c2b6be59f4456c9c1516f57bc457c">Boundaries</a>[dd][3]==0)</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;             X[i][dd] = rand()*P.<a class="code" href="classParameters.html#ab50c2b6be59f4456c9c1516f57bc457c">Boundaries</a>[dd][2] + P.<a class="code" href="classParameters.html#ab50c2b6be59f4456c9c1516f57bc457c">Boundaries</a>[dd][0] ;</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;           <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;             X[i][dd] = rand()*(P.<a class="code" href="classParameters.html#ab50c2b6be59f4456c9c1516f57bc457c">Boundaries</a>[dd][2]-2*P.<a class="code" href="classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53">r</a>[i]) + P.<a class="code" href="classParameters.html#ab50c2b6be59f4456c9c1516f57bc457c">Boundaries</a>[dd][0] + P.<a class="code" href="classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53">r</a>[i] ;</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;         }</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    }</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;  }</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160; </div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;} ;</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160; </div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;<span class="preprocessor">#ifdef EMSCRIPTEN</span></div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;<span class="preprocessor">#ifdef USEBINDINGS</span></div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="emscripten__specific_8h.html">emscripten_specific.h</a>&quot;</span></div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160; </div>
 <div class="ttc" id="aCoarseGraining_2Parameters_8h_html"><div class="ttname"><a href="CoarseGraining_2Parameters_8h.html">Parameters.h</a></div></div>
 <div class="ttc" id="aCoarseGraining_2Typedefs_8h_html"><div class="ttname"><a href="CoarseGraining_2Typedefs_8h.html">Typedefs.h</a></div></div>
 <div class="ttc" id="aContactList_8h_html"><div class="ttname"><a href="ContactList_8h.html">ContactList.h</a></div></div>
@@ -849,6 +866,7 @@ $(function() {
 <div class="ttc" id="aclassSimulation_html_a46542e885c635e3ea22a50ef9d36f81a"><div class="ttname"><a href="classSimulation.html#a46542e885c635e3ea22a50ef9d36f81a">Simulation::Torque</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; Torque</div><div class="ttdef"><b>Definition:</b> DEMND.h:63</div></div>
 <div class="ttc" id="aclassSimulation_html_a47f7361b016f2ff32e4b26741af0616e"><div class="ttname"><a href="classSimulation.html#a47f7361b016f2ff32e4b26741af0616e">Simulation::ParticleForce</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParticleForce</div><div class="ttdef"><b>Definition:</b> DEMND.h:79</div></div>
 <div class="ttc" id="aclassSimulation_html_a486ae99dfeb707ec8b1a29e02b754222"><div class="ttname"><a href="classSimulation.html#a486ae99dfeb707ec8b1a29e02b754222">Simulation::PBCFlags</a></div><div class="ttdeci">std::vector&lt; uint32_t &gt; PBCFlags</div><div class="ttdef"><b>Definition:</b> DEMND.h:76</div></div>
+<div class="ttc" id="aclassSimulation_html_a49c0ea3881c08d52c37992739fd5e71e"><div class="ttname"><a href="classSimulation.html#a49c0ea3881c08d52c37992739fd5e71e">Simulation::randomDrop</a></div><div class="ttdeci">void randomDrop()</div><div class="ttdef"><b>Definition:</b> DEMND.h:749</div></div>
 <div class="ttc" id="aclassSimulation_html_a4aa574e603c9a9013d4663a51cc53df7"><div class="ttname"><a href="classSimulation.html#a4aa574e603c9a9013d4663a51cc53df7">Simulation::init_from_file</a></div><div class="ttdeci">void init_from_file(char filename[])</div><div class="ttdoc">Initialise the simulation from a file.</div><div class="ttdef"><b>Definition:</b> DEMND.h:133</div></div>
 <div class="ttc" id="aclassSimulation_html_a4baeea0b400f3894c7d42791a7f75328"><div class="ttname"><a href="classSimulation.html#a4baeea0b400f3894c7d42791a7f75328">Simulation::Z</a></div><div class="ttdeci">std::vector&lt; double &gt; Z</div><div class="ttdef"><b>Definition:</b> DEMND.h:67</div></div>
 <div class="ttc" id="aclassSimulation_html_a4dc8ed0a8598f6ba5242f05ec207a205"><div class="ttname"><a href="classSimulation.html#a4dc8ed0a8598f6ba5242f05ec207a205">Simulation::ExternalAction</a></div><div class="ttdeci">std::vector&lt; SpecificAction&lt; d &gt; &gt; ExternalAction</div><div class="ttdef"><b>Definition:</b> DEMND.h:74</div></div>
@@ -951,7 +969,7 @@ $(function() {
 <div class="ttc" id="agroup__DEM_html_ggac5ecf92a792f505a64533e107971ae35aec0ee4a392a3223b0d108d177aaa8bd7"><div class="ttname"><a href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35aec0ee4a392a3223b0d108d177aaa8bd7">WallType::MOVINGWALL</a></div><div class="ttdeci">@ MOVINGWALL</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga7722c8ecbb62d99aee7ce68b1752f337"><div class="ttname"><a href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a></div><div class="ttdeci">int N</div></div>
-<div class="ttc" id="anamespaceemscripten_html"><div class="ttname"><a href="namespaceemscripten.html">emscripten</a></div><div class="ttdef"><b>Definition:</b> emscripten_specific.h:147</div></div>
+<div class="ttc" id="anamespaceemscripten_html"><div class="ttname"><a href="namespaceemscripten.html">emscripten</a></div><div class="ttdef"><b>Definition:</b> emscripten_specific.h:148</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

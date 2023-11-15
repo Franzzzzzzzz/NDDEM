@@ -34,7 +34,7 @@ public:
     void simu_setAngularVelocity(int id, v1d omega) {return S.setAngularVelocity(id,omega) ; }
     double simu_getTime() {return S.getTime() ; }
     double simu_getGravityAngle() {return S.getGravityAngle() ; }
-
+    void simu_randomDrop() {return S.randomDrop() ; }
 
     //CoarseGraining
     void cg_setup_CG () {

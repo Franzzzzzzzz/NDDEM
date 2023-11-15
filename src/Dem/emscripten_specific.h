@@ -27,6 +27,7 @@
         .EMFUNCTION(dim,getWallForce)\
         .EMFUNCTION(dim,setExternalForce)\
         .EMFUNCTION(dim,getTime)\
+        .EMFUNCTION(dim,randomDrop)\
         ;
 
 EMSCRIPTEN_BINDINGS(my_class_example) {

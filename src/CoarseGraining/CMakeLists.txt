@@ -6,8 +6,8 @@ set_property(TARGET CoarseGraining PROPERTY CXX_STANDARD 17)
 #set_property(TARGET CoarseGraining_Liggghts PROPERTY CXX_STANDARD 17)
 
 if(EMSCRIPTEN)
- target_compile_options(CoarseGraining PUBLIC -g -O3 ${Matlab_Macro} -Wall -DUSEBINDINGS)
- target_link_libraries(CoarseGraining PUBLIC -g -O3 -lz -lm -Wall -DUSEBINDINGS)
+ target_compile_options(CoarseGraining PUBLIC -O3 ${Matlab_Macro} -Wall -DUSEBINDINGS)
+ target_link_libraries(CoarseGraining PUBLIC -O3 -lz -lm -Wall -DUSEBINDINGS)
  set(MODULARIZE "1")
  set(EXPORT_NAME "CoarseGraining")
  set_target_properties(
