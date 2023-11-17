@@ -180,7 +180,6 @@ std::vector<std::vector<double>> MercuryReader_data_particles::get_bounds()
   reset() ;  
   return res ; 
 }
- 
 //--------------------------------------------
 int MercuryReader_data_particles::read_timestep (int ts) 
 {

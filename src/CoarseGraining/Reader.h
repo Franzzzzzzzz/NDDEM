@@ -10,6 +10,7 @@
 class Reader {
 public:
     virtual std::vector<std::vector<double>> get_bounds() {return {} ; }
+    virtual std::vector<double> get_minmaxradius() {return {} ; }
     virtual int get_dimension () {return 3 ;}
     virtual int get_numts() 
     {
@@ -168,7 +169,6 @@ protected:
 
 private:
     double Radius=-1, Density=-1 ;
-    const double pbcthreshold = 2. ;
 } ;
 
 #endif

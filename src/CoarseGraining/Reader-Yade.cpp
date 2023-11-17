@@ -93,7 +93,7 @@ int YadeReader::getfield_from_data (std::string name, std::vector<std::string> &
   uint8_t * buffer ; size_t data_offset=0 ; 
   unsigned long int us=header[1]; 
   buffer=(uint8_t*) malloc(header[1]) ;
-  int jlast = 0 ; int ndata=0 ; 
+  int jlast = 0 ;
   for (uint32_t i=0; i<header[0] ; data_offset+=header[3+i], i++, us=header[1])
   { 
     int error = uncompress(buffer, &us, datacompress.data()+data_offset, header[3+i]) ; 
@@ -103,7 +103,6 @@ int YadeReader::getfield_from_data (std::string name, std::vector<std::string> &
     for (size_t j=jlast ; j<jlast+us/bytepervalue ; j++)
     {
       data[idx+j%ncomponents][j/ncomponents] = byte2double(buffer+(j-jlast)*bytepervalue, bytepervalue) ;
-      ndata++ ;
     }
     jlast += us/bytepervalue ; 
   }  

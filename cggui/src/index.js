@@ -8,7 +8,9 @@ import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreen
 import vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData';
 import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
+import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 import vtkVolume from '@kitware/vtk.js/Rendering/Core/Volume';
+import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper';
 import vtkImageMapper from '@kitware/vtk.js/Rendering/Core/ImageMapper';
 import vtkImageSlice from '@kitware/vtk.js/Rendering/Core/ImageSlice';
@@ -24,6 +26,7 @@ import vtkGestureCameraManipulator from '@kitware/vtk.js/Interaction/Manipulator
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
 import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
+import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 
 //import './popup.css'
 import './popupform.css'
@@ -48,6 +51,8 @@ fullScreenRenderer.getControlContainer().style.width="40%" ;
 
 var dispts = 0 ;
 var defaultdensity = -1 ; 
+var sphereinfos=false ;
+var actor2=[] ;
 
 var worker = new Worker("worker.js");
 
@@ -90,34 +95,40 @@ lookupTable.updateRange();
 
 actor.getProperty().setRGBTransferFunction(0, lookupTable);
 actor.getProperty().setScalarOpacityUnitDistance(0, 3.0);
-actor.getProperty().setInterpolationTypeToLinear();
+//actor.getProperty().setInterpolationTypeToLinear();
 actor.getProperty().setUseGradientOpacity(0, false);
 actor.getProperty().setShade(false);
 actor.getProperty().setAmbient(1);
 actor.getProperty().setDiffuse(0.7);
 actor.getProperty().setSpecular(0.3);
 actor.getProperty().setSpecularPower(8.0);
+//actor.getProperty().setInterpolationTypeToFastLinear() ; 
+console.log(actor.getProperty())
 
-    var width = 3, height = 3, depth = 3;
-    var size = width * height * depth;
+var width = 3, height = 3, depth = 3;
+var size = width * height * depth;
 
-    var values = [];
-    for (var i = 0; i < size; i++) {
-        values[i] = i/26*255;
-    }
+var values = [0,255,0,255,255,255,0,255,0, 255,255,255,255,0,255,255,255,255, 0,255,0,255,255,255,0,255,0];
+// for (var i = 0; i < size; i++) {
+//     values[i] = i/26*255;
+// }
+var values = [256,0,256,0,256,0,256,0,256, 0,256,0,256,0,256,0,256,0,  256,0,256,0,256,0,256,0,256];
+//var values=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,256,0,0,0,0,0,256,256,256]
+lookupTable.setMappingRange(...[0,256]);
+lookupTable.updateRange();
 
-    var scalars = vtkDataArray.newInstance({
-        values: values,
-        numberOfComponents: 1, // number of channels (grayscale)
-        dataType: VtkDataTypes.FLOAT, // values encoding
-        name: 'scalars'
-    });
+var scalars = vtkDataArray.newInstance({
+    values: values,
+    numberOfComponents: 1, // number of channels (grayscale)
+    dataType: VtkDataTypes.FLOAT, // values encoding
+    name: 'scalars'
+});
 
-    var imageData = vtkImageData.newInstance();
-    imageData.setOrigin(0, 0, 0);
-    imageData.setSpacing(1, 1, 1);
-    imageData.setExtent(0, width - 1, 0, height - 1, 0, depth - 1);
-    imageData.getPointData().setScalars(scalars);
+var imageData = vtkImageData.newInstance();
+imageData.setOrigin(0, 0, 0);
+imageData.setSpacing(1, 1, 1);
+imageData.setExtent(0, width - 1, 0, height - 1, 0, depth - 1);
+imageData.getPointData().setScalars(scalars);
 
 mapper.setInputData(imageData);
 renderer.addVolume(actor);
@@ -283,6 +294,12 @@ function filenameupdate (filelist)
             else
                 console.log("Invalid file selection") ; 
         }
+        // Try to identify filetype
+        const matches =filelist[0].name.match(/vtu/g);
+        if (matches && matches.length > 0) 
+        {
+            document.getElementById("filetype").selectedIndex=1 ;
+        }
         document.getElementById("file_initial").value=Math.min(...numbers) ; 
         document.getElementById("file_delta").value=(Math.max(...numbers)-Math.min(...numbers))/(filelist.length-1); 
     }
@@ -351,6 +368,7 @@ document.getElementById("updatefile").addEventListener('click', async() => {
     
     console.log(data)
     worker.postMessage([ 'initialise', data, document.getElementById("filename1").files, document.getElementById("filename2").files])
+    console.log("HERE") 
     isedit=false ;
 }) ; 
 
@@ -592,8 +610,12 @@ function build_parameter_json()
     var times=timeslider.noUiSlider.get() ; 
     data["skip"]=parseInt(times[0]) ; 
     data["max time"]=parseInt(times[1])-parseInt(times[0]) ;
-    dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]-1}}) ; 
-    dispslider.noUiSlider.set(data["skip"]) ; 
+    
+    if (data["skip"]!=parseInt(dispslider.noUiSlider.options.range.min) || data["skip"]+data["max time"]-1!=parseInt(dispslider.noUiSlider.options.range.max))
+    {
+        dispslider.noUiSlider.updateOptions({range: {'min':  data["skip"], 'max': data["skip"]+data["max time"]-1}}) ; 
+        dispslider.noUiSlider.set(data["skip"]) ; 
+    }
     
     data["time average"]=document.getElementById("timeaverage").value ; 
     
@@ -829,6 +851,23 @@ document.getElementById('cliprange').addEventListener('change', async() => {
     renderWindow.render();
 });
 
+document.getElementById('showsphere').addEventListener('click', async() =>  {
+    if (sphereinfos==false)
+    {
+        var ts=parseInt(dispslider.noUiSlider.get()) ; 
+        worker.postMessage(['getspheres', ts]) ; 
+        sphereinfos=true ; 
+    }
+    else
+    {
+        for (var n=actor2.length-1 ; n>=0 ; n--)
+            renderer.removeActor(actor2[n]) ; 
+        renderWindow.render();
+        sphereinfos=false ;
+        actor2=[] ; 
+    }
+}) ; 
+
 dispslider.noUiSlider.on('change', function() {
     updated=false ; 
     if (document.getElementById('autoupdate').checked)
@@ -882,8 +921,13 @@ worker.onmessage = function (e)
         document.getElementById('zmin').value = e.data[2][0][2] ; 
         document.getElementById('zmax').value = e.data[2][1][2] ;  
      }
+     if (e.data[3].length>0)
+     {
+         document.getElementById('windowsize').value = e.data[3][1]*4 ; 
+         document.getElementById('windowsize').step = Math.pow(10,Math.floor(Math.log10(0.0562))) ; 
+     }
      timeslider.noUiSlider.updateOptions({range: {'min': 0,'max': e.data[1]-1}}) ; 
-     timeslider.noUiSlider.set([0,e.data[1]-1]) ;
+     timeslider.noUiSlider.set([0,e.data[1]-1]) ; 
      dispslider.noUiSlider.updateOptions({range: {'min': 0,'max': e.data[1]-1}}) ; 
      dispslider.noUiSlider.set([0]) ;
      
@@ -912,7 +956,7 @@ worker.onmessage = function (e)
                 cancelable: true
             });
         document.getElementById('updateCG').dispatchEvent(ev);
-        renderer.resetCamera();
+        //renderer.resetCamera();
         renderer.getActiveCamera().setViewUp(0,0,1) ; 
         interactorStyle.setCenterOfRotation(renderer.getActiveCamera().getFocalPoint()) ;
         renderWindow.render();
@@ -961,5 +1005,34 @@ worker.onmessage = function (e)
     //renderer.resetCamera();
     renderWindow.render();
  }
-    
+ else if (e.data[0] == 'sphereinfos')
+ {
+      console.log(e.data[1]) ; 
+      const sphereSource = vtkSphereSource.newInstance({ center: [0, 0, 0], height: 1.0 });
+
+      const mapper2 = vtkMapper.newInstance();
+      mapper2.setInputConnection(sphereSource.getOutputPort());
+
+       
+      for (let n = 0; n < e.data[1][0].length; n++) 
+      {
+        actor2.push(vtkActor.newInstance());
+        actor2[n].setMapper(mapper2);
+        actor2[n].setScale(2*e.data[1][3][n], 2*e.data[1][3][n], 2*e.data[1][3][n]) ; 
+        actor2[n].setPosition(e.data[1][0][n], e.data[1][1][n], e.data[1][2][n]);
+        actor2[n].getProperty().setColor(Math.random(),Math.random(),Math.random()) ; 
+        renderer.addActor(actor2[n]);
+      }
+      renderer.resetCamera();
+      renderWindow.render();
+ }
 }
+
+
+
+
+
+
+
+
+

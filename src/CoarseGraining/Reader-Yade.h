@@ -24,8 +24,15 @@ public:
       res[0][2]=*(z.first) ; res[1][2]=*(z.second) ; 
       
       return res ; 
-      
     }
+    virtual std::vector<double> get_minmaxradius() 
+    {
+      if (curts==-1) read_timestep(0) ; 
+      else read_timestep(curts) ; 
+      auto r = std::minmax_element(data[6].begin(), data[6].end()) ; 
+      return {*r.first, *r.second} ; 
+    }
+    
     virtual int get_num_particles () {return N;}
     virtual int get_num_contacts () {return -1;}
     
