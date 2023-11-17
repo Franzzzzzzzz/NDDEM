@@ -2,9 +2,9 @@ var searchData=
 [
   ['r_4507',['R',['../classTexturing.html#ab7bed15777c17b0233b37ebff1063844',1,'Texturing']]],
   ['r_4508',['r',['../classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53',1,'Parameters']]],
-  ['radius_4509',['radius',['../structParam.html#acf711c388136804ad6854a47bc9ff423',1,'Param::radius()'],['../classNDDEMReader.html#ade81335d2515aa1845d1d3846e6a038d',1,'NDDEMReader::radius()']]],
-  ['radius_4510',['Radius',['../classDatafile.html#a38f108fe0a0d9721f0b6b27c5424ac0a',1,'Datafile::Radius()'],['../classReader.html#a679846d260ede5b522da376bab63be3b',1,'Reader::Radius()']]],
-  ['radius_4511',['radius',['../group__CoarseGraining.html#ga306d608be378bca19975baaea028d560',1,'Data']]],
+  ['radius_4509',['Radius',['../classReader.html#a679846d260ede5b522da376bab63be3b',1,'Reader']]],
+  ['radius_4510',['radius',['../group__CoarseGraining.html#ga306d608be378bca19975baaea028d560',1,'Data::radius()'],['../structParam.html#acf711c388136804ad6854a47bc9ff423',1,'Param::radius()'],['../classNDDEMReader.html#ade81335d2515aa1845d1d3846e6a038d',1,'NDDEMReader::radius()']]],
+  ['radius_4511',['Radius',['../classDatafile.html#a38f108fe0a0d9721f0b6b27c5424ac0a',1,'Datafile']]],
   ['rand_4512',['rand',['../group__DEM.html#ga690c31bf9802dc16c4a4c07b0540c014',1,'Tools']]],
   ['raw64_4513',['raw64',['../classYadeReader.html#aa1a6729ba37780dda8ad8de89a23475f',1,'YadeReader']]],
   ['rb_4514',['RB',['../classRigidBodies__.html#aacb660b06193a4f3fe512aa432d4dcae',1,'RigidBodies_']]],

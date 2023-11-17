@@ -115,152 +115,176 @@ $(function() {
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> write () ;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    std::vector&lt;double&gt; get_result(<span class="keywordtype">int</span> ts, std::string field, <span class="keywordtype">int</span> component) ;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    std::vector&lt;double&gt; get_gridinfo() ;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">// Expose functions from member classes for js access</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">   49</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">param_from_json_string</a> (std::string param)  { <a class="code" href="classnlohmann_1_1basic__json.html">json</a> jsonparam =<a class="code" href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">json::parse</a>(param) ; <span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a83d5617cb277a489dc46686fe41b6a67">from_json</a>(jsonparam) ; }</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">   50</a></span>&#160;    std::vector&lt;std::vector&lt;double&gt;&gt; <a class="code" href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">param_get_bounds</a> (<span class="keywordtype">int</span> file = 0) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a1f73ff04971269077b903b15a1404517">files</a>[file].reader-&gt;get_bounds() ; }</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">   51</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">param_get_numts</a>(<span class="keywordtype">int</span> file = 0) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a1f73ff04971269077b903b15a1404517">files</a>[file].reader-&gt;get_numts(); }</div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">   52</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">debug</a> () {<span class="comment">/*char resc[5000] ; sprintf(resc, &quot;%d %X&quot;, P.files.size(), P.files[0].reader) ; return resc ; */</span>printf(<span class="stringliteral">&quot;BLAAAA\n&quot;</span>) ; }</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#aaa48140c0bbb711dce411727544b498d">   53</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#aaa48140c0bbb711dce411727544b498d">param_read_timestep</a>(<span class="keywordtype">int</span> n) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a0884df781f5b0a0defca749e20a43287">read_timestep</a>(n) ; }</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a5fba577d5ca6a8cbae451ddf741daf85">   54</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#a5fba577d5ca6a8cbae451ddf741daf85">param_post_init</a> () {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#aada6abb00bb83c905fb02b7216034965">post_init</a>() ; }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="comment">/*std::string testing(std::string input) {</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">        FILE * in = fopen(input.c_str(), &quot;r&quot;) ;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">        printf(&quot;[%s]&quot;, input.c_str()) ;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">        if (in != nullptr)</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">        {</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">            printf(&quot;Starting reading\n&quot;) ;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">            while (!feof(in))</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">                fscanf(in,&quot;%*c&quot;) ;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">            fclose(in) ;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">            printf(&quot;Finished reading\n&quot;) ;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">        }</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">        return(input) ;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">    } */</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;} ;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">//=========================================================</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#ae0bd04a7d8a839c2c8b06656e3b5d773">   73</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#ae0bd04a7d8a839c2c8b06656e3b5d773">CoarseGraining::setup_CG</a> ()</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="comment">//P.verify() ;</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span> (C != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">delete</span> C ;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    C = <span class="keyword">new</span> <a class="code" href="classCoarsing.html">Coarsing</a> (P.dim, P.boxes, P.boundaries, P.maxT) ;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : P.extrafields)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        C-&gt;add_extra_field(i.name, i.order, i.type) ;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">if</span> (P.window == <a class="code" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5">Windows::LucyND_Periodic</a>)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        C-&gt;setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta) ;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        C-&gt;setWindow(P.window,P.windowsize) ;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    pipeline = C-&gt;set_flags(P.flags) ;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">auto</span> extrafieldmap = C-&gt;grid_setfields() ;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    C-&gt;grid_neighbour() ;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    C-&gt;cT=-1 ;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;}</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">//-----------------------------------------</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a4c88fe310074bdbd73b7cfcfae76d3d1">   93</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#a4c88fe310074bdbd73b7cfcfae76d3d1">CoarseGraining::process_timestep</a> (<span class="keywordtype">int</span> ts_abs, <span class="keywordtype">bool</span> hasdonefirstpass)</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;{</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">int</span> ts = ts_abs - P.skipT ;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;   </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">bool</span> avg=false ;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">if</span> (P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">AverageType::Intermediate</a> || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>) avg=true ;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    P.read_timestep(ts+P.skipT) ; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    C-&gt;cT = ts ;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    P.set_data (C-&gt;data) ;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">if</span> (!hasdonefirstpass) <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a24553a2fdacf611cf1fb636d49cd3af7">Pass::Pass1</a>) C-&gt;pass_1() ;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ac4f12b9f7f5e5174f6fbf217e4aac5ab">Pass::VelFluct</a>) C-&gt;compute_fluc_vel (avg) ;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6011801aa1426e2fbec667ec4506de7">Pass::RotFluct</a>) C-&gt;compute_fluc_rot (avg) ;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a7dd0791ec75e1af594b61ed389686b9e">Pass::Pass2</a>) C-&gt;pass_2() ;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a668dec4bc0b6584e5f226846c7ed9dd9">Pass::Pass3</a>) C-&gt;pass_3() ;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a710fdada10d085470e9dedfbdab857d3">Pass::Pass4</a>) C-&gt;pass_4() ;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6fe7c4788d45e82f71472865f52e3f3">Pass::Pass5</a>) C-&gt;pass_5() ;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">return</span> 0 ;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;}</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">//------------------------------------------------------------</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a800031169bbee4283112a65a6568941b">  113</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#a800031169bbee4283112a65a6568941b">CoarseGraining::process_fluct_from_avg</a>()</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ts=0 ; ts&lt;P.maxT ; ts++)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    {</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        P.read_timestep(ts+P.skipT, <span class="keyword">true</span>) ;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        C-&gt;cT = ts ;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        P.set_data (C-&gt;data) ;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        C-&gt;pass_1() ;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="comment">// printf(&quot;\r&quot;) ;</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">if</span> (P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">AverageType::Intermediate</a>   || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>) <span class="comment">//Should be automatically verified when the function is called</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        C-&gt;mean_time(<span class="keyword">true</span>) ;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">return</span> 0 ;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;}</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">//----------------------------------------------------------</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a17e73a3f2720a727705125f752e2ce00">  129</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#a17e73a3f2720a727705125f752e2ce00">CoarseGraining::process_all</a> ()</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;{</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordtype">bool</span> hasdonefirstpass = false ; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">if</span> ((P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">AverageType::Intermediate</a>   || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>) &amp;&amp;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        ((pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ac4f12b9f7f5e5174f6fbf217e4aac5ab">Pass::VelFluct</a>) || (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6011801aa1426e2fbec667ec4506de7">Pass::RotFluct</a>)))</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        process_fluct_from_avg() ;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        hasdonefirstpass = true ; </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ts=0 ; ts&lt;P.maxT ; ts++)</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="comment">// printf(&quot;\r%d &quot;, ts) ;</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        process_timestep(ts+P.skipT, hasdonefirstpass) ;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">if</span> (P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eab068018251f551730c472862a3b2fca9">AverageType::Final</a> || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        C-&gt;mean_time(<span class="keyword">false</span>) ;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;}</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="comment">//------------------------------------------------------</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#af78b95ef8616d246c65164bd01005602">  148</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#af78b95ef8616d246c65164bd01005602">CoarseGraining::write</a> ()</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;{</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;netCDF&quot;</span>)!=P.saveformat.end())   C-&gt;write_netCDF(P.save) ;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;vtk&quot;</span>)!=P.saveformat.end()) C-&gt;write_vtk (P.save) ;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;mat&quot;</span>)!=P.saveformat.end()) C-&gt;write_matlab(P.save, <span class="keyword">true</span>) ;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;numpy&quot;</span>)!=P.saveformat.end()) C-&gt;write_numpy(P.save, <span class="keyword">true</span>) ;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="comment">//------------------------------------------------------</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a03651f67a7fb3962e564ea8a0e6c68e4">  156</a></span>&#160;std::vector&lt;double&gt; <a class="code" href="classCoarseGraining.html#a03651f67a7fb3962e564ea8a0e6c68e4">CoarseGraining::get_result</a>(<span class="keywordtype">int</span> ts_abs, std::string field, <span class="keywordtype">int</span> component)</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;{</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; <span class="keywordtype">int</span> ts = ts_abs - P.skipT ;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; <span class="keywordflow">if</span> (ts != C-&gt;cT) {printf(<span class="stringliteral">&quot;The requested timestep has not been processed.\n&quot;</span>); <span class="keywordflow">return</span> {} ; }</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; <span class="keywordtype">int</span> idx = C-&gt;get_id(field) ;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; idx += component ;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; std::vector &lt;double&gt; res ;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; res.resize(C-&gt;CGP.size()) ;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0 ; i&lt;res.size() ; i++)</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;     res[i]=C-&gt;CGP[C-&gt;idx_FastFirst2SlowFirst(i)].fields[C-&gt;cT][idx] ;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; <span class="keywordflow">return</span> res ;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="comment">//-----------------------------------------------------</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">  169</a></span>&#160;std::vector&lt;double&gt; <a class="code" href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">CoarseGraining::get_gridinfo</a>()</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;{</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    std::vector&lt;double&gt; res ;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">//origin</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    res.push_back(C-&gt;CGP[0].location[0]) ;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    res.push_back(C-&gt;CGP[0].location[1]) ;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    res.push_back(C-&gt;CGP[0].location[2]) ;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">//spacing</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    res.push_back(C-&gt;dx[0]) ;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    res.push_back(C-&gt;dx[1]) ;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    res.push_back(C-&gt;dx[2]) ;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">//dimensions</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    res.push_back(C-&gt;npt[0]) ;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    res.push_back(C-&gt;npt[1]) ;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    res.push_back(C-&gt;npt[2]) ;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> res ;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;}</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment">//-----------------------------------------------------</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="preprocessor">#ifdef EMSCRIPTEN</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="preprocessor">#ifdef USEBINDINGS</span></div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor">    #include &quot;<a class="code" href="em__bindings_8h.html">em_bindings.h</a>&quot;</span></div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::vector&lt;std::vector&lt;double&gt;&gt; get_spheres(<span class="keywordtype">int</span> ts_abs) ; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">// Expose functions from member classes for js access</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">   50</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">param_from_json_string</a> (std::string param)  { <a class="code" href="classnlohmann_1_1basic__json.html">json</a> jsonparam =<a class="code" href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">json::parse</a>(param) ; <span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a83d5617cb277a489dc46686fe41b6a67">from_json</a>(jsonparam) ; }</div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">   51</a></span>&#160;    std::vector&lt;std::vector&lt;double&gt;&gt; <a class="code" href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">param_get_bounds</a> (<span class="keywordtype">int</span> file = 0) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a1f73ff04971269077b903b15a1404517">files</a>[file].reader-&gt;get_bounds() ; }</div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5">   52</a></span>&#160;    std::vector&lt;double&gt; <a class="code" href="classCoarseGraining.html#ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5">param_get_minmaxradius</a> (<span class="keywordtype">int</span> file = 0) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a1f73ff04971269077b903b15a1404517">files</a>[file].reader-&gt;get_minmaxradius() ; }</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">   53</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">param_get_numts</a>(<span class="keywordtype">int</span> file = 0) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a1f73ff04971269077b903b15a1404517">files</a>[file].reader-&gt;get_numts(); }</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">   54</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">debug</a> () {<span class="comment">/*char resc[5000] ; sprintf(resc, &quot;%d %X&quot;, P.files.size(), P.files[0].reader) ; return resc ; */</span>printf(<span class="stringliteral">&quot;BLAAAA\n&quot;</span>) ; }</div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#aaa48140c0bbb711dce411727544b498d">   55</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#aaa48140c0bbb711dce411727544b498d">param_read_timestep</a>(<span class="keywordtype">int</span> n) {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#a0884df781f5b0a0defca749e20a43287">read_timestep</a>(n) ; }</div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a5fba577d5ca6a8cbae451ddf741daf85">   56</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#a5fba577d5ca6a8cbae451ddf741daf85">param_post_init</a> () {<span class="keywordflow">return</span> P.<a class="code" href="structParam.html#aada6abb00bb83c905fb02b7216034965">post_init</a>() ; }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">/*std::string testing(std::string input) {</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">        FILE * in = fopen(input.c_str(), &quot;r&quot;) ;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">        printf(&quot;[%s]&quot;, input.c_str()) ;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">        if (in != nullptr)</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">        {</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">            printf(&quot;Starting reading\n&quot;) ;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">            while (!feof(in))</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">                fscanf(in,&quot;%*c&quot;) ;</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">            fclose(in) ;</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">            printf(&quot;Finished reading\n&quot;) ;</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">        }</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">        return(input) ;</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">    } */</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;} ;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//=========================================================</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#ae0bd04a7d8a839c2c8b06656e3b5d773">   75</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#ae0bd04a7d8a839c2c8b06656e3b5d773">CoarseGraining::setup_CG</a> ()</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;{</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="comment">//P.verify() ;</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">if</span> (C != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keyword">delete</span> C ;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    C = <span class="keyword">new</span> <a class="code" href="classCoarsing.html">Coarsing</a> (P.dim, P.boxes, P.boundaries, P.maxT) ;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> i : P.extrafields)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        C-&gt;add_extra_field(i.name, i.order, i.type) ;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">if</span> (P.window == <a class="code" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5">Windows::LucyND_Periodic</a>)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        C-&gt;setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta) ;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        C-&gt;setWindow(P.window,P.windowsize) ;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    pipeline = C-&gt;set_flags(P.flags) ;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">auto</span> extrafieldmap = C-&gt;grid_setfields() ;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    C-&gt;grid_neighbour() ;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    C-&gt;cT=-1 ;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">//-----------------------------------------</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a4c88fe310074bdbd73b7cfcfae76d3d1">   95</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#a4c88fe310074bdbd73b7cfcfae76d3d1">CoarseGraining::process_timestep</a> (<span class="keywordtype">int</span> ts_abs, <span class="keywordtype">bool</span> hasdonefirstpass)</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;{</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">int</span> ts = ts_abs - P.skipT ;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">bool</span> avg=false ;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">if</span> (P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">AverageType::Intermediate</a> || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>) avg=true ;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    P.read_timestep(ts+P.skipT) ; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    C-&gt;cT = ts ;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    P.set_data (C-&gt;data) ;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">if</span> (!hasdonefirstpass) <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a24553a2fdacf611cf1fb636d49cd3af7">Pass::Pass1</a>) C-&gt;pass_1() ;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ac4f12b9f7f5e5174f6fbf217e4aac5ab">Pass::VelFluct</a>) C-&gt;compute_fluc_vel (avg) ;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6011801aa1426e2fbec667ec4506de7">Pass::RotFluct</a>) C-&gt;compute_fluc_rot (avg) ;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a7dd0791ec75e1af594b61ed389686b9e">Pass::Pass2</a>) C-&gt;pass_2() ;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a668dec4bc0b6584e5f226846c7ed9dd9">Pass::Pass3</a>) C-&gt;pass_3() ;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882a710fdada10d085470e9dedfbdab857d3">Pass::Pass4</a>) C-&gt;pass_4() ;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">if</span> (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6fe7c4788d45e82f71472865f52e3f3">Pass::Pass5</a>) C-&gt;pass_5() ;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">return</span> 0 ;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;}</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">//------------------------------------------------------------</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a800031169bbee4283112a65a6568941b">  115</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCoarseGraining.html#a800031169bbee4283112a65a6568941b">CoarseGraining::process_fluct_from_avg</a>()</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ts=0 ; ts&lt;P.maxT ; ts++)</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        P.read_timestep(ts+P.skipT, <span class="keyword">true</span>) ;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        C-&gt;cT = ts ;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        P.set_data (C-&gt;data) ;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        C-&gt;pass_1() ;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="comment">// printf(&quot;\r&quot;) ;</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">if</span> (P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">AverageType::Intermediate</a>   || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>) <span class="comment">//Should be automatically verified when the function is called</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        C-&gt;mean_time(<span class="keyword">true</span>) ;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">return</span> 0 ;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;}</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="comment">//----------------------------------------------------------</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a17e73a3f2720a727705125f752e2ce00">  131</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#a17e73a3f2720a727705125f752e2ce00">CoarseGraining::process_all</a> ()</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;{</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordtype">bool</span> hasdonefirstpass = false ; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">if</span> ((P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">AverageType::Intermediate</a>   || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>) &amp;&amp;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        ((pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ac4f12b9f7f5e5174f6fbf217e4aac5ab">Pass::VelFluct</a>) || (pipeline &amp; <a class="code" href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6011801aa1426e2fbec667ec4506de7">Pass::RotFluct</a>)))</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        process_fluct_from_avg() ;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        hasdonefirstpass = true ; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    </div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ts=0 ; ts&lt;P.maxT ; ts++)</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    {</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="comment">// printf(&quot;\r%d &quot;, ts) ;</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        process_timestep(ts+P.skipT, hasdonefirstpass) ;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordflow">if</span> (P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eab068018251f551730c472862a3b2fca9">AverageType::Final</a> || P.timeaverage == <a class="code" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">AverageType::Both</a>)</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        C-&gt;mean_time(<span class="keyword">false</span>) ;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;}</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment">//------------------------------------------------------</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#af78b95ef8616d246c65164bd01005602">  150</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCoarseGraining.html#af78b95ef8616d246c65164bd01005602">CoarseGraining::write</a> ()</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;{</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;netCDF&quot;</span>)!=P.saveformat.end())   C-&gt;write_netCDF(P.save) ;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;vtk&quot;</span>)!=P.saveformat.end()) C-&gt;write_vtk (P.save) ;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;mat&quot;</span>)!=P.saveformat.end()) C-&gt;write_matlab(P.save, <span class="keyword">true</span>) ;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">if</span> (std::find(P.saveformat.begin(), P.saveformat.end(), <span class="stringliteral">&quot;numpy&quot;</span>)!=P.saveformat.end()) C-&gt;write_numpy(P.save, <span class="keyword">true</span>) ;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">//------------------------------------------------------</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a03651f67a7fb3962e564ea8a0e6c68e4">  158</a></span>&#160;std::vector&lt;double&gt; <a class="code" href="classCoarseGraining.html#a03651f67a7fb3962e564ea8a0e6c68e4">CoarseGraining::get_result</a>(<span class="keywordtype">int</span> ts_abs, std::string field, <span class="keywordtype">int</span> component)</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;{</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; <span class="keywordtype">int</span> ts = ts_abs - P.skipT ;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; <span class="keywordflow">if</span> (ts != C-&gt;cT) {printf(<span class="stringliteral">&quot;The requested timestep has not been processed.\n&quot;</span>); <span class="keywordflow">return</span> {} ; }</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; <span class="keywordtype">int</span> idx = C-&gt;get_id(field) ;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; idx += component ;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; std::vector &lt;double&gt; res ;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; res.resize(C-&gt;CGP.size()) ;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0 ; i&lt;res.size() ; i++)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;     res[i]=C-&gt;CGP[C-&gt;idx_FastFirst2SlowFirst(i)].fields[C-&gt;cT][idx] ;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; <span class="keywordflow">return</span> res ;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;}</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="comment">//-----------------------------------------------------</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">  171</a></span>&#160;std::vector&lt;double&gt; <a class="code" href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">CoarseGraining::get_gridinfo</a>()</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;{</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    std::vector&lt;double&gt; res ;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="comment">//origin</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    res.push_back(C-&gt;CGP[0].location[0]) ;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    res.push_back(C-&gt;CGP[0].location[1]) ;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    res.push_back(C-&gt;CGP[0].location[2]) ;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="comment">//spacing</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    res.push_back(C-&gt;dx[0]) ;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    res.push_back(C-&gt;dx[1]) ;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    res.push_back(C-&gt;dx[2]) ;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="comment">//dimensions</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    res.push_back(C-&gt;npt[0]) ;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    res.push_back(C-&gt;npt[1]) ;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    res.push_back(C-&gt;npt[2]) ;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordflow">return</span> res ;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;}</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="comment">//-----------------------------------------------------</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="line" href="classCoarseGraining.html#ac40e146719dc03de55ecbf3703c5ac45">  189</a></span>&#160;std::vector&lt;std::vector&lt;double&gt;&gt; <a class="code" href="classCoarseGraining.html#ac40e146719dc03de55ecbf3703c5ac45">CoarseGraining::get_spheres</a>(<span class="keywordtype">int</span> ts_abs)</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;{</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    std::vector&lt;std::vector&lt;double&gt;&gt; res ; res.resize(4) ; </div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">int</span> ts = ts_abs - P.skipT ;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    P.read_timestep(ts+P.skipT) ;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordtype">int</span> n =  P.get_num_particles() ; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;4 ; i++) res[i].resize(n) ; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordtype">double</span> *p ; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;3 ; i++) </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;       p = P.get_data(<a class="code" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a6fcf6a44eeee46cc0e15d6f0300da3c8">DataValue::pos</a>, i) ;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;       <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0 ; j&lt;n ; j++)</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;           res[i][j]=p[j] ; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    p = P.get_data(<a class="code" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a">DataValue::radius</a>) ;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0 ; j&lt;n ; j++)</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        res[3][j]=p[j] ; </div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">return</span> res ;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;}</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="preprocessor">#ifdef EMSCRIPTEN</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="preprocessor">#ifdef USEBINDINGS</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">    #include &quot;<a class="code" href="em__bindings_8h.html">em_bindings.h</a>&quot;</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aCoarseGraining_2Parameters_8h_html"><div class="ttname"><a href="CoarseGraining_2Parameters_8h.html">Parameters.h</a></div></div>
 <div class="ttc" id="aCoarseGraining_2Typedefs_8h_html"><div class="ttname"><a href="CoarseGraining_2Typedefs_8h.html">Typedefs.h</a></div></div>
 <div class="ttc" id="aCoarseGraining_2json_8hpp_html"><div class="ttname"><a href="CoarseGraining_2json_8hpp.html">json.hpp</a></div></div>
@@ -273,22 +297,24 @@ $(function() {
 <div class="ttc" id="aReader_8h_html"><div class="ttname"><a href="Reader_8h.html">Reader.h</a></div></div>
 <div class="ttc" id="aWindowLibrary_8h_html_af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5"><div class="ttname"><a href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5">Windows::LucyND_Periodic</a></div><div class="ttdeci">@ LucyND_Periodic</div></div>
 <div class="ttc" id="aclassCoarseGraining_html"><div class="ttname"><a href="classCoarseGraining.html">CoarseGraining</a></div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:32</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a03651f67a7fb3962e564ea8a0e6c68e4"><div class="ttname"><a href="classCoarseGraining.html#a03651f67a7fb3962e564ea8a0e6c68e4">CoarseGraining::get_result</a></div><div class="ttdeci">std::vector&lt; double &gt; get_result(int ts, std::string field, int component)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:156</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a03651f67a7fb3962e564ea8a0e6c68e4"><div class="ttname"><a href="classCoarseGraining.html#a03651f67a7fb3962e564ea8a0e6c68e4">CoarseGraining::get_result</a></div><div class="ttdeci">std::vector&lt; double &gt; get_result(int ts, std::string field, int component)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:158</div></div>
 <div class="ttc" id="aclassCoarseGraining_html_a0b11153dc64375763e99e2651ecb55fb"><div class="ttname"><a href="classCoarseGraining.html#a0b11153dc64375763e99e2651ecb55fb">CoarseGraining::P</a></div><div class="ttdeci">Param P</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:35</div></div>
 <div class="ttc" id="aclassCoarseGraining_html_a15f87f99b714f9b27ff1465177adeea6"><div class="ttname"><a href="classCoarseGraining.html#a15f87f99b714f9b27ff1465177adeea6">CoarseGraining::CoarseGraining</a></div><div class="ttdeci">CoarseGraining()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:34</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a17e73a3f2720a727705125f752e2ce00"><div class="ttname"><a href="classCoarseGraining.html#a17e73a3f2720a727705125f752e2ce00">CoarseGraining::process_all</a></div><div class="ttdeci">void process_all()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:129</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a1b8ba1632b0d13cdb3171938695b4b43"><div class="ttname"><a href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">CoarseGraining::param_get_bounds</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; param_get_bounds(int file=0)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:50</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a4c88fe310074bdbd73b7cfcfae76d3d1"><div class="ttname"><a href="classCoarseGraining.html#a4c88fe310074bdbd73b7cfcfae76d3d1">CoarseGraining::process_timestep</a></div><div class="ttdeci">int process_timestep(int ts, bool hasdonefirstpass=false)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:93</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a5fba577d5ca6a8cbae451ddf741daf85"><div class="ttname"><a href="classCoarseGraining.html#a5fba577d5ca6a8cbae451ddf741daf85">CoarseGraining::param_post_init</a></div><div class="ttdeci">void param_post_init()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:54</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a6ba0181d8241cbee37a2d1295ec39946"><div class="ttname"><a href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">CoarseGraining::param_get_numts</a></div><div class="ttdeci">int param_get_numts(int file=0)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:51</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a800031169bbee4283112a65a6568941b"><div class="ttname"><a href="classCoarseGraining.html#a800031169bbee4283112a65a6568941b">CoarseGraining::process_fluct_from_avg</a></div><div class="ttdeci">int process_fluct_from_avg()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:113</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a87460c5b2529de3e4c21f7e1383f0496"><div class="ttname"><a href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">CoarseGraining::get_gridinfo</a></div><div class="ttdeci">std::vector&lt; double &gt; get_gridinfo()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:169</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a17e73a3f2720a727705125f752e2ce00"><div class="ttname"><a href="classCoarseGraining.html#a17e73a3f2720a727705125f752e2ce00">CoarseGraining::process_all</a></div><div class="ttdeci">void process_all()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:131</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a1b8ba1632b0d13cdb3171938695b4b43"><div class="ttname"><a href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">CoarseGraining::param_get_bounds</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; param_get_bounds(int file=0)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:51</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a4c88fe310074bdbd73b7cfcfae76d3d1"><div class="ttname"><a href="classCoarseGraining.html#a4c88fe310074bdbd73b7cfcfae76d3d1">CoarseGraining::process_timestep</a></div><div class="ttdeci">int process_timestep(int ts, bool hasdonefirstpass=false)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:95</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a5fba577d5ca6a8cbae451ddf741daf85"><div class="ttname"><a href="classCoarseGraining.html#a5fba577d5ca6a8cbae451ddf741daf85">CoarseGraining::param_post_init</a></div><div class="ttdeci">void param_post_init()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:56</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a6ba0181d8241cbee37a2d1295ec39946"><div class="ttname"><a href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">CoarseGraining::param_get_numts</a></div><div class="ttdeci">int param_get_numts(int file=0)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:53</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a800031169bbee4283112a65a6568941b"><div class="ttname"><a href="classCoarseGraining.html#a800031169bbee4283112a65a6568941b">CoarseGraining::process_fluct_from_avg</a></div><div class="ttdeci">int process_fluct_from_avg()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:115</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a87460c5b2529de3e4c21f7e1383f0496"><div class="ttname"><a href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">CoarseGraining::get_gridinfo</a></div><div class="ttdeci">std::vector&lt; double &gt; get_gridinfo()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:171</div></div>
 <div class="ttc" id="aclassCoarseGraining_html_a87dc80a05b0a0366cee3539fcfaf0510"><div class="ttname"><a href="classCoarseGraining.html#a87dc80a05b0a0366cee3539fcfaf0510">CoarseGraining::pipeline</a></div><div class="ttdeci">Pass pipeline</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:37</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_a950b31e59564f642a070666da6cd03a1"><div class="ttname"><a href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">CoarseGraining::param_from_json_string</a></div><div class="ttdeci">void param_from_json_string(std::string param)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:49</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_aaa48140c0bbb711dce411727544b498d"><div class="ttname"><a href="classCoarseGraining.html#aaa48140c0bbb711dce411727544b498d">CoarseGraining::param_read_timestep</a></div><div class="ttdeci">int param_read_timestep(int n)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:53</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_ae0bd04a7d8a839c2c8b06656e3b5d773"><div class="ttname"><a href="classCoarseGraining.html#ae0bd04a7d8a839c2c8b06656e3b5d773">CoarseGraining::setup_CG</a></div><div class="ttdeci">void setup_CG()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:73</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_ae5445097512cf60f8a8096c32082592f"><div class="ttname"><a href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">CoarseGraining::debug</a></div><div class="ttdeci">void debug()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:52</div></div>
-<div class="ttc" id="aclassCoarseGraining_html_af78b95ef8616d246c65164bd01005602"><div class="ttname"><a href="classCoarseGraining.html#af78b95ef8616d246c65164bd01005602">CoarseGraining::write</a></div><div class="ttdeci">void write()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:148</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_a950b31e59564f642a070666da6cd03a1"><div class="ttname"><a href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">CoarseGraining::param_from_json_string</a></div><div class="ttdeci">void param_from_json_string(std::string param)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:50</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_aaa48140c0bbb711dce411727544b498d"><div class="ttname"><a href="classCoarseGraining.html#aaa48140c0bbb711dce411727544b498d">CoarseGraining::param_read_timestep</a></div><div class="ttdeci">int param_read_timestep(int n)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:55</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5"><div class="ttname"><a href="classCoarseGraining.html#ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5">CoarseGraining::param_get_minmaxradius</a></div><div class="ttdeci">std::vector&lt; double &gt; param_get_minmaxradius(int file=0)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:52</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_ac40e146719dc03de55ecbf3703c5ac45"><div class="ttname"><a href="classCoarseGraining.html#ac40e146719dc03de55ecbf3703c5ac45">CoarseGraining::get_spheres</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; get_spheres(int ts_abs)</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:189</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_ae0bd04a7d8a839c2c8b06656e3b5d773"><div class="ttname"><a href="classCoarseGraining.html#ae0bd04a7d8a839c2c8b06656e3b5d773">CoarseGraining::setup_CG</a></div><div class="ttdeci">void setup_CG()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:75</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_ae5445097512cf60f8a8096c32082592f"><div class="ttname"><a href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">CoarseGraining::debug</a></div><div class="ttdeci">void debug()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:54</div></div>
+<div class="ttc" id="aclassCoarseGraining_html_af78b95ef8616d246c65164bd01005602"><div class="ttname"><a href="classCoarseGraining.html#af78b95ef8616d246c65164bd01005602">CoarseGraining::write</a></div><div class="ttdeci">void write()</div><div class="ttdef"><b>Definition:</b> CoarseGraining.h:150</div></div>
 <div class="ttc" id="aclassCoarsing_html"><div class="ttname"><a href="classCoarsing.html">Coarsing</a></div><div class="ttdoc">Main Coarse graining class.</div><div class="ttdef"><b>Definition:</b> Coarsing.h:141</div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> json.hpp:17064</div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> json.hpp:23644</div></div>
@@ -304,6 +330,8 @@ $(function() {
 <div class="ttc" id="agroup__CoarseGraining_html_ggabe77423eb27f643233ef051559a64882ac4f12b9f7f5e5174f6fbf217e4aac5ab"><div class="ttname"><a href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ac4f12b9f7f5e5174f6fbf217e4aac5ab">VelFluct</a></div><div class="ttdeci">@ VelFluct</div><div class="ttdef"><b>Definition:</b> Coarsing.h:62</div></div>
 <div class="ttc" id="agroup__CoarseGraining_html_ggabe77423eb27f643233ef051559a64882ae6011801aa1426e2fbec667ec4506de7"><div class="ttname"><a href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6011801aa1426e2fbec667ec4506de7">RotFluct</a></div><div class="ttdeci">@ RotFluct</div><div class="ttdef"><b>Definition:</b> Coarsing.h:62</div></div>
 <div class="ttc" id="agroup__CoarseGraining_html_ggabe77423eb27f643233ef051559a64882ae6fe7c4788d45e82f71472865f52e3f3"><div class="ttname"><a href="group__CoarseGraining.html#ggabe77423eb27f643233ef051559a64882ae6fe7c4788d45e82f71472865f52e3f3">Pass5</a></div><div class="ttdeci">@ Pass5</div><div class="ttdef"><b>Definition:</b> Coarsing.h:61</div></div>
+<div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431a6fcf6a44eeee46cc0e15d6f0300da3c8"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a6fcf6a44eeee46cc0e15d6f0300da3c8">pos</a></div><div class="ttdeci">@ pos</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
+<div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a">radius</a></div><div class="ttdeci">@ radius</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
 <div class="ttc" id="agzip_8hpp_html"><div class="ttname"><a href="gzip_8hpp.html">gzip.hpp</a></div></div>
 <div class="ttc" id="anamespaceemscripten_html"><div class="ttname"><a href="namespaceemscripten.html">emscripten</a></div><div class="ttdef"><b>Definition:</b> emscripten_specific.h:148</div></div>
 <div class="ttc" id="astructParam_html"><div class="ttname"><a href="structParam.html">Param</a></div><div class="ttdoc">Contains the parameters of the simulation &amp; CG.</div><div class="ttdef"><b>Definition:</b> IOLiggghts.h:67</div></div>

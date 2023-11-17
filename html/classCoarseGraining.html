@@ -90,10 +90,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a03651f67a7fb3962e564ea8a0e6c68e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87460c5b2529de3e4c21f7e1383f0496"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#a87460c5b2529de3e4c21f7e1383f0496">get_gridinfo</a> ()</td></tr>
 <tr class="separator:a87460c5b2529de3e4c21f7e1383f0496"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac40e146719dc03de55ecbf3703c5ac45"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#ac40e146719dc03de55ecbf3703c5ac45">get_spheres</a> (int ts_abs)</td></tr>
+<tr class="separator:ac40e146719dc03de55ecbf3703c5ac45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a950b31e59564f642a070666da6cd03a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#a950b31e59564f642a070666da6cd03a1">param_from_json_string</a> (std::string param)</td></tr>
 <tr class="separator:a950b31e59564f642a070666da6cd03a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b8ba1632b0d13cdb3171938695b4b43"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#a1b8ba1632b0d13cdb3171938695b4b43">param_get_bounds</a> (int file=0)</td></tr>
 <tr class="separator:a1b8ba1632b0d13cdb3171938695b4b43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5">param_get_minmaxradius</a> (int file=0)</td></tr>
+<tr class="separator:ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ba0181d8241cbee37a2d1295ec39946"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#a6ba0181d8241cbee37a2d1295ec39946">param_get_numts</a> (int file=0)</td></tr>
 <tr class="separator:a6ba0181d8241cbee37a2d1295ec39946"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5445097512cf60f8a8096c32082592f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCoarseGraining.html#ae5445097512cf60f8a8096c32082592f">debug</a> ()</td></tr>
@@ -215,6 +219,24 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac40e146719dc03de55ecbf3703c5ac45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac40e146719dc03de55ecbf3703c5ac45">&#9670;&nbsp;</a></span>get_spheres()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::vector&lt; double &gt; &gt; CoarseGraining::get_spheres </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ts_abs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a950b31e59564f642a070666da6cd03a1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a950b31e59564f642a070666da6cd03a1">&#9670;&nbsp;</a></span>param_from_json_string()</h2>
 
@@ -252,6 +274,32 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;std::vector&lt;double&gt; &gt; CoarseGraining::param_get_bounds </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>file</em> = <code>0</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2bdfcfa9d86f8dc3e5b3c03ca98c0e5">&#9670;&nbsp;</a></span>param_get_minmaxradius()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; CoarseGraining::param_get_minmaxradius </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>file</em> = <code>0</code></td><td>)</td>

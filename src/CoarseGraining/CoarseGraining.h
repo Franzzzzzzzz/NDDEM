@@ -44,10 +44,12 @@ public:
     void write () ;
     std::vector<double> get_result(int ts, std::string field, int component) ;
     std::vector<double> get_gridinfo() ;
+    std::vector<std::vector<double>> get_spheres(int ts_abs) ; 
 
     // Expose functions from member classes for js access
     void param_from_json_string (std::string param)  { json jsonparam =json::parse(param) ; return P.from_json(jsonparam) ; }
     std::vector<std::vector<double>> param_get_bounds (int file = 0) {return P.files[file].reader->get_bounds() ; }
+    std::vector<double> param_get_minmaxradius (int file = 0) {return P.files[file].reader->get_minmaxradius() ; }
     int param_get_numts(int file = 0) {return P.files[file].reader->get_numts(); }
     void debug () {/*char resc[5000] ; sprintf(resc, "%d %X", P.files.size(), P.files[0].reader) ; return resc ; */printf("BLAAAA\n") ; }
     int param_read_timestep(int n) {return P.read_timestep(n) ; }
@@ -184,6 +186,28 @@ std::vector<double> CoarseGraining::get_gridinfo()
     return res ;
 }
 //-----------------------------------------------------
+std::vector<std::vector<double>> CoarseGraining::get_spheres(int ts_abs)
+{
+    std::vector<std::vector<double>> res ; res.resize(4) ; 
+    int ts = ts_abs - P.skipT ;
+    P.read_timestep(ts+P.skipT) ;
+    
+    int n =  P.get_num_particles() ; 
+    for (int i=0 ; i<4 ; i++) res[i].resize(n) ; 
+    
+    double *p ; 
+    for (int i=0 ; i<3 ; i++) 
+    {
+       p = P.get_data(DataValue::pos, i) ;
+       for (int j=0 ; j<n ; j++)
+           res[i][j]=p[j] ; 
+    }
+    p = P.get_data(DataValue::radius) ;
+    for (int j=0 ; j<n ; j++)
+        res[3][j]=p[j] ; 
+    
+    return res ;
+}
 
 #ifdef EMSCRIPTEN
 #ifdef USEBINDINGS

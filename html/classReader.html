@@ -98,6 +98,8 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a93617c0a1c6ebc7228c296cd84d3a540"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a93617c0a1c6ebc7228c296cd84d3a540">get_bounds</a> ()</td></tr>
 <tr class="separator:a93617c0a1c6ebc7228c296cd84d3a540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3aa87f2e6fa43e1944b0bd350528c27"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#ae3aa87f2e6fa43e1944b0bd350528c27">get_minmaxradius</a> ()</td></tr>
+<tr class="separator:ae3aa87f2e6fa43e1944b0bd350528c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf3db4e92f60ec13062e0e30c7af3c76"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#adf3db4e92f60ec13062e0e30c7af3c76">get_dimension</a> ()</td></tr>
 <tr class="separator:adf3db4e92f60ec13062e0e30c7af3c76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc20198c363687bac214ac08ab85ab5b"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#abc20198c363687bac214ac08ab85ab5b">get_numts</a> ()</td></tr>
@@ -166,8 +168,6 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a679846d260ede5b522da376bab63be3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefaa372af939643579e5b6379cff6a11"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#aefaa372af939643579e5b6379cff6a11">Density</a> =-1</td></tr>
 <tr class="separator:aefaa372af939643579e5b6379cff6a11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45673d0ef69aa41a2c6258417b728df4"><td class="memItemLeft" align="right" valign="top">const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a45673d0ef69aa41a2c6258417b728df4">pbcthreshold</a> = 2.</td></tr>
-<tr class="separator:a45673d0ef69aa41a2c6258417b728df4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6fa3c27ee3b57206583615aba1c954a6"></a>
@@ -474,6 +474,33 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Reimplemented in <a class="el" href="classNDDEMReader.html#a2be0db176181c9a8ad3a40feb033094d">NDDEMReader</a>, and <a class="el" href="classMercuryReader.html#a1012abb3c81a075d10f5c2555b41491d">MercuryReader</a>.</p>
+
+</div>
+</div>
+<a id="ae3aa87f2e6fa43e1944b0bd350528c27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3aa87f2e6fa43e1944b0bd350528c27">&#9670;&nbsp;</a></span>get_minmaxradius()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;double&gt; Reader::get_minmaxradius </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classYadeReader.html#ae03aded6caa8c52d0e77c6f99c80747d">YadeReader</a>.</p>
 
 </div>
 </div>
@@ -906,28 +933,6 @@ Private Attributes</h2></td></tr>
           <td class="memname">std::string Reader::path</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a45673d0ef69aa41a2c6258417b728df4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45673d0ef69aa41a2c6258417b728df4">&#9670;&nbsp;</a></span>pbcthreshold</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const double Reader::pbcthreshold = 2.</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

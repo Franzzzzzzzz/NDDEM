@@ -99,7 +99,7 @@ public:
     int build_index () ;
     int get_num_contacts () {return Nc;}
     int read_timestep(int ts) ; 
-    double * get_data (DataValue datavalue, int dd) {
+    virtual double * get_data (DataValue datavalue, int dd, std::string name="") {
         switch(datavalue) {
             case DataValue::id1 : return &(data[0][0]) ;
             case DataValue::id2 : return &(data[1][0] ) ;

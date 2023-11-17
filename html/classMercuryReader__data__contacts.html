@@ -95,8 +95,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1933f56aff70196e37aef0e18bc59ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1a3e5198e3fa8c5b4a315ea912d4189"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMercuryReader__data__contacts.html#ac1a3e5198e3fa8c5b4a315ea912d4189">read_timestep</a> (int ts)</td></tr>
 <tr class="separator:ac1a3e5198e3fa8c5b4a315ea912d4189"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75412533fdd867536e723f715aee4147"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMercuryReader__data__contacts.html#a75412533fdd867536e723f715aee4147">get_data</a> (<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431">DataValue</a> datavalue, int dd)</td></tr>
-<tr class="separator:a75412533fdd867536e723f715aee4147"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a778b63bf57f5ce25f566474521c06006"><td class="memItemLeft" align="right" valign="top">virtual double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMercuryReader__data__contacts.html#a778b63bf57f5ce25f566474521c06006">get_data</a> (<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431">DataValue</a> datavalue, int dd, std::string name=&quot;&quot;)</td></tr>
+<tr class="separator:a778b63bf57f5ce25f566474521c06006"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classMercuryReader"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classMercuryReader')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classMercuryReader.html">MercuryReader</a></td></tr>
 <tr class="memitem:a1012abb3c81a075d10f5c2555b41491d inherit pub_methods_classMercuryReader"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMercuryReader.html#a1012abb3c81a075d10f5c2555b41491d">get_dimension</a> ()</td></tr>
 <tr class="separator:a1012abb3c81a075d10f5c2555b41491d inherit pub_methods_classMercuryReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -107,6 +107,8 @@ Public Member Functions</h2></td></tr>
 <tr class="inherit_header pub_methods_classReader"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classReader')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classReader.html">Reader</a></td></tr>
 <tr class="memitem:a93617c0a1c6ebc7228c296cd84d3a540 inherit pub_methods_classReader"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a93617c0a1c6ebc7228c296cd84d3a540">get_bounds</a> ()</td></tr>
 <tr class="separator:a93617c0a1c6ebc7228c296cd84d3a540 inherit pub_methods_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3aa87f2e6fa43e1944b0bd350528c27 inherit pub_methods_classReader"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#ae3aa87f2e6fa43e1944b0bd350528c27">get_minmaxradius</a> ()</td></tr>
+<tr class="separator:ae3aa87f2e6fa43e1944b0bd350528c27 inherit pub_methods_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc20198c363687bac214ac08ab85ab5b inherit pub_methods_classReader"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#abc20198c363687bac214ac08ab85ab5b">get_numts</a> ()</td></tr>
 <tr class="separator:abc20198c363687bac214ac08ab85ab5b inherit pub_methods_classReader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e46509935970c4f1a4f7dfc48c0e130 inherit pub_methods_classReader"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a5e46509935970c4f1a4f7dfc48c0e130">get_num_particles</a> ()</td></tr>
@@ -236,8 +238,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a75412533fdd867536e723f715aee4147"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75412533fdd867536e723f715aee4147">&#9670;&nbsp;</a></span>get_data()</h2>
+<a id="a778b63bf57f5ce25f566474521c06006"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a778b63bf57f5ce25f566474521c06006">&#9670;&nbsp;</a></span>get_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -246,7 +248,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double* MercuryReader_data_contacts::get_data </td>
+          <td class="memname">virtual double* MercuryReader_data_contacts::get_data </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431">DataValue</a>&#160;</td>
           <td class="paramname"><em>datavalue</em>, </td>
@@ -255,7 +257,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>dd</em>&#160;</td>
+          <td class="paramname"><em>dd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -265,7 +273,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

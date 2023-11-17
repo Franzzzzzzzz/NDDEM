@@ -37,8 +37,9 @@ onmessage = async function(e) {
         var nts= CG.param_get_numts(0) ;
         console.log(nts) ; 
         var bounds = CG.param_get_bounds(0) ;
+        var windowsize = CG.param_get_minmaxradius(0) ;
         console.log(bounds) ; 
-        postMessage(['initialised', nts, bounds]) ; 
+        postMessage(['initialised', nts, bounds, windowsize]) ; 
     }
     else if (e.data[0] == 'setparameters')
     {
@@ -63,6 +64,11 @@ onmessage = async function(e) {
         var res=CG.get_result(e.data[1], e.data[2], e.data[3]) ;
         var res2=CG.get_gridinfo() ;
         postMessage(["resultobtained", res, res2]) ; 
+    }
+    else if (e.data[0] == 'getspheres')
+    {
+        var res = CG.get_spheres(e.data[1]) ;
+        postMessage(["sphereinfos", res]) ;
     }
     }
     catch (error) {
