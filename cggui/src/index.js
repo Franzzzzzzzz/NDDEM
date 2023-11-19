@@ -381,6 +381,7 @@ document.getElementById("updatefile").addEventListener('click', async() => {
         data["file"][1].mapping={"id1": "c_cout[1]", "id2": "c_cout[2]", "per": "c_cout[3]", "fx": "c_cout[4]", "fy": "c_cout[5]", "fz": "c_cout[6]"} ;
     
     console.log(data)
+    document.getElementById("wait").hidden=false ; 
     worker.postMessage([ 'initialise', data, document.getElementById("filename1").files, document.getElementById("filename2").files])
     console.log("HERE") 
     isedit=false ;
@@ -950,6 +951,7 @@ worker.onmessage = function (e)
      update_parameters();
      
      initialised=true; 
+     document.getElementById("wait").hidden=true ; 
  }
  else if (e.data[0] == 'parametrised')
  {
