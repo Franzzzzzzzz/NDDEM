@@ -49,6 +49,7 @@ public:
     //int read_full_ts(bool keep) ;
     //int set_data(struct Data & D, std::map<string,size_t> extrafieldmap) ;
     std::vector<vector<double>> get_bounds () ;
+    std::vector<double> get_minmaxradius() ; 
     int get_numts () ;
     int read_timestep (int ts) ; 
     int get_num_particles () {return Nitem ; }

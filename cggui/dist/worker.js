@@ -1,5 +1,6 @@
 {
 let isinitialised = false ; 
+let ismounted = false ;
 let CGlib ;
 let CG ; 
 
@@ -13,12 +14,28 @@ onmessage = async function(e) {
     {
         await initialise() ;
         isinitialised=true ; 
-        CGlib.FS.mkdir('/work'); 
     }
-    else if (isinitialised && e.data[0]=='initialise')
-    {
+    
+    try {
+    /*if (ismounted && e.data[0]=='initialise')
+    { 
         CGlib.FS.unmount('/work') ; 
+        ismounted=false ; 
+    }    */
+    if (!ismounted)
+    {
+        ismounted=true ; 
     }
+    }
+    catch (error) {
+        console.error(error);
+    }
+    /*else if (isinitialised && e.data[0]=='initialise')
+    { 
+        console.log("Bla")
+        CGlib.FS.unmount('/work') ; 
+        console.log("Bla")
+    }*/
     
     try {
     if (e.data[0] == 'initialise')
@@ -26,14 +43,35 @@ onmessage = async function(e) {
         for (var i=0 ; i<2 ; i++)
         {
             if (e.data[2+i].length==0) continue ; 
-            CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/work');
-            var name = e.data[1]["file"][i].filename.split(/(\\|\/)/g).pop()
-            e.data[1]["file"][i].filename = '/work/'+name ; 
+            if (e.data[1]["file"][i].action=="donothing") continue ; 
+            
+            if (i==0)
+            {
+                var name = e.data[1]["file"][i].filename.split(/(\\|\/)/g).pop()
+                e.data[1]["file"][i].filename = '/work/'+name ; 
+                console.log("P") ;
+                CGlib.FS.mkdir('/work'); 
+                console.log("Q") ;
+                CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/work');
+            }
+            if (i==1)
+            {
+                var name = e.data[1]["file"][i].filename.split(/(\\|\/)/g).pop()
+                e.data[1]["file"][i].filename = '/contact/'+name ; 
+                console.log("M") ;
+                CGlib.FS.mkdir('/contact'); 
+                console.log("N") ;
+                CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/contact');
+            }
         }
         
         var cstring = JSON.stringify(e.data[1]) ; 
+        console.log("Z") ; 
+        console.log(cstring) ;
         CG.param_from_json_string (cstring) ;
+        console.log("A") ; 
         CG.param_from_json_string ("{}") ;
+        console.log("B") ; 
         var nts= CG.param_get_numts(0) ;
         console.log(nts) ; 
         var bounds = CG.param_get_bounds(0) ;

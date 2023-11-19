@@ -71,13 +71,10 @@ mapper.setSampleDistance(1.1);
 actor.setMapper(mapper);
 
 const clipPlane1 = vtkPlane.newInstance();
-const clipPlane2 = vtkPlane.newInstance();
 let clipPlane1Position = 0;
-let clipPlane2Position = 0;
 let clipPlane1RotationAngle = 0;
 let clipPlane2RotationAngle = 0;
 const clipPlane1Normal = [-1, 1, 0];
-const clipPlane2Normal = [0, 0, 1];
 const rotationNormal = [0, 1, 0];
 
 // create color and opacity transfer functions
@@ -271,7 +268,7 @@ document.querySelector('.addfile').addEventListener('click', async () => {
 function filenameupdate (filelist)
 {
     document.getElementById("updatefile").style.visibility = "visible";
-    document.getElementById("filetype").hidden=false ; 
+    document.getElementById("filetype"+String(curfile)).hidden=false ; 
     let pattern=null ; 
     if (filelist.length>1)
     {
@@ -298,7 +295,7 @@ function filenameupdate (filelist)
         const matches =filelist[0].name.match(/vtu/g);
         if (matches && matches.length > 0) 
         {
-            document.getElementById("filetype").selectedIndex=1 ;
+            document.getElementById("filetype"+String(curfile)).selectedIndex=1 ;
         }
         document.getElementById("file_initial").value=Math.min(...numbers) ; 
         document.getElementById("file_delta").value=(Math.max(...numbers)-Math.min(...numbers))/(filelist.length-1); 
@@ -321,7 +318,7 @@ document.getElementById("filename2").addEventListener('change', async() =>
 document.getElementById("cancelfile").addEventListener('click', async() =>
 {
     //document.getElementById("filename"+String(curfile)).value="" ; 
-    document.getElementById("filetype").hidden=true ; 
+    document.getElementById("filetype"+String(curfile)).hidden=true ; 
     document.getElementById("file_multifile").hidden=true ;
     document.getElementById("file_delta").value="" ; 
     document.getElementById("file_initial").value="" ;
@@ -336,7 +333,7 @@ document.getElementById("cancelfile").addEventListener('click', async() =>
 document.getElementById("updatefile").addEventListener('click', async() => {
     var name = "file" + String(curfile) ; 
     document.getElementById(name+"_number").innerHTML = document.getElementById("filename"+String(curfile)).files.length + " file(s)" ; 
-    document.getElementById(name+"_type").value=document.getElementById("filetype").value ; 
+    document.getElementById(name+"_type").value=document.getElementById("filetype"+String(curfile)).value ; 
     document.getElementById(name+"_delta").value=document.getElementById("file_delta").value ; 
     document.getElementById(name+"_initial").value=document.getElementById("file_initial").value ;
     document.getElementById(name+"_pattern").value=document.getElementById("file_pattern").value ;
@@ -360,11 +357,28 @@ document.getElementById("updatefile").addEventListener('click', async() => {
     else 
         document.getElementById("remove"+name).visible==false ; 
     document.getElementById("addfileform").style.display = "None"; 
+    document.getElementById("filename"+String(curfile)).hidden=true ; 
+    document.getElementById("filetype"+String(curfile)).hidden=true ; 
+    document.getElementById("updatefile").style.visibility="hidden" ; 
+    
+    if (curfile==1)
+    {
+        if (document.getElementById("filetype1").value==3) document.querySelector('.addfile').hidden=true ; 
+        else 
+        {
+            document.querySelector('.addfile').hidden=false ; 
+            document.querySelector('.addfile').innerHTML="Add contact file" ; 
+        }        
+    }
     
     var data=build_file_json() ;
     for(i=0 ; i<data["file"].length ; i++) data["file"][i]["action"]="donothing" ; 
     if (isedit) data.file[curfile-1]["action"]="edit" ; 
     else data["file"][curfile-1]["action"]="create" ; 
+    
+    // Liggghts contact only
+    if (data["file"].length>1)
+        data["file"][1].mapping={"id1": "c_cout[1]", "id2": "c_cout[2]", "per": "c_cout[3]", "fx": "c_cout[4]", "fy": "c_cout[5]", "fz": "c_cout[6]"} ;
     
     console.log(data)
     worker.postMessage([ 'initialise', data, document.getElementById("filename1").files, document.getElementById("filename2").files])
@@ -376,7 +390,7 @@ function fileformedit()
 {
     var name = "file" + String(curfile) ;
     document.getElementById("filename"+String(curfile)).hidden=false ; 
-    document.getElementById("filetype").value=document.getElementById(name+"_type").value ; 
+    document.getElementById("filetype"+String(curfile)).value=document.getElementById(name+"_type").value ; 
     if (document.getElementById(name+"_delta").hidden == false)
     {
         document.getElementById("file_multifile").hidden=false ;
@@ -924,7 +938,7 @@ worker.onmessage = function (e)
      if (e.data[3].length>0)
      {
          document.getElementById('windowsize').value = e.data[3][1]*4 ; 
-         document.getElementById('windowsize').step = Math.pow(10,Math.floor(Math.log10(0.0562))) ; 
+         document.getElementById('windowsize').step = Math.pow(10,Math.floor(Math.log10(document.getElementById('windowsize').value))-1) ; 
      }
      timeslider.noUiSlider.updateOptions({range: {'min': 0,'max': e.data[1]-1}}) ; 
      timeslider.noUiSlider.set([0,e.data[1]-1]) ; 
@@ -977,7 +991,6 @@ worker.onmessage = function (e)
         dataType: VtkDataTypes.FLOAT, // values encoding
         name: 'scalars'
     });
-
     
     var img = vtkImageData.newInstance();
     img.setOrigin(e.data[2][0], e.data[2][1], e.data[2][2]);
@@ -985,6 +998,13 @@ worker.onmessage = function (e)
     img.setExtent(0, e.data[2][6]-1, 0, e.data[2][7]-1, 0, e.data[2][8]-1);
     //img.setExtent(e.data[2][0], e.data[2][0]+(e.data[2][6]-1)*e.data[2][3], e.data[2][1], e.data[2][1]+(e.data[2][7]-1)*e.data[2][4], e.data[2][2], e.data[2][2]+(e.data[2][8]-1)*e.data[2][5]); 
     img.getPointData().setScalars(scalars);
+    
+    console.log(document.getElementById('cliptype').value)
+    if (document.getElementById('cliptype').value==0)
+    {
+        clipPlane1.setNormal([1,0,0]);
+        clipPlane1.setOrigin([parseFloat(document.getElementById('xmin').value),0,0]);
+    }    
     
     if (document.getElementById('lockcscale').checked)
     {

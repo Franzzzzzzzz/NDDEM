@@ -104,7 +104,7 @@
 <!--         Future: LucyND_Periodic -->
     </select><br>
     <label for="windowsize">Window size:</label>
-    <input type="number" id="windowsize" disabled name="windowsize" step="0.05" value="1" style="width:20%;"> 
+    <input type="number" id="windowsize" disabled name="windowsize" step="0.05" value="1" min="0.00001" style="width:20%;"> 
 </div> 
 
 <button type="button" class="collapsible">Grid</button>
@@ -227,11 +227,14 @@
 <div class="form-popup" id="addfileform">
 <h3 style="text-align:center;"> Add file(s) to process </h3>
 <input type="file" id="filename1" multiple="multiple" hidden><input type="file" id="filename2" multiple="multiple" hidden><br>
-<select name="filetype" id="filetype" hidden>
+<select name="filetype1" id="filetype1" hidden>
     <option value="LiggghtsParticles">Liggghts (particles)</option>
     <option value="Yade">Yade (particles)</option>
     <option value="MercuryVTUParticles">Mercury VTU (particles)</option>
     <option value="NDDEM">NDDEM (particles and contacts)</option>
+</select>
+<select name="filetype2" id="filetype2" hidden>
+    <option value="LiggghtsContacts">Liggghts (contacts)</option>
 </select><br>
 <div id="file_multifile" hidden>
     <br>

@@ -20,6 +20,20 @@ vector<vector<double>> LiggghtsReader::get_bounds()
  reset() ; 
  return (res) ;
 }
+//-----------------------------------------------------------
+vector<double> LiggghtsReader::get_minmaxradius()
+{
+  read_timestep(0) ; 
+  double * r = get_data(DataValue::radius, 0) ; 
+  int n = get_num_particles() ; 
+  double minr=r[0], maxr=r[0] ; 
+  for (int i=0 ; i<n ; i++)
+  {
+    if (r[i]>maxr) maxr=r[i] ; 
+    if (r[i]<minr) minr=r[i] ;
+  }
+  return {minr, maxr} ; 
+}
 //------------------------------------------------------------
 int LiggghtsReader::get_numts()
 {
@@ -29,7 +43,7 @@ int LiggghtsReader::get_numts()
  do
  {
    getline(*in, line) ;
-   if (line == "ITEM: TIMESTEP") 
+   if (line[0]=='I' && line == "ITEM: TIMESTEP") 
    { 
        numts++ ;
        if (is_seekable)
