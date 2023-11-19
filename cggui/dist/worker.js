@@ -49,29 +49,22 @@ onmessage = async function(e) {
             {
                 var name = e.data[1]["file"][i].filename.split(/(\\|\/)/g).pop()
                 e.data[1]["file"][i].filename = '/work/'+name ; 
-                console.log("P") ;
                 CGlib.FS.mkdir('/work'); 
-                console.log("Q") ;
                 CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/work');
             }
             if (i==1)
             {
                 var name = e.data[1]["file"][i].filename.split(/(\\|\/)/g).pop()
                 e.data[1]["file"][i].filename = '/contact/'+name ; 
-                console.log("M") ;
                 CGlib.FS.mkdir('/contact'); 
-                console.log("N") ;
                 CGlib.FS.mount(CGlib.WORKERFS, { files: e.data[2+i] }, '/contact');
             }
         }
         
         var cstring = JSON.stringify(e.data[1]) ; 
-        console.log("Z") ; 
         console.log(cstring) ;
         CG.param_from_json_string (cstring) ;
-        console.log("A") ; 
         CG.param_from_json_string ("{}") ;
-        console.log("B") ; 
         var nts= CG.param_get_numts(0) ;
         console.log(nts) ; 
         var bounds = CG.param_get_bounds(0) ;
