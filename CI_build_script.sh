@@ -15,6 +15,10 @@ npm i -D webpack webpack-cli
 npm install
 npm run build
 
+cd cggui
+npm run build
+cd ..
+
 # quick peek at if it worked
 # ls live/deploy
 
