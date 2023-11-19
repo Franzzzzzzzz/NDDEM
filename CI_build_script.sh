@@ -40,6 +40,8 @@ cp ../bin/DEMND.wasm ../deploy/
 emmake make CoarseGraining
 cp ../bin/CoarseGraining.js ../deploy/
 cp ../bin/CoarseGraining.wasm ../deploy/
+cp ../bin/CoarseGraining.js ../cggui/dist/
+cp ../bin/CoarseGraining.wasm ../cggui/dist/
 
 emmake make DEMCGND
 cp ../bin/DEMCGND.js ../deploy/
