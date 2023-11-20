@@ -34,12 +34,14 @@ export function update_2d_cg_field(S, params) {
             // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax(params.particle_density*100);
+            lut.units = 'Density (kg/m<sup>3</sup>)';
         } else if ( params.cg_field === 'Size' ) {
             val = S.cg_get_result(0, "RADIUS", 0);
             lut = grainsize;
             // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(params.r_min);
             lut.setMax(params.r_max);
+            lut.units = 'Average particle size (m)';
         }
         else if ( params.cg_field === 'Velocity' ) {
             let vx = S.cg_get_result(0, "VAVG", 0);
@@ -53,6 +55,7 @@ export function update_2d_cg_field(S, params) {
             // lut.setMax( 0.9*maxVal);
             lut.setMin(-Math.PI);
             lut.setMax( Math.PI);
+            lut.units = 'Velocity direction (rad)';
         }
         else if ( params.cg_field === 'Pressure' ) {
             // const stressTcxx=S.cg_get_result(0, "TC", 0) ;
@@ -68,18 +71,21 @@ export function update_2d_cg_field(S, params) {
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax( 0.9*maxVal);
+            lut.units = 'Pressure (Pa)';
         } else if ( params.cg_field === 'Kinetic Pressure' ) {
             val=S.cg_get_result(0, "KineticPressure", 0) ;
             lut = divergent;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(-0.9*maxVal);
             lut.setMax( 0.9*maxVal);
+            lut.units = 'Kinetic pressure (Pa)';
         } else if ( params.cg_field === 'Shear stress' ) {
             val = S.cg_get_result(0, "TC", 1);
             lut = divergent;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(-0.9*maxVal);
             lut.setMax( 0.9*maxVal);
+            lut.units = 'Shear stress (Pa)';
         }
         
         // update colorbar
