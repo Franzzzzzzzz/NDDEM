@@ -1,6 +1,7 @@
 let minLabel = document.createElement('span');
 let maxLabel = document.createElement('span');
 let colorbar = document.createElement('span');
+let unitsLabel = document.createElement('div');
 
 let cb = document.createElement('div');
 cb.id = 'colorbar';
@@ -40,6 +41,16 @@ export function renderColorbar(lut) {
     maxLabel.textContent = M;
     maxLabel.style.marginLeft = '10px';
 
+    unitsLabel.innerHTML = lut.units;
+    // unitsLabel.style.marginBottom = '20px';
+    unitsLabel.style.width = '100%';
+    unitsLabel.style.position = 'absolute';
+    unitsLabel.style.top = '20px';
+    unitsLabel.style.left = '0';
+    unitsLabel.style.right = '0';
+    // unitsLabel.style.bottom = '20px';
+    unitsLabel.style.textAlign = 'center';
+
     // Create the colorbar
     // colorbar.style.display = 'inline-block';
     colorbar.style.flexGrow = 1;
@@ -49,7 +60,9 @@ export function renderColorbar(lut) {
     colorbar.style.verticalAlign = 'middle';
 
     // Append to container
+    cb.appendChild(unitsLabel);
     cb.appendChild(minLabel);
     cb.appendChild(colorbar);
     cb.appendChild(maxLabel);
+    
 }
