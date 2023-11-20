@@ -34,7 +34,7 @@ export function update_2d_cg_field(S, params) {
             // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax(params.particle_density*100);
-            lut.units = 'Density (kg/m<sup>3</sup>)';
+            lut.units = 'Density (kg/m<sup>'+String(params.dimension)+'</sup>)';
         } else if ( params.cg_field === 'Size' ) {
             val = S.cg_get_result(0, "RADIUS", 0);
             lut = grainsize;
@@ -71,21 +71,21 @@ export function update_2d_cg_field(S, params) {
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax( 0.9*maxVal);
-            lut.units = 'Pressure (Pa)';
+            lut.units = 'Pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
         } else if ( params.cg_field === 'Kinetic Pressure' ) {
             val=S.cg_get_result(0, "KineticPressure", 0) ;
             lut = divergent;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(-0.9*maxVal);
             lut.setMax( 0.9*maxVal);
-            lut.units = 'Kinetic pressure (Pa)';
+            lut.units = 'Kinetic pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
         } else if ( params.cg_field === 'Shear stress' ) {
             val = S.cg_get_result(0, "TC", 1);
             lut = divergent;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(-0.9*maxVal);
             lut.setMax( 0.9*maxVal);
-            lut.units = 'Shear stress (Pa)';
+            lut.units = 'Shear stress (N/m<sup>'+String(params.dimension-1)+'</sup>)';
         }
         
         // update colorbar
