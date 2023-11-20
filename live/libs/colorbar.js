@@ -11,7 +11,12 @@ function intToRGB(i) {
     return '#' + (i + 0x1000000).toString(16).slice(-6);
 }
 
+export function hideColorbar() {
+    cb.style.display = 'none';
+}
+
 export function renderColorbar(lut) {
+    cb.style.display = 'flex';
     // remove anything that was there before
     while (cb.firstChild) {
         cb.removeChild(cb.firstChild);
@@ -58,6 +63,7 @@ export function renderColorbar(lut) {
     colorbar.style.height = '20px';
     colorbar.style.background = gradient;
     colorbar.style.verticalAlign = 'middle';
+    colorbar.style.opacity = lut.opacity;
 
     // Append to container
     cb.appendChild(unitsLabel);

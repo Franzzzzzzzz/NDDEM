@@ -89,6 +89,7 @@ export function update_2d_cg_field(S, params) {
         }
         
         // update colorbar
+        lut.opacity = params.cg_opacity;
         COLORBAR.renderColorbar(lut);
 
         // console.log(lut);
@@ -130,6 +131,8 @@ export function update_2d_cg_field(S, params) {
 
         texture.needsUpdate = true;
         cg_mesh.material.map = texture;
+
+        COLORBAR.hideColorbar();
     }
 }
 
