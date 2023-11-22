@@ -137,7 +137,7 @@ async function init() {
     //
 
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.set( 0, 0, 3*params.L );
+    camera.position.set( 0, 3*params.L, -3*params.L );
     camera.up.set(1, 0, 0);
 
     scene = new THREE.Scene();
@@ -243,7 +243,8 @@ async function init() {
         });
     
     controls = new OrbitControls( camera, renderer.domElement );
-    controls.target.y = 0.5;
+    controls.target.y = params.L/2.;
+    controls.target.x = params.H/2.;
     controls.update();
 
     window.addEventListener( 'resize', onWindowResize, false );

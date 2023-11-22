@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = [{
     mode: "development",
@@ -22,11 +23,13 @@ module.exports = [{
         'intruder' : './live/src/intruder.js',
         'anisotropy' : './live/src/anisotropy.js',
         'dam-break' : './live/src/dam-break.js',
+        'code' : './live/src/code.js',
     },
     plugins: [
         new webpack.ProvidePlugin({
           THREE: 'three'
         }),
+        new MonacoWebpackPlugin(),
         new HtmlWebpackPlugin({
           title: 'NDDEM Uniaxial compression',
           favicon: "./visualise/resources/favicon.ico",
@@ -138,6 +141,13 @@ module.exports = [{
             template: "live/template.html",
             filename: "dam-break.html",
             chunks: ['dam-break']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Editor',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "code.html",
+            chunks: ['code']
         }),
       ],
     output: {
