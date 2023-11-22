@@ -10,6 +10,8 @@
   "dependencies": {
     "@tweenjs/tween.js": "^19.0.0",
     "file-loader": "^6.2.0",
+    "monaco-editor": "^0.44.0",
+    "monaco-editor-webpack-plugin": "^7.1.0",
     "papaparse": "^5.3.2",
     "plotly.js-dist": "^2.24.2",
     "three": "^0.138.2"
