@@ -155,9 +155,18 @@ module.exports = [{
         filename: '[name]-bundle.js',
         clean: true,
     },
+    // devServer: {
+    //     static: {
+    //        directory: '.'
+    //     },
+    // },
     devServer: {
+        headers: {
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+            'Cross-Origin-Opener-Policy': 'same-origin',
+        },
         static: {
-           directory: '.'
+            directory: '.'
         },
     },
     module: {
