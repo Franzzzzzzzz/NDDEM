@@ -25,7 +25,7 @@ let params = {
     particle_opacity : 0.8,
 };
 
-const value = `S.simu_interpret_command("dimensions 3 5000");
+let value = `S.simu_interpret_command("dimensions 3 1000");
 S.simu_interpret_command("radius -1 0.5");
 S.simu_interpret_command("mass -1 1");
 S.simu_interpret_command("auto rho");
@@ -34,12 +34,12 @@ S.simu_interpret_command("auto mass");
 S.simu_interpret_command("auto inertia");
 S.simu_interpret_command("auto skin");
 
-S.simu_interpret_command("boundary 0 WALL -2 2");
-S.simu_interpret_command("boundary 1 PBC -2 2");
-S.simu_interpret_command("boundary 2 PBC -2 2");
+S.simu_interpret_command("boundary 0 PBC -1 1");
+S.simu_interpret_command("boundary 1 PBC -1 1");
+S.simu_interpret_command("boundary 2 WALL -2 2");
 S.simu_interpret_command("gravity 0 -5 -5");
 
-S.simu_interpret_command("auto location roughinclineplane");
+S.simu_interpret_command("auto location randomdrop");
 
 S.simu_interpret_command("set Kn 75");
 S.simu_interpret_command("set Kt " + String(0.8*75));
@@ -52,6 +52,12 @@ S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall fo
 S.simu_interpret_command("auto skin");
 S.simu_finalise_init () ;
 `;
+
+if (!localStorage.getItem("script")) {
+    localStorage.setItem("script", value);
+} else { 
+    value = localStorage.getItem("script");
+}
 
 // Hover on each property to see its docs!
 const editor = monaco.editor.create(document.getElementById("code"), {
@@ -71,6 +77,7 @@ function update_from_text() {
     SPHERES.wipe(scene);
 
     let text = editor.getValue();
+    localStorage.setItem("script", text);
     let first_line = text.trim().split('\n')[0];
     let list = first_line.split(' ');
 
