@@ -25,7 +25,7 @@ let params = {
     particle_opacity : 0.8,
 };
 
-const value = `S.simu_interpret_command("dimensions 3 1000");
+const value = `S.simu_interpret_command("dimensions 3 5000");
 S.simu_interpret_command("radius -1 0.5");
 S.simu_interpret_command("mass -1 1");
 S.simu_interpret_command("auto rho");
@@ -64,7 +64,11 @@ const editor = monaco.editor.create(document.getElementById("code"), {
 editor.onDidChangeModelContent(update_from_text);
 
 function update_from_text() {
+    // reset everything
     logs.innerHTML = '';
+    S = undefined;
+    scene.remove(SPHERES.spheres)
+    SPHERES.wipe(scene);
 
     let text = editor.getValue();
     let first_line = text.trim().split('\n')[0];
@@ -141,9 +145,7 @@ document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) +
 async function init() {
 
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
-    
-    
-    camera.up.set(1, 0, 0);
+    camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x111 );
