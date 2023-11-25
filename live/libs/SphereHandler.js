@@ -302,6 +302,9 @@ export function add_pool_spheres(S,params,scene) {
             var material = NDParticleShader.clone();
             material.uniforms.R.value = params.radius;
             material.uniforms.banding.value = 1 + 2*(i%3);
+            if ( params.dimension === 2) {
+                material.side = THREE.DoubleSide;
+            }
             // material.uniforms.opacity.value = 1;
         }
         var object = new THREE.Mesh(geometrySphere, material);
