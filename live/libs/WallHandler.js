@@ -6,6 +6,8 @@ let font;
 
 let vertical_wall_displacement = 0;
 
+let walls;
+
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
@@ -32,6 +34,8 @@ let damped_wall_controller = new PIDcontroller(1e-4, 1e-5, 0);
 // p_controller = new PIDcontroller(1e-7,1e-6,0);
 // q_controller = new PIDcontroller(1e-6,1e-5,0);
 // }
+
+let box = new THREE.BoxGeometry(1, 1, 1);
 
 const wall_geometry = new THREE.BoxGeometry(1, 1, 1);
 export const wall_material = new THREE.MeshLambertMaterial();
@@ -597,4 +601,37 @@ export function add_scale_isotropic(params, scene) {
     axesHelper.rotation.z = Math.PI;
     // axesLabels.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
     // axesLabels.rotation.z = -Math.PI/2;
+}
+
+
+export function createWalls(scene) {
+    if ( walls !== undefined ) { scene.remove(walls); }
+    walls = new THREE.Object3D();
+    for ( let d = 0; d < 3; d++ ) {
+        walls.add(new THREE.Mesh(box , wall_material));
+        walls.add(new THREE.Mesh(box , wall_material));
+    }
+    scene.add(walls);
+}
+
+export function update(params) {
+    if ( walls !== undefined ) {
+        for ( let d = 0; d < 3; d++ ) {
+            if ( params['boundary'+d].type === 'WALL' ) {
+                for ( let i = 0; i < 2; i++ ) {
+                    walls.children[2*d +i].visible = true;
+                    walls.children[2*d +i].scale.set(
+                        (d!==0)*(params.boundary0.max - params.boundary0.min),
+                        (d!==1)*(params.boundary1.max - params.boundary1.min),
+                        (d!==2)*(params.boundary2.max - params.boundary2.min));
+                    }
+                    walls.children[2*d  ].position.setComponent(d, params['boundary'+d].min);
+                    walls.children[2*d+1].position.setComponent(d, params['boundary'+d].max);  
+            }
+            else {
+                walls.children[2*d  ].visible = false;
+                walls.children[2*d+1].visible = false;
+            }
+        }
+    }
 }

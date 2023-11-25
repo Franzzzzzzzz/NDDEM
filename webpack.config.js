@@ -145,7 +145,7 @@ module.exports = [{
         new HtmlWebpackPlugin({
             title: 'NDDEM Editor',
             favicon: "./visualise/resources/favicon.ico",
-            template: "live/plotly-template.html",
+            template: "live/code.html",
             filename: "code.html",
             chunks: ['code']
         }),

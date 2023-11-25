@@ -1,4 +1,5 @@
 import css from "../css/main.css";
+import css1 from "../css/code.css";
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -8,22 +9,23 @@ import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
 import * as monaco from 'monaco-editor';
 
-let code = document.createElement("div");
-code.id = 'code';
-code.style.height = '50%';
-document.getElementById("stats").appendChild(code);
-let logs = document.createElement("div");
-logs.id = 'logs';
-logs.style.overflow = 'auto';
-logs.style.height = '50%';
-logs.style.fontSize = 'smaller';
-document.getElementById("stats").appendChild(logs);
-
 let params = {
     quality : 6,
     lut : 'None',
     particle_opacity : 0.8,
+    graph_fraction : 0.333,
+    boundary0 : {type: 'None', min: 0, max: 0},
+    boundary1 : {type: 'None', min: 0, max: 0},
+    boundary2 : {type: 'None', min: 0, max: 0},
 };
+
+// move the scigem tag and make the font white
+let c = document.getElementById("scigem_tag");
+c.style.color = 'white';
+c.style.left = 'calc('+String(100*params.graph_fraction)+'% + 5px)';
+document.querySelectorAll('#scigem_tag a').forEach(function(a) {
+    a.style.color = 'white';
+});
 
 let value = `S.simu_interpret_command("dimensions 3 1000");
 S.simu_interpret_command("radius -1 0.5");
@@ -110,13 +112,15 @@ function update_from_text() {
     // console.log(params)
 
     SPHERES.createNDParticleShader(params).then( () => {
-        if ( params.dimension == 3 ) {
+        if ( params.dimension == 1 ) {
+            S = new NDDEMCGLib.DEMCG1D (params.N);
+        } else if ( params.dimension == 2 ) {
+            S = new NDDEMCGLib.DEMCG2D (params.N);
+        } else if ( params.dimension == 3 ) {
             S = new NDDEMCGLib.DEMCG3D (params.N);
-        }
-        else if ( params.dimension == 4 ) {
+        } else if ( params.dimension == 4 ) {
             S = new NDDEMCGLib.DEMCG4D (params.N);
-        }
-        else if ( params.dimension == 5 ) {
+        } else if ( params.dimension == 5 ) {
             S = new NDDEMCGLib.DEMCG5D (params.N);
         }
         eval(params.text);
@@ -145,13 +149,12 @@ let camera, scene, renderer, stats, panel, controls;
 let S;
 let NDDEMCGLib;
 
-let graph_fraction = 0.333;
-document.getElementById("stats").style.width = String(100*graph_fraction) + '%';
-document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) + '%';
+document.getElementById("container").style.width = String(100*params.graph_fraction) + '%';
+document.getElementById("canvas").style.width = String(100*(1-params.graph_fraction)) + '%';
 
 async function init() {
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-graph_fraction) / window.innerHeight, 1e-5, 1000 );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth*(1-params.graph_fraction) / window.innerHeight, 1e-5, 1000 );
     camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
@@ -163,7 +166,7 @@ async function init() {
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+    renderer.setSize( window.innerWidth*(1-params.graph_fraction), window.innerHeight );
 
     var container = document.getElementById( 'canvas' );
     container.appendChild( renderer.domElement );
@@ -172,6 +175,8 @@ async function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
+    WALLS.createWalls(scene);
+
     animate();
 
     update_from_text();
@@ -179,10 +184,10 @@ async function init() {
 
 function onWindowResize(){
 
-    camera.aspect = window.innerWidth*(1-graph_fraction) / window.innerHeight;
+    camera.aspect = window.innerWidth*(1-params.graph_fraction) / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth*(1-graph_fraction), window.innerHeight );
+    renderer.setSize( window.innerWidth*(1-params.graph_fraction), window.innerHeight );
 
 }
 
@@ -191,6 +196,7 @@ function animate() {
     if ( S !== undefined ) {
         if ( SPHERES.spheres !== undefined ) {
             SPHERES.move_spheres(S,params);
+            WALLS.update(params);
             S.simu_step_forward(5);
             // SPHERES.draw_force_network(S, params, scene);
         }
