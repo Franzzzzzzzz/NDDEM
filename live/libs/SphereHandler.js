@@ -86,8 +86,12 @@ function add_actual_spheres(S,params,scene) {
             total_particle_volume += get_particle_volume(params.dimension, radii[i]);
         }
         // console.log('Actual particle volume (assuming 3D particles): ' + total_particle_volume);
-        spheres = new THREE.Group();
-        scene.add(spheres);
+        if ( spheres === undefined ) {
+            spheres = new THREE.Group();
+            scene.add(spheres);
+        } else {
+            spheres.clear();
+        }
         // const material = new THREE.MeshStandardMaterial();
 
 
@@ -108,6 +112,7 @@ function add_actual_spheres(S,params,scene) {
         for ( let i = 0; i < params.N; i ++ ) {
             // const material = NDParticleShader.clone();
             const material = new THREE.MeshStandardMaterial();
+            material.side = THREE.DoubleSide;
             var object = new THREE.Mesh(geometrySphere, material);
             object.position.set(0,0,0);
             object.rotation.z = Math.PI / 2;
@@ -393,6 +398,7 @@ export function update_particle_material(params) {
             var object = spheres.children[i];
             // console.log(NDParticleShader)
             object.material = NDParticleShader.clone();
+            if ( params.dimension === 2 ) { object.material.side = THREE.DoubleSide; }
             if ( params.particle_opacity < 1 ) { object.material.transparent = true; }
             // object.material.opacity = params.particle_opacity;
             object.material.uniforms.opacity.value = params.particle_opacity;

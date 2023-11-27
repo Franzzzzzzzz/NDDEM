@@ -56,7 +56,7 @@ document.querySelectorAll('#scigem_tag a').forEach(function(a) {
 });
 
 let default_scripts = {}
-default_scripts['javascript'] = `S.simu_interpret_command("dimensions 3 500");
+default_scripts['javascript'] = `S.simu_interpret_command("dimensions 2 30");
 S.simu_interpret_command("radius -1 0.5");
 S.simu_interpret_command("mass -1 1");
 S.simu_interpret_command("auto rho");
@@ -66,8 +66,8 @@ S.simu_interpret_command("auto inertia");
 S.simu_interpret_command("auto skin");
 
 S.simu_interpret_command("boundary 0 PBC -1 1");
-S.simu_interpret_command("boundary 1 PBC -1 1");
-S.simu_interpret_command("boundary 2 WALL -2 2");
+S.simu_interpret_command("boundary 1 WALL -1 1");
+// S.simu_interpret_command("boundary 2 WALL -2 2");
 S.simu_interpret_command("gravity 0 -5 -5");
 
 S.simu_interpret_command("auto location randomdrop");
@@ -79,9 +79,9 @@ S.simu_interpret_command("set GammaT 0.1");
 S.simu_interpret_command("set Mu 0.5");
 S.simu_interpret_command("set T 150");
 S.simu_interpret_command("set dt " + String(0.01/20));
-S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
+S.simu_interpret_command("set tdump 1000");
 S.simu_interpret_command("auto skin");
-S.simu_finalise_init () ;`;
+S.simu_finalise_init();`;
 
 default_scripts['infile'] = `dimensions 3 100
 radius -1 0.5
@@ -111,17 +111,17 @@ auto skin`;
 
 let script_types = ['javascript', 'infile'];
 script_types.forEach( (s) => {
-    console.log("Checking for default " + s + " script");
+    // console.log("Checking for default " + s + " script");
     if (localStorage.getItem(s + "-script")) { // it is 'truthy'
-        console.log("Found default " + s + " script: ", localStorage.getItem(s + "-script"));
+        // console.log("Found default " + s + " script: ", localStorage.getItem(s + "-script"));
     } else {
         localStorage.setItem(s + "-script", default_scripts[s]);
-        console.log("Setting default " + s + " script")
+        // console.log("Setting default " + s + " script")
     }
 });
 
 let current_value = localStorage.getItem(script_type + "-script"); //default_scripts[script_type];
-console.log('EDITOR DEFAULT IS: ', current_value);
+// console.log('EDITOR DEFAULT IS: ', current_value);
 const editor = monaco.editor.create(document.getElementById("code"), {
 	current_value,
 	language: "javascript",
@@ -130,7 +130,9 @@ const editor = monaco.editor.create(document.getElementById("code"), {
 });
 editor.setValue(current_value); // not sure why
 
-editor.onDidChangeModelContent(update_from_text);
+editor.onDidChangeModelContent(() => {
+    update_from_text();
+});
 
 function update_from_text() {
     // reset everything
@@ -152,8 +154,6 @@ function update_from_text() {
         .join('\n');
         text += "\nS.simu_finalise_init () ;";
     }
-    console.log(text)
-
 
     let first_line = text.trim().split('\n')[0];
     let list = first_line.split(' ');
@@ -183,8 +183,14 @@ function update_from_text() {
     camera.position.y = params.boundary1.max + (params.boundary1.max - params.boundary1.min);
     camera.position.z = params.boundary2.max + (params.boundary2.max - params.boundary2.min);
 
+    if ( params.dimension < 3 ) {
+        camera.position.x = (params.boundary0.max + params.boundary0.min)/2.;
+        camera.position.y = (params.boundary1.max + params.boundary1.min)/2.;
+        camera.position.z = (params.boundary0.max - params.boundary0.min)*2.;
+        
+    }
+
     controls.update();
-    // console.log(params)
 
     SPHERES.createNDParticleShader(params).then( () => {
         if ( params.dimension == 1 ) {
@@ -232,9 +238,8 @@ async function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x222222 );
 
-    const hemiLight = new THREE.HemisphereLight();
-    hemiLight.intensity = 0.35;
-    scene.add( hemiLight );
+    const light = new THREE.AmbientLight();
+    scene.add( light );
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
