@@ -9,6 +9,20 @@ import * as WALLS from "../libs/WallHandler.js"
 import * as LAYOUT from '../libs/Layout.js'
 import * as monaco from 'monaco-editor';
 
+monaco.languages.register({ id: 'infile'});
+monaco.languages.setMonarchTokensProvider('infile', {
+    tokenizer: {
+        root: [
+            [/#.*$/, 'comment'],
+            [/\b(dimensions|radius|mass|auto|boundary|gravity|location|set|dt|tdump|finalise)\b/, 'keyword'],
+            [/\b(uniform|randomdrop)\b/, 'keyword'],
+            [/\b(PBC|WALL)\b/, 'keyword'],
+            [/\b(0|1|2|3|4|5|6|7|8|9)\b/, 'number'],
+            [/\b([a-zA-Z]+)\b/, 'identifier'],
+        ]
+    }
+});
+
 let params = {
     quality : 6,
     lut : 'None',
@@ -19,6 +33,20 @@ let params = {
     boundary2 : {type: 'None', min: 0, max: 0},
 };
 
+let urlParams = new URLSearchParams(window.location.search);
+let script_type = 'javascript';
+
+const toggleSwitch= document.getElementById("toggle-switch");
+
+toggleSwitch.addEventListener("click", function() {
+    script_type = (script_type === "javascript") ? "infile" : "javascript";
+    let text = localStorage.getItem(script_type + "-script")
+    editor.getModel().setValue(text);
+    monaco.editor.setModelLanguage(editor.getModel(), script_type)
+    console.log("Script type is now: " + script_type);
+    update_from_text();
+});
+
 // move the scigem tag and make the font white
 let c = document.getElementById("scigem_tag");
 c.style.color = 'white';
@@ -27,7 +55,8 @@ document.querySelectorAll('#scigem_tag a').forEach(function(a) {
     a.style.color = 'white';
 });
 
-let value = `S.simu_interpret_command("dimensions 3 1000");
+let default_scripts = {}
+default_scripts['javascript'] = `S.simu_interpret_command("dimensions 3 500");
 S.simu_interpret_command("radius -1 0.5");
 S.simu_interpret_command("mass -1 1");
 S.simu_interpret_command("auto rho");
@@ -52,22 +81,54 @@ S.simu_interpret_command("set T 150");
 S.simu_interpret_command("set dt " + String(0.01/20));
 S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
 S.simu_interpret_command("auto skin");
-S.simu_finalise_init () ;
-`;
+S.simu_finalise_init () ;`;
 
-if (!localStorage.getItem("script")) {
-    localStorage.setItem("script", value);
-} else { 
-    value = localStorage.getItem("script");
-}
+default_scripts['infile'] = `dimensions 3 100
+radius -1 0.5
+mass -1 1
+auto rho
+auto radius uniform 0.1 0.2
+auto mass
+auto inertia
+auto skin
 
-// Hover on each property to see its docs!
+boundary 0 PBC -1 1
+boundary 1 PBC -1 1
+boundary 2 WALL -2 2
+gravity 0 -5 -5
+
+auto location randomdrop
+
+set Kn 75
+set Kt 60
+set GammaN 0.1
+set GammaT 0.1
+set Mu 0.5
+set T 150
+set dt 0.0005
+set tdump 1000
+auto skin`;
+
+let script_types = ['javascript', 'infile'];
+script_types.forEach( (s) => {
+    console.log("Checking for default " + s + " script");
+    if (localStorage.getItem(s + "-script")) { // it is 'truthy'
+        console.log("Found default " + s + " script: ", localStorage.getItem(s + "-script"));
+    } else {
+        localStorage.setItem(s + "-script", default_scripts[s]);
+        console.log("Setting default " + s + " script")
+    }
+});
+
+let current_value = localStorage.getItem(script_type + "-script"); //default_scripts[script_type];
+console.log('EDITOR DEFAULT IS: ', current_value);
 const editor = monaco.editor.create(document.getElementById("code"), {
-	value,
+	current_value,
 	language: "javascript",
 	automaticLayout: true,
     theme: "vs-dark",
 });
+editor.setValue(current_value); // not sure why
 
 editor.onDidChangeModelContent(update_from_text);
 
@@ -79,7 +140,21 @@ function update_from_text() {
     SPHERES.wipe(scene);
 
     let text = editor.getValue();
-    localStorage.setItem("script", text);
+    localStorage.setItem(script_type + "-script", text);
+
+    if ( script_type === 'infile' ) {
+        let prependString = 'S.simu_interpret_command("';
+        let appendString = '");';
+    
+        text = text.split('\n')
+        // .map(line => prependString + line + appendString)
+        .map(line => line.trim() === '' ? line : prependString + line + appendString)
+        .join('\n');
+        text += "\nS.simu_finalise_init () ;";
+    }
+    console.log(text)
+
+
     let first_line = text.trim().split('\n')[0];
     let list = first_line.split(' ');
 
@@ -142,10 +217,7 @@ console.log = function(message) {
 };
 console.error = console.debug = console.info =  console.log
 
-
-var urlParams = new URLSearchParams(window.location.search);
-
-let camera, scene, renderer, stats, panel, controls;
+let camera, scene, renderer, controls;
 let S;
 let NDDEMCGLib;
 
@@ -158,7 +230,7 @@ async function init() {
     camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x111 );
+    scene.background = new THREE.Color( 0x222222 );
 
     const hemiLight = new THREE.HemisphereLight();
     hemiLight.intensity = 0.35;

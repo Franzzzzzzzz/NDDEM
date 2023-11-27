@@ -40,6 +40,7 @@ let box = new THREE.BoxGeometry(1, 1, 1);
 const wall_geometry = new THREE.BoxGeometry(1, 1, 1);
 export const wall_material = new THREE.MeshLambertMaterial();
 wall_material.wireframe = true;
+wall_material.wireframeLinewidth = 3;
 
 const arrow_colour = 0xDDDDDD;
 const arrow_material = new THREE.MeshLambertMaterial({ color: arrow_colour });
