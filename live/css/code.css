@@ -1,11 +1,21 @@
 html, body { height: 100%; width: 100%; margin: 0; }
 
+.flex-container {
+  display: flex;
+  align-items: stretch;
+}
+
 #container {
   /* display: flex; */
   /* align-items: stretch; */
   /* flex-direction: column; */
+  flex-grow: 1;
   height: 100%;
   width: 33%;
+}
+
+#canvas {
+  flex-grow: 1;
 }
 
 #code {
@@ -22,10 +32,16 @@ html, body { height: 100%; width: 100%; margin: 0; }
   font-size: x-small;
 }
 
+#row-divider {
+  background: black;
+  height: 10px;
+  cursor: row-resize;
+}
+
 #divider {
-  background: #000;
-  height: 5px;
-  cursor: ns-resize;
+  background: black;
+  width: 10px;
+  cursor: col-resize;
 }
 
 #toggle-container {

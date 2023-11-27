@@ -33,6 +33,60 @@ let params = {
     boundary2 : {type: 'None', min: 0, max: 0},
 };
 
+const resizer = document.getElementById('divider');
+const leftDiv = document.getElementById('container');
+const rightDiv = document.getElementById('canvas');
+let isDragging = false;
+
+const resizer2 = document.getElementById('row-divider');
+const topDiv = document.getElementById('code');
+const botDiv = document.getElementById('logs');
+let isDragging2 = false;
+
+resizer.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    e.preventDefault(); // This prevents unwanted behaviors
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (isDragging) {
+        const containerOffsetLeft = leftDiv.offsetTop;
+        const containerWidth = leftDiv.offsetWidth + rightDiv.offsetWidth;
+        const leftWidth = e.clientX - containerOffsetLeft;
+        const rightWidth = containerWidth - leftWidth;
+
+        leftDiv.style.width = `${leftWidth}px`;
+        rightDiv.style.width = `${rightWidth}px`;
+
+        params.graph_fraction = leftWidth/containerWidth;
+        // move the scigem tag and make the font white
+        let c = document.getElementById("scigem_tag");
+        c.style.left = 'calc('+String(100*params.graph_fraction)+'% + 5px)';
+
+        onWindowResize();
+    }
+    if (isDragging2) {
+        const containerOffset = topDiv.offsetTop;
+        const containerHeight = topDiv.offsetHeight + botDiv.offsetHeight;
+        const topHeight = e.clientY - containerOffset;
+        const bottomHeight = containerHeight - topHeight;
+
+        topDiv.style.height = `${topHeight}px`;
+        botDiv.style.height = `${bottomHeight}px`;
+    }
+});
+
+
+resizer2.addEventListener('mousedown', function(e) {
+    isDragging2 = true;
+    e.preventDefault(); // This prevents unwanted behaviors
+});
+
+document.addEventListener('mouseup', function() {
+    isDragging = false;
+    isDragging2 = false;
+});
+
 let urlParams = new URLSearchParams(window.location.search);
 let script_type = 'javascript';
 
@@ -45,14 +99,6 @@ toggleSwitch.addEventListener("click", function() {
     monaco.editor.setModelLanguage(editor.getModel(), script_type)
     console.log("Script type is now: " + script_type);
     update_from_text();
-});
-
-// move the scigem tag and make the font white
-let c = document.getElementById("scigem_tag");
-c.style.color = 'white';
-c.style.left = 'calc('+String(100*params.graph_fraction)+'% + 5px)';
-document.querySelectorAll('#scigem_tag a').forEach(function(a) {
-    a.style.color = 'white';
 });
 
 let default_scripts = {}
@@ -133,6 +179,15 @@ editor.setValue(current_value); // not sure why
 editor.onDidChangeModelContent(() => {
     update_from_text();
 });
+
+// move the scigem tag and make the font white
+let c = document.getElementById("scigem_tag");
+c.style.color = 'white';
+c.style.left = 'calc('+String(100*params.graph_fraction)+'% + 5px)';
+document.querySelectorAll('#scigem_tag a').forEach(function(a) {
+    a.style.color = 'white';
+});
+
 
 function update_from_text() {
     // reset everything
