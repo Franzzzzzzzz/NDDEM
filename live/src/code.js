@@ -88,7 +88,7 @@ document.addEventListener('mouseup', function() {
 });
 
 let urlParams = new URLSearchParams(window.location.search);
-let script_type = 'javascript';
+let script_type = 'infile';
 
 const toggleSwitch= document.getElementById("toggle-switch");
 
@@ -175,6 +175,7 @@ const editor = monaco.editor.create(document.getElementById("code"), {
     theme: "vs-dark",
 });
 editor.setValue(current_value); // not sure why
+monaco.editor.setModelLanguage(editor.getModel(), script_type)
 
 editor.onDidChangeModelContent(() => {
     update_from_text();

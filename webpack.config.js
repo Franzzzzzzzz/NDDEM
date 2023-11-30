@@ -149,6 +149,7 @@ module.exports = [{
             filename: "code.html",
             chunks: ['code']
         }),
+        new webpack.HotModuleReplacementPlugin(),
       ],
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
@@ -161,6 +162,7 @@ module.exports = [{
     //     },
     // },
     devServer: {
+        hot: true,
         headers: {
             'Cross-Origin-Embedder-Policy': 'require-corp',
             'Cross-Origin-Opener-Policy': 'same-origin',
@@ -209,5 +211,6 @@ module.exports = [{
             },
         ],
     },
+    // watch: true
 }
 ];
