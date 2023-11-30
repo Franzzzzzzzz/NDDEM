@@ -1,4 +1,4 @@
-# List of input file commands for coarse-graining (CG)
+# List of input file commands for NDDEM
 ### Description
 Input files are in plain text.
 In the following: 
