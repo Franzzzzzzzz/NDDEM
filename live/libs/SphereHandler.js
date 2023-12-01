@@ -414,6 +414,7 @@ export function update_particle_material(params) {
             object.material.transparent = true;
             object.material.opacity = params.particle_opacity;
             object.material.emissive = new THREE.Color( 0xFF0000 );
+            if ( params.dimension === 2 ) { object.material.side = THREE.DoubleSide; }
         }
     }
     if ( params.lut === 'Velocity' ) {

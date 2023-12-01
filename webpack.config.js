@@ -23,6 +23,7 @@ module.exports = [{
         'intruder' : './live/src/intruder.js',
         'anisotropy' : './live/src/anisotropy.js',
         'dam-break' : './live/src/dam-break.js',
+        'dam-break-2d' : './live/src/dam-break-2d.js',
         'code' : './live/src/code.js',
     },
     plugins: [
@@ -143,13 +144,19 @@ module.exports = [{
             chunks: ['dam-break']
         }),
         new HtmlWebpackPlugin({
+            title: 'NDDEM Dam Break',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/template.html",
+            filename: "dam-break-2d.html",
+            chunks: ['dam-break-2d']
+        }),
+        new HtmlWebpackPlugin({
             title: 'NDDEM Editor',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/code.html",
             filename: "code.html",
             chunks: ['code']
         }),
-        new webpack.HotModuleReplacementPlugin(),
       ],
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
@@ -163,10 +170,10 @@ module.exports = [{
     // },
     devServer: {
         hot: true,
-        headers: {
-            'Cross-Origin-Embedder-Policy': 'require-corp',
-            'Cross-Origin-Opener-Policy': 'same-origin',
-        },
+        // headers: {
+        //     'Cross-Origin-Embedder-Policy': 'require-corp',
+        //     'Cross-Origin-Opener-Policy': 'same-origin',
+        // },
         static: {
             directory: '.'
         },
@@ -211,6 +218,5 @@ module.exports = [{
             },
         ],
     },
-    // watch: true
 }
 ];
