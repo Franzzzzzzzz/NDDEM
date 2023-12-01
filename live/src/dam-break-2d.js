@@ -157,16 +157,19 @@ async function init() {
 
 function update_wall() {
     let theta;
-        if ( params.wallremoved ) { 
-            theta = params.theta*Math.PI/180;
-            params.boundary0.max = params.boundary0.max2;
-        } else { 
-            theta = 0;
-            params.boundary0.max = params.boundary0.max1;
-        }
-        S.simu_interpret_command("boundary 0 " + String(params.boundary0.type) + " " + String(params.boundary0.min) + " "+String(params.boundary0.max));
-        S.simu_interpret_command("gravity " + String(-10*Math.sin(theta)) + " " + String(-10*Math.cos(theta)));
-        if ( ! params.wallremoved ) {         S.simu_interpret_command("auto location randomdrop");    }
+    if ( params.wallremoved ) { 
+        theta = params.theta*Math.PI/180;
+        params.boundary0.max = params.boundary0.max2;
+    } else { 
+        theta = 0;
+        params.boundary0.max = params.boundary0.max1;
+    }
+    S.simu_interpret_command("boundary 0 " + String(params.boundary0.type) + " " + String(params.boundary0.min) + " "+String(params.boundary0.max));
+    S.simu_interpret_command("gravity " + String(-10*Math.sin(theta)) + " " + String(-10*Math.cos(theta)));
+    if ( ! params.wallremoved ) {
+        S.simu_interpret_command("auto location randomdrop");
+        crazy_damp();
+    }
 }
 
 
@@ -239,10 +242,24 @@ async function NDDEMPhysics() {
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 1");
         S.simu_interpret_command("set Mu_wall 1");
-        S.simu_interpret_command("set damping 0.0001");
+        // S.simu_interpret_command("set damping 0.0001");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc/10));
         S.simu_interpret_command("auto skin");
         S.simu_finalise_init () ;
+
+        crazy_damp();
+        
+    }
+}
+
+function crazy_damp() {
+    for ( let t=0; t<10; t++) {
+        S.simu_step_forward(5);
+
+        for ( let i=0; i<params.N; i++ ) {
+            S.simu_setVelocity(i,[0,0]);
+            // S.simu_setOmega(i,[0,0]);
+        }
     }
 }
