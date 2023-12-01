@@ -52,7 +52,7 @@ var params = {
     wallremoved: false,
     particle_density : 2700,
     phi_s : 0.5,
-    target_nu : 0.6,
+    target_nu : 0.58,
     show_gui : true,
     period : 5000
 }
@@ -114,7 +114,7 @@ async function init() {
     scene.background = new THREE.Color( 0x000000 );
 
     const hemiLight = new THREE.AmbientLight();
-    hemiLight.intensity = 0.35;
+    // hemiLight.intensity = 0.35;
     scene.add( hemiLight );
 
 
