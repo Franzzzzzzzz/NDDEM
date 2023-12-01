@@ -218,6 +218,5 @@ module.exports = [{
             },
         ],
     },
-    watch: true
 }
 ];
