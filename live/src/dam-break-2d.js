@@ -13,19 +13,10 @@ var urlParams = new URLSearchParams(window.location.search);
 
 if ( !urlParams.has('lut') ) { urlParams.set('lut','Size') }
 
-var clock = new THREE.Clock();
-
 let camera, scene, renderer, stats, panel, controls;
 let gui;
 let S;
-// var radius = 0.5;
-let particle_volume;
 let show_stats = false;
-// const thickness = radius;
-
-const mouse = new THREE.Vector2();
-let intersection_plane = new THREE.Plane();
-let camera_direction = new THREE.Vector3();
 
 var params = {
     dimension: 2,
@@ -38,8 +29,8 @@ var params = {
     },
     boundary1: {
         type : 'WALL',
-        min : -0.08,
-        max : 0.08,
+        min : -0.095,
+        max : 0.095,
     },
     boundary2: {
         type : 'None',
@@ -63,6 +54,7 @@ var params = {
     phi_s : 0.5,
     target_nu : 0.6,
     show_gui : true,
+    period : 5000
 }
 
 
@@ -94,9 +86,10 @@ if ( urlParams.has('auto') ) {
     setInterval( () => {
         params.wallremoved = !params.wallremoved;
         update_wall();
-    }, 5000);
+    }, params.period);
 }
 if ( urlParams.has('nogui') ) { params.showgui = false; }
+if ( urlParams.has('target_nu') ) { params.target_nu = parseFloat(urlParams.get('target_nu')); }
 
 SPHERES.createNDParticleShader(params).then( init );
 
