@@ -81,6 +81,8 @@ if ( urlParams.has('no_stats') ) {
 }
 if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
 if ( urlParams.has('theta') ) { params.theta = -parseFloat(urlParams.get('theta')); }
+if ( urlParams.has('period') ) { params.period = parseFloat(urlParams.get('period')); }
+
 
 if ( urlParams.has('auto') ) {
     setInterval( () => {

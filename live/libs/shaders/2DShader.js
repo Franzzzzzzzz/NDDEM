@@ -39,7 +39,7 @@ var NDDEMShader = new ShaderMaterial({
     // "x.x = - R*sin((uv.x - 0.5)*pi);",//*cos((uv.y - 0.5)*pi);",
     // "x.y = - R*sin((uv.y - 0.5)*pi);",
     "x.x = -2.0*R*(uv.x - 0.5);",
-    "x.y = -2.0*R*(uv.y - 0.5);",
+    "x.y = 2.0*R*(uv.y - 0.5);",
     
 
     // compute the rotated location by doing transpose(A) * x, with A the orientation matrix from the dumps
