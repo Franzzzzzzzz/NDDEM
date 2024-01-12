@@ -13,8 +13,16 @@ The code is split into different modules, with different purposes. The main modu
 ## Operating system support
 All parts of this code have been tested on all recent versions of Windows, Mac and Linux.
 
-## Installation instructions and documentation
-Installation instructions and documentation is split between the c++ and javascript code, and can be found here:
+## Installation
+### Installation of the NDDEM and coarse graining solvers without visualisation support:
+Use `cmake` then `make` on the src folder to compile the different components. It is suggested to first create a `build` folder at the root of the NDDEM directory. The final binary executables will be stored within a newly created `bin` folder. 
+
+### Installation and test of the live vidualisation. 
+- Install and activate [emscripten](https://emscripten.org/docs/tools_reference/emsdk.html) first.
+- Follow the steps in the script file CI_build_script.sh, adapting them to your setup.
+- Then, in the `live` folder, you should be able to run the local visualisation with `webpack build && webpack serve`. 
+
+## Documentation and examples
  - [NDDEM solver, coarse graining and texturing server](https://franzzzzzzzz.github.io/NDDEM/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
