@@ -214,7 +214,7 @@ public :
 
     void remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld) ; ///< Not tested. \warning not really tested
     void add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/) ; ///< Not implemented
-    void init_locations (char *line, v2d & X) ; ///< Set particle locations
+    void init_locations (char *line, v2d & X, char *extras) ; ///< Set particle locations
     void init_radii (char line[], v1d & r) ;  ///< Set particle radii
 
     void display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int, int) ; ///< On screen information display
@@ -536,7 +536,8 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
    else if (!strcmp(line, "location"))
    {
      in >> line ;
-     init_locations(line, X) ;
+     char extras[5000]; in.getline(extras, 5000) ; 
+     init_locations(line, X, extras) ;
      printf("[INFO] Set all particle locations\n") ;
    }
    else if (!strcmp(line, "radius"))
@@ -864,7 +865,7 @@ void Parameters<d>::add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d 
 }
 //----------------
 template <int d>
-void Parameters<d>::init_locations (char *line, v2d & X)
+void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
 {
     boost::random::mt19937 rng(seed);
     boost::random::uniform_01<boost::mt19937> rand(rng) ;
@@ -942,7 +943,7 @@ void Parameters<d>::init_locations (char *line, v2d & X)
             }
          } while ( sqrt(dst) > (Boundaries[id][0]-2*r[i])) ;
         }
-    }
+    }      
     else if (!strcmp(line, "roughinclineplane"))
     {
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
@@ -1029,6 +1030,21 @@ void Parameters<d>::init_locations (char *line, v2d & X)
             }
             if (dd==d) {printf("WARN: cannot affect all particles on the square lattice, not enough space in the simulation box\n") ; break ; }
         }
+    }
+    else if (!strcmp(line, "fromfile"))
+    {
+      while (*extras == ' ') extras++ ; 
+      std::ifstream in(extras); // Open the file
+    
+      if (!in) { std::cerr << "Failed to open the file." << std::endl; return;}
+      while (!in.eof())
+      {
+        int idx  ; 
+        in >> idx ;
+        for (int dd=0 ; dd<d ; dd++)
+          in >> X[idx][dd] ; 
+        in >> r[idx] ; 
+      }
     }
     else
         printf("ERR: undefined initial location function.\n") ;
