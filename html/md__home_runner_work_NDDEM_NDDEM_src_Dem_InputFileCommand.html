@@ -113,6 +113,7 @@ $(function() {
 <li><code>roughinclineplane</code>: stick grain along the plane of normal [1,0,0 ...] to create roughness.</li>
 <li><code>rhoughinclineplane2</code>: ????? not quite sure what this does anymore.</li>
 <li><code>quasicristal</code>: ????? not quite sure what this does anymore.</li>
+<li><code>fromfile filename</code>: set the locations from a textfile. The file should have columns, no delimiters. 1st column is particle id, following columns are the coordinates of location, last column is the particle radius.</li>
 </ul>
 </li>
 <li><code>radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]</code>: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.</li>

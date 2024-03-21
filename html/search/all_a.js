@@ -33,7 +33,7 @@ var searchData=
   ['infos_970',['infos',['../classcp.html#ae345ef1cb08b60160fb465a38792a08f',1,'cp']]],
   ['init_5ffrom_5ffile_971',['init_from_file',['../classSimulation.html#a4aa574e603c9a9013d4663a51cc53df7',1,'Simulation']]],
   ['init_5finertia_972',['init_inertia',['../classParameters.html#ac83e130a84555a33d30d9ef09402497c',1,'Parameters']]],
-  ['init_5flocations_973',['init_locations',['../classParameters.html#a08786748eb4d724086f4400f7a35f9f5',1,'Parameters']]],
+  ['init_5flocations_973',['init_locations',['../classParameters.html#aeaa9aafd61cd57915eb2709d16353b65',1,'Parameters']]],
   ['init_5fmass_974',['init_mass',['../classParameters.html#adf2eb2c0eaded89e25255e04de17d3bc',1,'Parameters']]],
   ['init_5fradii_975',['init_radii',['../classParameters.html#a49c208dcc24c4f4ed13a555078f7a95b',1,'Parameters']]],
   ['initial_976',['initial',['../classReader.html#aae7050815dd824441ddceba8ad43ee2f',1,'Reader']]],

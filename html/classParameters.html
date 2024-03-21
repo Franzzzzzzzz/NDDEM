@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad5e3deb959c8b9c527d80a2001c9ee69"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#ad5e3deb959c8b9c527d80a2001c9ee69">add_particle</a> ()</td></tr>
 <tr class="memdesc:ad5e3deb959c8b9c527d80a2001c9ee69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not implemented.  <a href="classParameters.html#ad5e3deb959c8b9c527d80a2001c9ee69">More...</a><br /></td></tr>
 <tr class="separator:ad5e3deb959c8b9c527d80a2001c9ee69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08786748eb4d724086f4400f7a35f9f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a08786748eb4d724086f4400f7a35f9f5">init_locations</a> (char *line, <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;X)</td></tr>
-<tr class="memdesc:a08786748eb4d724086f4400f7a35f9f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set particle locations.  <a href="classParameters.html#a08786748eb4d724086f4400f7a35f9f5">More...</a><br /></td></tr>
-<tr class="separator:a08786748eb4d724086f4400f7a35f9f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaa9aafd61cd57915eb2709d16353b65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#aeaa9aafd61cd57915eb2709d16353b65">init_locations</a> (char *line, <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;X, char *extras)</td></tr>
+<tr class="memdesc:aeaa9aafd61cd57915eb2709d16353b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set particle locations.  <a href="classParameters.html#aeaa9aafd61cd57915eb2709d16353b65">More...</a><br /></td></tr>
+<tr class="separator:aeaa9aafd61cd57915eb2709d16353b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49c208dcc24c4f4ed13a555078f7a95b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a49c208dcc24c4f4ed13a555078f7a95b">init_radii</a> (char line[], <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53">r</a>)</td></tr>
 <tr class="memdesc:a49c208dcc24c4f4ed13a555078f7a95b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set particle radii.  <a href="classParameters.html#a49c208dcc24c4f4ed13a555078f7a95b">More...</a><br /></td></tr>
 <tr class="separator:a49c208dcc24c4f4ed13a555078f7a95b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -632,8 +632,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="a08786748eb4d724086f4400f7a35f9f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08786748eb4d724086f4400f7a35f9f5">&#9670;&nbsp;</a></span>init_locations()</h2>
+<a id="aeaa9aafd61cd57915eb2709d16353b65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaa9aafd61cd57915eb2709d16353b65">&#9670;&nbsp;</a></span>init_locations()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -650,7 +650,13 @@ template&lt;int d&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;&#160;</td>
-          <td class="paramname"><em>X</em>&#160;</td>
+          <td class="paramname"><em>X</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>extras</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
