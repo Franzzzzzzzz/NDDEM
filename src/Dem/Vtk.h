@@ -45,7 +45,10 @@ int start_celldata (FILE *out, int N, int Ncf)
 int write_dimension_data (FILE *out, cv2d &X, cv1d &r, int d, vector < vector <double> > Boundaries)
 {
  vector <float> projectioncenter  ;
- for (int i=3 ; i<d ; i++) projectioncenter.push_back((Boundaries[i][1]+Boundaries[i][0])/2) ;
+ if (Boundaries[0][3]==static_cast<int>(WallType::ROTATINGSPHERE))
+   for (int i=3 ; i<d ; i++) projectioncenter.push_back((Boundaries[0][4+i])/2) ;
+ else
+   for (int i=3 ; i<d ; i++) projectioncenter.push_back((Boundaries[i][1]+Boundaries[i][0])/2) ;
 
  for (uint j=3 ; j<X[0].size() ; j++)
  {

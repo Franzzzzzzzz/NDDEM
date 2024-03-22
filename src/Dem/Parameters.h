@@ -13,7 +13,13 @@
 #include <map>
 //#include <boost/variant.hpp>
 #include <variant>
-#include <filesystem>
+#if __GNUC__ < 8
+  #include <experimental/filesystem>
+  namespace fs = std::experimental::filesystem ; 
+#else
+  #include <filesystem>
+  namespace fs = std::filesystem ; 
+#endif
 #include "Typedefs.h"
 #include "Tools.h"
 #include "Xml.h"
@@ -354,7 +360,7 @@ int Parameters<d>::set_boundaries()
 template <int d>
 void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
 {
- for (int j=0 ; j<d ; j++)
+ for (size_t j=0 ; j<Boundaries.size() ; j++)
  {
    if (Boundaries[j][3]==static_cast<int>(WallType::PBC)) //PBC
    {
@@ -401,7 +407,7 @@ void Parameters<d>::perform_PBCLE_move ()
 template <int d>
 void Parameters<d>::perform_MOVINGWALL ()
 {
- for (int j=0 ; j<d ; j++)
+ for (size_t j=0 ; j<Boundaries.size() ; j++)
  {
   if (Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
   {
@@ -465,9 +471,9 @@ void Parameters<d>::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
 
   in.close() ;
   // Self copy :)
-  std::filesystem::path p (path) ;
-  std::filesystem::path pcp (Directory+"/in") ;// pcp/= p.filename() ;
-  copy_file(p,pcp,std::filesystem::copy_options::overwrite_existing);
+  fs::path p (path) ;
+  fs::path pcp (Directory+"/in") ;// pcp/= p.filename() ;
+  copy_file(p,pcp, fs::copy_options::overwrite_existing);
 }
 //-------------------------------------------------
 template <int d>
@@ -646,7 +652,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["set"] = setvalue ;
  Lvl0["auto"] = doauto ;
 
- Lvl0["directory"] = [&](){in>>Directory ; if (! std::filesystem::exists(Directory)) std::filesystem::create_directory(Directory); };
+ Lvl0["directory"] = [&](){in>>Directory ; if (! fs::exists(Directory)) fs::create_directory(Directory); };
  Lvl0["dimensions"] = [&](){int nn; int dd ; in>>dd>>nn ; if (N!=nn || d!=dd) {printf("[ERROR] Dimension of number of particles not matching the input file requirements d=%d N=%d\n", d, N) ; std::exit(2) ; }} ;
  Lvl0["location"] = [&]()
  {
