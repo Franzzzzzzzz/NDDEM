@@ -1136,7 +1136,10 @@ template <int d>
 void Parameters<d>::xml_header ()
 {
    xmlout->openbranch("boundaries", {make_pair("length", to_string(d*2))}) ;
-   for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[i][0] << " " << Boundaries[i][1] << " " ;
+   if (Boundaries[0][3]==static_cast<int>(WallType::ROTATINGSPHERE))
+     for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[0][4+d]-Boundaries[0][0] << " " << Boundaries[0][4+d]+Boundaries[0][0]  << " " ;
+   else
+     for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[i][0] << " " << Boundaries[i][1] << " " ;
    xmlout->closebranch() ;
 
    xmlout->openbranch("radius", {make_pair("length", to_string(N))}) ;
