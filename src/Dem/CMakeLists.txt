@@ -7,6 +7,13 @@
 set (max_dimension "5" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
 add_compile_definitions(MAXDIM=${max_dimension})
 
+
+set(VALID_BUILD_TYPES "Debug" "RelWithDebInfo" "Release")
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${VALID_BUILD_TYPES})
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo." FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 #if(SAVE_FORCE_COMPONENTS)
 #   add_definitions(-DSAVE_FORCE_COMPONENTS=1)
 #else ()
@@ -27,6 +34,20 @@ if(EMSCRIPTEN)
     "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMND' -s EXPORTED_RUNTIME_METHODS=[getValue]"
  )
 else()
- target_compile_options(DEMND PUBLIC -g -fopenmp -Wall -Wextra)
- target_link_libraries(DEMND PUBLIC -g -fopenmp -lstdc++fs -lm -Wall -Wextra)
+   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      target_compile_options(DEMND PUBLIC -fopenmp -Wall -Wextra)
+      target_link_libraries(DEMND PUBLIC -fopenmp -lstdc++fs -lm -Wall -Wextra)
+   elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+      target_compile_options(DEMND PUBLIC -O3 -fopenmp -Wall -Wextra)
+      target_link_libraries(DEMND PUBLIC -O3 -fopenmp -lstdc++fs -lm -Wall -Wextra)
+   elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+      target_compile_options(DEMND PUBLIC -O3 -fopenmp -Wall -Wextra)
+      target_link_libraries(DEMND PUBLIC -O3 -fopenmp -lstdc++fs -lm -Wall -Wextra)
+   else()
+      target_compile_options(DEMND PUBLIC -O3 -fopenmp -Wall -Wextra)
+      target_link_libraries(DEMND PUBLIC -O3 -fopenmp -lstdc++fs -lm -Wall -Wextra)
+   endif()
+
+   
+
 endif()

@@ -20,8 +20,8 @@ public :
     Action() : Fn(d,0), Ft(d,0), Torquei(d*(d-1)/2,0), Torquej(d*(d-1)/2,0), vn(d,0), vt(d,0) {} 
     vector <double> Fn, Ft, Torquei, Torquej ;
     vector <double> vn, vt ;
-    void set (v1d a, v1d b, v1d c, v1d dd) {Fn=a ; Ft=b ; Torquei=c ; Torquej=dd ; }
-    void setvel(v1d vvn, v1d vvt) {vn=vvn; vt=vvt ;}
+    void set (cv1d &a, cv1d &b, cv1d &c, cv1d &dd) {Fn=a ; Ft=b ; Torquei=c ; Torquej=dd ; }
+    void setvel(cv1d &vvn, cv1d &vvt) {vn=vvn; vt=vvt ;}
     void setzero () 
     {
         for (int dd=0 ; dd<d ; dd++) Fn[dd]=Ft[dd]=vn[dd]=vt[dd]=0 ;    

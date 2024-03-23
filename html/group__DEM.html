@@ -587,6 +587,9 @@ Variables</h2></td></tr>
 <tr class="memitem:ga567c478cb6490ecbebb51b1eca3daebe"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga567c478cb6490ecbebb51b1eca3daebe">Tools&lt; d &gt;::det</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M)</td></tr>
 <tr class="memdesc:ga567c478cb6490ecbebb51b1eca3daebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix determinant (probably quite slow, but shouldn't really really matters for the usage)  <a href="group__DEM.html#ga567c478cb6490ecbebb51b1eca3daebe">More...</a><br /></td></tr>
 <tr class="separator:ga567c478cb6490ecbebb51b1eca3daebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaec638728dd27c23e2eef8c4533967658"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaec638728dd27c23e2eef8c4533967658">Tools&lt; d &gt;::det</a> (double M[<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>][<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>])</td></tr>
+<tr class="memdesc:gaec638728dd27c23e2eef8c4533967658"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix determinant using array on the stack (avoids malloc/free)  <a href="group__DEM.html#gaec638728dd27c23e2eef8c4533967658">More...</a><br /></td></tr>
+<tr class="separator:gaec638728dd27c23e2eef8c4533967658"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga99ce0f2023777fee64aa1d05b72353ed"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga99ce0f2023777fee64aa1d05b72353ed">Tools&lt; d &gt;::inverse</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M)</td></tr>
 <tr class="memdesc:ga99ce0f2023777fee64aa1d05b72353ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix inverse (very slow and redundant calculation of the determinant for the comatrix, but shouldn't really really matters for the usage)  <a href="group__DEM.html#ga99ce0f2023777fee64aa1d05b72353ed">More...</a><br /></td></tr>
 <tr class="separator:ga99ce0f2023777fee64aa1d05b72353ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1509,7 +1512,7 @@ template&lt;int d&gt; </div>
 </div>
 </div>
 <a id="ga567c478cb6490ecbebb51b1eca3daebe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga567c478cb6490ecbebb51b1eca3daebe">&#9670;&nbsp;</a></span>det() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga567c478cb6490ecbebb51b1eca3daebe">&#9670;&nbsp;</a></span>det() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1539,7 +1542,7 @@ template&lt;int d&gt; </div>
 </div>
 </div>
 <a id="ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">&#9670;&nbsp;</a></span>det() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">&#9670;&nbsp;</a></span>det() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1565,6 +1568,36 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage) </p>
+
+</div>
+</div>
+<a id="gaec638728dd27c23e2eef8c4533967658"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaec638728dd27c23e2eef8c4533967658">&#9670;&nbsp;</a></span>det() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::det </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>M</em>[d][d]</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>compute the matrix determinant using array on the stack (avoids malloc/free) </p>
 
 </div>
 </div>

@@ -259,6 +259,7 @@ static v1d transpose (cv1d & a) {v1d b (d*d,0) ; for (int i=0 ; i<d*d ; i++) b[(
 static void transpose_inplace (v1d & a) { for (int i=0 ; i<d ; i++) for (int j=i+1 ; j<d ; j++) std::swap(a[i*d+j], a[j*d+i]) ; } ///< Transpose in-place
 static double det (cv2d & M) ; ///< compute the matrix determinant (probably quite slow, but doesn't really really matters for the usage)
 static double det (cv1d & M) ; ///< compute the matrix determinant (probably quite slow, but shouldn't really really matters for the usage)
+static double det (double M[d][d]) ; ///< compute the matrix determinant using array on the stack (avoids malloc/free)
 static v1d inverse (cv1d & M) ; ///< compute the matrix inverse (very slow and redundant calculation of the determinant for the comatrix, but shouldn't really really matters for the usage)
 ///@}
 
@@ -709,9 +710,14 @@ template <int d>
 v1d Tools<d>::wedgeproduct (cv1d &a, cv1d &b)
 {
   v1d res (d*(d-1)/2, 0) ; int k ;
-  auto iter = MASIndex.begin() ;
+  /*auto iter = MASIndex.begin() ; //TODO speedup (iter allocates)
   for (k=0 ; iter!= MASIndex.end() ; iter++, k++)
-      res[k]=a[iter->first]*b[iter->second]-a[iter->second]*b[iter->first] ;
+      res[k]=a[iter->first]*b[iter->second]-a[iter->second]*b[iter->first] ;*/
+  
+  //auto iter = MASIndex.begin() ; //TODO speedup (iter allocates)
+  for (k=0 ; k<d ; k++)
+      res[k]=a[ MASIndex[k].first ]*b[MASIndex[k].second]-a[MASIndex[k].second]*b[MASIndex[k].first] ;
+  
   return (res) ;
 }
 //----------------------------------------
@@ -719,9 +725,9 @@ template <int d>
 void Tools<d>::wedgeproduct (v1d &res, cv1d &a, cv1d &b)
 {
   int k ;
-  auto iter = MASIndex.begin() ;
-  for (k=0 ; iter!= MASIndex.end() ; iter++, k++)
-      res[k]=a[iter->first]*b[iter->second]-a[iter->second]*b[iter->first] ;
+  //auto iter = MASIndex.begin() ; //TODO speedup (iter allocates)
+  for (k=0 ; k<d ; k++)
+      res[k]=a[ MASIndex[k].first ]*b[MASIndex[k].second]-a[MASIndex[k].second]*b[MASIndex[k].first] ;
 }
 //-----------------------------------
 template <int d>
@@ -759,8 +765,9 @@ template <int d>
 double Tools<d>::det (cv2d &M)
 {
  double res=0 ;
- vector<vector<double>>submatrix ;
- submatrix.resize(d-1, vector<double>(d-1)) ;  
+ //vector<vector<double>>submatrix ; //TODO speedup
+ //submatrix.resize(d-1, vector<double>(d-1)) ;  
+ double submatrix[d-1][d-1] ; 
  for (int i=0 ; i<d ; i++)
  {
    for (int j=0 ; j<d ; j++)
@@ -780,15 +787,16 @@ template <int d>
 double Tools<d>::det (cv1d &M)
 {
  double res=0 ;
- vector<double> submatrix ;
- submatrix.resize((d-1)*(d-1)) ;  
+ //vector<double> submatrix ;
+ //submatrix.resize((d-1)*(d-1)) ;  
+ double submatrix[d-1][d-1] ; 
  for (int i=0 ; i<d ; i++)
  {
    for (int j=0 ; j<d ; j++)
      for (int k=0 ; k<d-1 ; k++)
      {
        if (j==i) continue ; 
-       submatrix[k*(d-1)+ j-(j>i?1:0)]=M[k*d+j] ; 
+       submatrix[k][j-(j>i?1:0)]=M[k*d+j] ; 
      }
    res += ((i+d-1)%2?-1:1) * M[(d-1)*d+i] * Tools<d-1>::det(submatrix) ;
  }
@@ -796,6 +804,28 @@ double Tools<d>::det (cv1d &M)
 }
 template <> double Tools<2>::det(cv1d &M) { return M[0]*M[3]-M[1]*M[2] ; }
 template <> double Tools<1>::det(cv1d &M) { return M[0] ; }
+//----------------------------------------------------------
+template <int d>
+double Tools<d>::det (double M[d][d]) //All the other overload (vectors) eventually use that one for their recursion. 
+{
+ double res=0 ;
+ //vector<vector<double>>submatrix ; //TODO speedup
+ //submatrix.resize(d-1, vector<double>(d-1)) ;  
+ double submatrix[d-1][d-1] ; 
+ for (int i=0 ; i<d ; i++)
+ {
+   for (int j=0 ; j<d ; j++)
+     for (int k=0 ; k<d-1 ; k++)
+     {
+       if (j==i) continue ; 
+       submatrix[k][j-(j>i?1:0)]=M[k][j] ; 
+     }
+   res += ((i+d-1)%2?-1:1) * M[d-1][i] * Tools<d-1>::det(submatrix) ;
+ }
+ return res ; 
+}
+template <> double Tools<2>::det (double M[2][2] ) { return M[0][0]*M[1][1]-M[1][0]*M[0][1] ; }
+template <> double Tools<1>::det (double M[1][1] ) { return M[0][0] ; }
 //==================================
 template <int d>
 vector<double> Tools<d>::inverse (cv1d &M)

@@ -197,7 +197,9 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   }
 
   //Normal force
-  Fn=cn*(ovlp*kn) - vn*gamman ;
+  //Fn=cn*(ovlp*kn) - vn*gamman ; 
+  Tools<d>::vMul(Fn, cn, ovlp*kn) ; 
+  Tools<d>::vSubScaled (Fn, gamman, vn) ; //Fn=cn*(ovlp*kn) - vn*gamman ; 
   if (isdumptime)
   {
     Act.Fn_el = cn*(ovlp*kn) ; 
@@ -234,7 +236,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
     Tools<d>::vSubScaled(Ft, gammat, vt) ; //Ft -= (vt*Gammat) ;
   }
   Tools<d>::wedgeproduct(Torquei, rri, Ft) ;
-  Tools<d>::wedgeproduct(Torquej, rrj, -Ft) ; //TODO check the minus sign
+  Tools<d>::wedgeproduct(Torquej, Ft, rrj) ; //TODO check the minus sign Torquej = rrj^-Ft = Ft^rrj <= better for speed
 
   Contact.tspr=tspr ;
   //Act.set_rev(-Fn, -Ft, Torquej) ;
@@ -277,8 +279,10 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
     gammat = P->Gammat ;
   }
 
-  Fn=cn*(ovlp*kn) - vn*gamman;
-
+  //Fn=cn*(ovlp*kn) - vn*gamman;
+  Tools<d>::vMul(Fn, cn, ovlp*kn) ; 
+  Tools<d>::vSubScaled (Fn, gamman, vn) ; //Fn=cn*(ovlp*kn) - vn*gamman ; 
+  
   //Tangential force computation: retrieve contact or create new contact
   //history=History[make_pair(i,-(2*j+k+1))] ;
   tspr=Contact.tspr ; //history.second ;
@@ -346,8 +350,10 @@ void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, dou
   }
 
   //Normal force
-  Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
-
+  //Fn=cn*(ovlp*kn) - vn*gamman ;
+  Tools<d>::vMul(Fn, cn, ovlp*kn) ; 
+  Tools<d>::vSubScaled (Fn, gamman, vn) ; //Fn=cn*(ovlp*kn) - vn*gamman ; 
+  
   //Tangential force computation: retrieve contact or create new contact
   tspr=Contact.tspr ;
   if (tspr.size()==0) tspr.resize(d,0) ;
@@ -415,8 +421,10 @@ void Contacts<d>::particle_mesh ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri,
   }
 
   //Normal force
-  Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
-
+  //Fn=cn*(ovlp*kn) - vn*gamman ; //TODO
+  Tools<d>::vMul(Fn, cn, ovlp*kn) ; 
+  Tools<d>::vSubScaled (Fn, gamman, vn) ; //Fn=cn*(ovlp*kn) - vn*gamman ; 
+  
   //Tangential force computation: retrieve contact or create new contact
   //history=History[make_pair(i,-(2*j+k+1))] ;
   tspr=Contact.tspr ; //history.second ;
