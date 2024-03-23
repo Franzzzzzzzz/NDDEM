@@ -13,7 +13,7 @@
 #include <map>
 //#include <boost/variant.hpp>
 #include <variant>
-#if __GNUC__ < 8
+#if !__EMSCRIPTEN__ && __GNUC__ < 8
   #include <experimental/filesystem>
   namespace fs = std::experimental::filesystem ; 
 #else
