@@ -19,7 +19,7 @@ using v1i = vector <int> ;
 enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, lpq, fpq, mpq, mqp, extra_named} ;
 
 enum ContactModels {HOOKE=0, HERTZ} ; 
-enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4, PBC_LE=5, ELLIPSE=6} ; ///< Wall types
+enum class WallType {PBC=0, WALL=1, MOVINGWALL=2, SPHERE=3, ROTATINGSPHERE=4, PBC_LE=5, ELLIPSE=6, HEMISPHERE=7, AXIALCYLINDER} ; ///< Wall types
 
 #endif
 
