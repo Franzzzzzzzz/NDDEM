@@ -698,6 +698,8 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
     else if (!strcmp(line, "WALL")) Boundaries[id][3]=static_cast<int>(WallType::WALL) ;
     else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
     else if (!strcmp(line, "SPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::SPHERE) ; Boundaries[id].resize(4+d,0) ; }
+    else if (!strcmp(line, "HEMISPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::HEMISPHERE) ; Boundaries[id].resize(4+d,0) ; }
+    else if (!strcmp(line, "AXIALCYLINDER")) {Boundaries[id][3]=static_cast<int>(WallType::AXIALCYLINDER) ; }
     else if (!strcmp(line, "ROTATINGSPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::ROTATINGSPHERE) ; Boundaries[id].resize(4+d+d*(d-1)/2,0) ; }
     else if (!strcmp(line, "PBCLE")) {Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(6,0) ; }
     else if (!strcmp(line, "ELLIPSE")) {Boundaries[id][3]=static_cast<int>(WallType::ELLIPSE) ; Boundaries[id].resize(5,0) ; }
@@ -712,6 +714,13 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
             Boundaries[id][4]=Boundaries[id][1] ;
             Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
             for (int i=1 ; i<d; i++) // dim 0 has already been read and put in [4]
+                in>>Boundaries[id][4+i] ;
+    }
+    else if (Boundaries[id][3] == static_cast<int>(WallType::HEMISPHERE) )
+    {
+            Boundaries[id][2] = Boundaries[id][1] ; 
+            Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
+            for (int i=0 ; i<d; i++) // dim 0 has already been read and put in [4]
                 in>>Boundaries[id][4+i] ;
     }
     else if (Boundaries[id][3] == static_cast<int>(WallType::ROTATINGSPHERE) )
@@ -949,7 +958,35 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
             }
          } while ( sqrt(dst) > (Boundaries[id][0]-2*r[i])) ;
         }
-    }      
+    }  
+    else if (!strcmp(line, "incylinder"))
+    {
+        //printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
+        auto w = std::find_if(Boundaries.begin(), Boundaries.end(), [](auto u){return (u[3]==static_cast<int>(WallType::AXIALCYLINDER)) ; }) ; 
+        if ( w== Boundaries.end()) {printf("ERR: the cylinder wall cannot be found\n") ; fflush(stdout) ; } 
+        int id = w-Boundaries.begin() ; 
+        
+        for (int i=0 ; i<N ; i++)
+        {
+         double dst=0 ;
+         printf(".") ; fflush(stdout);
+         do {
+            dst=0 ;
+            for(int dd=0 ; dd < d ; dd++)
+            {
+              if (dd == static_cast<int>(Boundaries[id][1]))
+              {
+                X[i][dd] = rand() * (Boundaries[Boundaries[id][1]][2]-2*r[i]) + Boundaries[Boundaries[id][1]][0] + r[i] ; 
+              }
+              else 
+              {
+                X[i][dd] = (rand()*Boundaries[id][0]*2-Boundaries[id][0]) ; 
+                dst += X[i][dd]*X[i][dd] ;
+              }
+            }
+         } while ( sqrt(dst) > (Boundaries[id][0]-2*r[i])) ;
+        }
+    }
     else if (!strcmp(line, "roughinclineplane"))
     {
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;

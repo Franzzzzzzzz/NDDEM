@@ -326,12 +326,34 @@ public:
                             CLw.insert(tmpcp) ;
                         }
                     }
-                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE) || P.Boundaries[j][3]==static_cast<int>(WallType::ROTATINGSPHERE))
+                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE) || 
+                             P.Boundaries[j][3]==static_cast<int>(WallType::HEMISPHERE) || 
+                             P.Boundaries[j][3]==static_cast<int>(WallType::ROTATINGSPHERE))
                     {
                         tmpcp.contactlength=0 ;
                         for (int dd=0 ; dd<d ; dd++)
                             tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ;
-
+                        
+                        //printf("%d %g ", j, P.Boundaries[j][0]) ; 
+                        if (tmpcp.contactlength < (P.Boundaries[j][0] + P.r[i])*(P.Boundaries[j][0] + P.r[i]) &&
+                            tmpcp.contactlength > (P.Boundaries[j][0] - P.r[i])*(P.Boundaries[j][0] - P.r[i]))
+                        {
+                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j][0] ;
+                            if (tmpcp.contactlength < 0) tmpcp.j=2*j;
+                            else tmpcp.j=2*j+1 ;
+                            tmpcp.contactlength = fabs(tmpcp.contactlength) ;
+                            CLw.insert(tmpcp) ;
+                        }
+                    }
+                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::AXIALCYLINDER))
+                    {                        
+                        tmpcp.contactlength=0 ;
+                        
+                        for (int dd=0 ; dd<d ; dd++)
+                        {
+                            if (dd == P.Boundaries[j][1]) continue ; 
+                            tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ;
+                        }
                         if (tmpcp.contactlength < (P.Boundaries[j][0] + P.r[i])*(P.Boundaries[j][0] + P.r[i]) &&
                             tmpcp.contactlength > (P.Boundaries[j][0] - P.r[i])*(P.Boundaries[j][0] - P.r[i]))
                         {
@@ -447,12 +469,27 @@ public:
             // Particle wall contacts
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
-                if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::SPHERE))
+                if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::SPHERE) ||
+                   (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::HEMISPHERE))
+                )
                 {
+                    if ( P.Boundaries[it->j/2][3] == static_cast<int>(WallType::HEMISPHERE) && 
+                        X[it->i][P.Boundaries[it->j/2][2]]>P.Boundaries[it->j/2][4+P.Boundaries[it->j/2][2]]+P.r[it->i]) continue ; 
                     for (int dd = 0 ; dd<d ; dd++)
                         tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;
+                }
+                else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::AXIALCYLINDER))
+                {
+                    tmpcn[static_cast<int>(P.Boundaries[it->j/2][1])]= 0 ; 
+                    for (int dd = 0 ; dd<d ; dd++)
+                    {
+                        if (dd == P.Boundaries[it->j/2][1]) continue ; 
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
+                    }
+                    tmpcn/=Tools<d>::norm(tmpcn) ;
+                    C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;                    
                 }
                 else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ROTATINGSPHERE))
                 {
