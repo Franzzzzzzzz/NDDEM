@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['gzip_2ecpp_2945',['gzip.cpp',['../gzip_8cpp.html',1,'']]],
-  ['gzip_2ehpp_2946',['gzip.hpp',['../gzip_8hpp.html',1,'']]]
+  ['gzip_2ecpp_2980',['gzip.cpp',['../gzip_8cpp.html',1,'']]],
+  ['gzip_2ehpp_2981',['gzip.hpp',['../gzip_8hpp.html',1,'']]]
 ];

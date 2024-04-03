@@ -58,7 +58,7 @@ template <int d>
 class cp
 {
 public:
- cp (int ii, int jj, double ctlength, Action<d> * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false){} ///< New contact creation
+ cp (int ii, int jj, double ctlength, Action<d> * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false), persisting(true) {} ///< New contact creation
  cp(const cp& v) { *this=v ; }
  ~cp () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
  cp & operator= (const cp & c)
@@ -106,6 +106,7 @@ public:
  vector <double> tspr ; ///< Vector of tangential contact history
  Action<d> * infos ; ///< stores contact information if contact storing is requires \warning Poorly tested.
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
+ bool persisting ; ///< True if the contact is still maintained for the current ts. 
  
  std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, cv2d & Boundaries)
  {
@@ -169,6 +170,58 @@ public:
  void reset() {it = v.begin() ;}  ///< Go to the contact list beginning
  int insert(const cp<d>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which opened.
+ 
+ // Functions for Cell contact detections
+ int make_iterator_array(int N) 
+ {
+     it_array_beg.resize(N) ;
+     it_array_end.resize(N) ;
+     for (int i=0 ; i<N ; i++) it_array_beg[i] = null_list.begin() ; 
+     
+     while (v.begin()!=v.end() && !(v.begin()->persisting)) v.erase(v.begin()) ; 
+     
+     int curi = -1 ; int n=0 ; 
+     auto tmpit = v.begin() ; 
+     for (auto it = v.begin() ; it!=v.end() ; it++, n++)
+     {
+         if (it->i != curi)
+         {
+             it_array_beg[it->i] = it ; 
+             if (curi!= -1) it_array_end[curi] = it ; 
+             curi = it->i ; 
+         }
+         tmpit = it ; 
+         while (++tmpit != v.end() && !tmpit->persisting) {v.erase(tmpit) ; tmpit = it ; }
+     }
+     return 0 ; 
+ }
+ std::pair<typename list<cp<d>>::iterator, typename list<cp<d>>::iterator> it_bounds (int nmin, int nmax, int N)
+ {     
+     for ( ; nmin < N && it_array_beg[nmin] == null_list.begin() ; nmin++) ;
+     for ( ; nmax >=0 && it_array_beg[nmax] == null_list.begin() ; nmax--) ;
+
+     if (nmax<nmin) return {v.end(), v.end()} ; 
+     return {it_array_beg[nmin], it_array_end[nmax]} ; 
+ }
+ bool insert_cell (const cp<d>& a)
+ {
+     if (it_array_beg[a.i] == null_list.begin()) return false ; 
+     for (it = it_array_beg[a.i] ; it != it_array_end[a.i] ; it++)
+     {
+        if ((*it)==a)
+        {
+            it->contactlength=a.contactlength ;
+            it->ghost=a.ghost ;
+            it->ghostdir=a.ghostdir ;
+            it->persisting = true ; 
+            return true ; 
+        }
+     }
+     return false ; 
+ }
+ 
+ 
+ 
  list <cp<d>> v ; ///< Contains the list of contact
  Action<d> * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
@@ -184,6 +237,8 @@ public:
 private:
  typename list<cp<d>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
  Action<d> def ; ///< Default action
+ std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
+ list<cp<d>> null_list ; 
 };
 
 template <int d>
@@ -337,6 +392,7 @@ int ContactList<d>::insert(const cp<d> &a)
             it->contactlength=a.contactlength ;
             it->ghost=a.ghost ;
             it->ghostdir=a.ghostdir ;
+            it->persisting = true ; 
             it++ ;
         }
         else {it=v.insert(it,a) ; it++ ; }

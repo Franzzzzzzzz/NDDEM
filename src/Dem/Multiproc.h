@@ -25,6 +25,7 @@ public:
   
   void initialise (int NN, int PP, Parameters<d> & Param) {
     share.resize(PP+1,0) ; 
+    sharecell.resize(PP+1,0) ; 
     num_time=0 ; 
     P=PP ; 
     N=NN ; 
@@ -50,12 +51,38 @@ public:
   void delayingwall (int ID, int j, Action<d> & act) ; ///< Record the action on the wall. Only usefull if the force on the wall needs to be calculated
   void delayedwall_clean() ; ///< Clean the record of the force on the wal. 
   void load_balance() ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations. 
+  void merge_split_CLp () 
+  {
+    for (int p=1 ; p<P ; p++)
+      CLp[0].v.splice(CLp[0].v.end(), CLp[p].v) ; 
+    CLp[0].v.sort() ; 
+    CLp_all.v.merge(CLp[0].v) ; 
+    
+    CLp_all.make_iterator_array(N) ; 
+    
+    for (int p=0 ; p<P ; p++)
+    {
+      if (CLp[p].v.size() !=0) {printf("ERR: CLp %d should be of size 0 at this stage\n", p) ; }
+      auto [it_min, it_max] = CLp_all.it_bounds(share[p], share[p+1], N)  ;
+      if (it_min!=it_max) CLp[p].v.splice(CLp[p].v.begin(), CLp_all.v, it_min, it_max) ; 
+    }
+  }
+  void mergeback_CLp()
+  {
+    if (CLp_all.v.size() != 0) {printf("ERR: CLpall should be of size 0 at this stage\n") ; }
+    for (int p=0 ; p<P ; p++)
+    {
+      CLp_all.v.splice(CLp_all.v.end(), CLp[p].v) ; 
+    }
+  }
 
+  ContactList<d> CLp_all ; ///< Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). 
   vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
   vector <ContactList<d>> CLw ; ///< ContactList particle-wall for each processor
   vector <ContactListMesh<d>> CLm ; ///< ContactList particle-mesh for each processor
   vector <Contacts<d>> C ; ///< Dummy Contacts for independent calculation per processor
-  vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=d+1. 
+  vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=P+1. 
+  vector <int> sharecell ; ///< Cell share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1. 
   vector <double> timing ; ///< Used to record the time spent by each thread. 
   int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
 

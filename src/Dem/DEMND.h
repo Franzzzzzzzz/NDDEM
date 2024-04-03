@@ -13,6 +13,7 @@
 #include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"
+#include "Cells.h"
 #ifdef EMSCRIPTEN
     #include <emscripten.h>
     #include <emscripten/bind.h>
@@ -84,6 +85,7 @@ public:
 
     int numthread=1 ;
     Multiproc<d> MP ;
+    Cells<d> cells ; 
 
     double t ; int ti ;
     double dt ;
@@ -155,7 +157,9 @@ public:
         #endif
 
         MP.initialise(N, numthread, P) ;
-
+        
+        if (P.contact_strategy == ContactStrategies::CELLS) {cells.init_cells(P.Boundaries, P.cellsize) ; }
+        
         dt=P.dt ;
         t=0 ; ti=0 ;
         tprevious=clock() ;
@@ -259,10 +263,13 @@ public:
         P.perform_MOVINGWALL() ;
         P.perform_PBCLE_move() ;
         std::invoke (P.update_gravity, &P, dt) ;
+        if (P.contact_strategy == ContactStrategies::CELLS) cells.allocate_to_cells(X) ; 
 
         //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
         // ----- Contact detection ------
+        if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
+        
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout)
         {
          #ifdef NO_OPENMP
@@ -271,38 +278,52 @@ public:
          int ID = omp_get_thread_num();
          double timebeg = omp_get_wtime();
          #endif
-         cp<d> tmpcp(0,0,0,nullptr) ; double sum=0 ;
          cpm<d> tmpcpm(0,0,0,0,nullptr) ; 
+         cp<d> tmpcp(0,0,0,nullptr) ; double sum=0 ;
          
-         ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
-         CLp.reset() ; CLw.reset(); CLm.reset() ; 
-
-         for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+         ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
+         CLw.reset(); CLm.reset() ; 
+        
+         if (P.contact_strategy == ContactStrategies::CELLS)
          {
-            // Contact detection between particles
-            tmpcp.setinfo(CLp.default_action());
-            tmpcp.i=i ;
-            for (int j=i+1 ; j<N ; j++) // Regular particles
+             cells.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r) ; 
+         }
+         else
+         {
+            ContactList<d> & CLp = MP.CLp[ID] ;
+            CLp.reset() ; 
+            
+            for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
             {
-                if (RigidBodyId[i].has_value() && RigidBodyId[j].has_value() &&  RigidBodyId[i]==RigidBodyId[j]) continue ; 
-                if (Ghost[j])
+                // Contact detection between particles
+                tmpcp.setinfo(CLp.default_action());
+                tmpcp.i=i ;
+                for (int j=i+1 ; j<N ; j++) // Regular particles
                 {
-                    tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
-                    //CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
-                    (CLp.*CLp.check_ghost) (Ghost[j], P, X[i], X[j], tmpcp, 0,0,0) ;
-                }
-                else
-                {
-                    sum=0 ;
-                    for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-                    if (sum<P.skinsqr)
+                    if (RigidBodyId[i].has_value() && RigidBodyId[j].has_value() &&  RigidBodyId[i]==RigidBodyId[j]) continue ; 
+                    if (Ghost[j])
                     {
-                        tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-                        CLp.insert(tmpcp) ;
+                        tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+                        //CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
+                        (CLp.*CLp.check_ghost) (Ghost[j], P, X[i], X[j], tmpcp, 0,0,0) ;
+                    }
+                    else
+                    {
+                        sum=0 ;
+                        for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+                        if (sum<P.skinsqr)
+                        {
+                            tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
+                            CLp.insert(tmpcp) ;
+                        }
                     }
                 }
             }
-
+            CLp.finalise() ;
+         }
+         
+         for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
+         {
             // Contact detection between particles and walls
             tmpcp.setinfo(CLw.default_action());
             tmpcp.i=i ; tmpcp.ghost=0 ;
@@ -396,13 +417,15 @@ public:
                 }
             }
         }
-        CLp.finalise() ;
         CLw.finalise() ;
         CLm.finalise() ;
         #ifndef NO_OPENMP
         MP.timing[ID] += omp_get_wtime()-timebeg;
         #endif
-      } //END PARALLEL SECTION
+        } //END PARALLEL SECTION
+      
+        if (P.contact_strategy == ContactStrategies::CELLS) MP.merge_split_CLp() ; 
+        
         //-------------------------------------------------------------------------------
         // Force and torque computation
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
@@ -437,32 +460,33 @@ public:
             // Particle-particle contacts
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
-            if (it->ghost==0)
-            {
-                C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
-                                    X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime) ;
-            }
-            else
-            {
-                // printf("%d\n", it->ghost) ; fflush(stdout) ; 
-                (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
-                                       X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
-            }
+                if (it->ghost==0)
+                {
+                    C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
+                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime) ;
+                }
+                else
+                {
+                    // printf("%d\n", it->ghost) ; fflush(stdout) ; 
+                    (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
+                                        X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
+                }
 
-            if (isdumptime) it->saveinfo(C.Act) ;
+                if (isdumptime) it->saveinfo(C.Act) ;
 
-            Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
-            Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
+                Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
+                Tools<d>::vAddOne(Torque[it->i], C.Act.Torquei, TorqueCorr[it->i]) ;
 
-            if (MP.ismine(ID,it->j))
-            {
-                Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
-                Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
-            }
-            else
-                MP.delaying(ID, it->j, C.Act) ;
+                if (MP.ismine(ID,it->j))
+                {
+                    Tools<d>::vSubFew(F[it->j], C.Act.Fn, C.Act.Ft, Fcorr[it->j]) ;
+                    Tools<d>::vAddOne(Torque[it->j], C.Act.Torquej, TorqueCorr[it->j]) ;
+                }
+                else
+                    MP.delaying(ID, it->j, C.Act) ;
+                it->persisting = false ; 
 
-            //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
+                //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
             //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
 

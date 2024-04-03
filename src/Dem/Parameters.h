@@ -133,6 +133,8 @@ public :
         Mu_wall(0.5),        // Wall friction coefficient
         damping(0.0),
         skin(1.0), skinsqr(1.0),      // Skin size (for verlet list optimisation)
+        cellsize(1),
+        contact_strategy(ContactStrategies::NAIVE), 
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
@@ -172,7 +174,9 @@ public :
     double damping; //< Artificial rolling damping
     double skin ; ///< Skin for use in verlet list \warning Experimental
     double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental
-    ContactModels ContactModel=HOOKE ;
+    double cellsize ; ///< Size of cells for contact detection
+    ContactModels ContactModel=HOOKE ; ///< Model of interparticle contact
+    ContactStrategies contact_strategy = NAIVE ; ///< Strategy for the contact detection
     vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
     //ExportType dumpkind ;
     //ExportData dumplist ;
@@ -525,7 +529,8 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      {"dt",&dt},
      {"skin", &skin},
      {"gradientdescent_gamma", &graddesc_gamma},
-     {"gradientdescent_tol", &graddesc_tol}
+     {"gradientdescent_tol", &graddesc_tol},
+     {"cell_size", &cellsize}
   } ;
 
 // Lambda definitions
@@ -679,6 +684,9 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["mass"]     = [&](){int id ; double mass ;   in>>id>>mass   ; if(id==-1) m = v1d(N,mass  ) ; else r[id]=mass   ; printf("[INFO] Set mass of particle.\n") ;} ;
  Lvl0["gravity"]  = [&](){for (int i=0 ; i<d ; i++) {in >> g[i] ;} printf("[INFO] Changing gravity.\n") ; } ;
  Lvl0["ContactModel"] = [&](){ std::string s ; in >> s ; if (s=="Hertz") {ContactModel=ContactModels::HERTZ ;printf("[INFO] Using Hertz model\n") ;} else ContactModel=ContactModels::HOOKE ; } ;
+ Lvl0["ContactStrategy"] = [&](){ std::string s ; in >> s ; if (s=="naive") {contact_strategy = ContactStrategies::NAIVE ; } 
+                                                            else if (s=="cells") {contact_strategy = ContactStrategies::CELLS  ; } 
+                                                            else {printf("[WARN] Unknown contact strategy\n") ; }} ;
  Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
     Tools<d>::setzero(g) ;
     g[0] = -intensity * cos(angle / 180. * M_PI) ;

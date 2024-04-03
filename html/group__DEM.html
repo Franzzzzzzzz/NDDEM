@@ -75,6 +75,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html">Cell</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Individual cell for contact detection.  <a href="classCell.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html">Cells&lt; d &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">All the cells making the space, with related function for creating the cell array, neighbour arrays etc. Currently non implemented TODO: no pbc handling, no handling of moving boundaries.  <a href="classCells.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAction.html">Action&lt; d &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle force and torque contact information.  <a href="classAction.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -256,6 +262,10 @@ Enumerations</h2></td></tr>
 , <a class="el" href="group__DEM.html#gga823000505b0f0b93416074a98e1b7078a2b65c81040f82876138e37991162eb62">HERTZ</a>
  }</td></tr>
 <tr class="separator:ga823000505b0f0b93416074a98e1b7078"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga375410cc0bbd996376cbb08826d3b195"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga375410cc0bbd996376cbb08826d3b195">ContactStrategies</a> { <a class="el" href="group__DEM.html#gga375410cc0bbd996376cbb08826d3b195aae60f6d4f25d2ffa4c1fd272ea4f22e4">NAIVE</a> =0
+, <a class="el" href="group__DEM.html#gga375410cc0bbd996376cbb08826d3b195a8653d5a76f09db2c3ee8cc2abbe37565">CELLS</a> =1
+ }</td></tr>
+<tr class="separator:ga375410cc0bbd996376cbb08826d3b195"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac5ecf92a792f505a64533e107971ae35"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac5ecf92a792f505a64533e107971ae35">WallType</a> { <br />
 &#160;&#160;<a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a817a7e6f14396060c4e915adcaefb88e">PBC</a> =0
 , <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a48d536b2de1195d0c9f6ea8ab884085e">WALL</a> =1
@@ -878,6 +888,24 @@ Variables</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga823000505b0f0b93416074a98e1b7078afa2f176dfb59fc057fad92598923fcb5"></a>HOOKE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="gga823000505b0f0b93416074a98e1b7078a2b65c81040f82876138e37991162eb62"></a>HERTZ&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="ga375410cc0bbd996376cbb08826d3b195"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga375410cc0bbd996376cbb08826d3b195">&#9670;&nbsp;</a></span>ContactStrategies</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__DEM.html#ga375410cc0bbd996376cbb08826d3b195">ContactStrategies</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga375410cc0bbd996376cbb08826d3b195aae60f6d4f25d2ffa4c1fd272ea4f22e4"></a>NAIVE&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga375410cc0bbd996376cbb08826d3b195a8653d5a76f09db2c3ee8cc2abbe37565"></a>CELLS&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>

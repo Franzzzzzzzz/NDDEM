@@ -102,12 +102,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">load_balance</a> ()</td></tr>
 <tr class="memdesc:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">More...</a><br /></td></tr>
 <tr class="separator:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87050aeab8113dc0e1fb28c51e3979b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a87050aeab8113dc0e1fb28c51e3979b8">merge_split_CLp</a> ()</td></tr>
+<tr class="separator:a87050aeab8113dc0e1fb28c51e3979b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94f58ca4ca4e971589c41343c08fc75b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a94f58ca4ca4e971589c41343c08fc75b">mergeback_CLp</a> ()</td></tr>
+<tr class="separator:a94f58ca4ca4e971589c41343c08fc75b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="el" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</td></tr>
 <tr class="memdesc:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">pack the contact data in a 2d array  <a href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">More...</a><br /></td></tr>
 <tr class="separator:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:ad7e0402a4f8c180d27f4977d57b064b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ad7e0402a4f8c180d27f4977d57b064b8">CLp_all</a></td></tr>
+<tr class="memdesc:ad7e0402a4f8c180d27f4977d57b064b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc).  <a href="classMultiproc.html#ad7e0402a4f8c180d27f4977d57b064b8">More...</a><br /></td></tr>
+<tr class="separator:ad7e0402a4f8c180d27f4977d57b064b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e44ce6bab8e8f03bbc21d2616c651ea"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea">CLp</a></td></tr>
 <tr class="memdesc:a8e44ce6bab8e8f03bbc21d2616c651ea"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classContactList.html" title="Handles lists of contacts.">ContactList</a> particle-particle for each processor.  <a href="classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea">More...</a><br /></td></tr>
 <tr class="separator:a8e44ce6bab8e8f03bbc21d2616c651ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,8 +128,11 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a4e7773b5cad1e6e8034756a456b1bc20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dummy <a class="el" href="classContacts.html" title="Calculate contact forces.">Contacts</a> for independent calculation per processor.  <a href="classMultiproc.html#a4e7773b5cad1e6e8034756a456b1bc20">More...</a><br /></td></tr>
 <tr class="separator:a4e7773b5cad1e6e8034756a456b1bc20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaca563b2f6dc09eca7082d598265934a"><td class="memItemLeft" align="right" valign="top">vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#aaca563b2f6dc09eca7082d598265934a">share</a></td></tr>
-<tr class="memdesc:aaca563b2f6dc09eca7082d598265934a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=d+1.  <a href="classMultiproc.html#aaca563b2f6dc09eca7082d598265934a">More...</a><br /></td></tr>
+<tr class="memdesc:aaca563b2f6dc09eca7082d598265934a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=P+1.  <a href="classMultiproc.html#aaca563b2f6dc09eca7082d598265934a">More...</a><br /></td></tr>
 <tr class="separator:aaca563b2f6dc09eca7082d598265934a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac94c47a155a14823478427d3257fb381"><td class="memItemLeft" align="right" valign="top">vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ac94c47a155a14823478427d3257fb381">sharecell</a></td></tr>
+<tr class="memdesc:ac94c47a155a14823478427d3257fb381"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCell.html" title="Individual cell for contact detection.">Cell</a> share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1.  <a href="classMultiproc.html#ac94c47a155a14823478427d3257fb381">More...</a><br /></td></tr>
+<tr class="separator:ac94c47a155a14823478427d3257fb381"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2d9736090b91da23d7d07d6d9840045"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#af2d9736090b91da23d7d07d6d9840045">timing</a></td></tr>
 <tr class="memdesc:af2d9736090b91da23d7d07d6d9840045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to record the time spent by each thread.  <a href="classMultiproc.html#af2d9736090b91da23d7d07d6d9840045">More...</a><br /></td></tr>
 <tr class="separator:af2d9736090b91da23d7d07d6d9840045"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -255,6 +265,60 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="a87050aeab8113dc0e1fb28c51e3979b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87050aeab8113dc0e1fb28c51e3979b8">&#9670;&nbsp;</a></span>merge_split_CLp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::merge_split_CLp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a94f58ca4ca4e971589c41343c08fc75b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94f58ca4ca4e971589c41343c08fc75b">&#9670;&nbsp;</a></span>mergeback_CLp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::mergeback_CLp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a4e7773b5cad1e6e8034756a456b1bc20"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4e7773b5cad1e6e8034756a456b1bc20">&#9670;&nbsp;</a></span>C</h2>
@@ -307,6 +371,24 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p><a class="el" href="classContactList.html" title="Handles lists of contacts.">ContactList</a> particle-particle for each processor. </p>
+
+</div>
+</div>
+<a id="ad7e0402a4f8c180d27f4977d57b064b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7e0402a4f8c180d27f4977d57b064b8">&#9670;&nbsp;</a></span>CLp_all</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classContactList.html">ContactList</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::CLp_all</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). </p>
 
 </div>
 </div>
@@ -536,7 +618,25 @@ template&lt;int d&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=d+1. </p>
+<p>Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=P+1. </p>
+
+</div>
+</div>
+<a id="ac94c47a155a14823478427d3257fb381"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac94c47a155a14823478427d3257fb381">&#9670;&nbsp;</a></span>sharecell</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;int&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::sharecell</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="classCell.html" title="Individual cell for contact detection.">Cell</a> share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1. </p>
 
 </div>
 </div>
