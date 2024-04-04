@@ -26,38 +26,10 @@ public:
 template <int d>
 class Cells {
 public: 
-  int init_cells(std::vector<std::vector<double>> &boundaries, double ds) ; 
+  int init_cells (std::vector<std::vector<double>> &boundaries, double ds) ; 
+  int init_cells (std::vector<std::vector<double>> &boundaries, std::vector<double> & r) {double ds = 2.1*(*std::max_element(r.begin(), r.end())) ; return (init_cells(boundaries, ds)) ; }
   int allocate_to_cells (std::vector<std::vector<double>> & X) ; 
   int contacts (std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r) ; 
-  //----------------------------------------------------------
-  int check_contact (std::vector<std::vector<double>> & X, double rsq)
-  {
-    int ncontact = 0 ; 
-    if (sqrt(rsq)>delta)
-      printf("ERR: cells too small for the rsq provided") ; 
-    for (size_t c=0 ; c<cells.size() ; c++)
-    {
-      if (cells[c].incell.size()==0) continue ; 
-      // Inner cell contact
-      for (int i=0 ; i<cells[c].incell.size() ; i++)
-        for (int j=i+1 ; j<cells[c].incell.size() ; j++)
-          if (dsqr(X[cells[c].incell[i]], X[cells[c].incell[j]])<rsq)
-            ncontact++ ; 
-      
-      //neighbours contacts
-      for (int cc=0 ; cc<cells[c].neighbours.size() ; cc++)
-      {
-        int c2 = cells[c].neighbours[cc] ; 
-        for (int i=0 ; i<cells[c].incell.size() ; i++)
-          for (int j=0 ; j<cells[c2].incell.size() ; j++)
-            if (dsqr(X[cells[c].incell[i]], X[cells[c2].incell[j]])<rsq)
-              ncontact++ ;     
-      }
-    }
-    return ncontact ; 
-  }
-  
-  
   //-------------------------------------------
   int x2id (const std::vector<int>&v) 
   {
@@ -98,7 +70,7 @@ public:
       sum += (X1[k]-X2[k])*(X1[k]-X2[k]) ; 
     return sum ; 
   }
-
+  //---------------------------------------------
   
   
   std::vector<int> n_cell , cum_n_cell ; 
@@ -118,10 +90,10 @@ public:
  *                                                                                                   *
  *                                                                                                   *
  * ***************************************************************************************************/
-
 template <int d>
 int Cells<d>::init_cells(std::vector<std::vector<double>> &boundaries, double ds)
 {
+  
   n_cell.resize(d,0);
   cum_n_cell.resize(d+1,0) ; 
   origin.resize(d,0) ;
@@ -234,7 +206,9 @@ template <int d>
 int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r)
 {
   auto [cell_first, cell_last] = bounds ; 
-  cp<d> tmpcp(0,0,0,nullptr) ; double sum=0 ;
+  cp<d> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
+  double sum=0 ;
+  int ncontact=0 ; 
   for (int c=cell_first ; c<cell_last ; c++)
   {
     if (cells[c].incell.size()==0) continue ; 
@@ -249,6 +223,7 @@ int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, Conta
           sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
         if (sum<(r[i]+r[j])*(r[i]+r[j]))
         {
+            ncontact++ ; 
             if (i<j) {tmpcp.i = i ; tmpcp.j=j ;}
             else { tmpcp.i = j ; tmpcp.j=i ;} 
             tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
@@ -270,6 +245,7 @@ int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, Conta
             sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
           if (sum<(r[i]+r[j])*(r[i]+r[j]))
           {
+            ncontact++ ; 
             if (i<j) {tmpcp.i = i ; tmpcp.j=j ;}
             else { tmpcp.i = j ; tmpcp.j=i ;} 
             tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
@@ -278,6 +254,8 @@ int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, Conta
       }    
     }
   }
+  
+  //printf("{%d %ld}", ncontact, CLnew.v.size()) ; fflush(stdout) ;  
   return 0 ; 
 }
 

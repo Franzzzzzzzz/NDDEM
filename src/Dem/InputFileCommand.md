@@ -31,7 +31,7 @@ First indentation level keyword must be followed by one of the second level inde
   - `Mu_wall`: friction coefficient between wall and grains
   - `damping`: global damping coefficient
   - `orientationtracking`: calculate grain orientation or not (expect a true or false value)
-  - `skin`: skin size [DO NOT USE]
+  - `skin`: skin size [DEPRECATED, DO NOT USE]
   - `gradientdescent_gamma`: decay rate when used for gradient descent algorithm (only for wall ELLIPSE currently)
   - `gradientdescent_tol`: tolerance for stopping the gradient descent algo. 
 
@@ -49,7 +49,7 @@ First indentation level keyword must be followed by one of the second level inde
     - `quasicristal`: ????? not quite sure what this does anymore. 
     - `fromfile filename`: set the locations from a textfile. The file should have columns, no delimiters. 1st column is particle id, following columns are the coordinates of location, last column is the particle radius. 
   - `radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]`: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.
-  - `skin`: set the skin size. Should be used after the particle radius has been set. 
+  - `skin`: [DEPRECATED, DO NOT USE] set the skin size. Should be used after the particle radius has been set. 
   
 - `rigid N`: handles rigid bodies number N
   - `set NPARTICLES ID1 ID2 ... IDN`: particles belonging to the rigid body. 

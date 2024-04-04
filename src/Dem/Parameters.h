@@ -132,7 +132,6 @@ public :
         Mu(0.5),        // Friction coefficient
         Mu_wall(0.5),        // Wall friction coefficient
         damping(0.0),
-        skin(1.0), skinsqr(1.0),      // Skin size (for verlet list optimisation)
         cellsize(1),
         contact_strategy(ContactStrategies::NAIVE), 
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
@@ -172,8 +171,6 @@ public :
     double Mu ; ///< Fricton
     double Mu_wall; //< Wall friction
     double damping; //< Artificial rolling damping
-    double skin ; ///< Skin for use in verlet list \warning Experimental
-    double skinsqr ; ///< Skin squared for use in verlet list \warning Experimental
     double cellsize ; ///< Size of cells for contact detection
     ContactModels ContactModel=HOOKE ; ///< Model of interparticle contact
     ContactStrategies contact_strategy = NAIVE ; ///< Strategy for the contact detection
@@ -527,7 +524,7 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      {"orientationtracking",&orientationtracking},
      {"tinfo",&tinfo},
      {"dt",&dt},
-     {"skin", &skin},
+     //{"skin", &skin},
      {"gradientdescent_gamma", &graddesc_gamma},
      {"gradientdescent_tol", &graddesc_tol},
      {"cell_size", &cellsize}
@@ -557,25 +554,12 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      init_radii(line, r) ;
      printf("[INFO] Set all particle radii\n") ;
    }
-   else if (!strcmp(line, "skin"))
-   {
-     skin = 2 * *std::max_element(r.begin(), r.end()) ;
-     skinsqr = skin*skin ;
-   }
    else printf("[WARN] Unknown auto command in input script\n") ;
    printf("[INFO] Doing an auto \n") ;
    } ;
  auto setvalue = [&]() { char line[5000] ; in >> line ;
    try {
      in >> SetValueMap.at(line) ;
-     if (!strcmp(line, "skin"))
-     {
-       double maxradius = *std::max_element(r.begin(), r.end()) ;
-
-       if (skin<maxradius)
-         {skin=2*maxradius ; printf("The skin cannot be smaller than the radius") ; }
-       skinsqr=skin*skin ;
-     }
    }
    catch (const std::out_of_range & e) {
      if (!strcmp(line, "dumps"))

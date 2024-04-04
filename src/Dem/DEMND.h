@@ -68,8 +68,7 @@ public:
     std::vector < double > Z ;
     std::vector < std::vector <double> > Fcorr ;
     std::vector < std::vector <double> > TorqueCorr  ;
-    std::vector < double > displacement ; double maxdisp[2] ;
-    
+        
     std::vector < std::optional<int> > RigidBodyId ; 
 
     std::vector <SpecificAction<d>> ExternalAction ;
@@ -114,7 +113,6 @@ public:
         Z.resize (N,0) ;
         Fcorr.resize (N, std::vector <double> (d, 0)) ;
         TorqueCorr.resize (N, std::vector <double> (d*(d-1)/2, 0)) ;
-        displacement.resize (N, 0) ;
         RigidBodyId.resize(N,{}) ; 
 
         PBCFlags.resize (N, 0) ;
@@ -147,7 +145,6 @@ public:
         toclean = &(P.dumps) ;
         xmlout = P.xmlout ;
 
-        displacement[0]=P.skinsqr*2 ;
         P.RigidBodies.allocate (RigidBodyId) ; 
 
         #ifndef NO_OPENMP
@@ -158,7 +155,12 @@ public:
 
         MP.initialise(N, numthread, P) ;
         
-        if (P.contact_strategy == ContactStrategies::CELLS) {cells.init_cells(P.Boundaries, P.cellsize) ; }
+        if (P.contact_strategy == ContactStrategies::CELLS) 
+        {
+            cells.init_cells(P.Boundaries, P.cellsize) ; 
+            MP.splitcells(cells.cells.size()) ; 
+            MP.CLp_all.init_for_cells(N) ; 
+        }
         
         dt=P.dt ;
         t=0 ; ti=0 ;
@@ -207,8 +209,7 @@ public:
         }
 
         //----- Velocity Verlet step 1 : compute the new positions
-        maxdisp[0] = 0 ; maxdisp[1] = 0 ;
-        #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A) shared(maxdisp) shared(displacement) //ERROR RACE CONDITION ON MAXDISP
+        #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A)
         for (int i=0 ; i<N ; i++)
         {
             double disp, totdisp=0 ;
@@ -218,8 +219,8 @@ public:
                 X[i][dd] += disp  ;
                 totdisp += disp*disp ;
             }
-            displacement[i] += sqrt(totdisp) ;
-            if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; } // ERROR RACE CONDITION ON MAXDISP
+            //displacement[i] += sqrt(totdisp) ;
+            //if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; } // ERROR RACE CONDITION ON MAXDISP
 
             // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
             if (P.orientationtracking)
@@ -243,8 +244,8 @@ public:
             for (size_t j=0 ; j<P.Boundaries.size() ; j++, mask<<=1)
             {
                 if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
-                if      (X[i][j] <= P.Boundaries[j][0] + P.skin) {Ghost[i] |= mask ; }
-                else if (X[i][j] >= P.Boundaries[j][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+                if      (X[i][j] <= P.Boundaries[j][0] + P.r[i]) {Ghost[i] |= mask ; }
+                else if (X[i][j] >= P.Boundaries[j][1] - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
 
             if (P.Boundaries[0][3] == static_cast<int>(WallType::PBC_LE) && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
@@ -253,8 +254,8 @@ public:
                 double tmpyloc = X[i][1] + (Ghost_dir[i]&1?-1:1)*P.Boundaries[0][5] ;
                 if (tmpyloc > P.Boundaries[1][1]) tmpyloc -= P.Boundaries[1][2] ;
                 if (tmpyloc < P.Boundaries[1][0]) tmpyloc += P.Boundaries[1][2] ;
-                if      (tmpyloc <= P.Boundaries[1][0] + P.skin) {Ghost[i] |= mask ; }
-                else if (tmpyloc >= P.Boundaries[1][1] - P.skin) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+                if      (tmpyloc <= P.Boundaries[1][0] + P.r[i]) {Ghost[i] |= mask ; }
+                else if (tmpyloc >= P.Boundaries[1][1] - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
 
             }
 
@@ -270,7 +271,7 @@ public:
         // ----- Contact detection ------
         if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
         
-        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout)
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout) shared(cells)
         {
          #ifdef NO_OPENMP
          int ID = 0 ;
@@ -305,13 +306,13 @@ public:
                     {
                         tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
                         //CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
-                        (CLp.*CLp.check_ghost) (Ghost[j], P, X[i], X[j], tmpcp, 0,0,0) ;
+                        (CLp.*CLp.check_ghost) (Ghost[j], P, X[i], X[j], P.r[i], P.r[j], tmpcp, 0,0,0) ;
                     }
                     else
                     {
                         sum=0 ;
-                        for (int k=0 ; sum<P.skinsqr && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
-                        if (sum<P.skinsqr)
+                        for (int k=0 ; sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]) && k<d ; k++) sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;
+                        if (sum<(P.r[i]+P.r[j])*(P.r[i]+P.r[j]))
                         {
                             tmpcp.j=j ; tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
                             CLp.insert(tmpcp) ;
@@ -334,14 +335,14 @@ public:
                     if (P.Boundaries[j][3]==static_cast<int>(WallType::WALL) || P.Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
                     {
                         tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
-                        if (tmpcp.contactlength<P.skin)
+                        if (tmpcp.contactlength<P.r[i])
                         {
                             tmpcp.j=(2*j+0);
                             CLw.insert(tmpcp) ;
                         }
 
                         tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
-                        if (tmpcp.contactlength<P.skin)
+                        if (tmpcp.contactlength<P.r[i])
                         {
                             tmpcp.j=(2*j+1);
                             CLw.insert(tmpcp) ;
@@ -391,7 +392,7 @@ public:
                         
                         double tparam ; 
                         std::tie(tparam, tmpcp.contactlength) = Tools_2D::contact_ellipse_disk (X[i], P.Boundaries[j][0], P.Boundaries[j][1], P.Boundaries[j][4], P.Boundaries[j][5], P.graddesc_gamma, P.graddesc_tol) ; 
-                        if (tmpcp.contactlength<P.skin)
+                        if (tmpcp.contactlength<P.r[i])
                         {
                             tmpcp.j=2*j ;
                             #pragma GCC diagnostic push
@@ -411,7 +412,7 @@ public:
             {
                 bool a= CLm.check_mesh_dst_contact(P.Meshes[j], X[i], P.r[i], tmpcpm) ;
                 //printf("%d %g %g |", a, tmpcpm.contactlength, P.skin) ; 
-                if (a && tmpcpm.contactlength < P.skin) 
+                if (a && tmpcpm.contactlength < P.r[i]) 
                 {
                     CLm.insert(tmpcpm) ; 
                 }
@@ -424,7 +425,9 @@ public:
         #endif
         } //END PARALLEL SECTION
       
+        //printf("{%ld %ld}", MP.CLp_all.v.size(), MP.CLp[0].v.size()) ; fflush(stdout) ; 
         if (P.contact_strategy == ContactStrategies::CELLS) MP.merge_split_CLp() ; 
+        //printf("\n{%ld}\n", MP.CLp[0].v.size()) ; 
         
         //-------------------------------------------------------------------------------
         // Force and torque computation

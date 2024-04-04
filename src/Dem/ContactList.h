@@ -72,6 +72,7 @@ public:
      contactlength=c.contactlength ;
      owninfos = c.owninfos ; 
      infos=c.infos ;
+     persisting = c.persisting ; 
      return *this ;
  } ///< Affect contact.
 
@@ -172,13 +173,16 @@ public:
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which opened.
  
  // Functions for Cell contact detections
+ int init_for_cells(int N)
+ {
+     it_array_beg.resize(N,null_list.begin()) ;
+     it_array_end.resize(N,null_list.begin()) ;
+     return 0 ; 
+ }
  int make_iterator_array(int N) 
  {
-     it_array_beg.resize(N) ;
-     it_array_end.resize(N) ;
-     for (int i=0 ; i<N ; i++) it_array_beg[i] = null_list.begin() ; 
-     
-     while (v.begin()!=v.end() && !(v.begin()->persisting)) v.erase(v.begin()) ; 
+     for (int i=0 ; i<N ; i++) it_array_beg[i] = null_list.begin() ;
+     while (v.begin()!=v.end() && !(v.begin()->persisting)) v.erase(v.begin()) ;
      
      int curi = -1 ; int n=0 ; 
      auto tmpit = v.begin() ; 
@@ -191,20 +195,38 @@ public:
              curi = it->i ; 
          }
          tmpit = it ; 
-         while (++tmpit != v.end() && !tmpit->persisting) {v.erase(tmpit) ; tmpit = it ; }
+         while (++tmpit != v.end() && !tmpit->persisting) {v.erase(tmpit) ; tmpit = it ;  }
      }
+     if (curi!= -1) it_array_end[curi] = v.end() ; 
      return 0 ; 
  }
  std::pair<typename list<cp<d>>::iterator, typename list<cp<d>>::iterator> it_bounds (int nmin, int nmax, int N)
- {     
+ {   
      for ( ; nmin < N && it_array_beg[nmin] == null_list.begin() ; nmin++) ;
-     for ( ; nmax >=0 && it_array_beg[nmax] == null_list.begin() ; nmax--) ;
-
+     for (--nmax ; nmax >=0 && it_array_beg[nmax] == null_list.begin() ; nmax--) ;
+     
      if (nmax<nmin) return {v.end(), v.end()} ; 
      return {it_array_beg[nmin], it_array_end[nmax]} ; 
  }
  bool insert_cell (const cp<d>& a)
  {
+     
+     auto it = v.begin() ; 
+     /*while (it!=v.end() && it->i < a.i) {it++;}
+     if (it->i==a.i)
+     {
+        while (it!=v.end() && it->j < a.j) {it++;}
+        if (*it==a)
+        {
+            it->contactlength=a.contactlength ;
+            it->ghost=a.ghost ;
+            it->ghostdir=a.ghostdir ;
+            it->persisting = true ; 
+            return true ; 
+        }
+     }
+     return false ; */     
+     
      if (it_array_beg[a.i] == null_list.begin()) return false ; 
      for (it = it_array_beg[a.i] ; it != it_array_end[a.i] ; it++)
      {
@@ -228,16 +250,18 @@ public:
 
  //void check_ghost    (uint32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
  void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact) ; ///< \deprecated Measure distance between a ghost and a particle
- void check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp,
+ void check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
                    int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.
- void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
- void (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, cp<d> &,int startd, double partialsum, bitdim mask) ;
+ void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
+ void (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, double, double, cp<d> &,int startd, double partialsum, bitdim mask) ;
  void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
 
+  std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
+ 
 private:
  typename list<cp<d>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
  Action<d> def ; ///< Default action
- std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
+
  list<cp<d>> null_list ; 
 };
 
@@ -424,11 +448,13 @@ int ContactListMesh<d>::insert(const cpm<d> &a)
 
 //-----------------------------------Fastest version so far ...
 template <int d>
-void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp,
-                                 int startd, double partialsum, bitdim mask)
+void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, 
+                                          cv1d &X1, cv1d &X2, double r1, double r2, 
+                                          cp<d> & tmpcp, int startd, double partialsum, bitdim mask)
 {
     double sum=partialsum ;
-    for (int dd=startd ; sum<P.skinsqr && dd<d ; dd++, gst>>=1)
+    double rr = (r1+r2)*(r1+r2) ; 
+    for (int dd=startd ; sum<rr && dd<d ; dd++, gst>>=1)
     {
         sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ;
         if (gst & 1)
@@ -436,12 +462,12 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, c
             double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
             //printf("/%g %g %g %g %g %g %g/", partialsum, sumspawn, X1[0], X1[1], X2[0], X2[1], Delta ) ;
-            if (sumspawn<P.skinsqr)
-                check_ghost_regular (gst>>1, P, X1, X2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
+            if (sumspawn<rr)
+                check_ghost_regular (gst>>1, P, X1, X2, r1, r2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
         }
         partialsum = sum ;
     }
-    if (sum<P.skinsqr)
+    if (sum<rr)
     {
         tmpcp.contactlength=sqrt(sum) ;
         tmpcp.ghost=mask ;
@@ -452,25 +478,25 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, c
 
 //--------------------------------------------------------------------
 template <int d>
-void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & tmpcp,
+void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
                                      [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
     if (P.Boundaries[0][3] != static_cast<int>(WallType::PBC_LE))
-            check_ghost_regular(gst, P, X1, X2, tmpcp) ;
+            check_ghost_regular(gst, P, X1, X2, r1, r2, tmpcp) ;
     else
     {
      if ((gst & 1)==0)
      {
          double partialsum = (X1[0]-X2[0]) * (X1[0]-X2[0]) ;
          assert (((gst>>30 & 1) ==0)) ;
-         check_ghost_regular(gst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ;
+         check_ghost_regular(gst>>1, P, X1, X2, r1, r2, tmpcp, 1, partialsum, 0) ;
      }
      else //There is an image through the LE
      {
          //1 : case without taking that image
          double partialsum = (X1[0]-X2[0]) * (X1[0]-X2[0]) ;
          bitdim newgst = gst ; newgst &= (~(1<<30)) ;
-         check_ghost_regular(newgst>>1, P, X1, X2, tmpcp, 1, partialsum, 0) ;
+         check_ghost_regular(newgst>>1, P, X1, X2, r1, r2, tmpcp, 1, partialsum, 0) ;
 
          //2: now is the hard case: we take the image path
          double Delta= (tmpcp.ghostdir&1?-1:1) * P.Boundaries[0][2] ;
@@ -486,7 +512,7 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
          if (tmpX2[1] > P.Boundaries[1][1]) tmpX2[1] -= P.Boundaries[1][2] ;
          if (tmpX2[1] < P.Boundaries[1][0]) tmpX2[1] += P.Boundaries[1][2] ;
          //printf("{%g %g %X %X", tmpX2[0], tmpX2[1], newgst>>1, tmpcp.ghostdir) ;
-         check_ghost_regular(newgst>>1, P, X1, tmpX2, tmpcp, 1, partialsum, 1) ;
+         check_ghost_regular(newgst>>1, P, X1, tmpX2, r1, r2, tmpcp, 1, partialsum, 1) ;
          //printf("}") ;
      }
     }
