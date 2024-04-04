@@ -375,11 +375,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">ContactListMesh&lt; d &gt;::insert</a> (const <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a)</td></tr>
 <tr class="memdesc:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">More...</a><br /></td></tr>
 <tr class="separator:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1c8c60428be078ccfef07efb3a51fb06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga1c8c60428be078ccfef07efb3a51fb06">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
-<tr class="memdesc:ga1c8c60428be078ccfef07efb3a51fb06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#ga1c8c60428be078ccfef07efb3a51fb06">More...</a><br /></td></tr>
-<tr class="separator:ga1c8c60428be078ccfef07efb3a51fb06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0092469b3544e035073de0a040a9e966"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0092469b3544e035073de0a040a9e966">ContactList&lt; d &gt;::check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
-<tr class="separator:ga0092469b3544e035073de0a040a9e966"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeff346987b5693ce82599e507475315c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaeff346987b5693ce82599e507475315c">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="memdesc:gaeff346987b5693ce82599e507475315c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#gaeff346987b5693ce82599e507475315c">More...</a><br /></td></tr>
+<tr class="separator:gaeff346987b5693ce82599e507475315c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9a854a20f7524c3475af3fb1ec55fdeb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a854a20f7524c3475af3fb1ec55fdeb">ContactList&lt; d &gt;::check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="separator:ga9a854a20f7524c3475af3fb1ec55fdeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2b6fc11a9f73b813659147956d123d5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2b6fc11a9f73b813659147956d123d5e">ContactList&lt; d &gt;::check_ghost_dst</a> (uint32_t gst, int n, double partialsum, uint32_t mask, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;contact)</td></tr>
 <tr class="separator:ga2b6fc11a9f73b813659147956d123d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga56bdac21bdb7f45eddc38583694bf00d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga56bdac21bdb7f45eddc38583694bf00d">ContactList&lt; d &gt;::coordinance</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;Z)</td></tr>
@@ -405,6 +405,8 @@ Functions</h2></td></tr>
 <tr class="memitem:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">Multiproc&lt; d &gt;::split</a> (int <a class="el" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">N</a>, int <a class="el" href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">P</a>)</td></tr>
 <tr class="memdesc:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to allocate the grains to threads taking into account the load balance in the contact detection. <a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> takes over after a few iteration have run, and is usually more efficient.  <a href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">More...</a><br /></td></tr>
 <tr class="separator:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae0ec2e6c3cf902e89fb57ee9b5b16622"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae0ec2e6c3cf902e89fb57ee9b5b16622">Multiproc&lt; d &gt;::splitcells</a> (int <a class="el" href="classMultiproc.html#a4e7773b5cad1e6e8034756a456b1bc20">C</a>)</td></tr>
+<tr class="separator:gae0ec2e6c3cf902e89fb57ee9b5b16622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga09cbf4014b6f64277c0cfd25c1caad11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga09cbf4014b6f64277c0cfd25c1caad11">Multiproc&lt; d &gt;::delaying</a> (int ID, int j, <a class="el" href="classAction.html">Action</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;act)</td></tr>
 <tr class="memdesc:ga09cbf4014b6f64277c0cfd25c1caad11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Record the action to be added later to the relevent atom in sequencial settings, avoid potential race condition if an action was added to an atom that is not owned by the thread. This is for a particle-particle contact.  <a href="group__DEM.html#ga09cbf4014b6f64277c0cfd25c1caad11">More...</a><br /></td></tr>
 <tr class="separator:ga09cbf4014b6f64277c0cfd25c1caad11"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1164,8 +1166,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="ga0092469b3544e035073de0a040a9e966"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga0092469b3544e035073de0a040a9e966">&#9670;&nbsp;</a></span>check_ghost_LE()</h2>
+<a id="ga9a854a20f7524c3475af3fb1ec55fdeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9a854a20f7524c3475af3fb1ec55fdeb">&#9670;&nbsp;</a></span>check_ghost_LE()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1195,6 +1197,18 @@ template&lt;int d&gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
           <td class="paramname"><em>X2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>r1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>r2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1230,8 +1244,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="ga1c8c60428be078ccfef07efb3a51fb06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1c8c60428be078ccfef07efb3a51fb06">&#9670;&nbsp;</a></span>check_ghost_regular()</h2>
+<a id="gaeff346987b5693ce82599e507475315c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaeff346987b5693ce82599e507475315c">&#9670;&nbsp;</a></span>check_ghost_regular()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1261,6 +1275,18 @@ template&lt;int d&gt; </div>
           <td></td>
           <td class="paramtype"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;&#160;</td>
           <td class="paramname"><em>X2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>r1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>r2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -4579,6 +4605,26 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Function to allocate the grains to threads taking into account the load balance in the contact detection. <a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> takes over after a few iteration have run, and is usually more efficient. </p>
+
+</div>
+</div>
+<a id="gae0ec2e6c3cf902e89fb57ee9b5b16622"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae0ec2e6c3cf902e89fb57ee9b5b16622">&#9670;&nbsp;</a></span>splitcells()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::splitcells </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>C</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

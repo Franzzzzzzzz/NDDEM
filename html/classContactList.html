@@ -89,6 +89,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa82dd18cb5347359b32d54c7dd22181f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#aa82dd18cb5347359b32d54c7dd22181f">finalise</a> ()</td></tr>
 <tr class="memdesc:aa82dd18cb5347359b32d54c7dd22181f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Go to the end of the contact list, erasing any remaining contact which opened.  <a href="classContactList.html#aa82dd18cb5347359b32d54c7dd22181f">More...</a><br /></td></tr>
 <tr class="separator:aa82dd18cb5347359b32d54c7dd22181f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a314e3677d25d5ffccb3e9d7d3ec9e3bf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a314e3677d25d5ffccb3e9d7d3ec9e3bf">init_for_cells</a> (int <a class="el" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</td></tr>
+<tr class="separator:a314e3677d25d5ffccb3e9d7d3ec9e3bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade5c421f83d544dfa2db41119cf5d111"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#ade5c421f83d544dfa2db41119cf5d111">make_iterator_array</a> (int <a class="el" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</td></tr>
 <tr class="separator:ade5c421f83d544dfa2db41119cf5d111"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a152e9e4cec338bf2452e29c4c1df32cb"><td class="memItemLeft" align="right" valign="top">std::pair&lt; typename list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;::iterator, typename list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;::iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a152e9e4cec338bf2452e29c4c1df32cb">it_bounds</a> (int nmin, int nmax, int <a class="el" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</td></tr>
@@ -100,11 +102,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:acb3cd068eb25c33ac060bbfe0ea8b954"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2b6fc11a9f73b813659147956d123d5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2b6fc11a9f73b813659147956d123d5e">check_ghost_dst</a> (uint32_t gst, int n, double partialsum, uint32_t mask, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;contact)</td></tr>
 <tr class="separator:ga2b6fc11a9f73b813659147956d123d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1c8c60428be078ccfef07efb3a51fb06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga1c8c60428be078ccfef07efb3a51fb06">check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
-<tr class="memdesc:ga1c8c60428be078ccfef07efb3a51fb06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#ga1c8c60428be078ccfef07efb3a51fb06">More...</a><br /></td></tr>
-<tr class="separator:ga1c8c60428be078ccfef07efb3a51fb06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0092469b3544e035073de0a040a9e966"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0092469b3544e035073de0a040a9e966">check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
-<tr class="separator:ga0092469b3544e035073de0a040a9e966"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeff346987b5693ce82599e507475315c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaeff346987b5693ce82599e507475315c">check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="memdesc:gaeff346987b5693ce82599e507475315c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#gaeff346987b5693ce82599e507475315c">More...</a><br /></td></tr>
+<tr class="separator:gaeff346987b5693ce82599e507475315c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9a854a20f7524c3475af3fb1ec55fdeb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a854a20f7524c3475af3fb1ec55fdeb">check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="separator:ga9a854a20f7524c3475af3fb1ec55fdeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga56bdac21bdb7f45eddc38583694bf00d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga56bdac21bdb7f45eddc38583694bf00d">coordinance</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;Z)</td></tr>
 <tr class="memdesc:ga56bdac21bdb7f45eddc38583694bf00d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate and store coordination number in Z.  <a href="group__DEM.html#ga56bdac21bdb7f45eddc38583694bf00d">More...</a><br /></td></tr>
 <tr class="separator:ga56bdac21bdb7f45eddc38583694bf00d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,8 +118,12 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a75f15cd9b0711158597aed2b162852ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2af8751093f8abcc7d4cd1eab1c0601"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#ac2af8751093f8abcc7d4cd1eab1c0601">cid</a> =0</td></tr>
 <tr class="separator:ac2af8751093f8abcc7d4cd1eab1c0601"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d9f61951b7185204b875d219e2f13ad"><td class="memItemLeft" align="right" valign="top">void(ContactList::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a8d9f61951b7185204b875d219e2f13ad">check_ghost</a> )(<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, int startd, double partialsum, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask)</td></tr>
-<tr class="separator:a8d9f61951b7185204b875d219e2f13ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a797120df0c7516d8f84ffe8f2fe7ad20"><td class="memItemLeft" align="right" valign="top">void(ContactList::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a797120df0c7516d8f84ffe8f2fe7ad20">check_ghost</a> )(<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, double, double, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, int startd, double partialsum, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask)</td></tr>
+<tr class="separator:a797120df0c7516d8f84ffe8f2fe7ad20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10704c2c9fb00501be8cd474f7b40d68"><td class="memItemLeft" align="right" valign="top">std::vector&lt; typename list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;::iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a10704c2c9fb00501be8cd474f7b40d68">it_array_beg</a></td></tr>
+<tr class="separator:a10704c2c9fb00501be8cd474f7b40d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada9e59f9388008e60246a964f0cd051a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; typename list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;::iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#ada9e59f9388008e60246a964f0cd051a">it_array_end</a></td></tr>
+<tr class="separator:ada9e59f9388008e60246a964f0cd051a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -127,10 +133,6 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a1604f7433ecf8434f84870d2f26018a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classAction.html">Action</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a1604f7433ecf8434f84870d2f26018a4">def</a></td></tr>
 <tr class="memdesc:a1604f7433ecf8434f84870d2f26018a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default action.  <a href="classContactList.html#a1604f7433ecf8434f84870d2f26018a4">More...</a><br /></td></tr>
 <tr class="separator:a1604f7433ecf8434f84870d2f26018a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10704c2c9fb00501be8cd474f7b40d68"><td class="memItemLeft" align="right" valign="top">std::vector&lt; typename list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;::iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#a10704c2c9fb00501be8cd474f7b40d68">it_array_beg</a></td></tr>
-<tr class="separator:a10704c2c9fb00501be8cd474f7b40d68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada9e59f9388008e60246a964f0cd051a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; typename list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;::iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#ada9e59f9388008e60246a964f0cd051a">it_array_end</a></td></tr>
-<tr class="separator:ada9e59f9388008e60246a964f0cd051a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adffb56a2ec35967324768a02e1d19a6e"><td class="memItemLeft" align="right" valign="top">list&lt; <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactList.html#adffb56a2ec35967324768a02e1d19a6e">null_list</a></td></tr>
 <tr class="separator:adffb56a2ec35967324768a02e1d19a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -223,6 +225,34 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Go to the end of the contact list, erasing any remaining contact which opened. </p>
+
+</div>
+</div>
+<a id="a314e3677d25d5ffccb3e9d7d3ec9e3bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a314e3677d25d5ffccb3e9d7d3ec9e3bf">&#9670;&nbsp;</a></span>init_for_cells()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::init_for_cells </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>N</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -356,8 +386,8 @@ template&lt;int d&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a8d9f61951b7185204b875d219e2f13ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d9f61951b7185204b875d219e2f13ad">&#9670;&nbsp;</a></span>check_ghost</h2>
+<a id="a797120df0c7516d8f84ffe8f2fe7ad20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a797120df0c7516d8f84ffe8f2fe7ad20">&#9670;&nbsp;</a></span>check_ghost</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +395,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void(ContactList::* <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost) (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, int startd, double partialsum, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask)</td>
+          <td class="memname">void(ContactList::* <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost) (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;, double, double, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;, int startd, double partialsum, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -448,19 +478,11 @@ template&lt;int d&gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;typename list&lt;<a class="el" href="classcp.html">cp</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; &gt;::iterator&gt; <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::it_array_beg</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -472,19 +494,11 @@ template&lt;int d&gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;typename list&lt;<a class="el" href="classcp.html">cp</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; &gt;::iterator&gt; <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::it_array_end</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

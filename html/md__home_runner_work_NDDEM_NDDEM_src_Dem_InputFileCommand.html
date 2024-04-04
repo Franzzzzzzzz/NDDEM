@@ -96,7 +96,7 @@ $(function() {
 <li><code>Mu_wall</code>: friction coefficient between wall and grains</li>
 <li><code>damping</code>: global damping coefficient</li>
 <li><code>orientationtracking</code>: calculate grain orientation or not (expect a true or false value)</li>
-<li><code>skin</code>: skin size [DO NOT USE]</li>
+<li><code>skin</code>: skin size [DEPRECATED, DO NOT USE]</li>
 <li><code>gradientdescent_gamma</code>: decay rate when used for gradient descent algorithm (only for wall ELLIPSE currently)</li>
 <li><code>gradientdescent_tol</code>: tolerance for stopping the gradient descent algo.</li>
 </ul>
@@ -117,7 +117,7 @@ $(function() {
 </ul>
 </li>
 <li><code>radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]</code>: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.</li>
-<li><code>skin</code>: set the skin size. Should be used after the particle radius has been set.</li>
+<li><code>skin</code>: [DEPRECATED, DO NOT USE] set the skin size. Should be used after the particle radius has been set.</li>
 </ul>
 </li>
 <li><code>rigid N</code>: handles rigid bodies number N<ul>

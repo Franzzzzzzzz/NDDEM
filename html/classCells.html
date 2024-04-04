@@ -79,12 +79,12 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aca4c651e86f345584f2b8769d7676eb3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">init_cells</a> (std::vector&lt; std::vector&lt; double &gt;&gt; &amp;boundaries, double ds)</td></tr>
 <tr class="separator:aca4c651e86f345584f2b8769d7676eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5c0c2a6cc3bb35a5104e3503e9893c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#ad5c0c2a6cc3bb35a5104e3503e9893c9">init_cells</a> (std::vector&lt; std::vector&lt; double &gt;&gt; &amp;boundaries, std::vector&lt; double &gt; &amp;r)</td></tr>
+<tr class="separator:ad5c0c2a6cc3bb35a5104e3503e9893c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35dcc7c9beddea735c7968a564b4da8f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">allocate_to_cells</a> (std::vector&lt; std::vector&lt; double &gt;&gt; &amp;X)</td></tr>
 <tr class="separator:a35dcc7c9beddea735c7968a564b4da8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad700e65e663a3853bc75961b4af6e60f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">contacts</a> (std::pair&lt; int, int &gt; bounds, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLall, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r)</td></tr>
 <tr class="separator:ad700e65e663a3853bc75961b4af6e60f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6f2cbd0bfd12ad97667ff65012dfae7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#ae6f2cbd0bfd12ad97667ff65012dfae7">check_contact</a> (std::vector&lt; std::vector&lt; double &gt;&gt; &amp;X, double rsq)</td></tr>
-<tr class="separator:ae6f2cbd0bfd12ad97667ff65012dfae7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada87991cb47404158ccf5b7687ec4743"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a> (const std::vector&lt; int &gt; &amp;v)</td></tr>
 <tr class="separator:ada87991cb47404158ccf5b7687ec4743"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91707d3d06d4e39a8e7986868a08a3ef"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">id2x</a> (int id)</td></tr>
@@ -129,44 +129,6 @@ template&lt;int d&gt; </div>
           <td></td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae6f2cbd0bfd12ad97667ff65012dfae7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6f2cbd0bfd12ad97667ff65012dfae7">&#9670;&nbsp;</a></span>check_contact()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classCells.html">Cells</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_contact </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>X</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>rsq</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -286,7 +248,7 @@ template&lt;int d&gt; </div>
 </div>
 </div>
 <a id="aca4c651e86f345584f2b8769d7676eb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca4c651e86f345584f2b8769d7676eb3">&#9670;&nbsp;</a></span>init_cells()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aca4c651e86f345584f2b8769d7676eb3">&#9670;&nbsp;</a></span>init_cells() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -311,6 +273,44 @@ template&lt;int d&gt; </div>
           <td></td><td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad5c0c2a6cc3bb35a5104e3503e9893c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5c0c2a6cc3bb35a5104e3503e9893c9">&#9670;&nbsp;</a></span>init_cells() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classCells.html">Cells</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::init_cells </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>boundaries</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramname"><em>r</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

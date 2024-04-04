@@ -53,12 +53,24 @@ public:
   void load_balance() ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations. 
   void merge_split_CLp () 
   {
+    int tot =CLp[0].v.size()  ;
     for (int p=1 ; p<P ; p++)
+    {
+      tot +=CLp[p].v.size() ; 
       CLp[0].v.splice(CLp[0].v.end(), CLp[p].v) ; 
+    }
     CLp[0].v.sort() ; 
     CLp_all.v.merge(CLp[0].v) ; 
-    
+    //printf("/%d ", tot) ; fflush(stdout) ;
+    //for (auto &v: CLp_all.v) std::cout<<v.persisting ; 
     CLp_all.make_iterator_array(N) ; 
+    //printf(" %d ", CLp_all.v.size()) ; fflush(stdout) ; 
+    /*for (auto it = CLp_all.v.begin() ; it!=CLp_all.v.end() ; it++)
+      printf("|%X|", it) ;
+    for (auto it = CLp_all.it_array_beg.begin() ; it!=CLp_all.it_array_beg.end() ; it++)
+      printf("|%X|", *it) ;  
+    for (auto it = CLp_all.it_array_end.begin() ; it!=CLp_all.it_array_end.end() ; it++)
+      printf("|%X|", *it) ;  */
     
     for (int p=0 ; p<P ; p++)
     {
@@ -66,6 +78,17 @@ public:
       auto [it_min, it_max] = CLp_all.it_bounds(share[p], share[p+1], N)  ;
       if (it_min!=it_max) CLp[p].v.splice(CLp[p].v.begin(), CLp_all.v, it_min, it_max) ; 
     }
+    
+    tot =0 ; 
+    for (int p=0 ; p<P ; p++) tot+=CLp[p].v.size() ;
+    //printf("%d/\n", tot) ; fflush(stdout) ; 
+      
+    //if (CLp[0].v.size() !=0) {printf("ERR: CLp %d should be of size 0 at this stage\n", 0) ; }
+    //CLp[0].v.splice(CLp[0].v.begin(), CLp_all.v) ;
+        
+    /*for (auto &v: CLp[0].v) 
+      printf("B> %d %d\n", v.i, v.j);
+    printf("==================\n") ; fflush(stdout) ;  */
   }
   void mergeback_CLp()
   {
@@ -75,6 +98,7 @@ public:
       CLp_all.v.splice(CLp_all.v.end(), CLp[p].v) ; 
     }
   }
+  void splitcells(int C) ; 
 
   ContactList<d> CLp_all ; ///< Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). 
   vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
@@ -157,6 +181,14 @@ for (int i=0 ; i<P ; i++)
 }
 
 share[P]=N ;
+}
+//=====================================================
+template <int d>
+void Multiproc<d>::splitcells(int C)
+{
+  for (int p=0 ; p<P ; p++)
+    sharecell[p] = p*(C/P) ; 
+  sharecell[P] = C ; 
 }
 
 //-------------------------------------------------

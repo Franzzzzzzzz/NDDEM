@@ -164,7 +164,7 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
   contactlength=Contact.contactlength ;
 
   ovlp=ri+rj-contactlength ;
-  if (ovlp<=0) {Act.setzero() ; return ;}
+  if (ovlp<=0) {Act.setzero() ; Tools<d>::setzero(Contact.tspr) ; return ;}
   //printf("%g %g %g %g\n", ri, rj, Xi[2], Xj[2]) ; fflush(stdout) ;
   Tools<d>::vMinus(cn, Xi, Xj) ; //cn=(Xi-Xj) ;
   cn /= contactlength ;
@@ -253,7 +253,7 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
 {
   contactlength=Contact.contactlength ;
   ovlp=ri-contactlength ;
-  if (ovlp<=0) {Act.setzero() ; return ;}
+  if (ovlp<=0) {Act.setzero() ; Tools<d>::setzero(Contact.tspr) ; return ;}
 
   //Relative velocity at contact
   rri = -cn * (ri-ovlp/2.) ;

@@ -90,370 +90,349 @@ $(function() {
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
 <div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classCells.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classCells.html">Cells</a> {</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">public</span>: </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">init_cells</a>(std::vector&lt;std::vector&lt;double&gt;&gt; &amp;boundaries, <span class="keywordtype">double</span> ds) ; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">allocate_to_cells</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp; X) ; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">contacts</a> (std::pair&lt;int,int&gt; bounds, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLall, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLnew, std::vector&lt;std::vector&lt;double&gt;&gt; <span class="keyword">const</span> &amp; X, std::vector&lt;double&gt; <span class="keyword">const</span> &amp;r) ; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">//----------------------------------------------------------</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classCells.html#ae6f2cbd0bfd12ad97667ff65012dfae7">   33</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#ae6f2cbd0bfd12ad97667ff65012dfae7">check_contact</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp; X, <span class="keywordtype">double</span> rsq)</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">int</span> ncontact = 0 ; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">if</span> (sqrt(rsq)&gt;<a class="code" href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">delta</a>)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      printf(<span class="stringliteral">&quot;ERR: cells too small for the rsq provided&quot;</span>) ; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> c=0 ; c&lt;<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>.size() ; c++)</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell.size()==0) continue ; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="comment">// Inner cell contact</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell.size() ; i++)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=i+1 ; j&lt;<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell.size() ; j++)</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;          <span class="keywordflow">if</span> (<a class="code" href="classCells.html#aa123da27784a66880db0f39c49e3d170">dsqr</a>(X[<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell[i]], X[<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell[j]])&lt;rsq)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            ncontact++ ; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <span class="comment">//neighbours contacts</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cc=0 ; cc&lt;<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].neighbours.size() ; cc++)</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordtype">int</span> c2 = <a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].neighbours[cc] ; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell.size() ; i++)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0 ; j&lt;<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c2].incell.size() ; j++)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="classCells.html#aa123da27784a66880db0f39c49e3d170">dsqr</a>(X[<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c].incell[i]], X[<a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a>[c2].incell[j]])&lt;rsq)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;              ncontact++ ;     </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">return</span> ncontact ; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">//-------------------------------------------</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">   62</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a> (<span class="keyword">const</span> std::vector&lt;int&gt;&amp;v) </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">int</span> res=0 ; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      res += <a class="code" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">cum_n_cell</a>[dd] * v[dd] ; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">return</span> res ; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="comment">//-------------------------------------------</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">   70</a></span>&#160;  std::vector&lt;int&gt; <a class="code" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">id2x</a> (<span class="keywordtype">int</span> <span class="keywordtype">id</span>)  </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    std::vector&lt;int&gt; ids (<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0) ;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      ids[dd] = <span class="keywordtype">id</span> % <a class="code" href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">n_cell</a>[dd] ; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <span class="keywordtype">id</span> /= <a class="code" href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">n_cell</a>[dd] ; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    }    </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">return</span> ids ;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="comment">//-------------------------------------------</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classCells.html#afa7f1a124c921e1959576133645d93d6">   81</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classCells.html#afa7f1a124c921e1959576133645d93d6">test_idempotent</a> ()</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">cum_n_cell</a>[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>] ; i++)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a>(<a class="code" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">id2x</a>(i))!=i)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        printf(<span class="stringliteral">&quot;ERROR %d\n&quot;</span>, i) ; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordflow">return</span> false ; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      }</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">return</span> true ;         </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  }</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="comment">//---------------------------------------------</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="classCells.html#aa123da27784a66880db0f39c49e3d170">   94</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classCells.html#aa123da27784a66880db0f39c49e3d170">dsqr</a> (std::vector&lt;double&gt; &amp;X1, std::vector&lt;double&gt; &amp;X2)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">double</span> sum = 0 ; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; k&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; k++)</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      sum += (X1[k]-X2[k])*(X1[k]-X2[k]) ; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">return</span> sum ; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  }</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  </div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">  104</a></span>&#160;  std::vector&lt;int&gt; <a class="code" href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">n_cell</a> , <a class="code" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">cum_n_cell</a> ; </div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="classCells.html#a05aa219ad2a8efb5f77cd4c55100aece">  105</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classCells.html#a05aa219ad2a8efb5f77cd4c55100aece">origin</a> ; </div>
-<div class="line"><a name="l00106"></a><span class="lineno"><a class="line" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">  106</a></span>&#160;  std::vector&lt;Cell&gt; <a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a> ;</div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">  107</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">delta</a> ; </div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;} ; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">/*****************************************************************************************************</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment"> * IMPLEMENTATIONS                                                                                   *</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment"> * ***************************************************************************************************/</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00123"></a><span class="lineno"><a class="line" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">  123</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">Cells&lt;d&gt;::init_cells</a>(std::vector&lt;std::vector&lt;double&gt;&gt; &amp;boundaries, <span class="keywordtype">double</span> ds)</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;{</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  n_cell.resize(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  cum_n_cell.resize(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>+1,0) ; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  origin.resize(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0) ;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  delta=ds ; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  cum_n_cell[0] = 1 ;  </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; i++)</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  {</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    n_cell[i] = ceil((boundaries[i][1]-boundaries[i][0])/ds) ; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">if</span> (i&gt;0) </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      cum_n_cell[i] = cum_n_cell[i-1]*n_cell[i-1] ; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    origin[i] = boundaries[i][0] ; </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  cum_n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>] = cum_n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1]*n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1] ; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  cells.resize(cum_n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>]) ; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;v: n_cell) printf(<span class="stringliteral">&quot;%d &quot;</span>, v) ;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;v: cum_n_cell) printf(<span class="stringliteral">&quot;%d &quot;</span>, v) ; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  </div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keywordtype">int</span> ntot = 1&lt;&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  std::array&lt;uint8_t, d&gt; tmp ; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;cells.size() ; i++)</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">auto</span> x_base = id2x(i) ; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keyword">auto</span> x = x_base ; </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) tmp[dd] = x_base[dd] ; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="comment">/*auto res = hilbert::v2::PositionToIndex&lt;uint8_t, d&gt; (tmp) ; </span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment">    for (auto &amp; v: res) </span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">      printf(&quot;%d &quot;, v) ; </span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment">    printf(&quot;\n&quot;) ; */</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">//cells[i].hilbert_idx = hilbert::v2::PositionToIndex&lt;int, d&gt; (tmp) ; </span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    cells[i].neighbours.reserve(pow(3,<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>)) ;       </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=1 ; j&lt;ntot ; j++)</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keywordtype">int</span> nct = __builtin_popcount(j) ; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordtype">int</span> ndir = 1&lt;&lt;nct ; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; k&lt;ndir ; k++)</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      {</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordtype">bool</span> noadd = false ; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        x = x_base ; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keywordtype">int</span> dirn=0 ; </div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        {</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;          <span class="keywordflow">if</span> (j&gt;&gt;dd &amp; 1)</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;          {</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            <span class="keywordflow">if</span> (k&gt;&gt;dirn &amp; 1) </div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;              x[dd] += 1 ;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;              x[dd] -= 1 ; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            dirn++ ; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            <span class="keywordflow">if</span> (x[dd]&lt;0 || x[dd]&gt;=n_cell[dd]) </div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;            {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;              noadd=true ; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;              break ; </div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;          }</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        }</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        <span class="keywordflow">if</span> (!noadd)</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;          cells[i].neighbours.push_back(x2id(x)) ;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      }</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    }</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    </div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <a class="code" href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a>( cells[i].neighbours.begin(), cells[i].neighbours.end() );</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordtype">int</span> bef = cells[i].neighbours.size() ; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    cells[i].neighbours.erase( <a class="code" href="pugixml_8cpp.html#a444191b06b1fc17263925ef2c7185338">unique</a>( cells[i].neighbours.begin(), cells[i].neighbours.end() ), cells[i].neighbours.end() );</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordtype">int</span> aft = cells[i].neighbours.size() ; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">if</span> (bef-aft != 0) printf(<span class="stringliteral">&quot;ERR: no duplication of cells should happen with the algorithm.\n&quot;</span>) ;  </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    cells[i].neighbours.erase(std::remove_if(cells[i].neighbours.begin(), cells[i].neighbours.end(), </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                                            [=](<span class="keywordtype">size_t</span> x) { return x&lt;=i ; }), cells[i].neighbours.end());</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="comment">/*for (int i=0 ; i&lt;cum_n_cell[d] ; i++)</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="comment">  {</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="comment">    printf(&quot;%d &quot;, cells[i].neighbours.size()) ;    </span></div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="comment">  }*/</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="keywordflow">return</span> 0 ; </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;}</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="comment">//=================================================================</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00212"></a><span class="lineno"><a class="line" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">  212</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">Cells&lt;d&gt;::allocate_to_cells</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp; X)</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;{</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  std::vector&lt;int&gt; v (<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0) ; </div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;cells.size() ; i++)</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    cells[i].incell.clear() ; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  </div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;X.size() ; i++)</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      v[dd] = floor((X[i][dd]-origin[dd])/delta) ; </div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordtype">int</span> <span class="keywordtype">id</span> = x2id(v) ; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    cells[id].incell.push_back(i) ;       </div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  } </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="comment">/*int tot = 0 ; </span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="comment">  for (size_t i=0 ; i&lt;cells.size() ; i++)</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">    tot += cells[i].incell.size() ; */</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  <span class="keywordflow">return</span> 0 ; </div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;}</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment">//=================================================================</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
-<div class="line"><a name="l00234"></a><span class="lineno"><a class="line" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">  234</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">Cells&lt;d&gt;::contacts</a> (std::pair&lt;int,int&gt; bounds, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLall, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLnew, std::vector&lt;std::vector&lt;double&gt;&gt; <span class="keyword">const</span> &amp; X, std::vector&lt;double&gt; <span class="keyword">const</span> &amp;r)</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;{</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="keyword">auto</span> [cell_first, cell_last] = bounds ; </div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <a class="code" href="classcp.html">cp&lt;d&gt;</a> tmpcp(0,0,0,<span class="keyword">nullptr</span>) ; <span class="keywordtype">double</span> sum=0 ;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> c=cell_first ; c&lt;cell_last ; c++)</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  {</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">if</span> (cells[c].incell.size()==0) continue ; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">// Inner cell contact</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> ii=0 ; ii&lt;cells[c].incell.size() ; ii++)</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> jj=ii+1 ; jj&lt;cells[c].incell.size() ; jj++)</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      {</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        sum = 0 ; </div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        <span class="keywordtype">int</span> i = cells[c].incell[ii] ;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordtype">int</span> j = cells[c].incell[jj] ;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; sum&lt;(r[i]+r[j])*(r[i]+r[j]) &amp;&amp; k&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; k++) </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;          sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">if</span> (sum&lt;(r[i]+r[j])*(r[i]+r[j]))</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            <span class="keywordflow">if</span> (i&lt;j) {tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = i ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=j ;}</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <span class="keywordflow">else</span> { tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = j ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=i ;} </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            tmpcp.<a class="code" href="classcp.html#a0e2ea54c5799746e0fcc73ad85bb9081">contactlength</a>=sqrt(sum) ; tmpcp.<a class="code" href="classcp.html#a5ab3a9afca56ffd7798e9b3c40564dad">ghost</a>=0 ; tmpcp.<a class="code" href="classcp.html#adce38f7a307dd8a3d8d4c2248fe1dc7b">ghostdir</a>=0 ;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;            <span class="keywordflow">if</span> (!CLall.<a class="code" href="classContactList.html#aa1a5aff980d95577f762d7f65237386e">insert_cell</a>(tmpcp)) CLnew.<a class="code" href="classContactList.html#a75f15cd9b0711158597aed2b162852ce">v</a>.push_back(tmpcp) ; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        }</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      }</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    </div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="comment">//neighbours contacts</span></div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> cc=0 ; cc&lt;cells[c].neighbours.size() ; cc++)</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    {</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      <span class="keywordtype">int</span> c2 = cells[c].neighbours[cc] ; </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> ii=0 ; ii&lt;cells[c].incell.size() ; ii++)</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> jj=0 ; jj&lt;cells[c2].incell.size() ; jj++)</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        {</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;          sum = 0 ; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;          <span class="keywordtype">int</span> i = cells[c].incell[ii] ;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;          <span class="keywordtype">int</span> j = cells[c2].incell[jj] ;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; sum&lt;(r[i]+r[j])*(r[i]+r[j]) &amp;&amp; k&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; k++) </div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;          <span class="keywordflow">if</span> (sum&lt;(r[i]+r[j])*(r[i]+r[j]))</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;          {</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            <span class="keywordflow">if</span> (i&lt;j) {tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = i ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=j ;}</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;            <span class="keywordflow">else</span> { tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = j ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=i ;} </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;            tmpcp.<a class="code" href="classcp.html#a0e2ea54c5799746e0fcc73ad85bb9081">contactlength</a>=sqrt(sum) ; tmpcp.<a class="code" href="classcp.html#a5ab3a9afca56ffd7798e9b3c40564dad">ghost</a>=0 ; tmpcp.<a class="code" href="classcp.html#adce38f7a307dd8a3d8d4c2248fe1dc7b">ghostdir</a>=0 ;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            <span class="keywordflow">if</span> (!CLall.<a class="code" href="classContactList.html#aa1a5aff980d95577f762d7f65237386e">insert_cell</a>(tmpcp)) CLnew.<a class="code" href="classContactList.html#a75f15cd9b0711158597aed2b162852ce">v</a>.push_back(tmpcp) ; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;          }</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      }    </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    }</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  }</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="keywordflow">return</span> 0 ; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;}</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160; </div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160; </div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="comment">//===========================================================</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="comment">/*int main(int argc, char * argv[])</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">{</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="comment">  for (int i=0 ; i&lt;4 ; i++)</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="comment">    for (int j=0 ; j&lt;4 ; j++)</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="comment">      for (int k=0 ; k&lt;4 ; k++)</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="comment">      {</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">        long long id = hilbertDistance({i,j,k}, 4) ; </span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="comment">        printf(&quot;%d %d %d | %lld \n&quot;, i,j,k, id) ; </span></div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="comment">      }</span></div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="comment">  std::vector&lt;std::vector&lt;double&gt;&gt; bounds ; </span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="comment">  for (int dd=0 ; dd&lt;D ; dd++)</span></div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment">    bounds.push_back({0,1}) ; </span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment">  double ds = 1/8. ; </span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment">  boost::random::mt19937 rng(865); </span></div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment">  boost::random::uniform_01&lt;boost::mt19937&gt; rand(rng) ; </span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">  auto start = std::chrono::high_resolution_clock::now();</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="comment">  auto elapsed = std::chrono::high_resolution_clock::now()-start;   </span></div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment">  auto duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment">  std::vector&lt;std::vector&lt;double&gt;&gt; X (N, std::vector&lt;double&gt;(D,0))  ; </span></div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment">  for (auto &amp; v : X)</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment">      for (auto &amp; w: v)</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment">          w = rand() ;</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment">  double Dbase = 0.05 ;  double Dsqr=Dbase*Dbase; </span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment">  int count=0 ; </span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="comment">  //-----------------------------------------------------------</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment">  Cells&lt;D&gt; allcells; </span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">  start = std::chrono::high_resolution_clock::now();</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment">  allcells.init_cells(bounds, ds) ; </span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">  elapsed = std::chrono::high_resolution_clock::now()-start; </span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">  duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">  printf(&quot;INIT duration: %g\n&quot;, duration/1000000.) ; </span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="comment">  allcells.test_idempotent() ; </span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">  printf(&quot;INITIALISATION FINISHED\n&quot;) ; fflush(stdout) ;</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment">  //------------------------------------------------------------</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment">  start = std::chrono::high_resolution_clock::now();</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment">  count = 0; </span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment">  allcells.allocate_to_cells(X) ; </span></div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">  count = allcells.check_contact(X, Dsqr) ; </span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="comment">  elapsed = std::chrono::high_resolution_clock::now()-start; </span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="comment">  duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="comment">  printf(&quot;CNT cells: %g %d\n&quot;, duration/1000000., count) ; </span></div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">  //------------------------------------------------------------</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment">  start = std::chrono::high_resolution_clock::now();</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">  count =0 ;</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="comment">  for (int i=0 ; i&lt;N ; i++)</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="comment">      for (int j=i+1 ; j&lt;N ; j++)</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment">      {</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment">        double dst = allcells.dsqr(X[i], X[j]) ; </span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="comment">        if (dst &lt; Dsqr)</span></div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">            count ++ ;</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">      }</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="comment">  elapsed = std::chrono::high_resolution_clock::now()-start; </span></div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">  duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="comment">  printf(&quot;CNT normal: %g %d\n&quot;, duration/1000000., count) ; </span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="comment">  </span></div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="comment">}*/</span></div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160; </div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160; </div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160; </div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160; </div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160; </div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160; </div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160; </div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">init_cells</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp;boundaries, <span class="keywordtype">double</span> ds) ; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classCells.html#ad5c0c2a6cc3bb35a5104e3503e9893c9">   30</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#ad5c0c2a6cc3bb35a5104e3503e9893c9">init_cells</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp;boundaries, std::vector&lt;double&gt; &amp; r) {<span class="keywordtype">double</span> ds = 2.1*(*std::max_element(r.begin(), r.end())) ; <span class="keywordflow">return</span> (<a class="code" href="classCells.html#ad5c0c2a6cc3bb35a5104e3503e9893c9">init_cells</a>(boundaries, ds)) ; }</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">allocate_to_cells</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp; X) ; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">contacts</a> (std::pair&lt;int,int&gt; bounds, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLall, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLnew, std::vector&lt;std::vector&lt;double&gt;&gt; <span class="keyword">const</span> &amp; X, std::vector&lt;double&gt; <span class="keyword">const</span> &amp;r) ; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">//-------------------------------------------</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">   34</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a> (<span class="keyword">const</span> std::vector&lt;int&gt;&amp;v) </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">int</span> res=0 ; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      res += <a class="code" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">cum_n_cell</a>[dd] * v[dd] ; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">return</span> res ; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">//-------------------------------------------</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">   42</a></span>&#160;  std::vector&lt;int&gt; <a class="code" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">id2x</a> (<span class="keywordtype">int</span> <span class="keywordtype">id</span>)  </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    std::vector&lt;int&gt; ids (<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0) ;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      ids[dd] = <span class="keywordtype">id</span> % <a class="code" href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">n_cell</a>[dd] ; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordtype">id</span> /= <a class="code" href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">n_cell</a>[dd] ; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }    </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">return</span> ids ;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  }</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="comment">//-------------------------------------------</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classCells.html#afa7f1a124c921e1959576133645d93d6">   53</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classCells.html#afa7f1a124c921e1959576133645d93d6">test_idempotent</a> ()</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">cum_n_cell</a>[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>] ; i++)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a>(<a class="code" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">id2x</a>(i))!=i)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        printf(<span class="stringliteral">&quot;ERROR %d\n&quot;</span>, i) ; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">return</span> false ; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> true ;         </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="comment">//---------------------------------------------</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classCells.html#aa123da27784a66880db0f39c49e3d170">   66</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classCells.html#aa123da27784a66880db0f39c49e3d170">dsqr</a> (std::vector&lt;double&gt; &amp;X1, std::vector&lt;double&gt; &amp;X2)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  {</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">double</span> sum = 0 ; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; k&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; k++)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      sum += (X1[k]-X2[k])*(X1[k]-X2[k]) ; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">return</span> sum ; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">//---------------------------------------------</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  </div>
+<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">   76</a></span>&#160;  std::vector&lt;int&gt; <a class="code" href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">n_cell</a> , <a class="code" href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">cum_n_cell</a> ; </div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classCells.html#a05aa219ad2a8efb5f77cd4c55100aece">   77</a></span>&#160;  std::vector&lt;double&gt; <a class="code" href="classCells.html#a05aa219ad2a8efb5f77cd4c55100aece">origin</a> ; </div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">   78</a></span>&#160;  std::vector&lt;Cell&gt; <a class="code" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">cells</a> ;</div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">   79</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">delta</a> ; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;} ; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">/*****************************************************************************************************</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment"> * IMPLEMENTATIONS                                                                                   *</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment"> *                                                                                                   *</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment"> * ***************************************************************************************************/</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">   94</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">Cells&lt;d&gt;::init_cells</a>(std::vector&lt;std::vector&lt;double&gt;&gt; &amp;boundaries, <span class="keywordtype">double</span> ds)</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;{</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  n_cell.resize(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  cum_n_cell.resize(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>+1,0) ; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  origin.resize(<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0) ;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  delta=ds ; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  cum_n_cell[0] = 1 ;  </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; i++)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  {</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    n_cell[i] = ceil((boundaries[i][1]-boundaries[i][0])/ds) ; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">if</span> (i&gt;0) </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      cum_n_cell[i] = cum_n_cell[i-1]*n_cell[i-1] ; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    origin[i] = boundaries[i][0] ; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  }</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  cum_n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>] = cum_n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1]*n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1] ; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  cells.resize(cum_n_cell[<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>]) ; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;v: n_cell) printf(<span class="stringliteral">&quot;%d &quot;</span>, v) ;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;v: cum_n_cell) printf(<span class="stringliteral">&quot;%d &quot;</span>, v) ; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  printf(<span class="stringliteral">&quot;\n&quot;</span>) ; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordtype">int</span> ntot = 1&lt;&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  std::array&lt;uint8_t, d&gt; tmp ; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;cells.size() ; i++)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">auto</span> x_base = id2x(i) ; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keyword">auto</span> x = x_base ; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++) tmp[dd] = x_base[dd] ; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">/*auto res = hilbert::v2::PositionToIndex&lt;uint8_t, d&gt; (tmp) ; </span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">    for (auto &amp; v: res) </span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment">      printf(&quot;%d &quot;, v) ; </span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="comment">    printf(&quot;\n&quot;) ; */</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">//cells[i].hilbert_idx = hilbert::v2::PositionToIndex&lt;int, d&gt; (tmp) ; </span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    cells[i].neighbours.reserve(pow(3,<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>)) ;       </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=1 ; j&lt;ntot ; j++)</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <span class="keywordtype">int</span> nct = __builtin_popcount(j) ; </div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <span class="keywordtype">int</span> ndir = 1&lt;&lt;nct ; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; k&lt;ndir ; k++)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordtype">bool</span> noadd = false ; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        x = x_base ; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        </div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="keywordtype">int</span> dirn=0 ; </div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        {</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;          <span class="keywordflow">if</span> (j&gt;&gt;dd &amp; 1)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;          {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            <span class="keywordflow">if</span> (k&gt;&gt;dirn &amp; 1) </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;              x[dd] += 1 ;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;              x[dd] -= 1 ; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            dirn++ ; </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;            <span class="keywordflow">if</span> (x[dd]&lt;0 || x[dd]&gt;=n_cell[dd]) </div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;            {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;              noadd=true ; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;              break ; </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;            }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;          }</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        }</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordflow">if</span> (!noadd)</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;          cells[i].neighbours.push_back(x2id(x)) ;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      }</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a>( cells[i].neighbours.begin(), cells[i].neighbours.end() );</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordtype">int</span> bef = cells[i].neighbours.size() ; </div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    cells[i].neighbours.erase( <a class="code" href="pugixml_8cpp.html#a444191b06b1fc17263925ef2c7185338">unique</a>( cells[i].neighbours.begin(), cells[i].neighbours.end() ), cells[i].neighbours.end() );</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordtype">int</span> aft = cells[i].neighbours.size() ; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">if</span> (bef-aft != 0) printf(<span class="stringliteral">&quot;ERR: no duplication of cells should happen with the algorithm.\n&quot;</span>) ;  </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    cells[i].neighbours.erase(std::remove_if(cells[i].neighbours.begin(), cells[i].neighbours.end(), </div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                                            [=](<span class="keywordtype">size_t</span> x) { return x&lt;=i ; }), cells[i].neighbours.end());</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="comment">/*for (int i=0 ; i&lt;cum_n_cell[d] ; i++)</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="comment">  {</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment">    printf(&quot;%d &quot;, cells[i].neighbours.size()) ;    </span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="comment">  }*/</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keywordflow">return</span> 0 ; </div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;}</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment">//=================================================================</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">  184</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">Cells&lt;d&gt;::allocate_to_cells</a> (std::vector&lt;std::vector&lt;double&gt;&gt; &amp; X)</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;{</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  std::vector&lt;int&gt; v (<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>,0) ; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;cells.size() ; i++)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    cells[i].incell.clear() ; </div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  </div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;X.size() ; i++)</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  {</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd=0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      v[dd] = floor((X[i][dd]-origin[dd])/delta) ; </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordtype">int</span> <span class="keywordtype">id</span> = x2id(v) ; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    cells[id].incell.push_back(i) ;       </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  } </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <span class="comment">/*int tot = 0 ; </span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="comment">  for (size_t i=0 ; i&lt;cells.size() ; i++)</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="comment">    tot += cells[i].incell.size() ; */</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keywordflow">return</span> 0 ; </div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;}</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="comment">//=================================================================</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> d&gt;</div>
+<div class="line"><a name="l00206"></a><span class="lineno"><a class="line" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">  206</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">Cells&lt;d&gt;::contacts</a> (std::pair&lt;int,int&gt; bounds, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLall, <a class="code" href="classContactList.html">ContactList&lt;d&gt;</a> &amp; CLnew, std::vector&lt;std::vector&lt;double&gt;&gt; <span class="keyword">const</span> &amp; X, std::vector&lt;double&gt; <span class="keyword">const</span> &amp;r)</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;{</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="keyword">auto</span> [cell_first, cell_last] = bounds ; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <a class="code" href="classcp.html">cp&lt;d&gt;</a> tmpcp(0,0,0,<span class="keyword">nullptr</span>) ; tmpcp.<a class="code" href="classcp.html#a490fcae587216662f9ed29754f425e07">persisting</a> = true ; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordtype">double</span> sum=0 ;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordtype">int</span> ncontact=0 ; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> c=cell_first ; c&lt;cell_last ; c++)</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  {</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">if</span> (cells[c].incell.size()==0) continue ; </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">// Inner cell contact</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> ii=0 ; ii&lt;cells[c].incell.size() ; ii++)</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> jj=ii+1 ; jj&lt;cells[c].incell.size() ; jj++)</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      {</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        sum = 0 ; </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordtype">int</span> i = cells[c].incell[ii] ;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <span class="keywordtype">int</span> j = cells[c].incell[jj] ;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; sum&lt;(r[i]+r[j])*(r[i]+r[j]) &amp;&amp; k&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; k++) </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;          sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="keywordflow">if</span> (sum&lt;(r[i]+r[j])*(r[i]+r[j]))</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            ncontact++ ; </div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            <span class="keywordflow">if</span> (i&lt;j) {tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = i ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=j ;}</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            <span class="keywordflow">else</span> { tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = j ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=i ;} </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            tmpcp.<a class="code" href="classcp.html#a0e2ea54c5799746e0fcc73ad85bb9081">contactlength</a>=sqrt(sum) ; tmpcp.<a class="code" href="classcp.html#a5ab3a9afca56ffd7798e9b3c40564dad">ghost</a>=0 ; tmpcp.<a class="code" href="classcp.html#adce38f7a307dd8a3d8d4c2248fe1dc7b">ghostdir</a>=0 ;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            <span class="keywordflow">if</span> (!CLall.<a class="code" href="classContactList.html#aa1a5aff980d95577f762d7f65237386e">insert_cell</a>(tmpcp)) CLnew.<a class="code" href="classContactList.html#a75f15cd9b0711158597aed2b162852ce">v</a>.push_back(tmpcp) ; </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      }</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    </div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="comment">//neighbours contacts</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> cc=0 ; cc&lt;cells[c].neighbours.size() ; cc++)</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    {</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordtype">int</span> c2 = cells[c].neighbours[cc] ; </div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> ii=0 ; ii&lt;cells[c].incell.size() ; ii++)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> jj=0 ; jj&lt;cells[c2].incell.size() ; jj++)</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;          sum = 0 ; </div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;          <span class="keywordtype">int</span> i = cells[c].incell[ii] ;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;          <span class="keywordtype">int</span> j = cells[c2].incell[jj] ;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k=0 ; sum&lt;(r[i]+r[j])*(r[i]+r[j]) &amp;&amp; k&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; k++) </div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            sum+= (X[i][k]-X[j][k])*(X[i][k]-X[j][k]) ;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;          <span class="keywordflow">if</span> (sum&lt;(r[i]+r[j])*(r[i]+r[j]))</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;          {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            ncontact++ ; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;            <span class="keywordflow">if</span> (i&lt;j) {tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = i ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=j ;}</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;            <span class="keywordflow">else</span> { tmpcp.<a class="code" href="classcp.html#a532976de3eaca669595936a9dff36f69">i</a> = j ; tmpcp.<a class="code" href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">j</a>=i ;} </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            tmpcp.<a class="code" href="classcp.html#a0e2ea54c5799746e0fcc73ad85bb9081">contactlength</a>=sqrt(sum) ; tmpcp.<a class="code" href="classcp.html#a5ab3a9afca56ffd7798e9b3c40564dad">ghost</a>=0 ; tmpcp.<a class="code" href="classcp.html#adce38f7a307dd8a3d8d4c2248fe1dc7b">ghostdir</a>=0 ;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            <span class="keywordflow">if</span> (!CLall.<a class="code" href="classContactList.html#aa1a5aff980d95577f762d7f65237386e">insert_cell</a>(tmpcp)) CLnew.<a class="code" href="classContactList.html#a75f15cd9b0711158597aed2b162852ce">v</a>.push_back(tmpcp) ; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          }</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      }    </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  }</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="comment">//printf(&quot;{%d %ld}&quot;, ncontact, CLnew.v.size()) ; fflush(stdout) ;  </span></div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">return</span> 0 ; </div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;}</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="comment">//===========================================================</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="comment">/*int main(int argc, char * argv[])</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="comment">{</span></div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="comment">  for (int i=0 ; i&lt;4 ; i++)</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;<span class="comment">    for (int j=0 ; j&lt;4 ; j++)</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="comment">      for (int k=0 ; k&lt;4 ; k++)</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="comment">      {</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="comment">        long long id = hilbertDistance({i,j,k}, 4) ; </span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="comment">        printf(&quot;%d %d %d | %lld \n&quot;, i,j,k, id) ; </span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="comment">      }</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment">  std::vector&lt;std::vector&lt;double&gt;&gt; bounds ; </span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="comment">  for (int dd=0 ; dd&lt;D ; dd++)</span></div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="comment">    bounds.push_back({0,1}) ; </span></div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="comment">  double ds = 1/8. ; </span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="comment">  boost::random::mt19937 rng(865); </span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="comment">  boost::random::uniform_01&lt;boost::mt19937&gt; rand(rng) ; </span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="comment">  auto start = std::chrono::high_resolution_clock::now();</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">  auto elapsed = std::chrono::high_resolution_clock::now()-start;   </span></div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="comment">  auto duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="comment">  std::vector&lt;std::vector&lt;double&gt;&gt; X (N, std::vector&lt;double&gt;(D,0))  ; </span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="comment">  for (auto &amp; v : X)</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="comment">      for (auto &amp; w: v)</span></div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="comment">          w = rand() ;</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">  double Dbase = 0.05 ;  double Dsqr=Dbase*Dbase; </span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="comment">  int count=0 ; </span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="comment">  //-----------------------------------------------------------</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment">  Cells&lt;D&gt; allcells; </span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">  start = std::chrono::high_resolution_clock::now();</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="comment">  allcells.init_cells(bounds, ds) ; </span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="comment">  elapsed = std::chrono::high_resolution_clock::now()-start; </span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment">  duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment">  printf(&quot;INIT duration: %g\n&quot;, duration/1000000.) ; </span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment">  allcells.test_idempotent() ; </span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment">  printf(&quot;INITIALISATION FINISHED\n&quot;) ; fflush(stdout) ;</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="comment">  //------------------------------------------------------------</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment">  start = std::chrono::high_resolution_clock::now();</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">  count = 0; </span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment">  allcells.allocate_to_cells(X) ; </span></div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment">  count = allcells.check_contact(X, Dsqr) ; </span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment">  elapsed = std::chrono::high_resolution_clock::now()-start; </span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment">  duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="comment">  printf(&quot;CNT cells: %g %d\n&quot;, duration/1000000., count) ; </span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="comment">  //------------------------------------------------------------</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="comment">  start = std::chrono::high_resolution_clock::now();</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment">  count =0 ;</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">  for (int i=0 ; i&lt;N ; i++)</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment">      for (int j=i+1 ; j&lt;N ; j++)</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">      {</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">        double dst = allcells.dsqr(X[i], X[j]) ; </span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">        if (dst &lt; Dsqr)</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="comment">            count ++ ;</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">      }</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="comment">  elapsed = std::chrono::high_resolution_clock::now()-start; </span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment">  duration= std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(elapsed).count() ; </span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment">  printf(&quot;CNT normal: %g %d\n&quot;, duration/1000000., count) ; </span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment">  </span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment">}*/</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160; </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160; </div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160; </div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160; </div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160; </div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160; </div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160; </div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160; </div>
 <div class="ttc" id="aclassCell_html"><div class="ttname"><a href="classCell.html">Cell</a></div><div class="ttdoc">Individual cell for contact detection.</div><div class="ttdef"><b>Definition:</b> Cells.h:17</div></div>
 <div class="ttc" id="aclassCell_html_a680c4f6b59bdbdaf591972fb4319fdaa"><div class="ttname"><a href="classCell.html#a680c4f6b59bdbdaf591972fb4319fdaa">Cell::incell</a></div><div class="ttdeci">std::vector&lt; int &gt; incell</div><div class="ttdoc">list of particles in the cell</div><div class="ttdef"><b>Definition:</b> Cells.h:19</div></div>
 <div class="ttc" id="aclassCell_html_a7ec0112dce0e4ff3ad5247388ba2c3f5"><div class="ttname"><a href="classCell.html#a7ec0112dce0e4ff3ad5247388ba2c3f5">Cell::neighbours</a></div><div class="ttdeci">std::vector&lt; int &gt; neighbours</div><div class="ttdoc">list of cell neighbours to the current cell</div><div class="ttdef"><b>Definition:</b> Cells.h:20</div></div>
 <div class="ttc" id="aclassCells_html"><div class="ttname"><a href="classCells.html">Cells</a></div><div class="ttdoc">All the cells making the space, with related function for creating the cell array,...</div><div class="ttdef"><b>Definition:</b> Cells.h:27</div></div>
-<div class="ttc" id="aclassCells_html_a05aa219ad2a8efb5f77cd4c55100aece"><div class="ttname"><a href="classCells.html#a05aa219ad2a8efb5f77cd4c55100aece">Cells::origin</a></div><div class="ttdeci">std::vector&lt; double &gt; origin</div><div class="ttdef"><b>Definition:</b> Cells.h:105</div></div>
-<div class="ttc" id="aclassCells_html_a332a87c41916ef811eba1e9e3d8ae6dc"><div class="ttname"><a href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">Cells::delta</a></div><div class="ttdeci">double delta</div><div class="ttdef"><b>Definition:</b> Cells.h:107</div></div>
-<div class="ttc" id="aclassCells_html_a35dcc7c9beddea735c7968a564b4da8f"><div class="ttname"><a href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">Cells::allocate_to_cells</a></div><div class="ttdeci">int allocate_to_cells(std::vector&lt; std::vector&lt; double &gt;&gt; &amp;X)</div><div class="ttdef"><b>Definition:</b> Cells.h:212</div></div>
-<div class="ttc" id="aclassCells_html_a91707d3d06d4e39a8e7986868a08a3ef"><div class="ttname"><a href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">Cells::id2x</a></div><div class="ttdeci">std::vector&lt; int &gt; id2x(int id)</div><div class="ttdef"><b>Definition:</b> Cells.h:70</div></div>
-<div class="ttc" id="aclassCells_html_aa123da27784a66880db0f39c49e3d170"><div class="ttname"><a href="classCells.html#aa123da27784a66880db0f39c49e3d170">Cells::dsqr</a></div><div class="ttdeci">double dsqr(std::vector&lt; double &gt; &amp;X1, std::vector&lt; double &gt; &amp;X2)</div><div class="ttdef"><b>Definition:</b> Cells.h:94</div></div>
-<div class="ttc" id="aclassCells_html_aca4c651e86f345584f2b8769d7676eb3"><div class="ttname"><a href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">Cells::init_cells</a></div><div class="ttdeci">int init_cells(std::vector&lt; std::vector&lt; double &gt;&gt; &amp;boundaries, double ds)</div><div class="ttdef"><b>Definition:</b> Cells.h:123</div></div>
-<div class="ttc" id="aclassCells_html_acf33aa402cddc885c1e41b91f5a4dbd9"><div class="ttname"><a href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">Cells::cells</a></div><div class="ttdeci">std::vector&lt; Cell &gt; cells</div><div class="ttdef"><b>Definition:</b> Cells.h:106</div></div>
-<div class="ttc" id="aclassCells_html_ad20e9c33bd9a40c88e6779f4ff246938"><div class="ttname"><a href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">Cells::n_cell</a></div><div class="ttdeci">std::vector&lt; int &gt; n_cell</div><div class="ttdef"><b>Definition:</b> Cells.h:104</div></div>
-<div class="ttc" id="aclassCells_html_ad700e65e663a3853bc75961b4af6e60f"><div class="ttname"><a href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">Cells::contacts</a></div><div class="ttdeci">int contacts(std::pair&lt; int, int &gt; bounds, ContactList&lt; d &gt; &amp;CLall, ContactList&lt; d &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r)</div><div class="ttdef"><b>Definition:</b> Cells.h:234</div></div>
-<div class="ttc" id="aclassCells_html_ada87991cb47404158ccf5b7687ec4743"><div class="ttname"><a href="classCells.html#ada87991cb47404158ccf5b7687ec4743">Cells::x2id</a></div><div class="ttdeci">int x2id(const std::vector&lt; int &gt; &amp;v)</div><div class="ttdef"><b>Definition:</b> Cells.h:62</div></div>
-<div class="ttc" id="aclassCells_html_ae0232fb69225f59fc86aa0f4a8c38492"><div class="ttname"><a href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">Cells::cum_n_cell</a></div><div class="ttdeci">std::vector&lt; int &gt; cum_n_cell</div><div class="ttdef"><b>Definition:</b> Cells.h:104</div></div>
-<div class="ttc" id="aclassCells_html_ae6f2cbd0bfd12ad97667ff65012dfae7"><div class="ttname"><a href="classCells.html#ae6f2cbd0bfd12ad97667ff65012dfae7">Cells::check_contact</a></div><div class="ttdeci">int check_contact(std::vector&lt; std::vector&lt; double &gt;&gt; &amp;X, double rsq)</div><div class="ttdef"><b>Definition:</b> Cells.h:33</div></div>
-<div class="ttc" id="aclassCells_html_afa7f1a124c921e1959576133645d93d6"><div class="ttname"><a href="classCells.html#afa7f1a124c921e1959576133645d93d6">Cells::test_idempotent</a></div><div class="ttdeci">bool test_idempotent()</div><div class="ttdef"><b>Definition:</b> Cells.h:81</div></div>
-<div class="ttc" id="aclassContactList_html"><div class="ttname"><a href="classContactList.html">ContactList</a></div><div class="ttdoc">Handles lists of contacts.</div><div class="ttdef"><b>Definition:</b> ContactList.h:167</div></div>
-<div class="ttc" id="aclassContactList_html_a75f15cd9b0711158597aed2b162852ce"><div class="ttname"><a href="classContactList.html#a75f15cd9b0711158597aed2b162852ce">ContactList::v</a></div><div class="ttdeci">list&lt; cp&lt; d &gt; &gt; v</div><div class="ttdoc">Contains the list of contact.</div><div class="ttdef"><b>Definition:</b> ContactList.h:225</div></div>
-<div class="ttc" id="aclassContactList_html_aa1a5aff980d95577f762d7f65237386e"><div class="ttname"><a href="classContactList.html#aa1a5aff980d95577f762d7f65237386e">ContactList::insert_cell</a></div><div class="ttdeci">bool insert_cell(const cp&lt; d &gt; &amp;a)</div><div class="ttdef"><b>Definition:</b> ContactList.h:206</div></div>
+<div class="ttc" id="aclassCells_html_a05aa219ad2a8efb5f77cd4c55100aece"><div class="ttname"><a href="classCells.html#a05aa219ad2a8efb5f77cd4c55100aece">Cells::origin</a></div><div class="ttdeci">std::vector&lt; double &gt; origin</div><div class="ttdef"><b>Definition:</b> Cells.h:77</div></div>
+<div class="ttc" id="aclassCells_html_a332a87c41916ef811eba1e9e3d8ae6dc"><div class="ttname"><a href="classCells.html#a332a87c41916ef811eba1e9e3d8ae6dc">Cells::delta</a></div><div class="ttdeci">double delta</div><div class="ttdef"><b>Definition:</b> Cells.h:79</div></div>
+<div class="ttc" id="aclassCells_html_a35dcc7c9beddea735c7968a564b4da8f"><div class="ttname"><a href="classCells.html#a35dcc7c9beddea735c7968a564b4da8f">Cells::allocate_to_cells</a></div><div class="ttdeci">int allocate_to_cells(std::vector&lt; std::vector&lt; double &gt;&gt; &amp;X)</div><div class="ttdef"><b>Definition:</b> Cells.h:184</div></div>
+<div class="ttc" id="aclassCells_html_a91707d3d06d4e39a8e7986868a08a3ef"><div class="ttname"><a href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">Cells::id2x</a></div><div class="ttdeci">std::vector&lt; int &gt; id2x(int id)</div><div class="ttdef"><b>Definition:</b> Cells.h:42</div></div>
+<div class="ttc" id="aclassCells_html_aa123da27784a66880db0f39c49e3d170"><div class="ttname"><a href="classCells.html#aa123da27784a66880db0f39c49e3d170">Cells::dsqr</a></div><div class="ttdeci">double dsqr(std::vector&lt; double &gt; &amp;X1, std::vector&lt; double &gt; &amp;X2)</div><div class="ttdef"><b>Definition:</b> Cells.h:66</div></div>
+<div class="ttc" id="aclassCells_html_aca4c651e86f345584f2b8769d7676eb3"><div class="ttname"><a href="classCells.html#aca4c651e86f345584f2b8769d7676eb3">Cells::init_cells</a></div><div class="ttdeci">int init_cells(std::vector&lt; std::vector&lt; double &gt;&gt; &amp;boundaries, double ds)</div><div class="ttdef"><b>Definition:</b> Cells.h:94</div></div>
+<div class="ttc" id="aclassCells_html_acf33aa402cddc885c1e41b91f5a4dbd9"><div class="ttname"><a href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">Cells::cells</a></div><div class="ttdeci">std::vector&lt; Cell &gt; cells</div><div class="ttdef"><b>Definition:</b> Cells.h:78</div></div>
+<div class="ttc" id="aclassCells_html_ad20e9c33bd9a40c88e6779f4ff246938"><div class="ttname"><a href="classCells.html#ad20e9c33bd9a40c88e6779f4ff246938">Cells::n_cell</a></div><div class="ttdeci">std::vector&lt; int &gt; n_cell</div><div class="ttdef"><b>Definition:</b> Cells.h:76</div></div>
+<div class="ttc" id="aclassCells_html_ad5c0c2a6cc3bb35a5104e3503e9893c9"><div class="ttname"><a href="classCells.html#ad5c0c2a6cc3bb35a5104e3503e9893c9">Cells::init_cells</a></div><div class="ttdeci">int init_cells(std::vector&lt; std::vector&lt; double &gt;&gt; &amp;boundaries, std::vector&lt; double &gt; &amp;r)</div><div class="ttdef"><b>Definition:</b> Cells.h:30</div></div>
+<div class="ttc" id="aclassCells_html_ad700e65e663a3853bc75961b4af6e60f"><div class="ttname"><a href="classCells.html#ad700e65e663a3853bc75961b4af6e60f">Cells::contacts</a></div><div class="ttdeci">int contacts(std::pair&lt; int, int &gt; bounds, ContactList&lt; d &gt; &amp;CLall, ContactList&lt; d &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r)</div><div class="ttdef"><b>Definition:</b> Cells.h:206</div></div>
+<div class="ttc" id="aclassCells_html_ada87991cb47404158ccf5b7687ec4743"><div class="ttname"><a href="classCells.html#ada87991cb47404158ccf5b7687ec4743">Cells::x2id</a></div><div class="ttdeci">int x2id(const std::vector&lt; int &gt; &amp;v)</div><div class="ttdef"><b>Definition:</b> Cells.h:34</div></div>
+<div class="ttc" id="aclassCells_html_ae0232fb69225f59fc86aa0f4a8c38492"><div class="ttname"><a href="classCells.html#ae0232fb69225f59fc86aa0f4a8c38492">Cells::cum_n_cell</a></div><div class="ttdeci">std::vector&lt; int &gt; cum_n_cell</div><div class="ttdef"><b>Definition:</b> Cells.h:76</div></div>
+<div class="ttc" id="aclassCells_html_afa7f1a124c921e1959576133645d93d6"><div class="ttname"><a href="classCells.html#afa7f1a124c921e1959576133645d93d6">Cells::test_idempotent</a></div><div class="ttdeci">bool test_idempotent()</div><div class="ttdef"><b>Definition:</b> Cells.h:53</div></div>
+<div class="ttc" id="aclassContactList_html"><div class="ttname"><a href="classContactList.html">ContactList</a></div><div class="ttdoc">Handles lists of contacts.</div><div class="ttdef"><b>Definition:</b> ContactList.h:168</div></div>
+<div class="ttc" id="aclassContactList_html_a75f15cd9b0711158597aed2b162852ce"><div class="ttname"><a href="classContactList.html#a75f15cd9b0711158597aed2b162852ce">ContactList::v</a></div><div class="ttdeci">list&lt; cp&lt; d &gt; &gt; v</div><div class="ttdoc">Contains the list of contact.</div><div class="ttdef"><b>Definition:</b> ContactList.h:247</div></div>
+<div class="ttc" id="aclassContactList_html_aa1a5aff980d95577f762d7f65237386e"><div class="ttname"><a href="classContactList.html#aa1a5aff980d95577f762d7f65237386e">ContactList::insert_cell</a></div><div class="ttdeci">bool insert_cell(const cp&lt; d &gt; &amp;a)</div><div class="ttdef"><b>Definition:</b> ContactList.h:211</div></div>
 <div class="ttc" id="aclasscp_html"><div class="ttname"><a href="classcp.html">cp</a></div><div class="ttdoc">Contact properties class.</div><div class="ttdef"><b>Definition:</b> ContactList.h:59</div></div>
-<div class="ttc" id="aclasscp_html_a0e2ea54c5799746e0fcc73ad85bb9081"><div class="ttname"><a href="classcp.html#a0e2ea54c5799746e0fcc73ad85bb9081">cp::contactlength</a></div><div class="ttdeci">double contactlength</div><div class="ttdoc">Length of the contact.</div><div class="ttdef"><b>Definition:</b> ContactList.h:103</div></div>
-<div class="ttc" id="aclasscp_html_a48d0cbad59a1fe17b5002b30997ff5a7"><div class="ttname"><a href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">cp::j</a></div><div class="ttdeci">int j</div><div class="ttdoc">Index of second contacting particle or wall. If this is a wall contact, j=2*walldimension + (0 or 1 i...</div><div class="ttdef"><b>Definition:</b> ContactList.h:102</div></div>
-<div class="ttc" id="aclasscp_html_a532976de3eaca669595936a9dff36f69"><div class="ttname"><a href="classcp.html#a532976de3eaca669595936a9dff36f69">cp::i</a></div><div class="ttdeci">int i</div><div class="ttdoc">Index of contacting particle.</div><div class="ttdef"><b>Definition:</b> ContactList.h:101</div></div>
-<div class="ttc" id="aclasscp_html_a5ab3a9afca56ffd7798e9b3c40564dad"><div class="ttname"><a href="classcp.html#a5ab3a9afca56ffd7798e9b3c40564dad">cp::ghost</a></div><div class="ttdeci">uint32_t ghost</div><div class="ttdoc">Contain ghost information about ghost contact, cf detailed description.</div><div class="ttdef"><b>Definition:</b> ContactList.h:104</div></div>
-<div class="ttc" id="aclasscp_html_adce38f7a307dd8a3d8d4c2248fe1dc7b"><div class="ttname"><a href="classcp.html#adce38f7a307dd8a3d8d4c2248fe1dc7b">cp::ghostdir</a></div><div class="ttdeci">uint32_t ghostdir</div><div class="ttdoc">Contain ghost information about ghost direction, cf detailed description.</div><div class="ttdef"><b>Definition:</b> ContactList.h:105</div></div>
+<div class="ttc" id="aclasscp_html_a0e2ea54c5799746e0fcc73ad85bb9081"><div class="ttname"><a href="classcp.html#a0e2ea54c5799746e0fcc73ad85bb9081">cp::contactlength</a></div><div class="ttdeci">double contactlength</div><div class="ttdoc">Length of the contact.</div><div class="ttdef"><b>Definition:</b> ContactList.h:104</div></div>
+<div class="ttc" id="aclasscp_html_a48d0cbad59a1fe17b5002b30997ff5a7"><div class="ttname"><a href="classcp.html#a48d0cbad59a1fe17b5002b30997ff5a7">cp::j</a></div><div class="ttdeci">int j</div><div class="ttdoc">Index of second contacting particle or wall. If this is a wall contact, j=2*walldimension + (0 or 1 i...</div><div class="ttdef"><b>Definition:</b> ContactList.h:103</div></div>
+<div class="ttc" id="aclasscp_html_a490fcae587216662f9ed29754f425e07"><div class="ttname"><a href="classcp.html#a490fcae587216662f9ed29754f425e07">cp::persisting</a></div><div class="ttdeci">bool persisting</div><div class="ttdoc">True if the contact is still maintained for the current ts.</div><div class="ttdef"><b>Definition:</b> ContactList.h:110</div></div>
+<div class="ttc" id="aclasscp_html_a532976de3eaca669595936a9dff36f69"><div class="ttname"><a href="classcp.html#a532976de3eaca669595936a9dff36f69">cp::i</a></div><div class="ttdeci">int i</div><div class="ttdoc">Index of contacting particle.</div><div class="ttdef"><b>Definition:</b> ContactList.h:102</div></div>
+<div class="ttc" id="aclasscp_html_a5ab3a9afca56ffd7798e9b3c40564dad"><div class="ttname"><a href="classcp.html#a5ab3a9afca56ffd7798e9b3c40564dad">cp::ghost</a></div><div class="ttdeci">uint32_t ghost</div><div class="ttdoc">Contain ghost information about ghost contact, cf detailed description.</div><div class="ttdef"><b>Definition:</b> ContactList.h:105</div></div>
+<div class="ttc" id="aclasscp_html_adce38f7a307dd8a3d8d4c2248fe1dc7b"><div class="ttname"><a href="classcp.html#adce38f7a307dd8a3d8d4c2248fe1dc7b">cp::ghostdir</a></div><div class="ttdeci">uint32_t ghostdir</div><div class="ttdoc">Contain ghost information about ghost direction, cf detailed description.</div><div class="ttdef"><b>Definition:</b> ContactList.h:106</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
 <div class="ttc" id="apugixml_8cpp_html_a09a6af504e5bf26365ccb2d1c707ca48"><div class="ttname"><a href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a></div><div class="ttdeci">PUGI_IMPL_FN void sort(I begin, I end, const Pred &amp;pred)</div><div class="ttdef"><b>Definition:</b> pugixml.cpp:7707</div></div>
 <div class="ttc" id="apugixml_8cpp_html_a444191b06b1fc17263925ef2c7185338"><div class="ttname"><a href="pugixml_8cpp.html#a444191b06b1fc17263925ef2c7185338">unique</a></div><div class="ttdeci">PUGI_IMPL_FN I unique(I begin, I end)</div><div class="ttdef"><b>Definition:</b> pugixml.cpp:7621</div></div>
