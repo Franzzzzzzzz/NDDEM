@@ -42,7 +42,8 @@ public:
     delayedwall.resize(P) ;
     delayedwallj.resize(P) ;
     delayedwall_size.resize(P,0) ;
-    timing.resize(P,0) ;
+    timing_contacts.resize(P,0) ;
+    timing_forces.resize(P,0) ;
     }
   void disp_share(); ///< Display the # of particle on each thread. 
   bool ismine (int ID, int j) {if (j>=share[ID] && j<share[ID+1]) return true ; return false ; } ///< Check if a particle j belongs to the thread ID. 
@@ -50,7 +51,7 @@ public:
   void delayed_clean() ; ///< Clean the record list. 
   void delayingwall (int ID, int j, Action<d> & act) ; ///< Record the action on the wall. Only usefull if the force on the wall needs to be calculated
   void delayedwall_clean() ; ///< Clean the record of the force on the wal. 
-  void load_balance() ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations. 
+  void load_balance(ContactStrategies contactstrategy) ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.
   void merge_split_CLp () 
   {
     int tot =CLp[0].v.size()  ;
@@ -107,7 +108,7 @@ public:
   vector <Contacts<d>> C ; ///< Dummy Contacts for independent calculation per processor
   vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=P+1. 
   vector <int> sharecell ; ///< Cell share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1. 
-  vector <double> timing ; ///< Used to record the time spent by each thread. 
+  vector <double> timing_contacts, timing_forces ; ///< Used to record the time spent by each thread.
   int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
 
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
@@ -245,24 +246,26 @@ void Multiproc<d>::delayedwall_clean()
 }
 //--------------------------------------------
 template <int d>
-void Multiproc<d>::load_balance()
+void Multiproc<d>::load_balance(ContactStrategies contactstrategy)
 {
+  if (contactstrategy == NAIVE)
+    for (int i=0 ; i<P ; i++)
+      timing_forces[i]+= timing_contacts[i] ;
+
   if (P==1) return ;
-  double target = std::accumulate(timing.begin(), timing.end(), 0.) / P / num_time ;
+  double target = std::accumulate(timing_forces.begin(), timing_forces.end(), 0.) / P / num_time ;
   bool doloadbalance = false ;
   for (int i=0 ; i<P ; i++) // Checking that it's worth balancing the load
   {
-    if (abs(1-timing[i]/num_time/target)>0.1)
+    if (abs(1-timing_forces[i]/num_time/target)>0.1)
       doloadbalance = true ;
   }
   if (!doloadbalance)
     return ;
 
-
-
   vector <double> timeperatom ;
   for (int i=0 ; i<P ; i++)
-    timeperatom.push_back( (timing[i] / (share[i+1]-share[i])) / num_time) ;
+    timeperatom.push_back( (timing_forces[i] / (share[i+1]-share[i])) / num_time) ;
 
   double time ;
   //for (auto v: timing) printf("%g ", v) ;
@@ -294,34 +297,69 @@ void Multiproc<d>::load_balance()
   } while (newshare[i]>=N-(P-i)) ;
   }*/
 
-  printf("\nBalancing the load: processor migration\n") ;
-  for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
-  printf("\n") ; fflush(stdout) ;
-
-  share=newshare ;
-  ContactList<d> temp_p, temp_w ;
-
-  for (int i=0 ; i<P ; i++)
+  if (contactstrategy == NAIVE)
   {
-    temp_p.v.splice(temp_p.v.end(), CLp[i].v) ;
-    temp_w.v.splice(temp_w.v.end(), CLw[i].v) ;
-  }
+    printf("\nBalancing the load: processor migration\n") ;
+    for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
+    printf("\n") ; fflush(stdout) ;
 
-  //for (auto v: temp_p.v) printf("%d ", v.i) ;
-  for (int p=0 ; p<P ; p++)
+    share=newshare ;
+    ContactList<d> temp_p, temp_w ;
+
+    for (int i=0 ; i<P ; i++)
+    {
+      temp_p.v.splice(temp_p.v.end(), CLp[i].v) ;
+      temp_w.v.splice(temp_w.v.end(), CLw[i].v) ;
+    }
+
+    //for (auto v: temp_p.v) printf("%d ", v.i) ;
+    for (int p=0 ; p<P ; p++)
+    {
+      auto itp=temp_p.v.begin() ;
+      while ( itp != temp_p.v.end() && itp->i < newshare[p+1]) itp++ ;
+      CLp[p].v.splice(CLp[p].v.begin(), temp_p.v, temp_p.v.begin(), itp) ;
+
+      auto itw=temp_w.v.begin() ;
+      while ( itw != temp_w.v.end() && itw->i < newshare[p+1]) itw++ ;
+      CLw[p].v.splice(CLw[p].v.begin(), temp_w.v, temp_w.v.begin(), itw) ;
+
+    }
+
+    for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
+    printf("\n") ; fflush(stdout) ;
+  }
+  else if (contactstrategy == CELLS)
   {
-    auto itp=temp_p.v.begin() ;
-    while ( itp != temp_p.v.end() && itp->i < newshare[p+1]) itp++ ;
-    CLp[p].v.splice(CLp[p].v.begin(), temp_p.v, temp_p.v.begin(), itp) ;
+    double target = std::accumulate(timing_contacts.begin(), timing_contacts.end(), 0.) / P / num_time ;
+    bool doloadbalance = false ;
+    for (int i=0 ; i<P ; i++) // Checking that it's worth balancing the load
+    {
+      if (abs(1-timing_contacts[i]/num_time/target)>0.1)
+        doloadbalance = true ;
+    }
+    if (!doloadbalance)
+      return ;
 
-    auto itw=temp_w.v.begin() ;
-    while ( itw != temp_w.v.end() && itw->i < newshare[p+1]) itw++ ;
-    CLw[p].v.splice(CLw[p].v.begin(), temp_w.v, temp_w.v.begin(), itw) ;
+    vector <double> timepercell ;
+    for (int i=0 ; i<P ; i++)
+      timepercell.push_back( (timing_contacts[i] / (sharecell[i+1]-sharecell[i])) / num_time) ;
 
+    int curp=1 ; newshare[0]=0 ; newshare[P] = sharecell[P];
+    for (int p=1 ; p<P ; p++)
+    {
+      time=0 ; newshare[p] = newshare[p-1] ;
+      //printf("%g\n", target) ; fflush(stdout) ;
+      while (time<target)
+      {
+        if (newshare[p] >= share[curp])
+          curp++ ;
+        newshare[p]++ ;
+        if (newshare[p]==newshare[P]-(P-p)) break ; // To ensure at least 1 cell per core, not taking any risk
+        time += timepercell[curp-1] ;
+      }
+    }
+    sharecell = newshare ;
   }
-
-  for (int i=0 ; i<P ; i++) printf("%d %ld |", share[i], CLp[i].v.size() ) ;
-  printf("\n") ; fflush(stdout) ;
 }
 //--------------------------------------------------------------------------------
 template <int d>

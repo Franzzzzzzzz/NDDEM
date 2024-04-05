@@ -4,6 +4,8 @@
 #include <vector>
 #include <ctime>
 #include <cstring>
+
+#include <random>
 #ifndef NO_OPENMP
     #include <omp.h>
 #endif
@@ -270,7 +272,6 @@ public:
 
         // ----- Contact detection ------
         if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
-        
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout) shared(cells)
         {
          #ifdef NO_OPENMP
@@ -421,14 +422,14 @@ public:
         CLw.finalise() ;
         CLm.finalise() ;
         #ifndef NO_OPENMP
-        MP.timing[ID] += omp_get_wtime()-timebeg;
+        MP.timing_contacts[ID] += omp_get_wtime()-timebeg;
         #endif
         } //END PARALLEL SECTION
       
         //printf("{%ld %ld}", MP.CLp_all.v.size(), MP.CLp[0].v.size()) ; fflush(stdout) ; 
         if (P.contact_strategy == ContactStrategies::CELLS) MP.merge_split_CLp() ; 
         //printf("\n{%ld}\n", MP.CLp[0].v.size()) ; 
-        
+
         //-------------------------------------------------------------------------------
         // Force and torque computation
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
@@ -448,6 +449,8 @@ public:
         }
 
         //Particle - particle contacts
+
+
         #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout) shared(isdumptime)
         {
           #ifdef NO_OPENMP
@@ -569,7 +572,7 @@ public:
             }
             
             #ifndef NO_OPENMP
-            MP.timing[ID] += omp_get_wtime()-timebeg;
+            MP.timing_forces[ID] += omp_get_wtime()-timebeg;
             #endif
         } //END PARALLEL PART
         //ParticleForce = calculateParticleForce() ;
@@ -652,10 +655,11 @@ public:
         MP.num_time++ ;
         if (MP.num_time>100)
         {
-          MP.load_balance() ;
+          MP.load_balance(P.contact_strategy) ;
           // Cleaning the load balancing
           MP.num_time = 0 ;
-          MP.timing = vector<double>(MP.P,0) ;
+          MP.timing_contacts = vector<double>(MP.P,0) ;
+          MP.timing_forces = vector<double>(MP.P,0) ;
         }
         #endif
     }

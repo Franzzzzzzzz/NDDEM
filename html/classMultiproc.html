@@ -99,9 +99,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga902604fea6f0f763703abe9d7cd3b9a6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">delayedwall_clean</a> ()</td></tr>
 <tr class="memdesc:ga902604fea6f0f763703abe9d7cd3b9a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean the record of the force on the wal.  <a href="group__DEM.html#ga902604fea6f0f763703abe9d7cd3b9a6">More...</a><br /></td></tr>
 <tr class="separator:ga902604fea6f0f763703abe9d7cd3b9a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">load_balance</a> ()</td></tr>
-<tr class="memdesc:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd">More...</a><br /></td></tr>
-<tr class="separator:gaac01e9375aa9f3abf33a553b9a6c5dbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga64473def2a41ed54010b316e8b9f3bf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5">load_balance</a> (<a class="el" href="group__DEM.html#ga375410cc0bbd996376cbb08826d3b195">ContactStrategies</a> contactstrategy)</td></tr>
+<tr class="memdesc:ga64473def2a41ed54010b316e8b9f3bf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5">More...</a><br /></td></tr>
+<tr class="separator:ga64473def2a41ed54010b316e8b9f3bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87050aeab8113dc0e1fb28c51e3979b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a87050aeab8113dc0e1fb28c51e3979b8">merge_split_CLp</a> ()</td></tr>
 <tr class="separator:a87050aeab8113dc0e1fb28c51e3979b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94f58ca4ca4e971589c41343c08fc75b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a94f58ca4ca4e971589c41343c08fc75b">mergeback_CLp</a> ()</td></tr>
@@ -135,11 +135,13 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ac94c47a155a14823478427d3257fb381"><td class="memItemLeft" align="right" valign="top">vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ac94c47a155a14823478427d3257fb381">sharecell</a></td></tr>
 <tr class="memdesc:ac94c47a155a14823478427d3257fb381"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCell.html" title="Individual cell for contact detection.">Cell</a> share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1.  <a href="classMultiproc.html#ac94c47a155a14823478427d3257fb381">More...</a><br /></td></tr>
 <tr class="separator:ac94c47a155a14823478427d3257fb381"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2d9736090b91da23d7d07d6d9840045"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#af2d9736090b91da23d7d07d6d9840045">timing</a></td></tr>
-<tr class="memdesc:af2d9736090b91da23d7d07d6d9840045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to record the time spent by each thread.  <a href="classMultiproc.html#af2d9736090b91da23d7d07d6d9840045">More...</a><br /></td></tr>
-<tr class="separator:af2d9736090b91da23d7d07d6d9840045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ebc89a0a5bfe1b4817ea8baa4e6802e"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a2ebc89a0a5bfe1b4817ea8baa4e6802e">timing_contacts</a></td></tr>
+<tr class="separator:a2ebc89a0a5bfe1b4817ea8baa4e6802e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb16094b961b3b72abaaf6fdc0a37b51"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#acb16094b961b3b72abaaf6fdc0a37b51">timing_forces</a></td></tr>
+<tr class="memdesc:acb16094b961b3b72abaaf6fdc0a37b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to record the time spent by each thread.  <a href="classMultiproc.html#acb16094b961b3b72abaaf6fdc0a37b51">More...</a><br /></td></tr>
+<tr class="separator:acb16094b961b3b72abaaf6fdc0a37b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac898635d542458c39f661d2dad616b97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">num_time</a></td></tr>
-<tr class="memdesc:ac898635d542458c39f661d2dad616b97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of sample of time spent. Resets when <a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> is called.  <a href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">More...</a><br /></td></tr>
+<tr class="memdesc:ac898635d542458c39f661d2dad616b97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of sample of time spent. Resets when <a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> is called.  <a href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">More...</a><br /></td></tr>
 <tr class="separator:ac898635d542458c39f661d2dad616b97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a633287157aa869a2e2fb7e65f0970411"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; <a class="el" href="classAction.html">Action</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a633287157aa869a2e2fb7e65f0970411">delayed</a></td></tr>
 <tr class="memdesc:a633287157aa869a2e2fb7e65f0970411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Records the delayed <a class="el" href="classAction.html" title="Handle force and torque contact information.">Action</a>.  <a href="classMultiproc.html#a633287157aa869a2e2fb7e65f0970411">More...</a><br /></td></tr>
@@ -166,7 +168,7 @@ Public Attributes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">split</a> (int <a class="el" href="classMultiproc.html#aa748a5787f222e29ca5a213681d45e48">N</a>, int <a class="el" href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">P</a>)</td></tr>
-<tr class="memdesc:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to allocate the grains to threads taking into account the load balance in the contact detection. <a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> takes over after a few iteration have run, and is usually more efficient.  <a href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">More...</a><br /></td></tr>
+<tr class="memdesc:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to allocate the grains to threads taking into account the load balance in the contact detection. <a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> takes over after a few iteration have run, and is usually more efficient.  <a href="group__DEM.html#ga7a3c3c6b021a4ecf43dbf795f2230d77">More...</a><br /></td></tr>
 <tr class="separator:ga7a3c3c6b021a4ecf43dbf795f2230d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -584,7 +586,7 @@ template&lt;int d&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Number of sample of time spent. Resets when <a class="el" href="group__DEM.html#gaac01e9375aa9f3abf33a553b9a6c5dbd" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> is called. </p>
+<p>Number of sample of time spent. Resets when <a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> is called. </p>
 
 </div>
 </div>
@@ -642,8 +644,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="af2d9736090b91da23d7d07d6d9840045"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2d9736090b91da23d7d07d6d9840045">&#9670;&nbsp;</a></span>timing</h2>
+<a id="a2ebc89a0a5bfe1b4817ea8baa4e6802e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ebc89a0a5bfe1b4817ea8baa4e6802e">&#9670;&nbsp;</a></span>timing_contacts</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -651,7 +653,23 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">vector&lt;double&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::timing</td>
+          <td class="memname">vector&lt;double&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::timing_contacts</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb16094b961b3b72abaaf6fdc0a37b51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb16094b961b3b72abaaf6fdc0a37b51">&#9670;&nbsp;</a></span>timing_forces</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;double&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::timing_forces</td>
         </tr>
       </table>
 </div><div class="memdoc">
