@@ -445,6 +445,7 @@ for (int i=0; i<8 ; i++)
             Qs[j*4] += 1/8. * (CGP[pts[i][0]].fields[0][idvel+j]) ;
 
 //printf("%g %g %g|", Qs[0], Qs[4], Qs[8]) ;
+double epsilon=-1e-10 ; 
 for (int i=0; i<4 ; i++)
   if (pts[0+i][0]!=pts[4+i][0])
       for (int j=0; j<3 ; j++)
@@ -454,9 +455,11 @@ for (int i=0; i<4 ; i++)
         Qs[i+4*j] = ( data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * (*CGPtemp)[pts[0+i][0]].fields[0][idvel+j]
                    +(-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) * (*CGPtemp)[pts[4+i][0]].fields[0][idvel+j] ;
 
-        if ((data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) <0 || (-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0])<0)
+	double tmp1 = (data.pos[0][id] - CGP[pts[0+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]) ;
+        double tmp2 = (-data.pos[0][id] + CGP[pts[4+i][0]].location[0])/(CGP[pts[4+i][0]].location[0]-CGP[pts[0+i][0]].location[0]);  
+	if (tmp1<epsilon || tmp2<epsilon)
         {
-         printf("XXX %g %g %g %d %d\n", data.pos[0][id], CGP[pts[0+i][0]].location[0], CGP[pts[4+i][0]].location[0], pts[0+i][0], pts[4+i][0]) ;
+         printf("XXX %g %g %g %d %d %g %g\n", data.pos[0][id], CGP[pts[0+i][0]].location[0], CGP[pts[4+i][0]].location[0], pts[0+i][0], pts[4+i][0], tmp1, tmp2) ;
         }
 
        }
@@ -475,8 +478,8 @@ for (int i=0; i<4 ; i+=2)
         Qs[i/2+4*j] = ( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[0+i+4*j]
                      +(-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) * Qs[1+i+4*j];
 
-        if (( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) <0 ||
-            (-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2])<0)
+        if (( data.pos[2][id] - CGP[pts[0+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) < epsilon ||
+            (-data.pos[2][id] + CGP[pts[1+i][0]].location[2])/(CGP[pts[1+i][0]].location[2]-CGP[pts[0+i][0]].location[2]) < epsilon)
         {
          printf("ZZZ %g %g %g %d %d\n", data.pos[2][id], CGP[pts[0+i][0]].location[2], CGP[pts[1+i][0]].location[2], pts[1+i][0], pts[0+i][0]) ;
         }
@@ -491,7 +494,7 @@ if (pts[0][0]!=pts[2][0])
         Qs[4*j] = ( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1]) * Qs[0+4*j]
                  +(-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1]) * Qs[1+4*j];
 
-        if (( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<0 || (-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<0)
+        if (( data.pos[1][id] - CGP[pts[0][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<epsilon || (-data.pos[1][id] + CGP[pts[2][0]].location[1])/(CGP[pts[2][0]].location[1]-CGP[pts[0][0]].location[1])<epsilon)
          printf("YY %g %g %g %d %d\n", data.pos[1][id], CGP[pts[0][0]].location[1], CGP[pts[2][0]].location[1], pts[2][0], pts[0][0]) ;
     }
 //else nothing to do, the value are already at the right location ...
