@@ -260,6 +260,9 @@ public:
                 else if (tmpyloc >= P.Boundaries[1][1] - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
 
             }
+            
+            if (P.forceinsphere) 
+                P.perform_forceinsphere(X[i]) ; 
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION

@@ -95,6 +95,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a28908058acec9286bed2ffcdf770a61a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5aa5f13f9621704a454f988a897daf48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a5aa5f13f9621704a454f988a897daf48">perform_PBCLE</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;X, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;V, uint32_t &amp;PBCFlag)</td></tr>
 <tr class="separator:a5aa5f13f9621704a454f988a897daf48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a683e1dd67a1445e263ac08bb96f6947d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a683e1dd67a1445e263ac08bb96f6947d">perform_forceinsphere</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;X)</td></tr>
+<tr class="separator:a683e1dd67a1445e263ac08bb96f6947d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3ca372fa79aa0db07d332488a05ccf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#af3ca372fa79aa0db07d332488a05ccf5">perform_MOVINGWALL</a> ()</td></tr>
 <tr class="memdesc:af3ca372fa79aa0db07d332488a05ccf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move the boundary wall if moving.  <a href="classParameters.html#af3ca372fa79aa0db07d332488a05ccf5">More...</a><br /></td></tr>
 <tr class="separator:af3ca372fa79aa0db07d332488a05ccf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -189,6 +191,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:afea748e6daa7b46863582793e5132d3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f2747aaec0e728e9b02dd90bd5f3f2c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a7f2747aaec0e728e9b02dd90bd5f3f2c">damping</a></td></tr>
 <tr class="separator:a7f2747aaec0e728e9b02dd90bd5f3f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bd24a92c6e415def37e6260fe9335fe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a4bd24a92c6e415def37e6260fe9335fe">forceinsphere</a></td></tr>
+<tr class="separator:a4bd24a92c6e415def37e6260fe9335fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaab9f999922f58587ee5a5a3aec7f42c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#aaab9f999922f58587ee5a5a3aec7f42c">cellsize</a></td></tr>
 <tr class="memdesc:aaab9f999922f58587ee5a5a3aec7f42c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of cells for contact detection.  <a href="classParameters.html#aaab9f999922f58587ee5a5a3aec7f42c">More...</a><br /></td></tr>
 <tr class="separator:aaab9f999922f58587ee5a5a3aec7f42c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -853,6 +857,34 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="a683e1dd67a1445e263ac08bb96f6947d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a683e1dd67a1445e263ac08bb96f6947d">&#9670;&nbsp;</a></span>perform_forceinsphere()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::perform_forceinsphere </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td>
+          <td class="paramname"><em>X</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af3ca372fa79aa0db07d332488a05ccf5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af3ca372fa79aa0db07d332488a05ccf5">&#9670;&nbsp;</a></span>perform_MOVINGWALL()</h2>
 
@@ -1341,6 +1373,22 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered. </p>
+
+</div>
+</div>
+<a id="a4bd24a92c6e415def37e6260fe9335fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bd24a92c6e415def37e6260fe9335fe">&#9670;&nbsp;</a></span>forceinsphere</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::forceinsphere</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

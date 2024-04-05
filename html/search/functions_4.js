@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['data_3187',['data',['../classpugi_1_1xml__text.html#aa72eccab5664aa8b6870051dc5af9443',1,'pugi::xml_text']]],
-  ['data_3188',['Data',['../group__CoarseGraining.html#gaf11f741cb7f587e2e495452a8905a22a',1,'Data']]],
-  ['data_3189',['data',['../classxpath__string.html#ade42a938746bcba171b70bfb88c3c568',1,'xpath_string']]],
+  ['data_3188',['data',['../classxpath__string.html#ade42a938746bcba171b70bfb88c3c568',1,'xpath_string::data()'],['../classpugi_1_1xml__text.html#aa72eccab5664aa8b6870051dc5af9443',1,'pugi::xml_text::data()']]],
+  ['data_3189',['Data',['../group__CoarseGraining.html#gaf11f741cb7f587e2e495452a8905a22a',1,'Data']]],
   ['datafile_3190',['Datafile',['../classDatafile.html#a0803337152b8f18ad91d6217598bb95b',1,'Datafile']]],
   ['deallocate_5fmemory_3191',['deallocate_memory',['../structxml__allocator.html#a5df417155487cce4e0460b123ac33dc6',1,'xml_allocator']]],
   ['deallocate_5fpage_3192',['deallocate_page',['../structxml__allocator.html#a1c6bfe15a257a094f55659f8d71c209e',1,'xml_allocator']]],
