@@ -52,6 +52,14 @@ public:
   void delayingwall (int ID, int j, Action<d> & act) ; ///< Record the action on the wall. Only usefull if the force on the wall needs to be calculated
   void delayedwall_clean() ; ///< Clean the record of the force on the wal. 
   void load_balance(ContactStrategies contactstrategy) ; ///< Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.
+  void clear_all_contacts ()
+  {
+    CLp_all.v.clear() ;
+    CLp_all.clear_iterator_array(N) ;
+
+    for (int p=0 ; p<P ; p++)
+      CLp[p].v.clear();
+  }
   void merge_split_CLp () 
   {
     int tot =CLp[0].v.size()  ;

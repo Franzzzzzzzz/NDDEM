@@ -260,12 +260,15 @@ public:
                 else if (tmpyloc >= P.Boundaries[1][1] - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
 
             }
-            
-            if (P.forceinsphere) 
-                P.perform_forceinsphere(X[i]) ; 
+
+            if (P.forceinsphere)
+                P.perform_forceinsphere(X[i]) ;
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
+
+
+
         P.perform_MOVINGWALL() ;
         P.perform_PBCLE_move() ;
         std::invoke (P.update_gravity, &P, dt) ;

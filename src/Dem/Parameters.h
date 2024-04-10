@@ -206,17 +206,18 @@ public :
     void perform_PBC(v1d & X, uint32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
     void perform_PBCLE_move() ;
     void perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag) ;
-    void perform_forceinsphere(v1d & X)
+    bool perform_forceinsphere(v1d & X)
     {
+      bool res = false ;
       if (static_cast<WallType>(Boundaries[0][3]) !=WallType::SPHERE && static_cast<WallType>(Boundaries[0][3]) !=WallType::ROTATINGSPHERE)
-        printf("ERR: forceinsphere expect the sphere to be the first wall.") ; 
+      { printf("ERR: forceinsphere expect the sphere to be the first wall.") ; return false ; }
       
       double dst = 0 ; 
       for (int dd=0 ; dd<d ; dd++) dst += (X[dd]-Boundaries[0][4+dd])*(X[dd]-Boundaries[0][4+dd]) ; 
-      if (dst > Boundaries[0][0]*Boundaries[0][0])
+      if (dst > Boundaries[0][0]*Boundaries[0][0] || std::isnan(dst))
       {
-        printf("%g %g\n", sqrt(dst), Boundaries[0][0]) ; fflush(stdout) ; 
-        boost::random::mt19937 rng(seed);
+        printf("%g ", dst) ; fflush(stdout) ;
+        boost::random::mt19937 rng(++seed);
         boost::random::uniform_01<boost::mt19937> rand(rng) ;
         do {
             dst=0 ;
@@ -226,8 +227,10 @@ public :
               dst += (Boundaries[0][4+dd]-X[dd])*(Boundaries[0][4+dd]-X[dd]) ;
             }        
          } while ( dst > Boundaries[0][0]*Boundaries[0][0]) ;
-        printf("[INFO] Bringing back in sphere forcibly.\n"); fflush(stdout) ;         
+        res = true ;
+        printf("[INFO] Bringing back in sphere forcibly. \n"); fflush(stdout) ;
       }
+      return res ;
     }
 
     void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.

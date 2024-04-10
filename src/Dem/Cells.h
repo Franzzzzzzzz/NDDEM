@@ -36,7 +36,10 @@ public:
   {
     int res=0 ; 
     for (int dd=0; dd<d ; dd++)
+    {
+      if (v[dd] < 0 || v[dd]>=n_cell[dd]) {printf("WARN: particle outside the cell volume\n") ; fflush(stdout) ; return -1 ; }
       res += cum_n_cell[dd] * v[dd] ; 
+    }
     return res ; 
   }
   //-------------------------------------------
@@ -248,7 +251,8 @@ int Cells<d>::allocate_to_cells (std::vector<std::vector<double>> & X)
     for (int dd=0 ; dd<d ; dd++)
       v[dd] = floor((X[i][dd]-origin[dd])/delta) ; 
     int id = x2id(v) ; 
-    cells[id].incell.push_back(i) ;       
+    if (id != -1)
+      cells[id].incell.push_back(i) ;
   } 
   
   /*int tot = 0 ; 
