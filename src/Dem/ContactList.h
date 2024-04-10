@@ -179,6 +179,14 @@ public:
      it_array_end.resize(N,null_list.begin()) ;
      return 0 ; 
  }
+ int clear_iterator_array(int N)
+ {
+     for (int i=0 ; i<N ; i++)
+     {
+        it_array_beg[i] = null_list.begin() ;
+        it_array_end[i] = null_list.begin() ;
+     }
+ }
  int make_iterator_array(int N) 
  {
      for (int i=0 ; i<N ; i++) it_array_beg[i] = null_list.begin() ;
