@@ -255,9 +255,10 @@ int Cells<d>::allocate_to_cells (std::vector<std::vector<double>> & X)
       cells[id].incell.push_back(i) ;
   } 
   
-  /*int tot = 0 ; 
+  /*int tot = 0 ;
   for (size_t i=0 ; i<cells.size() ; i++)
-    tot += cells[i].incell.size() ; */
+    tot += cells[i].incell.size() ;
+  printf("%d ", tot) ; fflush(stdout) ;*/
   return 0 ; 
 }
 //=================================================================

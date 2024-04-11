@@ -133,7 +133,7 @@ public :
         Mu_wall(0.5),        // Wall friction coefficient
         damping(0.0),
         forceinsphere(false), 
-        cellsize(1),
+        cellsize(-1),
         contact_strategy(ContactStrategies::NAIVE), 
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),

@@ -159,7 +159,10 @@ public:
         
         if (P.contact_strategy == ContactStrategies::CELLS) 
         {
-            cells.init_cells(P.Boundaries, P.cellsize) ; 
+            printf("INITIALISE CELLS\n") ; fflush(stdout) ;
+            auto rmax = std::max_element(P.r.begin(), P.r.end()) ;
+            printf("%g ", *rmax) ;
+            cells.init_cells(P.Boundaries, P.cellsize==-1?(*rmax*2.1):P.cellsize) ;
             MP.splitcells(cells.cells.size()) ; 
             MP.CLp_all.init_for_cells(N) ; 
         }
@@ -266,8 +269,6 @@ public:
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
-
-
 
         P.perform_MOVINGWALL() ;
         P.perform_PBCLE_move() ;
