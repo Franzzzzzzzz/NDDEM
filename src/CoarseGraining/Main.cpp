@@ -1,5 +1,29 @@
 #include "CoarseGraining.h"
+#include<regex>
 
+int process_envvar(json &j)
+{
+    if (j.is_array() || j.is_object())
+    {
+        for (auto & jj: j)
+            process_envvar(jj) ;
+    }
+    else if (j.is_string() && !j.is_number())
+    {
+        std::string s = j.get<std::string>() ;
+
+        std::regex reg("[$][a-zA-Z0-9]+");
+        auto envvar = std::sregex_iterator(s.begin(), s.end(), reg);
+        auto endenvvar = std::sregex_iterator();
+
+        for (std::sregex_iterator i = envvar; i != endenvvar; ++i)
+        {
+            std::smatch match = *i ;
+            std::string val =std::string(std::getenv(match.str().substr(1).c_str())) ;
+            j=j.get<std::string>().replace(match.position(), match.length(), val) ;
+        }
+    }
+}
 //=======================================================
 int main(int argc, char * argv[])
 {
@@ -9,7 +33,7 @@ int main(int argc, char * argv[])
         std::exit(1) ; 
     }
     std::ifstream i(argv[1]);
-    if (i.is_open()==false) {printf("Cannot find the json file provided as argument\n") ; std::exit(1) ; }
+    if (i.is_open()==false) {printf("Cannot find the json file provided as argument [%s]\n", argv[0]) ; std::exit(1) ; }
     json param;
     try { i >> param; }
     catch(...)
@@ -18,6 +42,8 @@ int main(int argc, char * argv[])
         cout << param ;
     }
     
+    process_envvar(param) ;
+
     CoarseGraining Global ; 
     Global.P.from_json(param) ;
     Global.P.post_init() ; 

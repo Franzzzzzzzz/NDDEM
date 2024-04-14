@@ -115,7 +115,7 @@ void Param::from_json(json &j)
 int Param::read_timestep (int ts, bool particleonly)
 {
     if (curts == ts && tsread) return 0 ; //Already read and all
-
+    printf("%d ", ts) ;fflush(stdout) ;
     for (auto & v: files)
     {
      v.reader->read_timestep(ts) ;

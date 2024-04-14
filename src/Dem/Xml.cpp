@@ -204,10 +204,9 @@ pair <string,map<string,string>> XMLReader_base::gettag()
     string line, word ;
     getline(fic, line, '>') ;
     stringstream ss(line) ;
-    printf("\n[%s]", line.c_str()) ;
     ss >> l ;
     while (isspace(l)) ss>>l ;
-    if (l!='<') printf("ERR: gettag should start with a < character |%zd %s %c %d|\n", fic.tellg(), line.c_str(), l, l) ;
+    if (l!='<') printf("ERR: gettag should start with a < character |%s %c %d|\n", line.c_str(), l, l) ;
     ss >> l ;
     if (l=='/')
     {
@@ -243,8 +242,7 @@ tuple <string, map<string,string> , std::vector<double> > XMLReader_base::gettag
     vector <double> values ;
     int length= stoi(tag.second["length"]) ;
     values.resize(length, 0) ;
-    printf("THERE") ; fflush(stdout) ;
-    for (int i=0 ; i<length ; i++) {fic >> values[i] ; printf("%d ", i) ; }
+    for (int i=0 ; i<length ; i++) {fic >> values[i] ; }
     gettag() ;
     return (make_tuple(tag.first, tag.second, values)) ;
 }
@@ -308,14 +306,12 @@ double XMLReader::read_nextts(vector<string> &names, vector<vector<vector<double
     int col=stoi(prop["ncols"]), row=stoi(prop["nrows"]) ;
     names.push_back(prop["name"]) ;
     data.push_back(vector<vector<double>>(row, vector<double>(col,0))) ;
-    printf("%d %d|", col, row) ; fflush(stdout) ;
     if (prop["encoding"]=="ascii")
     {
         for (int i=0 ; i<row ; i++)
             for (int j=0 ; j<col ; j++)
             {
                 fic>>data[n][i][j] ;
-                printf("%d %d|", i, j) ; fflush(stdout) ;
             }
 
     }
