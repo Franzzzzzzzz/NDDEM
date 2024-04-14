@@ -1,12 +1,11 @@
 var searchData=
 [
-  ['r_1960',['r',['../classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53',1,'Parameters']]],
-  ['r_1961',['R',['../classTexturing.html#ab7bed15777c17b0233b37ebff1063844',1,'Texturing']]],
-  ['radius_1962',['radius',['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a',1,'Typedefs.h']]],
-  ['radius_1963',['Radius',['../classReader.html#a679846d260ede5b522da376bab63be3b',1,'Reader::Radius()'],['../classDatafile.html#a38f108fe0a0d9721f0b6b27c5424ac0a',1,'Datafile::Radius()']]],
-  ['radius_1964',['radius',['../classNDDEMReader.html#ade81335d2515aa1845d1d3846e6a038d',1,'NDDEMReader::radius()'],['../structParam.html#acf711c388136804ad6854a47bc9ff423',1,'Param::radius()'],['../group__CoarseGraining.html#ga306d608be378bca19975baaea028d560',1,'Data::radius()']]],
-  ['radius_1965',['RADIUS',['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5c6d0ec312d680ed011756648c9e96ea',1,'Parameters.h']]],
-  ['radius_1966',['radius',['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a',1,'Typedefs.h']]],
+  ['r_1961',['r',['../classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53',1,'Parameters']]],
+  ['r_1962',['R',['../classTexturing.html#ab7bed15777c17b0233b37ebff1063844',1,'Texturing']]],
+  ['radius_1963',['radius',['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a',1,'Typedefs.h']]],
+  ['radius_1964',['Radius',['../classReader.html#a679846d260ede5b522da376bab63be3b',1,'Reader::Radius()'],['../classDatafile.html#a38f108fe0a0d9721f0b6b27c5424ac0a',1,'Datafile::Radius()']]],
+  ['radius_1965',['radius',['../classNDDEMReader.html#ade81335d2515aa1845d1d3846e6a038d',1,'NDDEMReader::radius()'],['../structParam.html#acf711c388136804ad6854a47bc9ff423',1,'Param::radius()'],['../group__CoarseGraining.html#ga306d608be378bca19975baaea028d560',1,'Data::radius()'],['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a',1,'radius():&#160;Typedefs.h']]],
+  ['radius_1966',['RADIUS',['../group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5c6d0ec312d680ed011756648c9e96ea',1,'Parameters.h']]],
   ['rand_1967',['rand',['../group__DEM.html#ga690c31bf9802dc16c4a4c07b0540c014',1,'Tools']]],
   ['random_5ftest_1968',['random_test',['../group__CoarseGraining.html#ga52baee43793f5f03088eb32a36f4c6fb',1,'Data']]],
   ['randomdrop_1969',['randomDrop',['../classSimulation.html#a49c0ea3881c08d52c37992739fd5e71e',1,'Simulation']]],

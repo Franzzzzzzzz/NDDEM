@@ -140,7 +140,7 @@ void CoarseGraining::process_all ()
     
     for (int ts=0 ; ts<P.maxT ; ts++)
     {
-        // printf("\r%d ", ts) ;
+        printf("\rProcessing %d ", ts) ; fflush(stdout) ;
         process_timestep(ts+P.skipT, hasdonefirstpass) ;
     }
     if (P.timeaverage == AverageType::Final || P.timeaverage == AverageType::Both)
