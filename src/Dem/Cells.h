@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <numeric>
 
+#include "Boundaries.h"
+
 
 /** \brief Individual cell for contact detection
  */
@@ -26,9 +28,9 @@ public:
 template <int d>
 class Cells {
 public: 
-  int init_cells (std::vector<std::vector<double>> &boundaries, double ds) ; 
-  int init_cells (std::vector<std::vector<double>> &boundaries, std::vector<double> & r) {double ds = 2.1*(*std::max_element(r.begin(), r.end())) ; return (init_cells(boundaries, ds)) ; }
-  std::vector<std::vector<double>> boundary_handler (std::vector<std::vector<double>> &boundaries) ;
+  int init_cells (std::vector<Boundary<d>> &boundaries, double ds) ; 
+  int init_cells (std::vector<Boundary<d>> &boundaries, std::vector<double> & r) {double ds = 2.1*(*std::max_element(r.begin(), r.end())) ; return (init_cells(boundaries, ds)) ; }
+  std::vector<std::vector<double>> boundary_handler (std::vector<Boundary<d>> &boundaries) ;
   int allocate_to_cells (std::vector<std::vector<double>> & X) ; 
   int contacts (std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r) ; 
   //-------------------------------------------
@@ -96,13 +98,13 @@ public:
  * ***************************************************************************************************/
 
 template <int d>
-std::vector<std::vector<double>> Cells<d>::boundary_handler (std::vector<std::vector<double>> &boundaries)
+std::vector<std::vector<double>> Cells<d>::boundary_handler (std::vector<Boundary<d>> &boundaries)
 {
   std::vector<std::vector<double>> res (d, std::vector<double>(2,0)) ;
 
   for (size_t i=0 ; i<boundaries.size() ; i++)
   {
-    switch (static_cast<WallType>(boundaries[i][3]))
+    switch (boundaries[i].Type)
     {
       case WallType::PBC:
       case WallType::MOVINGWALL:
@@ -111,31 +113,31 @@ std::vector<std::vector<double>> Cells<d>::boundary_handler (std::vector<std::ve
                 printf("ERR: this type of boundary is incompatible with cell contacts\n") ;
                 break ;
       case WallType::WALL:
-                res[i][0] = boundaries[i][0] ;
-                res[i][1] = boundaries[i][1] ;
+                res[i][0] = boundaries[i].xmin ;
+                res[i][1] = boundaries[i].xmax ;
                 break ;
       case WallType::SPHERE:
       case WallType::ROTATINGSPHERE:
                    for (int dd=0 ; dd<d ; dd++)
                    {
-                      res[dd][0] = boundaries[i][4+dd]-boundaries[i][0] ;
-                      res[dd][1] = boundaries[i][4+dd]+boundaries[i][0] ;
+                      res[dd][0] = boundaries[i].center[dd]-boundaries[i].radius ;
+                      res[dd][1] = boundaries[i].center[dd]+boundaries[i].radius ;
                    }
                    break ;
       case WallType::HEMISPHERE:
                    for (int dd=0 ; dd<d ; dd++)
                    {
-                      res[dd][0] = boundaries[i][4+dd]-boundaries[i][0] ;
-                      if (dd != boundaries[i][2])
-                        res[dd][1] = boundaries[i][4+dd]+boundaries[i][0] ;
+                      res[dd][0] = boundaries[i].center[dd]-boundaries[i].radius ;
+                      if (dd != boundaries[i].axis)
+                        res[dd][1] = boundaries[i].center[dd]+boundaries[i].radius ;
                    }
                    break ;
       case WallType::AXIALCYLINDER:
                    for (int dd=0 ; dd<d ; dd++)
                    {
-                     if (dd==boundaries[i][1]) continue ;
-                     res[dd][0] = boundaries[i][4+dd]-boundaries[i][0] ;
-                     res[dd][1] = boundaries[i][4+dd]+boundaries[i][0] ;
+                     if (dd==boundaries[i].axis) continue ;
+                     res[dd][0] = boundaries[i].radius ;
+                     res[dd][1] = boundaries[i].radius ;
                    }
                    break ;
       default:
@@ -148,7 +150,7 @@ std::vector<std::vector<double>> Cells<d>::boundary_handler (std::vector<std::ve
 
 //------------------------------------------------------------------------------------
 template <int d>
-int Cells<d>::init_cells(std::vector<std::vector<double>> &bounds, double ds)
+int Cells<d>::init_cells(std::vector<Boundary<d>> &bounds, double ds)
 {
   auto boundaries = boundary_handler(bounds) ;
 

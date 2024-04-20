@@ -16,6 +16,7 @@
 #include "ContactList.h"
 #include "Multiproc.h"
 #include "Cells.h"
+#include "Boundaries.h"
 #ifdef EMSCRIPTEN
     #include <emscripten.h>
     #include <emscripten/bind.h>
@@ -248,19 +249,19 @@ public:
 
             for (size_t j=0 ; j<P.Boundaries.size() ; j++, mask<<=1)
             {
-                if (P.Boundaries[j][3] != static_cast<int>(WallType::PBC) && P.Boundaries[j][3] != static_cast<int>(WallType::PBC_LE)) continue ;
-                if      (X[i][j] <= P.Boundaries[j][0] + P.r[i]) {Ghost[i] |= mask ; }
-                else if (X[i][j] >= P.Boundaries[j][1] - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+                if (!P.Boundaries[j].is_periodic()) continue ;
+                if      (X[i][j] <= P.Boundaries[j].xmin + P.r[i]) {Ghost[i] |= mask ; }
+                else if (X[i][j] >= P.Boundaries[j].xmax - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
 
-            if (P.Boundaries[0][3] == static_cast<int>(WallType::PBC_LE) && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
+            if (P.Boundaries[0].Type == WallType::PBC_LE && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
             {
                 mask = (1<<30) ; // WARNING dim 30 will be used for LEPBC!!
-                double tmpyloc = X[i][1] + (Ghost_dir[i]&1?-1:1)*P.Boundaries[0][5] ;
-                if (tmpyloc > P.Boundaries[1][1]) tmpyloc -= P.Boundaries[1][2] ;
-                if (tmpyloc < P.Boundaries[1][0]) tmpyloc += P.Boundaries[1][2] ;
-                if      (tmpyloc <= P.Boundaries[1][0] + P.r[i]) {Ghost[i] |= mask ; }
-                else if (tmpyloc >= P.Boundaries[1][1] - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
+                double tmpyloc = X[i][1] + (Ghost_dir[i]&1?-1:1)*P.Boundaries[0].displacement ;
+                if (tmpyloc > P.Boundaries[1].xmax) tmpyloc -= P.Boundaries[1].delta ;
+                if (tmpyloc < P.Boundaries[1].xmin) tmpyloc += P.Boundaries[1].delta ;
+                if      (tmpyloc <= P.Boundaries[1].xmin + P.r[i]) {Ghost[i] |= mask ; }
+                else if (tmpyloc >= P.Boundaries[1].xmax - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
 
             }
 
@@ -338,68 +339,67 @@ public:
             tmpcp.i=i ; tmpcp.ghost=0 ;
             for (size_t j=0 ; j<P.Boundaries.size() ; j++) // Wall contacts
             {
-                    if (P.Boundaries[j][3]==static_cast<int>(WallType::PBC)) continue ;
+                    if (P.Boundaries[j].Type==WallType::PBC) continue ;
 
-                    if (P.Boundaries[j][3]==static_cast<int>(WallType::WALL) || P.Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
+                    if (P.Boundaries[j].Type==WallType::WALL || P.Boundaries[j].Type==WallType::MOVINGWALL)
                     {
-                        tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][0]) ;
+                        tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j].xmin) ;
                         if (tmpcp.contactlength<P.r[i])
                         {
                             tmpcp.j=(2*j+0);
                             CLw.insert(tmpcp) ;
                         }
 
-                        tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j][1]) ;
+                        tmpcp.contactlength=fabs(X[i][j]-P.Boundaries[j].xmax) ;
                         if (tmpcp.contactlength<P.r[i])
                         {
                             tmpcp.j=(2*j+1);
                             CLw.insert(tmpcp) ;
                         }
                     }
-                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::SPHERE) || 
-                             P.Boundaries[j][3]==static_cast<int>(WallType::HEMISPHERE) || 
-                             P.Boundaries[j][3]==static_cast<int>(WallType::ROTATINGSPHERE))
+                    else if (P.Boundaries[j].Type==WallType::SPHERE || 
+                             P.Boundaries[j].Type==WallType::HEMISPHERE || 
+                             P.Boundaries[j].Type==WallType::ROTATINGSPHERE)
                     {
                         tmpcp.contactlength=0 ;
                         for (int dd=0 ; dd<d ; dd++)
-                            tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ;
+                            tmpcp.contactlength += (P.Boundaries[j].center[dd] - X[i][dd])*(P.Boundaries[j].center[dd] - X[i][dd]) ;
                         
-                        //printf("%d %g ", j, P.Boundaries[j][0]) ; 
-                        if (tmpcp.contactlength < (P.Boundaries[j][0] + P.r[i])*(P.Boundaries[j][0] + P.r[i]) &&
-                            tmpcp.contactlength > (P.Boundaries[j][0] - P.r[i])*(P.Boundaries[j][0] - P.r[i]))
+                        if (tmpcp.contactlength < (P.Boundaries[j].radius + P.r[i])*(P.Boundaries[j].radius + P.r[i]) &&
+                            tmpcp.contactlength > (P.Boundaries[j].radius - P.r[i])*(P.Boundaries[j].radius - P.r[i]))
                         {
-                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j][0] ;
+                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j].radius ;
                             if (tmpcp.contactlength < 0) tmpcp.j=2*j;
                             else tmpcp.j=2*j+1 ;
                             tmpcp.contactlength = fabs(tmpcp.contactlength) ;
                             CLw.insert(tmpcp) ;
                         }
                     }
-                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::AXIALCYLINDER))
+                    else if (P.Boundaries[j].Type==WallType::AXIALCYLINDER)
                     {                        
                         tmpcp.contactlength=0 ;
                         
                         for (int dd=0 ; dd<d ; dd++)
                         {
-                            if (dd == P.Boundaries[j][1]) continue ; 
-                            tmpcp.contactlength += (P.Boundaries[j][4+dd] - X[i][dd])*(P.Boundaries[j][4+dd] - X[i][dd]) ;
+                            if (dd == P.Boundaries[j].axis) continue ; 
+                            tmpcp.contactlength += (P.Boundaries[j].center[dd] - X[i][dd])*(P.Boundaries[j].center[dd] - X[i][dd]) ;
                         }
-                        if (tmpcp.contactlength < (P.Boundaries[j][0] + P.r[i])*(P.Boundaries[j][0] + P.r[i]) &&
-                            tmpcp.contactlength > (P.Boundaries[j][0] - P.r[i])*(P.Boundaries[j][0] - P.r[i]))
+                        if (tmpcp.contactlength < (P.Boundaries[j].radius + P.r[i])*(P.Boundaries[j].radius + P.r[i]) &&
+                            tmpcp.contactlength > (P.Boundaries[j].radius - P.r[i])*(P.Boundaries[j].radius - P.r[i]))
                         {
-                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j][0] ;
+                            tmpcp.contactlength = sqrt(tmpcp.contactlength) - P.Boundaries[j].radius ;
                             if (tmpcp.contactlength < 0) tmpcp.j=2*j;
                             else tmpcp.j=2*j+1 ;
                             tmpcp.contactlength = fabs(tmpcp.contactlength) ;
                             CLw.insert(tmpcp) ;
                         }
                     }
-                    else if (P.Boundaries[j][3]==static_cast<int>(WallType::ELLIPSE))
+                    else if (P.Boundaries[j].Type==WallType::ELLIPSE)
                     {
                         static_assert((sizeof(double)==8)) ;
                         
                         double tparam ; 
-                        std::tie(tparam, tmpcp.contactlength) = Tools_2D::contact_ellipse_disk (X[i], P.Boundaries[j][0], P.Boundaries[j][1], P.Boundaries[j][4], P.Boundaries[j][5], P.graddesc_gamma, P.graddesc_tol) ; 
+                        std::tie(tparam, tmpcp.contactlength) = Tools_2D::contact_ellipse_disk (X[i], P.Boundaries[j].semiaxisx, P.Boundaries[j].semiaxisy, P.Boundaries[j].centerx, P.Boundaries[j].centery, P.graddesc_gamma, P.graddesc_tol) ; 
                         if (tmpcp.contactlength<P.r[i])
                         {
                             tmpcp.j=2*j ;
@@ -506,38 +506,37 @@ public:
             // Particle wall contacts
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
-                if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::SPHERE) ||
-                   (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::HEMISPHERE))
-                )
+                if (P.Boundaries[it->j/2].Type == WallType::SPHERE ||
+                    P.Boundaries[it->j/2].Type == WallType::HEMISPHERE)
                 {
-                    if ( P.Boundaries[it->j/2][3] == static_cast<int>(WallType::HEMISPHERE) && 
-                        X[it->i][P.Boundaries[it->j/2][2]]>P.Boundaries[it->j/2][4+P.Boundaries[it->j/2][2]]+P.r[it->i]) continue ; 
+                    if ( P.Boundaries[it->j/2].Type == WallType::HEMISPHERE && 
+                        X[it->i][P.Boundaries[it->j/2].axis]>P.Boundaries[it->j/2].center[P.Boundaries[it->j/2].axis]+P.r[it->i]) continue ; 
                     for (int dd = 0 ; dd<d ; dd++)
-                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2].center[dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;
                 }
-                else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::AXIALCYLINDER))
+                else if (P.Boundaries[it->j/2].Type == WallType::AXIALCYLINDER)
                 {
-                    tmpcn[static_cast<int>(P.Boundaries[it->j/2][1])]= 0 ; 
+                    tmpcn[P.Boundaries[it->j/2].axis]= 0 ; 
                     for (int dd = 0 ; dd<d ; dd++)
                     {
-                        if (dd == P.Boundaries[it->j/2][1]) continue ; 
-                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
+                        if (dd == P.Boundaries[it->j/2].axis) continue ; 
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2].center[dd])*((it->j%2==0)?-1:1) ;
                     }
                     tmpcn/=Tools<d>::norm(tmpcn) ;
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;                    
                 }
-                else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ROTATINGSPHERE))
+                else if (P.Boundaries[it->j/2].Type == WallType::ROTATINGSPHERE)
                 {
                     for (int dd = 0 ; dd<d ; dd++)
-                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2][4+dd])*((it->j%2==0)?-1:1) ;
+                        tmpcn[dd] = (X[it->i][dd]-P.Boundaries[it->j/2].center[dd])*((it->j%2==0)?-1:1) ;
                     tmpcn/=Tools<d>::norm(tmpcn) ;
-                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2][4]) , nullptr, &(P.Boundaries[it->j/2][4+d])) ;
+                    Tools<d>::surfacevelocity(tmpvel, X[it->i]+tmpcn*(-P.r[it->i]), &(P.Boundaries[it->j/2].center[0]) , nullptr, &(P.Boundaries[it->j/2].omega[0])) ;
                     //printf("%g | %g %g | %g %g | %g %g\n", P.Boundaries[it->j/2][4+2], (X[it->i]+tmpcn*(-P.r[it->i]))[0], (X[it->i]+tmpcn*(-P.r[it->i]))[1], P.Boundaries[it->j/2][4], P.Boundaries[it->j/2][5], tmpvel[0], tmpvel[1]) ; fflush(stdout) ;
                     C.particle_movingwall(V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, tmpvel, *it) ;
                 }
-                else if (P.Boundaries[it->j/2][3] == static_cast<int>(WallType::ELLIPSE))
+                else if (P.Boundaries[it->j/2].Type == WallType::ELLIPSE)
                 {
                     assert((d==2)) ; 
                     std::vector<double> tmpcn(2) ; 
@@ -546,8 +545,8 @@ public:
                     uint64_t c=((uint64_t)(it->ghostdir) <<32 | (uint64_t)(it->ghost)) ;
                     double tparam = *reinterpret_cast<double*>(&c) ; 
                     #pragma GCC diagnostic pop
-                    tmpcn[0]=X[it->i][0]-(P.Boundaries[it->j/2][4]+P.Boundaries[it->j/2][0]*cos(tparam)) ; 
-                    tmpcn[1]=X[it->i][1]-(P.Boundaries[it->j/2][5]+P.Boundaries[it->j/2][1]*sin(tparam)) ; 
+                    tmpcn[0]=X[it->i][0]-(P.Boundaries[it->j/2].centerx+P.Boundaries[it->j/2].semiaxisx*cos(tparam)) ; 
+                    tmpcn[1]=X[it->i][1]-(P.Boundaries[it->j/2].centery+P.Boundaries[it->j/2].semiaxisy*sin(tparam)) ; 
                     tmpcn/=sqrt(tmpcn[0]*tmpcn[0]+tmpcn[1]*tmpcn[1]);
                     C.particle_wall( V[it->i],Omega[it->i],P.r[it->i], P.m[it->i], tmpcn, *it) ;
                 }
@@ -787,13 +786,13 @@ public:
   std::vector<std::vector<double>> getOrientation() { return A; }
 
   /** \brief Expose the array of boundaries. \ingroup API */
-  std::vector<double> getBoundary(int a) { return P.Boundaries[a]; }
+  std::vector<double> getBoundary(int a) { return P.Boundaries[a].as_vector(); }
   void setBoundary(int a, std::vector<double> loc) {
-      P.Boundaries[a][0] = loc[0]; // low value
-      P.Boundaries[a][1] = loc[1]; // high value
-      P.Boundaries[a][2] = loc[1] - loc[0]; // length
-      if ( P.Boundaries[a][3] == static_cast<int>(WallType::PBC_LE) ) {
-          P.Boundaries[a][4] = loc[2];
+      P.Boundaries[a].xmin = loc[0]; // low value
+      P.Boundaries[a].xmax = loc[1]; // high value
+      P.Boundaries[a].delta = loc[1] - loc[0]; // length
+      if ( P.Boundaries[a].Type == WallType::PBC_LE ) {
+          P.Boundaries[a].vel = loc[2];
       }
   }
 
@@ -830,10 +829,10 @@ public:
         {
          for(int dd=0 ; dd < d ; dd++)
          {
-           if (P.Boundaries[dd][3]==0)
-             X[i][dd] = rand()*P.Boundaries[dd][2] + P.Boundaries[dd][0] ;
+           if (P.Boundaries[dd].Type==WallType::PBC)
+             X[i][dd] = rand()*P.Boundaries[dd].delta + P.Boundaries[dd].xmin ;
            else
-             X[i][dd] = rand()*(P.Boundaries[dd][2]-2*P.r[i]) + P.Boundaries[dd][0] + P.r[i] ;
+             X[i][dd] = rand()*(P.Boundaries[dd].delta-2*P.r[i]) + P.Boundaries[dd].xmin + P.r[i] ;
          }
     }
   }

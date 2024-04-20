@@ -49,7 +49,7 @@ public:
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
         {
           if (gh&1)
-            loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
+            loc[n] += P->Boundaries[n].delta * ((ghd&1)?-1:1) ;
         }
         return (particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact, isdumptime) ) ;
     } ///< Calculate the particle to regular (non Lees-Edward) ghost contact
@@ -62,7 +62,7 @@ public:
         vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ;
 
-        if ( P->Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (Contact.ghost & 1)==0)
+        if ( P->Boundaries[0].Type != WallType::PBC_LE || (Contact.ghost & 1)==0)
         {
             loc=Xj ;
             compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ;
@@ -75,13 +75,13 @@ public:
          uint32_t gh=Contact.ghost, ghd=Contact.ghostdir ; // Handle pbc in first dim
          vector <double> vel (d, 0) ; vel=Vj ;
          loc=Xj ;
-         loc[0] += P->Boundaries[0][2] * ((ghd&1)?-1:1) ;
-         loc[1] += (ghd&1?-1:1)*P->Boundaries[0][5] ;
+         loc[0] += P->Boundaries[0].delta * ((ghd&1)?-1:1) ;
+         loc[1] += (ghd&1?-1:1)*P->Boundaries[0].displacement ;
          double additionaldelta = 0 ;
-         if (loc[1] > P->Boundaries[1][1]) {additionaldelta = -P->Boundaries[1][2] ;}
-         if (loc[1] < P->Boundaries[1][0]) {additionaldelta =  P->Boundaries[1][2] ;}
+         if (loc[1] > P->Boundaries[1].xmax) {additionaldelta = -P->Boundaries[1].delta ;}
+         if (loc[1] < P->Boundaries[1].xmin) {additionaldelta =  P->Boundaries[1].delta ;}
          loc[1] += additionaldelta ;
-         vel[1] += (ghd&1?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ;
+         vel[1] += (ghd&1?-1:1) * P->Boundaries[0].vel * P->Boundaries[0].delta ;
 
          gh>>=1 ; ghd>>=1 ;
          compute_normalpbcloc (loc, 1, gh, ghd) ;
@@ -114,7 +114,7 @@ public:
         for (int n=startn ; gh>0 ; gh>>=1, ghd>>=1, n++)
         {
           if (gh&1)
-            loc[n] += P->Boundaries[n][2] * ((ghd&1)?-1:1) ;
+            loc[n] += P->Boundaries[n].delta * ((ghd&1)?-1:1) ;
         }
     }///< Move ghosts through the regular periodic boundary conditions (non Lees-Edward).
     

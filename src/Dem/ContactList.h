@@ -109,32 +109,32 @@ public:
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
  bool persisting ; ///< True if the contact is still maintained for the current ts. 
  
- std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, cv2d & Boundaries)
+ std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, std::vector<Boundary<d>> & boundaries)
  {
     vector <double> loc (d, 0), branch (d, 0)  ;
-    if ( Boundaries[0][3] != static_cast<int>(WallType::PBC_LE) || (ghost & 1)==0)
+    if ( boundaries[0].Type != WallType::PBC_LE || (ghost & 1)==0)
     {
         loc=X[j] ;
         uint32_t gh=ghost, ghd=ghostdir ;
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
             if (gh&1)
-                loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
+                loc[n] += boundaries[n].delta * ((ghd&1)?-1:1) ;
     }
     else
     {
         uint32_t gh=ghost, ghd=ghostdir ; // Handle pbc in first dim
         loc=X[j] ;
-        loc[0] += Boundaries[0][2] * ((ghd&1)?-1:1) ;
-        loc[1] += (ghd&1?-1:1)*Boundaries[0][5] ;
+        loc[0] += boundaries[0].delta * ((ghd&1)?-1:1) ;
+        loc[1] += (ghd&1?-1:1)*boundaries[0].displacement ;
         double additionaldelta = 0 ;
-        if (loc[1] > Boundaries[1][1]) {additionaldelta = -Boundaries[1][2] ;}
-        if (loc[1] < Boundaries[1][0]) {additionaldelta =  Boundaries[1][2] ;}
+        if (loc[1] > boundaries[1].xmax) {additionaldelta = -boundaries[1].delta ;}
+        if (loc[1] < boundaries[1].xmin) {additionaldelta =  boundaries[1].delta ;}
         loc[1] += additionaldelta ;
 
         gh>>=1 ; ghd>>=1 ;
         for (int n=1 ; gh>0 ; gh>>=1, ghd>>=1, n++)
             if (gh&1)
-                loc[n] += Boundaries[n][2] * ((ghd&1)?-1:1) ;
+                loc[n] += boundaries[n].delta * ((ghd&1)?-1:1) ;
     }
     for (int dd = 0 ; dd<d ; dd++) branch[dd] = X[i][dd]-loc[dd] ; //j->i
     for (int dd = 0 ; dd<d ; dd++) loc[dd] = (X[i][dd]+loc[dd])/2. ; // This location is wrong for sphere with different radius. TODO
@@ -178,14 +178,6 @@ public:
      it_array_beg.resize(N,null_list.begin()) ;
      it_array_end.resize(N,null_list.begin()) ;
      return 0 ; 
- }
- int clear_iterator_array(int N)
- {
-     for (int i=0 ; i<N ; i++)
-     {
-        it_array_beg[i] = null_list.begin() ;
-        it_array_end[i] = null_list.begin() ;
-     }
  }
  int make_iterator_array(int N) 
  {
@@ -467,7 +459,7 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P,
         sum += (X1[dd]-X2[dd]) * (X1[dd]-X2[dd]) ;
         if (gst & 1)
         {
-            double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd][2] ;
+            double Delta= (tmpcp.ghostdir&(1<<dd)?-1:1) * P.Boundaries[dd].delta ;
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
             //printf("/%g %g %g %g %g %g %g/", partialsum, sumspawn, X1[0], X1[1], X2[0], X2[1], Delta ) ;
             if (sumspawn<rr)
@@ -489,7 +481,7 @@ template <int d>
 void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
                                      [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
-    if (P.Boundaries[0][3] != static_cast<int>(WallType::PBC_LE))
+    if (P.Boundaries[0].Type != WallType::PBC_LE)
             check_ghost_regular(gst, P, X1, X2, r1, r2, tmpcp) ;
     else
     {
@@ -507,7 +499,7 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
          check_ghost_regular(newgst>>1, P, X1, X2, r1, r2, tmpcp, 1, partialsum, 0) ;
 
          //2: now is the hard case: we take the image path
-         double Delta= (tmpcp.ghostdir&1?-1:1) * P.Boundaries[0][2] ;
+         double Delta= (tmpcp.ghostdir&1?-1:1) * P.Boundaries[0].delta ;
          partialsum = (X1[0]-X2[0]-Delta) * (X1[0]-X2[0]-Delta) ;
          newgst = gst ;
          newgst &= (~(1<<1)) ;      // Clearing bit 1
@@ -516,9 +508,9 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
          tmpcp.ghostdir &= (~(1<<1)) ; //Clearing bit 1
          tmpcp.ghostdir |= ((tmpcp.ghostdir>>30)<<1) ; // Setting the value of bit 1 to the value of bit 30. No need for clearing in the ghostdir.
          auto tmpX2 = X2 ;
-         tmpX2[1] += (tmpcp.ghostdir&1?-1:1)*P.Boundaries[0][5] ;
-         if (tmpX2[1] > P.Boundaries[1][1]) tmpX2[1] -= P.Boundaries[1][2] ;
-         if (tmpX2[1] < P.Boundaries[1][0]) tmpX2[1] += P.Boundaries[1][2] ;
+         tmpX2[1] += (tmpcp.ghostdir&1?-1:1)*P.Boundaries[0].displacement ;
+         if (tmpX2[1] > P.Boundaries[1].xmax) tmpX2[1] -= P.Boundaries[1].delta ;
+         if (tmpX2[1] < P.Boundaries[1].xmin) tmpX2[1] += P.Boundaries[1].delta ;
          //printf("{%g %g %X %X", tmpX2[0], tmpX2[1], newgst>>1, tmpcp.ghostdir) ;
          check_ghost_regular(newgst>>1, P, X1, tmpX2, r1, r2, tmpcp, 1, partialsum, 1) ;
          //printf("}") ;
@@ -535,7 +527,7 @@ void ContactList<d>::check_ghost_dst(uint32_t gst, int n, double partialsum, uin
   {
     for ( ;(gst&1)==0; gst>>=1,n++) ;
     check_ghost_dst(gst-1, n, partialsum, mask, P, X1, X2, contact) ;
-    double Delta= (contact.ghostdir&(1<<n)?-1:1) * P.Boundaries[n][2] ;
+    double Delta= (contact.ghostdir&(1<<n)?-1:1) * P.Boundaries[n].delta ;
     partialsum = partialsum + Delta*(2*(X2[n]-X1[n]) + Delta) ;
     if (partialsum<contact.contactlength) // Found a lower distance with this ghost
     {
