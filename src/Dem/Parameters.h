@@ -26,6 +26,7 @@
 #include "Vtk.h"
 #include "RigidBody.h"
 #include "Mesh.h"
+#include "Boundaries.h"
 #include "json.hpp"
 //
 #include <boost/random.hpp>
@@ -156,7 +157,7 @@ public :
      g.resize(d,0) ; // Initialise gravity
      Frozen.resize(N,false) ;
 
-     Boundaries.resize(d, vector <double> (4,0.0)) ; // Boundary type in [:,3]: 0=regular pbc, 1=wall}
+     Boundaries.resize(d) ; // Boundary type in [:,3]: 0=regular pbc, 1=wall}
     }///< reset the full simulation.
 
     int N; ///< Number of particles
@@ -184,7 +185,7 @@ public :
     vector <double> I ; ///< Particule moment of inertia
     vector <double> g ; ///< Gravity vector
     vector <bool> Frozen ; ///< Frozen atom if true
-    vector < vector <double> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}.
+    vector < Boundary<d> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}.
     string Directory ; ///< Saving directory
     bool orientationtracking ; ///< Track orientation?
     bool wallforcecompute ; ///< Compute for on the wall?
@@ -209,12 +210,12 @@ public :
     bool perform_forceinsphere(v1d & X)
     {
       bool res = false ;
-      if (static_cast<WallType>(Boundaries[0][3]) !=WallType::SPHERE && static_cast<WallType>(Boundaries[0][3]) !=WallType::ROTATINGSPHERE)
+      if (! Boundaries[0].is_sphere())
       { printf("ERR: forceinsphere expect the sphere to be the first wall.") ; return false ; }
       
       double dst = 0 ; 
-      for (int dd=0 ; dd<d ; dd++) dst += (X[dd]-Boundaries[0][4+dd])*(X[dd]-Boundaries[0][4+dd]) ; 
-      if (dst > Boundaries[0][0]*Boundaries[0][0] || std::isnan(dst))
+      for (int dd=0 ; dd<d ; dd++) dst += (X[dd]-Boundaries[0].center[dd])*(X[dd]-Boundaries[0].center[dd]) ; 
+      if (dst > Boundaries[0].radius*Boundaries[0].radius || std::isnan(dst))
       {
         printf("%g ", dst) ; fflush(stdout) ;
         boost::random::mt19937 rng(++seed);
@@ -223,10 +224,10 @@ public :
             dst=0 ;
             for(int dd=0 ; dd < d ; dd++)
             {
-              X[dd] = (rand()*Boundaries[0][0]*2-Boundaries[0][0]) + Boundaries[0][4+dd] ; 
-              dst += (Boundaries[0][4+dd]-X[dd])*(Boundaries[0][4+dd]-X[dd]) ;
+              X[dd] = (rand()*Boundaries[0].radius*2-Boundaries[0].radius) + Boundaries[0].center[dd] ; 
+              dst += (Boundaries[0].center[dd]-X[dd])*(Boundaries[0].center[dd]-X[dd]) ;
             }        
-         } while ( dst > Boundaries[0][0]*Boundaries[0][0]) ;
+         } while ( dst > Boundaries[0].radius * Boundaries[0].radius) ;
         res = true ;
         printf("[INFO] Bringing back in sphere forcibly. \n"); fflush(stdout) ;
       }
@@ -260,7 +261,7 @@ public :
     int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
     {
      if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
-     if (outflags & ExportData::CONTACTPOSITION)
+     if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
      {
          for (int dd = 0 ; dd<d ; dd++)
              fprintf(out, "x%d_i, ", dd) ;
@@ -305,7 +306,7 @@ public :
          {
              if (outflags & ExportData::IDS)
                 fprintf(out, "%d %d ", contact.i, contact.j) ;
-             if (outflags & ExportData::CONTACTPOSITION)
+             if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
              {
                  for (auto dd : X[contact.i])
                   fprintf(out, "%g ", dd) ;
@@ -334,7 +335,7 @@ public :
 
              if (outflags & ExportData::BRANCHVECTOR)
              {
-                auto [loc,branch] = contact.compute_branchvector(X,Boundaries) ; 
+                auto [loc,branch] = contact.compute_branchvector(X, *this) ; 
                
                 for (int dd = 0 ; dd<d ; dd++) fprintf(out, "%g ", branch[dd]) ;
              }
@@ -377,10 +378,10 @@ int Parameters<d>::set_boundaries()
 {
     for (int i=0 ; i<d ; i++)
     {
-        Boundaries[i][0]= 0 ;
-        Boundaries[i][1]= 1 ;
-        Boundaries[i][2]=Boundaries[i][1]-Boundaries[i][0] ; //Precomputed to increase speed
-        Boundaries[i][3]=static_cast<int>(WallType::PBC) ; // PBC by default
+        Boundaries[i].xmin= 0 ;
+        Boundaries[i].xmax= 1 ;
+        Boundaries[i].delta=1 ; //Precomputed to increase speed
+        Boundaries[i].Type = WallType::PBC ; // PBC by default
     }
     //np.savetxt('Boundaries.csv', Boundaries , delimiter=',', fmt='%.6g', header='Low,High,Size,Type', comments='')
     return 0 ;
@@ -391,10 +392,10 @@ void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
 {
  for (size_t j=0 ; j<Boundaries.size() ; j++)
  {
-   if (Boundaries[j][3]==static_cast<int>(WallType::PBC)) //PBC
+   if (Boundaries[j].Type== WallType::PBC) //PBC
    {
-    if      (X[j]<Boundaries[j][0]) {X[j] += Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
-    else if (X[j]>Boundaries[j][1]) {X[j] -= Boundaries[j][2] ; PBCFlag |= (1<<j) ;}
+    if      (X[j]<Boundaries[j].xmin) {X[j] += Boundaries[j].delta ; PBCFlag |= (1<<j) ;}
+    else if (X[j]>Boundaries[j].xmax) {X[j] -= Boundaries[j].delta ; PBCFlag |= (1<<j) ;}
    }
  }
 }
@@ -402,34 +403,34 @@ void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
 template <int d>
 void Parameters<d>::perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag)
 {
-    if (Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
+    if (Boundaries[0].Type == WallType::PBC_LE)
     {
-        if      (X[0]<Boundaries[0][0])
+        if      (X[0]<Boundaries[0].xmin)
         {
-            X[0] += Boundaries[0][2] ; PBCFlag |= 1 ;
-            X[1] += Boundaries[0][5] ;
-            V[1] += Boundaries[0][2]*Boundaries[0][4] ; ;
+            X[0] += Boundaries[0].delta ; PBCFlag |= 1 ;
+            X[1] += Boundaries[0].displacement ;
+            V[1] += Boundaries[0].delta*Boundaries[0].vel ; ;
         }
-        else if (X[0]>Boundaries[0][1])
+        else if (X[0]>Boundaries[0].xmax)
         {
-            X[0] -= Boundaries[0][2] ; PBCFlag |= 1 ;
-            X[1] -= Boundaries[0][5] ;
-            V[1] -= Boundaries[0][2]*Boundaries[0][4] ; ;
+            X[0] -= Boundaries[0].delta ; PBCFlag |= 1 ;
+            X[1] -= Boundaries[0].displacement ;
+            V[1] -= Boundaries[0].delta*Boundaries[0].vel ; ;
         }
 
-        if ( X[1]<Boundaries[1][0]) {X[1]+=Boundaries[1][2] ; PBCFlag |= 2 ; }
-        if ( X[1]>Boundaries[1][1]) {X[1]-=Boundaries[1][2] ; PBCFlag |= 2 ; }
+        if ( X[1]<Boundaries[1].xmin) {X[1]+=Boundaries[1].delta ; PBCFlag |= 2 ; }
+        if ( X[1]>Boundaries[1].xmax) {X[1]-=Boundaries[1].delta ; PBCFlag |= 2 ; }
     }
 }
 //----------------------------------------------------
 template <int d>
 void Parameters<d>::perform_PBCLE_move ()
 {
-    if (Boundaries[0][3]==static_cast<int>(WallType::PBC_LE))
+    if (Boundaries[0].Type==WallType::PBC_LE)
     {
-        Boundaries[0][5] += dt*Boundaries[0][4]*Boundaries[0][2] ;
-        if (Boundaries[0][5]>Boundaries[1][1])
-            Boundaries[0][5] -= Boundaries[1][2] ;
+        Boundaries[0].displacement += dt*Boundaries[0].vel*Boundaries[0].delta ;
+        if (Boundaries[0].displacement>Boundaries[1].xmax)
+            Boundaries[0].displacement -= Boundaries[1].delta ;
     }
 }
 //----------------------------------------------------
@@ -438,10 +439,10 @@ void Parameters<d>::perform_MOVINGWALL ()
 {
  for (size_t j=0 ; j<Boundaries.size() ; j++)
  {
-  if (Boundaries[j][3]==static_cast<int>(WallType::MOVINGWALL))
+  if (Boundaries[j].Type == WallType::MOVINGWALL)
   {
-    Boundaries[j][0] += Boundaries[j][4] * dt ;
-    Boundaries[j][1] += Boundaries[j][5] * dt ;
+    Boundaries[j].xmin += Boundaries[j].velmin * dt ;
+    Boundaries[j].xmax += Boundaries[j].velmax * dt ;
   }
  }
 }
@@ -713,55 +714,35 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      printf("[INFO] Setting up a rotating gravity\n") ;
     } ;
  Lvl0["boundary"] = [&](){size_t id ; in>>id ;
-    if (id>=Boundaries.size()) {Boundaries.resize(id+1) ; Boundaries[id].resize(4,0) ; }
+    if (id>=Boundaries.size()) {Boundaries.resize(id+1) ;}
     char line [5000] ; in>>line ;
-    if (!strcmp(line, "PBC")) Boundaries[id][3]=static_cast<int>(WallType::PBC) ;
-    else if (!strcmp(line, "WALL")) Boundaries[id][3]=static_cast<int>(WallType::WALL) ;
-    else if (!strcmp(line, "MOVINGWALL")) {Boundaries[id][3]=static_cast<int>(WallType::MOVINGWALL) ; Boundaries[id].resize(4+2, 0) ; }
-    else if (!strcmp(line, "SPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::SPHERE) ; Boundaries[id].resize(4+d,0) ; }
-    else if (!strcmp(line, "HEMISPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::HEMISPHERE) ; Boundaries[id].resize(4+d,0) ; }
-    else if (!strcmp(line, "AXIALCYLINDER")) {Boundaries[id][3]=static_cast<int>(WallType::AXIALCYLINDER) ; }
-    else if (!strcmp(line, "ROTATINGSPHERE")) {Boundaries[id][3]=static_cast<int>(WallType::ROTATINGSPHERE) ; Boundaries[id].resize(4+d+d*(d-1)/2,0) ; }
-    else if (!strcmp(line, "PBCLE")) {Boundaries[id][3]=static_cast<int>(WallType::PBC_LE) ; Boundaries[id].resize(6,0) ; }
-    else if (!strcmp(line, "ELLIPSE")) {Boundaries[id][3]=static_cast<int>(WallType::ELLIPSE) ; Boundaries[id].resize(5,0) ; }
-    else if (!strcmp(line, "REMOVE")) { Boundaries.erase(Boundaries.begin() + id); return ; }
+    if (!strcmp(line, "PBC")) 
+      Boundaries[id].Type=WallType::PBC ;
+    else if (!strcmp(line, "WALL")) 
+      Boundaries[id].Type=WallType::WALL ;
+    else if (!strcmp(line, "MOVINGWALL")) 
+      Boundaries[id].Type=WallType::MOVINGWALL ;
+    else if (!strcmp(line, "SPHERE")) 
+      Boundaries[id].Type=WallType::SPHERE ; 
+    else if (!strcmp(line, "HEMISPHERE")) 
+      Boundaries[id].Type=WallType::HEMISPHERE ; 
+    else if (!strcmp(line, "AXIALCYLINDER")) 
+      Boundaries[id].Type=WallType::AXIALCYLINDER ;
+    else if (!strcmp(line, "ROTATINGSPHERE")) 
+      Boundaries[id].Type=WallType::ROTATINGSPHERE ; 
+    else if (!strcmp(line, "PBCLE")) 
+    {
+      assert((id==0)) ;
+      Boundaries[id].Type=WallType::PBC_LE ; 
+    }
+    else if (!strcmp(line, "ELLIPSE")) 
+      Boundaries[id].Type=WallType::ELLIPSE ; 
+    else if (!strcmp(line, "REMOVE")) 
+      { Boundaries.erase(Boundaries.begin() + id); return ; }
     else printf("[WARN] Unknown boundary condition, unchanged.\n") ;
-    in >> Boundaries[id][0] ; in>> Boundaries[id][1] ;
-    Boundaries[id][2]=Boundaries[id][1]-Boundaries[id][0] ;
-    if  (Boundaries[id][3] == static_cast<int>(WallType::MOVINGWALL))
-    {in >> Boundaries[id][4] ; in >> Boundaries[id][5] ;}
-    else if (Boundaries[id][3] == static_cast<int>(WallType::SPHERE) )
-    {
-            Boundaries[id][4]=Boundaries[id][1] ;
-            Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
-            for (int i=1 ; i<d; i++) // dim 0 has already been read and put in [4]
-                in>>Boundaries[id][4+i] ;
-    }
-    else if (Boundaries[id][3] == static_cast<int>(WallType::HEMISPHERE) )
-    {
-            Boundaries[id][2] = Boundaries[id][1] ; 
-            Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
-            for (int i=0 ; i<d; i++) // dim 0 has already been read and put in [4]
-                in>>Boundaries[id][4+i] ;
-    }
-    else if (Boundaries[id][3] == static_cast<int>(WallType::ROTATINGSPHERE) )
-    {
-            Boundaries[id][4]=Boundaries[id][1] ;
-            Boundaries[id][1] = Boundaries[id][0]*Boundaries[id][0] ; // Computing Rsqr for speed
-            for (int i=1 ; i<d; i++) in>>Boundaries[id][4+i] ;
-            for (int i=0; i<d*(d-1)/2 ; i++) in >> Boundaries[id][4+d+i] ;
-    }
-    else if (Boundaries[id][3] == static_cast<int>(WallType::PBC_LE))
-    {
-        assert((id==0)) ;
-        in >> Boundaries[id][4] ;
-        Boundaries[id][5] = 0 ;
-    }
-    else if (Boundaries[id][3] == static_cast<int>(WallType::ELLIPSE))
-    {
-      assert((d==2)) ; 
-      in >> Boundaries[id][4] ; in>> Boundaries[id][5] ;
-    }
+    
+    Boundaries[id].read_line(in) ; 
+    
     printf("[INFO] Changing BC.\n") ;
    };
  Lvl0["rigid"] = [&] () 
@@ -910,15 +891,15 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         auto m = *(std::max_element(r.begin(), r.end())) ;
         printf("%g\n", m) ;
         int dd ;
-        for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
+        for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd].xmin+m ;
         for (int i=1 ; i<N ; i++)
         {
             X[i]=X[i-1] ;
             for (dd=0 ; dd<d ; dd++)
             {
                 X[i][dd] += 2*m ;
-                if (X[i][dd]>Boundaries[dd][1]-m)
-                    X[i][dd] = Boundaries[dd][0]+m ;
+                if (X[i][dd] > Boundaries[dd].xmax-m)
+                    X[i][dd] = Boundaries[dd].xmin+m ;
                 else
                     break ;
             }
@@ -930,15 +911,15 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         auto m = *(std::max_element(r.begin(), r.end())) ;
         printf("%g\n", m) ;
         int dd ;
-        for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
+        for (dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd].xmin+m ;
         for (int i=1 ; i<N ; i++)
         {
             X[i]=X[i-1] ;
             for (dd=0 ; dd<d ; dd++)
             {
                 X[i][dd] += 2*m ;
-                if (X[i][dd]>Boundaries[dd][1]-m)
-                    X[i][dd] = Boundaries[dd][0]+m + 0.1*m*(rand()-0.5) ;
+                if (X[i][dd] > Boundaries[dd].xmax-m)
+                    X[i][dd] = Boundaries[dd].xmin+m + 0.1*m*(rand()-0.5) ;
                 else
                     break ;
             }
@@ -952,18 +933,18 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         {
          for(int dd=0 ; dd < d ; dd++)
          {
-           if (Boundaries[dd][3]==0)
-             X[i][dd] = rand()*Boundaries[dd][2] + Boundaries[dd][0] ;
+           if (Boundaries[dd].Type==WallType::PBC)
+             X[i][dd] = rand()*Boundaries[dd].delta + Boundaries[dd].xmin ;
            else
-             X[i][dd] = rand()*(Boundaries[dd][2]-2*r[i]) + Boundaries[dd][0] + r[i] ;
+             X[i][dd] = rand()*(Boundaries[dd].delta-2*r[i]) + Boundaries[dd].xmin + r[i] ;
          }
         }
     }
     else if (!strcmp(line, "insphere"))
     {
         //printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
-        auto w = std::find_if(Boundaries.begin(), Boundaries.end(), [](auto u){return (u[3]==static_cast<int>(WallType::SPHERE) || u[3]==static_cast<int>(WallType::ROTATINGSPHERE)) ; }) ; 
-        if ( w== Boundaries.end()) {printf("ERR: the spherical wall cannot be found\n") ; fflush(stdout) ; } 
+        auto w = std::find_if(Boundaries.begin(), Boundaries.end(), [](auto u){return (u.Type==WallType::SPHERE || u.Type==WallType::ROTATINGSPHERE) ; }) ; 
+        if ( w == Boundaries.end()) {printf("ERR: the spherical wall cannot be found\n") ; fflush(stdout) ; } 
         int id = w-Boundaries.begin() ; 
         
         for (int i=0 ; i<N ; i++)
@@ -974,16 +955,16 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
             dst=0 ;
             for(int dd=0 ; dd < d ; dd++)
             {
-              X[i][dd] = (rand()*Boundaries[id][0]*2-Boundaries[id][0]) + Boundaries[id][4+dd] ; 
-              dst += (Boundaries[id][4+dd]-X[i][dd])*(Boundaries[id][4+dd]-X[i][dd]) ;
+              X[i][dd] = (rand()*Boundaries[id].radius*2-Boundaries[id].radius) + Boundaries[id].center[dd] ; 
+              dst += (Boundaries[id].center[dd]-X[i][dd])*(Boundaries[id].center[dd]-X[i][dd]) ;
             }
-         } while ( sqrt(dst) > (Boundaries[id][0]-2*r[i])) ;
+         } while ( sqrt(dst) > (Boundaries[id].radius-2*r[i])) ;
         }
     }  
     else if (!strcmp(line, "incylinder"))
     {
         //printf("Location::insphere assumes that wall #d is a sphere") ; fflush(stdout) ;
-        auto w = std::find_if(Boundaries.begin(), Boundaries.end(), [](auto u){return (u[3]==static_cast<int>(WallType::AXIALCYLINDER)) ; }) ; 
+        auto w = std::find_if(Boundaries.begin(), Boundaries.end(), [](auto u){return (u.Type==WallType::AXIALCYLINDER) ; }) ; 
         if ( w== Boundaries.end()) {printf("ERR: the cylinder wall cannot be found\n") ; fflush(stdout) ; } 
         int id = w-Boundaries.begin() ; 
         
@@ -995,17 +976,17 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
             dst=0 ;
             for(int dd=0 ; dd < d ; dd++)
             {
-              if (dd == static_cast<int>(Boundaries[id][1]))
+              if (dd == Boundaries[id].axis)
               {
-                X[i][dd] = rand() * (Boundaries[Boundaries[id][1]][2]-2*r[i]) + Boundaries[Boundaries[id][1]][0] + r[i] ; 
+                X[i][dd] = rand() * (Boundaries[Boundaries[id].axis].delta-2*r[i]) + Boundaries[Boundaries[id].axis].xmin + r[i] ; 
               }
               else 
               {
-                X[i][dd] = (rand()*Boundaries[id][0]*2-Boundaries[id][0]) ; 
+                X[i][dd] = (rand()*Boundaries[id].radius*2-Boundaries[id].radius) ; 
                 dst += X[i][dd]*X[i][dd] ;
               }
             }
-         } while ( sqrt(dst) > (Boundaries[id][0]-2*r[i])) ;
+         } while ( sqrt(dst) > (Boundaries[id].radius-2*r[i])) ;
         }
     }
     else if (!strcmp(line, "roughinclineplane"))
@@ -1013,7 +994,7 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ;
-      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m+delta ;
+      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd].xmin+m+delta ;
       Frozen[0]=true ;
       for (int i=1 ; i<N ; i++)
       {
@@ -1021,12 +1002,12 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         for (int dd=d-1 ; dd>=0 ; dd--)
         {
           X[i][dd] += 2*m+2*delta ;
-          if (X[i][dd]>Boundaries[dd][1]-m-delta)
-            X[i][dd] = Boundaries[dd][0]+m+delta ;
+          if (X[i][dd]>Boundaries[dd].xmax-m-delta)
+            X[i][dd] = Boundaries[dd].xmin+m+delta ;
           else
             break ;
         }
-        if (X[i][0]==Boundaries[0][0]+m+delta) Frozen[i]=true ;
+        if (X[i][0]==Boundaries[0].xmin+m+delta) Frozen[i]=true ;
         // randomize the previous grain
         for (int dd=0 ; dd<d ; dd++)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
@@ -1037,7 +1018,7 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
       auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
       double delta=0.1*m ; int ddd ;
-      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd][0]+m ;
+      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd].xmin+m ;
       Frozen[0]=true ; bool bottomlayer=true ;
       for (int i=1 ; i<N ; i++)
       {
@@ -1047,16 +1028,16 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
           if (bottomlayer)
           {
             X[i][ddd]+= 2*m ;
-            if (X[i][ddd]>Boundaries[ddd][1]-m)
-              X[i][ddd] = Boundaries[ddd][0]+m ;
+            if (X[i][ddd]>Boundaries[ddd].xmax-m)
+              X[i][ddd] = Boundaries[ddd].xmin+m ;
             else
               break ;
           }
           else
           {
             X[i][ddd] += 2*m+2*delta ;
-            if (X[i][ddd]>Boundaries[ddd][1]-m-delta)
-              X[i][ddd] = Boundaries[ddd][0]+m+delta ;
+            if (X[i][ddd]>Boundaries[ddd].xmax-m-delta)
+              X[i][ddd] = Boundaries[ddd].xmin+m+delta ;
             else
               break ;
           }
@@ -1080,15 +1061,15 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         printf("%g\n", m) ;
         int dd ;
         // X is an array of particle locations
-        for (dd=0 ; dd<d ; dd++) { X[0][dd]=Boundaries[dd][0]+m ; } // d is number of dimensions, dd is its index
+        for (dd=0 ; dd<d ; dd++) { X[0][dd]=Boundaries[dd].xmin+m ; } // d is number of dimensions, dd is its index
         for (int i=1 ; i<N ; i++) // number of particles
         {
             X[i]=X[i-1] ; // get previous particle location
             for (dd=0 ; dd<d ; dd++) // iterate over dimensions
             {
                 X[i][dd] += 2*m ; // add a diameter
-                if (X[i][dd]>Boundaries[dd][1]-m) // if too close to 'right'
-                    X[i][dd] = Boundaries[dd][0]+m ; // bring back to 'left'
+                if (X[i][dd]>Boundaries[dd].xmax-m) // if too close to 'right'
+                    X[i][dd] = Boundaries[dd].xmin+m ; // bring back to 'left'
                 else
                     break ;
             }
@@ -1194,10 +1175,10 @@ template <int d>
 void Parameters<d>::xml_header ()
 {
    xmlout->openbranch("boundaries", {make_pair("length", to_string(d*2))}) ;
-   if (Boundaries[0][3]==static_cast<int>(WallType::ROTATINGSPHERE))
-     for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[0][4+d]-Boundaries[0][0] << " " << Boundaries[0][4+d]+Boundaries[0][0]  << " " ;
+   if (Boundaries[0].Type==WallType::ROTATINGSPHERE)
+     for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[0].center[d]-Boundaries[0].radius << " " << Boundaries[0].center[d]+Boundaries[0].radius  << " " ;
    else
-     for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[i][0] << " " << Boundaries[i][1] << " " ;
+     for (int i=0 ; i<d ; i++) xmlout->fic << Boundaries[i].xmin << " " << Boundaries[i].xmax << " " ;
    xmlout->closebranch() ;
 
    xmlout->openbranch("radius", {make_pair("length", to_string(N))}) ;
@@ -1271,7 +1252,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         vector<vector<double>> contactdata ; 
         if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
         {
-          std::tie(mapping, contactdata) = MP.contacts2array(v.second, X, Boundaries) ;
+          std::tie(mapping, contactdata) = MP.contacts2array(v.second, X, *this) ;
           if (mapping[0].first != ExportData::IDS) printf("ERR: something went wrong in writing contact data in the vtk file %X\n", static_cast<unsigned int>(mapping[0].first)) ; 
           vtkwriter::write_contactlines (out, contactdata) ; 
         }
@@ -1344,7 +1325,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
       
       if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
       { 
-        auto [mapping, tmp] = MP.contacts2array(v.second, X, Boundaries) ;
+        auto [mapping, tmp] = MP.contacts2array(v.second, X, *this) ;
         for (auto & v:mapping)
         {
           switch(v.first){

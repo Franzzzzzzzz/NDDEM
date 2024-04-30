@@ -278,6 +278,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a745727a64f32080cf213b668026dde48">HEMISPHERE</a> =7
 , <br />
 &#160;&#160;<a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35acdc57914080484150a75fb5aa18cdb73">AXIALCYLINDER</a>
+, <a class="el" href="group__DEM.html#ggac5ecf92a792f505a64533e107971ae35a0db45d2a4141101bdfe48e3314cfbca3">UNDEFINED</a>
 <br />
  }</td></tr>
 <tr class="separator:gac5ecf92a792f505a64533e107971ae35"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -375,11 +376,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">ContactListMesh&lt; d &gt;::insert</a> (const <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a)</td></tr>
 <tr class="memdesc:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">More...</a><br /></td></tr>
 <tr class="separator:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaeff346987b5693ce82599e507475315c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaeff346987b5693ce82599e507475315c">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
-<tr class="memdesc:gaeff346987b5693ce82599e507475315c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#gaeff346987b5693ce82599e507475315c">More...</a><br /></td></tr>
-<tr class="separator:gaeff346987b5693ce82599e507475315c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9a854a20f7524c3475af3fb1ec55fdeb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a854a20f7524c3475af3fb1ec55fdeb">ContactList&lt; d &gt;::check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
-<tr class="separator:ga9a854a20f7524c3475af3fb1ec55fdeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad76a4d15d692f4f6b418dc729d495b21"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad76a4d15d692f4f6b418dc729d495b21">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="memdesc:gad76a4d15d692f4f6b418dc729d495b21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#gad76a4d15d692f4f6b418dc729d495b21">More...</a><br /></td></tr>
+<tr class="separator:gad76a4d15d692f4f6b418dc729d495b21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadefea27a55639d4a6304a1e5ef42942a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadefea27a55639d4a6304a1e5ef42942a">ContactList&lt; d &gt;::check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="separator:gadefea27a55639d4a6304a1e5ef42942a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2b6fc11a9f73b813659147956d123d5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2b6fc11a9f73b813659147956d123d5e">ContactList&lt; d &gt;::check_ghost_dst</a> (uint32_t gst, int n, double partialsum, uint32_t mask, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;contact)</td></tr>
 <tr class="separator:ga2b6fc11a9f73b813659147956d123d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga56bdac21bdb7f45eddc38583694bf00d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga56bdac21bdb7f45eddc38583694bf00d">ContactList&lt; d &gt;::coordinance</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;Z)</td></tr>
@@ -422,9 +423,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga64473def2a41ed54010b316e8b9f3bf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5">Multiproc&lt; d &gt;::load_balance</a> (<a class="el" href="group__DEM.html#ga375410cc0bbd996376cbb08826d3b195">ContactStrategies</a> contactstrategy)</td></tr>
 <tr class="memdesc:ga64473def2a41ed54010b316e8b9f3bf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5">More...</a><br /></td></tr>
 <tr class="separator:ga64473def2a41ed54010b316e8b9f3bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">Multiproc&lt; d &gt;::contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="el" href="group__Texturing.html#gae81dd62e2c6ced0fc9eb7a4ea7b1bd32">Boundaries</a>)</td></tr>
-<tr class="memdesc:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">pack the contact data in a 2d array  <a href="group__DEM.html#gaf956b204095a34f69a549ae3b9ba7f9e">More...</a><br /></td></tr>
-<tr class="separator:gaf956b204095a34f69a549ae3b9ba7f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga981c61f50f6836f5e712818fbefcc5f6"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga981c61f50f6836f5e712818fbefcc5f6">Multiproc&lt; d &gt;::contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">P</a>)</td></tr>
+<tr class="memdesc:ga981c61f50f6836f5e712818fbefcc5f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">pack the contact data in a 2d array  <a href="group__DEM.html#ga981c61f50f6836f5e712818fbefcc5f6">More...</a><br /></td></tr>
+<tr class="separator:ga981c61f50f6836f5e712818fbefcc5f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -1094,6 +1095,7 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ggac5ecf92a792f505a64533e107971ae35a3507764cffdfea213396f9d9eb30f870"></a>ELLIPSE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ggac5ecf92a792f505a64533e107971ae35a745727a64f32080cf213b668026dde48"></a>HEMISPHERE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ggac5ecf92a792f505a64533e107971ae35acdc57914080484150a75fb5aa18cdb73"></a>AXIALCYLINDER&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ggac5ecf92a792f505a64533e107971ae35a0db45d2a4141101bdfe48e3314cfbca3"></a>UNDEFINED&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -1166,8 +1168,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="ga9a854a20f7524c3475af3fb1ec55fdeb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga9a854a20f7524c3475af3fb1ec55fdeb">&#9670;&nbsp;</a></span>check_ghost_LE()</h2>
+<a id="gadefea27a55639d4a6304a1e5ef42942a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadefea27a55639d4a6304a1e5ef42942a">&#9670;&nbsp;</a></span>check_ghost_LE()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1175,7 +1177,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost_LE </td>
+          <td class="memname">bool <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost_LE </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>&#160;</td>
           <td class="paramname"><em>gst</em>, </td>
@@ -1244,8 +1246,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="gaeff346987b5693ce82599e507475315c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaeff346987b5693ce82599e507475315c">&#9670;&nbsp;</a></span>check_ghost_regular()</h2>
+<a id="gad76a4d15d692f4f6b418dc729d495b21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad76a4d15d692f4f6b418dc729d495b21">&#9670;&nbsp;</a></span>check_ghost_regular()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1253,7 +1255,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost_regular </td>
+          <td class="memname">bool <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost_regular </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>&#160;</td>
           <td class="paramname"><em>gst</em>, </td>
@@ -1398,8 +1400,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="gaf956b204095a34f69a549ae3b9ba7f9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf956b204095a34f69a549ae3b9ba7f9e">&#9670;&nbsp;</a></span>contacts2array()</h2>
+<a id="ga981c61f50f6836f5e712818fbefcc5f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga981c61f50f6836f5e712818fbefcc5f6">&#9670;&nbsp;</a></span>contacts2array()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1421,8 +1423,8 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;&#160;</td>
-          <td class="paramname"><em>Boundaries</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>P</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

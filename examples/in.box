@@ -1,0 +1,33 @@
+# Uniaxial compaction
+directory TestCells
+dimensions 3 200
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+ContactStrategy cells
+
+boundary 0 PBCLE -4 4 1
+boundary 1 PBC  -4 4
+boundary 2 PBC  -4 4
+
+#auto location roughinclineplane2
+auto location randomdrop
+
+gravity 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+#set cell_size 1.5
+
+set T 10
+set dt 0.0001
+set dumps VTK with 1 Omega
+set dumps CONTACTFORCES with 4 Ids Position Fn Ft
+set tdump 100
+EOF

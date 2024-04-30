@@ -1,3 +1,4 @@
+#include "Boundaries.h"
 namespace vtkwriter {
   
 FILE * open (char path[], int d) {
@@ -41,14 +42,15 @@ int start_celldata (FILE *out, int N, int Ncf)
   fprintf(out, "\nCELL_DATA %d\n", N+Ncf) ; 
   return 0 ; 
 }
-//------------------------------------------------------------------------------  
-int write_dimension_data (FILE *out, cv2d &X, cv1d &r, int d, vector < vector <double> > Boundaries)
+//------------------------------------------------------------------------------ 
+template <int dd>
+int write_dimension_data (FILE *out, cv2d &X, cv1d &r, int d, vector < Boundary<dd> > boundaries)
 {
  vector <float> projectioncenter  ;
- if (Boundaries[0][3]==static_cast<int>(WallType::ROTATINGSPHERE))
-   for (int i=3 ; i<d ; i++) projectioncenter.push_back((Boundaries[0][4+i])/2) ;
+ if (boundaries[0].Type==WallType::ROTATINGSPHERE)
+   for (int i=3 ; i<d ; i++) projectioncenter.push_back((boundaries[0].center[i])/2) ;
  else
-   for (int i=3 ; i<d ; i++) projectioncenter.push_back((Boundaries[i][1]+Boundaries[i][0])/2) ;
+   for (int i=3 ; i<d ; i++) projectioncenter.push_back((boundaries[i].xmax+boundaries[i].xmin)/2) ;
 
  for (uint j=3 ; j<X[0].size() ; j++)
  {
