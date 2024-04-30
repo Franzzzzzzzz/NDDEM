@@ -128,7 +128,7 @@ public:
   vector <vector <int> > delayedwallj ; ///< Records the j id of the wall in the associated delayed action
   vector <uint> delayedwall_size ; ///< Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()
 
-  auto contacts2array (ExportData exp, cv2d &X, std::vector<Boundary<d>> &boundaries) ; ///< pack the contact data in a 2d array
+  auto contacts2array (ExportData exp, cv2d &X, Parameters<d> &P) ; ///< pack the contact data in a 2d array
   
   int P ; ///< Number of threads
 
@@ -371,7 +371,7 @@ void Multiproc<d>::load_balance(ContactStrategies contactstrategy)
 }
 //--------------------------------------------------------------------------------
 template <int d>
-auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, std::vector<Boundary<d>> &boundaries)
+auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, Parameters<d> & P)
 {
   vector<vector<double>> res ;
   vector<std::pair<ExportData, int>> contactmapping ; 
@@ -406,7 +406,7 @@ auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, std::vector<Bounda
     {  
        ExportData expid= static_cast<ExportData>(1) ; 
        ExportData expall=exprt ;
-       auto [loc,branch] = contact.compute_branchvector(X,boundaries) ; 
+       auto [loc,branch] = contact.compute_branchvector(X,P) ; 
        while (static_cast<int>(expall)>0)
        {
          if (expall & static_cast<ExportData>(1))

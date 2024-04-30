@@ -60,12 +60,12 @@ public:
                             cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
     {
         vector <double> loc (d, 0) ;
-        //if (debug == nullptr) n= 1 ;
-
+        //if (debug == nullptr) n= 1 ; 
         if ( P->Boundaries[0].Type != WallType::PBC_LE || (Contact.ghost & 1)==0)
         {
             loc=Xj ;
             compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ;
+            //printf(">> %g %g %g %g %g %g\n ", Xi[0], Xi[1], Xi[2], loc[0], loc[1], loc[2]) ; 
             particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact, isdumptime) ;
             //if (debug != nullptr)
             // fprintf(debug, "%g %g %g %g %g 0 %d\n", loc[0], loc[1], Vj[0], Vj[1], rj, Contact.j) ;
@@ -85,30 +85,38 @@ public:
 
          gh>>=1 ; ghd>>=1 ;
          compute_normalpbcloc (loc, 1, gh, ghd) ;
+         //printf(">> %g %g %g %g %g %g\n ", Xi[0], Xi[1], Xi[2], loc[0], loc[1], loc[2]) ; 
          particle_particle (Xi, Vi, Omegai, ri, mi, loc, vel, Omegaj, rj, mj, Contact, isdumptime) ;
-         //if (debug != nullptr)
-         //    fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], rj, n, Contact.j) ;
-
-        // And then backward ... ... ... but actually not needed yay!
-         /*gh=Contact.ghost;
-         ghd=~Contact.ghostdir ;
-         loc = Xi ;
-         vel=Vi ;
-         loc[0] += P->Boundaries[0][2] * ((ghd&1)?-1:1) ;
-         loc[1] += (ghd&1?-1:1)*P->Boundaries[0][5] ;
-         loc[1] -= additionaldelta ;
-         vel[1] += (ghd&1?-1:1) * P->Boundaries[0][4] * P->Boundaries[0][2] ;
-
-         gh>>=1 ; ghd>>=1 ;
-         compute_normalpbcloc (loc, 1, gh, ghd) ;
-         particle_particle (Xj, Vj, Omegaj, rj, loc, vel, Omegai, ri, Contact, ContactCalculation::REVERSE) ;
-         if (debug != nullptr)
-             fprintf(debug, "%g %g %g %g %g %d %d\n", loc[0], loc[1], vel[0], vel[1], ri, -n, Contact.i) ;
-         n++ ;
-         printf("%g %g %g %g | %g %g %g %g\n", Act.Fni[0], Act.Fnj[0], Act.Fti[0], Act.Ftj[0],  Act.Fni[1], Act.Fnj[1], Act.Fti[1], Act.Ftj[1]) ; */
         }
     } ///< Calculate the particle to (potentially) Lees-Edward ghost contact
 
+    void particle_ghost_LE_cells (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
+                                  cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
+    {
+        vector <double> loc (d, 0) ;
+        //if (debug == nullptr) n= 1 ;
+
+        if ( P->Boundaries[0].Type != WallType::PBC_LE || (Contact.ghost & 1)==0)
+        {
+            loc=Xj ;
+            compute_normalpbcloc(loc, 0, Contact.ghost, Contact.ghostdir) ;
+            particle_particle (Xi, Vi, Omegai, ri, mi, loc, Vj, Omegaj, rj, mj, Contact, isdumptime) ;
+        }
+        else
+        {
+         uint32_t gh=Contact.ghost, ghd=Contact.ghostdir ; // Handle pbc in first dim
+         vector <double> vel (d, 0) ; vel=Vj ;
+         loc=Xj ;
+         loc[0] += P->Boundaries[0].delta * ((ghd&1)?-1:1) ;
+         loc[1] += (ghd&1?-1:1)*P->Boundaries[0].displacement ;
+         vel[1] += (ghd&1?-1:1) * P->Boundaries[0].vel * P->Boundaries[0].delta ;
+
+         gh>>=1 ; ghd>>=1 ;
+         compute_normalpbcloc (loc, 1, gh, ghd) ;
+         particle_particle (Xi, Vi, Omegai, ri, mi, loc, vel, Omegaj, rj, mj, Contact, isdumptime) ;
+        }
+    } ///< Calculate the particle to (potentially) Lees-Edward ghost contact for the cell contact finding (slightly different handling of pbc. 
+    
     void compute_normalpbcloc (v1d & loc, int startn, uint32_t gh, uint32_t ghd)
     {
         for (int n=startn ; gh>0 ; gh>>=1, ghd>>=1, n++)
@@ -150,7 +158,10 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
   Fn.resize(d,0) ; Ft.resize(d,0) ; tvec.resize(d,0) ; Ftc.resize(d,0) ;
   tspr.resize(d,0) ; tsprc.resize(d,0) ;
 
-  particle_ghost = &Contacts::particle_ghost_LE ;
+  if (PP.contact_strategy == ContactStrategies::CELLS)
+    particle_ghost = &Contacts::particle_ghost_LE_cells ;
+  else
+    particle_ghost = &Contacts::particle_ghost_LE ;
 
 }
 

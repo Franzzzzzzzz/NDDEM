@@ -261,7 +261,7 @@ public :
     int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
     {
      if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
-     if (outflags & ExportData::CONTACTPOSITION)
+     if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
      {
          for (int dd = 0 ; dd<d ; dd++)
              fprintf(out, "x%d_i, ", dd) ;
@@ -306,7 +306,7 @@ public :
          {
              if (outflags & ExportData::IDS)
                 fprintf(out, "%d %d ", contact.i, contact.j) ;
-             if (outflags & ExportData::CONTACTPOSITION)
+             if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
              {
                  for (auto dd : X[contact.i])
                   fprintf(out, "%g ", dd) ;
@@ -335,7 +335,7 @@ public :
 
              if (outflags & ExportData::BRANCHVECTOR)
              {
-                auto [loc,branch] = contact.compute_branchvector(X, Boundaries) ; 
+                auto [loc,branch] = contact.compute_branchvector(X, *this) ; 
                
                 for (int dd = 0 ; dd<d ; dd++) fprintf(out, "%g ", branch[dd]) ;
              }
@@ -1252,7 +1252,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         vector<vector<double>> contactdata ; 
         if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
         {
-          std::tie(mapping, contactdata) = MP.contacts2array(v.second, X, Boundaries) ;
+          std::tie(mapping, contactdata) = MP.contacts2array(v.second, X, *this) ;
           if (mapping[0].first != ExportData::IDS) printf("ERR: something went wrong in writing contact data in the vtk file %X\n", static_cast<unsigned int>(mapping[0].first)) ; 
           vtkwriter::write_contactlines (out, contactdata) ; 
         }
@@ -1325,7 +1325,7 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
       
       if (v.second & (ExportData::IDS | ExportData::GHOSTMASK | ExportData::GHOSTDIR | ExportData::FT_FRICTYPE | ExportData::CONTACTPOSITION | ExportData::FN | ExportData::FT | ExportData::BRANCHVECTOR | ExportData::FN_EL | ExportData::FN_VISC | ExportData::FT_EL | ExportData::FT_VISC | ExportData::FT_FRIC))
       { 
-        auto [mapping, tmp] = MP.contacts2array(v.second, X, Boundaries) ;
+        auto [mapping, tmp] = MP.contacts2array(v.second, X, *this) ;
         for (auto & v:mapping)
         {
           switch(v.first){

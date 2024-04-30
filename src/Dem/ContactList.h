@@ -109,35 +109,38 @@ public:
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
  bool persisting ; ///< True if the contact is still maintained for the current ts. 
  
- std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, std::vector<Boundary<d>> & boundaries)
+ std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, Parameters<d> &P)
  {
     vector <double> loc (d, 0), branch (d, 0)  ;
-    if ( boundaries[0].Type != WallType::PBC_LE || (ghost & 1)==0)
+    if ( P.Boundaries[0].Type != WallType::PBC_LE || (ghost & 1)==0)
     {
         loc=X[j] ;
         uint32_t gh=ghost, ghd=ghostdir ;
         for (int n=0 ; gh>0 ; gh>>=1, ghd>>=1, n++)
             if (gh&1)
-                loc[n] += boundaries[n].delta * ((ghd&1)?-1:1) ;
+                loc[n] += P.Boundaries[n].delta * ((ghd&1)?-1:1) ;
     }
     else
     {
         uint32_t gh=ghost, ghd=ghostdir ; // Handle pbc in first dim
         loc=X[j] ;
-        loc[0] += boundaries[0].delta * ((ghd&1)?-1:1) ;
-        loc[1] += (ghd&1?-1:1)*boundaries[0].displacement ;
-        double additionaldelta = 0 ;
-        if (loc[1] > boundaries[1].xmax) {additionaldelta = -boundaries[1].delta ;}
-        if (loc[1] < boundaries[1].xmin) {additionaldelta =  boundaries[1].delta ;}
-        loc[1] += additionaldelta ;
+        loc[0] += P.Boundaries[0].delta * ((ghd&1)?-1:1) ;
+        loc[1] += (ghd&1?-1:1)*P.Boundaries[0].displacement ;
+        if (P.contact_strategy != ContactStrategies::CELLS)
+        {
+            double additionaldelta = 0 ;
+            if (loc[1] > P.Boundaries[1].xmax) {additionaldelta = -P.Boundaries[1].delta ;}
+            if (loc[1] < P.Boundaries[1].xmin) {additionaldelta =  P.Boundaries[1].delta ;}
+            loc[1] += additionaldelta ;
+        }
 
         gh>>=1 ; ghd>>=1 ;
         for (int n=1 ; gh>0 ; gh>>=1, ghd>>=1, n++)
             if (gh&1)
-                loc[n] += boundaries[n].delta * ((ghd&1)?-1:1) ;
+                loc[n] += P.Boundaries[n].delta * ((ghd&1)?-1:1) ;
     }
     for (int dd = 0 ; dd<d ; dd++) branch[dd] = X[i][dd]-loc[dd] ; //j->i
-    for (int dd = 0 ; dd<d ; dd++) loc[dd] = (X[i][dd]+loc[dd])/2. ; // This location is wrong for sphere with different radius. TODO
+    for (int dd = 0 ; dd<d ; dd++) loc[dd] = (X[i][dd]+loc[dd]*(P.r[i]/(P.r[i]+P.r[j]) )) ; // This location is wrong for sphere with different radius.
     return {loc, branch} ; 
  } ///< Compute the location & branch vector of the contact
 } ;
@@ -250,10 +253,10 @@ public:
 
  //void check_ghost    (uint32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
  void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact) ; ///< \deprecated Measure distance between a ghost and a particle
- void check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
+ bool check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
                    int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.
- void check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
- void (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, double, double, cp<d> &,int startd, double partialsum, bitdim mask) ;
+ bool check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
+ bool (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, double, double, cp<d> &,int startd, double partialsum, bitdim mask) ;
  void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
 
   std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
@@ -448,7 +451,7 @@ int ContactListMesh<d>::insert(const cpm<d> &a)
 
 //-----------------------------------Fastest version so far ...
 template <int d>
-void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, 
+bool ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, 
                                           cv1d &X1, cv1d &X2, double r1, double r2, 
                                           cp<d> & tmpcp, int startd, double partialsum, bitdim mask)
 {
@@ -463,7 +466,10 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P,
             double sumspawn = partialsum + (X1[dd]-X2[dd]-Delta) * (X1[dd]-X2[dd]-Delta) ;
             //printf("/%g %g %g %g %g %g %g/", partialsum, sumspawn, X1[0], X1[1], X2[0], X2[1], Delta ) ;
             if (sumspawn<rr)
-                check_ghost_regular (gst>>1, P, X1, X2, r1, r2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
+            {
+                bool res = check_ghost_regular (gst>>1, P, X1, X2, r1, r2, tmpcp, dd+1, sumspawn, mask | (1<<dd)) ;
+                if (res) return true ; 
+            }
         }
         partialsum = sum ;
     }
@@ -472,17 +478,19 @@ void ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P,
         tmpcp.contactlength=sqrt(sum) ;
         tmpcp.ghost=mask ;
         insert(tmpcp) ;
+        return true ; 
         //printf("[%d %d %X %X %g]\n", tmpcp.i, tmpcp.j, tmpcp.ghost, tmpcp.ghostdir, tmpcp.contactlength) ;
     }
+    return false ; 
 }
 
 //--------------------------------------------------------------------
 template <int d>
-void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
+bool ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
                                      [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
     if (P.Boundaries[0].Type != WallType::PBC_LE)
-            check_ghost_regular(gst, P, X1, X2, r1, r2, tmpcp) ;
+            return check_ghost_regular(gst, P, X1, X2, r1, r2, tmpcp) ;
     else
     {
      if ((gst & 1)==0)
@@ -516,6 +524,8 @@ void ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
          //printf("}") ;
      }
     }
+    
+    return false ; 
 }
 
 //----------------------------------------

@@ -253,7 +253,7 @@ public:
                 if      (X[i][j] <= P.Boundaries[j].xmin + P.r[i]) {Ghost[i] |= mask ; }
                 else if (X[i][j] >= P.Boundaries[j].xmax - P.r[i]) {Ghost[i] |= mask ; Ghost_dir[i] |= mask ;}
             }
-
+            
             if (P.Boundaries[0].Type == WallType::PBC_LE && (Ghost[i]&1)) // We need to consider the case where we have a ghost through the LE_PBC
             {
                 mask = (1<<30) ; // WARNING dim 30 will be used for LEPBC!!
@@ -280,7 +280,13 @@ public:
 
         // ----- Contact detection ------
         if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
-        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout) shared(cells)
+        double LE_displacement ; 
+        if (P.Boundaries[0].Type == WallType::PBC_LE) 
+            LE_displacement = P.Boundaries[0].displacement ; 
+        else
+            LE_displacement = 0 ; 
+        
+        #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout) shared(cells) shared(LE_displacement)
         {
          #ifdef NO_OPENMP
          int ID = 0 ;
@@ -296,7 +302,7 @@ public:
         
          if (P.contact_strategy == ContactStrategies::CELLS)
          {
-             cells.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r) ; 
+             cells.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r, LE_displacement) ; 
          }
          else
          {
@@ -310,12 +316,23 @@ public:
                 tmpcp.i=i ;
                 for (int j=i+1 ; j<N ; j++) // Regular particles
                 {
+                    
                     if (RigidBodyId[i].has_value() && RigidBodyId[j].has_value() &&  RigidBodyId[i]==RigidBodyId[j]) continue ; 
-                    if (Ghost[j])
+                    if (Ghost[j] | Ghost[i])
                     {
-                        tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] ;
+                        tmpcp.j=j ; tmpcp.ghostdir=Ghost_dir[j] | (Ghost[i]&(~Ghost_dir[i])) ;
+                        bitdim tmpghost = Ghost[j] | Ghost[i] ;
+                        if (P.Boundaries[0].Type == WallType::PBC_LE && (Ghost[i]&1))
+                        {                            
+                            double tmpyloc = X[j][1] + (tmpcp.ghostdir&1?-1:1)*P.Boundaries[0].displacement ;
+                            if (tmpyloc > P.Boundaries[1].xmax) tmpyloc -= P.Boundaries[1].delta ;
+                            if (tmpyloc < P.Boundaries[1].xmin) tmpyloc += P.Boundaries[1].delta ;
+                            if      (tmpyloc <= P.Boundaries[1].xmin + P.r[i]) {tmpghost |= (1<<30)  ; }
+                            else if (tmpyloc >= P.Boundaries[1].xmax - P.r[i]) {tmpghost |= (1<<30)  ; tmpcp.ghostdir |= (1<<30)  ;}
+                        }
+                        
                         //CLp.check_ghost (Ghost[j], P, X[i], X[j], tmpcp) ;
-                        (CLp.*CLp.check_ghost) (Ghost[j], P, X[i], X[j], P.r[i], P.r[j], tmpcp, 0,0,0) ;
+                        (CLp.*CLp.check_ghost) (tmpghost, P, X[i], X[j], P.r[i], P.r[j], tmpcp, 0,0,0) ;
                     }
                     else
                     {
@@ -471,8 +488,10 @@ public:
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ;
 
             // Particle-particle contacts
+            //printf("====%d %g=====\n", ti, P.Boundaries[0].displacement) ;
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
+                //printf("%d %d %X %X %g\n", it->i, it->j, it->ghost, it-> ghostdir, it->contactlength) ; 
                 if (it->ghost==0)
                 {
                     C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
@@ -704,14 +723,14 @@ public:
   /** \brief DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces. \ingroup API */
   std::vector<std::vector<double>> getContactForce() 
   {
-    auto [_, res] = MP.contacts2array (ExportData::IDS | ExportData::FN, X, P.Boundaries) ; 
+    auto [_, res] = MP.contacts2array (ExportData::IDS | ExportData::FN, X, P) ; 
     return res; 
   }
   
   /** \brief Expose the array of contact information. \ingroup API */
   std::vector<std::vector<double>> getContactInfos(int flags) 
   {
-    auto [_, res] = MP.contacts2array (static_cast<ExportData>(flags), X, P.Boundaries) ; 
+    auto [_, res] = MP.contacts2array (static_cast<ExportData>(flags), X, P) ; 
     return res; 
   }
   
