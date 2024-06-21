@@ -709,13 +709,13 @@ void Tools<d>::matvecmult (v1d & res, cv1d &A, cv1d &v)
 template <int d>
 v1d Tools<d>::wedgeproduct (cv1d &a, cv1d &b)
 {
-  v1d res (d*(d-1)/2, 0) ; int k ;
+  v1d res (d*(d-1)/2, 0) ; size_t k ;
   /*auto iter = MASIndex.begin() ; //TODO speedup (iter allocates)
   for (k=0 ; iter!= MASIndex.end() ; iter++, k++)
       res[k]=a[iter->first]*b[iter->second]-a[iter->second]*b[iter->first] ;*/
   
   //auto iter = MASIndex.begin() ; //TODO speedup (iter allocates)
-  for (k=0 ; k<d ; k++)
+  for (k=0 ; k<MASIndex.size() ; k++)
       res[k]=a[ MASIndex[k].first ]*b[MASIndex[k].second]-a[MASIndex[k].second]*b[MASIndex[k].first] ;
   
   return (res) ;
@@ -724,9 +724,10 @@ v1d Tools<d>::wedgeproduct (cv1d &a, cv1d &b)
 template <int d>
 void Tools<d>::wedgeproduct (v1d &res, cv1d &a, cv1d &b)
 {
-  int k ;
+  size_t k ;
   //auto iter = MASIndex.begin() ; //TODO speedup (iter allocates)
-  for (k=0 ; k<d ; k++)
+  //printf("////%d %d %d %d////\n", a.size(), b.size(), res.size(), MASIndex.size()) ; 
+  for (k=0 ; k<MASIndex.size() ; k++)
       res[k]=a[ MASIndex[k].first ]*b[MASIndex[k].second]-a[MASIndex[k].second]*b[MASIndex[k].first] ;
 }
 //-----------------------------------
