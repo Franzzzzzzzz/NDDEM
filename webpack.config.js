@@ -7,36 +7,38 @@ module.exports = [{
     mode: "development",
     // mode: "production",
     entry: {
-        'uniaxial' : './live/src/uniaxial.js',
-        'triaxial' : './live/src/triaxial.js',
-        'isotropic' : './live/src/isotropic.js',
-        'inclined-plane' : './live/src/inclined-plane.js',
-        'lees-edwards' : './live/src/lees-edwards.js',
-        'rotation' : './live/src/rotation.js',
-        'rotating-drum-2d' : './live/src/rotating-drum-2d.js',
-        '4d-pool' : './live/src/4d-pool.js',
-        'no-friction-2d-pool' : './live/src/no-friction-2d-pool.js',
-        'coarse-graining' : './live/src/coarse-graining.js',
-        'rotation-matrix' : './live/src/rotation-matrix.js',
-        'simple-shear' : './live/src/simple-shear.js',
-        'hopper' : './live/src/hopper.js',
-        'intruder' : './live/src/intruder.js',
-        'anisotropy' : './live/src/anisotropy.js',
-        'dam-break' : './live/src/dam-break.js',
-        'dam-break-2d' : './live/src/dam-break-2d.js',
-        'code' : './live/src/code.js',
+        'uniaxial': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/uniaxial.js'],
+        'triaxial': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/triaxial.js'],
+        'isotropic': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/isotropic.js'],
+        'inclined-plane': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/inclined-plane.js'],
+        'lees-edwards': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/lees-edwards.js'],
+        'rotation': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/rotation.js'],
+        'rotating-drum-2d': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/rotating-drum-2d.js'],
+        '4d-pool': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/4d-pool.js'],
+        'no-friction-2d-pool': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/no-friction-2d-pool.js'],
+        'coarse-graining': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/coarse-graining.js'],
+        'rotation-matrix': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/rotation-matrix.js'],
+        'simple-shear': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/simple-shear.js'],
+        'hopper': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/hopper.js'],
+        'intruder': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/intruder.js'],
+        'anisotropy': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/anisotropy.js'],
+        'dam-break': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/dam-break.js'],
+        'dam-break-2d': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/dam-break-2d.js'],
+        'code': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/code.js'],
+        'ring': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/ring.js'],
+        'slice': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/slice.js'],
     },
     plugins: [
         new webpack.ProvidePlugin({
-          THREE: 'three'
+            THREE: 'three'
         }),
         new MonacoWebpackPlugin(),
         new HtmlWebpackPlugin({
-          title: 'NDDEM Uniaxial compression',
-          favicon: "./visualise/resources/favicon.ico",
-          template: "live/plotly-template.html",
-          filename: "uniaxial.html",
-          chunks: ['uniaxial']
+            title: 'NDDEM Uniaxial compression',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "uniaxial.html",
+            chunks: ['uniaxial']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Triaxial compression',
@@ -51,7 +53,7 @@ module.exports = [{
             template: "live/plotly-template.html",
             filename: "isotropic.html",
             chunks: ['isotropic']
-        }),        
+        }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Simple Shear',
             favicon: "./visualise/resources/favicon.ico",
@@ -157,26 +159,37 @@ module.exports = [{
             filename: "code.html",
             chunks: ['code']
         }),
-      ],
+        new HtmlWebpackPlugin({
+            title: "NDDEM Ring maker",
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "ring.html",
+            chunks: ['ring']
+        }),
+        new HtmlWebpackPlugin({
+            title: "NDDEM CT Slicer",
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/template.html",
+            filename: "slice.html",
+            chunks: ['slice']
+        }),
+        new webpack.HotModuleReplacementPlugin()
+    ],
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
+        publicPath: '/',
         filename: '[name]-bundle.js',
         clean: true,
     },
-    // devServer: {
-    //     static: {
-    //        directory: '.'
-    //     },
-    // },
     devServer: {
         hot: true,
-        // headers: {
-        //     'Cross-Origin-Embedder-Policy': 'require-corp',
-        //     'Cross-Origin-Opener-Policy': 'same-origin',
-        // },
+        // open: true,
         static: {
             directory: '.'
         },
+        // watchFiles: ['live/src/**/*', 'visualise/**/*'],
+        watchFiles: ['live/src/**/*.js', 'visualise/**/*.{js,html,css}'],
+
     },
     module: {
         rules: [
@@ -185,10 +198,10 @@ module.exports = [{
                 use: ["style-loader", "css-loader"],
             },
             {
-                test: /\.(ico|webmanifest|stl)$/,
+                test: /\.(ico|webmanifest|stl|nrrd|png)$/,
                 exclude: /node_modules/,
                 use: ["file-loader?name=[name].[ext]"] // ?name=[name].[ext] is only necessary to preserve the original file name
-              },
+            },
         ],
     },
 },
@@ -196,14 +209,14 @@ module.exports = [{
     mode: "development",
     // mode: "production",
     entry: {
-        'nddem' : './visualise/js/nddem.js',
-        'coarse_grain' : './visualise/js/coarse_grain.js',
-        'logo' : './visualise/examples/js/logo.js',
-        'slice' : './visualise/examples/js/slice.js',
-        'multiple_rotating_earths' : './visualise/examples/js/multiple_rotating_earths.js',
-        'rotating_earth_controls' : './visualise/examples/js/rotating_earth_controls.js',
-        'rotating_earth' : './visualise/examples/js/rotating_earth.js',
-        'torus_explainer' : './visualise/examples/js/torus_explainer.js',
+        'nddem': './visualise/js/nddem.js',
+        'coarse_grain': './visualise/js/coarse_grain.js',
+        'logo': './visualise/examples/js/logo.js',
+        'slice': './visualise/examples/js/slice.js',
+        'multiple_rotating_earths': './visualise/examples/js/multiple_rotating_earths.js',
+        'rotating_earth_controls': './visualise/examples/js/rotating_earth_controls.js',
+        'rotating_earth': './visualise/examples/js/rotating_earth.js',
+        'torus_explainer': './visualise/examples/js/torus_explainer.js',
     },
     output: {
         path: path.resolve(__dirname, 'visualise/deploy'),

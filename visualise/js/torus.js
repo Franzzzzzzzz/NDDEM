@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 
 var R, r; // parameters of torus
 var wristband1, wristband2;
@@ -29,7 +30,7 @@ function add_torus(scene, params, world, particles) {
     var torus_colour = 0xaaaaaa;
     var wristband_colour = 0x000000;
   }
-  var geometry = new THREE.TorusBufferGeometry(
+  var geometry = new THREE.TorusGeometry(
     R,
     r,
     Math.pow(2, params.quality + 1) * 2,
@@ -47,7 +48,7 @@ function add_torus(scene, params, world, particles) {
     wristband1.receiveShadow = true;
   }
 
-  var geometry = new THREE.TorusBufferGeometry(
+  var geometry = new THREE.TorusGeometry(
     r + R - r / 6,
     r / 5,
     Math.pow(2, params.quality + 1) * 2,
@@ -59,7 +60,7 @@ function add_torus(scene, params, world, particles) {
   });
   wristband1_phi = new THREE.Mesh(geometry, material);
 
-  var geometry = new THREE.TorusBufferGeometry(
+  var geometry = new THREE.TorusGeometry(
     r,
     r / 10,
     Math.pow(2, params.quality + 1) * 2,
@@ -92,7 +93,7 @@ function add_torus(scene, params, world, particles) {
   controller1.rotation.x += (params.rotate_torus / 180) * Math.PI;
 
   if (params.N > 5) {
-    var geometry = new THREE.TorusBufferGeometry(
+    var geometry = new THREE.TorusGeometry(
       R,
       r,
       Math.pow(2, params.quality) * 2,
@@ -110,7 +111,7 @@ function add_torus(scene, params, world, particles) {
       wristband2.receiveShadow = true;
     }
 
-    var geometry = new THREE.TorusBufferGeometry(
+    var geometry = new THREE.TorusGeometry(
       r + R - r / 6,
       r / 5,
       Math.pow(2, params.quality) * 2,
@@ -122,7 +123,7 @@ function add_torus(scene, params, world, particles) {
     });
     wristband2_phi = new THREE.Mesh(geometry, material);
 
-    var geometry = new THREE.TorusBufferGeometry(
+    var geometry = new THREE.TorusGeometry(
       r,
       r / 10,
       Math.pow(2, params.quality) * 2,
@@ -243,10 +244,10 @@ function add_left_oculus_model(controller) {
           object.receiveShadow = true;
 
           // Pause label
-          var font_loader = new THREE.FontLoader();
+          var font_loader = new FontLoader();
           font_loader.load(
             params.root_dir +
-              "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
+            "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
             function (font) {
               var fontsize = 0.005;
               var geometry = new TextGeometry("  Play \nPause", {
@@ -359,10 +360,10 @@ function add_right_oculus_model(controller) {
           object.receiveShadow = true;
 
           // Pause label
-          var font_loader = new THREE.FontLoader();
+          var font_loader = new FontLoader();
           font_loader.load(
             params.root_dir +
-              "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
+            "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
             function (font) {
               var fontsize = 0.005;
               var geometry = new TextGeometry("  Play \nPause", {
@@ -473,10 +474,10 @@ function add_vive_models(scene, params, world) {
     controller.receiveShadow = true;
 
     // Pause label
-    var font_loader = new THREE.FontLoader();
+    var font_loader = new FontLoader();
     font_loader.load(
       params.root_dir +
-        "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
+      "visualise/node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
       function (font) {
         var fontsize = 0.005;
         var geometry = new TextGeometry("  Play \nPause", {

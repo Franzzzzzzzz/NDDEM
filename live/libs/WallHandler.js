@@ -1,20 +1,28 @@
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import { PIDcontroller } from './PIDcontroller.js';
+import { addition, subtraction } from './Mesh.js';
+import font_file from '../resources/helvetiker_bold.typeface.json';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { ExtrudeGeometry } from "./ExtrudeGeometry.js";
+
 export let left, right, floor, roof, front, back;
 export let axesHelper, arrow_x, arrow_y, arrow_z;
 let arrow_body, arrow_head;
 let textGeo_x, textGeo_y, textGeo_z;
-let font;
+// let font;
 
 let vertical_wall_displacement = 0;
 
 let walls;
+export let ring = new THREE.Group();
 
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
-import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
-
-import { PIDcontroller } from './PIDcontroller.js'
 
 var loader = new FontLoader();
-loader.load("../resources/helvetiker_bold.typeface.json", function (f) { font = f });
+// loader.load("../resources/helvetiker_bold.typeface.json", function (f) { font = f });
+// console.log(font_file)
+// loader.load(font_file, function (f) { font = f });
+let font = loader.parse(font_file);
 
 // let p_controller = new PIDcontroller(5e-4,1e-5,0);
 // let q_controller = new PIDcontroller(5e-4,1e-5,0);
@@ -45,12 +53,12 @@ wall_material.wireframeLinewidth = 3;
 const arrow_colour = 0xDDDDDD;
 const arrow_material = new THREE.MeshLambertMaterial({ color: arrow_colour });
 
-export function add_circle_wall(params, scene) { 
+export function add_circle_wall(params, scene) {
     if (left !== undefined) { scene.remove(left); }
-    const circle_geometry = new THREE.RingGeometry( params.R, params.R+params.thickness, 100, 1 );
-    left = new THREE.Mesh( circle_geometry, wall_material );
+    const circle_geometry = new THREE.RingGeometry(params.R, params.R + params.thickness, 100, 1);
+    left = new THREE.Mesh(circle_geometry, wall_material);
     left.rotation.x = Math.PI;
-    scene.add( left );
+    scene.add(left);
 }
 
 export function remove_all_walls(scene) {
@@ -415,13 +423,13 @@ export function update_top_wall(params, S, scene, dt = 0.001) {
 
 }
 
-export function update_damped_wall(current, target, params, S, dt, axis=1) {
+export function update_damped_wall(current, target, params, S, dt, axis = 1) {
     let delta_L = damped_wall_controller.update(target, current, dt);
     vertical_wall_displacement += delta_L;
     let L_cur = params.L - vertical_wall_displacement;
-    
-    if ( axis == 0 && params.aspect_ratio !== undefined ) {
-        S.simu_setBoundary(axis, [-L_cur*params.aspect_ratio, L_cur*params.aspect_ratio]); // Set location of the walls in y
+
+    if (axis == 0 && params.aspect_ratio !== undefined) {
+        S.simu_setBoundary(axis, [-L_cur * params.aspect_ratio, L_cur * params.aspect_ratio]); // Set location of the walls in y
     } else {
         S.simu_setBoundary(axis, [-L_cur, L_cur]); // Set location of the walls in y
     }
@@ -606,33 +614,258 @@ export function add_scale_isotropic(params, scene) {
 
 
 export function createWalls(scene) {
-    if ( walls !== undefined ) { scene.remove(walls); }
+    if (walls !== undefined) { scene.remove(walls); }
     walls = new THREE.Object3D();
-    for ( let d = 0; d < 3; d++ ) {
-        walls.add(new THREE.Mesh(box , wall_material));
-        walls.add(new THREE.Mesh(box , wall_material));
+    for (let d = 0; d < 3; d++) {
+        walls.add(new THREE.Mesh(box, wall_material));
+        walls.add(new THREE.Mesh(box, wall_material));
     }
     scene.add(walls);
 }
 
 export function update(params) {
-    if ( walls !== undefined ) {
-        for ( let d = 0; d < 3; d++ ) {
-            if ( params['boundary'+d].type === 'WALL' ) {
-                for ( let i = 0; i < 2; i++ ) {
-                    walls.children[2*d +i].visible = true;
-                    walls.children[2*d +i].scale.set(
-                        (d!==0)*(params.boundary0.max - params.boundary0.min),
-                        (d!==1)*(params.boundary1.max - params.boundary1.min),
-                        (d!==2)*(params.boundary2.max - params.boundary2.min));
-                    }
-                    walls.children[2*d  ].position.setComponent(d, params['boundary'+d].min);
-                    walls.children[2*d+1].position.setComponent(d, params['boundary'+d].max);  
+    if (walls !== undefined) {
+        for (let d = 0; d < 3; d++) {
+            if (params['boundary' + d].type === 'WALL') {
+                for (let i = 0; i < 2; i++) {
+                    walls.children[2 * d + i].visible = true;
+                    walls.children[2 * d + i].scale.set(
+                        (d !== 0) * (params.boundary0.max - params.boundary0.min),
+                        (d !== 1) * (params.boundary1.max - params.boundary1.min),
+                        (d !== 2) * (params.boundary2.max - params.boundary2.min));
+                }
+                walls.children[2 * d].position.setComponent(d, params['boundary' + d].min);
+                walls.children[2 * d + 1].position.setComponent(d, params['boundary' + d].max);
             }
             else {
-                walls.children[2*d  ].visible = false;
-                walls.children[2*d+1].visible = false;
+                walls.children[2 * d].visible = false;
+                walls.children[2 * d + 1].visible = false;
             }
         }
     }
+}
+
+export function toggle_ring_walls(params) {
+    if (ring !== undefined && ring.parent) {
+        let scene = ring.parent;
+        scene.remove(ring);
+        HollowCylinder(params).then(ring => {
+            scene.add(ring);
+            if (params.wall) {
+                ring.visible = true;
+            } else {
+                ring.visible = false;
+            }
+        });
+    }
+    if (walls !== undefined) {
+        for (let d = 0; d < 3; d++) {
+            if (params.boundary[d].type === 'WALL') {
+                let linear_thickness = 0.1;
+                for (let i = 0; i < 1; i++) { // just first wall for ring!
+                    walls.children[2 * d + i].visible = true;
+                    walls.children[2 * d + i].scale.set(
+                        (d !== 0) * params.boundary[0].range + (d == 0) * linear_thickness,
+                        (d !== 1) * params.boundary[1].range + (d == 1) * linear_thickness,
+                        (d !== 2) * params.boundary[2].range + (d == 2) * linear_thickness
+                    );
+                }
+                walls.children[2 * d + 1].visible = false;
+                for (let i = 0; i < 3; i++) {
+                    if (i !== d) {
+                        walls.children[2 * d].position.setComponent(i, (params.boundary[i].min + params.boundary[i].max) / 2);
+                    }
+                    else {
+                        walls.children[2 * d].position.setComponent(d, params.boundary[d].min - linear_thickness / 2.);
+                        walls.children[2 * d + 1].position.setComponent(d, params.boundary[d].max + linear_thickness / 2.);
+                    }
+                }
+                // if (params.wall) {
+                //     ring.scale.set(
+                //         (params.boundary[0].max - params.boundary[0].min) + params.thickness,
+                //         (params.boundary[1].max - params.boundary[1].min) + params.thickness,
+                //         (params.boundary[2].max - params.boundary[2].min) + params.thickness
+                //     );
+                //     ring.position.set(
+                //         (params.boundary[0].max + params.boundary[0].min) / 2,
+                //         (params.boundary[1].max + params.boundary[1].min) / 2,
+                //         (params.boundary[2].max + params.boundary[2].min) / 2
+                //     );
+                // }
+            }
+            else {
+                walls.children[2 * d].visible = false;
+                walls.children[2 * d + 1].visible = false;
+            }
+        }
+    }
+}
+
+export async function HollowCylinder(params) {
+
+    // Create a ring shape
+    var outerRadius = params.R_0;
+    var innerRadius = params.R_finger;
+    let depth = params.boundary[2].range * params.R_0 * 2 / params.boundary[0].range;
+    let material = new THREE.MeshLambertMaterial({ color: 0x666666, side: THREE.DoubleSide });
+    // material.wireframe = true;
+
+    let geometry;
+    if (params.shank.type == 'cylinder') {
+        var shape = new THREE.Shape();
+        shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, true);
+        let hole = new THREE.Path();
+        hole.absarc(0, 0, innerRadius, 0, Math.PI * 2, false);
+        shape.holes.push(hole);
+
+        depth = params.T;
+        let bevel = 0.5;//params.thickness / 2.
+        // Extrude the shape
+        var extrudeSettings = {
+            depth: depth,
+            // bevelEnabled: false,
+            bevelEnabled: true,
+            bevelThickness: bevel,
+            bevelSize: bevel,
+            bevelOffset: -bevel,
+            bevelSegments: 20,
+            curveSegments: Math.pow(2, params.quality + 1), // higher because its big
+        };
+        geometry = new ExtrudeGeometry(shape, extrudeSettings);
+        ring = new THREE.Mesh(geometry, material);
+        // hole = new THREE.CylinderGeometry(innerRadius, innerRadius, depth, 32);
+    } else if (params.shank.type === 'protruding') {
+        let height = params.shank.height * params.R_0;
+
+        let radius = params.R_0;
+        let make_with_extrude = true;
+        // var width = 2 * radius; // Width of the flat top part is twice the radius
+        if (make_with_extrude) {
+            var shape = new THREE.Shape();
+            // Start from the top left corner
+            shape.moveTo(-radius, 0);
+
+            // Draw the top horizontal line to the right corner
+            shape.lineTo(radius, 0);
+
+            // Draw the right vertical line down
+            shape.lineTo(radius, -height);
+
+            // Draw the bottom semicircle
+            shape.absarc(0, -height, radius, 0, Math.PI, true);
+
+            // Draw the left vertical line up to close the shape
+            shape.lineTo(-radius, 0);
+
+            // Now you can use this shape to create geometry
+            geometry = new THREE.ShapeGeometry(shape);
+
+            let hole = new THREE.Path();
+            hole.moveTo(-innerRadius, 0);
+            hole.absarc(0, -height, innerRadius, 0, Math.PI * 2, false);
+            shape.holes.push(hole);
+
+            let bevel = 0.5;//params.thickness / 2.
+            // Extrude the shape
+            var extrudeSettings = {
+                depth: depth,
+                // bevelEnabled: false,
+                bevelEnabled: true,
+                bevelThickness: bevel,
+                bevelSize: bevel,
+                bevelOffset: -bevel,
+                bevelSegments: 10,
+                curveSegments: Math.pow(2, params.quality + 1), // higher because its big
+                // bevelSegments: 3,
+                // curveSegments: 10
+            };
+            geometry = new ExtrudeGeometry(shape, extrudeSettings);
+            ring = new THREE.Mesh(geometry, material);
+        }
+        else {
+            let outer_ring = new THREE.CylinderGeometry(outerRadius, outerRadius, depth, Math.pow(2, params.quality + 0));
+            outer_ring.rotateX(Math.PI / 2);
+            outer_ring.translate(0, -height, depth / 2);
+
+            let hole = new THREE.CylinderGeometry(innerRadius, innerRadius, depth * 2, Math.pow(2, params.quality + 0));
+            hole.rotateX(Math.PI / 2);
+            hole.translate(0, -height, depth / 2);
+
+            // let shoulder_geom = new THREE.BoxGeometry(2 * outerRadius, height, depth);
+            let box_radius = 0.4;
+            let shoulder_geom_top = new RoundedBoxGeometry(2 * outerRadius, 2 * height / 3., depth, 5, box_radius);
+            let shoulder_geom_bot = new THREE.BoxGeometry(2 * outerRadius, 2 * height / 3., depth);
+            shoulder_geom_top.translate(0, height / 6, 0);
+            shoulder_geom_bot.translate(0, -height / 6, 0);
+            addition(shoulder_geom_top, shoulder_geom_bot, material).then((r) => {
+                let shoulder_geom = r.geometry;
+
+                shoulder_geom.translate(0, -height / 2, depth / 2);
+
+                // let outer = new THREE.Mesh(outer_ring, material);
+                // let inner = new THREE.Mesh(hole, wall_material);
+                // let shoulder = new THREE.Mesh(shoulder_geom, material);
+                params.cutOffAngle = 45;
+                params.tryKeepNormals = true;
+
+                addition(outer_ring, shoulder_geom, material).then((res) => {
+                    subtraction(res.geometry, hole, material).then((res2) => {
+                        ring.add(res2);
+                    });
+                });
+            });
+
+
+        }
+    }
+
+    // console.log(geometry)
+
+    // difference(geometry, hole).then((res) => {
+    //     // console.log(res)
+    //     ring.add(new THREE.Mesh(geometry, material));
+    // });
+
+
+
+    if (params.shank.gravity_tag && params.shank.type === 'protruding') {
+        let g = new THREE.Group();
+
+        let text = new THREE.Mesh(
+            new TextGeometry('g', { font: font, size: params.shank.fontsize, height: 0.25 * params.shank.fontsize }),
+            new THREE.MeshBasicMaterial({ color: 0x666666 })
+        )
+        g.add(text);
+
+        const arrow = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.2 * params.shank.fontsize, 0.2 * params.shank.fontsize, 5 * params.shank.fontsize, 32),
+            new THREE.MeshLambertMaterial({ color: 0x666666 })
+        );
+        let arrow_head = new THREE.Mesh(
+            new THREE.ConeGeometry(0.5 * params.shank.fontsize, 2 * params.shank.fontsize, 32),
+            new THREE.MeshLambertMaterial({ color: 0x666666 })
+        );
+        arrow_head.position.y = -2.5 * params.shank.fontsize;
+        arrow_head.rotateZ(Math.PI);
+        arrow.add(arrow_head);
+        arrow.position.x = 1.5 * params.shank.fontsize;
+        arrow.position.y = -0.5 * params.shank.fontsize;
+        arrow.rotateZ(-Math.PI * (90 - params.theta) / 180);
+
+        g.add(arrow);
+
+        g.position.x = -0.85 * params.R_0;
+        g.position.y = -0.25 * params.R_0;
+        g.position.z = depth + 0.5 * params.shank.fontsize;
+
+
+
+        // g.position.z = 0.75 * params.shank.fontsize;
+
+        // g.position.z = -0.5 * depth;
+        ring.add(g);
+
+    }
+
+    return ring;
 }

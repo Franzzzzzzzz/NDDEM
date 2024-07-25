@@ -14,11 +14,11 @@
     "monaco-editor-webpack-plugin": "^7.1.0",
     "papaparse": "^5.3.2",
     "plotly.js-dist": "^2.24.2",
-    "three": "^0.138.2"
+    "three": "^0.161.0",
+    "three-bvh-csg": "^0.0.16"
   },
   "devDependencies": {
     "@nightwatch/mobile-helper": "^0.1.12",
-    "@webpack-cli/serve": "^1.7.0",
     "chromedriver": "^119.0.1",
     "css-loader": "^6.7.1",
     "geckodriver": "^4.0.4",
@@ -26,8 +26,8 @@
     "nightwatch": "^3.0.1",
     "selenium-server": "^3.141.59",
     "style-loader": "^3.3.1",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.0"
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
   }
 }

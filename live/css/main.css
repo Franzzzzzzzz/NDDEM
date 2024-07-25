@@ -4,25 +4,36 @@ html * {
 
 body {
     margin: 0;
+    padding: 0;
     overflow: hidden;
 }
 
 .flex-container {
     display: flex;
     flex-direction: row;
+    height: 100vh;
+    width: 100vw;
 }
 
 #stats {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    height: 100%;
     width: 50%;
-    height: 100vh;
+    /* Flex-grow, Flex-shrink, Flex-basis */
     margin: 0;
     padding: 0;
 }
 
 #canvas {
-    width: 50%;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
     height: 100%;
-    /* disable selection */
+    width: 50%;
+    /* Flex-grow, Flex-shrink, Flex-basis */
+
     -webkit-user-select: none;
     /* Safari */
     -ms-user-select: none;
@@ -100,4 +111,27 @@ a {
     height: 20px;
     color: white;
     display: flex;
+}
+
+@media screen and (max-width: 1080px) {
+    .flex-container {
+        flex-direction: column;
+    }
+
+    #stats,
+    #canvas {
+        height: 50%;
+        /* Each div takes half the height */
+        width: 100%;
+        flex: 1 1 auto;
+        /* Full width in column layout */
+    }
+
+    #scigem_tag {
+        color: white;
+    }
+
+    a {
+        color: white;
+    }
 }
