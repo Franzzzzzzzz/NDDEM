@@ -25,8 +25,6 @@ module.exports = [{
         'dam-break': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/dam-break.js'],
         'dam-break-2d': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/dam-break-2d.js'],
         'code': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/code.js'],
-        'ring': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/ring.js'],
-        'slice': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/slice.js'],
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -158,20 +156,6 @@ module.exports = [{
             template: "live/code.html",
             filename: "code.html",
             chunks: ['code']
-        }),
-        new HtmlWebpackPlugin({
-            title: "NDDEM Ring maker",
-            favicon: "./visualise/resources/favicon.ico",
-            template: "live/plotly-template.html",
-            filename: "ring.html",
-            chunks: ['ring']
-        }),
-        new HtmlWebpackPlugin({
-            title: "NDDEM CT Slicer",
-            favicon: "./visualise/resources/favicon.ico",
-            template: "live/template.html",
-            filename: "slice.html",
-            chunks: ['slice']
         }),
         new webpack.HotModuleReplacementPlugin()
     ],
