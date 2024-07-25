@@ -49,7 +49,7 @@ var clock = new THREE.Clock(); // global clock
 var lut = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 var LOADER;
 var NDParticleShader;
-var texture_path ;
+var texture_path;
 
 var params = PARAMS.process_params(time);
 
@@ -97,7 +97,7 @@ function build_world() {
     scene.background = new THREE.Color(0x111111); // revealjs background colour
   }
   if (params.display_type === "VR") {
-    var geometry = new THREE.SphereBufferGeometry(500, 60, 40);
+    var geometry = new THREE.SphereGeometry(500, 60, 40);
     // invert the geometry on the x-axis so that all of the faces point inward
     geometry.scale(-1, 1, 1);
     var texture = new THREE.TextureLoader().load(
@@ -139,9 +139,9 @@ function build_world() {
     false
   );
 
-  if ( params.stats ) {
-      stats = new Stats();
-      document.body.appendChild( stats.dom );
+  if (params.stats) {
+    stats = new Stats();
+    document.body.appendChild(stats.dom);
   }
   //if ( params.display_type === 'VR' ) { add_vive_models(); }
 }
@@ -194,7 +194,7 @@ function remove_everything() {
   function receiveMessage(event) {
     console.log(
       "Closing renderer. Current number of programs:" +
-        renderer.info.programs.length
+      renderer.info.programs.length
     );
     // console.log(particles);
     // console.log(wristband);
@@ -242,14 +242,14 @@ function make_initial_sphere_texturing() {
   request.open(
     "GET",
     params.root_dir +
-      "load?ND=" +
-      params.N +
-      "&path=" +
-      params.fname +
-      "&texturepath=../" +
-      params.texture_dir +
-      "&resolution=" +
-      params.quality,
+    "load?ND=" +
+    params.N +
+    "&path=" +
+    params.fname +
+    "&texturepath=../" +
+    params.texture_dir +
+    "&resolution=" +
+    params.quality,
     true
   );
   console.log(request)
@@ -295,9 +295,9 @@ function make_initial_spheres(spheres) {
   } else {
     // var geometry = new THREE.SphereGeometry( 1, Math.pow(2,params.quality), Math.pow(2,params.quality) );
     var geometry = new THREE.SphereGeometry(
-        1,
-        Math.pow(2, params.quality),
-        Math.pow(2, params.quality)
+      1,
+      Math.pow(2, params.quality),
+      Math.pow(2, params.quality)
     );
   }
   var pointsGeometry = new THREE.SphereGeometry(
@@ -523,11 +523,11 @@ function update_spheres_texturing(t) {
     request.open(
       "GET",
       params.data_dir +
-        "render?ts=" +
-        String(t * time.save_rate).padStart(5, "0") +
-        commandstring +
-        "&running=" +
-        runvalue,
+      "render?ts=" +
+      String(t * time.save_rate).padStart(5, "0") +
+      commandstring +
+      "&running=" +
+      runvalue,
       true
     );
 
@@ -584,81 +584,81 @@ function update_spheres(spheres) {
     } else if (params.N == 4) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2)
       );
 
       //if ( (world[3].cur >  world[3].max-spheres[i][params.N] ) // NOTE: IMPLEMENT THIS!!
     } else if (params.N == 5) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2) -
-          Math.pow(world[4].cur - spheres[i][4], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2) -
+        Math.pow(world[4].cur - spheres[i][4], 2)
       );
     } else if (params.N == 6) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2) -
-          Math.pow(world[4].cur - spheres[i][4], 2) -
-          Math.pow(world[5].cur - spheres[i][5], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2) -
+        Math.pow(world[4].cur - spheres[i][4], 2) -
+        Math.pow(world[5].cur - spheres[i][5], 2)
       );
     } else if (params.N == 7) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2) -
-          Math.pow(world[4].cur - spheres[i][4], 2) -
-          Math.pow(world[5].cur - spheres[i][5], 2) -
-          Math.pow(world[6].cur - spheres[i][6], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2) -
+        Math.pow(world[4].cur - spheres[i][4], 2) -
+        Math.pow(world[5].cur - spheres[i][5], 2) -
+        Math.pow(world[6].cur - spheres[i][6], 2)
       );
     } else if (params.N == 8) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2) -
-          Math.pow(world[4].cur - spheres[i][4], 2) -
-          Math.pow(world[5].cur - spheres[i][5], 2) -
-          Math.pow(world[6].cur - spheres[i][6], 2) -
-          Math.pow(world[7].cur - spheres[i][7], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2) -
+        Math.pow(world[4].cur - spheres[i][4], 2) -
+        Math.pow(world[5].cur - spheres[i][5], 2) -
+        Math.pow(world[6].cur - spheres[i][6], 2) -
+        Math.pow(world[7].cur - spheres[i][7], 2)
       );
     } else if (params.N == 10) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2) -
-          Math.pow(world[4].cur - spheres[i][4], 2) -
-          Math.pow(world[5].cur - spheres[i][5], 2) -
-          Math.pow(world[6].cur - spheres[i][6], 2) -
-          Math.pow(world[7].cur - spheres[i][7], 2) -
-          Math.pow(world[8].cur - spheres[i][8], 2) -
-          Math.pow(world[9].cur - spheres[i][9], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2) -
+        Math.pow(world[4].cur - spheres[i][4], 2) -
+        Math.pow(world[5].cur - spheres[i][5], 2) -
+        Math.pow(world[6].cur - spheres[i][6], 2) -
+        Math.pow(world[7].cur - spheres[i][7], 2) -
+        Math.pow(world[8].cur - spheres[i][8], 2) -
+        Math.pow(world[9].cur - spheres[i][9], 2)
       );
     } else if (params.N == 30) {
       var R_draw = Math.sqrt(
         Math.pow(spheres[i][params.N], 2) -
-          Math.pow(world[3].cur - spheres[i][3], 2) -
-          Math.pow(world[4].cur - spheres[i][4], 2) -
-          Math.pow(world[5].cur - spheres[i][5], 2) -
-          Math.pow(world[6].cur - spheres[i][6], 2) -
-          Math.pow(world[7].cur - spheres[i][7], 2) -
-          Math.pow(world[8].cur - spheres[i][8], 2) -
-          Math.pow(world[9].cur - spheres[i][9], 2) -
-          Math.pow(world[10].cur - spheres[i][10], 2) -
-          Math.pow(world[11].cur - spheres[i][11], 2) -
-          Math.pow(world[12].cur - spheres[i][12], 2) -
-          Math.pow(world[13].cur - spheres[i][13], 2) -
-          Math.pow(world[14].cur - spheres[i][14], 2) -
-          Math.pow(world[15].cur - spheres[i][15], 2) -
-          Math.pow(world[16].cur - spheres[i][16], 2) -
-          Math.pow(world[17].cur - spheres[i][17], 2) -
-          Math.pow(world[18].cur - spheres[i][18], 2) -
-          Math.pow(world[19].cur - spheres[i][19], 2) -
-          Math.pow(world[20].cur - spheres[i][20], 2) -
-          Math.pow(world[21].cur - spheres[i][21], 2) -
-          Math.pow(world[22].cur - spheres[i][22], 2) -
-          Math.pow(world[23].cur - spheres[i][23], 2) -
-          Math.pow(world[24].cur - spheres[i][24], 2) -
-          Math.pow(world[25].cur - spheres[i][25], 2) -
-          Math.pow(world[26].cur - spheres[i][26], 2) -
-          Math.pow(world[27].cur - spheres[i][27], 2) -
-          Math.pow(world[28].cur - spheres[i][28], 2) -
-          Math.pow(world[29].cur - spheres[i][29], 2)
+        Math.pow(world[3].cur - spheres[i][3], 2) -
+        Math.pow(world[4].cur - spheres[i][4], 2) -
+        Math.pow(world[5].cur - spheres[i][5], 2) -
+        Math.pow(world[6].cur - spheres[i][6], 2) -
+        Math.pow(world[7].cur - spheres[i][7], 2) -
+        Math.pow(world[8].cur - spheres[i][8], 2) -
+        Math.pow(world[9].cur - spheres[i][9], 2) -
+        Math.pow(world[10].cur - spheres[i][10], 2) -
+        Math.pow(world[11].cur - spheres[i][11], 2) -
+        Math.pow(world[12].cur - spheres[i][12], 2) -
+        Math.pow(world[13].cur - spheres[i][13], 2) -
+        Math.pow(world[14].cur - spheres[i][14], 2) -
+        Math.pow(world[15].cur - spheres[i][15], 2) -
+        Math.pow(world[16].cur - spheres[i][16], 2) -
+        Math.pow(world[17].cur - spheres[i][17], 2) -
+        Math.pow(world[18].cur - spheres[i][18], 2) -
+        Math.pow(world[19].cur - spheres[i][19], 2) -
+        Math.pow(world[20].cur - spheres[i][20], 2) -
+        Math.pow(world[21].cur - spheres[i][21], 2) -
+        Math.pow(world[22].cur - spheres[i][22], 2) -
+        Math.pow(world[23].cur - spheres[i][23], 2) -
+        Math.pow(world[24].cur - spheres[i][24], 2) -
+        Math.pow(world[25].cur - spheres[i][25], 2) -
+        Math.pow(world[26].cur - spheres[i][26], 2) -
+        Math.pow(world[27].cur - spheres[i][27], 2) -
+        Math.pow(world[28].cur - spheres[i][28], 2) -
+        Math.pow(world[29].cur - spheres[i][29], 2)
       );
     }
     if (isNaN(R_draw)) {
@@ -753,7 +753,7 @@ function update_spheres(spheres) {
         var object2 = TORUS.wristband1.children[i];
         var phi =
           (2 * Math.PI * (world[3].cur - spheres[i][3])) /
-            (world[3].max - world[3].min) -
+          (world[3].max - world[3].min) -
           Math.PI / 2;
         var x = (TORUS.R + TORUS.r) * Math.cos(phi);
         var y = (TORUS.R + TORUS.r) * Math.sin(phi);
@@ -769,7 +769,7 @@ function update_spheres(spheres) {
         var object2 = TORUS.wristband1.children[i];
         var phi =
           (2 * Math.PI * (world[3].cur - spheres[i][3])) /
-            (world[3].max - world[3].min) -
+          (world[3].max - world[3].min) -
           Math.PI / 2;
         var theta =
           (2 * Math.PI * (world[4].cur - spheres[i][4])) /
@@ -784,7 +784,7 @@ function update_spheres(spheres) {
         var object3 = TORUS.wristband2.children[i];
         var phi =
           (2 * Math.PI * (world[5].cur - spheres[i][5])) /
-            (world[5].max - world[5].min) -
+          (world[5].max - world[5].min) -
           Math.PI / 2;
         var x = (TORUS.R + TORUS.r) * Math.cos(phi);
         var y = (TORUS.R + TORUS.r) * Math.sin(phi);
@@ -796,7 +796,7 @@ function update_spheres(spheres) {
         var object3 = TORUS.wristband2.children[i];
         var phi =
           (2 * Math.PI * (world[5].cur - spheres[i][5])) /
-            (world[5].max - world[5].min) -
+          (world[5].max - world[5].min) -
           Math.PI / 2;
         var theta =
           (2 * Math.PI * (world[6].cur - spheres[i][6])) /
@@ -828,9 +828,9 @@ function check_if_won() {
         //console.log(controller2.position.distanceTo(particles.children[params.pinky].position));
         if (
           loc_left.distanceTo(particles.children[params.pinky].position) <
-            particles.children[params.pinky].scale.x ||
+          particles.children[params.pinky].scale.x ||
           loc_right.distanceTo(particles.children[params.pinky].position) <
-            particles.children[params.pinky].scale.x
+          particles.children[params.pinky].scale.x
         ) {
           winning = true;
           bg.material.map = winning_texture;
@@ -913,7 +913,7 @@ function animate() {
     CAMERA.controls.update();
   }
   renderer.setAnimationLoop(render);
-  if ( params.stats ) { stats.update(); }
+  if (params.stats) { stats.update(); }
 }
 
 /**

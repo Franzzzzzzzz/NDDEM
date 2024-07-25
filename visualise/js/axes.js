@@ -124,7 +124,7 @@ function make_axes(scene, params, world) {
     var loader = new FontLoader();
     loader.load(
       params.root_dir +
-        "../node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
+      "../node_modules/three/examples/fonts/helvetiker_bold.typeface.json",
       function (font) {
         var textGeo_x = new TextGeometry("x" + world.ref_dim.x, {
           font: font,
@@ -186,7 +186,7 @@ function make_axes(scene, params, world) {
 function make_walls(scene, params, world) {
   walls = new THREE.Group();
   if (params.display_type === "VR") {
-    var base_plane_geometry = new THREE.PlaneBufferGeometry(1, 1);
+    var base_plane_geometry = new THREE.PlaneGeometry(1, 1);
     var base_plane_material = new THREE.MeshStandardMaterial({
       color: 0x000000,
     });
@@ -197,7 +197,7 @@ function make_walls(scene, params, world) {
     scene.add(base_plane);
   }
 
-  var geometry = new THREE.PlaneBufferGeometry(1, 1);
+  var geometry = new THREE.PlaneGeometry(1, 1);
   var material = new THREE.MeshStandardMaterial({
     color: 0xaaaaaa,
     // roughness: 1.0,
@@ -213,8 +213,8 @@ function make_walls(scene, params, world) {
   // }
   // }
 
-  if ( params.data_type === 'mercury-with-vtk-walls' ) {
-      // scene.add(world.vtk_walls);
+  if (params.data_type === 'mercury-with-vtk-walls') {
+    // scene.add(world.vtk_walls);
   }
 
   if (world[0].wall) {
@@ -296,7 +296,7 @@ function make_walls(scene, params, world) {
       left_wall.position.set(
         world[1].min * params.vr_scale,
         ((world[0].max - world[0].min) / 2) * params.vr_scale -
-          params.human_height,
+        params.human_height,
         ((world[2].max - world[2].min) / 2) * params.vr_scale
       );
       left_wall.material.side = THREE.DoubleSide;
@@ -326,7 +326,7 @@ function make_walls(scene, params, world) {
       right_wall.position.set(
         world[1].max * params.vr_scale,
         ((world[0].max - world[0].min) / 2) * params.vr_scale -
-          params.human_height,
+        params.human_height,
         ((world[2].max - world[2].min) / 2) * params.vr_scale
       );
       right_wall.material.side = THREE.DoubleSide;
@@ -358,7 +358,7 @@ function make_walls(scene, params, world) {
         front_wall.position.set(
           ((world[1].max - world[1].min) / 2) * params.vr_scale,
           ((world[0].max - world[0].min) / 2) * params.vr_scale -
-            params.human_height,
+          params.human_height,
           world[2].min * params.vr_scale
         );
         front_wall.material.side = THREE.DoubleSide;
@@ -387,7 +387,7 @@ function make_walls(scene, params, world) {
         back_wall.position.set(
           ((world[1].max - world[1].min) / 2) * params.vr_scale,
           ((world[0].max - world[0].min) / 2) * params.vr_scale -
-            params.human_height,
+          params.human_height,
           world[2].max * params.vr_scale
         );
         back_wall.material.side = THREE.DoubleSide;

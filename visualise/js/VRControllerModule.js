@@ -10,36 +10,36 @@ import * as THREE from "three";
 /*
 
 
-	VRController
+  VRController
 
 
 
 
-	Why is this useful?
+  Why is this useful?
 
-	1. This creates a THREE.Object3D() per connected Gamepad instance and
-	   passes it to you through a Window event for inclusion in your scene.
-	   It then handles copying the live positions and orientations from the
-	   Gamepad instance to this Object3D.
-	2. It also broadcasts Gamepad button and axes events to you on this
-	   Object3D instance. For your convenience button names are mapped to
-	   objects in the buttons array on supported devices. (And this support
-	   is easy to extend.) For implicitly supported devices you can continue
-	   to use the buttons array indexes.
-	3. This one JS file explicitly supports several existing VR controllers,
-	   and implicitly supports any controllers that operate similarly!
+  1. This creates a THREE.Object3D() per connected Gamepad instance and
+     passes it to you through a Window event for inclusion in your scene.
+     It then handles copying the live positions and orientations from the
+     Gamepad instance to this Object3D.
+  2. It also broadcasts Gamepad button and axes events to you on this
+     Object3D instance. For your convenience button names are mapped to
+     objects in the buttons array on supported devices. (And this support
+     is easy to extend.) For implicitly supported devices you can continue
+     to use the buttons array indexes.
+  3. This one JS file explicitly supports several existing VR controllers,
+     and implicitly supports any controllers that operate similarly!
 
 
-	What do I have to do?
+  What do I have to do?
 
-	1. Include THREE.VRController.update() in your animation loop and listen
-	   for controller connection events like so:
-	   window.addEventlistener('vr controller connected', (controller)=>{}).
-	2. When you receive a controller instance -- again, just an Object3D --
-	   you ought to set its standingMatrix property equal to your
-	   renderer.vr.getStandingMatrix(). If you are expecting a 3DOF controller
-	   you must set its head property equal to your camera.
-	3. Experiment and HAVE FUN!
+  1. Include THREE.VRController.update() in your animation loop and listen
+     for controller connection events like so:
+     window.addEventlistener('vr controller connected', (controller)=>{}).
+  2. When you receive a controller instance -- again, just an Object3D --
+     you ought to set its standingMatrix property equal to your
+     renderer.vr.getStandingMatrix(). If you are expecting a 3DOF controller
+     you must set its head property equal to your camera.
+  3. Experiment and HAVE FUN!
 
 
 */
@@ -286,11 +286,11 @@ function VRController(gamepad) {
       if (verbosity >= 0.4)
         console.log(
           controllerInfo +
-            'hand changed from "' +
-            handedness +
-            '" to "' +
-            controller.gamepad.hand +
-            '"'
+          'hand changed from "' +
+          handedness +
+          '" to "' +
+          controller.gamepad.hand +
+          '"'
         );
       handedness = controller.gamepad.hand;
       controller.dispatchEvent({ type: "hand changed", hand: handedness });
@@ -450,12 +450,12 @@ VRController.prototype.update = function () {
       if (VRController.verbosity >= 0.5)
         console.log(
           "> #" +
-            gamepad.index +
-            " " +
-            gamepad.id +
-            " (Handedness: " +
-            this.getHandedness() +
-            ") adding OrientationArmModel"
+          gamepad.index +
+          " " +
+          gamepad.id +
+          " (Handedness: " +
+          this.getHandedness() +
+          ") adding OrientationArmModel"
         );
       this.armModel = new OrientationArmModel();
     }
@@ -1202,7 +1202,7 @@ OrientationArmModel.prototype.update = function () {
     this.controllerQ,
     "YXZ"
   );
-  var controllerXDeg = THREE.Math.radToDeg(controllerEuler.x);
+  var controllerXDeg = THREE.MathUtils.radToDeg(controllerEuler.x);
   var extensionRatio = this.clamp_((controllerXDeg - 11) / (50 - 11), 0, 1);
 
   // Controller orientation in camera space.
@@ -1222,7 +1222,7 @@ OrientationArmModel.prototype.update = function () {
   // to wrist, but if controller is raised higher, more rotation comes from
   // the wrist.
   var totalAngle = this.quatAngle_(controllerCameraQ, new THREE.Quaternion());
-  var totalAngleDeg = THREE.Math.radToDeg(totalAngle);
+  var totalAngleDeg = THREE.MathUtils.radToDeg(totalAngle);
   var lerpSuppression = 1 - Math.pow(totalAngleDeg / 180, 4); // TODO(smus): ???
 
   var elbowRatio = OrientationArmModel.ELBOW_BEND_RATIO;
@@ -1239,13 +1239,13 @@ OrientationArmModel.prototype.update = function () {
   // Calculate our final controller position based on all our joint rotations
   // and lengths.
   /*
-	position_ =
-		root_rot_ * (
-			controller_root_offset_ +
+  position_ =
+    root_rot_ * (
+      controller_root_offset_ +
 2:      (arm_extension_ * amt_extension) +
 1:      elbow_rot * (kControllerForearm + (wrist_rot * kControllerPosition))
-		);
-	*/
+    );
+  */
   var wristPos = this.wristPos;
   wristPos.copy(OrientationArmModel.WRIST_CONTROLLER_OFFSET);
   wristPos.applyQuaternion(wristQ);
