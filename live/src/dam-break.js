@@ -5,11 +5,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
 import * as SPHERES from "../libs/SphereHandler.js"
-import * as WALLS from "../libs/WallHandler.js"
-import * as LAYOUT from '../libs/Layout.js'
-import { damp } from "three/src/math/MathUtils.js";
-import { max } from "three/examples/jsm/nodes/ShaderNode.js";
-// import { NDSTLLoader, renderSTL } from '../libs/NDSTLLoader.js';
 
 var urlParams = new URLSearchParams(window.location.search);
 
