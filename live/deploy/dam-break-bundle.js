@@ -451,7 +451,7 @@ eval("/*\n\tMIT License http://www.opensource.org/licenses/mit-license.php\n\tAu
   \*****************************************/
 /***/ ((module) => {
 
-eval("/** @typedef {\"info\" | \"warning\" | \"error\"} LogLevel */\n\n/** @type {LogLevel} */\nvar logLevel = \"info\";\n\nfunction dummy() {}\n\n/**\n * @param {LogLevel} level log level\n * @returns {boolean} true, if should log\n */\nfunction shouldLog(level) {\n\tvar shouldLog =\n\t\t(logLevel === \"info\" && level === \"info\") ||\n\t\t([\"info\", \"warning\"].indexOf(logLevel) >= 0 && level === \"warning\") ||\n\t\t([\"info\", \"warning\", \"error\"].indexOf(logLevel) >= 0 && level === \"error\");\n\treturn shouldLog;\n}\n\n/**\n * @param {(msg?: string) => void} logFn log function\n * @returns {(level: LogLevel, msg?: string) => void} function that logs when log level is sufficient\n */\nfunction logGroup(logFn) {\n\treturn function (level, msg) {\n\t\tif (shouldLog(level)) {\n\t\t\tlogFn(msg);\n\t\t}\n\t};\n}\n\n/**\n * @param {LogLevel} level log level\n * @param {string|Error} msg message\n */\nmodule.exports = function (level, msg) {\n\tif (shouldLog(level)) {\n\t\tif (level === \"info\") {\n\t\t\tconsole.log(msg);\n\t\t} else if (level === \"warning\") {\n\t\t\tconsole.warn(msg);\n\t\t} else if (level === \"error\") {\n\t\t\tconsole.error(msg);\n\t\t}\n\t}\n};\n\nvar group = console.group || dummy;\nvar groupCollapsed = console.groupCollapsed || dummy;\nvar groupEnd = console.groupEnd || dummy;\n\nmodule.exports.group = logGroup(group);\n\nmodule.exports.groupCollapsed = logGroup(groupCollapsed);\n\nmodule.exports.groupEnd = logGroup(groupEnd);\n\n/**\n * @param {LogLevel} level log level\n */\nmodule.exports.setLogLevel = function (level) {\n\tlogLevel = level;\n};\n\n/**\n * @param {Error} err error\n * @returns {string} formatted error\n */\nmodule.exports.formatError = function (err) {\n\tvar message = err.message;\n\tvar stack = err.stack;\n\tif (!stack) {\n\t\treturn message;\n\t} else if (stack.indexOf(message) < 0) {\n\t\treturn message + \"\\n\" + stack;\n\t} else {\n\t\treturn stack;\n\t}\n};\n\n\n//# sourceURL=webpack://nddem/./node_modules/webpack/hot/log.js?");
+eval("/** @typedef {\"info\" | \"warning\" | \"error\"} LogLevel */\n\n/** @type {LogLevel} */\nvar logLevel = \"info\";\n\nfunction dummy() {}\n\n/**\n * @param {LogLevel} level log level\n * @returns {boolean} true, if should log\n */\nfunction shouldLog(level) {\n\tvar shouldLog =\n\t\t(logLevel === \"info\" && level === \"info\") ||\n\t\t([\"info\", \"warning\"].indexOf(logLevel) >= 0 && level === \"warning\") ||\n\t\t([\"info\", \"warning\", \"error\"].indexOf(logLevel) >= 0 && level === \"error\");\n\treturn shouldLog;\n}\n\n/**\n * @param {(msg?: string) => void} logFn log function\n * @returns {(level: LogLevel, msg?: string) => void} function that logs when log level is sufficient\n */\nfunction logGroup(logFn) {\n\treturn function (level, msg) {\n\t\tif (shouldLog(level)) {\n\t\t\tlogFn(msg);\n\t\t}\n\t};\n}\n\n/**\n * @param {LogLevel} level log level\n * @param {string|Error} msg message\n */\nmodule.exports = function (level, msg) {\n\tif (shouldLog(level)) {\n\t\tif (level === \"info\") {\n\t\t\tconsole.log(msg);\n\t\t} else if (level === \"warning\") {\n\t\t\tconsole.warn(msg);\n\t\t} else if (level === \"error\") {\n\t\t\tconsole.error(msg);\n\t\t}\n\t}\n};\n\nvar group = console.group || dummy;\nvar groupCollapsed = console.groupCollapsed || dummy;\nvar groupEnd = console.groupEnd || dummy;\n\nmodule.exports.group = logGroup(group);\n\nmodule.exports.groupCollapsed = logGroup(groupCollapsed);\n\nmodule.exports.groupEnd = logGroup(groupEnd);\n\n/**\n * @param {LogLevel} level log level\n */\nmodule.exports.setLogLevel = function (level) {\n\tlogLevel = level;\n};\n\n/**\n * @param {Error} err error\n * @returns {string} formatted error\n */\nmodule.exports.formatError = function (err) {\n\tvar message = err.message;\n\tvar stack = err.stack;\n\tif (!stack) {\n\t\treturn message;\n\t} else if (stack.indexOf(message) < 0) {\n\t\treturn message + \"\\n\" + stack;\n\t}\n\treturn stack;\n};\n\n\n//# sourceURL=webpack://nddem/./node_modules/webpack/hot/log.js?");
 
 /***/ }),
 
@@ -461,7 +461,7 @@ eval("/** @typedef {\"info\" | \"warning\" | \"error\"} LogLevel */\n\n/** @type
   \*****************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("/*\n\tMIT License http://www.opensource.org/licenses/mit-license.php\n\tAuthor Tobias Koppers @sokra\n*/\n/*globals __webpack_hash__ */\nif (true) {\n\t/** @type {undefined|string} */\n\tvar lastHash;\n\tvar upToDate = function upToDate() {\n\t\treturn /** @type {string} */ (lastHash).indexOf(__webpack_require__.h()) >= 0;\n\t};\n\tvar log = __webpack_require__(/*! ./log */ \"./node_modules/webpack/hot/log.js\");\n\tvar check = function check() {\n\t\tmodule.hot\n\t\t\t.check()\n\t\t\t.then(function (updatedModules) {\n\t\t\t\tif (!updatedModules) {\n\t\t\t\t\tlog(\"warning\", \"[HMR] Cannot find update. Need to do a full reload!\");\n\t\t\t\t\tlog(\n\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\"[HMR] (Probably because of restarting the webpack-dev-server)\"\n\t\t\t\t\t);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\treturn module.hot\n\t\t\t\t\t.apply({\n\t\t\t\t\t\tignoreUnaccepted: true,\n\t\t\t\t\t\tignoreDeclined: true,\n\t\t\t\t\t\tignoreErrored: true,\n\t\t\t\t\t\tonUnaccepted: function (data) {\n\t\t\t\t\t\t\tlog(\n\t\t\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\t\t\"Ignored an update to unaccepted module \" +\n\t\t\t\t\t\t\t\t\tdata.chain.join(\" -> \")\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonDeclined: function (data) {\n\t\t\t\t\t\t\tlog(\n\t\t\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\t\t\"Ignored an update to declined module \" +\n\t\t\t\t\t\t\t\t\tdata.chain.join(\" -> \")\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonErrored: function (data) {\n\t\t\t\t\t\t\tlog(\"error\", data.error);\n\t\t\t\t\t\t\tlog(\n\t\t\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\t\t\"Ignored an error while updating module \" +\n\t\t\t\t\t\t\t\t\tdata.moduleId +\n\t\t\t\t\t\t\t\t\t\" (\" +\n\t\t\t\t\t\t\t\t\tdata.type +\n\t\t\t\t\t\t\t\t\t\")\"\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t}\n\t\t\t\t\t})\n\t\t\t\t\t.then(function (renewedModules) {\n\t\t\t\t\t\tif (!upToDate()) {\n\t\t\t\t\t\t\tcheck();\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\t__webpack_require__(/*! ./log-apply-result */ \"./node_modules/webpack/hot/log-apply-result.js\")(updatedModules, renewedModules);\n\n\t\t\t\t\t\tif (upToDate()) {\n\t\t\t\t\t\t\tlog(\"info\", \"[HMR] App is up to date.\");\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\t\t\t})\n\t\t\t.catch(function (err) {\n\t\t\t\tvar status = module.hot.status();\n\t\t\t\tif ([\"abort\", \"fail\"].indexOf(status) >= 0) {\n\t\t\t\t\tlog(\n\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\"[HMR] Cannot check for update. Need to do a full reload!\"\n\t\t\t\t\t);\n\t\t\t\t\tlog(\"warning\", \"[HMR] \" + log.formatError(err));\n\t\t\t\t} else {\n\t\t\t\t\tlog(\"warning\", \"[HMR] Update check failed: \" + log.formatError(err));\n\t\t\t\t}\n\t\t\t});\n\t};\n\tvar hotEmitter = __webpack_require__(/*! ./emitter */ \"./node_modules/webpack/hot/emitter.js\");\n\thotEmitter.on(\"webpackHotUpdate\", function (currentHash) {\n\t\tlastHash = currentHash;\n\t\tif (!upToDate()) {\n\t\t\tvar status = module.hot.status();\n\t\t\tif (status === \"idle\") {\n\t\t\t\tlog(\"info\", \"[HMR] Checking for updates on the server...\");\n\t\t\t\tcheck();\n\t\t\t} else if ([\"abort\", \"fail\"].indexOf(status) >= 0) {\n\t\t\t\tlog(\n\t\t\t\t\t\"warning\",\n\t\t\t\t\t\"[HMR] Cannot apply update as a previous update \" +\n\t\t\t\t\t\tstatus +\n\t\t\t\t\t\t\"ed. Need to do a full reload!\"\n\t\t\t\t);\n\t\t\t}\n\t\t}\n\t});\n\tlog(\"info\", \"[HMR] Waiting for update signal from WDS...\");\n} else {}\n\n\n//# sourceURL=webpack://nddem/./node_modules/webpack/hot/only-dev-server.js?");
+eval("/*\n\tMIT License http://www.opensource.org/licenses/mit-license.php\n\tAuthor Tobias Koppers @sokra\n*/\n/* globals __webpack_hash__ */\nif (true) {\n\t/** @type {undefined|string} */\n\tvar lastHash;\n\tvar upToDate = function upToDate() {\n\t\treturn /** @type {string} */ (lastHash).indexOf(__webpack_require__.h()) >= 0;\n\t};\n\tvar log = __webpack_require__(/*! ./log */ \"./node_modules/webpack/hot/log.js\");\n\tvar check = function check() {\n\t\tmodule.hot\n\t\t\t.check()\n\t\t\t.then(function (updatedModules) {\n\t\t\t\tif (!updatedModules) {\n\t\t\t\t\tlog(\"warning\", \"[HMR] Cannot find update. Need to do a full reload!\");\n\t\t\t\t\tlog(\n\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\"[HMR] (Probably because of restarting the webpack-dev-server)\"\n\t\t\t\t\t);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\treturn module.hot\n\t\t\t\t\t.apply({\n\t\t\t\t\t\tignoreUnaccepted: true,\n\t\t\t\t\t\tignoreDeclined: true,\n\t\t\t\t\t\tignoreErrored: true,\n\t\t\t\t\t\tonUnaccepted: function (data) {\n\t\t\t\t\t\t\tlog(\n\t\t\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\t\t\"Ignored an update to unaccepted module \" +\n\t\t\t\t\t\t\t\t\tdata.chain.join(\" -> \")\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonDeclined: function (data) {\n\t\t\t\t\t\t\tlog(\n\t\t\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\t\t\"Ignored an update to declined module \" +\n\t\t\t\t\t\t\t\t\tdata.chain.join(\" -> \")\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonErrored: function (data) {\n\t\t\t\t\t\t\tlog(\"error\", data.error);\n\t\t\t\t\t\t\tlog(\n\t\t\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\t\t\"Ignored an error while updating module \" +\n\t\t\t\t\t\t\t\t\tdata.moduleId +\n\t\t\t\t\t\t\t\t\t\" (\" +\n\t\t\t\t\t\t\t\t\tdata.type +\n\t\t\t\t\t\t\t\t\t\")\"\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t}\n\t\t\t\t\t})\n\t\t\t\t\t.then(function (renewedModules) {\n\t\t\t\t\t\tif (!upToDate()) {\n\t\t\t\t\t\t\tcheck();\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\t__webpack_require__(/*! ./log-apply-result */ \"./node_modules/webpack/hot/log-apply-result.js\")(updatedModules, renewedModules);\n\n\t\t\t\t\t\tif (upToDate()) {\n\t\t\t\t\t\t\tlog(\"info\", \"[HMR] App is up to date.\");\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\t\t\t})\n\t\t\t.catch(function (err) {\n\t\t\t\tvar status = module.hot.status();\n\t\t\t\tif ([\"abort\", \"fail\"].indexOf(status) >= 0) {\n\t\t\t\t\tlog(\n\t\t\t\t\t\t\"warning\",\n\t\t\t\t\t\t\"[HMR] Cannot check for update. Need to do a full reload!\"\n\t\t\t\t\t);\n\t\t\t\t\tlog(\"warning\", \"[HMR] \" + log.formatError(err));\n\t\t\t\t} else {\n\t\t\t\t\tlog(\"warning\", \"[HMR] Update check failed: \" + log.formatError(err));\n\t\t\t\t}\n\t\t\t});\n\t};\n\tvar hotEmitter = __webpack_require__(/*! ./emitter */ \"./node_modules/webpack/hot/emitter.js\");\n\thotEmitter.on(\"webpackHotUpdate\", function (currentHash) {\n\t\tlastHash = currentHash;\n\t\tif (!upToDate()) {\n\t\t\tvar status = module.hot.status();\n\t\t\tif (status === \"idle\") {\n\t\t\t\tlog(\"info\", \"[HMR] Checking for updates on the server...\");\n\t\t\t\tcheck();\n\t\t\t} else if ([\"abort\", \"fail\"].indexOf(status) >= 0) {\n\t\t\t\tlog(\n\t\t\t\t\t\"warning\",\n\t\t\t\t\t\"[HMR] Cannot apply update as a previous update \" +\n\t\t\t\t\t\tstatus +\n\t\t\t\t\t\t\"ed. Need to do a full reload!\"\n\t\t\t\t);\n\t\t\t}\n\t\t}\n\t});\n\tlog(\"info\", \"[HMR] Waiting for update signal from WDS...\");\n} else {}\n\n\n//# sourceURL=webpack://nddem/./node_modules/webpack/hot/only-dev-server.js?");
 
 /***/ }),
 
@@ -649,7 +649,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("8a93afd1ac3bf9ab53d1")
+/******/ 		__webpack_require__.h = () => ("8c233489af01a808766b")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
@@ -901,7 +901,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 					if (idx >= 0) registeredStatusHandlers.splice(idx, 1);
 /******/ 				},
 /******/ 		
-/******/ 				//inherit from previous dispose call
+/******/ 				// inherit from previous dispose call
 /******/ 				data: currentModuleData[moduleId]
 /******/ 			};
 /******/ 			currentChildModule = undefined;
@@ -993,11 +993,10 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 							return waitForBlockingPromises(function () {
 /******/ 								if (applyOnUpdate) {
 /******/ 									return internalApply(applyOnUpdate);
-/******/ 								} else {
-/******/ 									return setStatus("ready").then(function () {
-/******/ 										return updatedModules;
-/******/ 									});
 /******/ 								}
+/******/ 								return setStatus("ready").then(function () {
+/******/ 									return updatedModules;
+/******/ 								});
 /******/ 							});
 /******/ 						});
 /******/ 					});
@@ -1305,15 +1304,12 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 				if (__webpack_require__.o(currentUpdate, moduleId)) {
 /******/ 					var newModuleFactory = currentUpdate[moduleId];
 /******/ 					/** @type {TODO} */
-/******/ 					var result;
-/******/ 					if (newModuleFactory) {
-/******/ 						result = getAffectedModuleEffects(moduleId);
-/******/ 					} else {
-/******/ 						result = {
-/******/ 							type: "disposed",
-/******/ 							moduleId: moduleId
-/******/ 						};
-/******/ 					}
+/******/ 					var result = newModuleFactory
+/******/ 						? getAffectedModuleEffects(moduleId)
+/******/ 						: {
+/******/ 								type: "disposed",
+/******/ 								moduleId: moduleId
+/******/ 							};
 /******/ 					/** @type {Error|false} */
 /******/ 					var abortError = false;
 /******/ 					var doApply = false;
@@ -1564,17 +1560,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 										moduleId: moduleId,
 /******/ 										module: __webpack_require__.c[moduleId]
 /******/ 									});
-/******/ 								} catch (err2) {
+/******/ 								} catch (err1) {
 /******/ 									if (options.onErrored) {
 /******/ 										options.onErrored({
 /******/ 											type: "self-accept-error-handler-errored",
 /******/ 											moduleId: moduleId,
-/******/ 											error: err2,
+/******/ 											error: err1,
 /******/ 											originalError: err
 /******/ 										});
 /******/ 									}
 /******/ 									if (!options.ignoreErrored) {
-/******/ 										reportError(err2);
+/******/ 										reportError(err1);
 /******/ 										reportError(err);
 /******/ 									}
 /******/ 								}
