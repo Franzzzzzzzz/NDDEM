@@ -1,0 +1,30 @@
+{
+  "dimension": 3,
+  "objects": [
+    {
+      "dimensionality": 2,
+      "vertices": [
+           [-1 ,-1,  0  ],
+           [-1 , 1,  0  ],
+           [-0.5, 1, -0.5 ]]
+    },{
+      "dimensionality": 2,
+      "vertices": [
+        [   -1, -1,  0   ],
+        [ -0.5,  -1, -0.5  ],
+        [ -0.5,   1, -0.5  ]]
+    },{
+      "dimensionality": 2,
+      "vertices": [
+        [ 1 ,-1,  0   ],
+        [ 1 , 1,  0   ],
+        [ 0.5, 1, -0.5  ]]
+    },{
+      "dimensionality": 2,    
+      "vertices": [
+        [   1, -1,  0   ],
+        [ 0.5, -1, -0.5  ],
+        [ 0.5,  1, -0.5  ]]
+    }
+  ]
+}
