@@ -351,15 +351,15 @@ $(function() {
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;             fprintf(out, <span class="stringliteral">&quot;Torque%d:%d_j, &quot;</span>, val.first, val.second) ;</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;         }</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;     }</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;     <span class="keywordflow">if</span> (outflags &amp; <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a>)</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;     {</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd = 0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;             fprintf(out, <span class="stringliteral">&quot;lij%d, &quot;</span>, dd) ;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;     }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;     <span class="keywordflow">if</span> (outflags &amp; <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a>)</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        fprintf(out, <span class="stringliteral">&quot;GhostMask, &quot;</span>) ;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;     <span class="keywordflow">if</span> (outflags &amp; <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a>)</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        fprintf(out, <span class="stringliteral">&quot;GhostDir, &quot;</span>) ;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;     <span class="keywordflow">if</span> (outflags &amp; <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a87754225783423d6ab4c6a043598cdaa">ExportData::GHOSTMASK</a>)</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        fprintf(out, <span class="stringliteral">&quot;GhostMask, &quot;</span>) ;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;     <span class="keywordflow">if</span> (outflags &amp; <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a>)</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        fprintf(out, <span class="stringliteral">&quot;GhostDir, &quot;</span>) ;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;     <span class="keywordflow">if</span> (outflags &amp; <a class="code" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a990b1b14a2be8bf84c99d98f6fde0854">ExportData::BRANCHVECTOR</a>)</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;     {</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd = 0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;             fprintf(out, <span class="stringliteral">&quot;lij%d, &quot;</span>, dd) ;</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;     }</div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;     fseek (out, -2, SEEK_CUR) ;</div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;     fprintf(out, <span class="stringliteral">&quot;\n&quot;</span>) ;</div>

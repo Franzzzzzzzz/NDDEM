@@ -143,6 +143,7 @@ $(function() {
 <li><code>gravityangle INTENSITY ANGLE</code>: set the gravity angled from first dimension</li>
 <li><code>gravityrotate INTENSITY OMEGA DIM1 DIM2</code>: make the gravity rotate at an angular velocity OMEGA between DIM1 and 2.</li>
 <li><code>ContactModel [Hooke|Hertz]</code>: set contact model.</li>
+<li><code>ContactStrategy [naive|cells]</code>: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)</li>
 <li><code>boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo</code>: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:<ul>
 <li><code>MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY</code></li>
 <li><code>SPHERE RADIUS X1 ... XD</code>: sphere of radius RADIUS, center at the X location</li>
@@ -157,7 +158,7 @@ $(function() {
 </li>
 <li><code>rigid</code>: TODO (in development) ...</li>
 <li><code>mesh [file|translate|rotate|export] ...</code><ul>
-<li><code>file filename.json</code>: load a mesh file in json format. (in development)</li>
+<li><code>file filename.json</code>: load a mesh file in json format. See <a href="#json-mesh-file-format">below</a>.</li>
 <li><code>translate X0 X1 ... XN</code>: translate all the meshes by the given vector</li>
 <li><code>rotate X00 X01 ... X0N X10 ... XNN</code>: rotate all the meshes by the given rotation vector. Center of rotation is the mesh origin (first point)</li>
 <li><code>erase ID</code>: erase the mesh with the given ID</li>
@@ -166,11 +167,33 @@ $(function() {
 </li>
 <li><code>dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]</code>: select dump format and output fiels, the last 4 formats are plain text. <code>N</code> is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. <a class="el" href="structField.html" title="Contains Field informations.">Field</a> can include:<ul>
 <li>Particle data field: <code>[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*</code></li>
-<li>Contact data fields: <code>[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*</code>. NB: if Ghost_mask&gt;0; then the contact crosses a periodic boundary condition. </li>
+<li>Contact data fields: <code>[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*</code>. NB: if Ghost_mask&gt;0; then the contact crosses a periodic boundary condition.</li>
 </ul>
 </li>
 </ul>
-</div></div><!-- contents -->
+<h2>JSON <a class="el" href="classMesh.html">Mesh</a> file format</h2>
+<p>Meshes are recorded in a specific file format using json. The file must contain at top level two attributes, <code>dimension</code> defining the dimension of the space on which this mesh is to be used (ie. define the number of coordinates of points), and <code>objects</code> containing an array of objects.</p>
+<p>Individual objects must contain a <code>dimensionality</code> attributes, and a <code>vertices</code> attribute which is an array of the locations of the points defining the object. The array of vertices must have size <code>dimensionality + 1</code>. The maximum dimensionality of an object is the dimension of the space minus 1, the lowest dimensionality is 0 (single point).</p>
+<p>All objects are <a href="https://en.wikipedia.org/wiki/Simplex">simplexes</a>, more complex objects can be created by assembling simplexes together. The lower dimensionality edges of a higher dimensionality object are automatically generated (ie. grains will automatically interact with the vertices, edges, and faces of a 3D-tetrahedron in 4D space, with having to define those in the json file).</p>
+<p>The jupyter notebook in <code>scripts/jsonmesh2stl.ipynb</code> can be used to convert a mesh in <code>json</code> format to the more usual <code>stl</code> or <code>vtk</code> format. For mesh of dimension&gt;3, the mesh are sliced along the 3D space.</p>
+<p>Example of json mesh file: </p><div class="fragment"><div class="line">{</div>
+<div class="line">  &quot;dimension&quot;: 3,</div>
+<div class="line">  &quot;objects&quot;: [</div>
+<div class="line">    {</div>
+<div class="line">      &quot;dimensionality&quot;: 2,</div>
+<div class="line">      &quot;vertices&quot;: [</div>
+<div class="line">           [-1 ,-1,  0  ],</div>
+<div class="line">           [-1 , 1,  0  ],</div>
+<div class="line">           [-0.5, 1, -0.5 ]]</div>
+<div class="line">    },{</div>
+<div class="line">      &quot;dimensionality&quot;: 2,</div>
+<div class="line">      &quot;vertices&quot;: [</div>
+<div class="line">        [   -1, -1,  0   ],</div>
+<div class="line">        [ -0.5,  -1, -0.5  ],</div>
+<div class="line">        [ -0.5,   1, -0.5  ]]</div>
+<div class="line">    }]</div>
+<div class="line">}</div>
+</div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

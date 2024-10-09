@@ -287,15 +287,15 @@ public :
              fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
          }
      }
+     if (outflags & ExportData::GHOSTMASK)
+        fprintf(out, "GhostMask, ") ;
+     if (outflags & ExportData::GHOSTDIR)
+        fprintf(out, "GhostDir, ") ;
      if (outflags & ExportData::BRANCHVECTOR)
      {
          for (int dd = 0 ; dd<d ; dd++)
              fprintf(out, "lij%d, ", dd) ;
      }
-     if (outflags & ExportData::GHOSTMASK)
-        fprintf(out, "GhostMask, ") ;
-     if (outflags & ExportData::GHOSTDIR)
-        fprintf(out, "GhostDir, ") ;
 
      fseek (out, -2, SEEK_CUR) ;
      fprintf(out, "\n") ;

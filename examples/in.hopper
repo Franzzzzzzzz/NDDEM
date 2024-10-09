@@ -1,0 +1,32 @@
+# Higher dimensional hopper
+directory Output
+dimensions 3 50
+
+#set adimensional
+radius -1 0.2
+mass -1 1
+auto rho
+auto inertia
+
+
+boundary 0 WALL -1 1
+boundary 1 WALL -1 1
+boundary 2 PBC  -1 1
+
+auto location randomdrop
+mesh file hopper_plates_D3.json
+
+gravity 0 0 -1
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+set T 10
+set dt 0.0001
+#set dumps XML with 3 Position Velocity Omega
+#set dumps CSV with 1 Orientation
+set dumps VTK with 0
+set tdump 1000
+EOF

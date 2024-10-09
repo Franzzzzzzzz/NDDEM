@@ -71,7 +71,8 @@ These command have a single behaviour, described here.
 - `gravity G0 G1 ... Gd`: set the gravity vector
 - `gravityangle INTENSITY ANGLE`: set the gravity angled from first dimension
 - `gravityrotate INTENSITY OMEGA DIM1 DIM2`: make the gravity rotate at an angular velocity OMEGA between DIM1 and 2.
-- `ContactModel [Hooke|Hertz]`: set contact model. 
+- `ContactModel [Hooke|Hertz]`: set contact model.
+- `ContactStrategy [naive|cells]`: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)
 - `boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo`: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:
   - `MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY`
   - `SPHERE RADIUS X1 ... XD`: sphere of radius RADIUS, center at the X location
@@ -84,7 +85,7 @@ These command have a single behaviour, described here.
   - Special command: `boundary DIM REMOVE` Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution. 
 - `rigid`: TODO (in development) ...
 - `mesh [file|translate|rotate|export] ...`
-  - `file filename.json`: load a mesh file in json format. (in development)
+  - `file filename.json`: load a mesh file in json format. See [below](#json-mesh-file-format).
   - `translate X0 X1 ... XN`: translate all the meshes by the given vector
   - `rotate X00 X01 ... X0N X10 ... XNN`: rotate all the meshes by the given rotation vector. Center of rotation is the mesh origin (first point)
   - `erase ID`: erase the mesh with the given ID
@@ -94,8 +95,35 @@ These command have a single behaviour, described here.
   - Particle data field: `[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*`
   - Contact data fields: `[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*`. NB: if Ghost_mask>0; then the contact crosses a periodic boundary condition. 
 
+### JSON Mesh file format
+Meshes are recorded in a specific file format using json. The file must contain at top level two attributes, `dimension` defining the dimension of the space on which this mesh is to be used (ie. define the number of coordinates of points), and `objects` containing an array of objects. 
 
+Individual objects must contain a `dimensionality` attributes, and a `vertices` attribute which is an array of the locations of the points defining the object. The array of vertices must have size `dimensionality + 1`. The maximum dimensionality of an object is the dimension of the space minus 1, the lowest dimensionality is 0 (single point). 
 
+All objects are [simplexes](https://en.wikipedia.org/wiki/Simplex), more complex objects can be created by assembling simplexes together. The lower dimensionality edges of a higher dimensionality object are automatically generated (ie. grains will automatically interact with the vertices, edges, and faces of a 3D-tetrahedron in 4D space, with having to define those in the json file).
+
+The jupyter notebook in `scripts/jsonmesh2stl.ipynb` can be used to convert a mesh in `json` format to the more usual `stl` or `vtk` format. For mesh of dimension>3, the mesh are sliced along the 3D space. 
+
+Example of json mesh file:
+```json
+{
+  "dimension": 3,
+  "objects": [
+    {
+      "dimensionality": 2,
+      "vertices": [
+           [-1 ,-1,  0  ],
+           [-1 , 1,  0  ],
+           [-0.5, 1, -0.5 ]]
+    },{
+      "dimensionality": 2,
+      "vertices": [
+        [   -1, -1,  0   ],
+        [ -0.5,  -1, -0.5  ],
+        [ -0.5,   1, -0.5  ]]
+    }]
+}
+```
 
 
 
