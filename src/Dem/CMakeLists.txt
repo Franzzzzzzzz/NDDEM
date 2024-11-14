@@ -3,6 +3,15 @@
 #  add_compile_definitions(LEESEDWARD)
 #endif()
 
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0167 NEW)
+    cmake_policy(SET CMP0003 NEW)
+endif()
+
+include_directories(SYSTEM /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
+
+
 #option(SAVE_FORCE_COMPONENTS "Allow to dump the elastic/viscous/friction etc. part of the forces." OFF)
 set (max_dimension "5" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
 add_compile_definitions(MAXDIM=${max_dimension})

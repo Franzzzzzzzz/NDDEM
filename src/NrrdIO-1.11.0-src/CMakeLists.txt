@@ -27,6 +27,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 PROJECT(NrrdIO)
 INCLUDE_REGULAR_EXPRESSION("^.*.h$")
 
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0167 NEW)
+    cmake_policy(SET CMP0003 NEW)
+endif()
+
+
 #
 # This CMake file configures the NrrdIO library build.  NrrdIO
 # is used by Insight/Code/IO/itkNrrdIO for reading/writing 

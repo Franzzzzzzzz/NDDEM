@@ -6,6 +6,8 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 
 # policy??
 cmake_policy(SET CMP0003 NEW)
+cmake_policy(SET CMP0167 NEW)
+
 
 ### Require out-of-source builds
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
