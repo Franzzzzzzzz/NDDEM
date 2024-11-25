@@ -111,7 +111,8 @@ $(function() {
 <li><code>randomdrop</code>: random coordinates of the particles in the simulation region</li>
 <li><code>insphere</code>: randomly place the particles in a sphere, assuming that the wall number d is a sphere.</li>
 <li><code>roughinclineplane</code>: stick grain along the plane of normal [1,0,0 ...] to create roughness.</li>
-<li><code>rhoughinclineplane2</code>: ????? not quite sure what this does anymore.</li>
+<li><code>roughinclineplane2</code>: ????? not quite sure what this does anymore.</li>
+<li><code>largeroughinclineplane</code>: Same as <code>roughinclineplane</code> but also sets the radius of all frozen particles to the global maximum.</li>
 <li><code>quasicristal</code>: ????? not quite sure what this does anymore.</li>
 <li><code>fromfile filename</code>: set the locations from a textfile. The file should have columns, no delimiters. 1st column is particle id, following columns are the coordinates of location, last column is the particle radius.</li>
 </ul>
