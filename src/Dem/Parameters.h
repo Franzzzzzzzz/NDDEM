@@ -1013,6 +1013,38 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
       }
     }
+    else if (!strcmp(line, "largeroughinclineplane"))
+    {
+      printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension. The frozen particles are forced to be the largest particle radius\n") ; fflush(stdout) ;
+      auto m = *(std::max_element(r.begin(), r.end())) ; // Max radius
+      double delta=0.1*m ;
+      int i_bottom_layer = 1;
+      for (int dd=1 ; dd<d ; dd++) 
+        i_bottom_layer *= Boundaries[dd].delta/(2*(m+delta))  ;
+      printf("BOTTOM LAYER NUMBER: %d\n", i_bottom_layer);
+      for (int dd=0 ; dd<d ; dd++) X[0][dd]=Boundaries[dd].xmin+m+delta ;
+      Frozen[0]=true ;
+      r[0] = m;
+      for (int i=1 ; i<N ; i++)
+      {
+        X[i]=X[i-1] ;
+        for (int dd=d-1 ; dd>=0 ; dd--)
+        {
+          X[i][dd] += 2*m+2*delta ;
+          if (X[i][dd]>Boundaries[dd].xmax-m-delta)
+            X[i][dd] = Boundaries[dd].xmin+m+delta ;
+          else
+            break ;
+        }
+        if (i < i_bottom_layer ) {
+          Frozen[i]=true ;
+          r[i] = m;
+        }
+        // randomize the previous grain
+        for (int dd=0 ; dd<d ; dd++)
+          X[i-1][dd] += (rand()-0.5)*2*delta ;
+      }
+    }
     else if (!strcmp(line, "roughinclineplane2"))
     {
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
