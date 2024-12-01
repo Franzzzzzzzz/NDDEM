@@ -97,6 +97,8 @@ if (!urlParams.has('noinfo')) {
     document.body.appendChild(info_div);
 }
 
+params.boundary = 'Rectangle';
+
 
 SPHERES.createNDParticleShader(params).then(init);
 
@@ -305,6 +307,8 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("gravity -1 " + "0 ".repeat(params.dimension - 2))
 
         S.simu_interpret_command("auto location randomdrop");
+
+        // S.simu_interpret_command("ContactStrategy cells");
 
         // S.simu_interpret_command("set Kn 2e5");
         // S.simu_interpret_command("set Kt 8e4");
