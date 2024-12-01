@@ -11,11 +11,6 @@ import * as LAYOUT from '../libs/Layout.js'
 import * as RAYCAST from '../libs/RaycastHandler.js';
 import * as CGHANDLER from '../libs/CGHandler.js';
 
-let info_div = document.createElement("div")
-info_div.id = 'info_div';
-info_div.innerHTML = "Click on a particle to grab it"
-document.body.appendChild(info_div);
-
 var urlParams = new URLSearchParams(window.location.search);
 var clock = new THREE.Clock();
 
@@ -25,7 +20,8 @@ let S;
 
 var params = {
     dimension: 2,
-    L: 0.06, //system size
+    L0: 0.06, //system size
+    L1: 0.06,
     N: 150,
     zoom: 1000,
     // packing_fraction: 0.5,
@@ -52,6 +48,7 @@ var params = {
     particle_opacity: 0.5,
     F_mag_max: 0.005,
     aspect_ratio: 1,
+    nogui: false,
 }
 
 
@@ -70,7 +67,6 @@ else if (params.dimension === 3) {
 }
 else if (params.dimension === 4) {
 
-    params.L = 2.5;
     params.N = 300
     params.particle_volume = Math.PI * Math.PI * Math.pow(params.average_radius, 4) / 2.;
 }
@@ -80,9 +76,27 @@ params.particle_mass = params.particle_volume * params.particle_density;
 if (urlParams.has('cg_width')) { params.cg_width = parseInt(urlParams.get('cg_width')); }
 if (urlParams.has('cg_height')) { params.cg_height = parseInt(urlParams.get('cg_height')); }
 if (urlParams.has('cg_opacity')) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
-if (urlParams.has('particle_opacity')) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
-
 if (urlParams.has('quality')) { params.quality = parseInt(urlParams.get('quality')); }
+
+if (urlParams.has('particle_opacity')) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
+if (urlParams.has('zoom')) {
+    params.zoom = parseFloat(urlParams.get('zoom'));
+}
+if (urlParams.has('L0')) {
+    params.L0 = parseFloat(urlParams.get('L0'));
+}
+if (urlParams.has('L1')) {
+    params.L1 = parseFloat(urlParams.get('L1'));
+}
+if (urlParams.has('N')) { params.N = parseFloat(urlParams.get('N')); }
+if (urlParams.has('nogui')) { params.nogui = true; }
+if (!urlParams.has('noinfo')) {
+    let info_div = document.createElement("div")
+    info_div.id = 'info_div';
+    info_div.innerHTML = "Click on a particle to grab it"
+    document.body.appendChild(info_div);
+}
+
 
 SPHERES.createNDParticleShader(params).then(init);
 
@@ -100,7 +114,7 @@ async function init() {
         -1000,
         1000
     );
-    camera.position.set(0, 0, -5 * params.L);
+    camera.position.set(0, 0, -5 * params.L0);
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
     // console.log(camera)
@@ -127,11 +141,11 @@ async function init() {
     var vert_walls = [WALLS.left, WALLS.right, WALLS.back, WALLS.front];
 
     vert_walls.forEach(function (mesh) {
-        mesh.scale.x = 2 * params.L + 2 * params.thickness;
-        mesh.scale.z = 2 * params.L + 2 * params.thickness;
+        mesh.scale.x = 2 * params.L0 + 2 * params.thickness;
+        mesh.scale.z = 2 * params.L1 + 2 * params.thickness;
     });
 
-    CGHANDLER.add_cg_mesh(2 * params.L, 2 * params.L, scene);
+    CGHANDLER.add_cg_mesh(2 * params.L0, 2 * params.L1, scene);
 
     // geometry = new THREE.PlaneGeometry( 2*params.L, 0.1*params.L );
     // material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
@@ -149,37 +163,39 @@ async function init() {
     var container = document.getElementById('canvas');
     container.appendChild(renderer.domElement);
 
-    gui = new GUI();
-    gui.width = 320;
+    if (!params.nogui) {
+        gui = new GUI();
+        gui.width = 320;
 
-    if (params.dimension == 4) {
-        gui.add(params.d4, 'cur', -params.L, params.L, 0.001)
-            .name('D4 location').listen()
-            .onChange(function () {
-                if (urlParams.has('stl')) {
-                    meshes = renderSTL(meshes, NDsolids, scene, material, params.d4.cur);
-                }
-            });
+        if (params.dimension == 4) {
+            gui.add(params.d4, 'cur', -params.L3, params.L3, 0.001)
+                .name('D4 location').listen()
+                .onChange(function () {
+                    if (urlParams.has('stl')) {
+                        meshes = renderSTL(meshes, NDsolids, scene, material, params.d4.cur);
+                    }
+                });
+        }
+        // gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
+        // lut_folder
+        // ));
+        gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
+        gui.add(params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
+        gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
+            update_cg_params(S, params);
+        });
+        // gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
+        // params.cg_height = params.cg_width;
+        // update_cg_params(S, params);
+        // });
+        // gui.add ( params, 'paused').name('Paused').listen();
+
+        // const controls = new OrbitControls( camera, renderer.domElement );
+        // controls.update();
+
+        // let colorbar = container.getE('div');
+        // colorbar.id = 'ttt';
     }
-    // gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
-    // lut_folder
-    // ));
-    gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
-    gui.add(params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
-    gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
-        update_cg_params(S, params);
-    });
-    // gui.add ( params, 'cg_width', 1, 100,1).name('Resolution').listen().onChange( () => {
-    // params.cg_height = params.cg_width;
-    // update_cg_params(S, params);
-    // });
-    // gui.add ( params, 'paused').name('Paused').listen();
-
-    // const controls = new OrbitControls( camera, renderer.domElement );
-    // controls.update();
-
-    // let colorbar = container.getE('div');
-    // colorbar.id = 'ttt';
 
     window.addEventListener('resize', onWindowResize, false);
     RAYCAST.update_world(S, camera, params);
@@ -218,8 +234,8 @@ function update_cg_params(S, params) {
     cgparam["boxes"] = [params.cg_width, params.cg_height];
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"] = [
-        [-params.L, -params.L],
-        [params.L, params.L]];
+        [-params.L0, -params.L1],
+        [params.L0, params.L1]];
     cgparam["window size"] = params.cg_window_size * params.average_radius;
     cgparam["skip"] = 0;
     cgparam["max time"] = 1;
@@ -278,13 +294,13 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("auto inertia");
         S.simu_interpret_command("auto skin");
 
-        S.simu_interpret_command("boundary 0 WALL -" + String(params.L) + " " + String(params.L));
-        S.simu_interpret_command("boundary 1 WALL -" + String(params.L) + " " + String(params.L));
+        S.simu_interpret_command("boundary 0 WALL -" + String(params.L0) + " " + String(params.L0));
+        S.simu_interpret_command("boundary 1 WALL -" + String(params.L1) + " " + String(params.L1));
         if (params.dimension > 2) {
             S.simu_interpret_command("boundary 2 WALL -" + String(params.r_max) + " " + String(params.r_max));
         }
         if (params.dimension > 3) {
-            S.simu_interpret_command("boundary 3 WALL -" + String(params.L) + " " + String(params.L));
+            S.simu_interpret_command("boundary 3 WALL -" + String(params.L3) + " " + String(params.L3));
         }
         S.simu_interpret_command("gravity -1 " + "0 ".repeat(params.dimension - 2))
 
