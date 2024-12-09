@@ -49,7 +49,7 @@ First indentation level keyword must be followed by one of the second level inde
     - `largeroughinclineplane`: Same as `roughinclineplane` but also sets the radius of all frozen particles to the global maximum.
     - `quasicristal`: ????? not quite sure what this does anymore. 
     - `fromfile filename`: set the locations from a textfile. The file should have columns, no delimiters. 1st column is particle id, following columns are the coordinates of location, last column is the particle radius. 
-  - `radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]`: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.
+  - `radius [uniform|bidisperse|bidisperse_fuzzy] SMALLRADIUS LARGERADIUS [[RATIO] FUZZYNESS]`: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$. For `bidisperse_fuzzy`, randomness is added on the small and large radius by the fuzzyness factor (for example, the distribution of small radii will be $SMALLRADIUS*(1+rand(-1,1)*FUZZYNESS)$).
   - `skin`: [DEPRECATED, DO NOT USE] set the skin size. Should be used after the particle radius has been set. 
   
 - `rigid N`: handles rigid bodies number N
