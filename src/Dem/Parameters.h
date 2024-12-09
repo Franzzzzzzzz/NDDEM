@@ -1146,7 +1146,7 @@ void Parameters<d>::init_radii (char line[], v1d & r)
 {
   std::istringstream s(line) ;
   std::string word ;
-  double minr, maxr, fraction ;
+  double minr, maxr, fraction, fuzz ;
   boost::random::mt19937 rng(seed);
   boost::random::uniform_01<boost::mt19937> rand(rng) ;
 
@@ -1168,6 +1168,22 @@ void Parameters<d>::init_radii (char line[], v1d & r)
 
     for (auto & v : r) v = (rand()<f?maxr:minr) ;
 
+  }
+  else if (word == "bidisperse_fuzzy")
+  {
+    s >> minr ; s >> maxr ;
+    s >> fraction ;
+    s >> fuzz ;
+
+    double Vs=Tools<d>::Volume(minr) ;
+    double Vl=Tools<d>::Volume(maxr) ;
+    double f = fraction*Vs/((1-fraction)*Vl+fraction*Vs) ;
+
+    for (auto & v : r)
+    {
+      v = (rand()<f?maxr:minr) ;
+      v = v + (rand()*2-1)*(fuzz*v) ;
+    }
   }
   else
     printf("WARN: unknown radius distribution automatic creation. Nothing done ...\n") ;

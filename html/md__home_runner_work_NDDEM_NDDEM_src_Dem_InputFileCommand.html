@@ -117,7 +117,7 @@ $(function() {
 <li><code>fromfile filename</code>: set the locations from a textfile. The file should have columns, no delimiters. 1st column is particle id, following columns are the coordinates of location, last column is the particle radius.</li>
 </ul>
 </li>
-<li><code>radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]</code>: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.</li>
+<li><code>radius [uniform|bidisperse|bidisperse_fuzzy] SMALLRADIUS LARGERADIUS [[RATIO] FUZZYNESS]</code>: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$. For <code>bidisperse_fuzzy</code>, randomness is added on the small and large radius by the fuzzyness factor (for example, the distribution of small radii will be $SMALLRADIUS*(1+rand(-1,1)*FUZZYNESS)$).</li>
 <li><code>skin</code>: [DEPRECATED, DO NOT USE] set the skin size. Should be used after the particle radius has been set.</li>
 </ul>
 </li>
