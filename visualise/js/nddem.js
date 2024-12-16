@@ -4,7 +4,8 @@ console.log("Using threejs version " + THREE.REVISION);
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 // import { MTLLoader } from "../node_modules/three/examples/js/loaders/MTLLoader.js";
 import { VRController } from "../js/VRControllerModule.js";
-import { Lut } from "three/examples/jsm/math/Lut.js";
+// import { Lut } from "three/examples/jsm/math/Lut.js";
+import { Lut } from "../../live/libs/Lut.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
 import * as PARAMS from "./params.js";
@@ -338,6 +339,8 @@ function make_initial_spheres(spheres) {
   //     } );
   // }
   if (params.view_mode === "size") {
+    lut = new Lut("grainsize", 512); // options are rainbow, cooltowarm and blackbody
+    console.log(lut)
     params.minRadius = 999999;
     params.maxRadius = 0;
     for (var j = 0; j < params.num_particles; j++) {
@@ -356,7 +359,11 @@ function make_initial_spheres(spheres) {
   // var sphere_mesh_instaced = new THREE.InstancedMesh(geometry, material, params.num_particles); // TODO: TRY THIS OUT TO INCREASE SPEED
   for (var i = 0; i < spheres.length; i++) {
     if (params.N < 3) {
-      var color = ((Math.random() + 0.25) / 1.5) * 0xffffff;
+      if (params.view_mode === "size") {
+        var color = lut.getColor(spheres[i][params.N]);
+      } else {
+        var color = ((Math.random() + 0.25) / 1.5) * 0xffffff;
+      }
       var material = new THREE.PointsMaterial({
         color: color,
       });

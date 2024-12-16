@@ -1,22 +1,26 @@
 # Incline plane flow
-directory /Users/bmar5496/code/NDDEM/Output/InclinedPlaneSegregation/D6
-dimensions 6 483550
+#directory /Users/bmar5496/code/NDDEM/Output/InclinedPlaneSegregation/D6
+directory /project/RDS-FEI-SegNDDEM-RW/NDDEM/research/InclinedPlaneSegregation/data/__FOLDER__
+
+dimensions 6 __NUM_PARTICLES__
 
 #set adimensional
 radius -1 0.5
 mass -1 1
 auto rho
-auto radius bidisperse 0.25 0.5 0.5
+auto radius bidisperse_fuzzy 0.5 __MAX_SIZE__ 0.5 0.05
 auto inertia
 
-boundary 0 WALL 0 10
-boundary 1 PBC 0 5
-boundary 2 PBC 0 3.4
-boundary 3 PBC 0 3.4
-boundary 4 PBC 0 3.4
-boundary 5 PBC 0 3.4
+boundary 0 PBC 0 25
+boundary 1 PBC 0 11
+boundary 2 PBC 0 6.6
+boundary 3 PBC 0 6.6
+boundary 4 PBC 0 6.6
+boundary 5 PBC 0 6.6
 
-auto location roughinclineplane
+ContactStrategy cells
+
+auto location smallroughinclineplane
 
 gravity -1 0 0 0 0 0
 set Kn 2e5
@@ -28,8 +32,10 @@ set Mu 0.5
 
 set T 500
 set dt 0.0001
-set dumps XML with 4 Position Velocity Omega Coordination
-set dumps CSV with 1 Orientation
+set dumps XML with 1 Position
+set dumps CSV with 1 Position
+set dumps VTK with 2 Velocity Coordination
 set tdump 10000
-event 20 gravity -0.9 0.42 0 0 0 0
+event 6 boundary 0 WALL 0 40
+event 6.5 gravity -0.8660254038 0.5 0 0 0 0
 EOF

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^19.0.0",
+    "cors": "^2.8.5",
     "file-loader": "^6.2.0",
     "monaco-editor": "^0.44.0",
     "monaco-editor-webpack-plugin": "^7.1.0",

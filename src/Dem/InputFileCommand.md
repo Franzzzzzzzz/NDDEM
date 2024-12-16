@@ -45,7 +45,8 @@ First indentation level keyword must be followed by one of the second level inde
     - `randomdrop`: random coordinates of the particles in the simulation region
     - `insphere`: randomly place the particles in a sphere, assuming that the wall number d is a sphere. 
     - `roughinclineplane`: stick grain along the plane of normal [1,0,0 ...] to create roughness.
-    - `rhoughinclineplane2`: ????? not quite sure what this does anymore. 
+    - `roughinclineplane2`: ????? not quite sure what this does anymore. 
+    - `largeroughinclineplane`: Same as `roughinclineplane` but also sets the radius of all frozen particles to the global maximum.
     - `quasicristal`: ????? not quite sure what this does anymore. 
     - `fromfile filename`: set the locations from a textfile. The file should have columns, no delimiters. 1st column is particle id, following columns are the coordinates of location, last column is the particle radius. 
   - `radius [uniform|bidisperse] SMALLRADIUS LARGERADIUS [RATIO]`: set the particle radius from a distribution. Bidisperse is now defined by volume. For bidisperse, $ratio=V_{large}/(V_{small}+V_{large})$.
@@ -74,7 +75,7 @@ These command have a single behaviour, described here.
 - `ContactModel [Hooke|Hertz]`: set contact model.
 - `ContactStrategy [naive|cells]`: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)
 - `boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo`: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:
-  - `MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY`
+  - `MOVINGWALL LOCMIN LOCMAX VELMIN VELMAX`
   - `SPHERE RADIUS X1 ... XD`: sphere of radius RADIUS, center at the X location
   - `HEMISPHERE`
   - `AXIALCYLINDER RADIUS AXIS`: cylinder of the given radius with axis align with the coordinate axis indicated, all other coordinates of the axis vector = 0. 

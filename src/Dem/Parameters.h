@@ -13,13 +13,8 @@
 #include <map>
 //#include <boost/variant.hpp>
 #include <variant>
-#if !__EMSCRIPTEN__ && __GNUC__ < 8
-  #include <experimental/filesystem>
-  namespace fs = std::experimental::filesystem ; 
-#else
-  #include <filesystem>
-  namespace fs = std::filesystem ; 
-#endif
+#include <filesystem>
+namespace fs = std::filesystem ; 
 #include "Typedefs.h"
 #include "Tools.h"
 #include "Xml.h"
@@ -1013,6 +1008,52 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
           X[i-1][dd] += (rand()-0.5)*2*delta ;
       }
     }
+    else if (!strcmp(line, "smallroughinclineplane"))
+    {
+      printf("Location::smallroughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension. The frozen particles are forced to be the smallest particle radius\n") ; fflush(stdout) ;
+      auto r_max = *(std::max_element(r.begin(), r.end())) ; // Max radius
+      auto r_min = *(std::min_element(r.begin(), r.end())) ; // Max radius
+      double m = r_max;
+      double delta=0.1*r_max ;
+      int i_bottom_layer = 1;
+      for (int dd=1 ; dd<d ; dd++) 
+        i_bottom_layer *= floor(Boundaries[dd].delta/(2*r_min+0.2*r_min))  ;
+      printf("BOTTOM LAYER NUMBER: %d\n", i_bottom_layer);
+      // for (int dd=1 ; dd<d ; dd++) X[0][dd]=Boundaries[dd].xmin+r_max+delta ; // skip first dimension
+      Frozen[0]=true ;
+      r[0] = r_min;
+      for (int i=1 ; i<N ; i++)
+      {
+        X[i]=X[i-1] ;
+        if (i < i_bottom_layer ) {
+          Frozen[i]=true ;
+          r[i] = r_min;
+          m = r_min;
+          delta = 0.1*r_min;
+        } else {
+          m = r_max;
+          delta = 0.1*r_max;
+        }
+        for (int dd=d-1 ; dd>=0 ; dd--)
+        {
+          X[i][dd] += 2*m+2*delta ;
+          if (X[i][dd]>Boundaries[dd].xmax-m-delta)
+            if (i < i_bottom_layer ) {
+              X[i][dd] = 0 ;
+            } else {
+              X[i][dd] = Boundaries[dd].xmin+m+delta ;
+            }
+          else
+            break ;
+        }
+        // randomize this grain EXCEPT if it is a boundary particle
+        for (int dd=0 ; dd<d ; dd++) {
+          if (i >= i_bottom_layer ) {
+            X[i][dd] += (rand()-0.5)*2*delta ;
+          }
+        }
+      }
+    }
     else if (!strcmp(line, "roughinclineplane2"))
     {
       printf("Location::roughinclineplane assumes a plane of normal [1,0,0...] at location 0 along the 1st dimension.") ; fflush(stdout) ;
@@ -1027,6 +1068,7 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         {
           if (bottomlayer)
           {
+
             X[i][ddd]+= 2*m ;
             if (X[i][ddd]>Boundaries[ddd].xmax-m)
               X[i][ddd] = Boundaries[ddd].xmin+m ;
@@ -1100,7 +1142,7 @@ void Parameters<d>::init_radii (char line[], v1d & r)
 {
   std::istringstream s(line) ;
   std::string word ;
-  double minr, maxr, fraction ;
+  double minr, maxr, fraction, fuzz ;
   boost::random::mt19937 rng(seed);
   boost::random::uniform_01<boost::mt19937> rand(rng) ;
 
@@ -1122,6 +1164,22 @@ void Parameters<d>::init_radii (char line[], v1d & r)
 
     for (auto & v : r) v = (rand()<f?maxr:minr) ;
 
+  }
+  else if (word == "bidisperse_fuzzy")
+  {
+    s >> minr ; s >> maxr ;
+    s >> fraction ;
+    s >> fuzz ;
+
+    double Vs=Tools<d>::Volume(minr) ;
+    double Vl=Tools<d>::Volume(maxr) ;
+    double f = fraction*Vs/((1-fraction)*Vl+fraction*Vs) ;
+
+    for (auto & v : r)
+    {
+      v = (rand()<f?maxr:minr) ;
+      v = v + (rand()*2-1)*(fuzz*v) ;
+    }
   }
   else
     printf("WARN: unknown radius distribution automatic creation. Nothing done ...\n") ;
