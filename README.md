@@ -46,6 +46,12 @@ You can run an example from the `examples` folder as that oper:
 ./bin/DEMND 2 42 examples/in.example
 ```
 
+To run a simulation on multiple threads, you need to run something like this in the terminal before running the simulation (replace 4 with the number of threads you want to use):
+
+```
+export OMP_NUM_THREADS=4
+```
+
 ### Installation and test of the live visualisation. 
 - Install and activate [emscripten](https://emscripten.org/docs/tools_reference/emsdk.html) first.
 - Follow the steps in the script file CI_build_script.sh, adapting them to your setup.
