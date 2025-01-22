@@ -14,10 +14,39 @@ The code is split into different modules, with different purposes. The main modu
 All parts of this code have been tested on all recent versions of Windows, Mac and Linux.
 
 ## Installation
-### Installation of the NDDEM and coarse graining solvers without visualisation support:
-Use `cmake` then `make` on the src folder to compile the different components. It is suggested to first create a `build` folder at the root of the NDDEM directory. The final binary executables will be stored within a newly created `bin` folder. 
 
-### Installation and test of the live vidualisation. 
+### Ubuntu instructions
+
+To install the required packages on a recent version of Ubuntu, try:
+
+```
+sudo apt install doxygen texlive texlive-font-utils cmake build-essential libboost-dev
+```
+
+### Installation of the NDDEM and coarse graining solvers without visualisation support:
+
+From the root directory of this repository, make a `build` folder and move into it with:
+
+```
+mkdir build
+cd build
+```
+
+Use `cmake` and then `make` on the `src` folder to compile the different components. The final binary executables will be stored within a newly created `bin` folder.
+
+```
+cmake ../src
+make DEMND
+cd ..
+```
+
+You can run an example from the `examples` folder as that oper:
+
+```
+./bin/DEMND 2 42 examples/in.example
+```
+
+### Installation and test of the live visualisation. 
 - Install and activate [emscripten](https://emscripten.org/docs/tools_reference/emsdk.html) first.
 - Follow the steps in the script file CI_build_script.sh, adapting them to your setup.
 - Then, in the `live` folder, you should be able to run the local visualisation with `webpack build && webpack serve`. 
