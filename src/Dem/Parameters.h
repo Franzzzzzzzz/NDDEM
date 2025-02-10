@@ -1053,10 +1053,15 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         }
         // randomize this grain EXCEPT if it is a boundary particle
         for (int dd=0 ; dd<d ; dd++) {
-          if (i >= i_bottom_layer ) {
+          if (i >= i_bottom_layer) {
             X[i][dd] += (rand()-0.5)*2*delta ;
           }
         }
+      }
+      // add some randomness to boundary particles in first dimension only
+      for (int i=1 ; i<i_bottom_layer ; i++)
+      {
+        X[i][0] += rand()*2*delta;
       }
     }
     else if (!strcmp(line, "roughinclineplane2"))
