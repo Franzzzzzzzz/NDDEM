@@ -19,6 +19,12 @@ public:
   std::vector<double> center = std::vector<double>(d,0) ; 
   std::vector<double> omega  = std::vector<double>(d*(d-1)/2,0) ;   
   
+  template <class Archive>
+    void serialize(Archive &ar) {
+        ar(Type, xmin, xmax, delta, velmin, velmax, displacement, vel, semiaxisx, semiaxisy, centerx, centery, axis, center, omega) ; 
+    }  
+  
+  //============================================================================
   std::vector<double> as_vector() 
   {
     std::vector<double> res ; 

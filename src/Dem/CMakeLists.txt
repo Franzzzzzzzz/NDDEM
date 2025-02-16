@@ -34,6 +34,8 @@ if(EMSCRIPTEN)
     "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMND' -s EXPORTED_RUNTIME_METHODS=[getValue]"
  )
 else()
+   include_directories(AFTER ".")
+
    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       target_compile_options(DEMND PUBLIC -fopenmp -Wall -Wextra)
       target_link_libraries(DEMND PUBLIC -fopenmp -lstdc++fs -lm -Wall -Wextra)
