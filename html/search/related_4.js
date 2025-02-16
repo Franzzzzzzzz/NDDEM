@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['swap_5321',['swap',['../classnlohmann_1_1basic__json.html#aee0ae36cbfb0336832ebc0374c3c7679',1,'nlohmann::basic_json::swap()'],['../classnlohmann_1_1basic__json.html#aee0ae36cbfb0336832ebc0374c3c7679',1,'nlohmann::basic_json::swap()']]]
+  ['schema_3c_20genericschemadocument_20_3e_9108',['Schema&lt; GenericSchemaDocument &gt;',['../classGenericSchemaDocument.html#a706511849688d9245fc37109f02a03c4',1,'GenericSchemaDocument']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['xstr_5601',['XSTR',['../Preprocessor__macros_8h.html#afd0d88bc7a3fb393df04cdd260c553b3',1,'Preprocessor_macros.h']]]
+  ['running_5fon_5fvalgrind_9631',['RUNNING_ON_VALGRIND',['../valgrind_8h.html#a9f00625a835e796e264069df36212a1c',1,'valgrind.h']]]
 ];

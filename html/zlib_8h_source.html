@@ -746,7 +746,7 @@ $(function() {
 <div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160; </div>
 <div class="line"><a name="l00677"></a><span class="lineno"><a class="line" href="zlib_8h.html#ae1a33ab7164b2fbab7683c4bea4c50c4">  677</a></span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT deflateCopy <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((<a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> dest,</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;                                    <a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> source));</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;                                    <a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> <a class="code" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>));</div>
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;<span class="comment">     Sets the destination stream as a complete copy of the source stream.</span></div>
 <div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="comment"></span> </div>
@@ -861,7 +861,7 @@ $(function() {
 <div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160; </div>
 <div class="line"><a name="l00791"></a><span class="lineno"><a class="line" href="zlib_8h.html#a4891be63c26cb4dc463c8b2fba7e5ae2">  791</a></span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT deflatePrime <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((<a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> strm,</div>
 <div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;                                     <span class="keywordtype">int</span> bits,</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;                                     <span class="keywordtype">int</span> value));</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;                                     <span class="keywordtype">int</span> <a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>));</div>
 <div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;<span class="comment">     deflatePrime() inserts bits in the deflate output stream.  The intent</span></div>
 <div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;<span class="comment">   is that this function is used to start off the deflate output with the bits</span></div>
@@ -1011,7 +1011,7 @@ $(function() {
 <div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160; </div>
 <div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT inflateCopy <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((<a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> dest,</div>
-<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;                                    <a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> source));</div>
+<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;                                    <a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> <a class="code" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>));</div>
 <div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;<span class="comment">     Sets the destination stream as a complete copy of the source stream.</span></div>
 <div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;<span class="comment"></span> </div>
@@ -1052,7 +1052,7 @@ $(function() {
 <div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160; </div>
 <div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT inflatePrime <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((<a class="code" href="zlib_8h.html#a6ede25c84d3c9f8632305866acffb1d6">z_streamp</a> strm,</div>
 <div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;                                     <span class="keywordtype">int</span> bits,</div>
-<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;                                     <span class="keywordtype">int</span> value));</div>
+<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;                                     <span class="keywordtype">int</span> <a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>));</div>
 <div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;<span class="comment">     This function inserts bits in the inflate input stream.  The intent is</span></div>
 <div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;<span class="comment">   that this function is used to start inflating at a bit position in the</span></div>
@@ -1297,7 +1297,7 @@ $(function() {
 <div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160; </div>
 <div class="line"><a name="l01228"></a><span class="lineno"><a class="line" href="zlib_8h.html#a85df695aadb45de9c814f7a11f74705c"> 1228</a></span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT compress <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((Bytef *dest,   uLongf *destLen,</div>
-<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;                                 <span class="keyword">const</span> Bytef *source, uLong sourceLen));</div>
+<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;                                 <span class="keyword">const</span> Bytef *<a class="code" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, uLong sourceLen));</div>
 <div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;<span class="comment">     Compresses the source buffer into the destination buffer.  sourceLen is</span></div>
 <div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;<span class="comment">   the byte length of the source buffer.  Upon entry, destLen is the total size</span></div>
@@ -1312,7 +1312,7 @@ $(function() {
 <div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160; </div>
 <div class="line"><a name="l01243"></a><span class="lineno"><a class="line" href="zlib_8h.html#aa38fec9fd654c448681296d8bfee871a"> 1243</a></span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT compress2 <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((Bytef *dest,   uLongf *destLen,</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;                                  <span class="keyword">const</span> Bytef *source, uLong sourceLen,</div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;                                  <span class="keyword">const</span> Bytef *<a class="code" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, uLong sourceLen,</div>
 <div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;                                  <span class="keywordtype">int</span> level));</div>
 <div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;<span class="comment">     Compresses the source buffer into the destination buffer.  The level</span></div>
@@ -1335,7 +1335,7 @@ $(function() {
 <div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160; </div>
 <div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT uncompress <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((Bytef *dest,   uLongf *destLen,</div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;                                   <span class="keyword">const</span> Bytef *source, uLong sourceLen));</div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;                                   <span class="keyword">const</span> Bytef *<a class="code" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, uLong sourceLen));</div>
 <div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;<span class="comment">     Decompresses the source buffer into the destination buffer.  sourceLen is</span></div>
 <div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;<span class="comment">   the byte length of the source buffer.  Upon entry, destLen is the total size</span></div>
@@ -1353,7 +1353,7 @@ $(function() {
 <div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160; </div>
 <div class="line"><a name="l01284"></a><span class="lineno"><a class="line" href="zlib_8h.html#ae59b4222fca4f1cde46fd2d91461da35"> 1284</a></span>&#160;ZEXTERN <span class="keywordtype">int</span> ZEXPORT uncompress2 <a class="code" href="zlib_8h.html#afdabd56deb47ac17a15ca2e810bbdea8">OF</a>((Bytef *dest,   uLongf *destLen,</div>
-<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;                                    <span class="keyword">const</span> Bytef *source, uLong *sourceLen));</div>
+<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;                                    <span class="keyword">const</span> Bytef *<a class="code" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, uLong *sourceLen));</div>
 <div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;<span class="comment">     Same as uncompress, except that sourceLen is a pointer, where the</span></div>
 <div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;<span class="comment">   length of the source is *sourceLen.  On return, *sourceLen is the number of</span></div>
@@ -1982,6 +1982,8 @@ $(function() {
 <div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01912"></a><span class="lineno"> 1912</span>&#160; </div>
 <div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* ZLIB_H */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="apointer_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; T2 value</div><div class="ttdef"><b>Definition:</b> pointer.h:1282</div></div>
+<div class="ttc" id="apointer_8h_html_adb82dfe18535e9a30aa97d275f82bd55"><div class="ttname"><a href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a></div><div class="ttdeci">const CharType(&amp; source)[N]</div><div class="ttdef"><b>Definition:</b> pointer.h:1204</div></div>
 <div class="ttc" id="astructgzFile__s_html"><div class="ttname"><a href="structgzFile__s.html">gzFile_s</a></div><div class="ttdef"><b>Definition:</b> zlib.h:1818</div></div>
 <div class="ttc" id="astructgzFile__s_html_a8c1f4682372cc228f4e37bf7f95870a8"><div class="ttname"><a href="structgzFile__s.html#a8c1f4682372cc228f4e37bf7f95870a8">gzFile_s::next</a></div><div class="ttdeci">unsigned char * next</div><div class="ttdef"><b>Definition:</b> zlib.h:1820</div></div>
 <div class="ttc" id="astructgzFile__s_html_a98038b7edb4ab55ee321fa388afb687e"><div class="ttname"><a href="structgzFile__s.html#a98038b7edb4ab55ee321fa388afb687e">gzFile_s::pos</a></div><div class="ttdeci">z_off64_t pos</div><div class="ttdef"><b>Definition:</b> zlib.h:1821</div></div>

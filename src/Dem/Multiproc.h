@@ -69,7 +69,7 @@ public:
       CLp[0].v.splice(CLp[0].v.end(), CLp[p].v) ; 
     }
     CLp[0].v.sort() ; 
-    CLp_all.v.merge(CLp[0].v) ; 
+    CLp_all.v.merge(CLp[0].v) ; // Ordered merging
     //printf("/%d ", tot) ; fflush(stdout) ;
     //for (auto &v: CLp_all.v) std::cout<<v.persisting ; 
     CLp_all.make_iterator_array(N) ; 
@@ -107,8 +107,32 @@ public:
       CLp_all.v.splice(CLp_all.v.end(), CLp[p].v) ; 
     }
   }
+  
+  void coalesce_main_list() 
+  {
+    CLp_all.coalesce_list() ;     
+    num_mem_time=0 ; 
+  }
+  
   void splitcells(int C) ; 
-
+  auto contacts2array (ExportData exp, cv2d &X, Parameters<d> &P) ; ///< pack the contact data in a 2d array
+  
+  
+  
+  
+  template <class Archive>
+    void serialize(Archive &ar) {
+        ar(CLp_all, CLp, CLw, CLm, //C, 
+           share, sharecell, timing_contacts, timing_forces, num_time, 
+           delayed, delayedj, delayed_size, 
+           delayedwall, delayedwallj, delayedwall_size,
+           P, fullcontactinfo, N) ; 
+        printf("RESTART ERROR: STILL SOME THINGS TO SERIALIZE IN Simulation") ; 
+    }
+    
+    
+  
+  //------------------------------------------------
   ContactList<d> CLp_all ; ///< Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). 
   vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
   vector <ContactList<d>> CLw ; ///< ContactList particle-wall for each processor
@@ -118,7 +142,8 @@ public:
   vector <int> sharecell ; ///< Cell share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1. 
   vector <double> timing_contacts, timing_forces ; ///< Used to record the time spent by each thread.
   int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
-
+  int num_mem_time; ///< Number of iterations since the last list rebuilt. Resets when coalesce_main_list() is called. 
+  
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
   vector <vector <Action<d>> > delayed ; ///< Records the delayed Action
   vector <vector <int> > delayedj ; ///< Records the j id of the particle in the associated delayed action
@@ -127,8 +152,6 @@ public:
   vector <vector <Action<d>> > delayedwall ; ///< Records the delayed Action
   vector <vector <int> > delayedwallj ; ///< Records the j id of the wall in the associated delayed action
   vector <uint> delayedwall_size ; ///< Max length of the delayed wall vector for each thread. Can grow as needed on call to delaying()
-
-  auto contacts2array (ExportData exp, cv2d &X, Parameters<d> &P) ; ///< pack the contact data in a 2d array
   
   int P ; ///< Number of threads
 

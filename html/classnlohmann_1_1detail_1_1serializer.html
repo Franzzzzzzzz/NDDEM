@@ -125,7 +125,7 @@ Public Attributes</h2></td></tr>
 <tr class="separator:af15da74dab5b01150eabfed0be7d75df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4c340f2a5230f766a833366603a0049"><td class="memItemLeft" align="right" valign="top"><a class="el" href="CoarseGraining_2json_8hpp.html#a2cf645f34610e7f7d6e09ab88a2ab917">JSON_PRIVATE_UNLESS_TESTED</a> const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#ab4c340f2a5230f766a833366603a0049">ensure_ascii</a></td></tr>
 <tr class="separator:ab4c340f2a5230f766a833366603a0049"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39b0975f219b542d7ca633652e925b4c"><td class="memItemLeft" align="right" valign="top">std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#a39b0975f219b542d7ca633652e925b4c">state</a> = <a class="el" href="classnlohmann_1_1detail_1_1serializer.html#aacb365f529454cfaea396488358846a6">UTF8_ACCEPT</a></td></tr>
+<tr class="memitem:a39b0975f219b542d7ca633652e925b4c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#a39b0975f219b542d7ca633652e925b4c">state</a> = <a class="el" href="classnlohmann_1_1detail_1_1serializer.html#aacb365f529454cfaea396488358846a6">UTF8_ACCEPT</a></td></tr>
 <tr class="separator:a39b0975f219b542d7ca633652e925b4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4239a42672c7378a6b449ee010e6dace"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#a4239a42672c7378a6b449ee010e6dace">bytes</a> = 0</td></tr>
 <tr class="separator:a4239a42672c7378a6b449ee010e6dace"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,9 +185,9 @@ Private Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
-<tr class="memitem:aacb365f529454cfaea396488358846a6"><td class="memItemLeft" align="right" valign="top">static constexpr std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#aacb365f529454cfaea396488358846a6">UTF8_ACCEPT</a> = 0</td></tr>
+<tr class="memitem:aacb365f529454cfaea396488358846a6"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#aacb365f529454cfaea396488358846a6">UTF8_ACCEPT</a> = 0</td></tr>
 <tr class="separator:aacb365f529454cfaea396488358846a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5b8f0d2c527225103cfa2909fd05b93"><td class="memItemLeft" align="right" valign="top">static constexpr std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#af5b8f0d2c527225103cfa2909fd05b93">UTF8_REJECT</a> = 1</td></tr>
+<tr class="memitem:af5b8f0d2c527225103cfa2909fd05b93"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1serializer.html#af5b8f0d2c527225103cfa2909fd05b93">UTF8_REJECT</a> = 1</td></tr>
 <tr class="separator:af5b8f0d2c527225103cfa2909fd05b93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Typedef Documentation</h2>
@@ -769,7 +769,7 @@ template&lt;typename BasicJsonType &gt; </div>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>value to serialize </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pretty_print</td><td>whether the output shall be pretty-printed </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ensure_ascii</td><td>If <em>ensure_ascii</em> is true, all non-ASCII characters in the output are escaped with <code>\uXXXX</code> sequences, and the result consists of ASCII characters only. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ensure_ascii</td><td>If <em>ensure_ascii</em> is true, all non-ASCII characters in the output are escaped with <code>\uXXXX</code> sequences, and the result consists of <a class="el" href="structASCII.html" title="ASCII encoding.">ASCII</a> characters only. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">indent_step</td><td>the indent level </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">current_indent</td><td>the current indent level (only used internally) </td></tr>
   </table>
@@ -844,7 +844,7 @@ template&lt;typename BasicJsonType &gt; </div>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>value to serialize </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pretty_print</td><td>whether the output shall be pretty-printed </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">ensure_ascii</td><td>If <em>ensure_ascii</em> is true, all non-ASCII characters in the output are escaped with <code>\uXXXX</code> sequences, and the result consists of ASCII characters only. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ensure_ascii</td><td>If <em>ensure_ascii</em> is true, all non-ASCII characters in the output are escaped with <code>\uXXXX</code> sequences, and the result consists of <a class="el" href="structASCII.html" title="ASCII encoding.">ASCII</a> characters only. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">indent_step</td><td>the indent level </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">current_indent</td><td>the current indent level (only used internally) </td></tr>
   </table>
@@ -1172,7 +1172,8 @@ template&lt;typename BasicJsonType &gt; </div>
       </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">{</div>
-<div class="line">        std::uint32_t codepoint{}</div>
+<div class="line">        <a class="code" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> codepoint{}</div>
+<div class="ttc" id="astdint_8h_html_a435d1572bf3f880d55459d9805097f62"><div class="ttname"><a href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a></div><div class="ttdeci">unsigned int uint32_t</div><div class="ttdef"><b>Definition:</b> stdint.h:126</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1275,7 +1276,7 @@ template&lt;typename BasicJsonType &gt; </div>
 template&lt;typename BasicJsonType &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::uint8_t <a class="el" href="classnlohmann_1_1detail_1_1serializer.html">nlohmann::detail::serializer</a>&lt; BasicJsonType &gt;::state = <a class="el" href="classnlohmann_1_1detail_1_1serializer.html#aacb365f529454cfaea396488358846a6">UTF8_ACCEPT</a></td>
+          <td class="memname"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> <a class="el" href="classnlohmann_1_1detail_1_1serializer.html">nlohmann::detail::serializer</a>&lt; BasicJsonType &gt;::state = <a class="el" href="classnlohmann_1_1detail_1_1serializer.html#aacb365f529454cfaea396488358846a6">UTF8_ACCEPT</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1346,7 +1347,7 @@ template&lt;typename BasicJsonType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static constexpr std::uint8_t <a class="el" href="classnlohmann_1_1detail_1_1serializer.html">nlohmann::detail::serializer</a>&lt; BasicJsonType &gt;::UTF8_ACCEPT = 0</td>
+          <td class="memname">static constexpr <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> <a class="el" href="classnlohmann_1_1detail_1_1serializer.html">nlohmann::detail::serializer</a>&lt; BasicJsonType &gt;::UTF8_ACCEPT = 0</td>
         </tr>
       </table>
   </td>
@@ -1370,7 +1371,7 @@ template&lt;typename BasicJsonType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static constexpr std::uint8_t <a class="el" href="classnlohmann_1_1detail_1_1serializer.html">nlohmann::detail::serializer</a>&lt; BasicJsonType &gt;::UTF8_REJECT = 1</td>
+          <td class="memname">static constexpr <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> <a class="el" href="classnlohmann_1_1detail_1_1serializer.html">nlohmann::detail::serializer</a>&lt; BasicJsonType &gt;::UTF8_REJECT = 1</td>
         </tr>
       </table>
   </td>

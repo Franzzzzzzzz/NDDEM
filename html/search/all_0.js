@@ -6,5 +6,6 @@ var searchData=
   ['iter_5fimpl_3',['iter_impl',['../classnlohmann_1_1basic__json.html#a842e5c7ca096025c18b11e715d3401f4',1,'nlohmann::basic_json']]],
   ['json_5fsax_5fdom_5fcallback_5fparser_4',['json_sax_dom_callback_parser',['../classnlohmann_1_1basic__json.html#a95574da8d12905ea99dc348934c837da',1,'nlohmann::basic_json']]],
   ['json_5fsax_5fdom_5fparser_5',['json_sax_dom_parser',['../classnlohmann_1_1basic__json.html#a47aabb1eceae32e8a6e8e7f0ff34be60',1,'nlohmann::basic_json']]],
-  ['parser_6',['parser',['../classnlohmann_1_1basic__json.html#ac8f3125911eb018ef4ab00d879487baf',1,'nlohmann::basic_json']]]
+  ['loadandconstructloadwrapper_6',['LoadAndConstructLoadWrapper',['../classcereal_1_1construct.html#a8b518d294ce424a7304cd0a3d517ae48',1,'cereal::construct::LoadAndConstructLoadWrapper()'],['../classcereal_1_1construct.html#a78310d6c4c678dd6afacbccc3feaf174',1,'cereal::construct::LoadAndConstructLoadWrapper()']]],
+  ['parser_7',['parser',['../classnlohmann_1_1basic__json.html#ac8f3125911eb018ef4ab00d879487baf',1,'nlohmann::basic_json']]]
 ];

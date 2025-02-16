@@ -10,12 +10,24 @@
     #include <omp.h>
 #endif
 
+#include "cereal/types/vector.hpp"
+#include "cereal/types/chrono.hpp"
+#include "cereal/types/optional.hpp"
+#include "cereal/types/utility.hpp"
+#include "cereal/types/string.hpp"
+#include "cereal/types/map.hpp"
+#include "cereal/types/list.hpp"
+#include "cereal/archives/binary.hpp"
+
+#include "callgrind.h"
+
 #include "Typedefs.h"
 #include "Parameters.h"
 #include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"
 #include "Cells.h"
+#include "Octree.h"
 #include "Boundaries.h"
 #ifdef EMSCRIPTEN
     #include <emscripten.h>
@@ -88,11 +100,27 @@ public:
     int numthread=1 ;
     Multiproc<d> MP ;
     Cells<d> cells ; 
+    Octree<d> octree ; 
 
     double t ; int ti ;
     double dt ;
     clock_t tnow, tprevious ;
 
+    //-----------------------------------------
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar(N, 
+           X, V, A, Omega, F, FOld, Torque, TorqueOld, Vmag, OmegaMag, Z, Fcorr, TorqueCorr, RigidBodyId,
+           PBCFlags, WallForce, empty_array, ParticleForce, Ghost, Ghost_dir, Atmp, 
+           numthread, t, ti, dt, tnow, tprevious
+           , P
+           // Todo: ExternalAction, MP, cells, 
+        );
+        printf("RESTART ERROR: STILL SOME THINGS TO SERIALIZE IN Simulation") ; 
+    }
+    //-----------------------------------------
+    
     //==========================================================
     Simulation(int NN) {
         P = Parameters<d>(NN) ;
@@ -167,6 +195,13 @@ public:
             MP.splitcells(cells.cells.size()) ; 
             MP.CLp_all.init_for_cells(N) ; 
         }
+        else if (P.contact_strategy == ContactStrategies::OCTREE)
+        {
+            printf("INITIALISE OCTREE\n") ; fflush(stdout) ;
+            octree.init_cells(P.Boundaries, P.r) ;
+            MP.splitcells(octree.cells_to_split()) ; 
+            MP.CLp_all.init_for_cells(N) ; 
+        }
         
         dt=P.dt ;
         t=0 ; ti=0 ;
@@ -200,6 +235,8 @@ public:
     {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
+        //if (ntt==990) {CALLGRIND_START_INSTRUMENTATION ;}
+          
         // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
         // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
         bool isdumptime = (ntt==nt-1) || (ti % P.tdump==0) ;
@@ -275,11 +312,14 @@ public:
         P.perform_PBCLE_move() ;
         std::invoke (P.update_gravity, &P, dt) ;
         if (P.contact_strategy == ContactStrategies::CELLS) cells.allocate_to_cells(X) ; 
+        else if (P.contact_strategy == ContactStrategies::OCTREE) octree.allocate_to_cells(X) ; 
 
         //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
         // ----- Contact detection ------
-        if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
+        if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE) 
+            MP.mergeback_CLp() ;             
+    
         double LE_displacement ; 
         if (P.Boundaries[0].Type == WallType::PBC_LE) 
             LE_displacement = P.Boundaries[0].displacement ; 
@@ -303,6 +343,10 @@ public:
          if (P.contact_strategy == ContactStrategies::CELLS)
          {
              cells.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r, LE_displacement) ; 
+         }
+         else if (P.contact_strategy == ContactStrategies::OCTREE)
+         {
+             octree.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r, LE_displacement) ; 
          }
          else
          {
@@ -451,9 +495,14 @@ public:
         } //END PARALLEL SECTION
       
         //printf("{%ld %ld}", MP.CLp_all.v.size(), MP.CLp[0].v.size()) ; fflush(stdout) ; 
-        if (P.contact_strategy == ContactStrategies::CELLS) MP.merge_split_CLp() ; 
-        //printf("\n{%ld}\n", MP.CLp[0].v.size()) ; 
-
+        if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE) MP.merge_split_CLp() ; 
+        /*printf("\n{%ld}\n", MP.CLp[0].v.size()) ; 
+        for (auto &v: MP.CLp[0].v)
+        {
+            printf("C %d %d %d %X %X %g %g | %g %g %g | %g %g %g\n", 
+                   v.i, v.j, ntt, v.ghost, v.ghostdir, P.r[v.i], P.r[v.j], X[v.i][0], X[v.i][1], X[v.i][2], X[v.j][0], X[v.j][1], X[v.j][2]) ; 
+        }*/
+          
         //-------------------------------------------------------------------------------
         // Force and torque computation
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
@@ -687,6 +736,8 @@ public:
           MP.timing_forces = vector<double>(MP.P,0) ;
         }
         #endif
+        
+        //save_restart(*this, "restart_archive.bin") ; 
     }
   }
 
