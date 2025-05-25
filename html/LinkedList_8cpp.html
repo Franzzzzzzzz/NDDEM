@@ -74,13 +74,53 @@ $(function() {
 <div class="textblock"><code>#include &lt;cstdlib&gt;</code><br />
 <code>#include &lt;cstdio&gt;</code><br />
 <code>#include &quot;<a class="el" href="LinkedList_8h_source.html">LinkedList.h</a>&quot;</code><br />
+<code>#include &lt;boost/random/mersenne_twister.hpp&gt;</code><br />
+<code>#include &lt;boost/random/uniform_int_distribution.hpp&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a275d71a06a566c481d96368aadc1d167"><td class="memItemLeft" align="right" valign="top">boost::random::mt19937&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LinkedList_8cpp.html#a275d71a06a566c481d96368aadc1d167">rng</a> (static_cast&lt; unsigned int &gt;(std::time(nullptr)))</td></tr>
+<tr class="separator:a275d71a06a566c481d96368aadc1d167"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7064aef9348968bf4d1c5c86317e8f0c"><td class="memItemLeft" align="right" valign="top">boost::random::uniform_int_distribution&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LinkedList_8cpp.html#a7064aef9348968bf4d1c5c86317e8f0c">action</a> (0, 100)</td></tr>
+<tr class="separator:a7064aef9348968bf4d1c5c86317e8f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ec7850419dd01254042ab41505570e4"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a7ec7850419dd01254042ab41505570e4"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="LinkedList_8cpp.html#a7ec7850419dd01254042ab41505570e4">random</a> ()</td></tr>
+<tr class="separator:a7ec7850419dd01254042ab41505570e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9a6d88fc6df810bc2e5fd64590b3e36"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:af9a6d88fc6df810bc2e5fd64590b3e36"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="LinkedList_8cpp.html#af9a6d88fc6df810bc2e5fd64590b3e36">randomize</a> (std::list&lt; T &gt; &amp;A, <a class="el" href="classfg_1_1list.html">fg::list</a>&lt; T &gt; &amp;B, int target_size)</td></tr>
+<tr class="separator:af9a6d88fc6df810bc2e5fd64590b3e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="LinkedList_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a7064aef9348968bf4d1c5c86317e8f0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7064aef9348968bf4d1c5c86317e8f0c">&#9670;&nbsp;</a></span>action()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::random::uniform_int_distribution action </td>
+          <td>(</td>
+          <td class="paramtype">0&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">100&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0ddf1224851353fc92bfbff6f499fa97"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0ddf1224851353fc92bfbff6f499fa97">&#9670;&nbsp;</a></span>main()</h2>
 
@@ -103,6 +143,79 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7ec7850419dd01254042ab41505570e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ec7850419dd01254042ab41505570e4">&#9670;&nbsp;</a></span>random()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">T random </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af9a6d88fc6df810bc2e5fd64590b3e36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9a6d88fc6df810bc2e5fd64590b3e36">&#9670;&nbsp;</a></span>randomize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">randomize </td>
+          <td>(</td>
+          <td class="paramtype">std::list&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classfg_1_1list.html">fg::list</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>target_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a275d71a06a566c481d96368aadc1d167"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a275d71a06a566c481d96368aadc1d167">&#9670;&nbsp;</a></span>rng()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::random::mt19937 rng </td>
+          <td>(</td>
+          <td class="paramtype">static_cast&lt; unsigned int &gt;&#160;</td>
+          <td class="paramname">std::time(nullptr)</td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">

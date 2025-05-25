@@ -82,8 +82,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7c6b8c8bed60558255e2f792f6ddbd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affd39c8d8fc521a069a649d370c92d8b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOctree.html#affd39c8d8fc521a069a649d370c92d8b">allocate_to_cells</a> (std::vector&lt; std::vector&lt; double &gt;&gt; &amp;X)</td></tr>
 <tr class="separator:affd39c8d8fc521a069a649d370c92d8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade53fe170fc0fdb643c3b82bf28abea1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOctree.html#ade53fe170fc0fdb643c3b82bf28abea1">contacts</a> (std::pair&lt; int, int &gt; bounds, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLall, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r, double LE_displacement)</td></tr>
-<tr class="separator:ade53fe170fc0fdb643c3b82bf28abea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa05f4502d2cc17f9e0d22e1011f88938"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOctree.html#aa05f4502d2cc17f9e0d22e1011f88938">contacts</a> (int ID, std::pair&lt; int, int &gt; bounds, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r, double LE_displacement)</td></tr>
+<tr class="separator:aa05f4502d2cc17f9e0d22e1011f88938"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -150,8 +150,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="ade53fe170fc0fdb643c3b82bf28abea1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade53fe170fc0fdb643c3b82bf28abea1">&#9670;&nbsp;</a></span>contacts()</h2>
+<a id="aa05f4502d2cc17f9e0d22e1011f88938"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa05f4502d2cc17f9e0d22e1011f88938">&#9670;&nbsp;</a></span>contacts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,14 +164,20 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">int <a class="el" href="classOctree.html">Octree</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::contacts </td>
           <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">std::pair&lt; int, int &gt;&#160;</td>
           <td class="paramname"><em>bounds</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>CLall</em>, </td>
+          <td class="paramtype"><a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>CLp_it</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

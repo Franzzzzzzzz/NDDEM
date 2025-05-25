@@ -123,6 +123,9 @@ $(function() {
 <li>cbor_tag_handler_t
 : <a class="el" href="classnlohmann_1_1basic__json.html#a54951d14f0dd10cc3cfdaa24f8bfd15c">nlohmann::basic_json&lt; ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType &gt;</a>
 </li>
+<li>cell_contact_insert()
+: <a class="el" href="classCells.html#afa6d285155397e64096f76e37ae91fc6">Cells&lt; d &gt;</a>
+</li>
 <li>cells
 : <a class="el" href="classCells.html#acf33aa402cddc885c1e41b91f5a4dbd9">Cells&lt; d &gt;</a>
 , <a class="el" href="classSimulation.html#a1866609acd84ffa7f64127921ea40316">Simulation&lt; d &gt;</a>
@@ -147,7 +150,7 @@ $(function() {
 </li>
 <li>CEREAL_RAPIDJSON_DISABLEIF_RETURN()
 : <a class="el" href="classGenericArray.html#a335d707c70501935f6b449680ee7d830">GenericArray&lt; Const, ValueT &gt;</a>
-, <a class="el" href="classGenericObject.html#aa4fa92b17f39b0b98147338cbfa75250">GenericObject&lt; Const, ValueT &gt;</a>
+, <a class="el" href="classGenericObject.html#aa948d721aec0302b81be04d2a6038867">GenericObject&lt; Const, ValueT &gt;</a>
 , <a class="el" href="classGenericPointer.html#a35e26101cc82abfeed54f6b39c7a1aba">GenericPointer&lt; ValueType, Allocator &gt;</a>
 , <a class="el" href="classGenericValue.html#aa88264424038ed2c012c3b762a686f01">GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
@@ -300,7 +303,7 @@ $(function() {
 , <a class="el" href="classpugi_1_1xml__node.html#a4154ffb6451d4203b74bb56d3f3ecf50">pugi::xml_node</a>
 </li>
 <li>child_value()
-: <a class="el" href="classpugi_1_1xml__node.html#a50c7951752e76265f497e51d22ad4e29">pugi::xml_node</a>
+: <a class="el" href="classpugi_1_1xml__node.html#a3e92c57bca8669864b5ab7b54bd5cbca">pugi::xml_node</a>
 </li>
 <li>children()
 : <a class="el" href="classpugi_1_1xml__node.html#a4f72c001fed61753fa76fd32d4e978af">pugi::xml_node</a>
@@ -346,13 +349,10 @@ $(function() {
 </li>
 <li>clear()
 : <a class="el" href="classternary.html#a967ecdfeb7d7ccc712e2a47dfe57bd3a">ternary</a>
-, <a class="el" href="classTools.html#a2a204dc93b5939f9efa8778dd1e565c3">Tools&lt; d &gt;</a>
+, <a class="el" href="group__DEM.html#gadcf9a9902d9d7202c42c1fbe7e349586">Tools&lt; d &gt;</a>
 </li>
 <li>clear_all()
 : <a class="el" href="classCells.html#a0c1112b0fbd062d8df3b21a283e109ae">Cells&lt; d &gt;</a>
-</li>
-<li>clear_all_contacts()
-: <a class="el" href="classMultiproc.html#a8043098d1cd10e58ed7cc4a949b5cbb0">Multiproc&lt; d &gt;</a>
 </li>
 <li>clear_subtype()
 : <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">nlohmann::byte_container_with_subtype&lt; BinaryType &gt;</a>
@@ -390,8 +390,11 @@ $(function() {
 <li>CLp
 : <a class="el" href="classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea">Multiproc&lt; d &gt;</a>
 </li>
-<li>CLp_all
-: <a class="el" href="classMultiproc.html#ad7e0402a4f8c180d27f4977d57b064b8">Multiproc&lt; d &gt;</a>
+<li>CLp_it
+: <a class="el" href="classMultiproc.html#abe5a9b060f0a692aa8b1d03752cfaf7a">Multiproc&lt; d &gt;</a>
+</li>
+<li>CLp_new
+: <a class="el" href="classMultiproc.html#ae92277c7620f4689ac92c5d7b49e6f39">Multiproc&lt; d &gt;</a>
 </li>
 <li>CLw
 : <a class="el" href="classMultiproc.html#ab2f6b71cfb789957377af15f57c3ddc8">Multiproc&lt; d &gt;</a>
@@ -401,9 +404,6 @@ $(function() {
 </li>
 <li>coalesce_list()
 : <a class="el" href="classContactList.html#a85f9846298bbb8e364b41201e24d21a1">ContactList&lt; d &gt;</a>
-</li>
-<li>coalesce_main_list()
-: <a class="el" href="classMultiproc.html#acb0850c9a6e6e58173abef1eb1f4f2d7">Multiproc&lt; d &gt;</a>
 </li>
 <li>CoarseGraining()
 : <a class="el" href="classCoarseGraining.html#a15f87f99b714f9b27ff1465177adeea6">CoarseGraining</a>
@@ -549,25 +549,25 @@ $(function() {
 : <a class="el" href="classcpm.html#a38f7e92fe6aef732b00081a60bc6204c">cpm&lt; d &gt;</a>
 </li>
 <li>contacts()
-: <a class="el" href="classCells.html#a800130a1751d96e00576d3baec9aacae">Cells&lt; d &gt;</a>
+: <a class="el" href="classCells.html#a15ecc63c53310d29211d2afac7a53729">Cells&lt; d &gt;</a>
 </li>
 <li>Contacts()
 : <a class="el" href="group__DEM.html#ga881bc68d6e256d6539a4959f07dfcd6e">Contacts&lt; d &gt;</a>
 </li>
 <li>contacts()
-: <a class="el" href="classOctree.html#ade53fe170fc0fdb643c3b82bf28abea1">Octree&lt; d &gt;</a>
+: <a class="el" href="classOctree.html#aa05f4502d2cc17f9e0d22e1011f88938">Octree&lt; d &gt;</a>
 </li>
 <li>contacts2array()
 : <a class="el" href="group__DEM.html#ga981c61f50f6836f5e712818fbefcc5f6">Multiproc&lt; d &gt;</a>
 </li>
 <li>contacts_cell_cell()
-: <a class="el" href="classCells.html#a5714ec12e8cae2e015756d04580473d5">Cells&lt; d &gt;</a>
+: <a class="el" href="classCells.html#a80e27ce427b5908eadb5fcd6fcf45a9d">Cells&lt; d &gt;</a>
 </li>
 <li>contacts_cell_ghostcell()
-: <a class="el" href="classCells.html#a6557ef55931bb4754f67aa516f5b402d">Cells&lt; d &gt;</a>
+: <a class="el" href="classCells.html#a1dbfede3274f2368a65127e9fcc693af">Cells&lt; d &gt;</a>
 </li>
 <li>contacts_external()
-: <a class="el" href="classCells.html#a2e057eee313c28e5eac04c307b3a09ad">Cells&lt; d &gt;</a>
+: <a class="el" href="classCells.html#a07f1cb01db506af8057e3bf637f25439">Cells&lt; d &gt;</a>
 </li>
 <li>container
 : <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html#a88c0532ba4a5de1d527b18053b24fd19">nlohmann::detail::iteration_proxy&lt; IteratorType &gt;</a>

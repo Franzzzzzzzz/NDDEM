@@ -102,14 +102,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga64473def2a41ed54010b316e8b9f3bf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5">load_balance</a> (<a class="el" href="group__DEM.html#ga375410cc0bbd996376cbb08826d3b195">ContactStrategies</a> contactstrategy)</td></tr>
 <tr class="memdesc:ga64473def2a41ed54010b316e8b9f3bf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modify the atom share between threads to achieve better load balance between the threads based on the current speed of each one during the previous iterations.  <a href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5">More...</a><br /></td></tr>
 <tr class="separator:ga64473def2a41ed54010b316e8b9f3bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8043098d1cd10e58ed7cc4a949b5cbb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a8043098d1cd10e58ed7cc4a949b5cbb0">clear_all_contacts</a> ()</td></tr>
-<tr class="separator:a8043098d1cd10e58ed7cc4a949b5cbb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87050aeab8113dc0e1fb28c51e3979b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a87050aeab8113dc0e1fb28c51e3979b8">merge_split_CLp</a> ()</td></tr>
-<tr class="separator:a87050aeab8113dc0e1fb28c51e3979b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94f58ca4ca4e971589c41343c08fc75b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a94f58ca4ca4e971589c41343c08fc75b">mergeback_CLp</a> ()</td></tr>
-<tr class="separator:a94f58ca4ca4e971589c41343c08fc75b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb0850c9a6e6e58173abef1eb1f4f2d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#acb0850c9a6e6e58173abef1eb1f4f2d7">coalesce_main_list</a> ()</td></tr>
-<tr class="separator:acb0850c9a6e6e58173abef1eb1f4f2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9984b06bf83bf750e482278e311ed5fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a9984b06bf83bf750e482278e311ed5fe">merge_newcontacts</a> ()</td></tr>
+<tr class="separator:a9984b06bf83bf750e482278e311ed5fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23be342588078225b82682d65af7180d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a23be342588078225b82682d65af7180d">merge_oldnew_contacts</a> (int ID)</td></tr>
+<tr class="separator:a23be342588078225b82682d65af7180d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae0ec2e6c3cf902e89fb57ee9b5b16622"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae0ec2e6c3cf902e89fb57ee9b5b16622">splitcells</a> (int <a class="el" href="classMultiproc.html#a4e7773b5cad1e6e8034756a456b1bc20">C</a>)</td></tr>
 <tr class="separator:gae0ec2e6c3cf902e89fb57ee9b5b16622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga981c61f50f6836f5e712818fbefcc5f6"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga981c61f50f6836f5e712818fbefcc5f6">contacts2array</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="classMultiproc.html#a3e2d638fe1f99d1124d90839ffa14285">P</a>)</td></tr>
@@ -121,12 +117,12 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ad7e0402a4f8c180d27f4977d57b064b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ad7e0402a4f8c180d27f4977d57b064b8">CLp_all</a></td></tr>
-<tr class="memdesc:ad7e0402a4f8c180d27f4977d57b064b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc).  <a href="classMultiproc.html#ad7e0402a4f8c180d27f4977d57b064b8">More...</a><br /></td></tr>
-<tr class="separator:ad7e0402a4f8c180d27f4977d57b064b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e44ce6bab8e8f03bbc21d2616c651ea"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea">CLp</a></td></tr>
 <tr class="memdesc:a8e44ce6bab8e8f03bbc21d2616c651ea"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classContactList.html" title="Handles lists of contacts.">ContactList</a> particle-particle for each processor.  <a href="classMultiproc.html#a8e44ce6bab8e8f03bbc21d2616c651ea">More...</a><br /></td></tr>
 <tr class="separator:a8e44ce6bab8e8f03bbc21d2616c651ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae92277c7620f4689ac92c5d7b49e6f39"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ae92277c7620f4689ac92c5d7b49e6f39">CLp_new</a></td></tr>
+<tr class="memdesc:ae92277c7620f4689ac92c5d7b49e6f39"><td class="mdescLeft">&#160;</td><td class="mdescRight">New particle-particle contacts for each processor.  <a href="classMultiproc.html#ae92277c7620f4689ac92c5d7b49e6f39">More...</a><br /></td></tr>
+<tr class="separator:ae92277c7620f4689ac92c5d7b49e6f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2f6b71cfb789957377af15f57c3ddc8"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ab2f6b71cfb789957377af15f57c3ddc8">CLw</a></td></tr>
 <tr class="memdesc:ab2f6b71cfb789957377af15f57c3ddc8"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classContactList.html" title="Handles lists of contacts.">ContactList</a> particle-wall for each processor.  <a href="classMultiproc.html#ab2f6b71cfb789957377af15f57c3ddc8">More...</a><br /></td></tr>
 <tr class="separator:ab2f6b71cfb789957377af15f57c3ddc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,8 +147,10 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:ac898635d542458c39f661d2dad616b97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of sample of time spent. Resets when <a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> is called.  <a href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">More...</a><br /></td></tr>
 <tr class="separator:ac898635d542458c39f661d2dad616b97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae75b103706631ef8bf876bcd0a397b4b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ae75b103706631ef8bf876bcd0a397b4b">num_mem_time</a></td></tr>
-<tr class="memdesc:ae75b103706631ef8bf876bcd0a397b4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of iterations since the last list rebuilt. Resets when <a class="el" href="classMultiproc.html#acb0850c9a6e6e58173abef1eb1f4f2d7">coalesce_main_list()</a> is called.  <a href="classMultiproc.html#ae75b103706631ef8bf876bcd0a397b4b">More...</a><br /></td></tr>
+<tr class="memdesc:ae75b103706631ef8bf876bcd0a397b4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of iterations since the last list rebuilt. Resets when coalesce_main_list() is called.  <a href="classMultiproc.html#ae75b103706631ef8bf876bcd0a397b4b">More...</a><br /></td></tr>
 <tr class="separator:ae75b103706631ef8bf876bcd0a397b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe5a9b060f0a692aa8b1d03752cfaf7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#abe5a9b060f0a692aa8b1d03752cfaf7a">CLp_it</a></td></tr>
+<tr class="separator:abe5a9b060f0a692aa8b1d03752cfaf7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a633287157aa869a2e2fb7e65f0970411"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; <a class="el" href="classAction.html">Action</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a633287157aa869a2e2fb7e65f0970411">delayed</a></td></tr>
 <tr class="memdesc:a633287157aa869a2e2fb7e65f0970411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Records the delayed <a class="el" href="classAction.html" title="Handle force and torque contact information.">Action</a>.  <a href="classMultiproc.html#a633287157aa869a2e2fb7e65f0970411">More...</a><br /></td></tr>
 <tr class="separator:a633287157aa869a2e2fb7e65f0970411"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,60 +193,6 @@ class Multiproc&lt; d &gt;</h3>
 
 <p>Manual multiprocessor handling for OpenMP, for max efficiency &amp; avoiding bugs &amp; race conditions, hopefully. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8043098d1cd10e58ed7cc4a949b5cbb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8043098d1cd10e58ed7cc4a949b5cbb0">&#9670;&nbsp;</a></span>clear_all_contacts()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::clear_all_contacts </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="acb0850c9a6e6e58173abef1eb1f4f2d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb0850c9a6e6e58173abef1eb1f4f2d7">&#9670;&nbsp;</a></span>coalesce_main_list()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::coalesce_main_list </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="af469cf9d0075a8d76d22de5980b8602f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af469cf9d0075a8d76d22de5980b8602f">&#9670;&nbsp;</a></span>initialise()</h2>
 
@@ -333,8 +277,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="a87050aeab8113dc0e1fb28c51e3979b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87050aeab8113dc0e1fb28c51e3979b8">&#9670;&nbsp;</a></span>merge_split_CLp()</h2>
+<a id="a9984b06bf83bf750e482278e311ed5fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9984b06bf83bf750e482278e311ed5fe">&#9670;&nbsp;</a></span>merge_newcontacts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -345,7 +289,7 @@ template&lt;int d&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::merge_split_CLp </td>
+          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::merge_newcontacts </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -360,8 +304,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="a94f58ca4ca4e971589c41343c08fc75b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94f58ca4ca4e971589c41343c08fc75b">&#9670;&nbsp;</a></span>mergeback_CLp()</h2>
+<a id="a23be342588078225b82682d65af7180d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23be342588078225b82682d65af7180d">&#9670;&nbsp;</a></span>merge_oldnew_contacts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -372,9 +316,10 @@ template&lt;int d&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::mergeback_CLp </td>
+          <td class="memname">int <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::merge_oldnew_contacts </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ID</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -472,8 +417,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="ad7e0402a4f8c180d27f4977d57b064b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7e0402a4f8c180d27f4977d57b064b8">&#9670;&nbsp;</a></span>CLp_all</h2>
+<a id="abe5a9b060f0a692aa8b1d03752cfaf7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe5a9b060f0a692aa8b1d03752cfaf7a">&#9670;&nbsp;</a></span>CLp_it</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -481,12 +426,28 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classContactList.html">ContactList</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::CLp_all</td>
+          <td class="memname"><a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::CLp_it</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). </p>
+</div>
+</div>
+<a id="ae92277c7620f4689ac92c5d7b49e6f39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae92277c7620f4689ac92c5d7b49e6f39">&#9670;&nbsp;</a></span>CLp_new</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;<a class="el" href="classContactList.html">ContactList</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; &gt; <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::CLp_new</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>New particle-particle contacts for each processor. </p>
 
 </div>
 </div>
@@ -680,7 +641,7 @@ template&lt;int d&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Number of iterations since the last list rebuilt. Resets when <a class="el" href="classMultiproc.html#acb0850c9a6e6e58173abef1eb1f4f2d7">coalesce_main_list()</a> is called. </p>
+<p>Number of iterations since the last list rebuilt. Resets when coalesce_main_list() is called. </p>
 
 </div>
 </div>

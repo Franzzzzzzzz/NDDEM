@@ -186,8 +186,8 @@ $(function() {
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  </div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="comment">// Completing the mixed base with random vectors first</span></div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="comment">//TODO reset random number</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  boost::random::mt19937 rng(12345);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  boost::random::uniform_01&lt;boost::mt19937&gt; rand(rng) ;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  boost::random::mt19937 <a class="code" href="LinkedList_8cpp.html#a275d71a06a566c481d96368aadc1d167">rng</a>(12345);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  boost::random::uniform_01&lt;boost::mt19937&gt; rand(<a class="code" href="LinkedList_8cpp.html#a275d71a06a566c481d96368aadc1d167">rng</a>) ;</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=dimensionality ; i&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>-1 ; i++)</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0 ; j&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; j++)</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      tmpbase[i][j]=rand() ; <span class="comment">//TODO change random number </span></div>
@@ -266,6 +266,7 @@ $(function() {
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
 <div class="ttc" id="aCoarseGraining_2Parameters_8h_html"><div class="ttname"><a href="CoarseGraining_2Parameters_8h.html">Parameters.h</a></div></div>
 <div class="ttc" id="aCoarseGraining_2Typedefs_8h_html"><div class="ttname"><a href="CoarseGraining_2Typedefs_8h.html">Typedefs.h</a></div></div>
+<div class="ttc" id="aLinkedList_8cpp_html_a275d71a06a566c481d96368aadc1d167"><div class="ttname"><a href="LinkedList_8cpp.html#a275d71a06a566c481d96368aadc1d167">rng</a></div><div class="ttdeci">boost::random::mt19937 rng(static_cast&lt; unsigned int &gt;(std::time(nullptr)))</div></div>
 <div class="ttc" id="aclassMesh_html"><div class="ttname"><a href="classMesh.html">Mesh</a></div><div class="ttdef"><b>Definition:</b> Mesh.h:11</div></div>
 <div class="ttc" id="aclassMesh_html_a13890262967cdf588c9b6d02494c8464"><div class="ttname"><a href="classMesh.html#a13890262967cdf588c9b6d02494c8464">Mesh::export_json</a></div><div class="ttdeci">std::string export_json()</div><div class="ttdef"><b>Definition:</b> Mesh.h:30</div></div>
 <div class="ttc" id="aclassMesh_html_a2a7827599a7194b81464c67aaa2385f2"><div class="ttname"><a href="classMesh.html#a2a7827599a7194b81464c67aaa2385f2">Mesh::disp</a></div><div class="ttdeci">void disp()</div><div class="ttdef"><b>Definition:</b> Mesh.h:51</div></div>
