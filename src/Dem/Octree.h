@@ -65,7 +65,7 @@ public:
     //printf("A ") ; 
     for (size_t i=0 ; i<X.size() ; i++)
     {
-      int res=octree[lvl_tree[i]].allocate_single(X[i], i) ;
+      octree[lvl_tree[i]].allocate_single(X[i], i) ;
       /*if (i==101 || i==103)
       {
         auto v = octree[lvl_tree[i]].id2x(res) ; 
@@ -77,15 +77,15 @@ public:
     return 0;
   }
   //------------------------------------------------------------
-  int contacts(std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
+  int contacts(int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
   {
     
     for (char lvl = max_lvl - 1 ; lvl>=0 ; lvl--)
     {
-      octree[lvl].contacts(bounds, CLall, CLnew, X, r, LE_displacement) ; 
+      octree[lvl].contacts(ID, bounds, CLp_it, CLnew, X, r, LE_displacement) ; 
       
       for (char super_lvl=lvl-1 ; super_lvl>=0 ; super_lvl--)
-        octree[lvl].contacts_external (octree[super_lvl], lvl-super_lvl, bounds, CLall, CLnew, X, r, LE_displacement) ; 
+        octree[lvl].contacts_external (ID, octree[super_lvl], lvl-super_lvl, bounds, CLp_it, CLnew, X, r, LE_displacement) ; 
       
       std::get<0>(bounds)/= pow(2,d) ; 
       if (lvl>0 && std::get<1>(bounds) == octree[lvl].cum_n_cell[d]) std::get<1>(bounds)=octree[lvl-1].cum_n_cell[d] ;

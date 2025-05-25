@@ -218,39 +218,6 @@ public:
      if (nmax<nmin) return {v.end(), v.end()} ; 
      return {it_array_beg[nmin], it_array_end[nmax]} ; 
  }
- bool insert_cell (const cp<d>& a)
- {
-     
-     auto it = v.begin() ; 
-     /*while (it!=v.end() && it->i < a.i) {it++;}
-     if (it->i==a.i)
-     {
-        while (it!=v.end() && it->j < a.j) {it++;}
-        if (*it==a)
-        {
-            it->contactlength=a.contactlength ;
-            it->ghost=a.ghost ;
-            it->ghostdir=a.ghostdir ;
-            it->persisting = true ; 
-            return true ; 
-        }
-     }
-     return false ; */     
-     
-     if (it_array_beg[a.i] == null_list.begin()) return false ; 
-     for (it = it_array_beg[a.i] ; it != it_array_end[a.i] ; it++)
-     {
-        if ((*it)==a)
-        {
-            it->contactlength=a.contactlength ;
-            it->ghost=a.ghost ;
-            it->ghostdir=a.ghostdir ;
-            it->persisting = true ; 
-            return true ; 
-        }
-     }
-     return false ; 
- } 
  void coalesce_list ()
  {
      std::vector<cp<d>> vtmp ; 
@@ -281,7 +248,7 @@ public:
  
  list <cp<d>> v ; ///< Contains the list of contact
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
-  std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
+ std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
  
 private:
  typename list<cp<d>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.

@@ -1,6 +1,75 @@
 #include <cstdlib>
 #include <cstdio>
 #include "LinkedList.h"
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+
+boost::random::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
+boost::random::uniform_int_distribution<> action(0, 100);
+
+template<typename T>
+T random()
+{
+  
+}
+
+
+template <typename T>
+randomize(std::list<T> &A, fg::list<T> &B, int target_size)
+{
+  assert((A.size() == B.size())) ; 
+  
+  boost::random::uniform_int_distribution<> where(0, A.size());
+  
+  size_t sz = target_size-A.size() ;
+  if (sz>=target_size) p=0.5 ; 
+  else if (p<=target_size/2) p=1 ; 
+  else p=0.5+sz/(double)target_size/4 ; 
+  
+  int act = action(rng) ; 
+  if (act>p*100)
+  { // erase
+    int id=where(rng) ; 
+    auto i = A.begin() ; 
+    for (int idd=id ; idd; i++,idd--) ; 
+    A.erase(i) ; 
+    
+    auto i = B.begin() ; 
+    for (int idd=id ; idd; i++,idd--) ; 
+    B.erase(i) ; 
+    
+    delete ; 
+  }
+  else
+  { //insert
+    int id=where(rng) ; 
+    T value = random<T>() ; 
+    
+    auto i = A.begin() ; 
+    for (int idd=id ; idd; i++,idd--) ; 
+    A.insert(value) ; 
+    
+    auto i = B.begin() ; 
+    for (int idd=id ; idd; i++,idd--) ; 
+    B.insert(value) ; 
+    
+    delete ; 
+  }
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 int main(int argc, char * argv[]) 
 {

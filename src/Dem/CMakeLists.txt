@@ -8,7 +8,7 @@ set (max_dimension "5" CACHE STRING "Maximum simulation dimension. Higher requir
 add_compile_definitions(MAXDIM=${max_dimension})
 
 
-set(VALID_BUILD_TYPES "Debug" "RelWithDebInfo" "Release")
+set(VALID_BUILD_TYPES "Debug" "RelWithDebInfo" "Release" "PerfTracking")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${VALID_BUILD_TYPES})
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo." FORCE)
@@ -34,7 +34,6 @@ if(EMSCRIPTEN)
     "-O3 --bind -s MODULARIZE=1 -s EXPORT_NAME='DEMND' -s EXPORTED_RUNTIME_METHODS=[getValue]"
  )
 else()
-   include_directories(AFTER ".")
 
    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       target_compile_options(DEMND PUBLIC -fopenmp -Wall -Wextra)
@@ -45,6 +44,10 @@ else()
    elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
       target_compile_options(DEMND PUBLIC -O3 -fopenmp -Wall -Wextra)
       target_link_libraries(DEMND PUBLIC -O3 -fopenmp -lstdc++fs -lm -Wall -Wextra)
+   elseif(CMAKE_BUILD_TYPE STREQUAL "PerfTracking")
+      include_directories(AFTER "." /home/franz/intel/oneapi/vtune/2025.3/include/)
+      target_compile_options(DEMND PUBLIC -O3 -fopenmp -Wall -Wextra)
+      target_link_libraries(DEMND PUBLIC -O3 -fopenmp -lstdc++fs -lm -Wall -Wextra -L/home/franz/intel/oneapi/vtune/2025.3/lib64/ -littnotify)
    else()
       target_compile_options(DEMND PUBLIC -O3 -fopenmp -Wall -Wextra)
       target_link_libraries(DEMND PUBLIC -O3 -fopenmp -lstdc++fs -lm -Wall -Wextra)
