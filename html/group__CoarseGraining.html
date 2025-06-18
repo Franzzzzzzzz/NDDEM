@@ -222,6 +222,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gadde7281fae8c036a6411fb62db7032a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gadde7281fae8c036a6411fb62db7032a8">Coarsing::interpolate_vel_trilinear</a> (int id, bool usetimeavg)</td></tr>
 <tr class="memdesc:gadde7281fae8c036a6411fb62db7032a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tri-linear interpolation (only implemented in 3D, probably not too hard to implement in ND but annoying ...)  <a href="group__CoarseGraining.html#gadde7281fae8c036a6411fb62db7032a8">More...</a><br /></td></tr>
 <tr class="separator:gadde7281fae8c036a6411fb62db7032a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaae3a8bfab41c6dcb3f89282cfa86d2de"><td class="memTemplParams" colspan="2">template&lt;int D&gt; </td></tr>
+<tr class="memitem:gaae3a8bfab41c6dcb3f89282cfa86d2de"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaae3a8bfab41c6dcb3f89282cfa86d2de">Coarsing::interpolate_vel_multilinear</a> (int id, bool usetimeavg)</td></tr>
+<tr class="separator:gaae3a8bfab41c6dcb3f89282cfa86d2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga315f17f5e09d3169e6722b41b112aa98"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga315f17f5e09d3169e6722b41b112aa98">Coarsing::idx_FastFirst2SlowFirst</a> (int n)</td></tr>
 <tr class="memdesc:ga315f17f5e09d3169e6722b41b112aa98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change array traversing order.  <a href="group__CoarseGraining.html#ga315f17f5e09d3169e6722b41b112aa98">More...</a><br /></td></tr>
 <tr class="separator:ga315f17f5e09d3169e6722b41b112aa98"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1119,6 +1122,36 @@ Variables</h2></td></tr>
 
 <p>Interpolate the velocity. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>Use something better to interpolate velocity than the nearest neighbor interpolation. </dd></dl>
+
+</div>
+</div>
+<a id="gaae3a8bfab41c6dcb3f89282cfa86d2de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaae3a8bfab41c6dcb3f89282cfa86d2de">&#9670;&nbsp;</a></span>interpolate_vel_multilinear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int D&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> Coarsing::interpolate_vel_multilinear </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>usetimeavg</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

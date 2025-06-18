@@ -32,6 +32,7 @@ int process_envvar(json &j)
     }
     std::cout << j ;
 printf("HHHH") ; fflush(stdout) ; 
+return 0 ; 
 }
 //=======================================================
 int main(int argc, char * argv[])
