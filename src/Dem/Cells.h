@@ -44,10 +44,16 @@ public:
   std::vector<std::vector<double>> boundary_handler (std::vector<Boundary<d>> &boundaries) ;
   int allocate_to_cells (std::vector<std::vector<double>> & X) ; 
   int allocate_single (std::vector<double> & X, int grainid) ; 
-  int contacts (std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ; 
-  int contacts_external (Cells<d> &ocell, int delta_lvl, std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ;
-  int contacts_cell_cell (Cell & c1, Cell & c2, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, cp<d> & tmpcp ) ; 
-  int contacts_cell_ghostcell (Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp ) ;
+  int contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
+                ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ; 
+  int contacts_external (int ID, Cells<d> &ocell, int delta_lvl, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
+                         ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ;
+  int contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d> & CLp_it, 
+                          ContactList<d> & CLnew,std::vector<std::vector<double>> const & X, 
+                          std::vector<double> const &r, cp<d> & tmpcp ) ; 
+  int contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, CLp_it_t<d> & CLp_it, 
+                               ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp ) ;
+  bool cell_contact_insert (int ID, CLp_it_t<d> & CLp_it, const cp<d>& a) ; 
   int clear_all () ; 
   //-------------------------------------------
   int x2id (const std::vector<int>&v) 
@@ -459,12 +465,15 @@ int Cells<d>::allocate_single (std::vector<double> & X, int grainid)
 }
 //=================================================================
 template <int d>
-int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
+int Cells<d>::contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
+                        ContactList<d> & CLnew, 
+                        std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
 {
   auto [cell_first, cell_last] = bounds ; 
   cp<d> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
   double sum=0 ;
   int ncontact=0 ; 
+  //printf("B%d ", ID) ; fflush(stdout) ; 
   for (int c=cell_first ; c<cell_last ; c++)
   {
     if (cells[c].incell.size()==0) continue ; 
@@ -483,7 +492,10 @@ int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, Conta
             if (i<j) {tmpcp.i = i ; tmpcp.j=j ;}
             else { tmpcp.i = j ; tmpcp.j=i ;} 
             tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-            if (!CLall.insert_cell(tmpcp)) CLnew.v.push_back(tmpcp) ; 
+            if (!cell_contact_insert(ID, CLp_it, tmpcp)) 
+            {
+              CLnew.v.push_back(tmpcp) ;
+            }
         }
       }
     
@@ -505,7 +517,7 @@ int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, Conta
             if (i<j) {tmpcp.i = i ; tmpcp.j=j ;}
             else { tmpcp.i = j ; tmpcp.j=i ;} 
             tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-            if (!CLall.insert_cell(tmpcp)) CLnew.v.push_back(tmpcp) ; 
+            if (!cell_contact_insert(ID, CLp_it, tmpcp)) CLnew.v.push_back(tmpcp) ; 
           }
       }    
     }
@@ -552,20 +564,43 @@ int Cells<d>::contacts (std::pair<int,int> bounds, ContactList<d> & CLall, Conta
             if (i<j) {tmpcp.i = i ; tmpcp.j=j ; tmpcp.ghostdir = ghostdir ;}
             else    { tmpcp.i = j ; tmpcp.j=i ; tmpcp.ghostdir = (~ghostdir)&ghost ;} 
             tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=ghost ; 
-            if (!CLall.insert_cell(tmpcp)) CLnew.v.push_back(tmpcp) ; 
+            if (!cell_contact_insert(ID, CLp_it, tmpcp)) CLnew.v.push_back(tmpcp) ; 
           }
         }
     }
+    
     //printf("]\n") ; 
   }
+  //printf("E%d ", ID) ; fflush(stdout) ; 
   
   //printf("{%d %ld}", ncontact, CLnew.v.size()) ; fflush(stdout) ;  
   return 0 ; 
 }
+//-----------------------------------------------------------------------------
+template <int d>
+bool Cells<d>::cell_contact_insert (int ID, CLp_it_t<d> & CLp_it, const cp<d>& a)
+ { 
+     if (CLp_it.it_array_beg[a.i] == CLp_it.null_list.v.begin()) return false ; 
+     //for (auto it = CLp_it.it_array_beg[a.i] ; it != CLp_it.it_array_end[a.i] ; it++)
+     for (auto it = CLp_it.it_array_beg[a.i] ; it != CLp_it.it_ends[ID] && it->i == a.i ; it++)
+     {
+        if ((*it)==a)
+        {
+            it->contactlength=a.contactlength ;
+            it->ghost=a.ghost ;
+            it->ghostdir=a.ghostdir ;
+            it->persisting = true ; 
+            return true ; 
+        }
+     }
+     return false ; 
+ }
+
 //========================================================================================
 template <int d>
-int Cells<d>::contacts_cell_cell (Cell & c1, Cell & c2,
-                                  ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, cp<d> & tmpcp)
+int Cells<d>::contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d> & CLp_it, 
+                                  ContactList<d> & CLnew, 
+                                  std::vector<std::vector<double>> const & X, std::vector<double> const &r, cp<d> & tmpcp)
 {
  double sum ;
  for (size_t ii=0 ; ii<c1.incell.size() ; ii++)
@@ -581,15 +616,15 @@ int Cells<d>::contacts_cell_cell (Cell & c1, Cell & c2,
           if (i<j) {tmpcp.i = i ; tmpcp.j=j ;}
           else { tmpcp.i = j ; tmpcp.j=i ;} 
           tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=0 ; tmpcp.ghostdir=0 ;
-          if (!CLall.insert_cell(tmpcp)) CLnew.v.push_back(tmpcp) ; 
+          if (!cell_contact_insert(ID, CLp_it, tmpcp)) CLnew.v.push_back(tmpcp) ; 
       }
    }
   return 0;
 }
 //-------------------------------------------------------------------
 template <int d>
-int Cells<d>::contacts_cell_ghostcell (Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, 
-                                       ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp)
+int Cells<d>::contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, CLp_it_t<d> & CLp_it,
+                                       ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp)
 {      
  double sum ; 
  for (size_t ii=0 ; ii<c1.incell.size() ; ii++)
@@ -610,14 +645,15 @@ int Cells<d>::contacts_cell_ghostcell (Cell & c1, Cell & c2, bitdim ghost, bitdi
        if (i<j) {tmpcp.i = i ; tmpcp.j=j ; tmpcp.ghostdir = ghostdir ;}
        else    { tmpcp.i = j ; tmpcp.j=i ; tmpcp.ghostdir = (~ghostdir)&ghost ;} 
        tmpcp.contactlength=sqrt(sum) ; tmpcp.ghost=ghost ; 
-       if (!CLall.insert_cell(tmpcp)) CLnew.v.push_back(tmpcp) ; 
+       if (!cell_contact_insert(ID, CLp_it, tmpcp)) CLnew.v.push_back(tmpcp) ; 
      }
   }
  return 0;
 }
 //=========================================================================================
 template <int d>
-int Cells<d>::contacts_external (Cells<d> &ocell, int delta_lvl, std::pair<int,int> bounds, ContactList<d> & CLall, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
+int Cells<d>::contacts_external (int ID, Cells<d> &ocell, int delta_lvl, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
+                                 ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
 {
   auto [cell_first, cell_last] = bounds ; 
   cp<d> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
@@ -631,12 +667,12 @@ int Cells<d>::contacts_external (Cells<d> &ocell, int delta_lvl, std::pair<int,i
     int oid = ocell.x2id(xloc) ; 
        
     // Outer cell contact
-    contacts_cell_cell(cells[c], ocell.cells[oid], CLall, CLnew, X, r, tmpcp) ; 
+    contacts_cell_cell(ID, cells[c], ocell.cells[oid], CLp_it, CLnew, X, r, tmpcp) ; 
     
     for (size_t cc=0 ; cc<ocell.cells[oid].neighbours.size() ; cc++)
-      contacts_cell_cell(cells[c], ocell.cells[ocell.cells[oid].neighbours[cc]], CLall, CLnew, X, r, tmpcp) ; 
+      contacts_cell_cell(ID, cells[c], ocell.cells[ocell.cells[oid].neighbours[cc]], CLp_it, CLnew, X, r, tmpcp) ; 
     for (size_t cc=0 ; cc<ocell.cells[oid].neighbours_full.size() ; cc++)
-      contacts_cell_cell(cells[c], ocell.cells[ocell.cells[oid].neighbours_full[cc]], CLall, CLnew, X, r, tmpcp) ; 
+      contacts_cell_cell(ID, cells[c], ocell.cells[ocell.cells[oid].neighbours_full[cc]], CLp_it, CLnew, X, r, tmpcp) ; 
     
     //outer cell ghost contacts
     for (size_t cc=0 ; cc<ocell.cells[oid].neigh_ghosts.size() ; cc++)
@@ -650,7 +686,7 @@ int Cells<d>::contacts_external (Cells<d> &ocell, int delta_lvl, std::pair<int,i
         c2 = clip_LEmoved_cell(c2, newc2, ghost, ghostdir) ;
       }*/
       
-      contacts_cell_ghostcell(cells[c], ocell.cells[c2], ghost, ghostdir, CLall, CLnew, X, r, LE_displacement, tmpcp) ; 
+      contacts_cell_ghostcell(ID, cells[c], ocell.cells[c2], ghost, ghostdir, CLp_it, CLnew, X, r, LE_displacement, tmpcp) ; 
     }
     
     for (size_t cc=0 ; cc<ocell.cells[oid].neigh_ghosts_full.size() ; cc++)
@@ -664,7 +700,7 @@ int Cells<d>::contacts_external (Cells<d> &ocell, int delta_lvl, std::pair<int,i
         c2 = clip_LEmoved_cell(c2, newc2, ghost, ghostdir) ;
       }*/
       
-      contacts_cell_ghostcell(cells[c], ocell.cells[c2], ghost, ghostdir, CLall, CLnew, X, r, LE_displacement, tmpcp) ; 
+      contacts_cell_ghostcell(ID, cells[c], ocell.cells[c2], ghost, ghostdir, CLp_it, CLnew, X, r, LE_displacement, tmpcp) ; 
     }
   }
   return 0 ; 
