@@ -21,6 +21,8 @@ endif(NOT CMAKE_BUILD_TYPE)
 #endif()
 
 add_executable(DEMND DEMND.cpp Parameters.cpp Tools.cpp Contacts.cpp ContactList.cpp Xml.cpp Multiproc.cpp)
+include_directories(AFTER ${CMAKE_SOURCE_DIR}/Dem)
+
 set_property(TARGET DEMND PROPERTY CXX_STANDARD 17)
 if(EMSCRIPTEN)
  target_compile_options(DEMND PUBLIC -DNO_OPENMP -O3 -Wall -Wextra -DUSEBINDINGS -I${CMAKE_SOURCE_DIR}/Dem)
