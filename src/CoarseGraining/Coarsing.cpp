@@ -347,8 +347,8 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
   {
     if (isnan(data.pos[0][i])) continue ;
     //auto vavg = interpolate_vel (i, usetimeavg) ;
-    vavg = interpolate_vel_trilinear(i,usetimeavg) ;
-    //vavg = interpolate_vel_nearest(i,usetimeavg) ;
+    //vavg = interpolate_vel_trilinear(i,usetimeavg) ;
+    vavg = interpolate_vel_nearest(i,usetimeavg) ;
     //printf("%g %g | %g %g | %g %g\n", vavg[0], vavg2[0], vavg[1], vavg2[1], vavg[2], vavg2[2]) ;
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;
@@ -1174,7 +1174,7 @@ int Coarsing::mean_time(bool temporary)
 int Coarsing::write_vtk(string sout)
 {
   FILE *out ;
-  if (d!=3) printf("WARN: the write_vtk function hasn't been implement for dimension different from 3\n") ;
+  if (d!=3) printf("WARN: the write_vtk function hasn't been implement for dimension different from 3. Only the first 3 components of vectors and tensors will be saved.\n") ;
   for (int t=0 ; t<Time ; t++)
   {
     out=fopen((sout+"-"+std::to_string(t)+".vtk").c_str(), "w") ;
@@ -1204,14 +1204,14 @@ int Coarsing::write_vtk(string sout)
              for (int k=0 ; k<npt[2] ; k++)
               for (int j=0 ; j<npt[1] ; j++)
                for (int i=0 ; i<npt[0] ; i++)
-                for (int dd=0 ; dd<d ; dd++)
+                for (int dd=0 ; dd<std::min(d,3) ; dd++)
                   fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
              break ;
         case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
-               for (int dd=0 ; dd<d*d ; dd++)
+               for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
                 fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
             break ;
         default: printf("ERR: this should never happen. \n") ;
