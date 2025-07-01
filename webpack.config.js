@@ -161,8 +161,7 @@ module.exports = [{
     ],
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
-        // publicPath: '',
-        publicPath: '/live/deploy/', // Ensure this matches the server's path
+        publicPath: '',
         filename: '[name]-bundle.js',
         clean: true,
     },
