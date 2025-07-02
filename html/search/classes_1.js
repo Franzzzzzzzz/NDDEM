@@ -1,25 +1,11 @@
 var searchData=
 [
-  ['base_5fclass_4769',['base_class',['../structcereal_1_1base__class.html',1,'cereal']]],
-  ['base_5fclass_5fid_4770',['base_class_id',['../structcereal_1_1traits_1_1detail_1_1base__class__id.html',1,'cereal::traits::detail']]],
-  ['base_5fclass_5fid_5fhash_4771',['base_class_id_hash',['../structcereal_1_1traits_1_1detail_1_1base__class__id__hash.html',1,'cereal::traits::detail']]],
-  ['basecastbase_4772',['BaseCastBase',['../structcereal_1_1traits_1_1detail_1_1BaseCastBase.html',1,'cereal::traits::detail']]],
-  ['basereaderhandler_4773',['BaseReaderHandler',['../structBaseReaderHandler.html',1,'']]],
-  ['basereaderhandler_3c_20typename_20schemadocumenttype_3a_3aschematype_3a_3aencodingtype_20_3e_4774',['BaseReaderHandler&lt; typename SchemaDocumentType::SchemaType::EncodingType &gt;',['../structBaseReaderHandler.html',1,'']]],
-  ['basic_5fjson_4775',['basic_json',['../classnlohmann_1_1basic__json.html',1,'nlohmann']]],
-  ['basicistreamwrapper_4776',['BasicIStreamWrapper',['../classBasicIStreamWrapper.html',1,'']]],
-  ['basicostreamwrapper_4777',['BasicOStreamWrapper',['../classBasicOStreamWrapper.html',1,'']]],
-  ['biginteger_4778',['BigInteger',['../classinternal_1_1BigInteger.html',1,'internal']]],
-  ['binary_5fop_5ft_4779',['binary_op_t',['../structxpath__parser_1_1binary__op__t.html',1,'xpath_parser']]],
-  ['binary_5freader_4780',['binary_reader',['../classnlohmann_1_1detail_1_1binary__reader.html',1,'nlohmann::detail']]],
-  ['binary_5fwriter_4781',['binary_writer',['../classnlohmann_1_1detail_1_1binary__writer.html',1,'nlohmann::detail']]],
-  ['binarydata_4782',['BinaryData',['../structcereal_1_1BinaryData.html',1,'cereal']]],
-  ['binaryinputarchive_4783',['BinaryInputArchive',['../classcereal_1_1BinaryInputArchive.html',1,'cereal']]],
-  ['binaryoutputarchive_4784',['BinaryOutputArchive',['../classcereal_1_1BinaryOutputArchive.html',1,'cereal']]],
-  ['bind_5fto_5farchives_4785',['bind_to_archives',['../structcereal_1_1detail_1_1bind__to__archives.html',1,'cereal::detail']]],
-  ['binding_5fname_4786',['binding_name',['../structcereal_1_1detail_1_1binding__name.html',1,'cereal::detail']]],
-  ['bindingtype_3c_20std_3a_3avector_3c_20t_2c_20allocator_20_3e_20_3e_4787',['BindingType&lt; std::vector&lt; T, Allocator &gt; &gt;',['../structemscripten_1_1internal_1_1BindingType_3_01std_1_1vector_3_01T_00_01Allocator_01_4_01_4.html',1,'emscripten::internal']]],
-  ['boundaries_4788',['boundaries',['../structnlohmann_1_1detail_1_1dtoa__impl_1_1boundaries.html',1,'nlohmann::detail::dtoa_impl']]],
-  ['boundary_4789',['Boundary',['../classBoundary.html',1,'']]],
-  ['byte_5fcontainer_5fwith_5fsubtype_4790',['byte_container_with_subtype',['../classnlohmann_1_1byte__container__with__subtype.html',1,'nlohmann']]]
+  ['basic_5fjson_2713',['basic_json',['../classnlohmann_1_1basic__json.html',1,'nlohmann']]],
+  ['binary_5fop_5ft_2714',['binary_op_t',['../structxpath__parser_1_1binary__op__t.html',1,'xpath_parser']]],
+  ['binary_5freader_2715',['binary_reader',['../classnlohmann_1_1detail_1_1binary__reader.html',1,'nlohmann::detail']]],
+  ['binary_5fwriter_2716',['binary_writer',['../classnlohmann_1_1detail_1_1binary__writer.html',1,'nlohmann::detail']]],
+  ['bindingtype_3c_20std_3a_3avector_3c_20t_2c_20allocator_20_3e_20_3e_2717',['BindingType&lt; std::vector&lt; T, Allocator &gt; &gt;',['../structemscripten_1_1internal_1_1BindingType_3_01std_1_1vector_3_01T_00_01Allocator_01_4_01_4.html',1,'emscripten::internal']]],
+  ['boundaries_2718',['boundaries',['../structnlohmann_1_1detail_1_1dtoa__impl_1_1boundaries.html',1,'nlohmann::detail::dtoa_impl']]],
+  ['boundary_2719',['Boundary',['../classBoundary.html',1,'']]],
+  ['byte_5fcontainer_5fwith_5fsubtype_2720',['byte_container_with_subtype',['../classnlohmann_1_1byte__container__with__subtype.html',1,'nlohmann']]]
 ];

@@ -11,17 +11,7 @@ public:
     addforce=std::vector<double>(d,0.) ;
     cancelgravity=false ; 
   }
-      
-  //variables
-  std::vector<int> ids ; 
-  v1d F, com ;
-  v1d setvel, addforce ; 
-  double mass ; 
-  bool cancelgravity ; 
-  
-  template <class Archive> void serialize(Archive &ar) { ar(ids, F, com, setvel, addforce, mass, cancelgravity) ; }
-  
-  //--------------------------------------------------------------------------------
+    
   double setparticles(std::vector<int> iid, cv2d & X, cv1d & m) 
   {
     com=std::vector<double>(d,0) ;
@@ -40,18 +30,22 @@ public:
   
     return mass ; 
   }
+  
+  //variables
+  std::vector<int> ids ; 
+  v1d F, com ;
+  v1d setvel, addforce ; 
+  double mass ; 
+  bool cancelgravity ; 
 } ;
 
-//==============================================================================
 template <int d>
 class RigidBodies_
 {
 public :
 
   std::vector<RigidBody<d>> RB ; 
-  
-  template <class Archive> void serialize(Archive &ar) { ar(RB) ; }
-  
+    
   int allocate (std::vector<std::optional<int>> & RigidBodyId)
   {
     for (size_t i=0 ; i<RB.size() ; i++)

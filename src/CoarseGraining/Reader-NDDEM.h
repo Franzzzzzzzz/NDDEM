@@ -89,7 +89,7 @@ int NDDEMReader::read_timestep (int ts)
 //------------------------------------------------------------------------
  double * NDDEMReader::get_data(DataValue datavalue, int dd, std::string name)
 {
-    unsigned int delta ;
+    int delta ;
     switch (datavalue)
     {
         case DataValue::radius : return (radius.data()) ;

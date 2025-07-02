@@ -20,7 +20,6 @@
   #include <filesystem>
   namespace fs = std::filesystem ; 
 #endif
-
 #include "Typedefs.h"
 #include "Tools.h"
 #include "Xml.h"
@@ -35,7 +34,7 @@
 using json = nlohmann::json;
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
-enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000, MASS=0x200000} ; ///< Flags for export data control
+enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000} ; ///< Flags for export data control
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData   operator| (ExportData a, ExportData b) {auto c= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return c ; }
@@ -196,19 +195,11 @@ public :
     double graddesc_tol ; ///< Tolerance for the gradient descent algorithm
     bool contactforcedump ; ///< Extract the forces between grains as well?
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
-    double gravityrotateangle = 0.0; 
     RigidBodies_<d> RigidBodies ; ///< Handle all the rigid bodies
-    vector <Mesh<d>> Meshes ;    
+    vector <Mesh<d>> Meshes ;
+    double gravityrotateangle = 0.0; 
     
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
-    
-    template <class Archive>
-    void serialize(Archive &ar) {
-        ar(N, tdump, tinfo, T, dt, rho, Kn, Kt, Gamman, Gammat, Mu, Mu_wall, damping, forceinsphere, cellsize, ContactModel, contact_strategy,
-           dumps, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
-           graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events
-           ) ; 
-    }
 
 // Useful functions
     int set_boundaries() ;  ///< Set default boundaries
@@ -636,7 +627,6 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          }
          else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
          else if (word =="Radius") dumplist |= ExportData::RADIUS ;
-         else if (word =="Mass") dumplist |= ExportData::MASS ;
          
          else if (word =="Ids") dumplist |= ExportData::IDS ; // Contact properties
          else if (word =="Fn") dumplist |= ExportData::FN ;
@@ -710,7 +700,6 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
  Lvl0["ContactModel"] = [&](){ std::string s ; in >> s ; if (s=="Hertz") {ContactModel=ContactModels::HERTZ ;printf("[INFO] Using Hertz model\n") ;} else ContactModel=ContactModels::HOOKE ; } ;
  Lvl0["ContactStrategy"] = [&](){ std::string s ; in >> s ; if (s=="naive") {contact_strategy = ContactStrategies::NAIVE ; } 
                                                             else if (s=="cells") {contact_strategy = ContactStrategies::CELLS  ; } 
-                                                            else if (s=="octree") {contact_strategy = ContactStrategies::OCTREE ; }
                                                             else {printf("[WARN] Unknown contact strategy\n") ; }} ;
  Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
     Tools<d>::setzero(g) ;
@@ -1344,7 +1333,6 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
         if (v.second & ExportData::OMEGAMAG)  {tmp.push_back(OmegaMag) ; vtkwriter::write_data(out, {"OmegaMag", TensorType::SCALAR, &tmp}, d) ;}
         if (v.second & ExportData::ORIENTATION) vtkwriter::write_data(out, {"ORIENTATION", TensorType::TENSOR, &A}, d) ;
         if (v.second & ExportData::RADIUS) {tmp.push_back(r) ; vtkwriter::write_data(out, {"RADIUS", TensorType::SCALAR, &tmp}, d) ;}
-        if (v.second & ExportData::MASS) {tmp.push_back(m) ; vtkwriter::write_data(out, {"MASS", TensorType::SCALAR, &tmp}, d) ;}
         if (v.second & ExportData::COORDINATION) {tmp.push_back(Z) ; vtkwriter::write_data(out, {"Coordination", TensorType::SCALAR, &tmp}, d) ;  }
         if (v.second & ExportData::IDS) {
             vector<double> tmpid (N, 0) ;
