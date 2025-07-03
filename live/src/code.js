@@ -14,10 +14,14 @@ monaco.languages.setMonarchTokensProvider('infile', {
     tokenizer: {
         root: [
             [/#.*$/, 'comment'],
-            [/\b(dimensions|radius|mass|auto|boundary|gravity|gravityangle|location|set|dt|tdump|finalise)\b/, 'keyword'],
-            [/\b(uniform|randomdrop)\b/, 'keyword'],
-            [/\b(PBC|WALL)\b/, 'keyword'],
+            [/\b(dimensions|radius|mass|auto|boundary|gravity|gravityangle|gravityrotate|location|set|dt|tdump|finalise|rigid|inertia|skin)\b/, 'keyword'],
+            [/\b(uniform|randomdrop|square|randomsquare|insphere|roughinclineplane|largeinclineplane|smallinclineplane)\b/, 'keyword'],
+            [/\b(PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE)\b/, 'keyword'],
+            [/\b(Kn|Kt|GammaN|GammaT|Mu|T|rho)\b/, 'keyword'],
+            [/\b(ContactStrategy|naive|cells|octree)\b/, 'keyword'],
+            [/\b(mesh|file|translate|rotate|export)\b/, 'number'],
             [/\b(0|1|2|3|4|5|6|7|8|9)\b/, 'number'],
+            [/\b(ContactModel|Hooke|Hertz)\b/, 'keyword'],
             [/\b([a-zA-Z]+)\b/, 'identifier'],
         ]
     }
@@ -130,20 +134,20 @@ S.simu_interpret_command("auto skin");
 S.simu_finalise_init();`;
 
 default_scripts['infile'] = `dimensions 3 100
-radius -1 0.5
-mass -1 1
-auto rho
-auto radius uniform 0.1 0.2
-auto mass
-auto inertia
-auto skin
+radius -1 0.5 # set radius of all particles to 0.5
+mass -1 1 # set mass of all particles to 1
+auto rho # calculate density from mass and radius
+auto radius uniform 0.1 0.2 # now update radius of all particles to a uniform distribution between 0.1 and 0.2
+auto mass # recalculate mass from radius and density
+auto inertia # calculate inertia from mass and radius
+auto skin # update contact properties
 
-boundary 0 PBC -1 1
-boundary 1 PBC -1 1
-boundary 2 WALL -2 2
-gravity 0 -5 -5
+boundary 0 WALL -3 3 
+boundary 1 PBC -2 2
+boundary 2 PBC -1 1
+gravityangle 9.81 25
 
-auto location randomdrop
+auto location roughinclineplane
 
 set Kn 75
 set Kt 60
@@ -235,12 +239,9 @@ function update_from_text() {
     controls.target.y = params.boundary1.min + (params.boundary1.max - params.boundary1.min) / 2;
     controls.target.z = params.boundary2.min + (params.boundary2.max - params.boundary2.min) / 2;
 
-    camera.position.x = (params.boundary0.max + params.boundary0.min) / 2.;
-    camera.position.y = (params.boundary1.max + params.boundary1.min) / 2.;
-    // camera.position.z = (params.boundary0.max - params.boundary0.min)*2.;
-    // camera.position.x = params.boundary0.max + (params.boundary0.max - params.boundary0.min);
-    // camera.position.y = params.boundary1.max + (params.boundary1.max - params.boundary1.min);
-    camera.position.z = params.boundary2.max + 3 * (params.boundary2.max - params.boundary2.min);
+    camera.position.x = params.boundary0.max + (params.boundary0.max - params.boundary0.min);
+    camera.position.y = params.boundary1.max + (params.boundary1.max - params.boundary1.min);
+    camera.position.z = params.boundary2.max + (params.boundary2.max - params.boundary2.min);
 
     if (params.dimension < 3) {
         camera.position.x = (params.boundary0.max + params.boundary0.min) / 2.;
@@ -291,8 +292,8 @@ document.getElementById("canvas").style.width = String(100 * (1 - params.graph_f
 
 async function init() {
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth * (1 - params.graph_fraction) / window.innerHeight, 1e-2, 100);
-    camera.up.set(1, 0, 0);
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth * (1 - params.graph_fraction) / window.innerHeight, 1e-5, 1000);
+    camera.up.set(0, 0, 1);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x222222);

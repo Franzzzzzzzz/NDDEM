@@ -32,13 +32,6 @@ void sig_handler (int p)
     std::exit(p) ;
 }
 
-template <int d>
-void save_restart(const Simulation<d> &S, const std::string &filename) {
-    std::ofstream os(filename, std::ios::binary);
-    cereal::BinaryOutputArchive archive(os);
-    archive(S);
-}
-
 /** \brief Main simulation run. All the simulation is handled by this function.
  */
 template <int d>
@@ -82,7 +75,31 @@ int main (int argc, char *argv[])
  switch (dd)
  {
      BOOST_PP_FOR((1, MAXDIM), PRED, OP, MACRO)
-     
+//     case  1: templatedmain<1> (argv) ; break ;
+//     case  2: templatedmain<2> (argv) ; break ;
+//     case  3: templatedmain<3> (argv) ; break ;
+//     case  4: templatedmain<4> (argv) ; break ;
+//     case  5: templatedmain<5> (argv) ; break ;
+//     case  6: templatedmain<6> (argv) ; break ;
+//     case  7: templatedmain<7> (argv) ; break ;
+//     case  8: templatedmain<8> (argv) ; break ;
+//      case  9: templatedmain<9> (argv) ; break ;
+//      case 10: templatedmain<10> (argv) ; break ;
+//      case 11: templatedmain<11> (argv) ; break ;
+//      case 12: templatedmain<12> (argv) ; break ;
+//      case 13: templatedmain<13> (argv) ; break ;
+//      case 14: templatedmain<14> (argv) ; break ;
+//      case 15: templatedmain<15> (argv) ; break ;
+//      case 16: templatedmain<16> (argv) ; break ;
+//      case 17: templatedmain<17> (argv) ; break ;
+//      case 18: templatedmain<18> (argv) ; break ;
+//      case 19: templatedmain<19> (argv) ; break ;
+//      case 20: templatedmain<20> (argv) ; break ;
+//      case 21: templatedmain<21> (argv) ; break ;
+//      case 22: templatedmain<22> (argv) ; break ;
+//      case 23: templatedmain<23> (argv) ; break ;
+//      case 24: templatedmain<24> (argv) ; break ;
+//      case 25: templatedmain<25> (argv) ; break ;
      default : printf("DEMND was not compiled with support for dimension %d. Please recompile modifying the main function to support that dimension.\n", dd); std::exit(1) ;
  }
 

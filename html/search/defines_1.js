@@ -1,4 +1,8 @@
 var searchData=
 [
-  ['boost_5fiostreams_5fsource_9150',['BOOST_IOSTREAMS_SOURCE',['../gzip_8cpp.html#a9b57f9c60099e427afdff2644feaf832',1,'BOOST_IOSTREAMS_SOURCE():&#160;gzip.cpp'],['../zlib_8cpp.html#a9b57f9c60099e427afdff2644feaf832',1,'BOOST_IOSTREAMS_SOURCE():&#160;zlib.cpp']]]
+  ['cpphttplib_5fkeepalive_5fmax_5fcount_5329',['CPPHTTPLIB_KEEPALIVE_MAX_COUNT',['../Server_8h.html#a56599ecd6d67e12d9c71138ea69fc179',1,'Server.h']]],
+  ['cpphttplib_5fkeepalive_5ftimeout_5fsecond_5330',['CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND',['../Server_8h.html#a9290820a34ffe59a772df48b954fc4ac',1,'Server.h']]],
+  ['cpphttplib_5fkeepalive_5ftimeout_5fusecond_5331',['CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND',['../Server_8h.html#a072f5426d033b6e9128a2f60e7952c8a',1,'Server.h']]],
+  ['cpphttplib_5fpayload_5fmax_5flength_5332',['CPPHTTPLIB_PAYLOAD_MAX_LENGTH',['../Server_8h.html#a20a3df3819479bbd53093ce5e6ef86d6',1,'Server.h']]],
+  ['cpphttplib_5frequest_5furi_5fmax_5flength_5333',['CPPHTTPLIB_REQUEST_URI_MAX_LENGTH',['../Server_8h.html#ac260f5899a74e107b13c6c170d0ccc5a',1,'Server.h']]]
 ];

@@ -90,7 +90,7 @@ Public Types</h2></td></tr>
 <tr class="separator:a57095c6ed403f02e1bc2c240a13c9ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c9c1509ee714a9814b45a8030c84ec7"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a1c9c1509ee714a9814b45a8030c84ec7">mapped_type</a> = T</td></tr>
 <tr class="separator:a1c9c1509ee714a9814b45a8030c84ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cabe346c38a4f1ab1b8a396fbd2bbe2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> = std::vector&lt; std::pair&lt; const Key, T &gt;, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;</td></tr>
+<tr class="memitem:a0cabe346c38a4f1ab1b8a396fbd2bbe2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> = std::vector&lt; std::pair&lt; const Key, T &gt;, Allocator &gt;</td></tr>
 <tr class="separator:a0cabe346c38a4f1ab1b8a396fbd2bbe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89cc338e8466e74baaa138664c79ee98"><td class="memTemplParams" colspan="2">template&lt;typename InputIt &gt; </td></tr>
 <tr class="memitem:a89cc338e8466e74baaa138664c79ee98"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a89cc338e8466e74baaa138664c79ee98">require_input_iter</a> = typename std::enable_if&lt; std::is_convertible&lt; typename std::iterator_traits&lt; InputIt &gt;::iterator_category, std::input_iterator_tag &gt;::value &gt;::type</td></tr>
@@ -99,7 +99,7 @@ Public Types</h2></td></tr>
 <tr class="separator:a57095c6ed403f02e1bc2c240a13c9ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c9c1509ee714a9814b45a8030c84ec7"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a1c9c1509ee714a9814b45a8030c84ec7">mapped_type</a> = T</td></tr>
 <tr class="separator:a1c9c1509ee714a9814b45a8030c84ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cabe346c38a4f1ab1b8a396fbd2bbe2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> = std::vector&lt; std::pair&lt; const Key, T &gt;, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;</td></tr>
+<tr class="memitem:a0cabe346c38a4f1ab1b8a396fbd2bbe2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> = std::vector&lt; std::pair&lt; const Key, T &gt;, Allocator &gt;</td></tr>
 <tr class="separator:a0cabe346c38a4f1ab1b8a396fbd2bbe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89cc338e8466e74baaa138664c79ee98"><td class="memTemplParams" colspan="2">template&lt;typename InputIt &gt; </td></tr>
 <tr class="memitem:a89cc338e8466e74baaa138664c79ee98"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a89cc338e8466e74baaa138664c79ee98">require_input_iter</a> = typename std::enable_if&lt; std::is_convertible&lt; typename std::iterator_traits&lt; InputIt &gt;::iterator_category, std::input_iterator_tag &gt;::value &gt;::type</td></tr>
@@ -107,12 +107,12 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a87938c10b76510dac00412d2cb5fd1e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a87938c10b76510dac00412d2cb5fd1e4">ordered_map</a> (const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;alloc=<a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>())</td></tr>
+<tr class="memitem:a87938c10b76510dac00412d2cb5fd1e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a87938c10b76510dac00412d2cb5fd1e4">ordered_map</a> (const Allocator &amp;alloc=Allocator())</td></tr>
 <tr class="separator:a87938c10b76510dac00412d2cb5fd1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memTemplParams" colspan="2">template&lt;class It &gt; </td></tr>
-<tr class="memitem:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a9d25efb51325cc1be027b8ea00c1f8b8">ordered_map</a> (It first, It last, const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;alloc=<a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>())</td></tr>
+<tr class="memitem:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a9d25efb51325cc1be027b8ea00c1f8b8">ordered_map</a> (It first, It last, const Allocator &amp;alloc=Allocator())</td></tr>
 <tr class="separator:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0482ea79e7786367a2d9b5c789c091ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0482ea79e7786367a2d9b5c789c091ce">ordered_map</a> (std::initializer_list&lt; T &gt; init, const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;alloc=<a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>())</td></tr>
+<tr class="memitem:a0482ea79e7786367a2d9b5c789c091ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0482ea79e7786367a2d9b5c789c091ce">ordered_map</a> (std::initializer_list&lt; T &gt; init, const Allocator &amp;alloc=Allocator())</td></tr>
 <tr class="separator:a0482ea79e7786367a2d9b5c789c091ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38834c948b844033caa7d5c76fee5866"><td class="memItemLeft" align="right" valign="top">std::pair&lt; iterator, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a38834c948b844033caa7d5c76fee5866">emplace</a> (const <a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> &amp;key, T &amp;&amp;t)</td></tr>
 <tr class="separator:a38834c948b844033caa7d5c76fee5866"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,12 +141,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2c8509f72bc33307661f1a0ed5763f9e"><td class="memTemplParams" colspan="2">template&lt;typename InputIt , typename  = require_input_iter&lt;InputIt&gt;&gt; </td></tr>
 <tr class="memitem:a2c8509f72bc33307661f1a0ed5763f9e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a2c8509f72bc33307661f1a0ed5763f9e">insert</a> (InputIt first, InputIt last)</td></tr>
 <tr class="separator:a2c8509f72bc33307661f1a0ed5763f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87938c10b76510dac00412d2cb5fd1e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a87938c10b76510dac00412d2cb5fd1e4">ordered_map</a> (const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;alloc=<a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>())</td></tr>
+<tr class="memitem:a87938c10b76510dac00412d2cb5fd1e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a87938c10b76510dac00412d2cb5fd1e4">ordered_map</a> (const Allocator &amp;alloc=Allocator())</td></tr>
 <tr class="separator:a87938c10b76510dac00412d2cb5fd1e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memTemplParams" colspan="2">template&lt;class It &gt; </td></tr>
-<tr class="memitem:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a9d25efb51325cc1be027b8ea00c1f8b8">ordered_map</a> (It first, It last, const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;alloc=<a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>())</td></tr>
+<tr class="memitem:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a9d25efb51325cc1be027b8ea00c1f8b8">ordered_map</a> (It first, It last, const Allocator &amp;alloc=Allocator())</td></tr>
 <tr class="separator:a9d25efb51325cc1be027b8ea00c1f8b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0482ea79e7786367a2d9b5c789c091ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0482ea79e7786367a2d9b5c789c091ce">ordered_map</a> (std::initializer_list&lt; T &gt; init, const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;alloc=<a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>())</td></tr>
+<tr class="memitem:a0482ea79e7786367a2d9b5c789c091ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a0482ea79e7786367a2d9b5c789c091ce">ordered_map</a> (std::initializer_list&lt; T &gt; init, const Allocator &amp;alloc=Allocator())</td></tr>
 <tr class="separator:a0482ea79e7786367a2d9b5c789c091ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38834c948b844033caa7d5c76fee5866"><td class="memItemLeft" align="right" valign="top">std::pair&lt; iterator, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1ordered__map.html#a38834c948b844033caa7d5c76fee5866">emplace</a> (const <a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> &amp;key, T &amp;&amp;t)</td></tr>
 <tr class="separator:a38834c948b844033caa7d5c76fee5866"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -191,7 +191,7 @@ struct nlohmann::ordered_map&lt; Key, T, IgnoredLess, Allocator &gt;</h3>
 template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;const Key, T&gt;&gt;&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> =  std::vector&lt;std::pair&lt;const Key, T&gt;, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>&gt;</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> =  std::vector&lt;std::pair&lt;const Key, T&gt;, Allocator&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -207,7 +207,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;const Key, T&gt;&gt;&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> =  std::vector&lt;std::pair&lt;const Key, T&gt;, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>&gt;</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a0cabe346c38a4f1ab1b8a396fbd2bbe2">Container</a> =  std::vector&lt;std::pair&lt;const Key, T&gt;, Allocator&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -223,7 +223,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;const Key, T&gt;&gt;&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> =  Key</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> =  Key</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -239,7 +239,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;const Key, T&gt;&gt;&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> =  Key</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> =  Key</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -255,7 +255,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;const Key, T&gt;&gt;&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a1c9c1509ee714a9814b45a8030c84ec7">mapped_type</a> =  T</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a1c9c1509ee714a9814b45a8030c84ec7">mapped_type</a> =  T</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -271,7 +271,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;const Key, T&gt;&gt;&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a1c9c1509ee714a9814b45a8030c84ec7">mapped_type</a> =  T</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a1c9c1509ee714a9814b45a8030c84ec7">mapped_type</a> =  T</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -289,7 +289,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;typename InputIt &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a89cc338e8466e74baaa138664c79ee98">require_input_iter</a> =  typename std::enable_if&lt;std::is_convertible&lt;typename std::iterator_traits&lt;InputIt&gt;::iterator_category, std::input_iterator_tag&gt;::value&gt;::type</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a89cc338e8466e74baaa138664c79ee98">require_input_iter</a> =  typename std::enable_if&lt;std::is_convertible&lt;typename std::iterator_traits&lt;InputIt&gt;::iterator_category, std::input_iterator_tag&gt;::value&gt;::type</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -307,7 +307,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
 template&lt;typename InputIt &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a89cc338e8466e74baaa138664c79ee98">require_input_iter</a> =  typename std::enable_if&lt;std::is_convertible&lt;typename std::iterator_traits&lt;InputIt&gt;::iterator_category, std::input_iterator_tag&gt;::value&gt;::type</td>
+          <td class="memname">using <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html#a89cc338e8466e74baaa138664c79ee98">require_input_iter</a> =  typename std::enable_if&lt;std::is_convertible&lt;typename std::iterator_traits&lt;InputIt&gt;::iterator_category, std::input_iterator_tag&gt;::value&gt;::type</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -327,10 +327,10 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
+          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;&#160;</td>
-          <td class="paramname"><em>alloc</em> = <code><a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>()</code></td><td>)</td>
+          <td class="paramtype">const Allocator &amp;&#160;</td>
+          <td class="paramname"><em>alloc</em> = <code>Allocator()</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -357,7 +357,7 @@ template&lt;class It &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
+          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
           <td>(</td>
           <td class="paramtype">It&#160;</td>
           <td class="paramname"><em>first</em>, </td>
@@ -371,8 +371,8 @@ template&lt;class It &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;&#160;</td>
-          <td class="paramname"><em>alloc</em> = <code><a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>()</code>&#160;</td>
+          <td class="paramtype">const Allocator &amp;&#160;</td>
+          <td class="paramname"><em>alloc</em> = <code>Allocator()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -401,7 +401,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
+          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
           <td>(</td>
           <td class="paramtype">std::initializer_list&lt; T &gt;&#160;</td>
           <td class="paramname"><em>init</em>, </td>
@@ -409,8 +409,8 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;&#160;</td>
-          <td class="paramname"><em>alloc</em> = <code><a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>()</code>&#160;</td>
+          <td class="paramtype">const Allocator &amp;&#160;</td>
+          <td class="paramname"><em>alloc</em> = <code>Allocator()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -439,10 +439,10 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
+          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;&#160;</td>
-          <td class="paramname"><em>alloc</em> = <code><a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>()</code></td><td>)</td>
+          <td class="paramtype">const Allocator &amp;&#160;</td>
+          <td class="paramname"><em>alloc</em> = <code>Allocator()</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -469,7 +469,7 @@ template&lt;class It &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
+          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
           <td>(</td>
           <td class="paramtype">It&#160;</td>
           <td class="paramname"><em>first</em>, </td>
@@ -483,8 +483,8 @@ template&lt;class It &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;&#160;</td>
-          <td class="paramname"><em>alloc</em> = <code><a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>()</code>&#160;</td>
+          <td class="paramtype">const Allocator &amp;&#160;</td>
+          <td class="paramname"><em>alloc</em> = <code>Allocator()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -513,7 +513,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
+          <td class="memname"><a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::<a class="el" href="structnlohmann_1_1ordered__map.html">ordered_map</a> </td>
           <td>(</td>
           <td class="paramtype">std::initializer_list&lt; T &gt;&#160;</td>
           <td class="paramname"><em>init</em>, </td>
@@ -521,8 +521,8 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &amp;&#160;</td>
-          <td class="paramname"><em>alloc</em> = <code><a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a>()</code>&#160;</td>
+          <td class="paramtype">const Allocator &amp;&#160;</td>
+          <td class="paramname"><em>alloc</em> = <code>Allocator()</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -552,7 +552,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::at </td>
+          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::at </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -580,7 +580,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::at </td>
+          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::at </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -608,7 +608,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::at </td>
+          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::at </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -636,7 +636,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::at </td>
+          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::at </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -664,7 +664,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::count </td>
+          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::count </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -692,7 +692,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::count </td>
+          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::count </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -720,7 +720,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::emplace </td>
+          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::emplace </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> &amp;&#160;</td>
           <td class="paramname"><em>key</em>, </td>
@@ -758,7 +758,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::emplace </td>
+          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::emplace </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structnlohmann_1_1ordered__map.html#a57095c6ed403f02e1bc2c240a13c9ed8">key_type</a> &amp;&#160;</td>
           <td class="paramname"><em>key</em>, </td>
@@ -796,7 +796,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::erase </td>
+          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::erase </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -824,7 +824,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::erase </td>
+          <td class="memname">size_type <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::erase </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -852,7 +852,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::erase </td>
+          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::erase </td>
           <td>(</td>
           <td class="paramtype">iterator&#160;</td>
           <td class="paramname"><em>pos</em></td><td>)</td>
@@ -880,7 +880,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::erase </td>
+          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::erase </td>
           <td>(</td>
           <td class="paramtype">iterator&#160;</td>
           <td class="paramname"><em>pos</em></td><td>)</td>
@@ -908,7 +908,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::find </td>
+          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::find </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -936,7 +936,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::find </td>
+          <td class="memname">iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::find </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -964,7 +964,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const_iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::find </td>
+          <td class="memname">const_iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::find </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -992,7 +992,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const_iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::find </td>
+          <td class="memname">const_iterator <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::find </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -1020,7 +1020,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::insert </td>
+          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">const value_type &amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1048,7 +1048,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::insert </td>
+          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">const value_type &amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1078,7 +1078,7 @@ template&lt;typename InputIt , typename  = require_input_iter&lt;InputIt&gt;&gt;
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::insert </td>
+          <td class="memname">void <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">InputIt&#160;</td>
           <td class="paramname"><em>first</em>, </td>
@@ -1118,7 +1118,7 @@ template&lt;typename InputIt , typename  = require_input_iter&lt;InputIt&gt;&gt;
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::insert </td>
+          <td class="memname">void <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">InputIt&#160;</td>
           <td class="paramname"><em>first</em>, </td>
@@ -1156,7 +1156,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::insert </td>
+          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">value_type &amp;&amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1184,7 +1184,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::insert </td>
+          <td class="memname">std::pair&lt;iterator, bool&gt; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::insert </td>
           <td>(</td>
           <td class="paramtype">value_type &amp;&amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1212,7 +1212,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::operator[] </td>
+          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::operator[] </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -1240,7 +1240,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::operator[] </td>
+          <td class="memname">T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::operator[] </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -1268,7 +1268,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::operator[] </td>
+          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::operator[] </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>
@@ -1296,7 +1296,7 @@ template&lt;class Key , class T , class IgnoredLess  = std::less&lt;Key&gt;, cla
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt;::operator[] </td>
+          <td class="memname">const T&amp; <a class="el" href="structnlohmann_1_1ordered__map.html">nlohmann::ordered_map</a>&lt; Key, T, IgnoredLess, Allocator &gt;::operator[] </td>
           <td>(</td>
           <td class="paramtype">const Key &amp;&#160;</td>
           <td class="paramname"><em>key</em></td><td>)</td>

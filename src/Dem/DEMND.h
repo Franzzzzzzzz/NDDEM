@@ -10,25 +10,12 @@
     #include <omp.h>
 #endif
 
-#include "cereal/types/vector.hpp"
-#include "cereal/types/chrono.hpp"
-#include "cereal/types/optional.hpp"
-#include "cereal/types/utility.hpp"
-#include "cereal/types/string.hpp"
-#include "cereal/types/map.hpp"
-#include "cereal/types/list.hpp"
-#include "cereal/archives/binary.hpp"
-
-//#include "callgrind.h"
-//#include <ittnotify.h>
-
 #include "Typedefs.h"
 #include "Parameters.h"
 #include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"
 #include "Cells.h"
-#include "Octree.h"
 #include "Boundaries.h"
 #ifdef EMSCRIPTEN
     #include <emscripten.h>
@@ -101,27 +88,11 @@ public:
     int numthread=1 ;
     Multiproc<d> MP ;
     Cells<d> cells ; 
-    Octree<d> octree ; 
 
     double t ; int ti ;
     double dt ;
     clock_t tnow, tprevious ;
 
-    //-----------------------------------------
-    template <class Archive>
-    void serialize( Archive & ar )
-    {
-        ar(N, 
-           X, V, A, Omega, F, FOld, Torque, TorqueOld, Vmag, OmegaMag, Z, Fcorr, TorqueCorr, RigidBodyId,
-           PBCFlags, WallForce, empty_array, ParticleForce, Ghost, Ghost_dir, Atmp, 
-           numthread, t, ti, dt, tnow, tprevious
-           , P
-           // Todo: ExternalAction, MP, cells, 
-        );
-        printf("RESTART ERROR: STILL SOME THINGS TO SERIALIZE IN Simulation") ; 
-    }
-    //-----------------------------------------
-    
     //==========================================================
     Simulation(int NN) {
         P = Parameters<d>(NN) ;
@@ -194,14 +165,7 @@ public:
             printf("%g ", *rmax) ;
             cells.init_cells(P.Boundaries, P.cellsize==-1?(*rmax*2.1):P.cellsize) ;
             MP.splitcells(cells.cells.size()) ; 
-            MP.CLp_it.init(N, numthread) ; 
-        }
-        else if (P.contact_strategy == ContactStrategies::OCTREE)
-        {
-            printf("INITIALISE OCTREE\n") ; fflush(stdout) ;
-            octree.init_cells(P.Boundaries, P.r) ;
-            MP.splitcells(octree.cells_to_split()) ; 
-            MP.CLp_it.init(N, numthread) ; 
+            MP.CLp_all.init_for_cells(N) ; 
         }
         
         dt=P.dt ;
@@ -233,12 +197,9 @@ public:
      * \ingroup API
     */
     void step_forward (int nt)
-    {        
-        
+    {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
-        //if (ntt==990) {CALLGRIND_START_INSTRUMENTATION ;}
-          
         // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
         // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
         bool isdumptime = (ntt==nt-1) || (ti % P.tdump==0) ;
@@ -252,7 +213,7 @@ public:
             fflush(stdout) ;
             tprevious=tnow ;
         }
-        
+
         //----- Velocity Verlet step 1 : compute the new positions
         #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A)
         for (int i=0 ; i<N ; i++)
@@ -309,23 +270,22 @@ public:
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
-        
+
         P.perform_MOVINGWALL() ;
         P.perform_PBCLE_move() ;
         std::invoke (P.update_gravity, &P, dt) ;
         if (P.contact_strategy == ContactStrategies::CELLS) cells.allocate_to_cells(X) ; 
-        else if (P.contact_strategy == ContactStrategies::OCTREE) octree.allocate_to_cells(X) ; 
+
+        //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
         // ----- Contact detection ------
+        if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
         double LE_displacement ; 
         if (P.Boundaries[0].Type == WallType::PBC_LE) 
             LE_displacement = P.Boundaries[0].displacement ; 
         else
             LE_displacement = 0 ; 
-          
-        for (int i=0 ; i<MP.P ; i++)
-            MP.CLp_it.it_ends[i] = MP.CLp[i].v.end() ;
-          
+        
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout) shared(cells) shared(LE_displacement)
         {
          #ifdef NO_OPENMP
@@ -342,11 +302,7 @@ public:
         
          if (P.contact_strategy == ContactStrategies::CELLS)
          {
-             cells.contacts(ID, {MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_it, MP.CLp_new[ID], X, P.r, LE_displacement) ; 
-         }
-         else if (P.contact_strategy == ContactStrategies::OCTREE)
-         {
-             octree.contacts(ID, {MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_it, MP.CLp_new[ID], X, P.r, LE_displacement) ; 
+             cells.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r, LE_displacement) ; 
          }
          else
          {
@@ -494,13 +450,10 @@ public:
         #endif
         } //END PARALLEL SECTION
       
-        if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE)
-        {
-            MP.merge_newcontacts() ; 
-            for (int i=0 ; i<N ; i++)
-                MP.CLp_it.it_array_beg[i] = MP.CLp_it.null_list.v.begin() ; 
-        }
-          
+        //printf("{%ld %ld}", MP.CLp_all.v.size(), MP.CLp[0].v.size()) ; fflush(stdout) ; 
+        if (P.contact_strategy == ContactStrategies::CELLS) MP.merge_split_CLp() ; 
+        //printf("\n{%ld}\n", MP.CLp[0].v.size()) ; 
+
         //-------------------------------------------------------------------------------
         // Force and torque computation
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
@@ -518,8 +471,10 @@ public:
             else
                 it++ ;
         }
-        
+
         //Particle - particle contacts
+
+
         #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout) shared(isdumptime)
         {
           #ifdef NO_OPENMP
@@ -534,28 +489,9 @@ public:
 
             // Particle-particle contacts
             //printf("====%d %g=====\n", ti, P.Boundaries[0].displacement) ;
-            int curi = -1 ; 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
-                // We need to do some contact handling first
-                while (it != CLp.v.end() && !it->persisting) 
-                    it = CLp.v.erase(it) ; 
-                if (it == CLp.v.end())
-                {
-                    /*if (curi!= -1) 
-                        MP.CLp_it.it_array_end[curi] = CLp.v.end() ; */
-                    break ; 
-                }
-                
-                if ( it->i != curi )
-                {
-                    MP.CLp_it.it_array_beg[it->i] = it ; 
-                    /*if (curi != -1) 
-                        MP.CLp_it.it_array_end[curi] = it ; */
-                    curi = it->i ;
-                }    
-                
-                // Proceed if the contact needs to be considered                
+                //printf("%d %d %X %X %g\n", it->i, it->j, it->ghost, it-> ghostdir, it->contactlength) ; 
                 if (it->ghost==0)
                 {
                     C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
@@ -567,6 +503,7 @@ public:
                     (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
                                         X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
                 }
+
                 if (isdumptime) it->saveinfo(C.Act) ;
 
                 Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
@@ -579,15 +516,12 @@ public:
                 }
                 else
                     MP.delaying(ID, it->j, C.Act) ;
-                
                 it->persisting = false ; 
 
                 //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-                //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+            //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
-            //if (curi!= -1) 
-            //    MP.CLp_it.it_array_end[curi] = CLp.v.end() ; 
-            
+
             // Particle wall contacts
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
@@ -677,7 +611,6 @@ public:
             Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
             }
         }
-        
         MP.delayed_clean() ;
 
         // Benchmark::stop_clock("Forces");
@@ -705,8 +638,7 @@ public:
         } // END OF PARALLEL SECTION
 
         // Benchmark::stop_clock("Verlet last");
-        
-        
+
         // Check events
         P.check_events(t, X,V,Omega) ;
 
@@ -742,13 +674,12 @@ public:
         }
 
         if (P.wallforcecompute || P.wallforcecomputed) MP.delayedwall_clean() ;
-        
-        
+
         // Load balancing on the procs as needed
         #ifndef NO_OPENMP
         MP.num_time++ ;
-        if (MP.num_time>50)
-        {    
+        if (MP.num_time>100)
+        {
           MP.load_balance(P.contact_strategy) ;
           // Cleaning the load balancing
           MP.num_time = 0 ;
@@ -756,8 +687,6 @@ public:
           MP.timing_forces = vector<double>(MP.P,0) ;
         }
         #endif
-        
-        //save_restart(*this, "restart_archive.bin") ; 
     }
   }
 

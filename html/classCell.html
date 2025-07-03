@@ -91,18 +91,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a5655dd93b705dc2208bce1fd6ef6e2ed"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a5655dd93b705dc2208bce1fd6ef6e2ed">neigh_ghosts_dir</a></td></tr>
 <tr class="memdesc:a5655dd93b705dc2208bce1fd6ef6e2ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ghost cell directions going through PBC (1 is negative delta)  <a href="classCell.html#a5655dd93b705dc2208bce1fd6ef6e2ed">More...</a><br /></td></tr>
 <tr class="separator:a5655dd93b705dc2208bce1fd6ef6e2ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90394bf54dcfc6a8f7a0745865dcf107"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a90394bf54dcfc6a8f7a0745865dcf107">neighbours_full</a></td></tr>
-<tr class="memdesc:a90394bf54dcfc6a8f7a0745865dcf107"><td class="mdescLeft">&#160;</td><td class="mdescRight">list of cell neighbours to the current cell  <a href="classCell.html#a90394bf54dcfc6a8f7a0745865dcf107">More...</a><br /></td></tr>
-<tr class="separator:a90394bf54dcfc6a8f7a0745865dcf107"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e309c5e988ee36dfd89a0ab4f6dc45b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a9e309c5e988ee36dfd89a0ab4f6dc45b">neigh_ghosts_full</a></td></tr>
-<tr class="memdesc:a9e309c5e988ee36dfd89a0ab4f6dc45b"><td class="mdescLeft">&#160;</td><td class="mdescRight">list of the ghost cells through the PBC  <a href="classCell.html#a9e309c5e988ee36dfd89a0ab4f6dc45b">More...</a><br /></td></tr>
-<tr class="separator:a9e309c5e988ee36dfd89a0ab4f6dc45b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb70b4da45150079d121552d600c5cb1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#adb70b4da45150079d121552d600c5cb1">neigh_ghosts_full_dim</a></td></tr>
-<tr class="memdesc:adb70b4da45150079d121552d600c5cb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ghost cell dimensions going through PBC.  <a href="classCell.html#adb70b4da45150079d121552d600c5cb1">More...</a><br /></td></tr>
-<tr class="separator:adb70b4da45150079d121552d600c5cb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:addfea399a7098807185efb6b47ac083d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#addfea399a7098807185efb6b47ac083d">neigh_ghosts_full_dir</a></td></tr>
-<tr class="memdesc:addfea399a7098807185efb6b47ac083d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ghost cell directions going through PBC (1 is negative delta)  <a href="classCell.html#addfea399a7098807185efb6b47ac083d">More...</a><br /></td></tr>
-<tr class="separator:addfea399a7098807185efb6b47ac083d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Individual cell for contact detection. </p>
@@ -171,54 +159,6 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9e309c5e988ee36dfd89a0ab4f6dc45b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e309c5e988ee36dfd89a0ab4f6dc45b">&#9670;&nbsp;</a></span>neigh_ghosts_full</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;int&gt; Cell::neigh_ghosts_full</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>list of the ghost cells through the PBC </p>
-
-</div>
-</div>
-<a id="adb70b4da45150079d121552d600c5cb1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb70b4da45150079d121552d600c5cb1">&#9670;&nbsp;</a></span>neigh_ghosts_full_dim</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>&gt; Cell::neigh_ghosts_full_dim</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Ghost cell dimensions going through PBC. </p>
-
-</div>
-</div>
-<a id="addfea399a7098807185efb6b47ac083d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#addfea399a7098807185efb6b47ac083d">&#9670;&nbsp;</a></span>neigh_ghosts_full_dir</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a>&gt; Cell::neigh_ghosts_full_dir</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Ghost cell directions going through PBC (1 is negative delta) </p>
-
-</div>
-</div>
 <a id="a7ec0112dce0e4ff3ad5247388ba2c3f5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7ec0112dce0e4ff3ad5247388ba2c3f5">&#9670;&nbsp;</a></span>neighbours</h2>
 
@@ -227,22 +167,6 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;int&gt; Cell::neighbours</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>list of cell neighbours to the current cell </p>
-
-</div>
-</div>
-<a id="a90394bf54dcfc6a8f7a0745865dcf107"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90394bf54dcfc6a8f7a0745865dcf107">&#9670;&nbsp;</a></span>neighbours_full</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;int&gt; Cell::neighbours_full</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -338,7 +338,6 @@ struct Field * Coarsing::get_field(string nm)
 int Coarsing::compute_fluc_vel (bool usetimeavg)
 {
   // printf(" -> VelFluct") ; fflush(stdout) ;
-  static bool once = false ; 
   v1d vavg (d,0) ;
   data.vel_fluc.resize(d, std::vector <double> (data.N, 0.0)) ;
 
@@ -348,26 +347,8 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
   {
     if (isnan(data.pos[0][i])) continue ;
     //auto vavg = interpolate_vel (i, usetimeavg) ;
-    switch (d)
-    {
-      case 2: vavg = interpolate_vel_multilinear<2>(i,usetimeavg) ; break ; 
-      case 3: vavg = interpolate_vel_trilinear(i,usetimeavg) ; break ; 
-      case 4: vavg = interpolate_vel_multilinear<4>(i,usetimeavg) ; break ; 
-      case 5: vavg = interpolate_vel_multilinear<5>(i,usetimeavg) ; break ; 
-      case 6: vavg = interpolate_vel_multilinear<6>(i,usetimeavg) ; break ; 
-      case 7: vavg = interpolate_vel_multilinear<7>(i,usetimeavg) ; break ; 
-      case 8: vavg = interpolate_vel_multilinear<8>(i,usetimeavg) ; break ; 
-      default: 
-        if (!once)
-        {
-          printf("\nERROR: cannot linearly interpolate in such dimension!. Falling back to Nearest Neighbour interpolation.\n") ; 
-          once = true ; 
-        }
-        vavg = interpolate_vel_nearest(i,usetimeavg) ;
-        break ; 
-    }
-    
-    //vavg = interpolate_vel_trilinear(i,usetimeavg) ;
+    vavg = interpolate_vel_trilinear(i,usetimeavg) ;
+    //vavg = interpolate_vel_nearest(i,usetimeavg) ;
     //printf("%g %g | %g %g | %g %g\n", vavg[0], vavg2[0], vavg[1], vavg2[1], vavg[2], vavg2[2]) ;
     for (int dd=0 ; dd<d ; dd++)
       data.vel_fluc[dd][i]=data.vel[dd][i]-vavg[dd] ;
@@ -427,7 +408,7 @@ v1d Coarsing::interpolate_rot_nearest (int id, bool usetimeavg)
 //--------
 v1d Coarsing::interpolate_vel_trilinear (int id, bool usetimeavg)
 {
-assert((d==3)) ;
+assert(d==3) ;
 int pts[8][3] ;
 double Qs[4*3]={0,0,0,0,0,0,0,0,0,0,0,0} ;
 double x;
@@ -557,12 +538,12 @@ if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt ; CGP[i].
 if (doradius) for (int i=0 ; i<Npt ; CGP[i].fields[cT][radiusid]=0, i++) ;
 if (doextra)
     for (size_t v = 0 ; v<extraid.size() ; v++)
-      for (int w = 0 ; w<extrancomp[v] ; w++)
+      for (size_t w = 0 ; w<extrancomp[v] ; w++)
         for (int i=0 ; i<Npt ; CGP[i].fields[cT][extraid[v]+w]=0, i++) ;
 
 //printf("Starting pass 1...\r") ; fflush(stdout) ;
 
-double dm, dI=1.0 ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
+double dm, dI ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a bit ...
 vector<double> totweight(data.N,0) ;
 
 // printf(" -> Pass 1") ; fflush(stdout) ;
@@ -597,7 +578,7 @@ for (i=0 ; i<data.N ; i++)
        CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
      if (doextra)
        for (size_t v = 0 ; v<extraid.size() ; v++)
-         for (int w = 0 ; w<extrancomp[v] ; w++)
+         for (size_t w = 0 ; w<extrancomp[v] ; w++)
            *(CGf+extraid[v]+w) += wp * dm * data.extra[extralocation[v]+w][i] ;
  }
 
@@ -635,7 +616,7 @@ for (i=0 ; i<Npt ; i++)
     if (doradius && rho!=0) {CGP[i].fields[cT][radiusid] /= rho ; }
     if (doextra && rho!=0)
        for (size_t v = 0 ; v<extraid.size() ; v++)
-         for (int w = 0 ; w<extrancomp[v] ; w++)
+         for (size_t w = 0 ; w<extrancomp[v] ; w++)
             CGP[i].fields[cT][extraid[v]+w] /= rho ;
 }
 return 0 ;
@@ -1193,7 +1174,7 @@ int Coarsing::mean_time(bool temporary)
 int Coarsing::write_vtk(string sout)
 {
   FILE *out ;
-  if (d!=3) printf("WARN: the write_vtk function hasn't been implement for dimension different from 3. Only the first 3 components of vectors and tensors will be saved.\n") ;
+  if (d!=3) printf("WARN: the write_vtk function hasn't been implement for dimension different from 3\n") ;
   for (int t=0 ; t<Time ; t++)
   {
     out=fopen((sout+"-"+std::to_string(t)+".vtk").c_str(), "w") ;
@@ -1223,14 +1204,14 @@ int Coarsing::write_vtk(string sout)
              for (int k=0 ; k<npt[2] ; k++)
               for (int j=0 ; j<npt[1] ; j++)
                for (int i=0 ; i<npt[0] ; i++)
-                for (int dd=0 ; dd<std::min(d,3) ; dd++)
+                for (int dd=0 ; dd<d ; dd++)
                   fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
              break ;
         case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
-               for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
+               for (int dd=0 ; dd<d*d ; dd++)
                 fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
             break ;
         default: printf("ERR: this should never happen. \n") ;

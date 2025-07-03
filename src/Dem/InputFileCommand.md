@@ -73,7 +73,7 @@ These command have a single behaviour, described here.
 - `gravityangle INTENSITY ANGLE`: set the gravity angled from first dimension
 - `gravityrotate INTENSITY OMEGA DIM1 DIM2`: make the gravity rotate at an angular velocity OMEGA between DIM1 and 2.
 - `ContactModel [Hooke|Hertz]`: set contact model.
-- `ContactStrategy [naive|cells|octree]`: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?) or with cells+octree (usefull for polydisperse).
+- `ContactStrategy [naive|cells]`: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)
 - `boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo`: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:
   - `MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY`
   - `SPHERE RADIUS X1 ... XD`: sphere of radius RADIUS, center at the X location

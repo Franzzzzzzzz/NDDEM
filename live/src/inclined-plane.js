@@ -303,7 +303,7 @@ function finish_setup() {
         Array(params.dimension).fill(params.L - params.r_max)];
     cgparam["boundaries"][0][0] = params.r_max;
     cgparam["boundaries"][1][0] = 4 * params.L;
-    cgparam["window size"] = 2 * params.average_radius;
+    cgparam["window size"] = 6 * params.average_radius;
     cgparam["skip"] = 0;
     cgparam["max time"] = 1;
     cgparam["time average"] = "None";
