@@ -19,6 +19,7 @@ import * as AUDIO from '../libs/audio.js';
 var urlParams = new URLSearchParams(window.location.search);
 
 let camera, scene, renderer;
+let controls;
 let gui;
 let S;
 let x;
@@ -150,11 +151,10 @@ async function init() {
         }
         // NOTE: NEED TO MAKE A DESTRUCTOR!
     });
-    const controls = new OrbitControls(camera, renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
     controls.target.y = params.table_height - params.L2;
     controls.update();
 
-    let isMobile = false
     if (navigator.userAgentData === undefined) { isMobile = false; }
     else { isMobile = navigator.userAgentData.mobile; } //resolves true/false
 
@@ -312,6 +312,12 @@ function update() {
             if (params.d4.cur !== x[0][3]) {
                 params.d4.cur = x[0][3];
                 replace_meshes();
+            }
+            if (controls !== undefined) {
+                controls.target.x = x[0][0];
+                controls.target.y = x[0][1];
+                controls.target.z = x[0][2];
+                controls.update();
             }
         }
     }
