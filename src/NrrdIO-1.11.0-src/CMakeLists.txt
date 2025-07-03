@@ -23,7 +23,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 PROJECT(NrrdIO)
 INCLUDE_REGULAR_EXPRESSION("^.*.h$")
 
