@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['parse_5fevent_5ft_4970',['parse_event_t',['../namespacenlohmann_1_1detail.html#a2fb6dae6578e06ae73ca0d7cc8512b1a',1,'nlohmann::detail::parse_event_t()'],['../namespacenlohmann_1_1detail.html#a2fb6dae6578e06ae73ca0d7cc8512b1a',1,'nlohmann::detail::parse_event_t()']]],
-  ['pass_4971',['Pass',['../group__CoarseGraining.html#gabe77423eb27f643233ef051559a64882',1,'Coarsing.h']]],
-  ['predicate_5ft_4972',['predicate_t',['../pugixml_8cpp.html#a164f693113306594e46b073c232de257',1,'pugixml.cpp']]]
+  ['operator_8576',['Operator',['../classinternal_1_1GenericRegex.html#acd9c0338546415c6d6dabdb76f8be673',1,'internal::GenericRegex']]]
 ];

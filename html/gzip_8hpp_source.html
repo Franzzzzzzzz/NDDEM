@@ -362,7 +362,7 @@ $(function() {
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Sink&gt;</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> write_long(<span class="keywordtype">long</span> n, Sink&amp; next)</div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    {</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keyword">typedef</span> <span class="keyword">typename</span> category_of&lt;Sink&gt;::type category;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="namespacecereal_1_1bitset__detail.html#a4f5825a3267dd05e798bed76cf7e29cc">category_of&lt;Sink&gt;::type</a> category;</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keyword">typedef</span> is_convertible&lt;category, output&gt; can_write;</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        write_long(n, next, can_write());</div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    }</div>
@@ -724,7 +724,7 @@ $(function() {
 <div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="keywordtype">bool</span> has_name = !p.file_name.empty();</div>
 <div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    <span class="keywordtype">bool</span> has_comment = !p.comment.empty();</div>
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160; </div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    std::string::size_type length =</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    <a class="code" href="namespacecereal.html#aba657f7ef148daa498dc4fa9e579b01e">std::string::size_type</a> length =</div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;        10 +</div>
 <div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        (has_name ? p.file_name.size() + 1 : 0) +</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;        (has_comment ? p.comment.size() + 1 : 0);</div>
@@ -828,6 +828,8 @@ $(function() {
 <div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// #ifndef BOOST_IOSTREAMS_GZIP_HPP_INCLUDED</span></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34">id2</a></div><div class="ttdeci">@ id2</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93">id1</a></div><div class="ttdeci">@ id1</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
+<div class="ttc" id="anamespacecereal_1_1bitset__detail_html_a4f5825a3267dd05e798bed76cf7e29cc"><div class="ttname"><a href="namespacecereal_1_1bitset__detail.html#a4f5825a3267dd05e798bed76cf7e29cc">cereal::bitset_detail::type</a></div><div class="ttdeci">type</div><div class="ttdoc">The type the bitset is encoded with.</div><div class="ttdef"><b>Definition:</b> bitset.hpp:44</div></div>
+<div class="ttc" id="anamespacecereal_html_aba657f7ef148daa498dc4fa9e579b01e"><div class="ttname"><a href="namespacecereal.html#aba657f7ef148daa498dc4fa9e579b01e">cereal::size_type</a></div><div class="ttdeci">CEREAL_SIZE_TYPE size_type</div><div class="ttdoc">The size type used by cereal.</div><div class="ttdef"><b>Definition:</b> helpers.hpp:61</div></div>
 <div class="ttc" id="anamespacenlohmann_1_1detail_html_a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282"><div class="ttname"><a href="namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282">nlohmann::detail::cbor_tag_handler_t::error</a></div><div class="ttdeci">@ error</div><div class="ttdoc">throw a parse_error exception in case of a tag</div></div>
 <div class="ttc" id="anamespacenlohmann_1_1detail_html_acc422c11342b31368f610b6f96fcedc6"><div class="ttname"><a href="namespacenlohmann_1_1detail.html#acc422c11342b31368f610b6f96fcedc6">nlohmann::detail::get</a></div><div class="ttdeci">auto get(const nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt; &amp;i) -&gt; decltype(i.key())</div><div class="ttdef"><b>Definition:</b> json.hpp:4317</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:4337</div></div>

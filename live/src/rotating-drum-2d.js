@@ -62,7 +62,6 @@ var params = {
     filling_fraction: 0.5, // how full the drum is
     size_ratio: 1.5, // ratio of small to large particle size
     density_ratio: 1, // ratio of small to large particle density
-    nogui: false,
 }
 
 function setup() {
@@ -88,12 +87,6 @@ if (urlParams.has('quality')) { params.quality = parseInt(urlParams.get('quality
 if (urlParams.has('cg_opacity')) { params.cg_opacity = parseInt(urlParams.get('cg_opacity')); }
 if (urlParams.has('size_ratio')) { params.size_ratio = parseFloat(urlParams.get('size_ratio')); }
 if (urlParams.has('density_ratio')) { params.density_ratio = parseFloat(urlParams.get('density_ratio')); }
-if (urlParams.has('nogui')) { params.nogui = true; }
-if (urlParams.has('noinfo')) {
-    Fr_div.style.display = 'none';
-    let scigem_tag = document.getElementById("scigem_tag");
-    scigem_tag.style.display = 'none';
-}
 
 SPHERES.update_cylinder_colour(0x000000);
 SPHERES.createNDParticleShader(params).then(init);
@@ -178,67 +171,65 @@ async function init() {
     // }
 
     // gui
-    if (!params.nogui) {
-        gui = new GUI();
+    gui = new GUI();
 
-        gui.width = 300;
+    gui.width = 300;
 
-        gui.add(params, 'omega', 0, 20)
-            // .name( 'Froude number').listen()
-            .name('Rotation rate').listen()
-            .onChange(() => {
-                // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
-                // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
-                update_Fr();
-                S.simu_interpret_command("boundary " + String(params.dimension) + " ROTATINGSPHERE " + String(params.R) + " 0 0 " + String(-params.omega) + " 0 0"); // add a sphere!
-            });
-        gui.add(params, 'mu', 0, 1)
-            .name('Particle Friction').listen()
-            .onChange(() => {
-                S.simu_interpret_command("set Mu " + String(params.mu));
-            });
-        gui.add(params, 'mu_wall', 0, 1)
-            .name('Wall Friction').listen()
-            .onChange(() => {
-                S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
-            });
-        gui.add(params, 'filling_fraction', 0, 1)
-            .name('Filling Fraction').listen()
-            .onChange(() => {
-                reset_particles();
-            });
-        gui.add(params, 'phi_s', 0, 1)
-            .name('Small particle conc').listen()
-            .onChange(() => {
-                reset_particles();
-            });
-        gui.add(params, 'size_ratio', 1, 3, 0.01)
-            .name('Size ratio').listen()
-            .onChange(() => {
-                reset_particles();
-            });
-        gui.add(params, 'density_ratio', 0.1, 10)
-            .name('Density ratio').listen()
-            .onChange(() => {
-                reset_particles();
-            });
+    gui.add(params, 'omega', 0, 20)
+        // .name( 'Froude number').listen()
+        .name('Rotation rate').listen()
+        .onChange(() => {
+            // params.omega = Math.sqrt(2*params.Fr*9.81/(2*params.R));
+            // S.simu_interpret_command("gravityrotate -9.81 " + params.omega + " 0 1")
+            update_Fr();
+            S.simu_interpret_command("boundary " + String(params.dimension) + " ROTATINGSPHERE " + String(params.R) + " 0 0 " + String(-params.omega) + " 0 0"); // add a sphere!
+        });
+    gui.add(params, 'mu', 0, 1)
+        .name('Particle Friction').listen()
+        .onChange(() => {
+            S.simu_interpret_command("set Mu " + String(params.mu));
+        });
+    gui.add(params, 'mu_wall', 0, 1)
+        .name('Wall Friction').listen()
+        .onChange(() => {
+            S.simu_interpret_command("set Mu_wall " + String(params.mu_wall));
+        });
+    gui.add(params, 'filling_fraction', 0, 1)
+        .name('Filling Fraction').listen()
+        .onChange(() => {
+            reset_particles();
+        });
+    gui.add(params, 'phi_s', 0, 1)
+        .name('Small particle conc').listen()
+        .onChange(() => {
+            reset_particles();
+        });
+    gui.add(params, 'size_ratio', 1, 3, 0.01)
+        .name('Size ratio').listen()
+        .onChange(() => {
+            reset_particles();
+        });
+    gui.add(params, 'density_ratio', 0.1, 10)
+        .name('Density ratio').listen()
+        .onChange(() => {
+            reset_particles();
+        });
 
 
-        // gui.add( params.lifters, 'number', 0,12,1)
-        //     .name( 'Number of lifters').listen()
-        //     .onChange( update_lifters);
-        // gui.add( params.lifters, 'width', 0,params.R/2.)
-        //     .name( 'Lifter width').listen()
-        //     .onChange( update_lifters);
+    // gui.add( params.lifters, 'number', 0,12,1)
+    //     .name( 'Number of lifters').listen()
+    //     .onChange( update_lifters);
+    // gui.add( params.lifters, 'width', 0,params.R/2.)
+    //     .name( 'Lifter width').listen()
+    //     .onChange( update_lifters);
 
-        gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
-        gui.add(params, 'cg_field', ['Density', 'Size', 'Velocity', 'Pressure', 'Shear stress', 'Kinetic Pressure']).name('Field').listen();
-        // gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
-        //     update_cg_params(S, params);
-        // });
-        // controls = new OrbitControls( camera, renderer.domElement );
-        // controls.update();
-    }
+    gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
+    gui.add(params, 'cg_field', ['Density', 'Size', 'Velocity', 'Pressure', 'Shear stress', 'Kinetic Pressure']).name('Field').listen();
+    // gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
+    //     update_cg_params(S, params);
+    // });
+    // controls = new OrbitControls( camera, renderer.domElement );
+    // controls.update();
 
     window.addEventListener('resize', onWindowResize, false);
 

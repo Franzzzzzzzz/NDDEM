@@ -106,7 +106,7 @@ return 0 ;
 //-------------------------------------------------------------
 int LiggghtsReader::read_timestep(int ts)
 {
-  if (ts<mapped_ts.size())
+  if (static_cast<size_t>(ts)<mapped_ts.size())
   {
     if (mapped_ts[ts].has_value())
     {
@@ -165,7 +165,7 @@ int LiggghtsReader::read_timestep_impl(int ts, bool skip)
 
  if (is_seekable)
  {
-  if (mapped_ts.size()<=curts+1) mapped_ts.resize(curts+2) ;
+  if (mapped_ts.size()<=static_cast<size_t>(curts+1)) mapped_ts.resize(curts+2) ;
   mapped_ts[curts+1]=in->tellg() ;
  }
 

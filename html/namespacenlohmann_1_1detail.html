@@ -386,7 +386,7 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a3603b59a17d1c5e15050743b847992f2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a3603b59a17d1c5e15050743b847992f2">difference_type_t</a> = typename T::difference_type</td></tr>
 <tr class="separator:a3603b59a17d1c5e15050743b847992f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26dc71e2dd9336587e56062178f9abce"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a26dc71e2dd9336587e56062178f9abce"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a26dc71e2dd9336587e56062178f9abce">pointer_t</a> = typename T::pointer</td></tr>
+<tr class="memitem:a26dc71e2dd9336587e56062178f9abce"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a26dc71e2dd9336587e56062178f9abce">pointer_t</a> = typename <a class="el" href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">T::pointer</a></td></tr>
 <tr class="separator:a26dc71e2dd9336587e56062178f9abce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a082bdafd3b4c61d9d1e92b35b8f75ee3"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a082bdafd3b4c61d9d1e92b35b8f75ee3"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a082bdafd3b4c61d9d1e92b35b8f75ee3">reference_t</a> = typename T::reference</td></tr>
@@ -666,7 +666,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a5440d650150d01e8015133521351b459"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a5440d650150d01e8015133521351b459">from_json</a> (const BasicJsonType &amp;j, EnumType &amp;e)</td></tr>
 <tr class="separator:a5440d650150d01e8015133521351b459"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5cfb765aad92795abd7fda29d017272a"><td class="memTemplParams" colspan="2">template&lt;typename BasicJsonType , typename T , typename Allocator , enable_if_t&lt; is_getable&lt; BasicJsonType, T &gt;::value, int &gt;  = 0&gt; </td></tr>
-<tr class="memitem:a5cfb765aad92795abd7fda29d017272a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a5cfb765aad92795abd7fda29d017272a">from_json</a> (const BasicJsonType &amp;j, std::forward_list&lt; T, Allocator &gt; &amp;l)</td></tr>
+<tr class="memitem:a5cfb765aad92795abd7fda29d017272a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a5cfb765aad92795abd7fda29d017272a">from_json</a> (const BasicJsonType &amp;j, std::forward_list&lt; T, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt; &amp;l)</td></tr>
 <tr class="separator:a5cfb765aad92795abd7fda29d017272a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3df497b1d3977f071b488ecac1401517"><td class="memTemplParams" colspan="2">template&lt;typename BasicJsonType , typename T , enable_if_t&lt; is_getable&lt; BasicJsonType, T &gt;::value, int &gt;  = 0&gt; </td></tr>
 <tr class="memitem:a3df497b1d3977f071b488ecac1401517"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a3df497b1d3977f071b488ecac1401517">from_json</a> (const BasicJsonType &amp;j, std::valarray&lt; T &gt; &amp;l)</td></tr>
@@ -708,10 +708,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a8b99ec9b29f3f20a18fc4281fb784e49"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a8b99ec9b29f3f20a18fc4281fb784e49">from_json</a> (const BasicJsonType &amp;j, std::tuple&lt; Args... &gt; &amp;t)</td></tr>
 <tr class="separator:a8b99ec9b29f3f20a18fc4281fb784e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae93147a54d2740228ef16a5e6210ca3e"><td class="memTemplParams" colspan="2">template&lt;typename BasicJsonType , typename Key , typename Value , typename Compare , typename Allocator , typename  = enable_if_t &lt; !std::is_constructible &lt;                                        typename BasicJsonType::string_t, Key &gt;::value &gt;&gt; </td></tr>
-<tr class="memitem:ae93147a54d2740228ef16a5e6210ca3e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#ae93147a54d2740228ef16a5e6210ca3e">from_json</a> (const BasicJsonType &amp;j, std::map&lt; Key, Value, Compare, Allocator &gt; &amp;m)</td></tr>
+<tr class="memitem:ae93147a54d2740228ef16a5e6210ca3e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#ae93147a54d2740228ef16a5e6210ca3e">from_json</a> (const BasicJsonType &amp;j, std::map&lt; Key, <a class="el" href="document_8h.html#a071cf97155ba72ac9a1fc4ad7e63d481">Value</a>, Compare, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt; &amp;m)</td></tr>
 <tr class="separator:ae93147a54d2740228ef16a5e6210ca3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef5c8ea108f4d2b03fb4a635617510de"><td class="memTemplParams" colspan="2">template&lt;typename BasicJsonType , typename Key , typename Value , typename Hash , typename KeyEqual , typename Allocator , typename  = enable_if_t &lt; !std::is_constructible &lt;                                        typename BasicJsonType::string_t, Key &gt;::value &gt;&gt; </td></tr>
-<tr class="memitem:aef5c8ea108f4d2b03fb4a635617510de"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#aef5c8ea108f4d2b03fb4a635617510de">from_json</a> (const BasicJsonType &amp;j, std::unordered_map&lt; Key, Value, Hash, KeyEqual, Allocator &gt; &amp;m)</td></tr>
+<tr class="memitem:aef5c8ea108f4d2b03fb4a635617510de"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#aef5c8ea108f4d2b03fb4a635617510de">from_json</a> (const BasicJsonType &amp;j, std::unordered_map&lt; Key, <a class="el" href="document_8h.html#a071cf97155ba72ac9a1fc4ad7e63d481">Value</a>, Hash, KeyEqual, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt; &amp;m)</td></tr>
 <tr class="separator:aef5c8ea108f4d2b03fb4a635617510de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c45286b0a2f15ea0a756cb87a76cf9b"><td class="memTemplParams" colspan="2">template&lt;typename string_type &gt; </td></tr>
 <tr class="memitem:a3c45286b0a2f15ea0a756cb87a76cf9b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacenlohmann_1_1detail.html#a3c45286b0a2f15ea0a756cb87a76cf9b">int_to_string</a> (string_type &amp;target, std::size_t value)</td></tr>
@@ -1321,7 +1321,7 @@ template&lt;typename BasicJsonType &gt; </div>
 template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespacenlohmann_1_1detail.html#a26dc71e2dd9336587e56062178f9abce">nlohmann::detail::pointer_t</a> = typedef typename T::pointer</td>
+          <td class="memname">using <a class="el" href="namespacenlohmann_1_1detail.html#a26dc71e2dd9336587e56062178f9abce">nlohmann::detail::pointer_t</a> = typedef typename <a class="el" href="pointer_8h.html#aae1f8d263916ad71bd415381591549c0">T::pointer</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1683,7 +1683,7 @@ template&lt;typename ... Ts&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a2fb6dae6578e06ae73ca0d7cc8512b1a">nlohmann::detail::parse_event_t</a> : uint8_t</td>
+          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a2fb6dae6578e06ae73ca0d7cc8512b1a">nlohmann::detail::parse_event_t</a> : <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a></td>
         </tr>
       </table>
   </td>
@@ -1731,7 +1731,7 @@ template&lt;typename ... Ts&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a2fb6dae6578e06ae73ca0d7cc8512b1a">nlohmann::detail::parse_event_t</a> : uint8_t</td>
+          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a2fb6dae6578e06ae73ca0d7cc8512b1a">nlohmann::detail::parse_event_t</a> : <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a></td>
         </tr>
       </table>
   </td>
@@ -1779,7 +1779,7 @@ template&lt;typename ... Ts&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985">nlohmann::detail::value_t</a> : std::uint8_t</td>
+          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985">nlohmann::detail::value_t</a> : <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a></td>
         </tr>
       </table>
   </td>
@@ -1792,7 +1792,7 @@ template&lt;typename ... Ts&gt; </div>
 <p>the JSON type enumeration </p>
 <p>This enumeration collects the different JSON types. It is internally used to distinguish the stored values, and the functions <a class="el" href="classnlohmann_1_1basic__json.html#aedc7afad96292b5ab61a2e0ad3067f5f">basic_json::is_null()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a57e8411a770a6263d6d8f2116c37f3aa">basic_json::is_object()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#ab5b70d60a636b9c5e10f6c8caac60b9e">basic_json::is_array()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#ab303d17366c26fca12242c7f8def1bb7">basic_json::is_string()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a911b11e855e685fa59ea1d111490b36b">basic_json::is_boolean()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#abd47ac8eba63833152795280f75b5851">basic_json::is_number()</a> (with <a class="el" href="classnlohmann_1_1basic__json.html#ac4b4acf2c0ad075c0dc125a65c102362">basic_json::is_number_integer()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a5493f2ed1e07b0ece428bd5a47e2fb95">basic_json::is_number_unsigned()</a>, and <a class="el" href="classnlohmann_1_1basic__json.html#a116cdb9300b56519fc9cf756609296cb">basic_json::is_number_float()</a>), <a class="el" href="classnlohmann_1_1basic__json.html#aecaaa0613d3f3a5b49b34b02afc5f85d">basic_json::is_discarded()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a548d2d4013da24e7d7510d90febc80c4">basic_json::is_primitive()</a>, and <a class="el" href="classnlohmann_1_1basic__json.html#a4e05a7d5deec758f1d830741b68b4249">basic_json::is_structured()</a> rely on it.</p>
 <dl class="section note"><dt>Note</dt><dd>There are three enumeration entries (number_integer, number_unsigned, and number_float), because the library distinguishes these three types for numbers: <a class="el" href="classnlohmann_1_1basic__json.html#ae09af9c23351b7245d9be4d1b2035fef">basic_json::number_unsigned_t</a> is used for unsigned integers, <a class="el" href="classnlohmann_1_1basic__json.html#a11e390944da90db83089eb2426a749d3">basic_json::number_integer_t</a> is used for signed integers, and <a class="el" href="classnlohmann_1_1basic__json.html#a5b8abaebd922d82d69756327c0c347e6">basic_json::number_float_t</a> is used for floating-point numbers or to approximate integers which do not fit in the limits of their respective type.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1basic__json.html#a19734fbc9c97d536832892ddacd6b62a">basic_json::basic_json(const value_t value_type)</a> &ndash; create a JSON value with the default value for a given type</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1basic__json.html#a19734fbc9c97d536832892ddacd6b62a">basic_json::basic_json(const value_t value_type)</a> &ndash; create <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> JSON <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> with the default <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> for <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> given type</dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 1.0.0 </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1ed8fc6239da25abcaf681d30ace4985a37a6259cc0c1dae299a7866489dff0bd"></a>null&#160;</td><td class="fielddoc"><p>null value </p>
@@ -1849,7 +1849,7 @@ template&lt;typename ... Ts&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985">nlohmann::detail::value_t</a> : std::uint8_t</td>
+          <td class="memname">enum <a class="el" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985">nlohmann::detail::value_t</a> : <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a></td>
         </tr>
       </table>
   </td>
@@ -1862,7 +1862,7 @@ template&lt;typename ... Ts&gt; </div>
 <p>the JSON type enumeration </p>
 <p>This enumeration collects the different JSON types. It is internally used to distinguish the stored values, and the functions <a class="el" href="classnlohmann_1_1basic__json.html#aedc7afad96292b5ab61a2e0ad3067f5f">basic_json::is_null()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a57e8411a770a6263d6d8f2116c37f3aa">basic_json::is_object()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#ab5b70d60a636b9c5e10f6c8caac60b9e">basic_json::is_array()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#ab303d17366c26fca12242c7f8def1bb7">basic_json::is_string()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a911b11e855e685fa59ea1d111490b36b">basic_json::is_boolean()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#abd47ac8eba63833152795280f75b5851">basic_json::is_number()</a> (with <a class="el" href="classnlohmann_1_1basic__json.html#ac4b4acf2c0ad075c0dc125a65c102362">basic_json::is_number_integer()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a5493f2ed1e07b0ece428bd5a47e2fb95">basic_json::is_number_unsigned()</a>, and <a class="el" href="classnlohmann_1_1basic__json.html#a116cdb9300b56519fc9cf756609296cb">basic_json::is_number_float()</a>), <a class="el" href="classnlohmann_1_1basic__json.html#aecaaa0613d3f3a5b49b34b02afc5f85d">basic_json::is_discarded()</a>, <a class="el" href="classnlohmann_1_1basic__json.html#a548d2d4013da24e7d7510d90febc80c4">basic_json::is_primitive()</a>, and <a class="el" href="classnlohmann_1_1basic__json.html#a4e05a7d5deec758f1d830741b68b4249">basic_json::is_structured()</a> rely on it.</p>
 <dl class="section note"><dt>Note</dt><dd>There are three enumeration entries (number_integer, number_unsigned, and number_float), because the library distinguishes these three types for numbers: <a class="el" href="classnlohmann_1_1basic__json.html#ae09af9c23351b7245d9be4d1b2035fef">basic_json::number_unsigned_t</a> is used for unsigned integers, <a class="el" href="classnlohmann_1_1basic__json.html#a11e390944da90db83089eb2426a749d3">basic_json::number_integer_t</a> is used for signed integers, and <a class="el" href="classnlohmann_1_1basic__json.html#a5b8abaebd922d82d69756327c0c347e6">basic_json::number_float_t</a> is used for floating-point numbers or to approximate integers which do not fit in the limits of their respective type.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1basic__json.html#a19734fbc9c97d536832892ddacd6b62a">basic_json::basic_json(const value_t value_type)</a> &ndash; create a JSON value with the default value for a given type</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1basic__json.html#a19734fbc9c97d536832892ddacd6b62a">basic_json::basic_json(const value_t value_type)</a> &ndash; create <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> JSON <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> with the default <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> for <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> given type</dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 1.0.0 </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1ed8fc6239da25abcaf681d30ace4985a37a6259cc0c1dae299a7866489dff0bd"></a>null&#160;</td><td class="fielddoc"><p>null value </p>
@@ -2152,7 +2152,7 @@ template&lt;typename BasicJsonType , typename T , typename Allocator , enable_if
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::forward_list&lt; T, Allocator &gt; &amp;&#160;</td>
+          <td class="paramtype">std::forward_list&lt; T, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>l</em>&#160;</td>
         </tr>
         <tr>
@@ -2182,7 +2182,7 @@ template&lt;typename BasicJsonType , typename Key , typename Value , typename Co
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::map&lt; Key, Value, Compare, Allocator &gt; &amp;&#160;</td>
+          <td class="paramtype">std::map&lt; Key, <a class="el" href="document_8h.html#a071cf97155ba72ac9a1fc4ad7e63d481">Value</a>, Compare, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>m</em>&#160;</td>
         </tr>
         <tr>
@@ -2272,7 +2272,7 @@ template&lt;typename BasicJsonType , typename Key , typename Value , typename Ha
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::unordered_map&lt; Key, Value, Hash, KeyEqual, Allocator &gt; &amp;&#160;</td>
+          <td class="paramtype">std::unordered_map&lt; Key, <a class="el" href="document_8h.html#a071cf97155ba72ac9a1fc4ad7e63d481">Value</a>, Hash, KeyEqual, <a class="el" href="classrapidjson_1_1Allocator.html">Allocator</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>m</em>&#160;</td>
         </tr>
         <tr>

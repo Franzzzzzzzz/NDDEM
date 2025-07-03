@@ -56,7 +56,7 @@ public :
 
       //double length = 0 ; for (int i=0 ; i<d ;i++) length += lpq[i]*lpq[i] ; length = sqrt(length)/Nsteps ;
 
-      first=prev=Lucy(distance(p,loc)) ;
+      first=prev=cur=Lucy(distance(p,loc)) ;
       for (int i=0 ; i<Nsteps ; i++)
       {
         for (int j=0; j<d ; j++)

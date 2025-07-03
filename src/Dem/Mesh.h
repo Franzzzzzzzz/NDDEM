@@ -87,8 +87,12 @@ public:
   //std::vector<double> norms ; 
   std::vector<double> mixedbase ; ///< Mixed based: first n=dimensionality vectors are neither normalised nor unit vectors, while they d-n last vectors are.  
   std::vector<double> invertbase ; ///< Inverted base: inverse(transpose(mixedbase)). 
-
+  
   std::vector<std::vector<Mesh>> submeshes ; 
+  
+  template <class Archive> 
+  void serialize(Archive &ar) 
+  { ar(dimensionality, origin, mixedbase, invertbase, submeshes) ; }
 } ; 
 
 

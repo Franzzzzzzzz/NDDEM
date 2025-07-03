@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['wchar_5fdecoder_2932',['wchar_decoder',['../structwchar__decoder.html',1,'']]],
-  ['wchar_5fselector_2933',['wchar_selector',['../structwchar__selector.html',1,'']]],
-  ['wchar_5fselector_3c_202_20_3e_2934',['wchar_selector&lt; 2 &gt;',['../structwchar__selector_3_012_01_4.html',1,'']]],
-  ['wchar_5fselector_3c_204_20_3e_2935',['wchar_selector&lt; 4 &gt;',['../structwchar__selector_3_014_01_4.html',1,'']]],
-  ['wide_5fstring_5finput_5fadapter_2936',['wide_string_input_adapter',['../classnlohmann_1_1detail_1_1wide__string__input__adapter.html',1,'nlohmann::detail']]],
-  ['wide_5fstring_5finput_5fhelper_2937',['wide_string_input_helper',['../structnlohmann_1_1detail_1_1wide__string__input__helper.html',1,'nlohmann::detail']]],
-  ['wide_5fstring_5finput_5fhelper_3c_20baseinputadapter_2c_202_20_3e_2938',['wide_string_input_helper&lt; BaseInputAdapter, 2 &gt;',['../structnlohmann_1_1detail_1_1wide__string__input__helper_3_01BaseInputAdapter_00_012_01_4.html',1,'nlohmann::detail']]],
-  ['wide_5fstring_5finput_5fhelper_3c_20baseinputadapter_2c_204_20_3e_2939',['wide_string_input_helper&lt; BaseInputAdapter, 4 &gt;',['../structnlohmann_1_1detail_1_1wide__string__input__helper_3_01BaseInputAdapter_00_014_01_4.html',1,'nlohmann::detail']]]
+  ['variant_5fsave_5fvisitor_5255',['variant_save_visitor',['../structcereal_1_1boost__variant__detail_1_1variant__save__visitor.html',1,'cereal::boost_variant_detail::variant_save_visitor&lt; Archive &gt;'],['../structcereal_1_1variant__detail_1_1variant__save__visitor.html',1,'cereal::variant_detail::variant_save_visitor&lt; Archive &gt;']]],
+  ['version_5256',['Version',['../structcereal_1_1detail_1_1Version.html',1,'cereal::detail']]],
+  ['version_5fbinding_5ftag_5257',['version_binding_tag',['../structcereal_1_1detail_1_1anonymous__namespace_02helpers_8hpp_03_1_1version__binding__tag.html',1,'cereal::detail::anonymous_namespace{helpers.hpp}']]],
+  ['versions_5258',['Versions',['../structcereal_1_1detail_1_1Versions.html',1,'cereal::detail']]],
+  ['virtual_5fbase_5fclass_5259',['virtual_base_class',['../structcereal_1_1virtual__base__class.html',1,'cereal']]]
 ];
