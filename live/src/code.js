@@ -30,12 +30,17 @@ monaco.languages.setMonarchTokensProvider('infile', {
 let params = {
     quality: 6,
     lut: 'None',
-    particle_opacity: 0.8,
+    particle_opacity: 1,
     graph_fraction: 0.333,
     boundary0: { type: 'None', min: 0, max: 0 },
     boundary1: { type: 'None', min: 0, max: 0 },
     boundary2: { type: 'None', min: 0, max: 0 },
+    vmax: 20, // max velocity to colour by
+    omegamax: 20, // max rotation rate to colour by
+    F_mag_max: 20, // max force to colour by
 };
+
+let clock = new THREE.Clock();
 
 const resizer = document.getElementById('divider');
 const leftDiv = document.getElementById('container');
@@ -239,15 +244,16 @@ function update_from_text() {
     controls.target.y = params.boundary1.min + (params.boundary1.max - params.boundary1.min) / 2;
     controls.target.z = params.boundary2.min + (params.boundary2.max - params.boundary2.min) / 2;
 
-    camera.position.x = params.boundary0.max + (params.boundary0.max - params.boundary0.min);
-    camera.position.y = params.boundary1.max + (params.boundary1.max - params.boundary1.min);
-    camera.position.z = params.boundary2.max + (params.boundary2.max - params.boundary2.min);
+    camera.up.set(1, 0, 0);
+    camera.position.x = (params.boundary0.max + params.boundary0.min) / 2.;
+    camera.position.y = (params.boundary1.max + params.boundary1.min) / 2.;
+    camera.position.z = params.boundary2.max + 4 * (params.boundary2.max - params.boundary2.min);
 
     if (params.dimension < 3) {
         camera.position.x = (params.boundary0.max + params.boundary0.min) / 2.;
         camera.position.y = (params.boundary1.max + params.boundary1.min) / 2.;
         camera.position.z = (params.boundary0.max - params.boundary0.min) * 2.;
-
+        camera.up.set(0, 1, 0);
     }
 
     controls.update();
@@ -266,6 +272,10 @@ function update_from_text() {
         }
         eval(params.text);
         SPHERES.add_spheres(S, params, scene);
+
+        let radii = S.simu_getRadii();
+        params.r_min = Math.min(...radii);
+        params.r_max = Math.max(...radii);
     });
 }
 
@@ -292,14 +302,19 @@ document.getElementById("canvas").style.width = String(100 * (1 - params.graph_f
 
 async function init() {
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth * (1 - params.graph_fraction) / window.innerHeight, 1e-5, 1000);
-    camera.up.set(0, 0, 1);
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth * (1 - params.graph_fraction) / window.innerHeight, 1e-2, 100);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x222222);
+    scene.background = new THREE.Color(0x111);
 
-    const light = new THREE.AmbientLight();
-    scene.add(light);
+    const ambientLight = new THREE.AmbientLight();
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight();
+    dirLight.position.set(5, 5, 5);
+    dirLight.castShadow = true;
+    dirLight.shadow.camera.zoom = 2;
+    scene.add(dirLight);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -312,11 +327,20 @@ async function init() {
 
     window.addEventListener('resize', onWindowResize, false);
 
+    WALLS.wall_material.color = new THREE.Color(0xffffff);
     WALLS.createWalls(scene);
+    console.log(WALLS.wall_material)
+
 
     animate();
 
     update_from_text();
+
+    let gui = new GUI();
+    gui.width = 320;
+    gui.add(params, 'particle_opacity').min(0).max(1).step(0.01).name('Particle opacity').listen().onChange(() => SPHERES.update_particle_material(params));
+    gui.add(params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Size']).name('Colour by')
+        .onChange(() => SPHERES.update_particle_material(params));
 }
 
 function onWindowResize() {
@@ -332,10 +356,16 @@ function animate() {
     requestAnimationFrame(animate);
     if (S !== undefined) {
         if (SPHERES.spheres !== undefined) {
+            clock.start();
+            while (clock.getElapsedTime() < 1 / 30) {
+                S.simu_step_forward(1);
+            }
+            clock.stop();
             SPHERES.move_spheres(S, params);
             WALLS.update(params);
-            S.simu_step_forward(5);
-            // SPHERES.draw_force_network(S, params, scene);
+
+            // S.simu_step_forward(5);
+            SPHERES.draw_force_network(S, params, scene);
         }
     }
     renderer.render(scene, camera);
