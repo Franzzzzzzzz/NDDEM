@@ -226,7 +226,7 @@ function update_walls(){
     S.simu_interpret_command('mesh remove 1');
     S.simu_interpret_command('mesh remove 0');
 
-    S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
+    S.simu_interpret_command('mesh string {"dimension":2,"objects":[{"dimensionality":1.0,"vertices":[['+String(params.D/2.)+','+String(-params.L)+'],['+String(params.W/2.)+','+String(params.H-params.L)+']]},{"dimensionality":1.0,"vertices":[['+String(-params.D/2.)+','+String(-params.L)+'],['+String(-params.W/2.)+','+String(params.H-params.L)+']]}]}');
 
 
     let alpha = Math.atan(params.H/(params.W/2. - params.D/2.));

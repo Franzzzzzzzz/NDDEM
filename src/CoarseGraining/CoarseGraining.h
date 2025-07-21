@@ -18,7 +18,8 @@
 //#include "termcolor.hpp"
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/stream.hpp>
-#include "json.hpp"
+//#include "json.hpp"
+#include "json_parser.h"
 #include "Typedefs.h"
 #include "Coarsing.h"
 #include "Reader.h"

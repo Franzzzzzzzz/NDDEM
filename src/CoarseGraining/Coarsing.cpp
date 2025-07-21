@@ -1,5 +1,11 @@
 #include "Coarsing.h"
 
+#ifdef EMSCRIPTEN
+  #define STR_PROTECT(s) static_cast<const char*>(s "\0")
+#else
+  #define STR_PROTECT(s) s
+#endif
+
 //========================================================
 int Coarsing::set_field_struct()
 {
@@ -844,16 +850,17 @@ bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true,
 
 int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
 int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
-int Pkid=get_id("KineticPressure") ; if (Pkid<0) doPk=false ;
+int Pkid=get_id(STR_PROTECT("KineticPressure")) ; if (Pkid<0) doPk=false ;
 int Tauid=get_id("ShearStress") ;    if (Tauid<0) doTau=false ;
 int TCid=get_id("TC") ; int TKid=get_id("TK") ;
 
-int Gamdotid=get_id("StrainRate") ;            if (Gamdotid<0) doGamdot=false ;
-int Gamvdotid=get_id("VolumetricStrainRate") ; if (Gamvdotid<0) doGamvdot=false ;
-int Gamtauid=get_id("ShearStrainRate") ;       if (Gamtauid<0) doGamtau=false ;
-int Omegaid=get_id("RotationalVelocity") ;     if (Omegaid<0) doOmega=false ;
-int OmegaMagid=get_id("RotationalVelocityMag");if (OmegaMagid<0) doOmegaMag=false ;
+int Gamdotid=get_id("StrainRate") ;            if (Gamdotid<0) doGamdot=false ; 
+int Gamvdotid=get_id(STR_PROTECT("VolumetricStrainRate")) ; if (Gamvdotid<0) doGamvdot=false ;
+int Gamtauid=get_id(STR_PROTECT("ShearStrainRate")) ;       if (Gamtauid<0) doGamtau=false ;
+int Omegaid=get_id(STR_PROTECT("RotationalVelocity")) ;     if (Omegaid<0) doOmega=false ; 
+int OmegaMagid=get_id(STR_PROTECT("RotationalVelocityMag"));if (OmegaMagid<0) doOmegaMag=false ;
 int VAVGid=get_id("VAVG") ;
+  
 vector <double> gradient ;
 if (doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) gradient.resize(d*d,0) ;
 if ((doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) && VAVGid == -1) { printf("Error: missing VAVG to compute velocity gradients ...\n") ; fflush(stdout) ; }

@@ -28,11 +28,19 @@
 #include "RigidBody.h"
 #include "Mesh.h"
 #include "Boundaries.h"
-#include "json.hpp"
+#include "json_parser.h"
+//#include "json.hpp"
 //
 #include <boost/random.hpp>
+  
+#ifdef EMSCRIPTEN
+  #define STR_PROTECT(s) static_cast<const char*>(s "\0")
+#else
+  #define STR_PROTECT(s) s
+#endif
 
-using json = nlohmann::json;
+//using json = nlohmann::json;
+using json = nddem::json ; 
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
 enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000, MASS=0x200000} ; ///< Flags for export data control
@@ -813,12 +821,13 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      }
     //try 
     { 
-      if (j["dimension"]!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["dimension"].get<int>(),d) ; return ;}
+      if (j["dimension"].get<int>()!=d) {printf("Incorrect dimension in the json Mesh file: %d, expecting %d.\n", j["dimension"].get<int>(),d) ; return ;}
       for (auto & v: j["objects"])
-      {
-        Meshes.push_back({v["dimensionality"].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()}) ;  
+      {                
+        Meshes.push_back({v[STR_PROTECT("dimensionality")].get<int>(), v["vertices"].get<std::vector<std::vector<double>>>()}) ;  
+                
         printf("[INFO] Mesh object added.\n") ; 
-      }
+      }      
     }
    }
    else if (s=="translate")
