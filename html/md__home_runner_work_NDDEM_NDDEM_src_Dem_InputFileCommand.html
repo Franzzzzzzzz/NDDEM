@@ -144,7 +144,7 @@ $(function() {
 <li><code>gravityangle INTENSITY ANGLE</code>: set the gravity angled from first dimension</li>
 <li><code>gravityrotate INTENSITY OMEGA DIM1 DIM2</code>: make the gravity rotate at an angular velocity OMEGA between DIM1 and 2.</li>
 <li><code>ContactModel [Hooke|Hertz]</code>: set contact model.</li>
-<li><code>ContactStrategy [naive|cells]</code>: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)</li>
+<li><code>ContactStrategy [naive|cells|octree]</code>: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?) or with cells+octree (usefull for polydisperse).</li>
 <li><code>boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo</code>: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:<ul>
 <li><code>MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY</code></li>
 <li><code>SPHERE RADIUS X1 ... XD</code>: sphere of radius RADIUS, center at the X location</li>

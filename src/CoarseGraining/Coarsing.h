@@ -203,7 +203,8 @@ public :
     v1d interpolate_vel_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the velocity
     v1d interpolate_rot_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the angular velocity
     v1d interpolate_vel_trilinear (int id, bool usetimeavg) ; ///< Tri-linear interpolation (only implemented in 3D, probably not too hard to implement in ND but annoying ...)
-
+    template <int D> v1d interpolate_vel_multilinear (int id, bool usetimeavg);
+    
     int idx_FastFirst2SlowFirst (int n) ; ///< Change array traversing order
 
     // Windowing functions
@@ -298,5 +299,70 @@ int Coarsing::setWindow (double w, vector<bool> per, vector<int> boxes, vector<d
   Window = new LibLucyND_Periodic (&data,w,d,p,boxes,deltas) ;
 return 0 ;
 }
+//-----------------------------------------------------------
+//-----------------------------------------------------------------------------------------
+template <int D>
+v1d Coarsing::interpolate_vel_multilinear (int id, bool usetimeavg)
+{
+int pts[1<<D][D] ;
+const static int idvel=get_id("VAVG") ;
+
+auto clip = [&](int a, int maxd){if (a<0) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (a) ; } ;
+
+
+// Determine the floor and ceil indices in each dimension
+std::vector<int> i0(D), i1(D);
+for (int dd = 0; dd < D; ++dd) {
+    double val = (data.pos[dd][id] - CGP[0].location[dd]) / dx[dd];
+    i0[dd] = clip(std::floor(val), npt[dd]);
+    i1[dd] = clip(std::ceil(val), npt[dd]);
+}
+
+// Construct all corner indices of the cube
+int n_corners = 1<<D ; 
+for (int c = 0; c < n_corners; ++c) {
+    for (int dd = 0; dd < D; ++dd) {
+        pts[c][dd] = ((c >> dd) & 1) ? i1[dd] : i0[dd];
+    }
+}
+
+// Convert multi-dim index to linear index
+std::vector<int> lin_idx(n_corners);
+for (int c = 0; c < n_corners; ++c) {
+    int idx = 0;
+    for (int dd = 0; dd < D; ++dd)
+        idx += nptcum[dd] * pts[c][dd];
+    lin_idx[c] = idx;
+}
+
+
+std::vector<double> weights(n_corners, 1.0);
+for (int i = 0; i < n_corners; ++i) {
+    for (int j = 0; j < D; ++j) {
+        double x0 = CGP[lin_idx[i]].location[j];
+        double t = (data.pos[j][id] - x0) / dx[j];
+        if (((i >> j) & 1) == 0)
+            weights[i] *= (1.0 - t);
+        else
+            weights[i] *= t;
+    }
+}
+
+// Interpolate field
+std::vector<double> result(D, 0.0);
+for (int i = 0; i < n_corners; ++i)
+    for (int j = 0; j < D; ++j) 
+    {
+      double val ; 
+      if (usetimeavg)
+        val = (*CGPtemp)[lin_idx[i]].fields[0][idvel + j] ; 
+      else 
+        val = CGP[lin_idx[i]].fields[0][idvel + j];
+      
+      result[j] += val * weights[i];
+    }
+return result ; 
+}
+
 
 #endif

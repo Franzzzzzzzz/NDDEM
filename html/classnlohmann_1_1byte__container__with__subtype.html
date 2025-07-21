@@ -78,7 +78,7 @@ $(function() {
 <p>an internal type for a backed binary type  
  <a href="classnlohmann_1_1byte__container__with__subtype.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="CoarseGraining_2json_8hpp_source.html">json.hpp</a>&gt;</code></p>
 <div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Inheritance diagram for nlohmann::byte_container_with_subtype&lt; BinaryType &gt;:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -93,9 +93,6 @@ Public Types</h2></td></tr>
 <tr class="memitem:a4d27e8633c5a5e3b49dd4ccb06515713"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> = BinaryType</td></tr>
 <tr class="memdesc:a4d27e8633c5a5e3b49dd4ccb06515713"><td class="mdescLeft">&#160;</td><td class="mdescRight">the type of the underlying container  <a href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">More...</a><br /></td></tr>
 <tr class="separator:a4d27e8633c5a5e3b49dd4ccb06515713"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d27e8633c5a5e3b49dd4ccb06515713"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> = BinaryType</td></tr>
-<tr class="memdesc:a4d27e8633c5a5e3b49dd4ccb06515713"><td class="mdescLeft">&#160;</td><td class="mdescRight">the type of the underlying container  <a href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">More...</a><br /></td></tr>
-<tr class="separator:a4d27e8633c5a5e3b49dd4ccb06515713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -105,44 +102,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a640b6dd55847e86dbb936f97b946170e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73dcae1798eab1b496936bfae7b4b9c0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a73dcae1798eab1b496936bfae7b4b9c0">byte_container_with_subtype</a> (<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;b) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(std::move(b))))</td></tr>
 <tr class="separator:a73dcae1798eab1b496936bfae7b4b9c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bd3e08ec6d3ed9014ad7d83eca5e3b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9bd3e08ec6d3ed9014ad7d83eca5e3b3">byte_container_with_subtype</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;b, std::uint8_t subtype_) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(b)))</td></tr>
+<tr class="memitem:a9bd3e08ec6d3ed9014ad7d83eca5e3b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9bd3e08ec6d3ed9014ad7d83eca5e3b3">byte_container_with_subtype</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;b, <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> subtype_) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(b)))</td></tr>
 <tr class="separator:a9bd3e08ec6d3ed9014ad7d83eca5e3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9e66c61f46afdd9a9c3617967c4c797"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#aa9e66c61f46afdd9a9c3617967c4c797">byte_container_with_subtype</a> (<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;b, std::uint8_t subtype_) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(std::move(b))))</td></tr>
+<tr class="memitem:aa9e66c61f46afdd9a9c3617967c4c797"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#aa9e66c61f46afdd9a9c3617967c4c797">byte_container_with_subtype</a> (<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;b, <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> subtype_) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(std::move(b))))</td></tr>
 <tr class="separator:aa9e66c61f46afdd9a9c3617967c4c797"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee67fde9d3d571a07d5bb35df21c0555"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#aee67fde9d3d571a07d5bb35df21c0555">operator==</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> &amp;rhs) const</td></tr>
 <tr class="separator:aee67fde9d3d571a07d5bb35df21c0555"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a760bf39cc5477bc663d8bb3c44aabf6a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a760bf39cc5477bc663d8bb3c44aabf6a">operator!=</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> &amp;rhs) const</td></tr>
 <tr class="separator:a760bf39cc5477bc663d8bb3c44aabf6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype</a> (std::uint8_t subtype_) noexcept</td></tr>
+<tr class="memitem:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype</a> (<a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> subtype_) noexcept</td></tr>
 <tr class="memdesc:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the binary subtype  <a href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">More...</a><br /></td></tr>
 <tr class="separator:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3ca9d09e55342f9588404e1dc2222f0"><td class="memItemLeft" align="right" valign="top">constexpr std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">subtype</a> () const noexcept</td></tr>
-<tr class="memdesc:ac3ca9d09e55342f9588404e1dc2222f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the binary subtype  <a href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">More...</a><br /></td></tr>
-<tr class="separator:ac3ca9d09e55342f9588404e1dc2222f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fc42fb07003bf7048c2f1fc79478e02"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype</a> () const noexcept</td></tr>
-<tr class="memdesc:a9fc42fb07003bf7048c2f1fc79478e02"><td class="mdescLeft">&#160;</td><td class="mdescRight">return whether the value has a subtype  <a href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">More...</a><br /></td></tr>
-<tr class="separator:a9fc42fb07003bf7048c2f1fc79478e02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b122b28ff2b8680557ca44ac9748e49"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">clear_subtype</a> () noexcept</td></tr>
-<tr class="memdesc:a7b122b28ff2b8680557ca44ac9748e49"><td class="mdescLeft">&#160;</td><td class="mdescRight">clears the binary subtype  <a href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">More...</a><br /></td></tr>
-<tr class="separator:a7b122b28ff2b8680557ca44ac9748e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89c78caf8c7b54dc1bcfa4b0b23d2fc8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a89c78caf8c7b54dc1bcfa4b0b23d2fc8">byte_container_with_subtype</a> () noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>()))</td></tr>
-<tr class="separator:a89c78caf8c7b54dc1bcfa4b0b23d2fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a640b6dd55847e86dbb936f97b946170e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a640b6dd55847e86dbb936f97b946170e">byte_container_with_subtype</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;b) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(b)))</td></tr>
-<tr class="separator:a640b6dd55847e86dbb936f97b946170e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73dcae1798eab1b496936bfae7b4b9c0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a73dcae1798eab1b496936bfae7b4b9c0">byte_container_with_subtype</a> (<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;b) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(std::move(b))))</td></tr>
-<tr class="separator:a73dcae1798eab1b496936bfae7b4b9c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bd3e08ec6d3ed9014ad7d83eca5e3b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9bd3e08ec6d3ed9014ad7d83eca5e3b3">byte_container_with_subtype</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;b, std::uint8_t subtype_) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(b)))</td></tr>
-<tr class="separator:a9bd3e08ec6d3ed9014ad7d83eca5e3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9e66c61f46afdd9a9c3617967c4c797"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#aa9e66c61f46afdd9a9c3617967c4c797">byte_container_with_subtype</a> (<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;b, std::uint8_t subtype_) noexcept(noexcept(<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a>(std::move(b))))</td></tr>
-<tr class="separator:aa9e66c61f46afdd9a9c3617967c4c797"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee67fde9d3d571a07d5bb35df21c0555"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#aee67fde9d3d571a07d5bb35df21c0555">operator==</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> &amp;rhs) const</td></tr>
-<tr class="separator:aee67fde9d3d571a07d5bb35df21c0555"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a760bf39cc5477bc663d8bb3c44aabf6a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a760bf39cc5477bc663d8bb3c44aabf6a">operator!=</a> (const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> &amp;rhs) const</td></tr>
-<tr class="separator:a760bf39cc5477bc663d8bb3c44aabf6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype</a> (std::uint8_t subtype_) noexcept</td></tr>
-<tr class="memdesc:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the binary subtype  <a href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">More...</a><br /></td></tr>
-<tr class="separator:a63227e70c8b976fd6f65bb2d2d7dd021"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3ca9d09e55342f9588404e1dc2222f0"><td class="memItemLeft" align="right" valign="top">constexpr std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">subtype</a> () const noexcept</td></tr>
+<tr class="memitem:ac3ca9d09e55342f9588404e1dc2222f0"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">subtype</a> () const noexcept</td></tr>
 <tr class="memdesc:ac3ca9d09e55342f9588404e1dc2222f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the binary subtype  <a href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">More...</a><br /></td></tr>
 <tr class="separator:ac3ca9d09e55342f9588404e1dc2222f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fc42fb07003bf7048c2f1fc79478e02"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype</a> () const noexcept</td></tr>
@@ -154,7 +125,7 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:ae36c8f29f4f50a00962b0e9110ba2756"><td class="memItemLeft" align="right" valign="top">std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ae36c8f29f4f50a00962b0e9110ba2756">m_subtype</a> = 0</td></tr>
+<tr class="memitem:ae36c8f29f4f50a00962b0e9110ba2756"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ae36c8f29f4f50a00962b0e9110ba2756">m_subtype</a> = 0</td></tr>
 <tr class="separator:ae36c8f29f4f50a00962b0e9110ba2756"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69aa7a914a7a31b61d3a9567d74ddf7b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a69aa7a914a7a31b61d3a9567d74ddf7b">m_has_subtype</a> = false</td></tr>
 <tr class="separator:a69aa7a914a7a31b61d3a9567d74ddf7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,25 +145,7 @@ class nlohmann::byte_container_with_subtype&lt; BinaryType &gt;</h3>
 <dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a4d27e8633c5a5e3b49dd4ccb06515713"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d27e8633c5a5e3b49dd4ccb06515713">&#9670;&nbsp;</a></span>container_type <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> =  BinaryType</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>the type of the underlying container </p>
-
-</div>
-</div>
-<a id="a4d27e8633c5a5e3b49dd4ccb06515713"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d27e8633c5a5e3b49dd4ccb06515713">&#9670;&nbsp;</a></span>container_type <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d27e8633c5a5e3b49dd4ccb06515713">&#9670;&nbsp;</a></span>container_type</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,7 +164,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a89c78caf8c7b54dc1bcfa4b0b23d2fc8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89c78caf8c7b54dc1bcfa4b0b23d2fc8">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[1/10]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a89c78caf8c7b54dc1bcfa4b0b23d2fc8">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -238,7 +191,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <a id="a640b6dd55847e86dbb936f97b946170e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a640b6dd55847e86dbb936f97b946170e">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[2/10]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a640b6dd55847e86dbb936f97b946170e">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -266,7 +219,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <a id="a73dcae1798eab1b496936bfae7b4b9c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73dcae1798eab1b496936bfae7b4b9c0">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[3/10]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a73dcae1798eab1b496936bfae7b4b9c0">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -294,7 +247,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <a id="a9bd3e08ec6d3ed9014ad7d83eca5e3b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9bd3e08ec6d3ed9014ad7d83eca5e3b3">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[4/10]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bd3e08ec6d3ed9014ad7d83eca5e3b3">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[4/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -313,7 +266,7 @@ template&lt;typename BinaryType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::uint8_t&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td>
           <td class="paramname"><em>subtype_</em>&#160;</td>
         </tr>
         <tr>
@@ -332,7 +285,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <a id="aa9e66c61f46afdd9a9c3617967c4c797"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9e66c61f46afdd9a9c3617967c4c797">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[5/10]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9e66c61f46afdd9a9c3617967c4c797">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -351,166 +304,7 @@ template&lt;typename BinaryType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::uint8_t&#160;</td>
-          <td class="paramname"><em>subtype_</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a89c78caf8c7b54dc1bcfa4b0b23d2fc8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89c78caf8c7b54dc1bcfa4b0b23d2fc8">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[6/10]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a640b6dd55847e86dbb936f97b946170e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a640b6dd55847e86dbb936f97b946170e">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[7/10]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a73dcae1798eab1b496936bfae7b4b9c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73dcae1798eab1b496936bfae7b4b9c0">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[8/10]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9bd3e08ec6d3ed9014ad7d83eca5e3b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9bd3e08ec6d3ed9014ad7d83eca5e3b3">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[9/10]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::uint8_t&#160;</td>
-          <td class="paramname"><em>subtype_</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa9e66c61f46afdd9a9c3617967c4c797"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9e66c61f46afdd9a9c3617967c4c797">&#9670;&nbsp;</a></span>byte_container_with_subtype() <span class="overload">[10/10]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::<a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a4d27e8633c5a5e3b49dd4ccb06515713">container_type</a> &amp;&amp;&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::uint8_t&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td>
           <td class="paramname"><em>subtype_</em>&#160;</td>
         </tr>
         <tr>
@@ -530,7 +324,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7b122b28ff2b8680557ca44ac9748e49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b122b28ff2b8680557ca44ac9748e49">&#9670;&nbsp;</a></span>clear_subtype() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b122b28ff2b8680557ca44ac9748e49">&#9670;&nbsp;</a></span>clear_subtype()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -562,89 +356,13 @@ template&lt;typename BinaryType &gt; </div>
 <dd>
 see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype()</a> &ndash; sets the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
 <dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary value has a <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
-<dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
-
-</div>
-</div>
-<a id="a7b122b28ff2b8680557ca44ac9748e49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b122b28ff2b8680557ca44ac9748e49">&#9670;&nbsp;</a></span>clear_subtype() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::clear_subtype </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>clears the binary subtype </p>
-<p>Clears the binary subtype and flags the value as not having a subtype, which has implications for serialization; for instance MessagePack will prefer the bin family over the ext family.</p>
-<p>@complexity Constant.</p>
-<p>@exceptionsafety No-throw guarantee: this member function never throws exceptions.</p>
-<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">subtype()</a> &ndash; return the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype()</a> &ndash; sets the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary value has a <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
+see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> has <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
 
 </div>
 </div>
 <a id="a9fc42fb07003bf7048c2f1fc79478e02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9fc42fb07003bf7048c2f1fc79478e02">&#9670;&nbsp;</a></span>has_subtype() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr bool <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::has_subtype </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>return whether the value has a subtype </p>
-<dl class="section return"><dt>Returns</dt><dd>whether the value has a subtype</dd></dl>
-<p>@complexity Constant.</p>
-<p>@exceptionsafety No-throw guarantee: this member function never throws exceptions.</p>
-<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">subtype()</a> &ndash; return the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype()</a> &ndash; sets the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">clear_subtype()</a> &ndash; clears the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
-<dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
-
-</div>
-</div>
-<a id="a9fc42fb07003bf7048c2f1fc79478e02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9fc42fb07003bf7048c2f1fc79478e02">&#9670;&nbsp;</a></span>has_subtype() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fc42fb07003bf7048c2f1fc79478e02">&#9670;&nbsp;</a></span>has_subtype()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -682,35 +400,7 @@ see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b
 </div>
 </div>
 <a id="a760bf39cc5477bc663d8bb3c44aabf6a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a760bf39cc5477bc663d8bb3c44aabf6a">&#9670;&nbsp;</a></span>operator!=() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::operator!= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a>&lt; BinaryType &gt; &amp;&#160;</td>
-          <td class="paramname"><em>rhs</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a760bf39cc5477bc663d8bb3c44aabf6a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a760bf39cc5477bc663d8bb3c44aabf6a">&#9670;&nbsp;</a></span>operator!=() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a760bf39cc5477bc663d8bb3c44aabf6a">&#9670;&nbsp;</a></span>operator!=()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -738,35 +428,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <a id="aee67fde9d3d571a07d5bb35df21c0555"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee67fde9d3d571a07d5bb35df21c0555">&#9670;&nbsp;</a></span>operator==() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">byte_container_with_subtype</a>&lt; BinaryType &gt; &amp;&#160;</td>
-          <td class="paramname"><em>rhs</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aee67fde9d3d571a07d5bb35df21c0555"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee67fde9d3d571a07d5bb35df21c0555">&#9670;&nbsp;</a></span>operator==() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aee67fde9d3d571a07d5bb35df21c0555">&#9670;&nbsp;</a></span>operator==()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -794,7 +456,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <a id="a63227e70c8b976fd6f65bb2d2d7dd021"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63227e70c8b976fd6f65bb2d2d7dd021">&#9670;&nbsp;</a></span>set_subtype() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a63227e70c8b976fd6f65bb2d2d7dd021">&#9670;&nbsp;</a></span>set_subtype()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -807,7 +469,7 @@ template&lt;typename BinaryType &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::set_subtype </td>
           <td>(</td>
-          <td class="paramtype">std::uint8_t&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a>&#160;</td>
           <td class="paramname"><em>subtype_</em></td><td>)</td>
           <td></td>
         </tr>
@@ -827,52 +489,13 @@ template&lt;typename BinaryType &gt; </div>
 <dd>
 see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">clear_subtype()</a> &ndash; clears the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
 <dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary value has a <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
-<dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
-
-</div>
-</div>
-<a id="a63227e70c8b976fd6f65bb2d2d7dd021"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63227e70c8b976fd6f65bb2d2d7dd021">&#9670;&nbsp;</a></span>set_subtype() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::set_subtype </td>
-          <td>(</td>
-          <td class="paramtype">std::uint8_t&#160;</td>
-          <td class="paramname"><em>subtype_</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>sets the binary subtype </p>
-<p>Sets the binary subtype of the value, also flags a binary JSON value as having a subtype, which has implications for serialization.</p>
-<p>@complexity Constant.</p>
-<p>@exceptionsafety No-throw guarantee: this member function never throws exceptions.</p>
-<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0">subtype()</a> &ndash; return the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">clear_subtype()</a> &ndash; clears the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary value has a <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
+see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> has <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
 
 </div>
 </div>
 <a id="ac3ca9d09e55342f9588404e1dc2222f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3ca9d09e55342f9588404e1dc2222f0">&#9670;&nbsp;</a></span>subtype() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3ca9d09e55342f9588404e1dc2222f0">&#9670;&nbsp;</a></span>subtype()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -883,7 +506,7 @@ template&lt;typename BinaryType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr std::uint8_t <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::subtype </td>
+          <td class="memname">constexpr <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::subtype </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -905,46 +528,7 @@ template&lt;typename BinaryType &gt; </div>
 <dd>
 see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">clear_subtype()</a> &ndash; clears the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
 <dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary value has a <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
-<dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
-
-</div>
-</div>
-<a id="ac3ca9d09e55342f9588404e1dc2222f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3ca9d09e55342f9588404e1dc2222f0">&#9670;&nbsp;</a></span>subtype() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename BinaryType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr std::uint8_t <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::subtype </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>return the binary subtype </p>
-<p>Returns the numerical subtype of the value if it has a subtype. If it does not have a subtype, this function will return size_t(-1) as a sentinel value.</p>
-<dl class="section return"><dt>Returns</dt><dd>the numerical subtype of the binary value</dd></dl>
-<p>@complexity Constant.</p>
-<p>@exceptionsafety No-throw guarantee: this member function never throws exceptions.</p>
-<dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a63227e70c8b976fd6f65bb2d2d7dd021">set_subtype()</a> &ndash; sets the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a7b122b28ff2b8680557ca44ac9748e49">clear_subtype()</a> &ndash; clears the binary <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a> </dd>
-<dd>
-see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary value has a <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
+see <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#a9fc42fb07003bf7048c2f1fc79478e02">has_subtype()</a> &ndash; returns whether or not the binary <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a> has <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html#ac3ca9d09e55342f9588404e1dc2222f0" title="return the binary subtype">subtype</a></dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 3.8.0 </dd></dl>
 
 </div>
@@ -986,7 +570,7 @@ template&lt;typename BinaryType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::uint8_t <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::m_subtype = 0</td>
+          <td class="memname"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">std::uint8_t</a> <a class="el" href="classnlohmann_1_1byte__container__with__subtype.html">nlohmann::byte_container_with_subtype</a>&lt; BinaryType &gt;::m_subtype = 0</td>
         </tr>
       </table>
   </td>
@@ -999,7 +583,7 @@ template&lt;typename BinaryType &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/runner/work/NDDEM/NDDEM/src/Dem/<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a></li>
+<li>/home/runner/work/NDDEM/NDDEM/src/CoarseGraining/<a class="el" href="CoarseGraining_2json_8hpp_source.html">json.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

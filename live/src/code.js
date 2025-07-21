@@ -14,14 +14,10 @@ monaco.languages.setMonarchTokensProvider('infile', {
     tokenizer: {
         root: [
             [/#.*$/, 'comment'],
-            [/\b(dimensions|radius|mass|auto|boundary|gravity|gravityangle|gravityrotate|location|set|dt|tdump|finalise|rigid|inertia|skin)\b/, 'keyword'],
-            [/\b(uniform|randomdrop|square|randomsquare|insphere|roughinclineplane|largeinclineplane|smallinclineplane)\b/, 'keyword'],
-            [/\b(PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE)\b/, 'keyword'],
-            [/\b(Kn|Kt|GammaN|GammaT|Mu|T|rho)\b/, 'keyword'],
-            [/\b(ContactStrategy|naive|cells|octree)\b/, 'keyword'],
-            [/\b(mesh|file|translate|rotate|export)\b/, 'number'],
+            [/\b(dimensions|radius|mass|auto|boundary|gravity|gravityangle|location|set|dt|tdump|finalise)\b/, 'keyword'],
+            [/\b(uniform|randomdrop)\b/, 'keyword'],
+            [/\b(PBC|WALL)\b/, 'keyword'],
             [/\b(0|1|2|3|4|5|6|7|8|9)\b/, 'number'],
-            [/\b(ContactModel|Hooke|Hertz)\b/, 'keyword'],
             [/\b([a-zA-Z]+)\b/, 'identifier'],
         ]
     }
@@ -30,17 +26,12 @@ monaco.languages.setMonarchTokensProvider('infile', {
 let params = {
     quality: 6,
     lut: 'None',
-    particle_opacity: 1,
+    particle_opacity: 0.8,
     graph_fraction: 0.333,
     boundary0: { type: 'None', min: 0, max: 0 },
     boundary1: { type: 'None', min: 0, max: 0 },
     boundary2: { type: 'None', min: 0, max: 0 },
-    vmax: 20, // max velocity to colour by
-    omegamax: 20, // max rotation rate to colour by
-    F_mag_max: 20, // max force to colour by
 };
-
-let clock = new THREE.Clock();
 
 const resizer = document.getElementById('divider');
 const leftDiv = document.getElementById('container');
@@ -139,20 +130,20 @@ S.simu_interpret_command("auto skin");
 S.simu_finalise_init();`;
 
 default_scripts['infile'] = `dimensions 3 100
-radius -1 0.5 # set radius of all particles to 0.5
-mass -1 1 # set mass of all particles to 1
-auto rho # calculate density from mass and radius
-auto radius uniform 0.1 0.2 # now update radius of all particles to a uniform distribution between 0.1 and 0.2
-auto mass # recalculate mass from radius and density
-auto inertia # calculate inertia from mass and radius
-auto skin # update contact properties
+radius -1 0.5
+mass -1 1
+auto rho
+auto radius uniform 0.1 0.2
+auto mass
+auto inertia
+auto skin
 
-boundary 0 WALL -3 3 
-boundary 1 PBC -2 2
-boundary 2 PBC -1 1
-gravityangle 9.81 25
+boundary 0 PBC -1 1
+boundary 1 PBC -1 1
+boundary 2 WALL -2 2
+gravity 0 -5 -5
 
-auto location roughinclineplane
+auto location randomdrop
 
 set Kn 75
 set Kt 60
@@ -244,16 +235,18 @@ function update_from_text() {
     controls.target.y = params.boundary1.min + (params.boundary1.max - params.boundary1.min) / 2;
     controls.target.z = params.boundary2.min + (params.boundary2.max - params.boundary2.min) / 2;
 
-    camera.up.set(1, 0, 0);
     camera.position.x = (params.boundary0.max + params.boundary0.min) / 2.;
     camera.position.y = (params.boundary1.max + params.boundary1.min) / 2.;
-    camera.position.z = params.boundary2.max + 4 * (params.boundary2.max - params.boundary2.min);
+    // camera.position.z = (params.boundary0.max - params.boundary0.min)*2.;
+    // camera.position.x = params.boundary0.max + (params.boundary0.max - params.boundary0.min);
+    // camera.position.y = params.boundary1.max + (params.boundary1.max - params.boundary1.min);
+    camera.position.z = params.boundary2.max + 3 * (params.boundary2.max - params.boundary2.min);
 
     if (params.dimension < 3) {
         camera.position.x = (params.boundary0.max + params.boundary0.min) / 2.;
         camera.position.y = (params.boundary1.max + params.boundary1.min) / 2.;
         camera.position.z = (params.boundary0.max - params.boundary0.min) * 2.;
-        camera.up.set(0, 1, 0);
+
     }
 
     controls.update();
@@ -272,10 +265,6 @@ function update_from_text() {
         }
         eval(params.text);
         SPHERES.add_spheres(S, params, scene);
-
-        let radii = S.simu_getRadii();
-        params.r_min = Math.min(...radii);
-        params.r_max = Math.max(...radii);
     });
 }
 
@@ -303,18 +292,13 @@ document.getElementById("canvas").style.width = String(100 * (1 - params.graph_f
 async function init() {
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth * (1 - params.graph_fraction) / window.innerHeight, 1e-2, 100);
+    camera.up.set(1, 0, 0);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111);
+    scene.background = new THREE.Color(0x222222);
 
-    const ambientLight = new THREE.AmbientLight();
-    scene.add(ambientLight);
-
-    const dirLight = new THREE.DirectionalLight();
-    dirLight.position.set(5, 5, 5);
-    dirLight.castShadow = true;
-    dirLight.shadow.camera.zoom = 2;
-    scene.add(dirLight);
+    const light = new THREE.AmbientLight();
+    scene.add(light);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -327,20 +311,11 @@ async function init() {
 
     window.addEventListener('resize', onWindowResize, false);
 
-    WALLS.wall_material.color = new THREE.Color(0xffffff);
     WALLS.createWalls(scene);
-    console.log(WALLS.wall_material)
-
 
     animate();
 
     update_from_text();
-
-    let gui = new GUI();
-    gui.width = 320;
-    gui.add(params, 'particle_opacity').min(0).max(1).step(0.01).name('Particle opacity').listen().onChange(() => SPHERES.update_particle_material(params));
-    gui.add(params, 'lut', ['None', 'Velocity', 'Rotation Rate', 'Size']).name('Colour by')
-        .onChange(() => SPHERES.update_particle_material(params));
 }
 
 function onWindowResize() {
@@ -356,16 +331,10 @@ function animate() {
     requestAnimationFrame(animate);
     if (S !== undefined) {
         if (SPHERES.spheres !== undefined) {
-            clock.start();
-            while (clock.getElapsedTime() < 1 / 30) {
-                S.simu_step_forward(1);
-            }
-            clock.stop();
             SPHERES.move_spheres(S, params);
             WALLS.update(params);
-
-            // S.simu_step_forward(5);
-            SPHERES.draw_force_network(S, params, scene);
+            S.simu_step_forward(5);
+            // SPHERES.draw_force_network(S, params, scene);
         }
     }
     renderer.render(scene, camera);

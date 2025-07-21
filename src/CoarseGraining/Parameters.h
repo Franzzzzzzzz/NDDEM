@@ -1,7 +1,8 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-using json = nlohmann::json;
+//using json = nlohmann::json;
+using json = nddem::json ; 
 
 enum FileFormat {NDDEM, Liggghts, MercuryData, MercuryVTU, Yade, Interactive} ;
 enum FileType {both, particles, contacts} ;
@@ -71,28 +72,28 @@ private :
 //=================================================================================================
 void Param::from_json(json &j)
 {
-    for (auto & v : j.items())
+    for (auto v : j.items())
     {
              if (v.key() == "file") {process_file(v.value()) ; }
-        else if (v.key() == "savefile") save = v.value() ;
+        else if (v.key() == "savefile") save = v.value().get<string>() ;
         else if (v.key() == "saveformat")
         {
             try {saveformat = v.value().get<vector<string>>();}
             catch(...) {string a = v.value().get<string>(); saveformat.push_back(a) ; }
         }
         else if (v.key() == "window size")
-        { windowsize = v.value(); requiredfieldset[v.key()] = true ; }
-        else if (v.key() == "skip") skipT = v.value() ;
-        else if (v.key() == "max time") { maxT = v.value() ; requiredfieldset[v.key()] = true ;}
+        { windowsize = v.value().get<double>(); requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "skip") skipT = v.value().get<int>() ;
+        else if (v.key() == "max time") { maxT = v.value().get<int>() ; requiredfieldset[v.key()] = true ;}
         else if (v.key() == "fields") { flags = v.value().get<vector<string>>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boxes")  {boxes = v.value().get<decltype(boxes)>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boundaries") {boundaries = v.value().get<decltype(boundaries)>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "time average")
         {
-            if (v.value() == "None") timeaverage = AverageType::None ;
-            else if (v.value() == "Final") timeaverage = AverageType::Final ;
-            else if (v.value() == "Intermediate") timeaverage = AverageType::Intermediate ;
-            else if (v.value() == "Intermediate and Final" || v.value() =="Final and Intermediate") timeaverage = AverageType::Both ;
+            if (v.value().get<string>() == "None") timeaverage = AverageType::None ;
+            else if (v.value().get<string>() == "Final") timeaverage = AverageType::Final ;
+            else if (v.value().get<string>() == "Intermediate") timeaverage = AverageType::Intermediate ;
+            else if (v.value().get<string>() == "Intermediate and Final" || v.value().get<string>() =="Final and Intermediate") timeaverage = AverageType::Both ;
             else
                 printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final'). Case sensitive\n") ;
         }
@@ -102,7 +103,7 @@ void Param::from_json(json &j)
         else if (v.key() == "radius") { default_radius=v.value().get<double>() ; }
         else if (v.key() == "diameter") { default_radius=v.value().get<double>()/2. ; }
         else if (v.key() == "extra fields") { process_extrafields(v.value()) ; }
-        else if (v.key() == "dimension") {dim = v.value() ; requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "dimension") {dim = v.value().get<int>() ; requiredfieldset[v.key()] = true ; }
         else printf("Unknown json key: %s.\n", v.key().c_str()) ;
     }
 
@@ -213,13 +214,12 @@ void Param::process_extrafields (json &j)
     for (auto & v : j)
     {
         FieldType typ=FieldType::Particle ;
-             if (v["type"]=="Particle") typ = FieldType::Particle ;
-        else if (v["type"]=="Contact") typ = FieldType::Contact ;
-        else if (v["type"]=="Fluctuation") typ = FieldType::Fluctuation ;
+             if (v["type"].get<string>()=="Particle") typ = FieldType::Particle ;
+        else if (v["type"].get<string>()=="Contact") typ = FieldType::Contact ;
+        else if (v["type"].get<string>()=="Fluctuation") typ = FieldType::Fluctuation ;
         else printf("ERR: unknown extrafields type\n") ;
-        extrafields.push_back({.name=v["name"], .order=static_cast<TensorOrder>(v["tensor order"]), .type=typ}) ;
-        auto w = v.find("mapping") ;
-        if (w != v.end()) {extrafields.back().mapping=v["mapping"];}
+        extrafields.push_back({.name=v["name"].get<string>(), .order=static_cast<TensorOrder>(v["tensor order"].get<int>()), .type=typ}) ;
+        if (v.exist("mapping")) {extrafields.back().mapping=v["mapping"].get<string>();}
     }
 }
 //---------------------------------------------------------
@@ -230,65 +230,64 @@ void Param::process_file (json &j2)
         auto & j =j2[f] ; 
         
         // Treat actions first if the tag is present
-       auto v = j.find("action") ;
-        if (v != j.end())
+        if (j.exist("action"))
         {
-            if ( *v == "remove")
+            auto v = j["action"] ; 
+            if ( v.get<string>() == "remove")
             {
                 files.erase(files.begin()+f) ;
                 continue ; 
             }
-            else if (*v == "edit")
+            else if (v.get<string>() == "edit")
                 files.erase(files.begin()+f) ;
-            else if (*v == "donothing")
+            else if (v.get<string>() == "donothing")
                 continue ; 
-            else if (*v == "create") 
+            else if (v.get<string>() == "create") 
                 ; // do nothing
             else
                 printf("WARN: Unknown action command on process_file\n") ; 
         }         
         
         FileType content = FileType::particles ;
-        v = j.find("content") ;
-        if (v != j.end())
-        { if ( *v == "particles") content = FileType::particles ;
-        else if (*v == "contacts") content = FileType::contacts ;
-        else if (*v == "both") content = FileType::both ;
-        else printf("WARN: unknown file content.\n") ;
+        if (j.exist("content"))
+        { 
+          if ( j["content"].get<string>() == "particles") content = FileType::particles ;
+          else if ( j["content"].get<string>() == "contacts") content = FileType::contacts ;
+          else if ( j["content"].get<string>() == "both") content = FileType::both ;
+          else printf("WARN: unknown file content.\n") ;
         }
         else {printf("WARN: the key 'content' is recommended when defining a file. Set to 'particles' by default.\n") ;}
 
         FileFormat format ;
-        v = j.find("format") ;
-        if (v != j.end())
-        { if ( *v == "liggghts") format = FileFormat::Liggghts ;
-        else if (*v == "NDDEM") format = FileFormat::NDDEM ;
-        else if (*v == "mercury_legacy") format = FileFormat::MercuryData ;
-        else if (*v == "mercury_vtu") format = FileFormat::MercuryVTU ;
-        else if (*v == "yade") format = FileFormat::Yade ; 
-        else if (*v == "interactive") format = FileFormat::Interactive ;
-        else {printf("ERR: unknown file format.\n") ; return ;}
+        if (j.exist("format"))
+        { 
+          if ( j["format"].get<string>() == "liggghts") format = FileFormat::Liggghts ;
+          else if ( j["format"].get<string>() == "NDDEM") format = FileFormat::NDDEM ;
+          else if ( j["format"].get<string>() == "mercury_legacy") format = FileFormat::MercuryData ;
+          else if ( j["format"].get<string>() == "mercury_vtu") format = FileFormat::MercuryVTU ;
+          else if ( j["format"].get<string>() == "yade") format = FileFormat::Yade ; 
+          else if ( j["format"].get<string>() == "interactive") format = FileFormat::Interactive ;
+          else {printf("ERR: unknown file format.\n") ; return ;}
         }
         else { printf("ERR: the key 'format' is required when defining a file. \n") ; return ; }
 
         
         std::map <std::string, std::string> mapping ;
-        v = j.find("mapping") ;
-        if (v != j.end()) mapping= v->get<std::map <std::string, std::string>>();
+        if ( j.exist("mapping") ) mapping= j["mapping"].get<std::map <std::string, std::string>>();
 
         files.insert(files.begin()+f, {.fileformat=format, .filetype=content, .mapping=mapping, .reader = nullptr,}) ;
      
         if (files[f].fileformat == FileFormat::NDDEM)
-            files[f].reader = new NDDEMReader (j["filename"]);
+            files[f].reader = new NDDEMReader (j["filename"].get<string>());
         else if (files[f].fileformat == FileFormat::Interactive)
             files[f].reader = new InteractiveReader ();
         #ifndef NOTALLFORMATS
         else if (files[f].fileformat == FileFormat::Liggghts)
         {
             if (files[f].filetype == FileType::both)
-                files[f].reader = new LiggghtsReader (j["filename"]) ;
+                files[f].reader = new LiggghtsReader (j["filename"].get<string>()) ;
             else if (files[f].filetype == FileType::particles)
-                files[f].reader = new LiggghtsReader_particles (j["filename"]) ;
+                files[f].reader = new LiggghtsReader_particles (j["filename"].get<string>()) ;
             else if (files[f].filetype == FileType::contacts)
             {
                 std::vector<File>::iterator it ;
@@ -301,13 +300,13 @@ void Param::process_file (json &j2)
                     files.pop_back() ;
                     continue ;
                 }
-                files[f].reader = new LiggghtsReader_contacts (j["filename"], it->reader, files[f].mapping) ;
+                files[f].reader = new LiggghtsReader_contacts (j["filename"].get<string>(), it->reader, files[f].mapping) ;
             }
         }
         else if (files[f].fileformat == FileFormat::MercuryData)
         {
             if (files[f].filetype == FileType::particles)
-                files[f].reader = new MercuryReader_data_particles (j["filename"]) ;
+                files[f].reader = new MercuryReader_data_particles (j["filename"].get<string>()) ;
             else if (files[f].filetype == FileType::contacts) // TODO
             {}//files[f].reader = new MercuryReader_contacts (files[f].path) ;
             else
@@ -316,7 +315,7 @@ void Param::process_file (json &j2)
         else if (files[f].fileformat == FileFormat::MercuryVTU)
         {
             if (files[f].filetype == FileType::particles)
-                files[f].reader = new MercuryReader_vtu_particles (j["filename"]) ;
+                files[f].reader = new MercuryReader_vtu_particles (j["filename"].get<string>()) ;
             //else if (files[f].filetype == FileType::contacts) // TODO
             //{}//files[f].reader = new MercuryReader_contacts (files[f].path) ;
             else
@@ -333,11 +332,9 @@ void Param::process_file (json &j2)
         }
         
         bool multifile = false ; 
-        files[f].reader->path = j["filename"] ; 
-        v = j.find("initial") ;
-        if (v != j.end()) {multifile = true ; files[f].reader->filenumbering.initial = v->get<double>() ; }
-        v = j.find("delta") ;
-        if (v != j.end()) {multifile = true ; files[f].reader->filenumbering.delta = v->get<double>() ; }
+        files[f].reader->path = j["filename"].get<string>() ; 
+        if (j.exist("initial")) {multifile = true ; files[f].reader->filenumbering.initial = j["initial"].get<double>() ; }
+        if (j.exist("delta")) {multifile = true ; files[f].reader->filenumbering.delta = j["delta"].get<double>() ; }
 
         if (multifile && files[f].reader->path.find('%') == std::string::npos)
             printf("WARN: you have provided file initial or delta numbering, but there is no pattern in your filename, which is surprising\n") ; 

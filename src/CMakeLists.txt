@@ -67,7 +67,7 @@ if(EMSCRIPTEN)
  add_executable(DEMCGND DemCgND.cpp Dem/Parameters.cpp Dem/Tools.cpp Dem/Contacts.cpp Dem/ContactList.cpp Dem/Xml.cpp Dem/Multiproc.cpp
                         CoarseGraining/Coarsing.cpp )
  set_property(TARGET DEMCGND PROPERTY CXX_STANDARD 17)
- target_compile_options(DEMCGND PUBLIC -DSAVE_FORCE_COMPONENTS=0 -DNO_OPENMP -s USE_BOOST_HEADERS=1 ${Matlab_Macro} -O3 -Wall -Wextra -DNOTALLFORMATS)# -pthread)
+ target_compile_options(DEMCGND PUBLIC -DSAVE_FORCE_COMPONENTS=0 -DNO_OPENMP -s USE_BOOST_HEADERS=1 ${Matlab_Macro} -O3 -Wall -Wextra -DNOTALLFORMATS -I${CMAKE_SOURCE_DIR}/Dem) # -pthread)
  target_link_libraries(DEMCGND PUBLIC -DNO_OPENMP -O3 -lm -Wall -Wextra)# -pthread)
  set(MODULARIZE "1")
  set(EXPORT_NAME "DEMCGND")
@@ -75,7 +75,7 @@ if(EMSCRIPTEN)
     DEMCGND
     PROPERTIES
     LINK_FLAGS
-    "-O3 --bind -s MODULARIZE=1 -s SINGLE_FILE=1 -s EXPORT_NAME='DEMCGND' -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_BOOST_HEADERS=1 -s USE_ZLIB=1"# --pthread -s PTHREAD_POOL_SIZE=4"# -s PROXY_TO_PTHREAD"
+    "-O3 --bind -s MODULARIZE=1 -s SINGLE_FILE=1 -s EXPORT_NAME='DEMCGND' -s ASSERTIONS=1 -s STACK_OVERFLOW_CHECK=1 -s ALLOW_MEMORY_GROWTH=1 -s USE_BOOST_HEADERS=1 -s USE_ZLIB=1"# --pthread -s PTHREAD_POOL_SIZE=4"# -s PROXY_TO_PTHREAD"
  )
 endif()
 

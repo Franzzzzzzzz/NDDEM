@@ -74,10 +74,10 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ae80799461cc7c7c621ff75eb6835e7ce"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7cea9021e7b22ef17fba93b80380f0ffbbc8">bufcapacitybytes</a>
-, <a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a> = bufcapacitybytes / (sizeof(char_t) + 4)
+<tr class="memitem:a7c25902cfc9e9063565a4ded3c2ff11f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fa9021e7b22ef17fba93b80380f0ffbbc8">bufcapacitybytes</a>
+, <a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a> = bufcapacitybytes / (sizeof(char_t) + 4)
  }</td></tr>
-<tr class="separator:ae80799461cc7c7c621ff75eb6835e7ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a7c25902cfc9e9063565a4ded3c2ff11f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -108,19 +108,19 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a84c87765fbdf444d981ffb0f67899dd4"><td class="memItemLeft" align="right" valign="top">char_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxml__buffered__writer.html#a84c87765fbdf444d981ffb0f67899dd4">buffer</a> [<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
+<tr class="memitem:a84c87765fbdf444d981ffb0f67899dd4"><td class="memItemLeft" align="right" valign="top">char_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxml__buffered__writer.html#a84c87765fbdf444d981ffb0f67899dd4">buffer</a> [<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
 <tr class="separator:a84c87765fbdf444d981ffb0f67899dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aceabb9252961f82a27f902b624ff0c21"><td class="memItemLeft" >union {</td></tr>
-<tr class="memitem:a69899b9888c966f6c7120e6343198f28"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#ac672c70ba0597cf94d35c352ac563891">data_u8</a> [4 *<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
-<tr class="separator:a69899b9888c966f6c7120e6343198f28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c831afe8afd636cef293bb4efdcf676"><td class="memItemLeft" >&#160;&#160;&#160;uint16_t&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#aa969d3724efe221a68927947e3a5196d">data_u16</a> [2 *<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
-<tr class="separator:a9c831afe8afd636cef293bb4efdcf676"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7067edb606bb06bce5cde36f5504533"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#afa54826d8227c4ee661e1a9cc1e1acf2">data_u32</a> [<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
-<tr class="separator:af7067edb606bb06bce5cde36f5504533"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8edbbd3b5b660344aa37b52710a5318f"><td class="memItemLeft" >&#160;&#160;&#160;char_t&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#a6f21e839a1c66901995c8aae5cc9ad7b">data_char</a> [<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
-<tr class="separator:a8edbbd3b5b660344aa37b52710a5318f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aceabb9252961f82a27f902b624ff0c21"><td class="memItemLeft" valign="top">}&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxml__buffered__writer.html#aceabb9252961f82a27f902b624ff0c21">scratch</a></td></tr>
-<tr class="separator:aceabb9252961f82a27f902b624ff0c21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a5d825bee6aaa53136066de3b1e02a9"><td class="memItemLeft" >union {</td></tr>
+<tr class="memitem:acc96d83b7cc839ea1569ece6c21792a6"><td class="memItemLeft" >&#160;&#160;&#160;<a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#ac672c70ba0597cf94d35c352ac563891">data_u8</a> [4 *<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
+<tr class="separator:acc96d83b7cc839ea1569ece6c21792a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac5bb8e41490fa6d0379703a84ea359d"><td class="memItemLeft" >&#160;&#160;&#160;<a class="el" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a>&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#aa969d3724efe221a68927947e3a5196d">data_u16</a> [2 *<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
+<tr class="separator:aac5bb8e41490fa6d0379703a84ea359d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a197f75389e6a293bf156fa647e741727"><td class="memItemLeft" >&#160;&#160;&#160;<a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#afa54826d8227c4ee661e1a9cc1e1acf2">data_u32</a> [<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
+<tr class="separator:a197f75389e6a293bf156fa647e741727"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69bb86ee8b6ec7e993245c5627e4ae6b"><td class="memItemLeft" >&#160;&#160;&#160;char_t&#160;&#160;&#160;<a class="el" href="classxml__buffered__writer.html#a6f21e839a1c66901995c8aae5cc9ad7b">data_char</a> [<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td></tr>
+<tr class="separator:a69bb86ee8b6ec7e993245c5627e4ae6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a5d825bee6aaa53136066de3b1e02a9"><td class="memItemLeft" valign="top">}&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxml__buffered__writer.html#a1a5d825bee6aaa53136066de3b1e02a9">scratch</a></td></tr>
+<tr class="separator:a1a5d825bee6aaa53136066de3b1e02a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37cdd45f867937e1978565f5a0fa318b"><td class="memItemLeft" align="right" valign="top">xml_writer &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxml__buffered__writer.html#a37cdd45f867937e1978565f5a0fa318b">writer</a></td></tr>
 <tr class="separator:a37cdd45f867937e1978565f5a0fa318b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bad6a93035d796939d84bee30e74ce7"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classxml__buffered__writer.html#a6bad6a93035d796939d84bee30e74ce7">bufsize</a></td></tr>
@@ -136,8 +136,8 @@ Private Member Functions</h2></td></tr>
 <tr class="separator:a0aab8cdf0db6269840a0b16319bdb985"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="ae80799461cc7c7c621ff75eb6835e7ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae80799461cc7c7c621ff75eb6835e7ce">&#9670;&nbsp;</a></span>anonymous enum</h2>
+<a id="a7c25902cfc9e9063565a4ded3c2ff11f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c25902cfc9e9063565a4ded3c2ff11f">&#9670;&nbsp;</a></span>anonymous enum</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -148,8 +148,8 @@ Private Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae80799461cc7c7c621ff75eb6835e7cea9021e7b22ef17fba93b80380f0ffbbc8"></a>bufcapacitybytes&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd"></a>bufcapacity&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7c25902cfc9e9063565a4ded3c2ff11fa9021e7b22ef17fba93b80380f0ffbbc8"></a>bufcapacitybytes&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd"></a>bufcapacity&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -677,7 +677,7 @@ Private Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char_t xml_buffered_writer::buffer[<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
+          <td class="memname">char_t xml_buffered_writer::buffer[<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -705,7 +705,7 @@ Private Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char_t xml_buffered_writer::data_char[<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
+          <td class="memname">char_t xml_buffered_writer::data_char[<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -719,7 +719,7 @@ Private Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint16_t xml_buffered_writer::data_u16[2 *<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
+          <td class="memname"><a class="el" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a> xml_buffered_writer::data_u16[2 *<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -733,7 +733,7 @@ Private Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint32_t xml_buffered_writer::data_u32[<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
+          <td class="memname"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> xml_buffered_writer::data_u32[<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -747,7 +747,7 @@ Private Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t xml_buffered_writer::data_u8[4 *<a class="el" href="classxml__buffered__writer.html#ae80799461cc7c7c621ff75eb6835e7ceab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
+          <td class="memname"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> xml_buffered_writer::data_u8[4 *<a class="el" href="classxml__buffered__writer.html#a7c25902cfc9e9063565a4ded3c2ff11fab8b49b73105796783607f1f1ddd382cd">bufcapacity</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -768,8 +768,8 @@ Private Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aceabb9252961f82a27f902b624ff0c21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aceabb9252961f82a27f902b624ff0c21">&#9670;&nbsp;</a></span></h2>
+<a id="a1a5d825bee6aaa53136066de3b1e02a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a5d825bee6aaa53136066de3b1e02a9">&#9670;&nbsp;</a></span></h2>
 
 <div class="memitem">
 <div class="memproto">
