@@ -92,7 +92,6 @@ export function update_2d_cg_field(S, params) {
         lut.opacity = params.cg_opacity;
         COLORBAR.renderColorbar(lut);
 
-        // console.log(lut);
         for ( let i = 0; i < size; i ++ ) {
             var color = lut.getColor(val[i]);
             
