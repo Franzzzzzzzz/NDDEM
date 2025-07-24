@@ -108,7 +108,7 @@ function initGraphics() {
 
     textureLoader = new THREE.TextureLoader();
 
-    var ambientLight = new THREE.AmbientLight(0xaaaaaa);
+    var ambientLight = new THREE.AmbientLight(0xffffff);
     scene.add(ambientLight);
 
     var light = new THREE.DirectionalLight(0xffffff, 1);
