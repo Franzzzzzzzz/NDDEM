@@ -18,19 +18,19 @@ public:
     Vector1Djs simu_getRadii() {return S.getRadii() ; }
     void simu_setRadius(int id, double radius) {return S.setRadius(id, radius) ; }
     void simu_setMass(int id, double mass) {return S.setMass(id, mass) ; }
-    void simu_fixParticle(int a, v1d loc) {return S.fixParticle(a, loc) ; }
+    void simu_fixParticle(int a, Vector1Djs loc) {return S.fixParticle(a, loc) ; }
     void simu_setFrozen(int a) {return S.setFrozen(a) ; }
     Vector2Djs simu_getOrientation() {return S.getOrientation() ; }
     Vector2Djs simu_getVelocity() {return S.getVelocity() ; }
-    void simu_setVelocity(int id, v1d vel) {return S.setVelocity(id, vel) ; }
+    void simu_setVelocity(int id, Vector1Djs vel) {return S.setVelocity(id, vel) ; }
     Vector2Djs simu_getContactForce() {return S.getContactForce() ; }
     Vector2Djs simu_getContactInfos(int flags) {return S.getContactInfos(flags) ; }
     Vector1Djs simu_getRotationRate() {return S.getRotationRate() ; }
     Vector1Djs simu_getBoundary(int a) {return S.getBoundary(a) ; }
-    void simu_setBoundary(int a, std::vector<double> loc) {return S.setBoundary(a,loc);}
+    void simu_setBoundary(int a, Vector1Djs loc) {return S.setBoundary(a,loc);}
     Vector2Djs simu_getWallForce() {return S.getWallForce() ; }
-    void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
-    void simu_setAngularVelocity(int id, v1d omega) {return S.setAngularVelocity(id,omega) ; }
+    void simu_setExternalForce(int id, int duration, Vector1Djs force) {return S.setExternalForce(id,duration,force) ; }
+    void simu_setAngularVelocity(int id, Vector1Djs omega) {return S.setAngularVelocity(id,omega) ; }
     double simu_getTime() {return S.getTime() ; }
     double simu_getGravityAngle() {return S.getGravityAngle() ; }
     void simu_randomDrop() {return S.randomDrop() ; }
