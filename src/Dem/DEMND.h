@@ -62,12 +62,23 @@
         }
         return outer;
     }
+    
+    std::vector<double> from_js_array(emscripten::val jsArray) {
+    std::vector<double> vec;
+    size_t length = jsArray["length"].as<unsigned>();
+    vec.reserve(length);
+    for (unsigned i = 0; i < length; ++i) {
+        vec.push_back(jsArray[i].as<double>());
+    }
+    return vec;
+}   
     #endif
 #else
     using Vector2Djs = std::vector<std::vector<double>> ; 
     using Vector1Djs = std::vector<double> ; 
     template <typename T> std::vector<std::vector<T>> to_js_array(std::vector<std::vector<T>>& data) {return data ; }
     template <typename T> std::vector<T> to_js_array(std::vector<T>& data) {return data ; }
+    template <typename T> std::vector<T> from_js_array(std::vector<T>& data) {return data ; }
 #endif
     
 /** \weakgroup API
@@ -869,24 +880,27 @@ public:
   //void setX(std::vector < std::vector <double> > X_) { X = X_; }
 
   /** \brief Set the velocity of a single particle \ingroup API */
-  void setVelocity(int id, v1d vel) {
+  void setVelocity(int id, Vector1Djs vel) {
+      auto vel2 = from_js_array(vel) ;
       for (int i=0 ; i<d ; i++) {
-          V[id][i] = vel[i];
+          V[id][i] = vel2[i];
       }
   }
 
   /** \brief Set the angular velocity of a single particle \ingroup API */
-  void setAngularVelocity(int id, v1d omega) {
+  void setAngularVelocity(int id, Vector1Djs omega) {
+      auto omega2 = from_js_array(omega) ;
       for (int i=0; i<(d*(d-1)/2); i++) {
-          Omega[id][i] = omega[i];
+          Omega[id][i] = omega2[i];
       }
   }
 
 
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
-  void fixParticle(int a, v1d loc) {
+  void fixParticle(int a, Vector1Djs loc) {
+      auto loc2 = from_js_array (loc) ;       
       for (int i=0 ; i<d ; i++) {
-          X[a][i] = loc[i];
+          X[a][i] = loc2[i];
           V[a][i] = 0;
       }
       for (int i=0; i<(d*(d-1)/2); i++) {
@@ -911,12 +925,13 @@ public:
 
   /** \brief Expose the array of boundaries. \ingroup API */
   Vector1Djs getBoundary(int a) { return to_js_array(P.Boundaries[a].as_vector()); }
-  void setBoundary(int a, std::vector<double> loc) {
-      P.Boundaries[a].xmin = loc[0]; // low value
-      P.Boundaries[a].xmax = loc[1]; // high value
-      P.Boundaries[a].delta = loc[1] - loc[0]; // length
+  void setBoundary(int a, Vector1Djs loc) {
+      auto loc2 = from_js_array(loc) ;
+      P.Boundaries[a].xmin = loc2[0]; // low value
+      P.Boundaries[a].xmax = loc2[1]; // high value
+      P.Boundaries[a].delta = loc2[1] - loc2[0]; // length
       if ( P.Boundaries[a].Type == WallType::PBC_LE ) {
-          P.Boundaries[a].vel = loc[2];
+          P.Boundaries[a].vel = loc2[2];
       }
   }
 
@@ -935,13 +950,15 @@ public:
    }
 
   /** \brief Set an additional external force on a particle for a certain duration. \param id particle id \param duration number of timesteps to apply the force for \param force force vector to apply \ingroup API */
-  void setExternalForce (int id, int duration, v1d force)
+  void setExternalForce (int id, int duration, Vector1Djs force)
   {
-      printf("\nSetting the force: %g %g %g %g\n", force[0],force[1],force[2],force[3]);
+      auto force2 = from_js_array(force) ; 
+      
+      printf("\nSetting the force: %g %g %g %g\n", force2[0],force2[1],force2[2],force2[3]);
       ExternalAction.resize(ExternalAction.size()+1) ;
       ExternalAction[ExternalAction.size()-1].id = id ;
       ExternalAction[ExternalAction.size()-1].duration = duration ;
-      ExternalAction[ExternalAction.size()-1].set(force, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
+      ExternalAction[ExternalAction.size()-1].set(force2, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
   }
 
   void randomDrop()
