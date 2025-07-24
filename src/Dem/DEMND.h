@@ -33,9 +33,43 @@
 #ifdef EMSCRIPTEN
     #include <emscripten.h>
     #include <emscripten/bind.h>
-    using namespace emscripten;
-#endif
 
+    #ifndef JS_CONVERT_ARRAYS
+    #define JS_CONVERT_ARRAYS
+    using namespace emscripten;
+    using Vector2Djs = emscripten::val ;
+    using Vector1Djs = emscripten::val ;
+ 
+    template <typename T>
+    emscripten::val to_js_array(const std::vector<std::vector<T>>& data) {
+        using namespace emscripten;
+        val outer = val::array();
+        for (size_t i = 0; i < data.size(); ++i) {
+            val inner = val::array();
+            for (size_t j = 0; j < data[i].size(); ++j) {
+                inner.set(j, data[i][j]);
+            }
+            outer.set(i, inner);
+        }
+        return outer;
+    }
+    template <typename T>
+    emscripten::val to_js_array(const std::vector<T>& data) {
+        using namespace emscripten;
+        val outer = val::array();
+        for (size_t i = 0; i < data.size(); ++i) {
+            outer.set(i, data[i]);
+        }
+        return outer;
+    }
+    #endif
+#else
+    using Vector2Djs = std::vector<std::vector<double>> ; 
+    using Vector1Djs = std::vector<double> ; 
+    template <typename T> std::vector<std::vector<T>> to_js_array(std::vector<std::vector<T>>& data) {return data ; }
+    template <typename T> std::vector<T> to_js_array(std::vector<T>& data) {return data ; }
+#endif
+    
 /** \weakgroup API
  * These functions are useful for external access, for interactive runs. This is the basic flow of API calls to run an interactive simulation:
  * \dot
@@ -774,10 +808,10 @@ public:
 
   //-------------------------------------------------------------------
   /** \brief Expose the array of locations. \ingroup API */
-  std::vector<std::vector<double>> getX() { return X; }
+  Vector2Djs getX() { return to_js_array(X); }
 
   /** \brief Expose the array of radii. \ingroup API */
-  std::vector<double> getRadii() { return P.r; }
+  Vector1Djs getRadii() { return to_js_array(P.r); }
 
   /** \brief Set the radius of a specific particle. \ingroup API */
   void setRadius(int id, double radius) { P.r[id] = radius; } // NOTE: NOT UPDATING THE MASS!!! THIS IS SUCH A BAD IDEA
@@ -786,23 +820,23 @@ public:
   void setMass(int id, double mass) { P.m[id] = mass; }
 
   /** \brief Expose the array of velocities. \ingroup API */
-  std::vector<std::vector<double>> getVelocity() { return V; }
+  Vector2Djs getVelocity() { return to_js_array(V); }
 
   /** \brief Expose the array of orientation rate. \ingroup API */
-  std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
+  Vector1Djs getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return to_js_array(OmegaMag); }
 
   /** \brief DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces. \ingroup API */
-  std::vector<std::vector<double>> getContactForce() 
+  Vector2Djs getContactForce() 
   {
     auto [_, res] = MP.contacts2array (ExportData::IDS | ExportData::FN, X, P) ; 
-    return res; 
+    return to_js_array(res); 
   }
   
   /** \brief Expose the array of contact information. \ingroup API */
-  std::vector<std::vector<double>> getContactInfos(int flags) 
+  Vector2Djs getContactInfos(int flags) 
   {
     auto [_, res] = MP.contacts2array (static_cast<ExportData>(flags), X, P) ; 
-    return res; 
+    return to_js_array(res); 
   }
   
   
@@ -832,7 +866,7 @@ public:
   }*/
 
   /** \brief Set the array of locations. \ingroup API */
-  void setX(std::vector < std::vector <double> > X_) { X = X_; }
+  //void setX(std::vector < std::vector <double> > X_) { X = X_; }
 
   /** \brief Set the velocity of a single particle \ingroup API */
   void setVelocity(int id, v1d vel) {
@@ -873,10 +907,10 @@ public:
 
 
   /** \brief Expose the array of orientation. \ingroup API */
-  std::vector<std::vector<double>> getOrientation() { return A; }
+  Vector2Djs getOrientation() { return to_js_array(A); }
 
   /** \brief Expose the array of boundaries. \ingroup API */
-  std::vector<double> getBoundary(int a) { return P.Boundaries[a].as_vector(); }
+  Vector1Djs getBoundary(int a) { return to_js_array(P.Boundaries[a].as_vector()); }
   void setBoundary(int a, std::vector<double> loc) {
       P.Boundaries[a].xmin = loc[0]; // low value
       P.Boundaries[a].xmax = loc[1]; // high value
@@ -887,16 +921,16 @@ public:
   }
 
   /** \brief Expose the array of wall forces. \ingroup API */
-  std::vector<std::vector<double>> getWallForce() {
+  Vector2Djs getWallForce() {
       // std::cout<<P.wallforcerequested<<" "<<P.wallforcecomputed<<std::endl;
       P.wallforcerequested = true;
       if ( P.wallforcecomputed ) {
           P.wallforcerequested = false;
           P.wallforcecomputed = false;
-          return WallForce;
+          return to_js_array(WallForce);
       }
       else {
-        return empty_array ;
+        return to_js_array(empty_array) ;
       }
    }
 

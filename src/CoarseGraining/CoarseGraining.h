@@ -12,6 +12,40 @@
     #include <emscripten.h>
     #include <emscripten/bind.h>
     using namespace emscripten ;
+    
+    #ifndef JS_CONVERT_ARRAYS
+    #define JS_CONVERT_ARRAYS
+    using Vector2Djs = emscripten::val ;
+    using Vector1Djs = emscripten::val ;
+ 
+    template <typename T>
+    emscripten::val to_js_array(const std::vector<std::vector<T>>& data) {
+        using namespace emscripten;
+        val outer = val::array();
+        for (size_t i = 0; i < data.size(); ++i) {
+            val inner = val::array();
+            for (size_t j = 0; j < data[i].size(); ++j) {
+                inner.set(j, data[i][j]);
+            }
+            outer.set(i, inner);
+        }
+        return outer;
+    }
+    template <typename T>
+    emscripten::val to_js_array(const std::vector<T>& data) {
+        using namespace emscripten;
+        val outer = val::array();
+        for (size_t i = 0; i < data.size(); ++i) {
+            outer.set(i, data[i]);
+        }
+        return outer;
+    }
+    #endif
+#else
+    using Vector2Djs = std::vector<std::vector<double>> ; 
+    using Vector1Djs = std::vector<double> ; 
+    template <typename T> std::vector<std::vector<T>> to_js_array(std::vector<std::vector<T>>& data) {return data ; }
+    template <typename T> std::vector<T> to_js_array(std::vector<T>& data) {return data ; }
 #endif
 
 #include "gzip.hpp"
@@ -29,7 +63,7 @@
 #include "Reader-Mercury.h"
 #include "Reader-Yade.h"
 #include "Parameters.h"
-
+    
 class CoarseGraining {
 public:
     CoarseGraining() {}
@@ -43,14 +77,14 @@ public:
     int process_fluct_from_avg() ;
     void process_all ();
     void write () ;
-    std::vector<double> get_result(int ts, std::string field, int component) ;
-    std::vector<double> get_gridinfo() ;
-    std::vector<std::vector<double>> get_spheres(int ts_abs) ; 
+    Vector1Djs get_result(int ts, std::string field, int component) ;
+    Vector1Djs get_gridinfo() ;
+    Vector2Djs get_spheres(int ts_abs) ; 
 
     // Expose functions from member classes for js access
     void param_from_json_string (std::string param)  { json jsonparam =json::parse(param) ; return P.from_json(jsonparam) ; }
-    std::vector<std::vector<double>> param_get_bounds (int file = 0) {return P.files[file].reader->get_bounds() ; }
-    std::vector<double> param_get_minmaxradius (int file = 0) {return P.files[file].reader->get_minmaxradius() ; }
+    Vector2Djs param_get_bounds (int file = 0) {auto tmp = P.files[file].reader->get_bounds() ; return to_js_array(tmp) ;  }
+    Vector1Djs param_get_minmaxradius (int file = 0) {auto tmp = P.files[file].reader->get_minmaxradius() ; return to_js_array(tmp) ; }
     int param_get_numts(int file = 0) {return P.files[file].reader->get_numts(); }
     void debug () {/*char resc[5000] ; sprintf(resc, "%d %X", P.files.size(), P.files[0].reader) ; return resc ; */printf("BLAAAA\n") ; }
     int param_read_timestep(int n) {return P.read_timestep(n) ; }
@@ -156,7 +190,7 @@ void CoarseGraining::write ()
     if (std::find(P.saveformat.begin(), P.saveformat.end(), "numpy")!=P.saveformat.end()) C->write_numpy(P.save, true) ;
 }
 //------------------------------------------------------
-std::vector<double> CoarseGraining::get_result(int ts_abs, std::string field, int component)
+Vector1Djs CoarseGraining::get_result(int ts_abs, std::string field, int component)
 {
  int ts = ts_abs - P.skipT ;
  if (ts != C->cT) {printf("The requested timestep has not been processed.\n"); return {} ; }
@@ -166,10 +200,10 @@ std::vector<double> CoarseGraining::get_result(int ts_abs, std::string field, in
  res.resize(C->CGP.size()) ;
  for (size_t i = 0 ; i<res.size() ; i++)
      res[i]=C->CGP[C->idx_FastFirst2SlowFirst(i)].fields[C->cT][idx] ;
- return res ;
+ return to_js_array(res) ;
 }
 //-----------------------------------------------------
-std::vector<double> CoarseGraining::get_gridinfo()
+Vector1Djs CoarseGraining::get_gridinfo()
 {
     std::vector<double> res ;
     //origin
@@ -184,10 +218,10 @@ std::vector<double> CoarseGraining::get_gridinfo()
     res.push_back(C->npt[0]) ;
     res.push_back(C->npt[1]) ;
     res.push_back(C->npt[2]) ;
-    return res ;
+    return to_js_array(res) ;
 }
 //-----------------------------------------------------
-std::vector<std::vector<double>> CoarseGraining::get_spheres(int ts_abs)
+Vector2Djs CoarseGraining::get_spheres(int ts_abs)
 {
     std::vector<std::vector<double>> res ; res.resize(4) ; 
     int ts = ts_abs - P.skipT ;
@@ -207,7 +241,7 @@ std::vector<std::vector<double>> CoarseGraining::get_spheres(int ts_abs)
     for (int j=0 ; j<n ; j++)
         res[3][j]=p[j] ; 
     
-    return res ;
+    return to_js_array(res) ;
 }
 
 #ifdef EMSCRIPTEN
