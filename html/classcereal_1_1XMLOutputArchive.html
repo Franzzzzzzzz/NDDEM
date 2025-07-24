@@ -106,13 +106,13 @@ Public Member Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Common Functionality</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Common use cases for directly interacting with an <a class="el" href="classcereal_1_1XMLOutputArchive.html" title="An output archive designed to save data to XML.">XMLOutputArchive</a> </p>
 </div></td></tr>
-<tr class="memitem:a38f4d3926118a014c72a56b1d7547dac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a38f4d3926118a014c72a56b1d7547dac">XMLOutputArchive</a> (std::ostream &amp;stream, <a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html">Options</a> const &amp;options=<a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html#ab7120fd4a284844186093c581e922c87">Options::Default</a>())</td></tr>
+<tr class="memitem:a38f4d3926118a014c72a56b1d7547dac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a38f4d3926118a014c72a56b1d7547dac">XMLOutputArchive</a> (std::ostream &amp;stream, <a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html">Options</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;options=<a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html#ab7120fd4a284844186093c581e922c87">Options::Default</a>())</td></tr>
 <tr class="memdesc:a38f4d3926118a014c72a56b1d7547dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct, outputting to the provided stream upon destruction.  <a href="classcereal_1_1XMLOutputArchive.html#a38f4d3926118a014c72a56b1d7547dac">More...</a><br /></td></tr>
 <tr class="separator:a38f4d3926118a014c72a56b1d7547dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27af07bb73acbc1ad38d3f9a625e0d3c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a27af07bb73acbc1ad38d3f9a625e0d3c">~XMLOutputArchive</a> () <a class="el" href="macros_8hpp.html#a6c37b2307b83bbe2a3de58d78a2b8c0b">CEREAL_NOEXCEPT</a></td></tr>
 <tr class="memdesc:a27af07bb73acbc1ad38d3f9a625e0d3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, flushes the XML.  <a href="classcereal_1_1XMLOutputArchive.html#a27af07bb73acbc1ad38d3f9a625e0d3c">More...</a><br /></td></tr>
 <tr class="separator:a27af07bb73acbc1ad38d3f9a625e0d3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2aa0db0f3e102d463b0cdb20e3caed10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a2aa0db0f3e102d463b0cdb20e3caed10">saveBinaryValue</a> (const void *data, size_t size, const char *name=nullptr)</td></tr>
+<tr class="memitem:a2aa0db0f3e102d463b0cdb20e3caed10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a2aa0db0f3e102d463b0cdb20e3caed10">saveBinaryValue</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *data, size_t size, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *name=nullptr)</td></tr>
 <tr class="memdesc:a2aa0db0f3e102d463b0cdb20e3caed10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves some binary data, encoded as a <a class="el" href="namespacecereal_1_1base64.html">base64</a> string, with an optional name.  <a href="classcereal_1_1XMLOutputArchive.html#a2aa0db0f3e102d463b0cdb20e3caed10">More...</a><br /></td></tr>
 <tr class="separator:a2aa0db0f3e102d463b0cdb20e3caed10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Internal Functionality</div></td></tr>
@@ -124,33 +124,33 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa71de505f1aa29fe74065df4bbb39d7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#aa71de505f1aa29fe74065df4bbb39d7e">finishNode</a> ()</td></tr>
 <tr class="memdesc:aa71de505f1aa29fe74065df4bbb39d7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Designates the most recently added node as finished.  <a href="classcereal_1_1XMLOutputArchive.html#aa71de505f1aa29fe74065df4bbb39d7e">More...</a><br /></td></tr>
 <tr class="separator:aa71de505f1aa29fe74065df4bbb39d7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa301c06076e60466516f7d69198c2185"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#aa301c06076e60466516f7d69198c2185">setNextName</a> (const char *name)</td></tr>
+<tr class="memitem:aa301c06076e60466516f7d69198c2185"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#aa301c06076e60466516f7d69198c2185">setNextName</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *name)</td></tr>
 <tr class="memdesc:aa301c06076e60466516f7d69198c2185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the name for the next node created with startNode.  <a href="classcereal_1_1XMLOutputArchive.html#aa301c06076e60466516f7d69198c2185">More...</a><br /></td></tr>
 <tr class="separator:aa301c06076e60466516f7d69198c2185"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9024955d0fd8cf818bf068d3814b9e09"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
-<tr class="memitem:a9024955d0fd8cf818bf068d3814b9e09"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a9024955d0fd8cf818bf068d3814b9e09">saveValue</a> (T const &amp;value)</td></tr>
+<tr class="memitem:a9024955d0fd8cf818bf068d3814b9e09"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a9024955d0fd8cf818bf068d3814b9e09">saveValue</a> (T <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;value)</td></tr>
 <tr class="memdesc:a9024955d0fd8cf818bf068d3814b9e09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves some data, encoded as a string, into the current top level node.  <a href="classcereal_1_1XMLOutputArchive.html#a9024955d0fd8cf818bf068d3814b9e09">More...</a><br /></td></tr>
 <tr class="separator:a9024955d0fd8cf818bf068d3814b9e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d85b7350ab575fedeebcc0c31a56777"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a2d85b7350ab575fedeebcc0c31a56777">saveValue</a> (<a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> const &amp;value)</td></tr>
+<tr class="memitem:a2d85b7350ab575fedeebcc0c31a56777"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a2d85b7350ab575fedeebcc0c31a56777">saveValue</a> (<a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;value)</td></tr>
 <tr class="memdesc:a2d85b7350ab575fedeebcc0c31a56777"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload for uint8_t prevents them from being serialized as characters.  <a href="classcereal_1_1XMLOutputArchive.html#a2d85b7350ab575fedeebcc0c31a56777">More...</a><br /></td></tr>
 <tr class="separator:a2d85b7350ab575fedeebcc0c31a56777"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05f3803cec394e287d1088bc78f2381b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a05f3803cec394e287d1088bc78f2381b">saveValue</a> (<a class="el" href="stdint_8h.html#aef44329758059c91c76d334e8fc09700">int8_t</a> const &amp;value)</td></tr>
+<tr class="memitem:a05f3803cec394e287d1088bc78f2381b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a05f3803cec394e287d1088bc78f2381b">saveValue</a> (<a class="el" href="stdint_8h.html#aef44329758059c91c76d334e8fc09700">int8_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;value)</td></tr>
 <tr class="memdesc:a05f3803cec394e287d1088bc78f2381b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload for int8_t prevents them from being serialized as characters.  <a href="classcereal_1_1XMLOutputArchive.html#a05f3803cec394e287d1088bc78f2381b">More...</a><br /></td></tr>
 <tr class="separator:a05f3803cec394e287d1088bc78f2381b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4af064c2dc6a9451ef9a4dd93bdd304e"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a4af064c2dc6a9451ef9a4dd93bdd304e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a4af064c2dc6a9451ef9a4dd93bdd304e">insertType</a> ()</td></tr>
 <tr class="memdesc:a4af064c2dc6a9451ef9a4dd93bdd304e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Causes the type to be appended as an attribute to the most recently made node if output type is set to true.  <a href="classcereal_1_1XMLOutputArchive.html#a4af064c2dc6a9451ef9a4dd93bdd304e">More...</a><br /></td></tr>
 <tr class="separator:a4af064c2dc6a9451ef9a4dd93bdd304e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbc756983609a1600576faff3c558c57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#afbc756983609a1600576faff3c558c57">appendAttribute</a> (const char *name, const char *value)</td></tr>
+<tr class="memitem:afbc756983609a1600576faff3c558c57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#afbc756983609a1600576faff3c558c57">appendAttribute</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *name, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *value)</td></tr>
 <tr class="memdesc:afbc756983609a1600576faff3c558c57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Appends an attribute to the current top level node.  <a href="classcereal_1_1XMLOutputArchive.html#afbc756983609a1600576faff3c558c57">More...</a><br /></td></tr>
 <tr class="separator:afbc756983609a1600576faff3c558c57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ee4939c2a9023004e83d61457415e63"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a5ee4939c2a9023004e83d61457415e63">hasSizeAttributes</a> () const</td></tr>
+<tr class="memitem:a5ee4939c2a9023004e83d61457415e63"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1XMLOutputArchive.html#a5ee4939c2a9023004e83d61457415e63">hasSizeAttributes</a> () <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a></td></tr>
 <tr class="separator:a5ee4939c2a9023004e83d61457415e63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classcereal_1_1OutputArchive"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcereal_1_1OutputArchive')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcereal_1_1OutputArchive.html">cereal::OutputArchive&lt; XMLOutputArchive &gt;</a></td></tr>
-<tr class="memitem:a98fbde73bf6d41f4e717e91011e3be7f inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a98fbde73bf6d41f4e717e91011e3be7f">OutputArchive</a> (<a class="el" href="classcereal_1_1XMLOutputArchive.html">XMLOutputArchive</a> *const derived)</td></tr>
+<tr class="memitem:a98fbde73bf6d41f4e717e91011e3be7f inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a98fbde73bf6d41f4e717e91011e3be7f">OutputArchive</a> (<a class="el" href="classcereal_1_1XMLOutputArchive.html">XMLOutputArchive</a> *<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> derived)</td></tr>
 <tr class="memdesc:a98fbde73bf6d41f4e717e91011e3be7f inherit pub_methods_classcereal_1_1OutputArchive"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the output archive.  <a href="classcereal_1_1OutputArchive.html#a98fbde73bf6d41f4e717e91011e3be7f">More...</a><br /></td></tr>
 <tr class="separator:a98fbde73bf6d41f4e717e91011e3be7f inherit pub_methods_classcereal_1_1OutputArchive"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c6421d26bc4d2cd95db038c3ce91a49 inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcereal_1_1OutputArchive.html">OutputArchive</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a2c6421d26bc4d2cd95db038c3ce91a49">operator=</a> (<a class="el" href="classcereal_1_1OutputArchive.html">OutputArchive</a> const &amp;)=delete</td></tr>
+<tr class="memitem:a2c6421d26bc4d2cd95db038c3ce91a49 inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcereal_1_1OutputArchive.html">OutputArchive</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a2c6421d26bc4d2cd95db038c3ce91a49">operator=</a> (<a class="el" href="classcereal_1_1OutputArchive.html">OutputArchive</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;)=delete</td></tr>
 <tr class="separator:a2c6421d26bc4d2cd95db038c3ce91a49 inherit pub_methods_classcereal_1_1OutputArchive"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abef67f45c79d199c690359715905987b inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcereal_1_1XMLOutputArchive.html">XMLOutputArchive</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#abef67f45c79d199c690359715905987b">operator()</a> (Types &amp;&amp;... args)</td></tr>
 <tr class="memdesc:abef67f45c79d199c690359715905987b inherit pub_methods_classcereal_1_1OutputArchive"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializes all passed in data.  <a href="classcereal_1_1OutputArchive.html#abef67f45c79d199c690359715905987b">More...</a><br /></td></tr>
@@ -158,10 +158,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac0070bbf21d6a02a48d55b8052b90f64 inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#ac0070bbf21d6a02a48d55b8052b90f64">serializeDeferments</a> ()</td></tr>
 <tr class="memdesc:ac0070bbf21d6a02a48d55b8052b90f64 inherit pub_methods_classcereal_1_1OutputArchive"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serializes any data marked for deferment using defer.  <a href="classcereal_1_1OutputArchive.html#ac0070bbf21d6a02a48d55b8052b90f64">More...</a><br /></td></tr>
 <tr class="separator:ac0070bbf21d6a02a48d55b8052b90f64 inherit pub_methods_classcereal_1_1OutputArchive"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0efb18ad82f46327f48449e84222328b inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a0efb18ad82f46327f48449e84222328b">registerSharedPointer</a> (const std::shared_ptr&lt; const void &gt; &amp;sharedPointer)</td></tr>
+<tr class="memitem:a0efb18ad82f46327f48449e84222328b inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a0efb18ad82f46327f48449e84222328b">registerSharedPointer</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::shared_ptr&lt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void &gt; &amp;sharedPointer)</td></tr>
 <tr class="memdesc:a0efb18ad82f46327f48449e84222328b inherit pub_methods_classcereal_1_1OutputArchive"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a shared pointer with the archive.  <a href="classcereal_1_1OutputArchive.html#a0efb18ad82f46327f48449e84222328b">More...</a><br /></td></tr>
 <tr class="separator:a0efb18ad82f46327f48449e84222328b inherit pub_methods_classcereal_1_1OutputArchive"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf97e7c48f6d307d6fa87d4b3fd3ad0e inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#abf97e7c48f6d307d6fa87d4b3fd3ad0e">registerPolymorphicType</a> (char const *name)</td></tr>
+<tr class="memitem:abf97e7c48f6d307d6fa87d4b3fd3ad0e inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#abf97e7c48f6d307d6fa87d4b3fd3ad0e">registerPolymorphicType</a> (char <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> *name)</td></tr>
 <tr class="memdesc:abf97e7c48f6d307d6fa87d4b3fd3ad0e inherit pub_methods_classcereal_1_1OutputArchive"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a polymorphic type name with the archive.  <a href="classcereal_1_1OutputArchive.html#abf97e7c48f6d307d6fa87d4b3fd3ad0e">More...</a><br /></td></tr>
 <tr class="separator:abf97e7c48f6d307d6fa87d4b3fd3ad0e inherit pub_methods_classcereal_1_1OutputArchive"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4788dde3f0691f0dbbfc14fe6e2997cd inherit pub_methods_classcereal_1_1OutputArchive"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcereal_1_1XMLOutputArchive.html">XMLOutputArchive</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcereal_1_1OutputArchive.html#a4788dde3f0691f0dbbfc14fe6e2997cd">operator&amp;</a> (T &amp;&amp;arg)</td></tr>
@@ -241,7 +241,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html">Options</a> const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html">Options</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>options</em> = <code><a class="el" href="classcereal_1_1XMLOutputArchive_1_1Options.html#ab7120fd4a284844186093c581e922c87">Options::Default</a>()</code>&#160;</td>
         </tr>
         <tr>
@@ -308,13 +308,13 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void cereal::XMLOutputArchive::appendAttribute </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>value</em>&#160;</td>
         </tr>
         <tr>
@@ -427,7 +427,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">void cereal::XMLOutputArchive::saveBinaryValue </td>
           <td>(</td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -439,7 +439,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>name</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
@@ -473,7 +473,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">void cereal::XMLOutputArchive::saveValue </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#aef44329758059c91c76d334e8fc09700">int8_t</a> const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#aef44329758059c91c76d334e8fc09700">int8_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -503,7 +503,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">void cereal::XMLOutputArchive::saveValue </td>
           <td>(</td>
-          <td class="paramtype">T const &amp;&#160;</td>
+          <td class="paramtype">T <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -532,7 +532,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">void cereal::XMLOutputArchive::saveValue </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -560,7 +560,7 @@ template&lt;class T &gt; </div>
         <tr>
           <td class="memname">void cereal::XMLOutputArchive::setNextName </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>

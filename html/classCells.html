@@ -81,7 +81,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af960620aaf7a9db4f08da964ec16db4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a538f95a2138230e370959896ffe9269b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a538f95a2138230e370959896ffe9269b">init_cells</a> (std::vector&lt; <a class="el" href="classBoundary.html">Boundary</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&gt; &amp;boundaries, std::vector&lt; double &gt; &amp;r)</td></tr>
 <tr class="separator:a538f95a2138230e370959896ffe9269b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a289f6bc9a1637277a1ee1eb3b301e2b6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a289f6bc9a1637277a1ee1eb3b301e2b6">init_subcells</a> (std::vector&lt; <a class="el" href="classBoundary.html">Boundary</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&gt; &amp;bounds, double delta_super[], const std::vector&lt; int &gt; &amp;n_cell_super)</td></tr>
+<tr class="memitem:a289f6bc9a1637277a1ee1eb3b301e2b6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a289f6bc9a1637277a1ee1eb3b301e2b6">init_subcells</a> (std::vector&lt; <a class="el" href="classBoundary.html">Boundary</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&gt; &amp;bounds, double delta_super[], <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::vector&lt; int &gt; &amp;n_cell_super)</td></tr>
 <tr class="separator:a289f6bc9a1637277a1ee1eb3b301e2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c05536a0e27f3dee11c51d109acaa7e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a0c05536a0e27f3dee11c51d109acaa7e">init_allocate</a> ()</td></tr>
 <tr class="separator:a0c05536a0e27f3dee11c51d109acaa7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -93,19 +93,19 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a35dcc7c9beddea735c7968a564b4da8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a279c115a792e4ed5d1b0d3bc695624d0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a279c115a792e4ed5d1b0d3bc695624d0">allocate_single</a> (std::vector&lt; double &gt; &amp;X, int grainid)</td></tr>
 <tr class="separator:a279c115a792e4ed5d1b0d3bc695624d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15ecc63c53310d29211d2afac7a53729"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a15ecc63c53310d29211d2afac7a53729">contacts</a> (int ID, std::pair&lt; int, int &gt; bounds, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r, double LE_displacement)</td></tr>
+<tr class="memitem:a15ecc63c53310d29211d2afac7a53729"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a15ecc63c53310d29211d2afac7a53729">contacts</a> (int ID, std::pair&lt; int, int &gt; bounds, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;X, std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;r, double LE_displacement)</td></tr>
 <tr class="separator:a15ecc63c53310d29211d2afac7a53729"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07f1cb01db506af8057e3bf637f25439"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a07f1cb01db506af8057e3bf637f25439">contacts_external</a> (int ID, <a class="el" href="classCells.html">Cells</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;ocell, int delta_lvl, std::pair&lt; int, int &gt; bounds, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r, double LE_displacement)</td></tr>
+<tr class="memitem:a07f1cb01db506af8057e3bf637f25439"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a07f1cb01db506af8057e3bf637f25439">contacts_external</a> (int ID, <a class="el" href="classCells.html">Cells</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;ocell, int delta_lvl, std::pair&lt; int, int &gt; bounds, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;X, std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;r, double LE_displacement)</td></tr>
 <tr class="separator:a07f1cb01db506af8057e3bf637f25439"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80e27ce427b5908eadb5fcd6fcf45a9d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a80e27ce427b5908eadb5fcd6fcf45a9d">contacts_cell_cell</a> (int ID, <a class="el" href="classCell.html">Cell</a> &amp;c1, <a class="el" href="classCell.html">Cell</a> &amp;c2, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp)</td></tr>
+<tr class="memitem:a80e27ce427b5908eadb5fcd6fcf45a9d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a80e27ce427b5908eadb5fcd6fcf45a9d">contacts_cell_cell</a> (int ID, <a class="el" href="classCell.html">Cell</a> &amp;c1, <a class="el" href="classCell.html">Cell</a> &amp;c2, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;X, std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;r, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp)</td></tr>
 <tr class="separator:a80e27ce427b5908eadb5fcd6fcf45a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dbfede3274f2368a65127e9fcc693af"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a1dbfede3274f2368a65127e9fcc693af">contacts_cell_ghostcell</a> (int ID, <a class="el" href="classCell.html">Cell</a> &amp;c1, <a class="el" href="classCell.html">Cell</a> &amp;c2, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> ghost, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> ghostdir, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;X, std::vector&lt; double &gt; const &amp;r, double LE_displacement, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp)</td></tr>
+<tr class="memitem:a1dbfede3274f2368a65127e9fcc693af"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a1dbfede3274f2368a65127e9fcc693af">contacts_cell_ghostcell</a> (int ID, <a class="el" href="classCell.html">Cell</a> &amp;c1, <a class="el" href="classCell.html">Cell</a> &amp;c2, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> ghost, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> ghostdir, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLnew, std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;X, std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;r, double LE_displacement, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp)</td></tr>
 <tr class="separator:a1dbfede3274f2368a65127e9fcc693af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa6d285155397e64096f76e37ae91fc6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#afa6d285155397e64096f76e37ae91fc6">cell_contact_insert</a> (int ID, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
+<tr class="memitem:afa6d285155397e64096f76e37ae91fc6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#afa6d285155397e64096f76e37ae91fc6">cell_contact_insert</a> (int ID, <a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;CLp_it, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="separator:afa6d285155397e64096f76e37ae91fc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c1112b0fbd062d8df3b21a283e109ae"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a0c1112b0fbd062d8df3b21a283e109ae">clear_all</a> ()</td></tr>
 <tr class="separator:a0c1112b0fbd062d8df3b21a283e109ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada87991cb47404158ccf5b7687ec4743"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a> (const std::vector&lt; int &gt; &amp;v)</td></tr>
+<tr class="memitem:ada87991cb47404158ccf5b7687ec4743"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#ada87991cb47404158ccf5b7687ec4743">x2id</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::vector&lt; int &gt; &amp;v)</td></tr>
 <tr class="separator:ada87991cb47404158ccf5b7687ec4743"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91707d3d06d4e39a8e7986868a08a3ef"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCells.html#a91707d3d06d4e39a8e7986868a08a3ef">id2x</a> (int id)</td></tr>
 <tr class="separator:a91707d3d06d4e39a8e7986868a08a3ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,7 +232,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em>&#160;</td>
         </tr>
         <tr>
@@ -346,13 +346,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>X</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>r</em>, </td>
         </tr>
         <tr>
@@ -412,13 +412,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>X</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>r</em>, </td>
         </tr>
         <tr>
@@ -490,13 +490,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>X</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>r</em>, </td>
         </tr>
         <tr>
@@ -568,13 +568,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; std::vector&lt; double &gt;&gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>X</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; const &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; double &gt; <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> &amp;&#160;</td>
           <td class="paramname"><em>r</em>, </td>
         </tr>
         <tr>
@@ -786,7 +786,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; int &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::vector&lt; int &gt; &amp;&#160;</td>
           <td class="paramname"><em>n_cell_super</em>&#160;</td>
         </tr>
         <tr>
@@ -840,7 +840,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">int <a class="el" href="classCells.html">Cells</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::x2id </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; int &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::vector&lt; int &gt; &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>

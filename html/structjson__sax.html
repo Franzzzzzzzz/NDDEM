@@ -102,7 +102,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a32f8a32794cb384f0de3d3a96a6bb696"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a32f8a32794cb384f0de3d3a96a6bb696">number_unsigned</a> (<a class="el" href="structjson__sax.html#acbd02515ccdc3bfe940688fc96ac1359">number_unsigned_t</a> val)=0</td></tr>
 <tr class="memdesc:a32f8a32794cb384f0de3d3a96a6bb696"><td class="mdescLeft">&#160;</td><td class="mdescRight">an unsigned integer number was read  <a href="structjson__sax.html#a32f8a32794cb384f0de3d3a96a6bb696">More...</a><br /></td></tr>
 <tr class="separator:a32f8a32794cb384f0de3d3a96a6bb696"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19eafa3a92fc75e0258a842283396aa9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a19eafa3a92fc75e0258a842283396aa9">number_float</a> (<a class="el" href="structjson__sax.html#acb0bfbb3b0c6e9dc02cd6aab12c85654">number_float_t</a> val, const <a class="el" href="structjson__sax.html#a62085d156a899aaf2913ac25ded93996">string_t</a> &amp;s)=0</td></tr>
+<tr class="memitem:a19eafa3a92fc75e0258a842283396aa9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a19eafa3a92fc75e0258a842283396aa9">number_float</a> (<a class="el" href="structjson__sax.html#acb0bfbb3b0c6e9dc02cd6aab12c85654">number_float_t</a> val, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structjson__sax.html#a62085d156a899aaf2913ac25ded93996">string_t</a> &amp;s)=0</td></tr>
 <tr class="memdesc:a19eafa3a92fc75e0258a842283396aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">a floating-point number was read  <a href="structjson__sax.html#a19eafa3a92fc75e0258a842283396aa9">More...</a><br /></td></tr>
 <tr class="separator:a19eafa3a92fc75e0258a842283396aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3da9ee0c61f1a37e6c6a3d2dccb16765"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a3da9ee0c61f1a37e6c6a3d2dccb16765">string</a> (<a class="el" href="structjson__sax.html#a62085d156a899aaf2913ac25ded93996">string_t</a> &amp;val)=0</td></tr>
@@ -126,16 +126,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a81fbddbf7dc96eab21ef916625ad5f3b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a81fbddbf7dc96eab21ef916625ad5f3b">end_array</a> ()=0</td></tr>
 <tr class="memdesc:a81fbddbf7dc96eab21ef916625ad5f3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">the end of an array was read  <a href="structjson__sax.html#a81fbddbf7dc96eab21ef916625ad5f3b">More...</a><br /></td></tr>
 <tr class="separator:a81fbddbf7dc96eab21ef916625ad5f3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af165920966b60b78e57a2e4d92a63897"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#af165920966b60b78e57a2e4d92a63897">parse_error</a> (std::size_t position, const std::string &amp;last_token, const <a class="el" href="classdetail_1_1exception.html">detail::exception</a> &amp;ex)=0</td></tr>
+<tr class="memitem:af165920966b60b78e57a2e4d92a63897"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#af165920966b60b78e57a2e4d92a63897">parse_error</a> (std::size_t position, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;last_token, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classdetail_1_1exception.html">detail::exception</a> &amp;ex)=0</td></tr>
 <tr class="memdesc:af165920966b60b78e57a2e4d92a63897"><td class="mdescLeft">&#160;</td><td class="mdescRight">a parse error occurred  <a href="structjson__sax.html#af165920966b60b78e57a2e4d92a63897">More...</a><br /></td></tr>
 <tr class="separator:af165920966b60b78e57a2e4d92a63897"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3603caf3847143337b9974d4b1c94f11"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a3603caf3847143337b9974d4b1c94f11">json_sax</a> ()=default</td></tr>
 <tr class="separator:a3603caf3847143337b9974d4b1c94f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a978a4d26990f64d60686ef22568e76eb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a978a4d26990f64d60686ef22568e76eb">json_sax</a> (const <a class="el" href="structjson__sax.html">json_sax</a> &amp;)=default</td></tr>
+<tr class="memitem:a978a4d26990f64d60686ef22568e76eb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a978a4d26990f64d60686ef22568e76eb">json_sax</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structjson__sax.html">json_sax</a> &amp;)=default</td></tr>
 <tr class="separator:a978a4d26990f64d60686ef22568e76eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb6b743b889faf0c050f80bfae890450"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#adb6b743b889faf0c050f80bfae890450">json_sax</a> (<a class="el" href="structjson__sax.html">json_sax</a> &amp;&amp;) noexcept=default</td></tr>
 <tr class="separator:adb6b743b889faf0c050f80bfae890450"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09ee025eef62b4297faf70ab964d557e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structjson__sax.html">json_sax</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a09ee025eef62b4297faf70ab964d557e">operator=</a> (const <a class="el" href="structjson__sax.html">json_sax</a> &amp;)=default</td></tr>
+<tr class="memitem:a09ee025eef62b4297faf70ab964d557e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structjson__sax.html">json_sax</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#a09ee025eef62b4297faf70ab964d557e">operator=</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structjson__sax.html">json_sax</a> &amp;)=default</td></tr>
 <tr class="separator:a09ee025eef62b4297faf70ab964d557e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd554bf068d498dccf90854f24888b8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structjson__sax.html">json_sax</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjson__sax.html#acd554bf068d498dccf90854f24888b8e">operator=</a> (<a class="el" href="structjson__sax.html">json_sax</a> &amp;&amp;) noexcept=default</td></tr>
 <tr class="separator:acd554bf068d498dccf90854f24888b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -271,7 +271,7 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structjson__sax.html">json_sax</a>&lt; BasicJsonType &gt;::<a class="el" href="structjson__sax.html">json_sax</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structjson__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structjson__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -564,7 +564,7 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structjson__sax.html#a62085d156a899aaf2913ac25ded93996">string_t</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structjson__sax.html#a62085d156a899aaf2913ac25ded93996">string_t</a> &amp;&#160;</td>
           <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
@@ -680,7 +680,7 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structjson__sax.html">json_sax</a>&amp; <a class="el" href="structjson__sax.html">json_sax</a>&lt; BasicJsonType &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structjson__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structjson__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -742,13 +742,13 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;&#160;</td>
           <td class="paramname"><em>last_token</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classdetail_1_1exception.html">detail::exception</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classdetail_1_1exception.html">detail::exception</a> &amp;&#160;</td>
           <td class="paramname"><em>ex</em>&#160;</td>
         </tr>
         <tr>

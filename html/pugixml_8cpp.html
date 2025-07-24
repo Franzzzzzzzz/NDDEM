@@ -221,7 +221,7 @@ Macros</h2></td></tr>
 <tr class="separator:aff2957c2801d07ec2af5209653bbce62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68b7cf7d9e5b646cfed21bd0b6c113be"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a68b7cf7d9e5b646cfed21bd0b6c113be">PUGI_IMPL_UNLIKELY</a>(cond)&#160;&#160;&#160;(cond)</td></tr>
 <tr class="separator:a68b7cf7d9e5b646cfed21bd0b6c113be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38b75026920b1cedb5ccedb2e7a2938d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a38b75026920b1cedb5ccedb2e7a2938d">PUGI_IMPL_STATIC_ASSERT</a>(cond)&#160;&#160;&#160;{ static const char condition_failed[(cond) ? 1 : -1] = {0}; (void)condition_failed[0]; }</td></tr>
+<tr class="memitem:a38b75026920b1cedb5ccedb2e7a2938d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a38b75026920b1cedb5ccedb2e7a2938d">PUGI_IMPL_STATIC_ASSERT</a>(cond)&#160;&#160;&#160;{ static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char condition_failed[(cond) ? 1 : -1] = {0}; (void)condition_failed[0]; }</td></tr>
 <tr class="separator:a38b75026920b1cedb5ccedb2e7a2938d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f5486fd7b0f347c0c12ad12d56a245b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1f5486fd7b0f347c0c12ad12d56a245b">PUGI_IMPL_DMC_VOLATILE</a></td></tr>
 <tr class="separator:a1f5486fd7b0f347c0c12ad12d56a245b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -239,7 +239,7 @@ Macros</h2></td></tr>
 <tr class="separator:aeaf52c49bfbe4f38ccca0d108b67754f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00cd3aa8a45add92361bb8cd19c7d97b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a00cd3aa8a45add92361bb8cd19c7d97b">PUGI_IMPL_GETHEADER_IMPL</a>(object,  page,  flags)&#160;&#160;&#160;(((reinterpret_cast&lt;char*&gt;(object) - reinterpret_cast&lt;char*&gt;(page)) &lt;&lt; 8) | (flags))</td></tr>
 <tr class="separator:a00cd3aa8a45add92361bb8cd19c7d97b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2980ede52f331993d1aa44dcdc064b89"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2980ede52f331993d1aa44dcdc064b89">PUGI_IMPL_GETPAGE_IMPL</a>(header)&#160;&#160;&#160;static_cast&lt;impl::xml_memory_page*&gt;(const_cast&lt;void*&gt;(static_cast&lt;const void*&gt;(reinterpret_cast&lt;const char*&gt;(&amp;header) - (header &gt;&gt; 8))))</td></tr>
+<tr class="memitem:a2980ede52f331993d1aa44dcdc064b89"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2980ede52f331993d1aa44dcdc064b89">PUGI_IMPL_GETPAGE_IMPL</a>(header)&#160;&#160;&#160;static_cast&lt;impl::xml_memory_page*&gt;(const_cast&lt;void*&gt;(static_cast&lt;<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void*&gt;(reinterpret_cast&lt;<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char*&gt;(&amp;header) - (header &gt;&gt; 8))))</td></tr>
 <tr class="separator:a2980ede52f331993d1aa44dcdc064b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ce0d2d9f9a081e48fa75f56ed04dc43"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3ce0d2d9f9a081e48fa75f56ed04dc43">PUGI_IMPL_GETPAGE</a>(n)&#160;&#160;&#160;<a class="el" href="pugixml_8cpp.html#a2980ede52f331993d1aa44dcdc064b89">PUGI_IMPL_GETPAGE_IMPL</a>((n)-&gt;header)</td></tr>
 <tr class="separator:a3ce0d2d9f9a081e48fa75f56ed04dc43"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -488,19 +488,19 @@ Functions</h2></td></tr>
 <tr class="separator:a5924fc0d73ed48d5f8b58cf6cb39cb2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ead5b394d866b96e7a69a00b11ff3ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3ead5b394d866b96e7a69a00b11ff3ca">default_deallocate</a> (void *ptr)</td></tr>
 <tr class="separator:a3ead5b394d866b96e7a69a00b11ff3ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a775f7b78d2f13c1b72d69b114599461d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a775f7b78d2f13c1b72d69b114599461d">strlength</a> (const char_t *s)</td></tr>
+<tr class="memitem:a775f7b78d2f13c1b72d69b114599461d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a775f7b78d2f13c1b72d69b114599461d">strlength</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s)</td></tr>
 <tr class="separator:a775f7b78d2f13c1b72d69b114599461d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18ca4720d82fac6db58f522a2c6a682e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a18ca4720d82fac6db58f522a2c6a682e">strequal</a> (const char_t *src, const char_t *dst)</td></tr>
+<tr class="memitem:a18ca4720d82fac6db58f522a2c6a682e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a18ca4720d82fac6db58f522a2c6a682e">strequal</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *src, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *dst)</td></tr>
 <tr class="separator:a18ca4720d82fac6db58f522a2c6a682e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abed5392ee276c01db9fb069dd1e28780"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abed5392ee276c01db9fb069dd1e28780">strequalrange</a> (const char_t *lhs, const char_t *rhs, size_t count)</td></tr>
+<tr class="memitem:abed5392ee276c01db9fb069dd1e28780"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abed5392ee276c01db9fb069dd1e28780">strequalrange</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *lhs, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *rhs, size_t count)</td></tr>
 <tr class="separator:abed5392ee276c01db9fb069dd1e28780"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2260a7e81d25e3e004803e60875a4c63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2260a7e81d25e3e004803e60875a4c63">strlength_wide</a> (const wchar_t *s)</td></tr>
+<tr class="memitem:a2260a7e81d25e3e004803e60875a4c63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2260a7e81d25e3e004803e60875a4c63">strlength_wide</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *s)</td></tr>
 <tr class="separator:a2260a7e81d25e3e004803e60875a4c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7858deaa5ac596573f126e360221e499"><td class="memTemplParams" colspan="2">template&lt;typename Object &gt; </td></tr>
-<tr class="memitem:a7858deaa5ac596573f126e360221e499"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structxml__allocator.html">xml_allocator</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7858deaa5ac596573f126e360221e499">get_allocator</a> (const Object *object)</td></tr>
+<tr class="memitem:a7858deaa5ac596573f126e360221e499"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structxml__allocator.html">xml_allocator</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7858deaa5ac596573f126e360221e499">get_allocator</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Object *object)</td></tr>
 <tr class="separator:a7858deaa5ac596573f126e360221e499"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a053c9f8b9232107ae995cd243655d3"><td class="memTemplParams" colspan="2">template&lt;typename Object &gt; </td></tr>
-<tr class="memitem:a2a053c9f8b9232107ae995cd243655d3"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structxml__document__struct.html">xml_document_struct</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2a053c9f8b9232107ae995cd243655d3">get_document</a> (const Object *object)</td></tr>
+<tr class="memitem:a2a053c9f8b9232107ae995cd243655d3"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structxml__document__struct.html">xml_document_struct</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2a053c9f8b9232107ae995cd243655d3">get_document</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Object *object)</td></tr>
 <tr class="separator:a2a053c9f8b9232107ae995cd243655d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e3289a70e0af5e46e8ad02dc8c0f415"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> xml_attribute_struct *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a0e3289a70e0af5e46e8ad02dc8c0f415">allocate_attribute</a> (<a class="el" href="structxml__allocator.html">xml_allocator</a> &amp;alloc)</td></tr>
 <tr class="separator:a0e3289a70e0af5e46e8ad02dc8c0f415"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -542,36 +542,36 @@ Functions</h2></td></tr>
 <tr class="separator:aaf0cb0440cad4fe27233f6482e324e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac65295a489782c48a97a97e972ed61b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ac65295a489782c48a97a97e972ed61b0">get_wchar_encoding</a> ()</td></tr>
 <tr class="separator:ac65295a489782c48a97a97e972ed61b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a692fbc38a0056dd59dec71d856ba2a49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a692fbc38a0056dd59dec71d856ba2a49">parse_declaration_encoding</a> (const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *data, size_t size, const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&amp;out_encoding, size_t &amp;out_length)</td></tr>
+<tr class="memitem:a692fbc38a0056dd59dec71d856ba2a49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a692fbc38a0056dd59dec71d856ba2a49">parse_declaration_encoding</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *data, size_t size, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&amp;out_encoding, size_t &amp;out_length)</td></tr>
 <tr class="separator:a692fbc38a0056dd59dec71d856ba2a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8249b94ed556c157dba0e1e6a1299650"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8249b94ed556c157dba0e1e6a1299650">guess_buffer_encoding</a> (const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *data, size_t size)</td></tr>
+<tr class="memitem:a8249b94ed556c157dba0e1e6a1299650"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8249b94ed556c157dba0e1e6a1299650">guess_buffer_encoding</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *data, size_t size)</td></tr>
 <tr class="separator:a8249b94ed556c157dba0e1e6a1299650"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff8218b7e2530f96bbf74558e67ebdf6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aff8218b7e2530f96bbf74558e67ebdf6">get_buffer_encoding</a> (xml_encoding encoding, const void *contents, size_t size)</td></tr>
+<tr class="memitem:aff8218b7e2530f96bbf74558e67ebdf6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aff8218b7e2530f96bbf74558e67ebdf6">get_buffer_encoding</a> (xml_encoding encoding, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *contents, size_t size)</td></tr>
 <tr class="separator:aff8218b7e2530f96bbf74558e67ebdf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1829a20385a65b51d964ce4d419ac9cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1829a20385a65b51d964ce4d419ac9cf">get_mutable_buffer</a> (char_t *&amp;out_buffer, size_t &amp;out_length, const void *contents, size_t size, bool is_mutable)</td></tr>
+<tr class="memitem:a1829a20385a65b51d964ce4d419ac9cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1829a20385a65b51d964ce4d419ac9cf">get_mutable_buffer</a> (char_t *&amp;out_buffer, size_t &amp;out_length, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *contents, size_t size, bool is_mutable)</td></tr>
 <tr class="separator:a1829a20385a65b51d964ce4d419ac9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd0b8c40cb078d00aefcd71bf9b5e390"><td class="memTemplParams" colspan="2">template&lt;typename D &gt; </td></tr>
-<tr class="memitem:abd0b8c40cb078d00aefcd71bf9b5e390"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abd0b8c40cb078d00aefcd71bf9b5e390">convert_buffer_generic</a> (char_t *&amp;out_buffer, size_t &amp;out_length, const void *contents, size_t size, D)</td></tr>
+<tr class="memitem:abd0b8c40cb078d00aefcd71bf9b5e390"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abd0b8c40cb078d00aefcd71bf9b5e390">convert_buffer_generic</a> (char_t *&amp;out_buffer, size_t &amp;out_length, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *contents, size_t size, D)</td></tr>
 <tr class="separator:abd0b8c40cb078d00aefcd71bf9b5e390"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd1f93dc57151c5292e24ba935b2f0e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abd1f93dc57151c5292e24ba935b2f0e7">get_latin1_7bit_prefix_length</a> (const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *data, size_t size)</td></tr>
+<tr class="memitem:abd1f93dc57151c5292e24ba935b2f0e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abd1f93dc57151c5292e24ba935b2f0e7">get_latin1_7bit_prefix_length</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *data, size_t size)</td></tr>
 <tr class="separator:abd1f93dc57151c5292e24ba935b2f0e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9163b4a36cf2f553cb5cd037a706a639"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9163b4a36cf2f553cb5cd037a706a639">convert_buffer_latin1</a> (char_t *&amp;out_buffer, size_t &amp;out_length, const void *contents, size_t size, bool is_mutable)</td></tr>
+<tr class="memitem:a9163b4a36cf2f553cb5cd037a706a639"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9163b4a36cf2f553cb5cd037a706a639">convert_buffer_latin1</a> (char_t *&amp;out_buffer, size_t &amp;out_length, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *contents, size_t size, bool is_mutable)</td></tr>
 <tr class="separator:a9163b4a36cf2f553cb5cd037a706a639"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94848fb07803614d93af998761be643e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a94848fb07803614d93af998761be643e">convert_buffer</a> (char_t *&amp;out_buffer, size_t &amp;out_length, xml_encoding encoding, const void *contents, size_t size, bool is_mutable)</td></tr>
+<tr class="memitem:a94848fb07803614d93af998761be643e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a94848fb07803614d93af998761be643e">convert_buffer</a> (char_t *&amp;out_buffer, size_t &amp;out_length, xml_encoding encoding, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *contents, size_t size, bool is_mutable)</td></tr>
 <tr class="separator:a94848fb07803614d93af998761be643e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f5495dbea9f9b5d93590e5896b118e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1f5495dbea9f9b5d93590e5896b118e0">as_utf8_begin</a> (const wchar_t *str, size_t length)</td></tr>
+<tr class="memitem:a1f5495dbea9f9b5d93590e5896b118e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1f5495dbea9f9b5d93590e5896b118e0">as_utf8_begin</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *str, size_t length)</td></tr>
 <tr class="separator:a1f5495dbea9f9b5d93590e5896b118e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f34bdce6ab8f9a6290abae16323023d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7f34bdce6ab8f9a6290abae16323023d">as_utf8_end</a> (char *buffer, size_t size, const wchar_t *str, size_t length)</td></tr>
+<tr class="memitem:a7f34bdce6ab8f9a6290abae16323023d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7f34bdce6ab8f9a6290abae16323023d">as_utf8_end</a> (char *buffer, size_t size, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *str, size_t length)</td></tr>
 <tr class="separator:a7f34bdce6ab8f9a6290abae16323023d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a910e733d5fe47e977a2272b0bdde2721"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a910e733d5fe47e977a2272b0bdde2721">as_utf8_impl</a> (const wchar_t *str, size_t length)</td></tr>
+<tr class="memitem:a910e733d5fe47e977a2272b0bdde2721"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a910e733d5fe47e977a2272b0bdde2721">as_utf8_impl</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *str, size_t length)</td></tr>
 <tr class="separator:a910e733d5fe47e977a2272b0bdde2721"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e31663bd88912da77558e4f7fb00da3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt; wchar_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7e31663bd88912da77558e4f7fb00da3">as_wide_impl</a> (const char *str, size_t size)</td></tr>
+<tr class="memitem:a7e31663bd88912da77558e4f7fb00da3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt; wchar_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7e31663bd88912da77558e4f7fb00da3">as_wide_impl</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *str, size_t size)</td></tr>
 <tr class="separator:a7e31663bd88912da77558e4f7fb00da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afeaebb026671399f617b36e27fa92234"><td class="memTemplParams" colspan="2">template&lt;typename Header &gt; </td></tr>
-<tr class="memitem:afeaebb026671399f617b36e27fa92234"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#afeaebb026671399f617b36e27fa92234">strcpy_insitu_allow</a> (size_t length, const Header &amp;header, <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> header_mask, char_t *target)</td></tr>
+<tr class="memitem:afeaebb026671399f617b36e27fa92234"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#afeaebb026671399f617b36e27fa92234">strcpy_insitu_allow</a> (size_t length, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Header &amp;header, <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> header_mask, char_t *target)</td></tr>
 <tr class="separator:afeaebb026671399f617b36e27fa92234"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6acbb945c483e413572aadd55a2c8712"><td class="memTemplParams" colspan="2">template&lt;typename String , typename Header &gt; </td></tr>
-<tr class="memitem:a6acbb945c483e413572aadd55a2c8712"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a6acbb945c483e413572aadd55a2c8712">strcpy_insitu</a> (String &amp;dest, Header &amp;header, <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> header_mask, const char_t *<a class="el" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, size_t source_length)</td></tr>
+<tr class="memitem:a6acbb945c483e413572aadd55a2c8712"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a6acbb945c483e413572aadd55a2c8712">strcpy_insitu</a> (String &amp;dest, Header &amp;header, <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> header_mask, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>, size_t source_length)</td></tr>
 <tr class="separator:a6acbb945c483e413572aadd55a2c8712"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a095fca2682dd92f157625936501d1b21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a095fca2682dd92f157625936501d1b21">strconv_escape</a> (char_t *s, <a class="el" href="structgap.html">gap</a> &amp;g)</td></tr>
 <tr class="separator:a095fca2682dd92f157625936501d1b21"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -590,36 +590,36 @@ Functions</h2></td></tr>
 <tr class="memitem:a8b37b77e90cb5817784fa4d3c0fce380"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8b37b77e90cb5817784fa4d3c0fce380">get_write_encoding</a> (xml_encoding encoding)</td></tr>
 <tr class="separator:a8b37b77e90cb5817784fa4d3c0fce380"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81839da37a7d3dda082dd86acd0e5b5b"><td class="memTemplParams" colspan="2">template&lt;typename D , typename T &gt; </td></tr>
-<tr class="memitem:a81839da37a7d3dda082dd86acd0e5b5b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a81839da37a7d3dda082dd86acd0e5b5b">convert_buffer_output_generic</a> (typename T::value_type dest, const char_t *data, size_t length, D, T)</td></tr>
+<tr class="memitem:a81839da37a7d3dda082dd86acd0e5b5b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a81839da37a7d3dda082dd86acd0e5b5b">convert_buffer_output_generic</a> (typename T::value_type dest, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *data, size_t length, D, T)</td></tr>
 <tr class="separator:a81839da37a7d3dda082dd86acd0e5b5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad062509d1719b6e74470b6dbbccc32ce"><td class="memTemplParams" colspan="2">template&lt;typename D , typename T &gt; </td></tr>
-<tr class="memitem:ad062509d1719b6e74470b6dbbccc32ce"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad062509d1719b6e74470b6dbbccc32ce">convert_buffer_output_generic</a> (typename T::value_type dest, const char_t *data, size_t length, D, T, bool opt_swap)</td></tr>
+<tr class="memitem:ad062509d1719b6e74470b6dbbccc32ce"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad062509d1719b6e74470b6dbbccc32ce">convert_buffer_output_generic</a> (typename T::value_type dest, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *data, size_t length, D, T, bool opt_swap)</td></tr>
 <tr class="separator:ad062509d1719b6e74470b6dbbccc32ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52cd33a8dc5b0412c3e817512ec98ef9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a52cd33a8dc5b0412c3e817512ec98ef9">get_valid_length</a> (const char_t *data, size_t length)</td></tr>
+<tr class="memitem:a52cd33a8dc5b0412c3e817512ec98ef9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a52cd33a8dc5b0412c3e817512ec98ef9">get_valid_length</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *data, size_t length)</td></tr>
 <tr class="separator:a52cd33a8dc5b0412c3e817512ec98ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c1e23f1d5e2345198b3a7cb72b9c76b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1c1e23f1d5e2345198b3a7cb72b9c76b">convert_buffer_output</a> (char_t *, <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *r_u8, <a class="el" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a> *r_u16, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *r_u32, const char_t *data, size_t length, xml_encoding encoding)</td></tr>
+<tr class="memitem:a1c1e23f1d5e2345198b3a7cb72b9c76b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1c1e23f1d5e2345198b3a7cb72b9c76b">convert_buffer_output</a> (char_t *, <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *r_u8, <a class="el" href="stdint_8h.html#a273cf69d639a59973b6019625df33e30">uint16_t</a> *r_u16, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> *r_u32, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *data, size_t length, xml_encoding encoding)</td></tr>
 <tr class="separator:a1c1e23f1d5e2345198b3a7cb72b9c76b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab87511166fc7a13ed9e2d85dcb73670a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab87511166fc7a13ed9e2d85dcb73670a">text_output_escaped</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, const char_t *s, <a class="el" href="pugixml_8cpp.html#af8255f70e16ba8c6dbd5ff66cef9af26">chartypex_t</a> type, unsigned int flags)</td></tr>
+<tr class="memitem:ab87511166fc7a13ed9e2d85dcb73670a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab87511166fc7a13ed9e2d85dcb73670a">text_output_escaped</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s, <a class="el" href="pugixml_8cpp.html#af8255f70e16ba8c6dbd5ff66cef9af26">chartypex_t</a> type, unsigned int flags)</td></tr>
 <tr class="separator:ab87511166fc7a13ed9e2d85dcb73670a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab350d053c07c3976bb39a151581356fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab350d053c07c3976bb39a151581356fc">text_output</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, const char_t *s, <a class="el" href="pugixml_8cpp.html#af8255f70e16ba8c6dbd5ff66cef9af26">chartypex_t</a> type, unsigned int flags)</td></tr>
+<tr class="memitem:ab350d053c07c3976bb39a151581356fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab350d053c07c3976bb39a151581356fc">text_output</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s, <a class="el" href="pugixml_8cpp.html#af8255f70e16ba8c6dbd5ff66cef9af26">chartypex_t</a> type, unsigned int flags)</td></tr>
 <tr class="separator:ab350d053c07c3976bb39a151581356fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbd8e4df8e97263b7e756b37cbf301a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#acbd8e4df8e97263b7e756b37cbf301a1">text_output_cdata</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, const char_t *s)</td></tr>
+<tr class="memitem:acbd8e4df8e97263b7e756b37cbf301a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#acbd8e4df8e97263b7e756b37cbf301a1">text_output_cdata</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s)</td></tr>
 <tr class="separator:acbd8e4df8e97263b7e756b37cbf301a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a478905783b7081440dc5076ff42cd1e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a478905783b7081440dc5076ff42cd1e2">text_output_indent</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, const char_t *indent, size_t indent_length, unsigned int depth)</td></tr>
+<tr class="memitem:a478905783b7081440dc5076ff42cd1e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a478905783b7081440dc5076ff42cd1e2">text_output_indent</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *indent, size_t indent_length, unsigned int depth)</td></tr>
 <tr class="separator:a478905783b7081440dc5076ff42cd1e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cc26a3d1377e49746725ab2044e6a0d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2cc26a3d1377e49746725ab2044e6a0d">node_output_comment</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, const char_t *s)</td></tr>
+<tr class="memitem:a2cc26a3d1377e49746725ab2044e6a0d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2cc26a3d1377e49746725ab2044e6a0d">node_output_comment</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s)</td></tr>
 <tr class="separator:a2cc26a3d1377e49746725ab2044e6a0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36c9ed3414e0605a79a27cf8e711dfa9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a36c9ed3414e0605a79a27cf8e711dfa9">node_output_pi_value</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, const char_t *s)</td></tr>
+<tr class="memitem:a36c9ed3414e0605a79a27cf8e711dfa9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a36c9ed3414e0605a79a27cf8e711dfa9">node_output_pi_value</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s)</td></tr>
 <tr class="separator:a36c9ed3414e0605a79a27cf8e711dfa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05d1bf3ded0294ee5109cb5cacdc4f99"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a05d1bf3ded0294ee5109cb5cacdc4f99">node_output_attributes</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *node, const char_t *indent, size_t indent_length, unsigned int flags, unsigned int depth)</td></tr>
+<tr class="memitem:a05d1bf3ded0294ee5109cb5cacdc4f99"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a05d1bf3ded0294ee5109cb5cacdc4f99">node_output_attributes</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *node, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *indent, size_t indent_length, unsigned int flags, unsigned int depth)</td></tr>
 <tr class="separator:a05d1bf3ded0294ee5109cb5cacdc4f99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4cd311590420ae5ef799d11433f58c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae4cd311590420ae5ef799d11433f58c0">node_output_start</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *node, const char_t *indent, size_t indent_length, unsigned int flags, unsigned int depth)</td></tr>
+<tr class="memitem:ae4cd311590420ae5ef799d11433f58c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae4cd311590420ae5ef799d11433f58c0">node_output_start</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *node, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *indent, size_t indent_length, unsigned int flags, unsigned int depth)</td></tr>
 <tr class="separator:ae4cd311590420ae5ef799d11433f58c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d1eae935e38b49cd805390eda306679"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a5d1eae935e38b49cd805390eda306679">node_output_end</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *node)</td></tr>
 <tr class="separator:a5d1eae935e38b49cd805390eda306679"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad092fd8012bad5c9f17541a832188e48"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad092fd8012bad5c9f17541a832188e48">node_output_simple</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *node, unsigned int flags)</td></tr>
 <tr class="separator:ad092fd8012bad5c9f17541a832188e48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07c6c1e786c5022d046058c4e7ef3946"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a07c6c1e786c5022d046058c4e7ef3946">node_output</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *root, const char_t *indent, unsigned int flags, unsigned int depth)</td></tr>
+<tr class="memitem:a07c6c1e786c5022d046058c4e7ef3946"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a07c6c1e786c5022d046058c4e7ef3946">node_output</a> (<a class="el" href="classxml__buffered__writer.html">xml_buffered_writer</a> &amp;writer, xml_node_struct *root, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *indent, unsigned int flags, unsigned int depth)</td></tr>
 <tr class="separator:a07c6c1e786c5022d046058c4e7ef3946"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4bb9f073ea5b15a8c683479b3ca4644"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ac4bb9f073ea5b15a8c683479b3ca4644">has_declaration</a> (xml_node_struct *node)</td></tr>
 <tr class="separator:ac4bb9f073ea5b15a8c683479b3ca4644"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -643,17 +643,17 @@ Functions</h2></td></tr>
 <tr class="memitem:a78cb6a1f92159f3649ac191400feb3a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a78cb6a1f92159f3649ac191400feb3a2">is_text_node</a> (xml_node_struct *node)</td></tr>
 <tr class="separator:a78cb6a1f92159f3649ac191400feb3a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26cc6d62586f67dca2d7b25184156168"><td class="memTemplParams" colspan="2">template&lt;typename U &gt; </td></tr>
-<tr class="memitem:a26cc6d62586f67dca2d7b25184156168"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> U&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a26cc6d62586f67dca2d7b25184156168">string_to_integer</a> (const char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, U minv, U maxv)</td></tr>
+<tr class="memitem:a26cc6d62586f67dca2d7b25184156168"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> U&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a26cc6d62586f67dca2d7b25184156168">string_to_integer</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, U minv, U maxv)</td></tr>
 <tr class="separator:a26cc6d62586f67dca2d7b25184156168"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a849ad97aadf36fde77692f2579102341"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a849ad97aadf36fde77692f2579102341">get_value_int</a> (const char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
+<tr class="memitem:a849ad97aadf36fde77692f2579102341"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a849ad97aadf36fde77692f2579102341">get_value_int</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:a849ad97aadf36fde77692f2579102341"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d42b3cf4d478783be03b57b4b8dbab5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7d42b3cf4d478783be03b57b4b8dbab5">get_value_uint</a> (const char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
+<tr class="memitem:a7d42b3cf4d478783be03b57b4b8dbab5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a7d42b3cf4d478783be03b57b4b8dbab5">get_value_uint</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:a7d42b3cf4d478783be03b57b4b8dbab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe3fd13adbc9c10b35bea452088ddadb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abe3fd13adbc9c10b35bea452088ddadb">get_value_double</a> (const char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
+<tr class="memitem:abe3fd13adbc9c10b35bea452088ddadb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abe3fd13adbc9c10b35bea452088ddadb">get_value_double</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:abe3fd13adbc9c10b35bea452088ddadb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa50d99942c5d4049ff982ec3b06488c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa50d99942c5d4049ff982ec3b06488c8">get_value_float</a> (const char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
+<tr class="memitem:aa50d99942c5d4049ff982ec3b06488c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa50d99942c5d4049ff982ec3b06488c8">get_value_float</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:aa50d99942c5d4049ff982ec3b06488c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34899f063d543dea00d7930addc14c9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a34899f063d543dea00d7930addc14c9d">get_value_bool</a> (const char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
+<tr class="memitem:a34899f063d543dea00d7930addc14c9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a34899f063d543dea00d7930addc14c9d">get_value_bool</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *<a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:a34899f063d543dea00d7930addc14c9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a392d06514ba81cd707e2fb40201d3877"><td class="memTemplParams" colspan="2">template&lt;typename U &gt; </td></tr>
 <tr class="memitem:a392d06514ba81cd707e2fb40201d3877"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> char_t *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a392d06514ba81cd707e2fb40201d3877">integer_to_string</a> (char_t *begin, char_t *end, U <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, bool negative)</td></tr>
@@ -692,13 +692,13 @@ Functions</h2></td></tr>
 <tr class="memitem:a826b7e183311c8aa4e5b25157a3b3d3f"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a826b7e183311c8aa4e5b25157a3b3d3f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_parse_result&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a826b7e183311c8aa4e5b25157a3b3d3f">load_stream_impl</a> (<a class="el" href="structxml__document__struct.html">xml_document_struct</a> *doc, std::basic_istream&lt; T &gt; &amp;stream, unsigned int options, xml_encoding encoding, char_t **out_buffer)</td></tr>
 <tr class="separator:a826b7e183311c8aa4e5b25157a3b3d3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a792b1ed8480931649ea4116db76a245e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a792b1ed8480931649ea4116db76a245e">convert_path_heap</a> (const wchar_t *str)</td></tr>
+<tr class="memitem:a792b1ed8480931649ea4116db76a245e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a792b1ed8480931649ea4116db76a245e">convert_path_heap</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *str)</td></tr>
 <tr class="separator:a792b1ed8480931649ea4116db76a245e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84f44d706008d70217114ea05fb0ef64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> FILE *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a84f44d706008d70217114ea05fb0ef64">open_file_wide</a> (const wchar_t *path, const wchar_t *mode)</td></tr>
+<tr class="memitem:a84f44d706008d70217114ea05fb0ef64"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> FILE *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a84f44d706008d70217114ea05fb0ef64">open_file_wide</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *path, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *mode)</td></tr>
 <tr class="separator:a84f44d706008d70217114ea05fb0ef64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cc299f0db12962334df35524fd7ae33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> FILE *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2cc299f0db12962334df35524fd7ae33">open_file</a> (const char *path, const char *mode)</td></tr>
+<tr class="memitem:a2cc299f0db12962334df35524fd7ae33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> FILE *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2cc299f0db12962334df35524fd7ae33">open_file</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *path, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *mode)</td></tr>
 <tr class="separator:a2cc299f0db12962334df35524fd7ae33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8adf76173033c9b21c7874c3c4859f5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8adf76173033c9b21c7874c3c4859f5b">save_file_impl</a> (const xml_document &amp;doc, FILE *file, const char_t *indent, unsigned int flags, xml_encoding encoding)</td></tr>
+<tr class="memitem:a8adf76173033c9b21c7874c3c4859f5b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8adf76173033c9b21c7874c3c4859f5b">save_file_impl</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xml_document &amp;doc, FILE *file, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *indent, unsigned int flags, xml_encoding encoding)</td></tr>
 <tr class="separator:a8adf76173033c9b21c7874c3c4859f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bd6e032f69854151527f516bda0c752"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#a0bd6e032f69854151527f516bda0c752">pugi::unspecified_bool_xml_attribute</a> (xml_attribute ***)</td></tr>
 <tr class="separator:a0bd6e032f69854151527f516bda0c752"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -706,13 +706,13 @@ Functions</h2></td></tr>
 <tr class="separator:a2f7b76b39eaa088261cfe74182cba28e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d99e45d2b600027a268f5d6dd80864a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#a9d99e45d2b600027a268f5d6dd80864a">pugi::unspecified_bool_xml_text</a> (xml_text ***)</td></tr>
 <tr class="separator:a9d99e45d2b600027a268f5d6dd80864a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69383a1ee3e92185f93bb2322472d3ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#a69383a1ee3e92185f93bb2322472d3ce">pugi::as_utf8</a> (const wchar_t *str)</td></tr>
+<tr class="memitem:a69383a1ee3e92185f93bb2322472d3ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#a69383a1ee3e92185f93bb2322472d3ce">pugi::as_utf8</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *str)</td></tr>
 <tr class="separator:a69383a1ee3e92185f93bb2322472d3ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeaf400d819840506ade3a923a5658492"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#aeaf400d819840506ade3a923a5658492">pugi::as_utf8</a> (const std::basic_string&lt; wchar_t &gt; &amp;str)</td></tr>
+<tr class="memitem:aeaf400d819840506ade3a923a5658492"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#aeaf400d819840506ade3a923a5658492">pugi::as_utf8</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::basic_string&lt; wchar_t &gt; &amp;str)</td></tr>
 <tr class="separator:aeaf400d819840506ade3a923a5658492"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae372a27a1d2b6a23e431155820fbf166"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt; wchar_t &gt; <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#ae372a27a1d2b6a23e431155820fbf166">pugi::as_wide</a> (const char *str)</td></tr>
+<tr class="memitem:ae372a27a1d2b6a23e431155820fbf166"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt; wchar_t &gt; <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#ae372a27a1d2b6a23e431155820fbf166">pugi::as_wide</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *str)</td></tr>
 <tr class="separator:ae372a27a1d2b6a23e431155820fbf166"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e551b805e3bb7252b39d2979b465c70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt; wchar_t &gt; <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#a1e551b805e3bb7252b39d2979b465c70">pugi::as_wide</a> (const std::string &amp;str)</td></tr>
+<tr class="memitem:a1e551b805e3bb7252b39d2979b465c70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt; wchar_t &gt; <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#a1e551b805e3bb7252b39d2979b465c70">pugi::as_wide</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;str)</td></tr>
 <tr class="separator:a1e551b805e3bb7252b39d2979b465c70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc67229fed7dbe24a410d83b9233f916"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void <a class="el" href="pugixml_8hpp.html#a3d91f8ab11645e6dac8783d86d152b31">PUGIXML_FUNCTION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepugi.html#abc67229fed7dbe24a410d83b9233f916">pugi::set_memory_management_functions</a> (allocation_function allocate, deallocation_function deallocate)</td></tr>
 <tr class="separator:abc67229fed7dbe24a410d83b9233f916"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -724,7 +724,7 @@ Functions</h2></td></tr>
 <tr class="memitem:aab8f818e90a34b18c1da140588eca88d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aab8f818e90a34b18c1da140588eca88d">swap</a> (T &amp;lhs, T &amp;rhs)</td></tr>
 <tr class="separator:aab8f818e90a34b18c1da140588eca88d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08f53c77efa91323ff295e70af0ea5b8"><td class="memTemplParams" colspan="2">template&lt;typename I , typename Pred &gt; </td></tr>
-<tr class="memitem:a08f53c77efa91323ff295e70af0ea5b8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> I&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a08f53c77efa91323ff295e70af0ea5b8">min_element</a> (I begin, I end, const Pred &amp;pred)</td></tr>
+<tr class="memitem:a08f53c77efa91323ff295e70af0ea5b8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> I&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a08f53c77efa91323ff295e70af0ea5b8">min_element</a> (I begin, I end, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;pred)</td></tr>
 <tr class="separator:a08f53c77efa91323ff295e70af0ea5b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a181d689d647721b02f6db6c996550a3d"><td class="memTemplParams" colspan="2">template&lt;typename I &gt; </td></tr>
 <tr class="memitem:a181d689d647721b02f6db6c996550a3d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a181d689d647721b02f6db6c996550a3d">reverse</a> (I begin, I end)</td></tr>
@@ -733,28 +733,28 @@ Functions</h2></td></tr>
 <tr class="memitem:a444191b06b1fc17263925ef2c7185338"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> I&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a444191b06b1fc17263925ef2c7185338">unique</a> (I begin, I end)</td></tr>
 <tr class="separator:a444191b06b1fc17263925ef2c7185338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae32103b72e8928c87dfa9bce03565bb0"><td class="memTemplParams" colspan="2">template&lt;typename T , typename Pred &gt; </td></tr>
-<tr class="memitem:ae32103b72e8928c87dfa9bce03565bb0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae32103b72e8928c87dfa9bce03565bb0">insertion_sort</a> (T *begin, T *end, const Pred &amp;pred)</td></tr>
+<tr class="memitem:ae32103b72e8928c87dfa9bce03565bb0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae32103b72e8928c87dfa9bce03565bb0">insertion_sort</a> (T *begin, T *end, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;pred)</td></tr>
 <tr class="separator:ae32103b72e8928c87dfa9bce03565bb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1212d7df5db87e06b12d2a2705e4b73d"><td class="memTemplParams" colspan="2">template&lt;typename I , typename Pred &gt; </td></tr>
-<tr class="memitem:a1212d7df5db87e06b12d2a2705e4b73d"><td class="memTemplItemLeft" align="right" valign="top">I&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1212d7df5db87e06b12d2a2705e4b73d">median3</a> (I first, I middle, I last, const Pred &amp;pred)</td></tr>
+<tr class="memitem:a1212d7df5db87e06b12d2a2705e4b73d"><td class="memTemplItemLeft" align="right" valign="top">I&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1212d7df5db87e06b12d2a2705e4b73d">median3</a> (I first, I middle, I last, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;pred)</td></tr>
 <tr class="separator:a1212d7df5db87e06b12d2a2705e4b73d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c094b50369e7c77c5b9ec157b2350b1"><td class="memTemplParams" colspan="2">template&lt;typename T , typename Pred &gt; </td></tr>
-<tr class="memitem:a9c094b50369e7c77c5b9ec157b2350b1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9c094b50369e7c77c5b9ec157b2350b1">partition3</a> (T *begin, T *end, T pivot, const Pred &amp;pred, T **out_eqbeg, T **out_eqend)</td></tr>
+<tr class="memitem:a9c094b50369e7c77c5b9ec157b2350b1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9c094b50369e7c77c5b9ec157b2350b1">partition3</a> (T *begin, T *end, T pivot, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;pred, T **out_eqbeg, T **out_eqend)</td></tr>
 <tr class="separator:a9c094b50369e7c77c5b9ec157b2350b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09a6af504e5bf26365ccb2d1c707ca48"><td class="memTemplParams" colspan="2">template&lt;typename I , typename Pred &gt; </td></tr>
-<tr class="memitem:a09a6af504e5bf26365ccb2d1c707ca48"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a> (I begin, I end, const Pred &amp;pred)</td></tr>
+<tr class="memitem:a09a6af504e5bf26365ccb2d1c707ca48"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a> (I begin, I end, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;pred)</td></tr>
 <tr class="separator:a09a6af504e5bf26365ccb2d1c707ca48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b125cff014bd029663ef486205e71a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8b125cff014bd029663ef486205e71a5">hash_insert</a> (const void **table, size_t size, const void *key)</td></tr>
+<tr class="memitem:a8b125cff014bd029663ef486205e71a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8b125cff014bd029663ef486205e71a5">hash_insert</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void **table, size_t size, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *key)</td></tr>
 <tr class="separator:a8b125cff014bd029663ef486205e71a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae495a9f52adc166d7cd2f30a87e1d315"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae495a9f52adc166d7cd2f30a87e1d315">starts_with</a> (const char_t *string, const char_t *pattern)</td></tr>
+<tr class="memitem:ae495a9f52adc166d7cd2f30a87e1d315"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae495a9f52adc166d7cd2f30a87e1d315">starts_with</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *string, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *pattern)</td></tr>
 <tr class="separator:ae495a9f52adc166d7cd2f30a87e1d315"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1513a2532c51a58350c8091e25d2455b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1513a2532c51a58350c8091e25d2455b">find_char</a> (const char_t *s, char_t c)</td></tr>
+<tr class="memitem:a1513a2532c51a58350c8091e25d2455b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1513a2532c51a58350c8091e25d2455b">find_char</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s, char_t c)</td></tr>
 <tr class="separator:a1513a2532c51a58350c8091e25d2455b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79a011886695ff198f27daa4f1d9408d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a79a011886695ff198f27daa4f1d9408d">find_substring</a> (const char_t *s, const char_t *p)</td></tr>
+<tr class="memitem:a79a011886695ff198f27daa4f1d9408d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a79a011886695ff198f27daa4f1d9408d">find_substring</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *s, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *p)</td></tr>
 <tr class="separator:a79a011886695ff198f27daa4f1d9408d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab08a61d808aadcaec515099c6d8ca352"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab08a61d808aadcaec515099c6d8ca352">tolower_ascii</a> (char_t ch)</td></tr>
 <tr class="separator:ab08a61d808aadcaec515099c6d8ca352"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad34afe159db16c5eff7771f4f4935e4e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="classxpath__string.html">xpath_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad34afe159db16c5eff7771f4f4935e4e">string_value</a> (const xpath_node &amp;na, <a class="el" href="structxpath__allocator.html">xpath_allocator</a> *alloc)</td></tr>
+<tr class="memitem:ad34afe159db16c5eff7771f4f4935e4e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="classxpath__string.html">xpath_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad34afe159db16c5eff7771f4f4935e4e">string_value</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;na, <a class="el" href="structxpath__allocator.html">xpath_allocator</a> *alloc)</td></tr>
 <tr class="separator:ad34afe159db16c5eff7771f4f4935e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1d5307d5b910fd88ec35316e6739115"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae1d5307d5b910fd88ec35316e6739115">node_is_before_sibling</a> (xml_node_struct *ln, xml_node_struct *rn)</td></tr>
 <tr class="separator:ae1d5307d5b910fd88ec35316e6739115"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -762,13 +762,13 @@ Functions</h2></td></tr>
 <tr class="separator:a0d4ff2f108c20aa727cab26899108589"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ab686db9f80e7ac953ba69ccace1f6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8ab686db9f80e7ac953ba69ccace1f6a">node_is_ancestor</a> (xml_node_struct *parent, xml_node_struct *node)</td></tr>
 <tr class="separator:a8ab686db9f80e7ac953ba69ccace1f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd13cf186db3e5eb5fe7b184c4ee665f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abd13cf186db3e5eb5fe7b184c4ee665f">document_buffer_order</a> (const xpath_node &amp;xnode)</td></tr>
+<tr class="memitem:abd13cf186db3e5eb5fe7b184c4ee665f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abd13cf186db3e5eb5fe7b184c4ee665f">document_buffer_order</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;xnode)</td></tr>
 <tr class="separator:abd13cf186db3e5eb5fe7b184c4ee665f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f4c7e7ca3a98b25cbfa5d98dd21b300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2f4c7e7ca3a98b25cbfa5d98dd21b300">gen_nan</a> ()</td></tr>
 <tr class="separator:a2f4c7e7ca3a98b25cbfa5d98dd21b300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5762b318659399f5fda9c191f41ba15"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#af5762b318659399f5fda9c191f41ba15">is_nan</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:af5762b318659399f5fda9c191f41ba15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff7cc6743053889ff39123da1f1ae618"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aff7cc6743053889ff39123da1f1ae618">convert_number_to_string_special</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
+<tr class="memitem:aff7cc6743053889ff39123da1f1ae618"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aff7cc6743053889ff39123da1f1ae618">convert_number_to_string_special</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:aff7cc6743053889ff39123da1f1ae618"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa75560ac2faf904067e46dafaee19167"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa75560ac2faf904067e46dafaee19167">convert_number_to_boolean</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:aa75560ac2faf904067e46dafaee19167"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -778,57 +778,57 @@ Functions</h2></td></tr>
 <tr class="separator:afa8cc5242fdd3e8a83da9dcd0c7f1331"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70fefd711768a3ae223cf73fdb088f40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="classxpath__string.html">xpath_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a70fefd711768a3ae223cf73fdb088f40">convert_number_to_string</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>, <a class="el" href="structxpath__allocator.html">xpath_allocator</a> *alloc)</td></tr>
 <tr class="separator:a70fefd711768a3ae223cf73fdb088f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bf9a61bcf9eb4888ef36942e5cd8d05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a0bf9a61bcf9eb4888ef36942e5cd8d05">check_string_to_number_format</a> (const char_t *string)</td></tr>
+<tr class="memitem:a0bf9a61bcf9eb4888ef36942e5cd8d05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a0bf9a61bcf9eb4888ef36942e5cd8d05">check_string_to_number_format</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *string)</td></tr>
 <tr class="separator:a0bf9a61bcf9eb4888ef36942e5cd8d05"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6299198941714e42acefb1481370646"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae6299198941714e42acefb1481370646">convert_string_to_number</a> (const char_t *string)</td></tr>
+<tr class="memitem:ae6299198941714e42acefb1481370646"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae6299198941714e42acefb1481370646">convert_string_to_number</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *string)</td></tr>
 <tr class="separator:ae6299198941714e42acefb1481370646"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a1fca8011d76ef218f46957cf16cd1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1a1fca8011d76ef218f46957cf16cd1e">convert_string_to_number_scratch</a> (char_t(&amp;buffer)[32], const char_t *begin, const char_t *end, double *out_result)</td></tr>
+<tr class="memitem:a1a1fca8011d76ef218f46957cf16cd1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1a1fca8011d76ef218f46957cf16cd1e">convert_string_to_number_scratch</a> (char_t(&amp;buffer)[32], <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *begin, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *end, double *out_result)</td></tr>
 <tr class="separator:a1a1fca8011d76ef218f46957cf16cd1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ab89e4d3a6ba902d84a622f78a069e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2ab89e4d3a6ba902d84a622f78a069e4">round_nearest</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:a2ab89e4d3a6ba902d84a622f78a069e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e50504865fabc7c84367a037292f79e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9e50504865fabc7c84367a037292f79e">round_nearest_nzero</a> (double <a class="el" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a>)</td></tr>
 <tr class="separator:a9e50504865fabc7c84367a037292f79e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2ea4b1fc5f0f9d97a5f63df55a99989"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab2ea4b1fc5f0f9d97a5f63df55a99989">qualified_name</a> (const xpath_node &amp;node)</td></tr>
+<tr class="memitem:ab2ea4b1fc5f0f9d97a5f63df55a99989"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ab2ea4b1fc5f0f9d97a5f63df55a99989">qualified_name</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;node)</td></tr>
 <tr class="separator:ab2ea4b1fc5f0f9d97a5f63df55a99989"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d9a30549e838d905339ceac425a8669"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a0d9a30549e838d905339ceac425a8669">local_name</a> (const xpath_node &amp;node)</td></tr>
+<tr class="memitem:a0d9a30549e838d905339ceac425a8669"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a0d9a30549e838d905339ceac425a8669">local_name</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;node)</td></tr>
 <tr class="separator:a0d9a30549e838d905339ceac425a8669"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4b4cbb9c6aaed4cd05101f078b4427f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae4b4cbb9c6aaed4cd05101f078b4427f">namespace_uri</a> (xml_node node)</td></tr>
+<tr class="memitem:ae4b4cbb9c6aaed4cd05101f078b4427f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ae4b4cbb9c6aaed4cd05101f078b4427f">namespace_uri</a> (xml_node node)</td></tr>
 <tr class="separator:ae4b4cbb9c6aaed4cd05101f078b4427f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a07834a75b99d8d445c997781fa2878"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1a07834a75b99d8d445c997781fa2878">namespace_uri</a> (xml_attribute attr, xml_node parent)</td></tr>
+<tr class="memitem:a1a07834a75b99d8d445c997781fa2878"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a1a07834a75b99d8d445c997781fa2878">namespace_uri</a> (xml_attribute attr, xml_node parent)</td></tr>
 <tr class="separator:a1a07834a75b99d8d445c997781fa2878"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2999d476031b38ba1e0a45263ba175fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2999d476031b38ba1e0a45263ba175fe">namespace_uri</a> (const xpath_node &amp;node)</td></tr>
+<tr class="memitem:a2999d476031b38ba1e0a45263ba175fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a2999d476031b38ba1e0a45263ba175fe">namespace_uri</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;node)</td></tr>
 <tr class="separator:a2999d476031b38ba1e0a45263ba175fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01ac27b931558c01317a3de7772b9140"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a01ac27b931558c01317a3de7772b9140">normalize_space</a> (char_t *buffer)</td></tr>
 <tr class="separator:a01ac27b931558c01317a3de7772b9140"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8610002e14c0a353846c8106248bf2d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8610002e14c0a353846c8106248bf2d8">translate</a> (char_t *buffer, const char_t *from, const char_t *to, size_t to_length)</td></tr>
+<tr class="memitem:a8610002e14c0a353846c8106248bf2d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8610002e14c0a353846c8106248bf2d8">translate</a> (char_t *buffer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *from, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *to, size_t to_length)</td></tr>
 <tr class="separator:a8610002e14c0a353846c8106248bf2d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4516f1ad61c653aa7ab77b38b5c684b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> unsigned char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad4516f1ad61c653aa7ab77b38b5c684b">translate_table_generate</a> (<a class="el" href="structxpath__allocator.html">xpath_allocator</a> *alloc, const char_t *from, const char_t *to)</td></tr>
+<tr class="memitem:ad4516f1ad61c653aa7ab77b38b5c684b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> unsigned char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad4516f1ad61c653aa7ab77b38b5c684b">translate_table_generate</a> (<a class="el" href="structxpath__allocator.html">xpath_allocator</a> *alloc, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *from, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *to)</td></tr>
 <tr class="separator:ad4516f1ad61c653aa7ab77b38b5c684b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e5168e1b7500f59b4e551a4f13e0802"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3e5168e1b7500f59b4e551a4f13e0802">translate_table</a> (char_t *buffer, const unsigned char *table)</td></tr>
+<tr class="memitem:a3e5168e1b7500f59b4e551a4f13e0802"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3e5168e1b7500f59b4e551a4f13e0802">translate_table</a> (char_t *buffer, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> unsigned char *table)</td></tr>
 <tr class="separator:a3e5168e1b7500f59b4e551a4f13e0802"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63041941bf2b704523fead76b505d418"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a63041941bf2b704523fead76b505d418">is_xpath_attribute</a> (const char_t *name)</td></tr>
+<tr class="memitem:a63041941bf2b704523fead76b505d418"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a63041941bf2b704523fead76b505d418">is_xpath_attribute</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *name)</td></tr>
 <tr class="separator:a63041941bf2b704523fead76b505d418"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b2daf15316bc42897fa97eee2c87cce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3b2daf15316bc42897fa97eee2c87cce">hash_string</a> (const char_t *str)</td></tr>
+<tr class="memitem:a3b2daf15316bc42897fa97eee2c87cce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3b2daf15316bc42897fa97eee2c87cce">hash_string</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *str)</td></tr>
 <tr class="separator:a3b2daf15316bc42897fa97eee2c87cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bc9917e13d98d5cb612dae56a78ccd0"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a8bc9917e13d98d5cb612dae56a78ccd0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8bc9917e13d98d5cb612dae56a78ccd0">new_xpath_variable</a> (const char_t *name)</td></tr>
+<tr class="memitem:a8bc9917e13d98d5cb612dae56a78ccd0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8bc9917e13d98d5cb612dae56a78ccd0">new_xpath_variable</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *name)</td></tr>
 <tr class="separator:a8bc9917e13d98d5cb612dae56a78ccd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01dfff066d8432cddb546a646c351038"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_variable *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a01dfff066d8432cddb546a646c351038">new_xpath_variable</a> (xpath_value_type type, const char_t *name)</td></tr>
+<tr class="memitem:a01dfff066d8432cddb546a646c351038"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_variable *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a01dfff066d8432cddb546a646c351038">new_xpath_variable</a> (xpath_value_type type, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *name)</td></tr>
 <tr class="separator:a01dfff066d8432cddb546a646c351038"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54998853bf7f112d42b8f6688642e4e8"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a54998853bf7f112d42b8f6688642e4e8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a54998853bf7f112d42b8f6688642e4e8">delete_xpath_variable</a> (T *var)</td></tr>
 <tr class="separator:a54998853bf7f112d42b8f6688642e4e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56df69b1bca55eb52ebaf9581b7aa522"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a56df69b1bca55eb52ebaf9581b7aa522">delete_xpath_variable</a> (xpath_value_type type, xpath_variable *var)</td></tr>
 <tr class="separator:a56df69b1bca55eb52ebaf9581b7aa522"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b97966e4b676420606d6a04480f4944"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3b97966e4b676420606d6a04480f4944">copy_xpath_variable</a> (xpath_variable *lhs, const xpath_variable *rhs)</td></tr>
+<tr class="memitem:a3b97966e4b676420606d6a04480f4944"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a3b97966e4b676420606d6a04480f4944">copy_xpath_variable</a> (xpath_variable *lhs, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_variable *rhs)</td></tr>
 <tr class="separator:a3b97966e4b676420606d6a04480f4944"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a046d19e3dedb7e154882fe5ad4647e25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a046d19e3dedb7e154882fe5ad4647e25">get_variable_scratch</a> (char_t(&amp;buffer)[32], xpath_variable_set *set, const char_t *begin, const char_t *end, xpath_variable **out_result)</td></tr>
+<tr class="memitem:a046d19e3dedb7e154882fe5ad4647e25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a046d19e3dedb7e154882fe5ad4647e25">get_variable_scratch</a> (char_t(&amp;buffer)[32], xpath_variable_set *set, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *begin, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *end, xpath_variable **out_result)</td></tr>
 <tr class="separator:a046d19e3dedb7e154882fe5ad4647e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa445b0555e1eabcce1cf5a12808f70a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node_set::type_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa445b0555e1eabcce1cf5a12808f70a8">xpath_get_order</a> (const xpath_node *begin, const xpath_node *end)</td></tr>
+<tr class="memitem:aa445b0555e1eabcce1cf5a12808f70a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node_set::type_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa445b0555e1eabcce1cf5a12808f70a8">xpath_get_order</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *begin, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *end)</td></tr>
 <tr class="separator:aa445b0555e1eabcce1cf5a12808f70a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad84a1c6cc9aedeb003069d58199ca5f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node_set::type_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ad84a1c6cc9aedeb003069d58199ca5f5">xpath_sort</a> (xpath_node *begin, xpath_node *end, xpath_node_set::type_t type, bool rev)</td></tr>
 <tr class="separator:ad84a1c6cc9aedeb003069d58199ca5f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a959c2209346a23978707b96ca05d63d4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a959c2209346a23978707b96ca05d63d4">xpath_first</a> (const xpath_node *begin, const xpath_node *end, xpath_node_set::type_t type)</td></tr>
+<tr class="memitem:a959c2209346a23978707b96ca05d63d4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a959c2209346a23978707b96ca05d63d4">xpath_first</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *begin, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *end, xpath_node_set::type_t type)</td></tr>
 <tr class="separator:a959c2209346a23978707b96ca05d63d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bb4256f51e56915cc239c0f6934560c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> impl::xpath_ast_node *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a8bb4256f51e56915cc239c0f6934560c">evaluate_node_set_prepare</a> (<a class="el" href="structxpath__query__impl.html">xpath_query_impl</a> *impl)</td></tr>
 <tr class="separator:a8bb4256f51e56915cc239c0f6934560c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -839,33 +839,33 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a9ddfc1779fb25c9082b9f1c7fc78804a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9ddfc1779fb25c9082b9f1c7fc78804a">xml_memory_block_alignment</a> = sizeof(void*)</td></tr>
+<tr class="memitem:a9ddfc1779fb25c9082b9f1c7fc78804a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9ddfc1779fb25c9082b9f1c7fc78804a">xml_memory_block_alignment</a> = sizeof(void*)</td></tr>
 <tr class="separator:a9ddfc1779fb25c9082b9f1c7fc78804a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a582ffef102b56a11f5737420cae906ef"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a> = 64</td></tr>
+<tr class="memitem:a582ffef102b56a11f5737420cae906ef"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a> = 64</td></tr>
 <tr class="separator:a582ffef102b56a11f5737420cae906ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fe438ab2ab20f7ebf6be4a140eccc7d"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9fe438ab2ab20f7ebf6be4a140eccc7d">xml_memory_page_name_allocated_mask</a> = 32</td></tr>
+<tr class="memitem:a9fe438ab2ab20f7ebf6be4a140eccc7d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a9fe438ab2ab20f7ebf6be4a140eccc7d">xml_memory_page_name_allocated_mask</a> = 32</td></tr>
 <tr class="separator:a9fe438ab2ab20f7ebf6be4a140eccc7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6bd2c90078386db01e2551c0d11441f"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ac6bd2c90078386db01e2551c0d11441f">xml_memory_page_value_allocated_mask</a> = 16</td></tr>
+<tr class="memitem:ac6bd2c90078386db01e2551c0d11441f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ac6bd2c90078386db01e2551c0d11441f">xml_memory_page_value_allocated_mask</a> = 16</td></tr>
 <tr class="separator:ac6bd2c90078386db01e2551c0d11441f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24c7f234d1f6628ccf3d07bd1bf878b3"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a24c7f234d1f6628ccf3d07bd1bf878b3">xml_memory_page_type_mask</a> = 15</td></tr>
+<tr class="memitem:a24c7f234d1f6628ccf3d07bd1bf878b3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a24c7f234d1f6628ccf3d07bd1bf878b3">xml_memory_page_type_mask</a> = 15</td></tr>
 <tr class="separator:a24c7f234d1f6628ccf3d07bd1bf878b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b15189745c0b1e4c0031d53a353b878"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a4b15189745c0b1e4c0031d53a353b878">xml_memory_page_name_allocated_or_shared_mask</a> = <a class="el" href="pugixml_8cpp.html#a9fe438ab2ab20f7ebf6be4a140eccc7d">xml_memory_page_name_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td></tr>
+<tr class="memitem:a4b15189745c0b1e4c0031d53a353b878"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a4b15189745c0b1e4c0031d53a353b878">xml_memory_page_name_allocated_or_shared_mask</a> = <a class="el" href="pugixml_8cpp.html#a9fe438ab2ab20f7ebf6be4a140eccc7d">xml_memory_page_name_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td></tr>
 <tr class="separator:a4b15189745c0b1e4c0031d53a353b878"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbfa89e0a0522f9ba0cf9edb7b3ef75d"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abbfa89e0a0522f9ba0cf9edb7b3ef75d">xml_memory_page_value_allocated_or_shared_mask</a> = <a class="el" href="pugixml_8cpp.html#ac6bd2c90078386db01e2551c0d11441f">xml_memory_page_value_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td></tr>
+<tr class="memitem:abbfa89e0a0522f9ba0cf9edb7b3ef75d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#abbfa89e0a0522f9ba0cf9edb7b3ef75d">xml_memory_page_value_allocated_or_shared_mask</a> = <a class="el" href="pugixml_8cpp.html#ac6bd2c90078386db01e2551c0d11441f">xml_memory_page_value_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td></tr>
 <tr class="separator:abbfa89e0a0522f9ba0cf9edb7b3ef75d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05bd0a3e24463f672f4451d4f0eab192"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a05bd0a3e24463f672f4451d4f0eab192">xml_memory_page_size</a></td></tr>
+<tr class="memitem:a05bd0a3e24463f672f4451d4f0eab192"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a05bd0a3e24463f672f4451d4f0eab192">xml_memory_page_size</a></td></tr>
 <tr class="separator:a05bd0a3e24463f672f4451d4f0eab192"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6acb2529321dd30b6f3a8c34e88edb1c"><td class="memItemLeft" align="right" valign="top">static const unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a6acb2529321dd30b6f3a8c34e88edb1c">chartype_table</a> [256]</td></tr>
+<tr class="memitem:a6acb2529321dd30b6f3a8c34e88edb1c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a6acb2529321dd30b6f3a8c34e88edb1c">chartype_table</a> [256]</td></tr>
 <tr class="separator:a6acb2529321dd30b6f3a8c34e88edb1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5671e1188ce92b80a289fc6b9bf72598"><td class="memItemLeft" align="right" valign="top">static const unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a5671e1188ce92b80a289fc6b9bf72598">chartypex_table</a> [256]</td></tr>
+<tr class="memitem:a5671e1188ce92b80a289fc6b9bf72598"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a5671e1188ce92b80a289fc6b9bf72598">chartypex_table</a> [256]</td></tr>
 <tr class="separator:a5671e1188ce92b80a289fc6b9bf72598"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa798a68606a44106a36f7c32206bced3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa798a68606a44106a36f7c32206bced3">xpath_memory_page_size</a></td></tr>
+<tr class="memitem:aa798a68606a44106a36f7c32206bced3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#aa798a68606a44106a36f7c32206bced3">xpath_memory_page_size</a></td></tr>
 <tr class="separator:aa798a68606a44106a36f7c32206bced3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68d202bc68756b6fc6285c3cc6503242"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a68d202bc68756b6fc6285c3cc6503242">xpath_memory_block_alignment</a> = sizeof(double) &gt; sizeof(void*) ? sizeof(double) : sizeof(void*)</td></tr>
+<tr class="memitem:a68d202bc68756b6fc6285c3cc6503242"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#a68d202bc68756b6fc6285c3cc6503242">xpath_memory_block_alignment</a> = sizeof(double) &gt; sizeof(void*) ? sizeof(double) : sizeof(void*)</td></tr>
 <tr class="separator:a68d202bc68756b6fc6285c3cc6503242"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace94b7b2616c35a34bb5fc96f0b53706"><td class="memItemLeft" align="right" valign="top">static const xpath_node_set&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ace94b7b2616c35a34bb5fc96f0b53706">dummy_node_set</a></td></tr>
+<tr class="memitem:ace94b7b2616c35a34bb5fc96f0b53706"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node_set&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ace94b7b2616c35a34bb5fc96f0b53706">dummy_node_set</a></td></tr>
 <tr class="separator:ace94b7b2616c35a34bb5fc96f0b53706"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac567b57a323f39e5d481004d5c027996"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ac567b57a323f39e5d481004d5c027996">xpath_ast_depth_limit</a></td></tr>
+<tr class="memitem:ac567b57a323f39e5d481004d5c027996"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="pugixml_8cpp.html#ac567b57a323f39e5d481004d5c027996">xpath_ast_depth_limit</a></td></tr>
 <tr class="separator:ac567b57a323f39e5d481004d5c027996"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -1047,7 +1047,7 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">header</td><td>)</td>
-          <td>&#160;&#160;&#160;static_cast&lt;impl::xml_memory_page*&gt;(const_cast&lt;void*&gt;(static_cast&lt;const void*&gt;(reinterpret_cast&lt;const char*&gt;(&amp;header) - (header &gt;&gt; 8))))</td>
+          <td>&#160;&#160;&#160;static_cast&lt;impl::xml_memory_page*&gt;(const_cast&lt;void*&gt;(static_cast&lt;<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void*&gt;(reinterpret_cast&lt;<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char*&gt;(&amp;header) - (header &gt;&gt; 8))))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1389,7 +1389,7 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">cond</td><td>)</td>
-          <td>&#160;&#160;&#160;{ static const char condition_failed[(cond) ? 1 : -1] = {0}; (void)condition_failed[0]; }</td>
+          <td>&#160;&#160;&#160;{ static <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char condition_failed[(cond) ? 1 : -1] = {0}; (void)condition_failed[0]; }</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2101,7 +2101,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t as_utf8_begin </td>
           <td>(</td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>str</em>, </td>
         </tr>
         <tr>
@@ -2141,7 +2141,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>str</em>, </td>
         </tr>
         <tr>
@@ -2169,7 +2169,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::string as_utf8_impl </td>
           <td>(</td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>str</em>, </td>
         </tr>
         <tr>
@@ -2197,7 +2197,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> std::basic_string&lt;wchar_t&gt; as_wide_impl </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>str</em>, </td>
         </tr>
         <tr>
@@ -2225,7 +2225,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool check_string_to_number_format </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>string</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2279,7 +2279,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>contents</em>, </td>
         </tr>
         <tr>
@@ -2327,7 +2327,7 @@ template&lt;typename D &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>contents</em>, </td>
         </tr>
         <tr>
@@ -2373,7 +2373,7 @@ template&lt;typename D &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>contents</em>, </td>
         </tr>
         <tr>
@@ -2431,7 +2431,7 @@ template&lt;typename D &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -2473,7 +2473,7 @@ template&lt;typename D , typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -2521,7 +2521,7 @@ template&lt;typename D , typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -2651,7 +2651,7 @@ template&lt;typename D , typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* convert_number_to_string_special </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* convert_number_to_string_special </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -2671,7 +2671,7 @@ template&lt;typename D , typename T &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> char* convert_path_heap </td>
           <td>(</td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>str</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2689,7 +2689,7 @@ template&lt;typename D , typename T &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double convert_string_to_number </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>string</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2713,13 +2713,13 @@ template&lt;typename D , typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>begin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>end</em>, </td>
         </tr>
         <tr>
@@ -2753,7 +2753,7 @@ template&lt;typename D , typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const xpath_variable *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_variable *&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -2929,9 +2929,9 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const void* document_buffer_order </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void* document_buffer_order </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;&#160;</td>
           <td class="paramname"><em>xnode</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3017,9 +3017,9 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* find_char </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* find_char </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
@@ -3045,15 +3045,15 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* find_substring </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* find_substring </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>p</em>&#160;</td>
         </tr>
         <tr>
@@ -3097,7 +3097,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structxml__allocator.html">xml_allocator</a>&amp; get_allocator </td>
           <td>(</td>
-          <td class="paramtype">const Object *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Object *&#160;</td>
           <td class="paramname"><em>object</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3126,7 +3126,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>contents</em>, </td>
         </tr>
         <tr>
@@ -3159,7 +3159,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structxml__document__struct.html">xml_document_struct</a>&amp; get_document </td>
           <td>(</td>
-          <td class="paramtype">const Object *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Object *&#160;</td>
           <td class="paramname"><em>object</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3210,7 +3210,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t get_latin1_7bit_prefix_length </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -3250,7 +3250,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>contents</em>, </td>
         </tr>
         <tr>
@@ -3320,7 +3320,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t get_valid_length </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -3348,7 +3348,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool get_value_bool </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3366,7 +3366,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> double get_value_double </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3384,7 +3384,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> float get_value_float </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3402,7 +3402,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> int get_value_int </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3420,7 +3420,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> unsigned int get_value_uint </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3450,13 +3450,13 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>begin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>end</em>, </td>
         </tr>
         <tr>
@@ -3536,7 +3536,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xml_encoding guess_buffer_encoding </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -3582,7 +3582,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool hash_insert </td>
           <td>(</td>
-          <td class="paramtype">const void **&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void **&#160;</td>
           <td class="paramname"><em>table</em>, </td>
         </tr>
         <tr>
@@ -3594,7 +3594,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> void *&#160;</td>
           <td class="paramname"><em>key</em>&#160;</td>
         </tr>
         <tr>
@@ -3616,7 +3616,7 @@ template&lt;typename Object &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> unsigned int hash_string </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>str</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3804,7 +3804,7 @@ template&lt;typename T , typename Pred &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Pred &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;&#160;</td>
           <td class="paramname"><em>pred</em>&#160;</td>
         </tr>
         <tr>
@@ -3960,7 +3960,7 @@ template&lt;typename U &gt; </div>
         <tr>
           <td class="memname">bool is_xpath_attribute </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4217,9 +4217,9 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* local_name </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* local_name </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;&#160;</td>
           <td class="paramname"><em>node</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4296,7 +4296,7 @@ template&lt;typename I , typename Pred &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Pred &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;&#160;</td>
           <td class="paramname"><em>pred</em>&#160;</td>
         </tr>
         <tr>
@@ -4337,7 +4337,7 @@ template&lt;typename I , typename Pred &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Pred &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;&#160;</td>
           <td class="paramname"><em>pred</em>&#160;</td>
         </tr>
         <tr>
@@ -4357,9 +4357,9 @@ template&lt;typename I , typename Pred &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* namespace_uri </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* namespace_uri </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;&#160;</td>
           <td class="paramname"><em>node</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4375,7 +4375,7 @@ template&lt;typename I , typename Pred &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* namespace_uri </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* namespace_uri </td>
           <td>(</td>
           <td class="paramtype">xml_attribute&#160;</td>
           <td class="paramname"><em>attr</em>, </td>
@@ -4403,7 +4403,7 @@ template&lt;typename I , typename Pred &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* namespace_uri </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* namespace_uri </td>
           <td>(</td>
           <td class="paramtype">xml_node&#160;</td>
           <td class="paramname"><em>node</em></td><td>)</td>
@@ -4425,7 +4425,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> T* new_xpath_variable </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4449,7 +4449,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>name</em>&#160;</td>
         </tr>
         <tr>
@@ -4711,7 +4711,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>indent</em>, </td>
         </tr>
         <tr>
@@ -4757,7 +4757,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>indent</em>, </td>
         </tr>
         <tr>
@@ -4803,7 +4803,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
@@ -4859,7 +4859,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
@@ -4927,7 +4927,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>indent</em>, </td>
         </tr>
         <tr>
@@ -4985,13 +4985,13 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> FILE* open_file </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char *&#160;</td>
           <td class="paramname"><em>mode</em>&#160;</td>
         </tr>
         <tr>
@@ -5013,13 +5013,13 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> FILE* open_file_wide </td>
           <td>(</td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>mode</em>&#160;</td>
         </tr>
         <tr>
@@ -5041,7 +5041,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool parse_declaration_encoding </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
@@ -5053,7 +5053,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> *&amp;&#160;</td>
           <td class="paramname"><em>out_encoding</em>, </td>
         </tr>
         <tr>
@@ -5101,7 +5101,7 @@ template&lt;typename T , typename Pred &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Pred &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;&#160;</td>
           <td class="paramname"><em>pred</em>, </td>
         </tr>
         <tr>
@@ -5205,9 +5205,9 @@ template&lt;typename T , typename Pred &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> const char_t* qualified_name </td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t* qualified_name </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;&#160;</td>
           <td class="paramname"><em>node</em></td><td>)</td>
           <td></td>
         </tr>
@@ -5353,7 +5353,7 @@ template&lt;typename I &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool save_file_impl </td>
           <td>(</td>
-          <td class="paramtype">const xml_document &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xml_document &amp;&#160;</td>
           <td class="paramname"><em>doc</em>, </td>
         </tr>
         <tr>
@@ -5365,7 +5365,7 @@ template&lt;typename I &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>indent</em>, </td>
         </tr>
         <tr>
@@ -5641,7 +5641,7 @@ template&lt;typename I , typename Pred &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Pred &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Pred &amp;&#160;</td>
           <td class="paramname"><em>pred</em>&#160;</td>
         </tr>
         <tr>
@@ -5663,13 +5663,13 @@ template&lt;typename I , typename Pred &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool starts_with </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>string</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>pattern</em>&#160;</td>
         </tr>
         <tr>
@@ -5795,7 +5795,7 @@ template&lt;typename String , typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>source</em>, </td>
         </tr>
         <tr>
@@ -5834,7 +5834,7 @@ template&lt;typename Header &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Header &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Header &amp;&#160;</td>
           <td class="paramname"><em>header</em>, </td>
         </tr>
         <tr>
@@ -5873,13 +5873,13 @@ template&lt;typename Header &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool strequal </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>dst</em>&#160;</td>
         </tr>
         <tr>
@@ -5901,13 +5901,13 @@ template&lt;typename Header &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> bool strequalrange </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>rhs</em>, </td>
         </tr>
         <tr>
@@ -5937,7 +5937,7 @@ template&lt;typename U &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="pugixml_8cpp.html#afd7ba7b97063764aa21c94ae9b4e78ca">PUGI_IMPL_UNSIGNED_OVERFLOW</a> U string_to_integer </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>value</em>, </td>
         </tr>
         <tr>
@@ -5971,7 +5971,7 @@ template&lt;typename U &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> <a class="el" href="classxpath__string.html">xpath_string</a> string_value </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node &amp;&#160;</td>
           <td class="paramname"><em>na</em>, </td>
         </tr>
         <tr>
@@ -5999,7 +5999,7 @@ template&lt;typename U &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t strlength </td>
           <td>(</td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -6017,7 +6017,7 @@ template&lt;typename U &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> size_t strlength_wide </td>
           <td>(</td>
-          <td class="paramtype">const wchar_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> wchar_t *&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -6079,7 +6079,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
@@ -6119,7 +6119,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
@@ -6147,7 +6147,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
@@ -6187,7 +6187,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>indent</em>, </td>
         </tr>
         <tr>
@@ -6245,13 +6245,13 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>from</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>to</em>, </td>
         </tr>
         <tr>
@@ -6285,7 +6285,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const unsigned char *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> unsigned char *&#160;</td>
           <td class="paramname"><em>table</em>&#160;</td>
         </tr>
         <tr>
@@ -6313,13 +6313,13 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>from</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char_t *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> char_t *&#160;</td>
           <td class="paramname"><em>to</em>&#160;</td>
         </tr>
         <tr>
@@ -6399,13 +6399,13 @@ template&lt;typename I &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node xpath_first </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *&#160;</td>
           <td class="paramname"><em>begin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const xpath_node *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *&#160;</td>
           <td class="paramname"><em>end</em>, </td>
         </tr>
         <tr>
@@ -6433,13 +6433,13 @@ template&lt;typename I &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="pugixml_8cpp.html#a72f5dbb8bd03df7c7ba65966deb8c73d">PUGI_IMPL_FN</a> xpath_node_set::type_t xpath_get_order </td>
           <td>(</td>
-          <td class="paramtype">const xpath_node *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *&#160;</td>
           <td class="paramname"><em>begin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const xpath_node *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node *&#160;</td>
           <td class="paramname"><em>end</em>&#160;</td>
         </tr>
         <tr>
@@ -6537,7 +6537,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const unsigned char chartype_table[256]</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> unsigned char chartype_table[256]</td>
         </tr>
       </table>
   </td>
@@ -6579,7 +6579,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const unsigned char chartypex_table[256]</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> unsigned char chartypex_table[256]</td>
         </tr>
       </table>
   </td>
@@ -6622,7 +6622,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const xpath_node_set dummy_node_set</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> xpath_node_set dummy_node_set</td>
         </tr>
       </table>
   </td>
@@ -6644,7 +6644,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_block_alignment = sizeof(void*)</td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_block_alignment = sizeof(void*)</td>
         </tr>
       </table>
   </td>
@@ -6666,7 +6666,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_contents_shared_mask = 64</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_contents_shared_mask = 64</td>
         </tr>
       </table>
   </td>
@@ -6688,7 +6688,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_name_allocated_mask = 32</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_name_allocated_mask = 32</td>
         </tr>
       </table>
   </td>
@@ -6710,7 +6710,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_name_allocated_or_shared_mask = <a class="el" href="pugixml_8cpp.html#a9fe438ab2ab20f7ebf6be4a140eccc7d">xml_memory_page_name_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_name_allocated_or_shared_mask = <a class="el" href="pugixml_8cpp.html#a9fe438ab2ab20f7ebf6be4a140eccc7d">xml_memory_page_name_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td>
         </tr>
       </table>
   </td>
@@ -6732,7 +6732,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t xml_memory_page_size</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> size_t xml_memory_page_size</td>
         </tr>
       </table>
   </td>
@@ -6762,7 +6762,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_type_mask = 15</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_type_mask = 15</td>
         </tr>
       </table>
   </td>
@@ -6784,7 +6784,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_value_allocated_mask = 16</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_value_allocated_mask = 16</td>
         </tr>
       </table>
   </td>
@@ -6806,7 +6806,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_value_allocated_or_shared_mask = <a class="el" href="pugixml_8cpp.html#ac6bd2c90078386db01e2551c0d11441f">xml_memory_page_value_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xml_memory_page_value_allocated_or_shared_mask = <a class="el" href="pugixml_8cpp.html#ac6bd2c90078386db01e2551c0d11441f">xml_memory_page_value_allocated_mask</a> | <a class="el" href="pugixml_8cpp.html#a582ffef102b56a11f5737420cae906ef">xml_memory_page_contents_shared_mask</a></td>
         </tr>
       </table>
   </td>
@@ -6828,7 +6828,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t xpath_ast_depth_limit</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> size_t xpath_ast_depth_limit</td>
         </tr>
       </table>
   </td>
@@ -6855,7 +6855,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xpath_memory_block_alignment = sizeof(double) &gt; sizeof(void*) ? sizeof(double) : sizeof(void*)</td>
+          <td class="memname"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a> xpath_memory_block_alignment = sizeof(double) &gt; sizeof(void*) ? sizeof(double) : sizeof(void*)</td>
         </tr>
       </table>
   </td>
@@ -6877,7 +6877,7 @@ template&lt;typename I &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> const size_t xpath_memory_page_size</td>
+          <td class="memname"><a class="el" href="pugixml_8cpp.html#a9bc635e81cd6a4dc4dd038b0a80d508b">PUGI_IMPL_NS_END</a> static <a class="el" href="pugixml_8cpp.html#aa94f6f36120c8fdee03a5ae4a2476b24">PUGI_IMPL_NS_BEGIN</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> size_t xpath_memory_page_size</td>
         </tr>
       </table>
   </td>

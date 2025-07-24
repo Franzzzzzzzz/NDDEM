@@ -75,23 +75,23 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a1ba6164125996cf35136a4309f966453"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a1ba6164125996cf35136a4309f966453"><td class="memTemplItemLeft" align="right" valign="top">typename ::<a class="el" href="structcereal_1_1detail_1_1InputBindingMap.html">cereal::detail::InputBindingMap</a>&lt; Archive &gt;::Serializers&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a1ba6164125996cf35136a4309f966453">getInputBinding</a> (Archive &amp;ar, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const nameid)</td></tr>
+<tr class="memitem:a1ba6164125996cf35136a4309f966453"><td class="memTemplItemLeft" align="right" valign="top">typename ::<a class="el" href="structcereal_1_1detail_1_1InputBindingMap.html">cereal::detail::InputBindingMap</a>&lt; Archive &gt;::Serializers&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a1ba6164125996cf35136a4309f966453">getInputBinding</a> (Archive &amp;ar, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> nameid)</td></tr>
 <tr class="memdesc:a1ba6164125996cf35136a4309f966453"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an input binding from the given archive by deserializing the type meta data.  <a href="namespacecereal_1_1polymorphic__detail.html#a1ba6164125996cf35136a4309f966453">More...</a><br /></td></tr>
 <tr class="separator:a1ba6164125996cf35136a4309f966453"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d33747ce687e324440a360c1b8987b8"><td class="memTemplParams" colspan="2">template&lt;class Archive , class T &gt; </td></tr>
-<tr class="memitem:a8d33747ce687e324440a360c1b8987b8"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value||<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value) &amp;&amp;!std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a8d33747ce687e324440a360c1b8987b8">serialize_wrapper</a> (Archive &amp;ar, std::shared_ptr&lt; T &gt; &amp;ptr, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const nameid)</td></tr>
+<tr class="memitem:a8d33747ce687e324440a360c1b8987b8"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value||<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value) &amp;&amp;!std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a8d33747ce687e324440a360c1b8987b8">serialize_wrapper</a> (Archive &amp;ar, std::shared_ptr&lt; T &gt; &amp;ptr, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> nameid)</td></tr>
 <tr class="memdesc:a8d33747ce687e324440a360c1b8987b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a shared_ptr if the 2nd msb in the nameid is set, and if we can actually construct the pointee.  <a href="namespacecereal_1_1polymorphic__detail.html#a8d33747ce687e324440a360c1b8987b8">More...</a><br /></td></tr>
 <tr class="separator:a8d33747ce687e324440a360c1b8987b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c9e4b18c837d2487a4edcffe4c2a879"><td class="memTemplParams" colspan="2">template&lt;class Archive , class T , class D &gt; </td></tr>
-<tr class="memitem:a8c9e4b18c837d2487a4edcffe4c2a879"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value||<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value) &amp;&amp;!std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a8c9e4b18c837d2487a4edcffe4c2a879">serialize_wrapper</a> (Archive &amp;ar, std::unique_ptr&lt; T, D &gt; &amp;ptr, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const nameid)</td></tr>
+<tr class="memitem:a8c9e4b18c837d2487a4edcffe4c2a879"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value||<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value) &amp;&amp;!std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a8c9e4b18c837d2487a4edcffe4c2a879">serialize_wrapper</a> (Archive &amp;ar, std::unique_ptr&lt; T, D &gt; &amp;ptr, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> nameid)</td></tr>
 <tr class="memdesc:a8c9e4b18c837d2487a4edcffe4c2a879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a unique_ptr if the 2nd msb in the nameid is set, and if we can actually construct the pointee.  <a href="namespacecereal_1_1polymorphic__detail.html#a8c9e4b18c837d2487a4edcffe4c2a879">More...</a><br /></td></tr>
 <tr class="separator:a8c9e4b18c837d2487a4edcffe4c2a879"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e8faa1bd3d8119fcdb34b5b5453e6be"><td class="memTemplParams" colspan="2">template&lt;class Archive , class T &gt; </td></tr>
-<tr class="memitem:a0e8faa1bd3d8119fcdb34b5b5453e6be"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(!<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value &amp;&amp;!<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value)||std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a0e8faa1bd3d8119fcdb34b5b5453e6be">serialize_wrapper</a> (Archive &amp;, std::shared_ptr&lt; T &gt; &amp;, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const nameid)</td></tr>
+<tr class="memitem:a0e8faa1bd3d8119fcdb34b5b5453e6be"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(!<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value &amp;&amp;!<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value)||std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a0e8faa1bd3d8119fcdb34b5b5453e6be">serialize_wrapper</a> (Archive &amp;, std::shared_ptr&lt; T &gt; &amp;, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> nameid)</td></tr>
 <tr class="memdesc:a0e8faa1bd3d8119fcdb34b5b5453e6be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a shared_ptr if the 2nd msb in the nameid is set, and if we can actually construct the pointee.  <a href="namespacecereal_1_1polymorphic__detail.html#a0e8faa1bd3d8119fcdb34b5b5453e6be">More...</a><br /></td></tr>
 <tr class="separator:a0e8faa1bd3d8119fcdb34b5b5453e6be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dac803441014030e0f686f535d72eeb"><td class="memTemplParams" colspan="2">template&lt;class Archive , class T , class D &gt; </td></tr>
-<tr class="memitem:a9dac803441014030e0f686f535d72eeb"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(!<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value &amp;&amp;!<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value)||std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a9dac803441014030e0f686f535d72eeb">serialize_wrapper</a> (Archive &amp;, std::unique_ptr&lt; T, D &gt; &amp;, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const nameid)</td></tr>
+<tr class="memitem:a9dac803441014030e0f686f535d72eeb"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if&lt;(!<a class="el" href="structcereal_1_1traits_1_1is__default__constructible.html">traits::is_default_constructible</a>&lt; T &gt;::value &amp;&amp;!<a class="el" href="structcereal_1_1traits_1_1has__load__and__construct.html">traits::has_load_and_construct</a>&lt; T, Archive &gt;::value)||std::is_abstract&lt; T &gt;::value, bool &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecereal_1_1polymorphic__detail.html#a9dac803441014030e0f686f535d72eeb">serialize_wrapper</a> (Archive &amp;, std::unique_ptr&lt; T, D &gt; &amp;, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> nameid)</td></tr>
 <tr class="memdesc:a9dac803441014030e0f686f535d72eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a unique_ptr if the 2nd msb in the nameid is set, and if we can actually construct the pointee.  <a href="namespacecereal_1_1polymorphic__detail.html#a9dac803441014030e0f686f535d72eeb">More...</a><br /></td></tr>
 <tr class="separator:a9dac803441014030e0f686f535d72eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -116,7 +116,7 @@ template&lt;class Archive &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a>&#160;</td>
           <td class="paramname"><em>nameid</em>&#160;</td>
         </tr>
         <tr>
@@ -162,7 +162,7 @@ template&lt;class Archive , class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a>&#160;</td>
           <td class="paramname"><em>nameid</em>&#160;</td>
         </tr>
         <tr>
@@ -209,7 +209,7 @@ template&lt;class Archive , class T , class D &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a>&#160;</td>
           <td class="paramname"><em>nameid</em>&#160;</td>
         </tr>
         <tr>
@@ -256,7 +256,7 @@ template&lt;class Archive , class T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a>&#160;</td>
           <td class="paramname"><em>nameid</em>&#160;</td>
         </tr>
         <tr>
@@ -304,7 +304,7 @@ template&lt;class Archive , class T , class D &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> const&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a>&#160;</td>
           <td class="paramname"><em>nameid</em>&#160;</td>
         </tr>
         <tr>

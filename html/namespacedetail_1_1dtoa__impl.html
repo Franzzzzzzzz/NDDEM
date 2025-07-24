@@ -89,14 +89,14 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a3c879bf97b806cacbcbb2da07a5ff5c8"><td class="memTemplParams" colspan="2">template&lt;typename Target , typename Source &gt; </td></tr>
-<tr class="memitem:a3c879bf97b806cacbcbb2da07a5ff5c8"><td class="memTemplItemLeft" align="right" valign="top">Target&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a3c879bf97b806cacbcbb2da07a5ff5c8">reinterpret_bits</a> (const Source <a class="el" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>)</td></tr>
+<tr class="memitem:a3c879bf97b806cacbcbb2da07a5ff5c8"><td class="memTemplItemLeft" align="right" valign="top">Target&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a3c879bf97b806cacbcbb2da07a5ff5c8">reinterpret_bits</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Source <a class="el" href="pointer_8h.html#adb82dfe18535e9a30aa97d275f82bd55">source</a>)</td></tr>
 <tr class="separator:a3c879bf97b806cacbcbb2da07a5ff5c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a5ccf11847aab7a0f42f587b33935df"><td class="memTemplParams" colspan="2">template&lt;typename FloatType &gt; </td></tr>
 <tr class="memitem:a6a5ccf11847aab7a0f42f587b33935df"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structdetail_1_1dtoa__impl_1_1boundaries.html">boundaries</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a6a5ccf11847aab7a0f42f587b33935df">compute_boundaries</a> (FloatType value)</td></tr>
 <tr class="separator:a6a5ccf11847aab7a0f42f587b33935df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29ae6574f6be09a5c8ab08da9a3f71b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdetail_1_1dtoa__impl_1_1cached__power.html">cached_power</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a29ae6574f6be09a5c8ab08da9a3f71b4">get_cached_power_for_binary_exponent</a> (int e)</td></tr>
 <tr class="separator:a29ae6574f6be09a5c8ab08da9a3f71b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04eb234a28617519974fc962cd4da666"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a04eb234a28617519974fc962cd4da666">find_largest_pow10</a> (const <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> n, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> &amp;pow10)</td></tr>
+<tr class="memitem:a04eb234a28617519974fc962cd4da666"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a04eb234a28617519974fc962cd4da666">find_largest_pow10</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> n, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a> &amp;pow10)</td></tr>
 <tr class="separator:a04eb234a28617519974fc962cd4da666"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73a15efcb5c2157ea0e1375b98ef0e83"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedetail_1_1dtoa__impl.html#a73a15efcb5c2157ea0e1375b98ef0e83">grisu2_round</a> (char *buf, int len, <a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">std::uint64_t</a> dist, <a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">std::uint64_t</a> delta, <a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">std::uint64_t</a> rest, <a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">std::uint64_t</a> ten_k)</td></tr>
 <tr class="separator:a73a15efcb5c2157ea0e1375b98ef0e83"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,7 +203,7 @@ template&lt;typename FloatType &gt; </div>
         <tr>
           <td class="memname">int detail::dtoa_impl::find_largest_pow10 </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">std::uint32_t</a>&#160;</td>
           <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
@@ -551,7 +551,7 @@ template&lt;typename Target , typename Source &gt; </div>
         <tr>
           <td class="memname">Target detail::dtoa_impl::reinterpret_bits </td>
           <td>(</td>
-          <td class="paramtype">const Source&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Source&#160;</td>
           <td class="paramname"><em>source</em></td><td>)</td>
           <td></td>
         </tr>

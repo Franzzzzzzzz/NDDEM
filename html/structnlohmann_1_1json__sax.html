@@ -106,7 +106,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad9b253083e0509923ba195136f49face"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#ad9b253083e0509923ba195136f49face">number_unsigned</a> (<a class="el" href="structnlohmann_1_1json__sax.html#a32028cc056ae0f43aaae331cdbbbf856">number_unsigned_t</a> val)=0</td></tr>
 <tr class="memdesc:ad9b253083e0509923ba195136f49face"><td class="mdescLeft">&#160;</td><td class="mdescRight">an unsigned integer number was read  <a href="structnlohmann_1_1json__sax.html#ad9b253083e0509923ba195136f49face">More...</a><br /></td></tr>
 <tr class="separator:ad9b253083e0509923ba195136f49face"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7c31614e8a82164d2d7f8dbf4671b25"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#ae7c31614e8a82164d2d7f8dbf4671b25">number_float</a> (<a class="el" href="structnlohmann_1_1json__sax.html#a390c209bffd8c4800c8f3076dc465a20">number_float_t</a> val, const <a class="el" href="structnlohmann_1_1json__sax.html#ae01977a9f3c5b3667b7a2929ed91061e">string_t</a> &amp;s)=0</td></tr>
+<tr class="memitem:ae7c31614e8a82164d2d7f8dbf4671b25"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#ae7c31614e8a82164d2d7f8dbf4671b25">number_float</a> (<a class="el" href="structnlohmann_1_1json__sax.html#a390c209bffd8c4800c8f3076dc465a20">number_float_t</a> val, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structnlohmann_1_1json__sax.html#ae01977a9f3c5b3667b7a2929ed91061e">string_t</a> &amp;s)=0</td></tr>
 <tr class="memdesc:ae7c31614e8a82164d2d7f8dbf4671b25"><td class="mdescLeft">&#160;</td><td class="mdescRight">an floating-point number was read  <a href="structnlohmann_1_1json__sax.html#ae7c31614e8a82164d2d7f8dbf4671b25">More...</a><br /></td></tr>
 <tr class="separator:ae7c31614e8a82164d2d7f8dbf4671b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07eab82f6c82d606787eee9ad73d2bda"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a07eab82f6c82d606787eee9ad73d2bda">string</a> (<a class="el" href="structnlohmann_1_1json__sax.html#ae01977a9f3c5b3667b7a2929ed91061e">string_t</a> &amp;val)=0</td></tr>
@@ -130,16 +130,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a235ee975617f28e6a996d1e36a282312"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a235ee975617f28e6a996d1e36a282312">end_array</a> ()=0</td></tr>
 <tr class="memdesc:a235ee975617f28e6a996d1e36a282312"><td class="mdescLeft">&#160;</td><td class="mdescRight">the end of an array was read  <a href="structnlohmann_1_1json__sax.html#a235ee975617f28e6a996d1e36a282312">More...</a><br /></td></tr>
 <tr class="separator:a235ee975617f28e6a996d1e36a282312"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60287e3bd85f489e04c83f7e3b76e613"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a60287e3bd85f489e04c83f7e3b76e613">parse_error</a> (std::size_t position, const std::string &amp;last_token, const <a class="el" href="classnlohmann_1_1detail_1_1exception.html">detail::exception</a> &amp;ex)=0</td></tr>
+<tr class="memitem:a60287e3bd85f489e04c83f7e3b76e613"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a60287e3bd85f489e04c83f7e3b76e613">parse_error</a> (std::size_t position, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;last_token, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classnlohmann_1_1detail_1_1exception.html">detail::exception</a> &amp;ex)=0</td></tr>
 <tr class="memdesc:a60287e3bd85f489e04c83f7e3b76e613"><td class="mdescLeft">&#160;</td><td class="mdescRight">a parse error occurred  <a href="structnlohmann_1_1json__sax.html#a60287e3bd85f489e04c83f7e3b76e613">More...</a><br /></td></tr>
 <tr class="separator:a60287e3bd85f489e04c83f7e3b76e613"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac0f445c1173fa731104d93496a7e780"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#aac0f445c1173fa731104d93496a7e780">json_sax</a> ()=default</td></tr>
 <tr class="separator:aac0f445c1173fa731104d93496a7e780"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8358c063b2d7222b3aafa62fded04403"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a8358c063b2d7222b3aafa62fded04403">json_sax</a> (const <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;)=default</td></tr>
+<tr class="memitem:a8358c063b2d7222b3aafa62fded04403"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a8358c063b2d7222b3aafa62fded04403">json_sax</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;)=default</td></tr>
 <tr class="separator:a8358c063b2d7222b3aafa62fded04403"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62dae3713ca4914265904e30cd6b6347"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a62dae3713ca4914265904e30cd6b6347">json_sax</a> (<a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;&amp;) noexcept=default</td></tr>
 <tr class="separator:a62dae3713ca4914265904e30cd6b6347"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a90dae111cf189ac9ad340a60b199b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a1a90dae111cf189ac9ad340a60b199b6">operator=</a> (const <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;)=default</td></tr>
+<tr class="memitem:a1a90dae111cf189ac9ad340a60b199b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#a1a90dae111cf189ac9ad340a60b199b6">operator=</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;)=default</td></tr>
 <tr class="separator:a1a90dae111cf189ac9ad340a60b199b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac74584e3dc41f2465e69b37d7d2bf694"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnlohmann_1_1json__sax.html#ac74584e3dc41f2465e69b37d7d2bf694">operator=</a> (<a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> &amp;&amp;) noexcept=default</td></tr>
 <tr class="separator:ac74584e3dc41f2465e69b37d7d2bf694"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -275,7 +275,7 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structnlohmann_1_1json__sax.html">nlohmann::json_sax</a>&lt; BasicJsonType &gt;::<a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -568,7 +568,7 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structnlohmann_1_1json__sax.html#ae01977a9f3c5b3667b7a2929ed91061e">string_t</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structnlohmann_1_1json__sax.html#ae01977a9f3c5b3667b7a2929ed91061e">string_t</a> &amp;&#160;</td>
           <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
@@ -684,7 +684,7 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a>&amp; <a class="el" href="structnlohmann_1_1json__sax.html">nlohmann::json_sax</a>&lt; BasicJsonType &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="structnlohmann_1_1json__sax.html">json_sax</a>&lt; BasicJsonType &gt; &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -746,13 +746,13 @@ template&lt;typename BasicJsonType &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;&#160;</td>
           <td class="paramname"><em>last_token</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classnlohmann_1_1detail_1_1exception.html">detail::exception</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classnlohmann_1_1detail_1_1exception.html">detail::exception</a> &amp;&#160;</td>
           <td class="paramname"><em>ex</em>&#160;</td>
         </tr>
         <tr>

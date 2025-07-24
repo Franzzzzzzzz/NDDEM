@@ -1,38 +1,6 @@
 #include "Dem/DEMND.h"
 #include "CoarseGraining/CoarseGraining.h"
 
-#ifdef EMSCRIPTEN
- using Vector2D = emscripten::val ;
- using Vector1D = emscripten::val ;
-#else
- using Vector2D = std::vector<std::vector<double>> ; 
- using Vector1D = std::vector<double> ; 
-#endif
-
-template <typename T>
-emscripten::val to_js_array(const std::vector<std::vector<T>>& data) {
-    using namespace emscripten;
-    val outer = val::array();
-    for (size_t i = 0; i < data.size(); ++i) {
-        val inner = val::array();
-        for (size_t j = 0; j < data[i].size(); ++j) {
-            inner.set(j, data[i][j]);
-        }
-        outer.set(i, inner);
-    }
-    return outer;
-}
-template <typename T>
-emscripten::val to_js_array(const std::vector<T>& data) {
-    using namespace emscripten;
-    val outer = val::array();
-    for (size_t i = 0; i < data.size(); ++i) {
-        outer.set(i, data[i]);
-    }
-    return outer;
-}
-
-
 template <int dim>
 class DEMCGXD {
 public:
@@ -46,21 +14,21 @@ public:
     void simu_interpret_command (std::string s) {return S.interpret_command(s) ; }
     void simu_step_forward (int nt) {return S.step_forward(nt);}
     void simu_finalise() {return S.finalise() ; }
-    Vector2D simu_getX() {return to_js_array(S.getX()) ; }
-    Vector1D simu_getRadii() {return to_js_array(S.getRadii()) ; }
+    Vector2Djs simu_getX() {return S.getX() ; }
+    Vector1Djs simu_getRadii() {return S.getRadii() ; }
     void simu_setRadius(int id, double radius) {return S.setRadius(id, radius) ; }
     void simu_setMass(int id, double mass) {return S.setMass(id, mass) ; }
     void simu_fixParticle(int a, v1d loc) {return S.fixParticle(a, loc) ; }
     void simu_setFrozen(int a) {return S.setFrozen(a) ; }
-    Vector2D simu_getOrientation() {return to_js_array(S.getOrientation()) ; }
-    Vector2D simu_getVelocity() {return to_js_array(S.getVelocity()) ; }
+    Vector2Djs simu_getOrientation() {return S.getOrientation() ; }
+    Vector2Djs simu_getVelocity() {return S.getVelocity() ; }
     void simu_setVelocity(int id, v1d vel) {return S.setVelocity(id, vel) ; }
-    Vector2D simu_getContactForce() {return to_js_array(S.getContactForce()) ; }
-    Vector2D simu_getContactInfos(int flags) {return to_js_array(S.getContactInfos(flags)) ; }
-    Vector1D simu_getRotationRate() {return to_js_array(S.getRotationRate()) ; }
-    Vector1D simu_getBoundary(int a) {return to_js_array(S.getBoundary(a)) ; }
+    Vector2Djs simu_getContactForce() {return S.getContactForce() ; }
+    Vector2Djs simu_getContactInfos(int flags) {return S.getContactInfos(flags) ; }
+    Vector1Djs simu_getRotationRate() {return S.getRotationRate() ; }
+    Vector1Djs simu_getBoundary(int a) {return S.getBoundary(a) ; }
     void simu_setBoundary(int a, std::vector<double> loc) {return S.setBoundary(a,loc);}
-    Vector2D simu_getWallForce() {return to_js_array(S.getWallForce()) ; }
+    Vector2Djs simu_getWallForce() {return S.getWallForce() ; }
     void simu_setExternalForce(int id, int duration, v1d force) {return S.setExternalForce(id,duration,force) ; }
     void simu_setAngularVelocity(int id, v1d omega) {return S.setAngularVelocity(id,omega) ; }
     double simu_getTime() {return S.getTime() ; }
@@ -77,10 +45,10 @@ public:
         reader->set_data (DataValue::Imom, S.P.I) ;
     }
     int cg_process_timestep (int ts, bool allow_avg_fluct=false) {return CG.process_timestep(ts, allow_avg_fluct) ; }
-    Vector1D cg_get_result (int ts, std::string field, int component) {return to_js_array(CG.get_result(ts, field, component)) ; }
-    Vector1D cg_get_gridinfo () {return to_js_array(CG.get_gridinfo()) ;}
+    Vector1Djs cg_get_result (int ts, std::string field, int component) {return CG.get_result(ts, field, component) ; }
+    Vector1Djs cg_get_gridinfo () {return CG.get_gridinfo() ;}
     void cg_param_from_json_string(std::string param) {return CG.param_from_json_string(param) ;}
-    Vector2D cg_param_get_bounds (int file=0) {return to_js_array(CG.param_get_bounds(file));}
+    Vector2Djs cg_param_get_bounds (int file=0) {return CG.param_get_bounds(file);}
     int cg_param_get_numts (int file = 0) {return CG.param_get_numts(file) ; }
     void cg_param_post_init() {return CG.param_post_init() ; }
 

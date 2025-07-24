@@ -1310,7 +1310,7 @@ $(function() {
 <div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;  <span class="keywordflow">if</span> (ret != <a class="code" href="zlib_8h.html#a8cb802b6a11e926478dc6547c514c65c">Z_OK</a>) { <span class="keywordflow">return</span>; }</div>
 <div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160; </div>
 <div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;  strm.<a class="code" href="structz__stream__s.html#a0cf177f50dbb49692f27480cbcfde794">avail_in</a> = content.size();</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;  strm.<a class="code" href="structz__stream__s.html#a71613678076af3a9a4bb28d51a146150">next_in</a> = (Bytef *)content.data();</div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;  strm.<a class="code" href="structz__stream__s.html#a71613678076af3a9a4bb28d51a146150">next_in</a> = (<a class="code" href="zconf_8h.html#aeb722a888064be47e12d05f692e0f407">Bytef</a> *)content.data();</div>
 <div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160; </div>
 <div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;  std::string compressed;</div>
 <div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160; </div>
@@ -1318,7 +1318,7 @@ $(function() {
 <div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;  <span class="keywordtype">char</span> buff[bufsiz];</div>
 <div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;  <span class="keywordflow">do</span> {</div>
 <div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;    strm.<a class="code" href="structz__stream__s.html#a45ad2364307af9d944fd39d4eca3ca3c">avail_out</a> = bufsiz;</div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;    strm.<a class="code" href="structz__stream__s.html#aed4a02cfe93e975314fed50b04427bf3">next_out</a> = (Bytef *)buff;</div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;    strm.<a class="code" href="structz__stream__s.html#aed4a02cfe93e975314fed50b04427bf3">next_out</a> = (<a class="code" href="zconf_8h.html#aeb722a888064be47e12d05f692e0f407">Bytef</a> *)buff;</div>
 <div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    deflate(&amp;strm, <a class="code" href="zlib_8h.html#a876a626ba14eb12eea4bbf6823b6ca50">Z_FINISH</a>);</div>
 <div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    compressed.append(buff, bufsiz - strm.<a class="code" href="structz__stream__s.html#a45ad2364307af9d944fd39d4eca3ca3c">avail_out</a>);</div>
 <div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;  } <span class="keywordflow">while</span> (strm.<a class="code" href="structz__stream__s.html#a45ad2364307af9d944fd39d4eca3ca3c">avail_out</a> == 0);</div>
@@ -1341,7 +1341,7 @@ $(function() {
 <div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;  <span class="keywordflow">if</span> (ret != <a class="code" href="zlib_8h.html#a8cb802b6a11e926478dc6547c514c65c">Z_OK</a>) { <span class="keywordflow">return</span>; }</div>
 <div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160; </div>
 <div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;  strm.<a class="code" href="structz__stream__s.html#a0cf177f50dbb49692f27480cbcfde794">avail_in</a> = content.size();</div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;  strm.<a class="code" href="structz__stream__s.html#a71613678076af3a9a4bb28d51a146150">next_in</a> = (Bytef *)content.data();</div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;  strm.<a class="code" href="structz__stream__s.html#a71613678076af3a9a4bb28d51a146150">next_in</a> = (<a class="code" href="zconf_8h.html#aeb722a888064be47e12d05f692e0f407">Bytef</a> *)content.data();</div>
 <div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160; </div>
 <div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;  std::string decompressed;</div>
 <div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160; </div>
@@ -1349,7 +1349,7 @@ $(function() {
 <div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;  <span class="keywordtype">char</span> buff[bufsiz];</div>
 <div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;  <span class="keywordflow">do</span> {</div>
 <div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;    strm.<a class="code" href="structz__stream__s.html#a45ad2364307af9d944fd39d4eca3ca3c">avail_out</a> = bufsiz;</div>
-<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;    strm.<a class="code" href="structz__stream__s.html#aed4a02cfe93e975314fed50b04427bf3">next_out</a> = (Bytef *)buff;</div>
+<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;    strm.<a class="code" href="structz__stream__s.html#aed4a02cfe93e975314fed50b04427bf3">next_out</a> = (<a class="code" href="zconf_8h.html#aeb722a888064be47e12d05f692e0f407">Bytef</a> *)buff;</div>
 <div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;    inflate(&amp;strm, <a class="code" href="zlib_8h.html#ac3b62e37b9922d9496014515acd6083a">Z_NO_FLUSH</a>);</div>
 <div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;    decompressed.append(buff, bufsiz - strm.<a class="code" href="structz__stream__s.html#a45ad2364307af9d944fd39d4eca3ca3c">avail_out</a>);</div>
 <div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;  } <span class="keywordflow">while</span> (strm.<a class="code" href="structz__stream__s.html#a45ad2364307af9d944fd39d4eca3ca3c">avail_out</a> == 0);</div>
@@ -2657,6 +2657,7 @@ $(function() {
 <div class="ttc" id="astructz__stream__s_html_a89eb750ade7f4f0b56bfdadf13344982"><div class="ttname"><a href="structz__stream__s.html#a89eb750ade7f4f0b56bfdadf13344982">z_stream_s::zfree</a></div><div class="ttdeci">free_func zfree</div><div class="ttdef"><b>Definition:</b> zlib.h:99</div></div>
 <div class="ttc" id="astructz__stream__s_html_ab72467f908d2ce65d5b42ee6556ef8bb"><div class="ttname"><a href="structz__stream__s.html#ab72467f908d2ce65d5b42ee6556ef8bb">z_stream_s::opaque</a></div><div class="ttdeci">voidpf opaque</div><div class="ttdef"><b>Definition:</b> zlib.h:100</div></div>
 <div class="ttc" id="astructz__stream__s_html_aed4a02cfe93e975314fed50b04427bf3"><div class="ttname"><a href="structz__stream__s.html#aed4a02cfe93e975314fed50b04427bf3">z_stream_s::next_out</a></div><div class="ttdeci">Bytef * next_out</div><div class="ttdef"><b>Definition:</b> zlib.h:91</div></div>
+<div class="ttc" id="azconf_8h_html_aeb722a888064be47e12d05f692e0f407"><div class="ttname"><a href="zconf_8h.html#aeb722a888064be47e12d05f692e0f407">Bytef</a></div><div class="ttdeci">Byte FAR Bytef</div><div class="ttdef"><b>Definition:</b> zconf.h:406</div></div>
 <div class="ttc" id="azlib_8h_html"><div class="ttname"><a href="zlib_8h.html">zlib.h</a></div></div>
 <div class="ttc" id="azlib_8h_html_a27a96226f3dc88e4743131c632adf32f"><div class="ttname"><a href="zlib_8h.html#a27a96226f3dc88e4743131c632adf32f">Z_DEFLATED</a></div><div class="ttdeci">#define Z_DEFLATED</div><div class="ttdef"><b>Definition:</b> zlib.h:209</div></div>
 <div class="ttc" id="azlib_8h_html_a580d7c2527e653ddd783109271750849"><div class="ttname"><a href="zlib_8h.html#a580d7c2527e653ddd783109271750849">Z_DEFAULT_STRATEGY</a></div><div class="ttdeci">#define Z_DEFAULT_STRATEGY</div><div class="ttdef"><b>Definition:</b> zlib.h:200</div></div>
