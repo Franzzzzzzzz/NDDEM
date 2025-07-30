@@ -206,7 +206,10 @@ public :
     unsigned long int seed = 5489UL ; ///< Seed for the boost RNG. Initialised with the default seed of the Mersenne twister in Boost
     double gravityrotateangle = 0.0; 
     RigidBodies_<d> RigidBodies ; ///< Handle all the rigid bodies
-    vector <Mesh<d>> Meshes ;    
+    vector <Mesh<d>> Meshes ; ///< Handle all meshes
+    int n_restart=-1 ; ///< Restart writing frequency 
+    std::string restart_filename="" ; ///< Restart filename 
+    unsigned char restart_flag ; 
     
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
     
@@ -214,7 +217,8 @@ public :
     void serialize(Archive &ar) {
         ar(N, tdump, tinfo, T, dt, rho, Kn, Kt, Gamman, Gammat, Mu, Mu_wall, damping, forceinsphere, cellsize, ContactModel, contact_strategy,
            dumps, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
-           graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events
+           graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events,
+           n_restart, restart_filename, restart_flag 
            ) ; 
     }
 
@@ -871,6 +875,23 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      printf("[WARN] Unknown mesh subcommand\n") ; 
    
  };
+ Lvl0["restart"] = [&] () {
+   restart_flag=0 ;
+   std::string s ; in >> s ; 
+   if (s=="ignore")
+     restart_flag |= (1<<1) ; 
+   else if (s=="force") 
+     restart_flag |= (2<<1) ; 
+  
+   in >> s ; 
+   if (s=="keepall")
+     restart_flag |= 1 ; 
+   
+   in >> n_restart ; 
+   in >> restart_filename ;   
+ } ; 
+ 
+ 
 // Processing
  string line ;
  in>>line;

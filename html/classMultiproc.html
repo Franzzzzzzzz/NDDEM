@@ -146,10 +146,8 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ac898635d542458c39f661d2dad616b97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">num_time</a></td></tr>
 <tr class="memdesc:ac898635d542458c39f661d2dad616b97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of sample of time spent. Resets when <a class="el" href="group__DEM.html#ga64473def2a41ed54010b316e8b9f3bf5" title="Modify the atom share between threads to achieve better load balance between the threads based on the...">load_balance()</a> is called.  <a href="classMultiproc.html#ac898635d542458c39f661d2dad616b97">More...</a><br /></td></tr>
 <tr class="separator:ac898635d542458c39f661d2dad616b97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae75b103706631ef8bf876bcd0a397b4b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#ae75b103706631ef8bf876bcd0a397b4b">num_mem_time</a></td></tr>
-<tr class="memdesc:ae75b103706631ef8bf876bcd0a397b4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of iterations since the last list rebuilt. Resets when coalesce_main_list() is called.  <a href="classMultiproc.html#ae75b103706631ef8bf876bcd0a397b4b">More...</a><br /></td></tr>
-<tr class="separator:ae75b103706631ef8bf876bcd0a397b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe5a9b060f0a692aa8b1d03752cfaf7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCLp__it__t.html">CLp_it_t</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#abe5a9b060f0a692aa8b1d03752cfaf7a">CLp_it</a></td></tr>
+<tr class="memdesc:abe5a9b060f0a692aa8b1d03752cfaf7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator list for fast access to particle contacts.  <a href="classMultiproc.html#abe5a9b060f0a692aa8b1d03752cfaf7a">More...</a><br /></td></tr>
 <tr class="separator:abe5a9b060f0a692aa8b1d03752cfaf7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a633287157aa869a2e2fb7e65f0970411"><td class="memItemLeft" align="right" valign="top">vector&lt; vector&lt; <a class="el" href="classAction.html">Action</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html#a633287157aa869a2e2fb7e65f0970411">delayed</a></td></tr>
 <tr class="memdesc:a633287157aa869a2e2fb7e65f0970411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Records the delayed <a class="el" href="classAction.html" title="Handle force and torque contact information.">Action</a>.  <a href="classMultiproc.html#a633287157aa869a2e2fb7e65f0970411">More...</a><br /></td></tr>
@@ -431,6 +429,8 @@ template&lt;int d&gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Iterator list for fast access to particle contacts. </p>
+
 </div>
 </div>
 <a id="ae92277c7620f4689ac92c5d7b49e6f39"></a>
@@ -624,24 +624,6 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Number of grains. </p>
-
-</div>
-</div>
-<a id="ae75b103706631ef8bf876bcd0a397b4b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae75b103706631ef8bf876bcd0a397b4b">&#9670;&nbsp;</a></span>num_mem_time</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classMultiproc.html">Multiproc</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::num_mem_time</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Number of iterations since the last list rebuilt. Resets when coalesce_main_list() is called. </p>
 
 </div>
 </div>

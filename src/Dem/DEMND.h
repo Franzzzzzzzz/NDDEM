@@ -18,6 +18,7 @@
 #include "cereal/types/map.hpp"
 #include "cereal/types/list.hpp"
 #include "cereal/archives/binary.hpp"
+#include "cereal/archives/xml.hpp"
 
 //#include "callgrind.h"
 //#include <ittnotify.h>
@@ -153,17 +154,46 @@ public:
     clock_t tnow, tprevious ;
 
     //-----------------------------------------
+    void save_restart(const std::string &filename) {
+        std::ofstream os(filename, std::ios::binary);
+        cereal::BinaryOutputArchive archive(os);
+        //std::ofstream os(filename);
+        //cereal::XMLOutputArchive archive(os);
+        archive(*this);
+    }
+    void load_restart(const std::string &filename) {
+        std::ifstream os(filename, std::ios::binary);
+        std::cout << "FILEOPEN:" << filename << " " << os.is_open() <<  "\n" ; fflush(stdout) ;  
+        cereal::BinaryInputArchive archive(os);
+        //std::ifstream os(filename);
+        //cereal::XMLInputArchive archive(os);
+        archive(*this);
+
+        #ifndef NO_OPENMP
+          const char* env_p = std::getenv("OMP_NUM_THREADS") ;
+          if (env_p!=nullptr) numthread = atoi (env_p) ;
+          omp_set_num_threads(numthread) ;
+        #endif
+        
+        MP.C.resize(MP.P, Contacts<d>(P)) ; // Empty default contacts are not saved. Need to rebuild them.
+        
+        // Iterators are invalidated when saving, need to rebuild them
+        if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE)
+        {           
+            MP.CLp_it.init(P.N, MP.P) ; 
+            MP.CLp_it.rebuild(MP.CLp) ; 
+        }
+    }    
+    
     template <class Archive>
     void serialize( Archive & ar )
     {
         ar(N, 
-           X, V, A, Omega, F, FOld, Torque, TorqueOld, Vmag, OmegaMag, Z, Fcorr, TorqueCorr, RigidBodyId,
-           PBCFlags, WallForce, empty_array, ParticleForce, Ghost, Ghost_dir, Atmp, 
-           numthread, t, ti, dt, tnow, tprevious
-           , P
-           // Todo: ExternalAction, MP, cells, 
+           CEREAL_NVP(X), V, A, Omega, F, FOld, Torque, TorqueOld, Vmag, OmegaMag, Z, Fcorr, TorqueCorr, RigidBodyId,
+           PBCFlags, WallForce, empty_array, ParticleForce, Ghost, Ghost_dir, Atmp,
+           numthread, t, ti, dt, tnow, tprevious,
+           P, MP, cells, ExternalAction, octree
         );
-        printf("RESTART ERROR: STILL SOME THINGS TO SERIALIZE IN Simulation") ; 
     }
     //-----------------------------------------
     
@@ -279,7 +309,6 @@ public:
     */
     void step_forward (int nt)
     {        
-        
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
         //if (ntt==990) {CALLGRIND_START_INSTRUMENTATION ;}
@@ -582,23 +611,17 @@ public:
             int curi = -1 ; 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
-                // We need to do some contact handling first
+                // We need to do some contact handling first. This should technically only be done for non-NAIVE contact detection, but it shouldn't hurt the NAIVE, and is a very mild slow down.
                 while (it != CLp.v.end() && !it->persisting) 
                     it = CLp.v.erase(it) ; 
                 if (it == CLp.v.end())
-                {
-                    /*if (curi!= -1) 
-                        MP.CLp_it.it_array_end[curi] = CLp.v.end() ; */
                     break ; 
-                }
                 
                 if ( it->i != curi )
                 {
                     MP.CLp_it.it_array_beg[it->i] = it ; 
-                    /*if (curi != -1) 
-                        MP.CLp_it.it_array_end[curi] = it ; */
                     curi = it->i ;
-                }    
+                } 
                 
                 // Proceed if the contact needs to be considered                
                 if (it->ghost==0)
@@ -784,6 +807,13 @@ public:
             }
             
             //fprintf(stderr, "%g %g\n", X[0][0], X[0][1]) ;
+        }
+        if (ti % P.n_restart == 0 && ti != 0)
+        {
+            if (P.restart_flag & 1)
+                save_restart(P.Directory + "/" +  P.restart_filename+"-"+std::to_string(ti)) ; 
+            else
+                save_restart(P.Directory + "/" + P.restart_filename+"-"+((ti/P.n_restart)%2==0?"even":"odd")) ; 
         }
 
         if (P.wallforcecompute || P.wallforcecomputed) MP.delayedwall_clean() ;

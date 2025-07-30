@@ -37,7 +37,6 @@ public :
         for (int dd=0 ; dd<d*(d-1)/2 ; dd++) Torquei[dd]=Torquej[dd]=0 ;    
     }
     
-    
     //void set_fwd (v1d a, v1d b, v1d c) {Fni=a; Fti=b; Torquei=c ;}
     //  void set_rev (v1d a, v1d b, v1d c) {Fnj=a; Ftj=b; Torquej=c ;}
 } ;
@@ -48,6 +47,10 @@ class SpecificAction: public Action<d> {
 public :
     int id ;
     int duration ;
+    template <class Archive>
+    void serialize(Archive &ar) {
+        ar(cereal::base_class<Action<d>>(this), id, duration) ; 
+    }
 } ;
 
 // ------------------------------------ Contact properties class -------------------------------------------
@@ -65,6 +68,7 @@ template <int d>
 class cp
 {
 public:
+ cp () {} ///< Only for use when restarting
  cp (int ii, int jj, double ctlength, Action<d> * default_action) : i(ii), j(jj), contactlength(ctlength), tspr (vector <double> (d, 0)), infos(default_action), owninfos(false), persisting(true) {} ///< New contact creation
  cp(const cp& v) { *this=v ; }
  ~cp () { if (owninfos) delete(infos) ; } ///< Remove & clean contact
@@ -116,6 +120,22 @@ public:
  bool owninfos ; ///< True if the contact contains stored information for dump retrieval
  bool persisting ; ///< True if the contact is still maintained for the current ts. 
  
+ template <class Archive>
+ void save (Archive &ar) const {
+        ar(i, j, contactlength, ghost, ghostdir, tspr, owninfos, persisting) ;
+        if (owninfos)
+            ar(*infos) ; 
+    }
+ template <class Archive>
+ void load (Archive &ar) {
+        ar(i, j, contactlength, ghost, ghostdir, tspr, owninfos, persisting) ;
+        if (owninfos)
+        {
+            infos = new Action<d> ; 
+            ar(*infos) ; 
+        }
+    }
+ 
  std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, Parameters<d> &P)
  {
     vector <double> loc (d, 0), branch (d, 0)  ;
@@ -156,6 +176,7 @@ public:
 template <int d>
 class cpm : public cp<d> {
 public: 
+    cpm () {} ///< Only for use when restarting
     cpm (int ii, int jj, int sid, double ctlength, Action<d> * default_action) : cp<d>(ii,jj,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
     cpm(const cpm& v): cp<d>(v) {*this=v ;}
     ~cpm () {} ///< Remove & clean contact
@@ -168,6 +189,15 @@ public:
     } ///< Affect contact.
     vector <double> contactpoint; ///< Location of the contact, used only for Mesh at this point, to avoid recalculating. 
     int submeshid ; 
+    
+    template <class Archive>
+    void load (Archive &ar) {
+        ar( cereal::base_class<cp<d>>( this ), contactpoint, submeshid );
+    }
+    template <class Archive>
+    void save (Archive &ar) const {
+        ar( cereal::base_class<cp<d>>( this ), contactpoint, submeshid );
+    }
 } ; 
 
 // ------------------------------------ Contact List class -------------------------------------------
@@ -183,7 +213,7 @@ public:
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which opened.
  
  // Functions for Cell contact detections
- int init_for_cells(int N)
+ /*int init_for_cells(int N)
  {
      it_array_beg.resize(N,null_list.begin()) ;
      it_array_end.resize(N,null_list.begin()) ;
@@ -230,7 +260,7 @@ public:
      i=0 ; 
      for (auto& element : vtmp) {printf("\r%d", i++) ; fflush(stdout) ; v.push_back(element); }
      return ;      
- }
+ }*/
  
  //void check_ghost    (uint32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
  void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact) ; ///< \deprecated Measure distance between a ghost and a particle
@@ -244,11 +274,9 @@ public:
  template <class Archive>
  void serialize(Archive &ar) {ar(v, cid) ; }
  
- 
- 
  list <cp<d>> v ; ///< Contains the list of contact
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
- std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
+ //std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
  
 private:
  typename list<cp<d>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.

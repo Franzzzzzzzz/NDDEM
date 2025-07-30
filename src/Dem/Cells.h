@@ -28,6 +28,13 @@ public:
   std::vector<int> neigh_ghosts_full ; ///< list of the ghost cells through the PBC
   std::vector<bitdim> neigh_ghosts_full_dim ; ///< Ghost cell dimensions going through PBC
   std::vector<bitdim> neigh_ghosts_full_dir ; ///< Ghost cell directions going through PBC (1 is negative delta)
+  
+  template <class Archive>
+  void serialize( Archive & ar )
+  {
+    ar(incell, neighbours, neigh_ghosts, neigh_ghosts_dim, neigh_ghosts_dir, neighbours_full, neigh_ghosts_full, neigh_ghosts_full_dim, neigh_ghosts_full_dir) ; 
+  }
+  
 } ;
 
 /** \brief All the cells making the space, with related function for creating the cell array, neighbour arrays etc. 
@@ -55,6 +62,7 @@ public:
                                ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp ) ;
   bool cell_contact_insert (int ID, CLp_it_t<d> & CLp_it, const cp<d>& a) ; 
   int clear_all () ; 
+  
   //-------------------------------------------
   int x2id (const std::vector<int>&v) 
   {
@@ -132,7 +140,13 @@ public:
   std::vector<double> Delta ; 
   std::vector<Cell> cells ;
   double delta[d] ;
-  int planesize=0 ; 
+  int planesize=0 ;
+    
+  template <class Archive>
+    void serialize( Archive & ar )
+    {
+      ar(n_cell, cum_n_cell, CEREAL_NVP(origin), CEREAL_NVP(Delta), cells, delta, planesize) ; 
+    }
 } ; 
 
 /** @}*/
