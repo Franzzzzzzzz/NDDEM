@@ -27,6 +27,25 @@ struct CLp_it_t {
     it_ends.resize(P) ; 
     //it_array_end.resize(N,null_list.v.begin()) ;
   }
+  
+  void rebuild ( vector <ContactList<d>> & CLp )
+  {
+    for (size_t i=0 ; i<it_array_beg.size() ; i++)
+      it_array_beg[i] = null_list.v.begin() ; 
+    for (size_t i=0 ; i<size(CLp) ; i++)
+    {
+      int curi = -1 ; 
+      for (auto it = CLp[i].v.begin() ; it!=CLp[i].v.end() ; it++)
+      {                
+        if ( it->i != curi )
+        {
+          it_array_beg[it->i] = it ; 
+          curi = it->i ;
+        }   
+      }
+    }
+  }
+  
   std::vector<typename list<cp<d>>::iterator> it_array_beg/*, it_array_end */; ///< Contains iterator related to each particle contacts
   std::vector<typename list<cp<d>>::iterator> it_ends ; 
   ContactList<d> null_list ; ///< Empty list, effectively providing a null iterator. 
@@ -238,16 +257,14 @@ public:
   
   
   template <class Archive>
-    void serialize(Archive &ar) {
-        ar( CLp, CLw, CLm, //C, 
-           share, sharecell, timing_contacts, timing_forces, num_time, 
-           delayed, delayedj, delayed_size, 
-           delayedwall, delayedwallj, delayedwall_size,
-           P, fullcontactinfo, N) ; 
-        printf("RESTART ERROR: STILL SOME THINGS TO SERIALIZE IN Simulation") ; 
+  void serialize(Archive &ar) {
+        ar( /* CLp_it: Not saved on purpose, need to be rebuilt from scratch (iterator invalidate upon save/reload */
+            CLp, CLw, CLm, CLp_new, 
+            share, sharecell, timing_contacts, timing_forces, num_time, 
+            delayed, delayedj, delayed_size, 
+            delayedwall, delayedwallj, delayedwall_size,
+            P, fullcontactinfo, N) ; 
     }
-    
-    
   
   //------------------------------------------------
   //ContactList<d> CLp_all ; ///< Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). 
@@ -260,8 +277,7 @@ public:
   vector <int> sharecell ; ///< Cell share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1. 
   vector <double> timing_contacts, timing_forces ; ///< Used to record the time spent by each thread.
   int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
-  int num_mem_time; ///< Number of iterations since the last list rebuilt. Resets when coalesce_main_list() is called. 
-  CLp_it_t<d> CLp_it ; 
+  CLp_it_t<d> CLp_it ; ///< Iterator list for fast access to particle contacts
   
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
   vector <vector <Action<d>> > delayed ; ///< Records the delayed Action

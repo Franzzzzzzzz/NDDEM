@@ -9,7 +9,8 @@
 template <int d>
 class Mesh 
 {
-public: 
+public:
+  Mesh() {} ///< Only for use by Restarting
   Mesh (int dim, std::vector<std::vector<double>> vertices, bool compute_submeshes=true) ;
   void translate (cv1d t) {origin += t ; for (auto & v: submeshes) for (auto &w: v) w.translate(t) ; }
   void rotate ([[maybe_unused]] cv1d rot) 

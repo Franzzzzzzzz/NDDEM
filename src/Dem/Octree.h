@@ -9,9 +9,7 @@
 
 template <int d>
 class Octree {
-public:
-  std::vector<Cells<d>> octree ; 
-  
+public:  
   int init_cells (std::vector<Boundary<d>> &boundaries, std::vector<double> & r)
   {
     lvl_tree.resize(r.size(), -1) ; 
@@ -96,8 +94,11 @@ public:
   }
   
   
+  std::vector<Cells<d>> octree ; 
   std::vector<char> lvl_tree ; 
   char max_lvl=-1 ;   
+  
+  template <class Archive> void serialize( Archive & ar ) { ar(octree, lvl_tree, max_lvl ); }
   
   
 } ; 

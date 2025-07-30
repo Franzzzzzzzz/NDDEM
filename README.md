@@ -7,11 +7,14 @@ This git repository contains the code for discrete element numerical modelling o
 The code is split into different modules, with different purposes. The main modules are:
 - src/Dem: `cpp` Main DEM simulation *@Franzzzzzzzz*
 - src/CoarseGraining: `cpp` Multi-dimensional coarse-graining code. *@Franzzzzzzzz*
+- live: `html+js`: interactive examples of DEM simulations. Most of the results can be seen from the [SciGEM education page.](https://scigem.education.com) *@benjym*
+- visualise: `html+js`: VR visualisation module of NDDEM *@benjym*
+
+### Obsolete module
 - src/TexturingServer: `cpp` Server to generate textures to visualise rotating particles. *@Franzzzzzzzz*
-- visualise: `html+js` VR visualisation module of NDDEM *@benjym*
 
 ## Operating system support
-All parts of this code have been tested on all recent versions of Windows, Mac and Linux.
+This code can be made to work with Windows, Mac and Linux.
 
 ## Installation
 
@@ -40,7 +43,7 @@ make DEMND
 cd ..
 ```
 
-You can run an example from the `examples` folder as that oper:
+You can run an example from the `examples` folder as:
 
 ```
 ./bin/DEMND 2 42 examples/in.example
@@ -57,7 +60,13 @@ export OMP_NUM_THREADS=4
 - Follow the steps in the script file CI_build_script.sh, adapting them to your setup.
 - Then, in the `live` folder, you should be able to run the local visualisation with `webpack build && webpack serve`. 
 
-## Documentation and examples
+## Usage
+### Standalone Usage
+- The DEM code uses specific script files of sequential commands describing the simulation. [List of available commands here](src/Dem/InputFileCommand.md). 
+- The CoarseGraining code uses json formatted input script files. [List of available commands here](src/CoarseGraining/InputFileCommand.md). 
+
+
+### Code documentation and examples
  - [NDDEM solver, coarse graining and texturing server](https://franzzzzzzzz.github.io/NDDEM/html/index.html)
  - [Visualisation](https://franzzzzzzzz.github.io/NDDEM/visualise/docs/index.html)
 <!-- Additional information and project progress are available as a [Dropbox Paper](https://paper.dropbox.com/doc/N-Dimensional-DEM--ATnZ6ZOpm18JqKQGFYDe3eS0Ag-cM3nXtl2Yy4gNNfqlNYeS). -->
