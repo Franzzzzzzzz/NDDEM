@@ -77,10 +77,19 @@ $(function() {
 <p>proxy class for the items() function  
  <a href="classnlohmann_1_1detail_1_1iteration__proxy.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="CoarseGraining_2json_8hpp_source.html">json.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:afe257e972e3b4658ef2e355f7389d4a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html#afe257e972e3b4658ef2e355f7389d4a5">iteration_proxy</a> (typename IteratorType::reference cont) noexcept</td></tr>
+<tr class="memdesc:afe257e972e3b4658ef2e355f7389d4a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct iteration proxy from a container  <a href="classnlohmann_1_1detail_1_1iteration__proxy.html#afe257e972e3b4658ef2e355f7389d4a5">More...</a><br /></td></tr>
+<tr class="separator:afe257e972e3b4658ef2e355f7389d4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a379f86709d340c4ab1995539b8af623d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html">iteration_proxy_value</a>&lt; IteratorType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html#a379f86709d340c4ab1995539b8af623d">begin</a> () noexcept</td></tr>
+<tr class="memdesc:a379f86709d340c4ab1995539b8af623d"><td class="mdescLeft">&#160;</td><td class="mdescRight">return iterator begin (needed for range-based for)  <a href="classnlohmann_1_1detail_1_1iteration__proxy.html#a379f86709d340c4ab1995539b8af623d">More...</a><br /></td></tr>
+<tr class="separator:a379f86709d340c4ab1995539b8af623d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90091f8492d23576edef72c5e8b9d4cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html">iteration_proxy_value</a>&lt; IteratorType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html#a90091f8492d23576edef72c5e8b9d4cf">end</a> () noexcept</td></tr>
+<tr class="memdesc:a90091f8492d23576edef72c5e8b9d4cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">return iterator end (needed for range-based for)  <a href="classnlohmann_1_1detail_1_1iteration__proxy.html#a90091f8492d23576edef72c5e8b9d4cf">More...</a><br /></td></tr>
+<tr class="separator:a90091f8492d23576edef72c5e8b9d4cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe257e972e3b4658ef2e355f7389d4a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html#afe257e972e3b4658ef2e355f7389d4a5">iteration_proxy</a> (typename IteratorType::reference cont) noexcept</td></tr>
 <tr class="memdesc:afe257e972e3b4658ef2e355f7389d4a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct iteration proxy from a container  <a href="classnlohmann_1_1detail_1_1iteration__proxy.html#afe257e972e3b4658ef2e355f7389d4a5">More...</a><br /></td></tr>
 <tr class="separator:afe257e972e3b4658ef2e355f7389d4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,7 +113,37 @@ class nlohmann::detail::iteration_proxy&lt; IteratorType &gt;</h3>
 <p>proxy class for the items() function </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="afe257e972e3b4658ef2e355f7389d4a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe257e972e3b4658ef2e355f7389d4a5">&#9670;&nbsp;</a></span>iteration_proxy()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afe257e972e3b4658ef2e355f7389d4a5">&#9670;&nbsp;</a></span>iteration_proxy() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename IteratorType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html">nlohmann::detail::iteration_proxy</a>&lt; IteratorType &gt;::<a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html">iteration_proxy</a> </td>
+          <td>(</td>
+          <td class="paramtype">typename IteratorType::reference&#160;</td>
+          <td class="paramname"><em>cont</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>construct iteration proxy from a container </p>
+
+</div>
+</div>
+<a id="afe257e972e3b4658ef2e355f7389d4a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe257e972e3b4658ef2e355f7389d4a5">&#9670;&nbsp;</a></span>iteration_proxy() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -135,7 +174,36 @@ template&lt;typename IteratorType &gt; </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a379f86709d340c4ab1995539b8af623d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a379f86709d340c4ab1995539b8af623d">&#9670;&nbsp;</a></span>begin()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a379f86709d340c4ab1995539b8af623d">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename IteratorType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html">iteration_proxy_value</a>&lt;IteratorType&gt; <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html">nlohmann::detail::iteration_proxy</a>&lt; IteratorType &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>return iterator begin (needed for range-based for) </p>
+
+</div>
+</div>
+<a id="a379f86709d340c4ab1995539b8af623d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a379f86709d340c4ab1995539b8af623d">&#9670;&nbsp;</a></span>begin() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,7 +232,36 @@ template&lt;typename IteratorType &gt; </div>
 </div>
 </div>
 <a id="a90091f8492d23576edef72c5e8b9d4cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90091f8492d23576edef72c5e8b9d4cf">&#9670;&nbsp;</a></span>end()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a90091f8492d23576edef72c5e8b9d4cf">&#9670;&nbsp;</a></span>end() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename IteratorType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy__value.html">iteration_proxy_value</a>&lt;IteratorType&gt; <a class="el" href="classnlohmann_1_1detail_1_1iteration__proxy.html">nlohmann::detail::iteration_proxy</a>&lt; IteratorType &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>return iterator end (needed for range-based for) </p>
+
+</div>
+</div>
+<a id="a90091f8492d23576edef72c5e8b9d4cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90091f8492d23576edef72c5e8b9d4cf">&#9670;&nbsp;</a></span>end() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -220,7 +317,7 @@ template&lt;typename IteratorType &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/runner/work/NDDEM/NDDEM/src/CoarseGraining/<a class="el" href="CoarseGraining_2json_8hpp_source.html">json.hpp</a></li>
+<li>/home/runner/work/NDDEM/NDDEM/src/Dem/<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

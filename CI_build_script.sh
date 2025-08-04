@@ -12,7 +12,7 @@ mkdir -p Textures
 
 # set up the live visualisation compilation and deploy with webpack
 npm i -D webpack webpack-cli
-npm ci
+npm install
 npm run build
 
 cd cggui

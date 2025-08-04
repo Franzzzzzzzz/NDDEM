@@ -9,8 +9,7 @@
 template <int d>
 class Mesh 
 {
-public:
-  Mesh() {} ///< Only for use by Restarting
+public: 
   Mesh (int dim, std::vector<std::vector<double>> vertices, bool compute_submeshes=true) ;
   void translate (cv1d t) {origin += t ; for (auto & v: submeshes) for (auto &w: v) w.translate(t) ; }
   void rotate ([[maybe_unused]] cv1d rot) 
@@ -88,12 +87,8 @@ public:
   //std::vector<double> norms ; 
   std::vector<double> mixedbase ; ///< Mixed based: first n=dimensionality vectors are neither normalised nor unit vectors, while they d-n last vectors are.  
   std::vector<double> invertbase ; ///< Inverted base: inverse(transpose(mixedbase)). 
-  
+
   std::vector<std::vector<Mesh>> submeshes ; 
-  
-  template <class Archive> 
-  void serialize(Archive &ar) 
-  { ar(dimensionality, origin, mixedbase, invertbase, submeshes) ; }
 } ; 
 
 

@@ -74,13 +74,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa7805236cf540735118948c270e64bc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#aa7805236cf540735118948c270e64bc5">save_restart</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;filename)</td></tr>
-<tr class="separator:aa7805236cf540735118948c270e64bc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affb992f0227a3a877585b02f39d1c2f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#affb992f0227a3a877585b02f39d1c2f1">load_restart</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;filename)</td></tr>
-<tr class="separator:affb992f0227a3a877585b02f39d1c2f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b6b9a933b490d12420fbf2eaa38a80c"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a2b6b9a933b490d12420fbf2eaa38a80c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classSimulation.html#a2b6b9a933b490d12420fbf2eaa38a80c">serialize</a> (Archive &amp;ar)</td></tr>
-<tr class="separator:a2b6b9a933b490d12420fbf2eaa38a80c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85783d8fe6508bc90f4455f69c65ceee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a85783d8fe6508bc90f4455f69c65ceee">Simulation</a> (int NN)</td></tr>
 <tr class="separator:a85783d8fe6508bc90f4455f69c65ceee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4aa574e603c9a9013d4663a51cc53df7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a4aa574e603c9a9013d4663a51cc53df7">init_from_file</a> (char filename[])</td></tr>
@@ -101,40 +94,43 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga8f4a717588a487f02fd6226b31d31753"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga8f4a717588a487f02fd6226b31d31753">finalise</a> ()</td></tr>
 <tr class="memdesc:ga8f4a717588a487f02fd6226b31d31753"><td class="mdescLeft">&#160;</td><td class="mdescRight">Settles the simulation, closing open files etc.  <a href="group__API.html#ga8f4a717588a487f02fd6226b31d31753">More...</a><br /></td></tr>
 <tr class="separator:ga8f4a717588a487f02fd6226b31d31753"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa4e2e6cd2041a98f4a7f3be44ca0a952"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa4e2e6cd2041a98f4a7f3be44ca0a952">getX</a> ()</td></tr>
-<tr class="memdesc:gaa4e2e6cd2041a98f4a7f3be44ca0a952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of locations.  <a href="group__API.html#gaa4e2e6cd2041a98f4a7f3be44ca0a952">More...</a><br /></td></tr>
-<tr class="separator:gaa4e2e6cd2041a98f4a7f3be44ca0a952"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga20074ac9cd0ec5ca599cca8e38a619be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga20074ac9cd0ec5ca599cca8e38a619be">getRadii</a> ()</td></tr>
-<tr class="memdesc:ga20074ac9cd0ec5ca599cca8e38a619be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of radii.  <a href="group__API.html#ga20074ac9cd0ec5ca599cca8e38a619be">More...</a><br /></td></tr>
-<tr class="separator:ga20074ac9cd0ec5ca599cca8e38a619be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaffb633e2c2c65ed82490c3e939f2a51b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaffb633e2c2c65ed82490c3e939f2a51b">getX</a> ()</td></tr>
+<tr class="memdesc:gaffb633e2c2c65ed82490c3e939f2a51b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of locations.  <a href="group__API.html#gaffb633e2c2c65ed82490c3e939f2a51b">More...</a><br /></td></tr>
+<tr class="separator:gaffb633e2c2c65ed82490c3e939f2a51b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2afe3cf45586975ffff01d466e8f437c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga2afe3cf45586975ffff01d466e8f437c">getRadii</a> ()</td></tr>
+<tr class="memdesc:ga2afe3cf45586975ffff01d466e8f437c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of radii.  <a href="group__API.html#ga2afe3cf45586975ffff01d466e8f437c">More...</a><br /></td></tr>
+<tr class="separator:ga2afe3cf45586975ffff01d466e8f437c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga04e90115f462996d131656184e22cd91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga04e90115f462996d131656184e22cd91">setRadius</a> (int id, double <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae4fe62e6806a7eeb5dbb66ab0544f80a">radius</a>)</td></tr>
 <tr class="memdesc:ga04e90115f462996d131656184e22cd91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the radius of a specific particle.  <a href="group__API.html#ga04e90115f462996d131656184e22cd91">More...</a><br /></td></tr>
 <tr class="separator:ga04e90115f462996d131656184e22cd91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga42f68de4b70af6034f0e3430ad18fcde"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga42f68de4b70af6034f0e3430ad18fcde">setMass</a> (int id, double <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431afe1b18e2fd39f763316753b044fbdb78">mass</a>)</td></tr>
 <tr class="memdesc:ga42f68de4b70af6034f0e3430ad18fcde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the mass of a specific particle.  <a href="group__API.html#ga42f68de4b70af6034f0e3430ad18fcde">More...</a><br /></td></tr>
 <tr class="separator:ga42f68de4b70af6034f0e3430ad18fcde"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa57130c2c3d31246fe6f087939f87d7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa57130c2c3d31246fe6f087939f87d7d">getVelocity</a> ()</td></tr>
-<tr class="memdesc:gaa57130c2c3d31246fe6f087939f87d7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of velocities.  <a href="group__API.html#gaa57130c2c3d31246fe6f087939f87d7d">More...</a><br /></td></tr>
-<tr class="separator:gaa57130c2c3d31246fe6f087939f87d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga51c1605a1f0cac80695e7850056422b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga51c1605a1f0cac80695e7850056422b4">getRotationRate</a> ()</td></tr>
-<tr class="memdesc:ga51c1605a1f0cac80695e7850056422b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of orientation rate.  <a href="group__API.html#ga51c1605a1f0cac80695e7850056422b4">More...</a><br /></td></tr>
-<tr class="separator:ga51c1605a1f0cac80695e7850056422b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3fff43acc78aa3bf5de10fbe46df45f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga3fff43acc78aa3bf5de10fbe46df45f4">getContactForce</a> ()</td></tr>
-<tr class="memdesc:ga3fff43acc78aa3bf5de10fbe46df45f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces.  <a href="group__API.html#ga3fff43acc78aa3bf5de10fbe46df45f4">More...</a><br /></td></tr>
-<tr class="separator:ga3fff43acc78aa3bf5de10fbe46df45f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacf657d700335b5cad0f3335f09cd6ae9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gacf657d700335b5cad0f3335f09cd6ae9">getContactInfos</a> (int flags)</td></tr>
-<tr class="memdesc:gacf657d700335b5cad0f3335f09cd6ae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of contact information.  <a href="group__API.html#gacf657d700335b5cad0f3335f09cd6ae9">More...</a><br /></td></tr>
-<tr class="separator:gacf657d700335b5cad0f3335f09cd6ae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa6ec0ecda9abd7a427b1593abac657e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa6ec0ecda9abd7a427b1593abac657e3">setVelocity</a> (int id, <a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a717dc19d2859f49af215c07598ba3fe9">vel</a>)</td></tr>
-<tr class="memdesc:gaa6ec0ecda9abd7a427b1593abac657e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the array of locations.  <a href="group__API.html#gaa6ec0ecda9abd7a427b1593abac657e3">More...</a><br /></td></tr>
-<tr class="separator:gaa6ec0ecda9abd7a427b1593abac657e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa6bec10d96c3ecfa0fc77e55be14c645"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa6bec10d96c3ecfa0fc77e55be14c645">setAngularVelocity</a> (int id, <a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae358f8d850aa0de45e1a1996e67d9bc5">omega</a>)</td></tr>
-<tr class="memdesc:gaa6bec10d96c3ecfa0fc77e55be14c645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the angular velocity of a single particle.  <a href="group__API.html#gaa6bec10d96c3ecfa0fc77e55be14c645">More...</a><br /></td></tr>
-<tr class="separator:gaa6bec10d96c3ecfa0fc77e55be14c645"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf535aa713f0757d3acc72651b0bdf3ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaf535aa713f0757d3acc72651b0bdf3ee">fixParticle</a> (int <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> loc)</td></tr>
-<tr class="memdesc:gaf535aa713f0757d3acc72651b0bdf3ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a single particle location, velocity, and angular velocity.  <a href="group__API.html#gaf535aa713f0757d3acc72651b0bdf3ee">More...</a><br /></td></tr>
-<tr class="separator:gaf535aa713f0757d3acc72651b0bdf3ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0eb8934c406d9a1eea3d72142de1cb89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga0eb8934c406d9a1eea3d72142de1cb89">setFrozen</a> (int <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
+<tr class="memitem:ga7e57e1686d5ffd88091e2b2fb7420527"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga7e57e1686d5ffd88091e2b2fb7420527">getVelocity</a> ()</td></tr>
+<tr class="memdesc:ga7e57e1686d5ffd88091e2b2fb7420527"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of velocities.  <a href="group__API.html#ga7e57e1686d5ffd88091e2b2fb7420527">More...</a><br /></td></tr>
+<tr class="separator:ga7e57e1686d5ffd88091e2b2fb7420527"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaae3ce9a68b9ac2886c0c6178da987ad"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaaae3ce9a68b9ac2886c0c6178da987ad">getRotationRate</a> ()</td></tr>
+<tr class="memdesc:gaaae3ce9a68b9ac2886c0c6178da987ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of orientation rate.  <a href="group__API.html#gaaae3ce9a68b9ac2886c0c6178da987ad">More...</a><br /></td></tr>
+<tr class="separator:gaaae3ce9a68b9ac2886c0c6178da987ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa892abc9bf2f4101a63243adb9836f2c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa892abc9bf2f4101a63243adb9836f2c">getContactForce</a> ()</td></tr>
+<tr class="memdesc:gaa892abc9bf2f4101a63243adb9836f2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces.  <a href="group__API.html#gaa892abc9bf2f4101a63243adb9836f2c">More...</a><br /></td></tr>
+<tr class="separator:gaa892abc9bf2f4101a63243adb9836f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1c98c8c77d3667385ed2da1c15fb8ff3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga1c98c8c77d3667385ed2da1c15fb8ff3">getContactInfos</a> (int flags)</td></tr>
+<tr class="memdesc:ga1c98c8c77d3667385ed2da1c15fb8ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of contact information.  <a href="group__API.html#ga1c98c8c77d3667385ed2da1c15fb8ff3">More...</a><br /></td></tr>
+<tr class="separator:ga1c98c8c77d3667385ed2da1c15fb8ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga05c66f3e96abab1dde60a1ea6fbad592"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga05c66f3e96abab1dde60a1ea6fbad592">setX</a> (std::vector&lt; std::vector&lt; double &gt; &gt; X_)</td></tr>
+<tr class="memdesc:ga05c66f3e96abab1dde60a1ea6fbad592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the array of locations.  <a href="group__API.html#ga05c66f3e96abab1dde60a1ea6fbad592">More...</a><br /></td></tr>
+<tr class="separator:ga05c66f3e96abab1dde60a1ea6fbad592"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa7fa3499c5a80bc2b1dc36183ba9caf0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa7fa3499c5a80bc2b1dc36183ba9caf0">setVelocity</a> (int id, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a717dc19d2859f49af215c07598ba3fe9">vel</a>)</td></tr>
+<tr class="memdesc:gaa7fa3499c5a80bc2b1dc36183ba9caf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the velocity of a single particle.  <a href="group__API.html#gaa7fa3499c5a80bc2b1dc36183ba9caf0">More...</a><br /></td></tr>
+<tr class="separator:gaa7fa3499c5a80bc2b1dc36183ba9caf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0f3dbc7f5d50d71db205a8bb7270a868"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga0f3dbc7f5d50d71db205a8bb7270a868">setAngularVelocity</a> (int id, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431ae358f8d850aa0de45e1a1996e67d9bc5">omega</a>)</td></tr>
+<tr class="memdesc:ga0f3dbc7f5d50d71db205a8bb7270a868"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the angular velocity of a single particle.  <a href="group__API.html#ga0f3dbc7f5d50d71db205a8bb7270a868">More...</a><br /></td></tr>
+<tr class="separator:ga0f3dbc7f5d50d71db205a8bb7270a868"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga22a205b23e4dd5e9bf2c5687ac91cb14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga22a205b23e4dd5e9bf2c5687ac91cb14">fixParticle</a> (int a, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> loc)</td></tr>
+<tr class="memdesc:ga22a205b23e4dd5e9bf2c5687ac91cb14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a single particle location, velocity, and angular velocity.  <a href="group__API.html#ga22a205b23e4dd5e9bf2c5687ac91cb14">More...</a><br /></td></tr>
+<tr class="separator:ga22a205b23e4dd5e9bf2c5687ac91cb14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0eb8934c406d9a1eea3d72142de1cb89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga0eb8934c406d9a1eea3d72142de1cb89">setFrozen</a> (int a)</td></tr>
 <tr class="memdesc:ga0eb8934c406d9a1eea3d72142de1cb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Freeze a single particle.  <a href="group__API.html#ga0eb8934c406d9a1eea3d72142de1cb89">More...</a><br /></td></tr>
 <tr class="separator:ga0eb8934c406d9a1eea3d72142de1cb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae92fc2ba0a8d73cf7bc7abd36a917cf1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gae92fc2ba0a8d73cf7bc7abd36a917cf1">getTime</a> ()</td></tr>
@@ -143,20 +139,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:gac68aababf0ba558de5d808793efb1e6d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gac68aababf0ba558de5d808793efb1e6d">getGravityAngle</a> ()</td></tr>
 <tr class="memdesc:gac68aababf0ba558de5d808793efb1e6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the current gravity angle.  <a href="group__API.html#gac68aababf0ba558de5d808793efb1e6d">More...</a><br /></td></tr>
 <tr class="separator:gac68aababf0ba558de5d808793efb1e6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga73724a0d7795c0adbad774dbd3d2549b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga73724a0d7795c0adbad774dbd3d2549b">getOrientation</a> ()</td></tr>
-<tr class="memdesc:ga73724a0d7795c0adbad774dbd3d2549b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of orientation.  <a href="group__API.html#ga73724a0d7795c0adbad774dbd3d2549b">More...</a><br /></td></tr>
-<tr class="separator:ga73724a0d7795c0adbad774dbd3d2549b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga105b33f8b9616164a7ecbc33a4950e54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga105b33f8b9616164a7ecbc33a4950e54">getBoundary</a> (int <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
-<tr class="memdesc:ga105b33f8b9616164a7ecbc33a4950e54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of boundaries.  <a href="group__API.html#ga105b33f8b9616164a7ecbc33a4950e54">More...</a><br /></td></tr>
-<tr class="separator:ga105b33f8b9616164a7ecbc33a4950e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae79306d56f91a0c252876be45cbe497c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#ae79306d56f91a0c252876be45cbe497c">setBoundary</a> (int <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> loc)</td></tr>
-<tr class="separator:ae79306d56f91a0c252876be45cbe497c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga17bd0751b4717f8bb7ce3a240775ffc7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga17bd0751b4717f8bb7ce3a240775ffc7">getWallForce</a> ()</td></tr>
-<tr class="memdesc:ga17bd0751b4717f8bb7ce3a240775ffc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of wall forces.  <a href="group__API.html#ga17bd0751b4717f8bb7ce3a240775ffc7">More...</a><br /></td></tr>
-<tr class="separator:ga17bd0751b4717f8bb7ce3a240775ffc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga71ff52efdd0a24b304999c4ca8691eda"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga71ff52efdd0a24b304999c4ca8691eda">setExternalForce</a> (int id, int duration, <a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> force)</td></tr>
-<tr class="memdesc:ga71ff52efdd0a24b304999c4ca8691eda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set an additional external force on a particle for a certain duration.  <a href="group__API.html#ga71ff52efdd0a24b304999c4ca8691eda">More...</a><br /></td></tr>
-<tr class="separator:ga71ff52efdd0a24b304999c4ca8691eda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3129fa33da12f5f4ae4772d35a24284b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga3129fa33da12f5f4ae4772d35a24284b">getOrientation</a> ()</td></tr>
+<tr class="memdesc:ga3129fa33da12f5f4ae4772d35a24284b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of orientation.  <a href="group__API.html#ga3129fa33da12f5f4ae4772d35a24284b">More...</a><br /></td></tr>
+<tr class="separator:ga3129fa33da12f5f4ae4772d35a24284b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa93f4b63400d7d265968d429dba9fdee"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gaa93f4b63400d7d265968d429dba9fdee">getBoundary</a> (int a)</td></tr>
+<tr class="memdesc:gaa93f4b63400d7d265968d429dba9fdee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of boundaries.  <a href="group__API.html#gaa93f4b63400d7d265968d429dba9fdee">More...</a><br /></td></tr>
+<tr class="separator:gaa93f4b63400d7d265968d429dba9fdee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5dbd055f9556c69b982a7f5f1a233d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#af5dbd055f9556c69b982a7f5f1a233d1">setBoundary</a> (int a, std::vector&lt; double &gt; loc)</td></tr>
+<tr class="separator:af5dbd055f9556c69b982a7f5f1a233d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac40eb65926ec79d05ab86d8f03d65a1e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#gac40eb65926ec79d05ab86d8f03d65a1e">getWallForce</a> ()</td></tr>
+<tr class="memdesc:gac40eb65926ec79d05ab86d8f03d65a1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expose the array of wall forces.  <a href="group__API.html#gac40eb65926ec79d05ab86d8f03d65a1e">More...</a><br /></td></tr>
+<tr class="separator:gac40eb65926ec79d05ab86d8f03d65a1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8543818667137a3859f76967f08c73a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__API.html#ga8543818667137a3859f76967f08c73a2">setExternalForce</a> (int id, int duration, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> force)</td></tr>
+<tr class="memdesc:ga8543818667137a3859f76967f08c73a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set an additional external force on a particle for a certain duration.  <a href="group__API.html#ga8543818667137a3859f76967f08c73a2">More...</a><br /></td></tr>
+<tr class="separator:ga8543818667137a3859f76967f08c73a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49c0ea3881c08d52c37992739fd5e71e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a49c0ea3881c08d52c37992739fd5e71e">randomDrop</a> ()</td></tr>
 <tr class="separator:a49c0ea3881c08d52c37992739fd5e71e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -196,7 +192,7 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a5fc027c6f24f5b846a0567ca7fc2d19a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4dc8ed0a8598f6ba5242f05ec207a205"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classSpecificAction.html">SpecificAction</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a4dc8ed0a8598f6ba5242f05ec207a205">ExternalAction</a></td></tr>
 <tr class="separator:a4dc8ed0a8598f6ba5242f05ec207a205"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a486ae99dfeb707ec8b1a29e02b754222"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a486ae99dfeb707ec8b1a29e02b754222">PBCFlags</a></td></tr>
+<tr class="memitem:a486ae99dfeb707ec8b1a29e02b754222"><td class="memItemLeft" align="right" valign="top">std::vector&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a486ae99dfeb707ec8b1a29e02b754222">PBCFlags</a></td></tr>
 <tr class="separator:a486ae99dfeb707ec8b1a29e02b754222"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef49d4beef65281ea392a0e5806d7399"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#aef49d4beef65281ea392a0e5806d7399">WallForce</a></td></tr>
 <tr class="separator:aef49d4beef65281ea392a0e5806d7399"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,9 +200,9 @@ Public Attributes</h2></td></tr>
 <tr class="separator:abf0c3c4b447a95d9d03ce4ecb8dde8e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47f7361b016f2ff32e4b26741af0616e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a47f7361b016f2ff32e4b26741af0616e">ParticleForce</a></td></tr>
 <tr class="separator:a47f7361b016f2ff32e4b26741af0616e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97ea76d8dbe30376f60b3308f0bc856f"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a97ea76d8dbe30376f60b3308f0bc856f">Ghost</a></td></tr>
+<tr class="memitem:a97ea76d8dbe30376f60b3308f0bc856f"><td class="memItemLeft" align="right" valign="top">vector&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a97ea76d8dbe30376f60b3308f0bc856f">Ghost</a></td></tr>
 <tr class="separator:a97ea76d8dbe30376f60b3308f0bc856f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a025db6580b4b23035d281c6ab3179eb8"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a025db6580b4b23035d281c6ab3179eb8">Ghost_dir</a></td></tr>
+<tr class="memitem:a025db6580b4b23035d281c6ab3179eb8"><td class="memItemLeft" align="right" valign="top">vector&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a025db6580b4b23035d281c6ab3179eb8">Ghost_dir</a></td></tr>
 <tr class="separator:a025db6580b4b23035d281c6ab3179eb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cdc83ac25525f2908926f6d2ea54ebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a0cdc83ac25525f2908926f6d2ea54ebe">Atmp</a></td></tr>
 <tr class="separator:a0cdc83ac25525f2908926f6d2ea54ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,8 +212,6 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a38838d855fb6de256fc59825e0f72520"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1866609acd84ffa7f64127921ea40316"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCells.html">Cells</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a1866609acd84ffa7f64127921ea40316">cells</a></td></tr>
 <tr class="separator:a1866609acd84ffa7f64127921ea40316"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60cf97b3085c09d6055afc85a4e36672"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classOctree.html">Octree</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a60cf97b3085c09d6055afc85a4e36672">octree</a></td></tr>
-<tr class="separator:a60cf97b3085c09d6055afc85a4e36672"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d3c309593a4596780564b62e86cb594"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a8d3c309593a4596780564b62e86cb594">t</a></td></tr>
 <tr class="separator:a8d3c309593a4596780564b62e86cb594"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ca2a1635b610cde142f9a6c502bd68a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html#a0ca2a1635b610cde142f9a6c502bd68a">ti</a></td></tr>
@@ -289,34 +283,6 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="affb992f0227a3a877585b02f39d1c2f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#affb992f0227a3a877585b02f39d1c2f1">&#9670;&nbsp;</a></span>load_restart()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::load_restart </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a49c0ea3881c08d52c37992739fd5e71e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a49c0ea3881c08d52c37992739fd5e71e">&#9670;&nbsp;</a></span>randomDrop()</h2>
 
@@ -345,66 +311,8 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
-<a id="aa7805236cf540735118948c270e64bc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7805236cf540735118948c270e64bc5">&#9670;&nbsp;</a></span>save_restart()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::save_restart </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> std::string &amp;&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2b6b9a933b490d12420fbf2eaa38a80c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b6b9a933b490d12420fbf2eaa38a80c">&#9670;&nbsp;</a></span>serialize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<div class="memtemplate">
-template&lt;class Archive &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::serialize </td>
-          <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae79306d56f91a0c252876be45cbe497c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae79306d56f91a0c252876be45cbe497c">&#9670;&nbsp;</a></span>setBoundary()</h2>
+<a id="af5dbd055f9556c69b982a7f5f1a233d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5dbd055f9556c69b982a7f5f1a233d1">&#9670;&nbsp;</a></span>setBoundary()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -423,7 +331,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a>&#160;</td>
+          <td class="paramtype">std::vector&lt; double &gt;&#160;</td>
           <td class="paramname"><em>loc</em>&#160;</td>
         </tr>
         <tr>
@@ -630,7 +538,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">vector&lt;<a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::Ghost</td>
+          <td class="memname">vector&lt;uint32_t&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::Ghost</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -646,7 +554,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">vector&lt;<a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::Ghost_dir</td>
+          <td class="memname">vector&lt;uint32_t&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::Ghost_dir</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -695,22 +603,6 @@ template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">int <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::numthread =1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a60cf97b3085c09d6055afc85a4e36672"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60cf97b3085c09d6055afc85a4e36672">&#9670;&nbsp;</a></span>octree</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classOctree.html">Octree</a>&lt;<a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::octree</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -790,7 +682,7 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::PBCFlags</td>
+          <td class="memname">std::vector&lt;uint32_t&gt; <a class="el" href="classSimulation.html">Simulation</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::PBCFlags</td>
         </tr>
       </table>
 </div><div class="memdoc">

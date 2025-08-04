@@ -14,7 +14,7 @@ if(EMSCRIPTEN)
     CoarseGraining
     PROPERTIES
     LINK_FLAGS
-    "-O3 -lnodefs.js -lworkerfs.js --bind -s ALLOW_MEMORY_GROWTH=1 -s STACK_OVERFLOW_CHECK=1 -s MODULARIZE=1 -s EXPORT_NAME='CoarseGraining' -s EXPORTED_RUNTIME_METHODS=[\"FS\",\"WORKERFS\"]"
+    "-O3 -lnodefs.js -lworkerfs.js --bind -s ALLOW_MEMORY_GROWTH=1 -s MODULARIZE=1 -s EXPORT_NAME='CoarseGraining' -s EXPORTED_RUNTIME_METHODS=[\"FS\",\"WORKERFS\"]"
  )
 else()
  target_compile_options(CoarseGraining PUBLIC -Wall -g -DNRRDIO ${Matlab_Macro})

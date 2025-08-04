@@ -101,7 +101,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af33bca30e711f980ca929149947d3ad5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContacts.html#af33bca30e711f980ca929149947d3ad5">particle_ghost_LE_cells</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Xi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Omegai, double ri, double mi, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Xj, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vj, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Omegaj, double rj, double mj, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="group__CoarseGraining.html#ggaa01498a3ceb2fa74dc9536c16caef1daa9c1d0d502acdb7e7eed8d86d264f55b5">Contact</a>, bool isdumptime)</td></tr>
 <tr class="memdesc:af33bca30e711f980ca929149947d3ad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the particle to (potentially) Lees-Edward ghost contact for the cell contact finding (slightly different handling of pbc.  <a href="classContacts.html#af33bca30e711f980ca929149947d3ad5">More...</a><br /></td></tr>
 <tr class="separator:af33bca30e711f980ca929149947d3ad5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf0f12073fe14930761d3e98f363978b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContacts.html#aaf0f12073fe14930761d3e98f363978b">compute_normalpbcloc</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;loc, int startn, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> gh, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> ghd)</td></tr>
+<tr class="memitem:aaf0f12073fe14930761d3e98f363978b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContacts.html#aaf0f12073fe14930761d3e98f363978b">compute_normalpbcloc</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;loc, int startn, uint32_t gh, uint32_t ghd)</td></tr>
 <tr class="memdesc:aaf0f12073fe14930761d3e98f363978b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move ghosts through the regular periodic boundary conditions (non Lees-Edward).  <a href="classContacts.html#aaf0f12073fe14930761d3e98f363978b">More...</a><br /></td></tr>
 <tr class="separator:aaf0f12073fe14930761d3e98f363978b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -195,13 +195,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>gh</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>ghd</em>&#160;</td>
         </tr>
         <tr>

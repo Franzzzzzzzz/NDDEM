@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['encodingtype_8970',['EncodingType',['../Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30',1,'Xml.h']]],
-  ['endianness_8971',['Endianness',['../classcereal_1_1PortableBinaryOutputArchive_1_1Options.html#ae2a21b6c39ca3520f070c8484c40f534',1,'cereal::PortableBinaryOutputArchive::Options::Endianness()'],['../classcereal_1_1PortableBinaryInputArchive_1_1Options.html#ae81663827b6e75d37a19c616e1abba6c',1,'cereal::PortableBinaryInputArchive::Options::Endianness()']]],
-  ['error_5fhandler_5ft_8972',['error_handler_t',['../namespacedetail.html#abe7cfa1fd8fa706ff4392bff9d1a8298',1,'detail::error_handler_t()'],['../namespacenlohmann_1_1detail.html#a5a76b60b26dc8c47256a996d18d967df',1,'nlohmann::detail::error_handler_t()']]],
-  ['exportdata_8973',['ExportData',['../group__DEM.html#ga513959f26fd4469592593d8e13e8eba1',1,'Parameters.h']]],
-  ['exporttype_8974',['ExportType',['../group__DEM.html#ga6bd23bde1932319c9832c0129a94b307',1,'Parameters.h']]]
+  ['fieldtype_4962',['FieldType',['../group__CoarseGraining.html#gaa01498a3ceb2fa74dc9536c16caef1da',1,'Coarsing.h']]],
+  ['fileformat_4963',['FileFormat',['../CoarseGraining_2Parameters_8h.html#a610845e6f56e545283af144cbbb99cfe',1,'Parameters.h']]],
+  ['filetype_4964',['FileType',['../CoarseGraining_2Parameters_8h.html#a2c794c5c13ab4dd7e65bad031dbe41c3',1,'Parameters.h']]]
 ];

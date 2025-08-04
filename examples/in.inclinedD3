@@ -1,6 +1,6 @@
 # Incline plane flow
-#directory /home/franz/Dropbox/DEM_ND/Samples/D3/
-directory OutputTest
+directory /home/franz/Dropbox/DEM_ND/Samples/D3/
+#directory OutputTest
 dimensions 3 125
 
 #set adimensional
@@ -24,11 +24,11 @@ set GammaT 75
 set Mu 0.5
 
 
-set T 100
+set T 500
 set dt 0.0001
 set dumps XML with 4 Position Velocity Omega Coordination
 set dumps CSV with 1 Orientation
 #set dumps VTK with 2 Velocity Coordination
-set tdump 10000
+set tdump 1000
 event 20 gravity -0.9 0.42 0
 EOF

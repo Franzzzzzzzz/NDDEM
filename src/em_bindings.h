@@ -206,7 +206,7 @@ EMSCRIPTEN_BINDINGS(DEMCG5D) {
 //     emscripten::register_vector<double>("Vec1DDouble");
 //     emscripten::register_vector<std::vector<double>>("Vec2DDouble");
 // }
-/*
+
 namespace emscripten {
 namespace internal {
 
@@ -235,4 +235,3 @@ struct TypeID<T,
 
 }  // namespace internal
 }  // namespace emscripten
-*/

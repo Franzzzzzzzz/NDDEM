@@ -175,22 +175,6 @@ module.exports = [{
         watchFiles: ['live/src/**/*.js', 'visualise/**/*.{js,html,css}'],
 
     },
-    watchOptions: {
-        ignored: [
-            '**/node_modules',
-            '**/build',
-            '**/src/Dem',
-            '**/src/CoarseGraining',
-            '**/*.o',
-            '**/*.a',
-            '**/*.cmake',
-            '**/CMakeFiles',
-            '**/deploy',
-            '**/.git'
-        ],
-        poll: 1000,
-        aggregateTimeout: 300,
-    },
     module: {
         rules: [
             {
@@ -222,22 +206,6 @@ module.exports = [{
         path: path.resolve(__dirname, 'visualise/deploy'),
         filename: '[name]-bundle.js',
         clean: true,
-    },
-    watchOptions: {
-        ignored: [
-            '**/node_modules',
-            '**/build',
-            '**/src/Dem',
-            '**/src/CoarseGraining',
-            '**/*.o',
-            '**/*.a',
-            '**/*.cmake',
-            '**/CMakeFiles',
-            '**/deploy',
-            '**/.git'
-        ],
-        poll: 1000,
-        aggregateTimeout: 300,
     },
     module: {
         rules: [

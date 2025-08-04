@@ -145,7 +145,6 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
 //     emscripten::register_vector<std::vector<double>>("Vec2DDouble");
 // }
 
-/*
 namespace emscripten {
 namespace internal {
 
@@ -173,4 +172,4 @@ struct TypeID<T,
 };
 
 }  // namespace internal
-}  // namespace emscripten*/
+}  // namespace emscripten

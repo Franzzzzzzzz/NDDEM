@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['json_5fliterals_5623',['json_literals',['../namespaceliterals_1_1json__literals.html',1,'']]]
+  ['emscripten_2993',['emscripten',['../namespaceemscripten.html',1,'']]],
+  ['internal_2994',['internal',['../namespaceemscripten_1_1internal.html',1,'emscripten']]]
 ];

@@ -10,78 +10,19 @@
     #include <omp.h>
 #endif
 
-#include "cereal/types/vector.hpp"
-#include "cereal/types/chrono.hpp"
-#include "cereal/types/optional.hpp"
-#include "cereal/types/utility.hpp"
-#include "cereal/types/string.hpp"
-#include "cereal/types/map.hpp"
-#include "cereal/types/list.hpp"
-#include "cereal/archives/binary.hpp"
-#include "cereal/archives/xml.hpp"
-
-//#include "callgrind.h"
-//#include <ittnotify.h>
-
 #include "Typedefs.h"
 #include "Parameters.h"
 #include "Contacts.h"
 #include "ContactList.h"
 #include "Multiproc.h"
 #include "Cells.h"
-#include "Octree.h"
 #include "Boundaries.h"
 #ifdef EMSCRIPTEN
     #include <emscripten.h>
     #include <emscripten/bind.h>
-
-    #ifndef JS_CONVERT_ARRAYS
-    #define JS_CONVERT_ARRAYS
     using namespace emscripten;
-    using Vector2Djs = emscripten::val ;
-    using Vector1Djs = emscripten::val ;
- 
-    template <typename T>
-    emscripten::val to_js_array(const std::vector<std::vector<T>>& data) {
-        using namespace emscripten;
-        val outer = val::array();
-        for (size_t i = 0; i < data.size(); ++i) {
-            val inner = val::array();
-            for (size_t j = 0; j < data[i].size(); ++j) {
-                inner.set(j, data[i][j]);
-            }
-            outer.set(i, inner);
-        }
-        return outer;
-    }
-    template <typename T>
-    emscripten::val to_js_array(const std::vector<T>& data) {
-        using namespace emscripten;
-        val outer = val::array();
-        for (size_t i = 0; i < data.size(); ++i) {
-            outer.set(i, data[i]);
-        }
-        return outer;
-    }
-    
-    std::vector<double> from_js_array(emscripten::val jsArray) {
-    std::vector<double> vec;
-    size_t length = jsArray["length"].as<unsigned>();
-    vec.reserve(length);
-    for (unsigned i = 0; i < length; ++i) {
-        vec.push_back(jsArray[i].as<double>());
-    }
-    return vec;
-}   
-    #endif
-#else
-    using Vector2Djs = std::vector<std::vector<double>> ; 
-    using Vector1Djs = std::vector<double> ; 
-    template <typename T> std::vector<std::vector<T>> to_js_array(std::vector<std::vector<T>>& data) {return data ; }
-    template <typename T> std::vector<T> to_js_array(std::vector<T>& data) {return data ; }
-    template <typename T> std::vector<T> from_js_array(std::vector<T>& data) {return data ; }
 #endif
-    
+
 /** \weakgroup API
  * These functions are useful for external access, for interactive runs. This is the basic flow of API calls to run an interactive simulation:
  * \dot
@@ -147,56 +88,11 @@ public:
     int numthread=1 ;
     Multiproc<d> MP ;
     Cells<d> cells ; 
-    Octree<d> octree ; 
 
     double t ; int ti ;
     double dt ;
     clock_t tnow, tprevious ;
 
-    //-----------------------------------------
-    void save_restart(const std::string &filename) {
-        std::ofstream os(filename, std::ios::binary);
-        cereal::BinaryOutputArchive archive(os);
-        //std::ofstream os(filename);
-        //cereal::XMLOutputArchive archive(os);
-        archive(*this);
-    }
-    void load_restart(const std::string &filename) {
-        std::ifstream os(filename, std::ios::binary);
-        std::cout << "FILEOPEN:" << filename << " " << os.is_open() <<  "\n" ; fflush(stdout) ;  
-        cereal::BinaryInputArchive archive(os);
-        //std::ifstream os(filename);
-        //cereal::XMLInputArchive archive(os);
-        archive(*this);
-
-        #ifndef NO_OPENMP
-          const char* env_p = std::getenv("OMP_NUM_THREADS") ;
-          if (env_p!=nullptr) numthread = atoi (env_p) ;
-          omp_set_num_threads(numthread) ;
-        #endif
-        
-        MP.C.resize(MP.P, Contacts<d>(P)) ; // Empty default contacts are not saved. Need to rebuild them.
-        
-        // Iterators are invalidated when saving, need to rebuild them
-        if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE)
-        {           
-            MP.CLp_it.init(P.N, MP.P) ; 
-            MP.CLp_it.rebuild(MP.CLp) ; 
-        }
-    }    
-    
-    template <class Archive>
-    void serialize( Archive & ar )
-    {
-        ar(N, 
-           CEREAL_NVP(X), V, A, Omega, F, FOld, Torque, TorqueOld, Vmag, OmegaMag, Z, Fcorr, TorqueCorr, RigidBodyId,
-           PBCFlags, WallForce, empty_array, ParticleForce, Ghost, Ghost_dir, Atmp,
-           numthread, t, ti, dt, tnow, tprevious,
-           P, MP, cells, ExternalAction, octree
-        );
-    }
-    //-----------------------------------------
-    
     //==========================================================
     Simulation(int NN) {
         P = Parameters<d>(NN) ;
@@ -269,14 +165,7 @@ public:
             printf("%g ", *rmax) ;
             cells.init_cells(P.Boundaries, P.cellsize==-1?(*rmax*2.1):P.cellsize) ;
             MP.splitcells(cells.cells.size()) ; 
-            MP.CLp_it.init(N, numthread) ; 
-        }
-        else if (P.contact_strategy == ContactStrategies::OCTREE)
-        {
-            printf("INITIALISE OCTREE\n") ; fflush(stdout) ;
-            octree.init_cells(P.Boundaries, P.r) ;
-            MP.splitcells(octree.cells_to_split()) ; 
-            MP.CLp_it.init(N, numthread) ; 
+            MP.CLp_all.init_for_cells(N) ; 
         }
         
         dt=P.dt ;
@@ -308,11 +197,9 @@ public:
      * \ingroup API
     */
     void step_forward (int nt)
-    {        
+    {
       for (int ntt=0 ; ntt<nt ; ntt++, t+=dt, ti++)
       {
-        //if (ntt==990) {CALLGRIND_START_INSTRUMENTATION ;}
-          
         // printf("UP TO TIME: %g with timestep: %g\n", t, dt);
         // printf("%g %g %g\n", X[0][0],X[0][1],X[0][2]);
         bool isdumptime = (ntt==nt-1) || (ti % P.tdump==0) ;
@@ -326,7 +213,7 @@ public:
             fflush(stdout) ;
             tprevious=tnow ;
         }
-        
+
         //----- Velocity Verlet step 1 : compute the new positions
         #pragma omp parallel for default(none) shared (N) shared(X) shared(P) shared(V) shared(FOld) shared(Omega) shared(PBCFlags) shared(dt) shared(Ghost) shared(Ghost_dir) shared(A)
         for (int i=0 ; i<N ; i++)
@@ -383,23 +270,22 @@ public:
 
             //Nghosts=Ghosts.size() ;
         } // END PARALLEL SECTION
-        
+
         P.perform_MOVINGWALL() ;
         P.perform_PBCLE_move() ;
         std::invoke (P.update_gravity, &P, dt) ;
         if (P.contact_strategy == ContactStrategies::CELLS) cells.allocate_to_cells(X) ; 
-        else if (P.contact_strategy == ContactStrategies::OCTREE) octree.allocate_to_cells(X) ; 
+
+        //  printf("%g %X %X %X %X\n", X[1][1] + P.Boundaries[0][5], Ghost[0], Ghost_dir[0], Ghost[1], Ghost_dir[1]) ;
 
         // ----- Contact detection ------
+        if (P.contact_strategy == ContactStrategies::CELLS) MP.mergeback_CLp() ; 
         double LE_displacement ; 
         if (P.Boundaries[0].Type == WallType::PBC_LE) 
             LE_displacement = P.Boundaries[0].displacement ; 
         else
             LE_displacement = 0 ; 
-          
-        for (int i=0 ; i<MP.P ; i++)
-            MP.CLp_it.it_ends[i] = MP.CLp[i].v.end() ;
-          
+        
         #pragma omp parallel default(none) shared(MP) shared(P) shared(N) shared(X) shared(Ghost) shared(Ghost_dir) shared(RigidBodyId) shared (stdout) shared(cells) shared(LE_displacement)
         {
          #ifdef NO_OPENMP
@@ -416,11 +302,7 @@ public:
         
          if (P.contact_strategy == ContactStrategies::CELLS)
          {
-             cells.contacts(ID, {MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_it, MP.CLp_new[ID], X, P.r, LE_displacement) ; 
-         }
-         else if (P.contact_strategy == ContactStrategies::OCTREE)
-         {
-             octree.contacts(ID, {MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_it, MP.CLp_new[ID], X, P.r, LE_displacement) ; 
+             cells.contacts({MP.sharecell[ID], MP.sharecell[ID+1]}, MP.CLp_all, MP.CLp[ID], X, P.r, LE_displacement) ; 
          }
          else
          {
@@ -568,13 +450,10 @@ public:
         #endif
         } //END PARALLEL SECTION
       
-        if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE)
-        {
-            MP.merge_newcontacts() ; 
-            for (int i=0 ; i<N ; i++)
-                MP.CLp_it.it_array_beg[i] = MP.CLp_it.null_list.v.begin() ; 
-        }
-          
+        //printf("{%ld %ld}", MP.CLp_all.v.size(), MP.CLp[0].v.size()) ; fflush(stdout) ; 
+        if (P.contact_strategy == ContactStrategies::CELLS) MP.merge_split_CLp() ; 
+        //printf("\n{%ld}\n", MP.CLp[0].v.size()) ; 
+
         //-------------------------------------------------------------------------------
         // Force and torque computation
         Tools<d>::setzero(F) ; Tools<d>::setzero(Fcorr) ; Tools<d>::setzero(TorqueCorr) ;
@@ -592,8 +471,10 @@ public:
             else
                 it++ ;
         }
-        
+
         //Particle - particle contacts
+
+
         #pragma omp parallel default(none) shared(MP) shared(P) shared(X) shared(V) shared(Omega) shared(F) shared(Fcorr) shared(TorqueCorr) shared(Torque) shared(stdout) shared(isdumptime)
         {
           #ifdef NO_OPENMP
@@ -608,22 +489,9 @@ public:
 
             // Particle-particle contacts
             //printf("====%d %g=====\n", ti, P.Boundaries[0].displacement) ;
-            int curi = -1 ; 
             for (auto it = CLp.v.begin() ; it!=CLp.v.end() ; it++)
             {
-                // We need to do some contact handling first. This should technically only be done for non-NAIVE contact detection, but it shouldn't hurt the NAIVE, and is a very mild slow down.
-                while (it != CLp.v.end() && !it->persisting) 
-                    it = CLp.v.erase(it) ; 
-                if (it == CLp.v.end())
-                    break ; 
-                
-                if ( it->i != curi )
-                {
-                    MP.CLp_it.it_array_beg[it->i] = it ; 
-                    curi = it->i ;
-                } 
-                
-                // Proceed if the contact needs to be considered                
+                //printf("%d %d %X %X %g\n", it->i, it->j, it->ghost, it-> ghostdir, it->contactlength) ; 
                 if (it->ghost==0)
                 {
                     C.particle_particle(X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
@@ -635,6 +503,7 @@ public:
                     (C.*C.particle_ghost) (X[it->i], V[it->i], Omega[it->i], P.r[it->i], P.m[it->i],
                                         X[it->j], V[it->j], Omega[it->j], P.r[it->j], P.m[it->j], *it, isdumptime);//, logghosts) ;
                 }
+
                 if (isdumptime) it->saveinfo(C.Act) ;
 
                 Tools<d>::vAddFew(F[it->i], C.Act.Fn, C.Act.Ft, Fcorr[it->i]) ;
@@ -647,15 +516,12 @@ public:
                 }
                 else
                     MP.delaying(ID, it->j, C.Act) ;
-                
                 it->persisting = false ; 
 
                 //Tools<d>::vAdd(F[it->i], Act.Fn, Act.Ft) ; Tools<d>::vSub(F[it->j], Act.Fn, Act.Ft) ; //F[it->i] += (Act.Fn + Act.Ft) ; F[it->j] -= (Act.Fn + Act.Ft) ;
-                //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
+            //Torque[it->i] += Act.Torquei ; Torque[it->j] += Act.Torquej ;
             }
-            //if (curi!= -1) 
-            //    MP.CLp_it.it_array_end[curi] = CLp.v.end() ; 
-            
+
             // Particle wall contacts
             for (auto it = CLw.v.begin() ; it!=CLw.v.end() ; it++)
             {
@@ -745,7 +611,6 @@ public:
             Tools<d>::vAddOne(Torque[MP.delayedj[i][j]], MP.delayed[i][j].Torquej, TorqueCorr[MP.delayedj[i][j]]) ;
             }
         }
-        
         MP.delayed_clean() ;
 
         // Benchmark::stop_clock("Forces");
@@ -773,8 +638,7 @@ public:
         } // END OF PARALLEL SECTION
 
         // Benchmark::stop_clock("Verlet last");
-        
-        
+
         // Check events
         P.check_events(t, X,V,Omega) ;
 
@@ -808,22 +672,14 @@ public:
             
             //fprintf(stderr, "%g %g\n", X[0][0], X[0][1]) ;
         }
-        if (ti % P.n_restart == 0 && ti != 0)
-        {
-            if (P.restart_flag & 1)
-                save_restart(P.Directory + "/" +  P.restart_filename+"-"+std::to_string(ti)) ; 
-            else
-                save_restart(P.Directory + "/" + P.restart_filename+"-"+((ti/P.n_restart)%2==0?"even":"odd")) ; 
-        }
 
         if (P.wallforcecompute || P.wallforcecomputed) MP.delayedwall_clean() ;
-        
-        
+
         // Load balancing on the procs as needed
         #ifndef NO_OPENMP
         MP.num_time++ ;
-        if (MP.num_time>50)
-        {    
+        if (MP.num_time>100)
+        {
           MP.load_balance(P.contact_strategy) ;
           // Cleaning the load balancing
           MP.num_time = 0 ;
@@ -831,8 +687,6 @@ public:
           MP.timing_forces = vector<double>(MP.P,0) ;
         }
         #endif
-        
-        //save_restart(*this, "restart_archive.bin") ; 
     }
   }
 
@@ -849,10 +703,10 @@ public:
 
   //-------------------------------------------------------------------
   /** \brief Expose the array of locations. \ingroup API */
-  Vector2Djs getX() { return to_js_array(X); }
+  std::vector<std::vector<double>> getX() { return X; }
 
   /** \brief Expose the array of radii. \ingroup API */
-  Vector1Djs getRadii() { return to_js_array(P.r); }
+  std::vector<double> getRadii() { return P.r; }
 
   /** \brief Set the radius of a specific particle. \ingroup API */
   void setRadius(int id, double radius) { P.r[id] = radius; } // NOTE: NOT UPDATING THE MASS!!! THIS IS SUCH A BAD IDEA
@@ -861,23 +715,23 @@ public:
   void setMass(int id, double mass) { P.m[id] = mass; }
 
   /** \brief Expose the array of velocities. \ingroup API */
-  Vector2Djs getVelocity() { return to_js_array(V); }
+  std::vector<std::vector<double>> getVelocity() { return V; }
 
   /** \brief Expose the array of orientation rate. \ingroup API */
-  Vector1Djs getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return to_js_array(OmegaMag); }
+  std::vector<double> getRotationRate() { Tools<d>::norm(OmegaMag, Omega) ; return OmegaMag; }
 
   /** \brief DEPRECATED: Use getContactInfo with the appropriate flags instead. Expose the array of particle id and normal forces. \ingroup API */
-  Vector2Djs getContactForce() 
+  std::vector<std::vector<double>> getContactForce() 
   {
     auto [_, res] = MP.contacts2array (ExportData::IDS | ExportData::FN, X, P) ; 
-    return to_js_array(res); 
+    return res; 
   }
   
   /** \brief Expose the array of contact information. \ingroup API */
-  Vector2Djs getContactInfos(int flags) 
+  std::vector<std::vector<double>> getContactInfos(int flags) 
   {
     auto [_, res] = MP.contacts2array (static_cast<ExportData>(flags), X, P) ; 
-    return to_js_array(res); 
+    return res; 
   }
   
   
@@ -907,30 +761,27 @@ public:
   }*/
 
   /** \brief Set the array of locations. \ingroup API */
-  //void setX(std::vector < std::vector <double> > X_) { X = X_; }
+  void setX(std::vector < std::vector <double> > X_) { X = X_; }
 
   /** \brief Set the velocity of a single particle \ingroup API */
-  void setVelocity(int id, Vector1Djs vel) {
-      auto vel2 = from_js_array(vel) ;
+  void setVelocity(int id, v1d vel) {
       for (int i=0 ; i<d ; i++) {
-          V[id][i] = vel2[i];
+          V[id][i] = vel[i];
       }
   }
 
   /** \brief Set the angular velocity of a single particle \ingroup API */
-  void setAngularVelocity(int id, Vector1Djs omega) {
-      auto omega2 = from_js_array(omega) ;
+  void setAngularVelocity(int id, v1d omega) {
       for (int i=0; i<(d*(d-1)/2); i++) {
-          Omega[id][i] = omega2[i];
+          Omega[id][i] = omega[i];
       }
   }
 
 
   /** \brief Set a single particle location, velocity, and angular velocity \ingroup API */
-  void fixParticle(int a, Vector1Djs loc) {
-      auto loc2 = from_js_array (loc) ;       
+  void fixParticle(int a, v1d loc) {
       for (int i=0 ; i<d ; i++) {
-          X[a][i] = loc2[i];
+          X[a][i] = loc[i];
           V[a][i] = 0;
       }
       for (int i=0; i<(d*(d-1)/2); i++) {
@@ -951,44 +802,41 @@ public:
 
 
   /** \brief Expose the array of orientation. \ingroup API */
-  Vector2Djs getOrientation() { return to_js_array(A); }
+  std::vector<std::vector<double>> getOrientation() { return A; }
 
   /** \brief Expose the array of boundaries. \ingroup API */
-  Vector1Djs getBoundary(int a) { return to_js_array(P.Boundaries[a].as_vector()); }
-  void setBoundary(int a, Vector1Djs loc) {
-      auto loc2 = from_js_array(loc) ;
-      P.Boundaries[a].xmin = loc2[0]; // low value
-      P.Boundaries[a].xmax = loc2[1]; // high value
-      P.Boundaries[a].delta = loc2[1] - loc2[0]; // length
+  std::vector<double> getBoundary(int a) { return P.Boundaries[a].as_vector(); }
+  void setBoundary(int a, std::vector<double> loc) {
+      P.Boundaries[a].xmin = loc[0]; // low value
+      P.Boundaries[a].xmax = loc[1]; // high value
+      P.Boundaries[a].delta = loc[1] - loc[0]; // length
       if ( P.Boundaries[a].Type == WallType::PBC_LE ) {
-          P.Boundaries[a].vel = loc2[2];
+          P.Boundaries[a].vel = loc[2];
       }
   }
 
   /** \brief Expose the array of wall forces. \ingroup API */
-  Vector2Djs getWallForce() {
+  std::vector<std::vector<double>> getWallForce() {
       // std::cout<<P.wallforcerequested<<" "<<P.wallforcecomputed<<std::endl;
       P.wallforcerequested = true;
       if ( P.wallforcecomputed ) {
           P.wallforcerequested = false;
           P.wallforcecomputed = false;
-          return to_js_array(WallForce);
+          return WallForce;
       }
       else {
-        return to_js_array(empty_array) ;
+        return empty_array ;
       }
    }
 
   /** \brief Set an additional external force on a particle for a certain duration. \param id particle id \param duration number of timesteps to apply the force for \param force force vector to apply \ingroup API */
-  void setExternalForce (int id, int duration, Vector1Djs force)
+  void setExternalForce (int id, int duration, v1d force)
   {
-      auto force2 = from_js_array(force) ; 
-      
-      printf("\nSetting the force: %g %g %g %g\n", force2[0],force2[1],force2[2],force2[3]);
+      printf("\nSetting the force: %g %g %g %g\n", force[0],force[1],force[2],force[3]);
       ExternalAction.resize(ExternalAction.size()+1) ;
       ExternalAction[ExternalAction.size()-1].id = id ;
       ExternalAction[ExternalAction.size()-1].duration = duration ;
-      ExternalAction[ExternalAction.size()-1].set(force2, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
+      ExternalAction[ExternalAction.size()-1].set(force, v1d(d,0), v1d(d*(d-1)/2,0), v1d(d*(d-1)/2,0)) ;
   }
 
   void randomDrop()

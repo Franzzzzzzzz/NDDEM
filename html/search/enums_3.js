@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['datavalue_8969',['DataValue',['../group__DEM.html#ga52b72596f946f6e47a9c5c9079071431',1,'DataValue():&#160;Typedefs.h'],['../CoarseGraining_2Typedefs_8h.html#a52b72596f946f6e47a9c5c9079071431',1,'DataValue():&#160;Typedefs.h']]]
+  ['encodingtype_4958',['EncodingType',['../Xml_8h.html#a4e646d951efa68acef6b35cea9c62b30',1,'Xml.h']]],
+  ['error_5fhandler_5ft_4959',['error_handler_t',['../namespacenlohmann_1_1detail.html#a5a76b60b26dc8c47256a996d18d967df',1,'nlohmann::detail::error_handler_t()'],['../namespacenlohmann_1_1detail.html#a5a76b60b26dc8c47256a996d18d967df',1,'nlohmann::detail::error_handler_t()']]],
+  ['exportdata_4960',['ExportData',['../group__DEM.html#ga513959f26fd4469592593d8e13e8eba1',1,'Parameters.h']]],
+  ['exporttype_4961',['ExportType',['../group__DEM.html#ga6bd23bde1932319c9832c0129a94b307',1,'Parameters.h']]]
 ];
