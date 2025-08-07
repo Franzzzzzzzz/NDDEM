@@ -808,7 +808,7 @@ public:
             
             //fprintf(stderr, "%g %g\n", X[0][0], X[0][1]) ;
         }
-        if (ti % P.n_restart == 0 && ti != 0)
+        if (P.n_restart >= 0 && ti % P.n_restart == 0 && ti != 0)
         {
             if (P.restart_flag & 1)
                 save_restart(P.Directory + "/" +  P.restart_filename+"-"+std::to_string(ti)) ; 
