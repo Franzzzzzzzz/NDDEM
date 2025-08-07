@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['indent_5fflags_5ft_4965',['indent_flags_t',['../pugixml_8cpp.html#a397ea59c428420ce984c5ab20bb92c3b',1,'pugixml.cpp']]],
-  ['input_5fformat_5ft_4966',['input_format_t',['../namespacenlohmann_1_1detail.html#aa554fc6a11519e4f347deb25a9f0db40',1,'nlohmann::detail::input_format_t()'],['../namespacenlohmann_1_1detail.html#aa554fc6a11519e4f347deb25a9f0db40',1,'nlohmann::detail::input_format_t()']]]
+  ['fieldtype_8975',['FieldType',['../group__CoarseGraining.html#gaa01498a3ceb2fa74dc9536c16caef1da',1,'Coarsing.h']]],
+  ['fileformat_8976',['FileFormat',['../CoarseGraining_2Parameters_8h.html#a610845e6f56e545283af144cbbb99cfe',1,'Parameters.h']]],
+  ['filetype_8977',['FileType',['../CoarseGraining_2Parameters_8h.html#a2c794c5c13ab4dd7e65bad031dbe41c3',1,'Parameters.h']]],
+  ['flags_8978',['Flags',['../namespacecereal.html#a95185aa9f39e4ac382bb6631beb68a67',1,'cereal']]]
 ];

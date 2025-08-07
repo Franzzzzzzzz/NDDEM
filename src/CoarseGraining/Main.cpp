@@ -3,26 +3,36 @@
 
 int process_envvar(json &j)
 {
+    std::cout << j << "\n" ; fflush(stdout) ;
+    std::cout << j.is_string() << " " ; fflush(stdout) ; 
+    std::cout << j.is_number() << " \n" ; fflush(stdout) ; 
     if (j.is_array() || j.is_object())
     {
         for (auto & jj: j)
             process_envvar(jj) ;
     }
-    else if (j.is_string() && !j.is_number())
+    else if (j.is_string())
     {
-        std::string s = j.get<std::string>() ;
-
-        std::regex reg("[$][a-zA-Z0-9]+");
-        auto envvar = std::sregex_iterator(s.begin(), s.end(), reg);
-        auto endenvvar = std::sregex_iterator();
-
-        for (std::sregex_iterator i = envvar; i != endenvvar; ++i)
+        try
         {
-            std::smatch match = *i ;
-            std::string val =std::string(std::getenv(match.str().substr(1).c_str())) ;
-            j=j.get<std::string>().replace(match.position(), match.length(), val) ;
+            std::cout <<"|"<< j <<"|"<<j.is_string() << "|"  << j.is_number()<< "<===\n"; fflush(stdout) ;
+            std::string s = j.get<std::string>() ;
+            std::regex reg("[$][a-zA-Z0-9]+");
+            auto envvar = std::sregex_iterator(s.begin(), s.end(), reg);
+            auto endenvvar = std::sregex_iterator();
+
+            for (std::sregex_iterator i = envvar; i != endenvvar; ++i)
+            {
+                std::smatch match = *i ;
+                std::string val =std::string(std::getenv(match.str().substr(1).c_str())) ;
+                j=j.get<std::string>().replace(match.position(), match.length(), val) ;
+            }
         }
+        catch (...) {}
     }
+    std::cout << j ;
+printf("HHHH") ; fflush(stdout) ; 
+return 0 ; 
 }
 //=======================================================
 int main(int argc, char * argv[])
@@ -41,8 +51,10 @@ int main(int argc, char * argv[])
         printf("This is not a legal json file, here is what we already got:\n") ;
         cout << param ;
     }
-    
+
+    /*std::cout << ">>>" << std::getenv("AR") << "\n" ;
     process_envvar(param) ;
+    std::cout << param ; fflush(stdout) ;*/
 
     CoarseGraining Global ; 
     Global.P.from_json(param) ;

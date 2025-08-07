@@ -144,7 +144,7 @@ $(function() {
 <li><code>gravityangle INTENSITY ANGLE</code>: set the gravity angled from first dimension</li>
 <li><code>gravityrotate INTENSITY OMEGA DIM1 DIM2</code>: make the gravity rotate at an angular velocity OMEGA between DIM1 and 2.</li>
 <li><code>ContactModel [Hooke|Hertz]</code>: set contact model.</li>
-<li><code>ContactStrategy [naive|cells]</code>: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)</li>
+<li><code>ContactStrategy [naive|cells|octree]</code>: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?) or with cells+octree (usefull for polydisperse).</li>
 <li><code>boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo</code>: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:<ul>
 <li><code>MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY</code></li>
 <li><code>SPHERE RADIUS X1 ... XD</code>: sphere of radius RADIUS, center at the X location</li>
@@ -154,7 +154,7 @@ $(function() {
 <li><code>PBCLE LOCMIN LOCMAX VELOCITY</code>: Lees-Edward boundary condition. Should be in dimension 0.</li>
 <li><code>ELLIPSE RX RY CX CY</code>: Ellipse wall (dim 2 only)</li>
 <li><code>allother LOCMIN LOCMAX</code></li>
-<li>Special command: <code>boundary DIM REMOVE</code> Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution.</li>
+<li>Special command: <code>boundary DIM REMOVE</code> Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution. Note that the boundaries will be renumbered if you do not remove the last one. This sounds ill-advised.</li>
 </ul>
 </li>
 <li><code>rigid</code>: TODO (in development) ...</li>
@@ -169,6 +169,17 @@ $(function() {
 <li><code>dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]</code>: select dump format and output fiels, the last 4 formats are plain text. <code>N</code> is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. <a class="el" href="structField.html" title="Contains Field informations.">Field</a> can include:<ul>
 <li>Particle data field: <code>[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*</code></li>
 <li>Contact data fields: <code>[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*</code>. NB: if Ghost_mask&gt;0; then the contact crosses a periodic boundary condition.</li>
+</ul>
+</li>
+<li><code>restart [auto|ignore|force] [keepall|evenodd] N filename</code>: this command performs two operations:<ul>
+<li>Save a restart file every N steps. The command either happen the timestep at the end of the file, after a dash (with <code>keepall</code>) or the name <code>even</code> or <code>odd</code> (with <code>evenodd</code>). The latter mode ensure that one restart file is available even if the program is killed while writing the file, which would corrupt the last file, while keeping the disk space low.</li>
+<li>If a previous restart file exist:<ul>
+<li>In <code>auto</code>, uses the latest available restart file to continue a previously interupted simulation. Any information from the input script or calculation up to that point will be wiped out.</li>
+<li>In <code>force</code>, uses the provided filename to restart the simulation. Further restart files will be written based on the filename saved in the restart file.</li>
+<li>In <code>ignore</code>, disregard any existing restart file.</li>
+</ul>
+</li>
+<li>Recommanded defaults would be: <code>restart auto evenodd ...</code></li>
 </ul>
 </li>
 </ul>

@@ -86,9 +86,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a65c45a2d0bf68b072baa0a46edfeac5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc1ea5fa252640f9d53bf660efbd3536"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactListMesh.html#adc1ea5fa252640f9d53bf660efbd3536">finalise</a> ()</td></tr>
 <tr class="separator:adc1ea5fa252640f9d53bf660efbd3536"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">insert</a> (const <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a)</td></tr>
+<tr class="memitem:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">insert</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">More...</a><br /></td></tr>
 <tr class="separator:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41403472a251ece5f6a88cd3c879a4a9"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
+<tr class="memitem:a41403472a251ece5f6a88cd3c879a4a9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classContactListMesh.html#a41403472a251ece5f6a88cd3c879a4a9">serialize</a> (Archive &amp;ar)</td></tr>
+<tr class="separator:a41403472a251ece5f6a88cd3c879a4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bdbf8640793b796454260b791376ab5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContactListMesh.html#a2bdbf8640793b796454260b791376ab5">check_mesh_dst_contact</a> (<a class="el" href="classMesh.html">Mesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;mesh, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Xo, double r, <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;c)</td></tr>
 <tr class="separator:a2bdbf8640793b796454260b791376ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -246,6 +249,36 @@ template&lt;int d&gt; </div>
 </div><div class="memdoc">
 
 <p>Go to the contact list beginning. </p>
+
+</div>
+</div>
+<a id="a41403472a251ece5f6a88cd3c879a4a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41403472a251ece5f6a88cd3c879a4a9">&#9670;&nbsp;</a></span>serialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<div class="memtemplate">
+template&lt;class Archive &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classContactListMesh.html">ContactListMesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::serialize </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;&#160;</td>
+          <td class="paramname"><em>ar</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

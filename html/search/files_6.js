@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['json_2ehpp_3028',['json.hpp',['../Dem_2json_8hpp.html',1,'(Global Namespace)'],['../CoarseGraining_2json_8hpp.html',1,'(Global Namespace)']]]
+  ['gzip_2ecpp_5713',['gzip.cpp',['../gzip_8cpp.html',1,'']]],
+  ['gzip_2ehpp_5714',['gzip.hpp',['../gzip_8hpp.html',1,'']]]
 ];

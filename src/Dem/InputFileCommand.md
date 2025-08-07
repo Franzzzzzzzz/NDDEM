@@ -73,7 +73,7 @@ These command have a single behaviour, described here.
 - `gravityangle INTENSITY ANGLE`: set the gravity angled from first dimension
 - `gravityrotate INTENSITY OMEGA DIM1 DIM2`: make the gravity rotate at an angular velocity OMEGA between DIM1 and 2.
 - `ContactModel [Hooke|Hertz]`: set contact model.
-- `ContactStrategy [naive|cells]`: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?)
+- `ContactStrategy [naive|cells|octree]`: strategy to find contacts, either naive (N²) or with cells (NlogN maybe?) or with cells+octree (usefull for polydisperse).
 - `boundary DIM [PBC|WALL|MOVINGWALL|SPHERE|ROTATINGSPHERE|PBCLE|ELLIPSE] LOCMIN LOCMAX extrainfo`: wall type along dimension DIM (the types are strings, not values). All walls require extra arguments:
   - `MOVINGWALL LOCMIN LOCMAX VELMINX VELMINY`
   - `SPHERE RADIUS X1 ... XD`: sphere of radius RADIUS, center at the X location
@@ -83,7 +83,7 @@ These command have a single behaviour, described here.
   - `PBCLE LOCMIN LOCMAX VELOCITY`: Lees-Edward boundary condition. Should be in dimension 0. 
   - `ELLIPSE RX RY CX CY`: Ellipse wall (dim 2 only)
   - `allother LOCMIN LOCMAX`
-  - Special command: `boundary DIM REMOVE` Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution. 
+  - Special command: `boundary DIM REMOVE` Delete the boundary in the indicated dimension. Usefull to remove default created boundaries, but use with caution. Note that the boundaries will be renumbered if you do not remove the last one. This sounds ill-advised. 
 - `rigid`: TODO (in development) ...
 - `mesh [file|translate|rotate|export] ...`
   - `file filename.json`: load a mesh file in json format. See [below](#json-mesh-file-format).
@@ -95,6 +95,16 @@ These command have a single behaviour, described here.
 - `dumps filename [VTK|NETCDF|XML|XMLbase64|CSV|CSVA|CONTACTFORCES|WALLFORCE] with N [cf. below ...]`: select dump format and output fiels, the last 4 formats are plain text. `N` is how many fields output follow, which will be in the output dumped file. Note that not all fields are available for all formats. Field can include:
   - Particle data field: `[Position|Velocity|Omega|OmegaMag|Orientation|Coordination|Radius|Ids]*`
   - Contact data fields: `[Ids|Fn|Ft|Torque|Branch|Fn_el|Fn_visc|Ft_el|Ft_visc|Ft_fric|Ft_frictype|Ghost_mask|Ghost_direction]*`. NB: if Ghost_mask>0; then the contact crosses a periodic boundary condition. 
+  
+- `restart [auto|ignore|force] [keepall|evenodd] N filename`: this command performs two operations:
+  - Save a restart file every N steps. The command either happen the timestep at the end of the file, after a dash (with `keepall`) or the name `even` or `odd` (with `evenodd`). The latter mode ensure that one restart file is available even if the program is killed while writing the file, which would corrupt the last file, while keeping the disk space low. 
+  - If a previous restart file exist:
+    - In `auto`, uses the latest available restart file to continue a previously interupted simulation. Any information from the input script or calculation up to that point will be wiped out. 
+    - In `force`, uses the provided filename to restart the simulation. Further restart files will be written based on the filename saved in the restart file. 
+    - In `ignore`, disregard any existing restart file. 
+  - Recommanded defaults would be: `restart auto evenodd ...`
+
+
 
 ### JSON Mesh file format
 Meshes are recorded in a specific file format using json. The file must contain at top level two attributes, `dimension` defining the dimension of the space on which this mesh is to be used (ie. define the number of coordinates of points), and `objects` containing an array of objects. 

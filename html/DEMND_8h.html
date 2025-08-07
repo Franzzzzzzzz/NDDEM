@@ -67,6 +67,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">DEMND.h File Reference</div>  </div>
@@ -80,12 +82,22 @@ $(function() {
 <code>#include &lt;cstring&gt;</code><br />
 <code>#include &lt;random&gt;</code><br />
 <code>#include &lt;omp.h&gt;</code><br />
+<code>#include &quot;<a class="el" href="vector_8hpp_source.html">cereal/types/vector.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="chrono_8hpp_source.html">cereal/types/chrono.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="optional_8hpp_source.html">cereal/types/optional.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="utility_8hpp_source.html">cereal/types/utility.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="string_8hpp_source.html">cereal/types/string.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="map_8hpp_source.html">cereal/types/map.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="list_8hpp_source.html">cereal/types/list.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="binary_8hpp_source.html">cereal/archives/binary.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="xml_8hpp_source.html">cereal/archives/xml.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Dem_2Typedefs_8h_source.html">Typedefs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Dem_2Parameters_8h_source.html">Parameters.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Contacts_8h_source.html">Contacts.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="ContactList_8h_source.html">ContactList.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Multiproc_8h_source.html">Multiproc.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Cells_8h_source.html">Cells.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Octree_8h_source.html">Octree.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Boundaries_8h_source.html">Boundaries.h</a>&quot;</code><br />
 </div>
 <p><a href="DEMND_8h_source.html">Go to the source code of this file.</a></p>
@@ -95,6 +107,25 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html">Simulation&lt; d &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a548f626458714ba5ca4a57fc9ff7410d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a> = std::vector&lt; std::vector&lt; double &gt; &gt;</td></tr>
+<tr class="separator:a548f626458714ba5ca4a57fc9ff7410d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad19ce50bcc83294b78e24da90a5a4441"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> = std::vector&lt; double &gt;</td></tr>
+<tr class="separator:ad19ce50bcc83294b78e24da90a5a4441"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae5ab008a11b463f93cec7929d5e412c0"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ae5ab008a11b463f93cec7929d5e412c0"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="DEMND_8h.html#ae5ab008a11b463f93cec7929d5e412c0">to_js_array</a> (std::vector&lt; std::vector&lt; T &gt;&gt; &amp;data)</td></tr>
+<tr class="separator:ae5ab008a11b463f93cec7929d5e412c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8a62e467ce58d0b345726143719ae21"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aa8a62e467ce58d0b345726143719ae21"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="DEMND_8h.html#aa8a62e467ce58d0b345726143719ae21">to_js_array</a> (std::vector&lt; T &gt; &amp;data)</td></tr>
+<tr class="separator:aa8a62e467ce58d0b345726143719ae21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1986183c4b6183969b5119ed63170f33"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a1986183c4b6183969b5119ed63170f33"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="DEMND_8h.html#a1986183c4b6183969b5119ed63170f33">from_js_array</a> (std::vector&lt; T &gt; &amp;data)</td></tr>
+<tr class="separator:a1986183c4b6183969b5119ed63170f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:gac20448335ecd8c809838b374144f5957"><td class="memItemLeft" align="right" valign="top">vector&lt; std::pair&lt; <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a>, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &gt; &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac20448335ecd8c809838b374144f5957">toclean</a></td></tr>
@@ -102,6 +133,96 @@ Variables</h2></td></tr>
 <tr class="memitem:gacabf51e402a05a98437894859ed3d834"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classXMLWriter.html">XMLWriter</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gacabf51e402a05a98437894859ed3d834">xmlout</a></td></tr>
 <tr class="separator:gacabf51e402a05a98437894859ed3d834"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ad19ce50bcc83294b78e24da90a5a4441"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad19ce50bcc83294b78e24da90a5a4441">&#9670;&nbsp;</a></span>Vector1Djs</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="DEMND_8h.html#ad19ce50bcc83294b78e24da90a5a4441">Vector1Djs</a> =  std::vector&lt;double&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a548f626458714ba5ca4a57fc9ff7410d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a548f626458714ba5ca4a57fc9ff7410d">&#9670;&nbsp;</a></span>Vector2Djs</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="DEMND_8h.html#a548f626458714ba5ca4a57fc9ff7410d">Vector2Djs</a> =  std::vector&lt;std::vector&lt;double&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a1986183c4b6183969b5119ed63170f33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1986183c4b6183969b5119ed63170f33">&#9670;&nbsp;</a></span>from_js_array()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;T&gt; from_js_array </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae5ab008a11b463f93cec7929d5e412c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5ab008a11b463f93cec7929d5e412c0">&#9670;&nbsp;</a></span>to_js_array() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::vector&lt;T&gt; &gt; to_js_array </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::vector&lt; T &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa8a62e467ce58d0b345726143719ae21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8a62e467ce58d0b345726143719ae21">&#9670;&nbsp;</a></span>to_js_array() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;T&gt; to_js_array </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

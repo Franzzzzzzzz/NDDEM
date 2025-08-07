@@ -236,12 +236,12 @@ $(function() {
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keyword">explicit</span> gzip_error(<span class="keywordtype">int</span> error)</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        : BOOST_IOSTREAMS_FAILURE(<span class="stringliteral">&quot;gzip error&quot;</span>),</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;          error_(<a class="code" href="namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282">error</a>), zlib_error_code_(zlib::okay) { }</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;          error_(<a class="code" href="namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592acb5e100e5a9a3e7f6d1fd97512215282">error</a>), zlib_error_code_(zlib::okay) { }</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keyword">explicit</span> gzip_error(<span class="keyword">const</span> zlib_error&amp; e)</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        : BOOST_IOSTREAMS_FAILURE(<span class="stringliteral">&quot;gzip error&quot;</span>),</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          error_(gzip::zlib_error), zlib_error_code_(e.<a class="code" href="namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282">error</a>())</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          error_(gzip::zlib_error), zlib_error_code_(e.<a class="code" href="namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592acb5e100e5a9a3e7f6d1fd97512215282">error</a>())</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        { }</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282">error</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> error_; }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592acb5e100e5a9a3e7f6d1fd97512215282">error</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> error_; }</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordtype">int</span> zlib_error_code()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> zlib_error_code_; }</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordtype">int</span> error_;</div>
@@ -362,7 +362,7 @@ $(function() {
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Sink&gt;</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> write_long(<span class="keywordtype">long</span> n, Sink&amp; next)</div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    {</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keyword">typedef</span> <span class="keyword">typename</span> category_of&lt;Sink&gt;::type category;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="namespacecereal_1_1bitset__detail.html#a4f5825a3267dd05e798bed76cf7e29cc">category_of&lt;Sink&gt;::type</a> category;</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keyword">typedef</span> is_convertible&lt;category, output&gt; can_write;</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        write_long(n, next, can_write());</div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    }</div>
@@ -390,7 +390,7 @@ $(function() {
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">//------------------Definition of helper templates for decompression----------//</span></div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160; </div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;namespace detail {</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;namespace <a class="code" href="namespacedetail.html">detail</a> {</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">// Processes gzip headers</span></div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="keyword">class </span>BOOST_IOSTREAMS_DECL gzip_header {</div>
@@ -541,7 +541,7 @@ $(function() {
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;                footer_.reset();</div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;            }</div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;            <span class="keywordflow">if</span> (state_ == s_header) {</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;                <span class="keywordtype">int</span> c = <a class="code" href="namespacenlohmann_1_1detail.html#acc422c11342b31368f610b6f96fcedc6">boost::iostreams::get</a>(peek);</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;                <span class="keywordtype">int</span> c = <a class="code" href="namespacedetail.html#a7116703ea757fe9821bf2e903b91c160">boost::iostreams::get</a>(peek);</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;                <span class="keywordflow">if</span> (traits_type::is_eof(c)) {</div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;                    boost::throw_exception(gzip_error(gzip::bad_header));</div>
 <div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (traits_type::would_block(c)) {</div>
@@ -566,7 +566,7 @@ $(function() {
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;                    boost::throw_exception(gzip_error(e));</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;                }</div>
 <div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;            } <span class="keywordflow">else</span> { <span class="comment">// state_ == s_footer</span></div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;                <span class="keywordtype">int</span> c = <a class="code" href="namespacenlohmann_1_1detail.html#acc422c11342b31368f610b6f96fcedc6">boost::iostreams::get</a>(peek);</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;                <span class="keywordtype">int</span> c = <a class="code" href="namespacedetail.html#a7116703ea757fe9821bf2e903b91c160">boost::iostreams::get</a>(peek);</div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;                <span class="keywordflow">if</span> (traits_type::is_eof(c)) {</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                    boost::throw_exception(gzip_error(gzip::bad_footer));</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (traits_type::would_block(c)) {</div>
@@ -576,7 +576,7 @@ $(function() {
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                <span class="keywordflow">if</span> (footer_.done()) {</div>
 <div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;                    <span class="keywordflow">if</span> (footer_.crc() != this-&gt;crc())</div>
 <div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;                        boost::throw_exception(gzip_error(gzip::bad_crc));</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;                    c = <a class="code" href="namespacenlohmann_1_1detail.html#acc422c11342b31368f610b6f96fcedc6">boost::iostreams::get</a>(peek);</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;                    c = <a class="code" href="namespacedetail.html#a7116703ea757fe9821bf2e903b91c160">boost::iostreams::get</a>(peek);</div>
 <div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;                    <span class="keywordflow">if</span> (traits_type::is_eof(c)) {</div>
 <div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;                        state_ = s_done;</div>
 <div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;                    } <span class="keywordflow">else</span> {</div>
@@ -716,7 +716,7 @@ $(function() {
 <div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160; </div>
 <div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;template&lt;typename Alloc&gt;</div>
 <div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;basic_gzip_compressor&lt;Alloc&gt;::basic_gzip_compressor</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    (const gzip_params&amp; p, <a class="code" href="namespacestd.html">std</a>::streamsize buffer_size)</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    (<a class="code" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> gzip_params&amp; p, <a class="code" href="namespacestd.html">std</a>::streamsize buffer_size)</div>
 <div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    : base_type(normalize_params(p), buffer_size),</div>
 <div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;      offset_(0), flags_(0)</div>
 <div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;{</div>
@@ -724,7 +724,7 @@ $(function() {
 <div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="keywordtype">bool</span> has_name = !p.file_name.empty();</div>
 <div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    <span class="keywordtype">bool</span> has_comment = !p.comment.empty();</div>
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160; </div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    std::string::size_type length =</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    <a class="code" href="namespacecereal.html#aba657f7ef148daa498dc4fa9e579b01e">std::string::size_type</a> length =</div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;        10 +</div>
 <div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        (has_name ? p.file_name.size() + 1 : 0) +</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;        (has_comment ? p.comment.size() + 1 : 0);</div>
@@ -828,10 +828,14 @@ $(function() {
 <div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// #ifndef BOOST_IOSTREAMS_GZIP_HPP_INCLUDED</span></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34">id2</a></div><div class="ttdeci">@ id2</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93">id1</a></div><div class="ttdeci">@ id1</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
-<div class="ttc" id="anamespacenlohmann_1_1detail_html_a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282"><div class="ttname"><a href="namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9acacb5e100e5a9a3e7f6d1fd97512215282">nlohmann::detail::cbor_tag_handler_t::error</a></div><div class="ttdeci">@ error</div><div class="ttdoc">throw a parse_error exception in case of a tag</div></div>
-<div class="ttc" id="anamespacenlohmann_1_1detail_html_acc422c11342b31368f610b6f96fcedc6"><div class="ttname"><a href="namespacenlohmann_1_1detail.html#acc422c11342b31368f610b6f96fcedc6">nlohmann::detail::get</a></div><div class="ttdeci">auto get(const nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt; &amp;i) -&gt; decltype(i.key())</div><div class="ttdef"><b>Definition:</b> json.hpp:4317</div></div>
-<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:4337</div></div>
+<div class="ttc" id="anamespacecereal_1_1bitset__detail_html_a4f5825a3267dd05e798bed76cf7e29cc"><div class="ttname"><a href="namespacecereal_1_1bitset__detail.html#a4f5825a3267dd05e798bed76cf7e29cc">cereal::bitset_detail::type</a></div><div class="ttdeci">type</div><div class="ttdoc">The type the bitset is encoded with.</div><div class="ttdef"><b>Definition:</b> bitset.hpp:44</div></div>
+<div class="ttc" id="anamespacecereal_html_aba657f7ef148daa498dc4fa9e579b01e"><div class="ttname"><a href="namespacecereal.html#aba657f7ef148daa498dc4fa9e579b01e">cereal::size_type</a></div><div class="ttdeci">CEREAL_SIZE_TYPE size_type</div><div class="ttdoc">The size type used by cereal.</div><div class="ttdef"><b>Definition:</b> helpers.hpp:61</div></div>
+<div class="ttc" id="anamespacedetail_html"><div class="ttname"><a href="namespacedetail.html">detail</a></div><div class="ttdoc">detail namespace with internal helper functions</div><div class="ttdef"><b>Definition:</b> json.hpp:260</div></div>
+<div class="ttc" id="anamespacedetail_html_a7116703ea757fe9821bf2e903b91c160"><div class="ttname"><a href="namespacedetail.html#a7116703ea757fe9821bf2e903b91c160">detail::get</a></div><div class="ttdeci">auto get(const nlohmann::detail::iteration_proxy_value&lt; IteratorType &gt; &amp;i) -&gt; decltype(i.key())</div><div class="ttdef"><b>Definition:</b> json.hpp:5657</div></div>
+<div class="ttc" id="anamespacedetail_html_a7c070b2bf3d61e3d8b8013f6fb18d592acb5e100e5a9a3e7f6d1fd97512215282"><div class="ttname"><a href="namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592acb5e100e5a9a3e7f6d1fd97512215282">detail::cbor_tag_handler_t::error</a></div><div class="ttdeci">@ error</div><div class="ttdoc">throw a parse_error exception in case of a tag</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:5678</div></div>
 <div class="ttc" id="anamespacevtkwriter_html_aea2c67d8308f961d1b8596869aadb06a"><div class="ttname"><a href="namespacevtkwriter.html#aea2c67d8308f961d1b8596869aadb06a">vtkwriter::close</a></div><div class="ttdeci">void close(FILE *out)</div><div class="ttdef"><b>Definition:</b> Vtk.h:123</div></div>
+<div class="ttc" id="azconf_8h_html_a2c212835823e3c54a8ab6d95c652660e"><div class="ttname"><a href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a></div><div class="ttdeci">#define const</div><div class="ttdef"><b>Definition:</b> zconf.h:233</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

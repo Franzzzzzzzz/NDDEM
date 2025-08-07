@@ -104,6 +104,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimulation.html">Simulation&lt; d &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCLp__it__t.html">CLp_it_t&lt; d &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple packing structure for the iterators to the contact list regions per particle.  <a href="structCLp__it__t.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMultiproc.html">Multiproc&lt; d &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manual multiprocessor handling for OpenMP, for max efficiency &amp; avoiding bugs &amp; race conditions, hopefully.  <a href="classMultiproc.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,14 +134,16 @@ Macros</h2></td></tr>
 <tr class="separator:ga674c1a85fb1c09ec56b0b8f6319e7b97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga13cacf0f3ae321bc32ab52b569781178"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga13cacf0f3ae321bc32ab52b569781178">MACRO</a>(r,  state)&#160;&#160;&#160;    case BOOST_PP_TUPLE_ELEM(2, 0, state): <a class="el" href="group__DEM.html#ga4b5412d14b03c046affaa81b692a1ad7">templatedmain</a>&lt;BOOST_PP_TUPLE_ELEM(2, 0, state)&gt;(argv);break;</td></tr>
 <tr class="separator:ga13cacf0f3ae321bc32ab52b569781178"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7e17245aaff48d106397c8ea949df656"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga7e17245aaff48d106397c8ea949df656">STR_PROTECT</a>(s)&#160;&#160;&#160;s</td></tr>
+<tr class="separator:ga7e17245aaff48d106397c8ea949df656"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5258e9af3e7909deddd2706490deb113"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5258e9af3e7909deddd2706490deb113">MAXDEFDIM</a>&#160;&#160;&#160;30</td></tr>
 <tr class="memdesc:ga5258e9af3e7909deddd2706490deb113"><td class="mdescLeft">&#160;</td><td class="mdescRight">For larger number of dimension, be taken in particular for periodic boundary conditions.  <a href="group__DEM.html#ga5258e9af3e7909deddd2706490deb113">More...</a><br /></td></tr>
 <tr class="separator:ga5258e9af3e7909deddd2706490deb113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:gab701e3ac61a85b337ec5c1abaad6742d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gab701e3ac61a85b337ec5c1abaad6742d">json</a> = <a class="el" href="namespacenlohmann.html#a9cc9a3033850a092f791d86854d117fc">nlohmann::json</a></td></tr>
-<tr class="separator:gab701e3ac61a85b337ec5c1abaad6742d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafcdeaab07a0630af78efe6b5e7003674"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafcdeaab07a0630af78efe6b5e7003674">json</a> = <a class="el" href="namespacenddem.html#a78b4efed9bad8c635c3999b456d945c0">nddem::json</a></td></tr>
+<tr class="separator:gafcdeaab07a0630af78efe6b5e7003674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga69aa29b598b851b0640aa225a9e5d61d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga69aa29b598b851b0640aa225a9e5d61d">uint</a> = unsigned int</td></tr>
 <tr class="separator:ga69aa29b598b851b0640aa225a9e5d61d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae570fe4d2fd13665912fabd3abd276b2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> = vector&lt; double &gt;</td></tr>
@@ -149,13 +154,13 @@ Typedefs</h2></td></tr>
 <tr class="separator:ga72418b0e9fe3ba385caf42f544229dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5d2a6c4d8d7894c4809a547bf179b696"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> = vector&lt; float &gt;</td></tr>
 <tr class="separator:ga5d2a6c4d8d7894c4809a547bf179b696"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa8e117446fe5e1ed1b76ff4dcfd83a89"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> = const vector&lt; double &gt;</td></tr>
+<tr class="memitem:gaa8e117446fe5e1ed1b76ff4dcfd83a89"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> = <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; double &gt;</td></tr>
 <tr class="separator:gaa8e117446fe5e1ed1b76ff4dcfd83a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaaee07f7198d82fae2bc0b65da1c43582"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> = const vector&lt; vector&lt; double &gt; &gt;</td></tr>
+<tr class="memitem:gaaee07f7198d82fae2bc0b65da1c43582"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> = <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; vector&lt; double &gt; &gt;</td></tr>
 <tr class="separator:gaaee07f7198d82fae2bc0b65da1c43582"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8e600930c2fdf4b04114320045fbfdf9"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8e600930c2fdf4b04114320045fbfdf9">cv3d</a> = const vector&lt; vector&lt; vector&lt; double &gt; &gt;&gt;</td></tr>
+<tr class="memitem:ga8e600930c2fdf4b04114320045fbfdf9"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8e600930c2fdf4b04114320045fbfdf9">cv3d</a> = <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; vector&lt; vector&lt; double &gt; &gt;&gt;</td></tr>
 <tr class="separator:ga8e600930c2fdf4b04114320045fbfdf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga00ee15069f11f61890fe822105202a1d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> = const vector&lt; float &gt;</td></tr>
+<tr class="memitem:ga00ee15069f11f61890fe822105202a1d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> = <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; float &gt;</td></tr>
 <tr class="separator:ga00ee15069f11f61890fe822105202a1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab4bc6d35a811dbdd4c1f943a6f679d63"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> = unsigned int</td></tr>
 <tr class="separator:gab4bc6d35a811dbdd4c1f943a6f679d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -205,6 +210,7 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29">FT_FRICTYPE</a> =0x80000
 , <a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38">CONTACTPOSITION</a> =0x100000
+, <a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acb6c2c4b3c8f95f9b58ad13f0a97245d">MASS</a> =0x200000
 <br />
  }</td></tr>
 <tr class="separator:ga513959f26fd4469592593d8e13e8eba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,6 +270,7 @@ Enumerations</h2></td></tr>
 <tr class="separator:ga823000505b0f0b93416074a98e1b7078"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga375410cc0bbd996376cbb08826d3b195"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga375410cc0bbd996376cbb08826d3b195">ContactStrategies</a> { <a class="el" href="group__DEM.html#gga375410cc0bbd996376cbb08826d3b195aae60f6d4f25d2ffa4c1fd272ea4f22e4">NAIVE</a> =0
 , <a class="el" href="group__DEM.html#gga375410cc0bbd996376cbb08826d3b195a8653d5a76f09db2c3ee8cc2abbe37565">CELLS</a> =1
+, <a class="el" href="group__DEM.html#gga375410cc0bbd996376cbb08826d3b195aabefbb1ea7a801b1b00c9b0709dcec50">OCTREE</a> =2
  }</td></tr>
 <tr class="separator:ga375410cc0bbd996376cbb08826d3b195"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac5ecf92a792f505a64533e107971ae35"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac5ecf92a792f505a64533e107971ae35">WallType</a> { <br />
@@ -286,11 +293,11 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:gadaad58b7ca2826f8edceed0561d9148b"><td class="memTemplParams" colspan="2">template&lt;int d&gt; </td></tr>
-<tr class="memitem:gadaad58b7ca2826f8edceed0561d9148b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadaad58b7ca2826f8edceed0561d9148b">operator&lt;</a> (const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a, const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;b)</td></tr>
+<tr class="memitem:gadaad58b7ca2826f8edceed0561d9148b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadaad58b7ca2826f8edceed0561d9148b">operator&lt;</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;b)</td></tr>
 <tr class="memdesc:gadaad58b7ca2826f8edceed0561d9148b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The contact list is order in increasing order of index i, and for two identical i in increasing order of j.  <a href="group__DEM.html#gadaad58b7ca2826f8edceed0561d9148b">More...</a><br /></td></tr>
 <tr class="separator:gadaad58b7ca2826f8edceed0561d9148b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga479483123baf2d7cf797c0b846e783c3"><td class="memTemplParams" colspan="2">template&lt;int d&gt; </td></tr>
-<tr class="memitem:ga479483123baf2d7cf797c0b846e783c3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga479483123baf2d7cf797c0b846e783c3">operator==</a> (const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a, const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;b)</td></tr>
+<tr class="memitem:ga479483123baf2d7cf797c0b846e783c3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga479483123baf2d7cf797c0b846e783c3">operator==</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;b)</td></tr>
 <tr class="memdesc:ga479483123baf2d7cf797c0b846e783c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contact equivalence is based solely on the index of objects in contact i and j.  <a href="group__DEM.html#ga479483123baf2d7cf797c0b846e783c3">More...</a><br /></td></tr>
 <tr class="separator:ga479483123baf2d7cf797c0b846e783c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga170f67aedc968a09d1c690e47d525501"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga170f67aedc968a09d1c690e47d525501">sig_handler</a> (int p)</td></tr>
@@ -303,85 +310,85 @@ Functions</h2></td></tr>
 <tr class="memitem:ga0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
 <tr class="memdesc:ga0ddf1224851353fc92bfbff6f499fa97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls the appropriate <a class="el" href="group__DEM.html#ga4b5412d14b03c046affaa81b692a1ad7" title="Main simulation run. All the simulation is handled by this function.">templatedmain()</a> function. Templated function are used to allow compiler optimisation for speed. Only a handful of dimension are compiled on the base code to limit compilation time and memory. If you need dimensions that are not cmpiled by default, have a look at the code it's pretty straightforward to activate the needed dimension. If the compilation failed with low meomry, in particular on older system, head to the code and comment the dimensions which are unused.  <a href="group__DEM.html#ga0ddf1224851353fc92bfbff6f499fa97">More...</a><br /></td></tr>
 <tr class="separator:ga0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2caeadcfa452ac674256b4871d0bb892"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2caeadcfa452ac674256b4871d0bb892">operator|=</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;a, const <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
+<tr class="memitem:ga2caeadcfa452ac674256b4871d0bb892"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2caeadcfa452ac674256b4871d0bb892">operator|=</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
 <tr class="separator:ga2caeadcfa452ac674256b4871d0bb892"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac115dbe4a97a52220d086595d97a2291"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac115dbe4a97a52220d086595d97a2291">operator|=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, const <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:gac115dbe4a97a52220d086595d97a2291"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac115dbe4a97a52220d086595d97a2291">operator|=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:gac115dbe4a97a52220d086595d97a2291"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga22604329959a9abf90486c1d826ca797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga22604329959a9abf90486c1d826ca797">operator|</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> a, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:ga22604329959a9abf90486c1d826ca797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga22604329959a9abf90486c1d826ca797">operator|</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:ga22604329959a9abf90486c1d826ca797"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4a60cd427d780d89fe12175089298f76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4a60cd427d780d89fe12175089298f76">operator~</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> a)</td></tr>
+<tr class="memitem:ga4a60cd427d780d89fe12175089298f76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4a60cd427d780d89fe12175089298f76">operator~</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="separator:ga4a60cd427d780d89fe12175089298f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad190906fe03f04e2d11603662ba4606f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad190906fe03f04e2d11603662ba4606f">operator&amp;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, const <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:gad190906fe03f04e2d11603662ba4606f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad190906fe03f04e2d11603662ba4606f">operator&amp;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:gad190906fe03f04e2d11603662ba4606f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0f19b7f91a6907aa7352b155a63b5d6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0f19b7f91a6907aa7352b155a63b5d6a">operator&gt;&gt;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;w, int u)</td></tr>
 <tr class="separator:ga0f19b7f91a6907aa7352b155a63b5d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabcca36d4d2332cd109c7d86aab113171"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gabcca36d4d2332cd109c7d86aab113171">operator&lt;&lt;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;w, int u)</td></tr>
 <tr class="separator:gabcca36d4d2332cd109c7d86aab113171"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8fd15d6056b5281f08d50a716c625b47"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8fd15d6056b5281f08d50a716c625b47">operator&amp;</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;a, <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
+<tr class="memitem:ga8fd15d6056b5281f08d50a716c625b47"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8fd15d6056b5281f08d50a716c625b47">operator&amp;</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
 <tr class="separator:ga8fd15d6056b5281f08d50a716c625b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8c0827b1f1863fba2cdb02c9ca5c0bc2">operator&amp;</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8c0827b1f1863fba2cdb02c9ca5c0bc2">operator&amp;</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafca03450931a610a6353b4b844cec366"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:gafca03450931a610a6353b4b844cec366"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafca03450931a610a6353b4b844cec366">operator&gt;&gt;</a> (std::istream &amp;in, <a class="el" href="classnumber__gen.html">number_gen</a>&lt; T &gt; &amp;n)</td></tr>
 <tr class="separator:gafca03450931a610a6353b4b844cec366"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadeb0a80559cc1b43095b26aaead0a7e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadeb0a80559cc1b43095b26aaead0a7e7">operator*</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, double b)</td></tr>
+<tr class="memitem:gadeb0a80559cc1b43095b26aaead0a7e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadeb0a80559cc1b43095b26aaead0a7e7">operator*</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:gadeb0a80559cc1b43095b26aaead0a7e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga678dfbc2027eab6bb09993656de1c98c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga678dfbc2027eab6bb09993656de1c98c">operator*</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> a, float b)</td></tr>
+<tr class="memitem:ga678dfbc2027eab6bb09993656de1c98c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga678dfbc2027eab6bb09993656de1c98c">operator*</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, float b)</td></tr>
 <tr class="separator:ga678dfbc2027eab6bb09993656de1c98c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad729fab8f3f8952e1cec80ace61a0c76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad729fab8f3f8952e1cec80ace61a0c76">operator*</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:gad729fab8f3f8952e1cec80ace61a0c76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad729fab8f3f8952e1cec80ace61a0c76">operator*</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="separator:gad729fab8f3f8952e1cec80ace61a0c76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae345462bae1ccfa3a0195682a4ca9632"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae345462bae1ccfa3a0195682a4ca9632">operator*</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> a, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
+<tr class="memitem:gae345462bae1ccfa3a0195682a4ca9632"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae345462bae1ccfa3a0195682a4ca9632">operator*</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
 <tr class="separator:gae345462bae1ccfa3a0195682a4ca9632"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae363df7ea1066e3934a12003d9ffaa41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae363df7ea1066e3934a12003d9ffaa41">operator+</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, double b)</td></tr>
+<tr class="memitem:gae363df7ea1066e3934a12003d9ffaa41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae363df7ea1066e3934a12003d9ffaa41">operator+</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:gae363df7ea1066e3934a12003d9ffaa41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1a17865c0f779d7a4dcd8032c8db47e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga1a17865c0f779d7a4dcd8032c8db47e0">operator+</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:ga1a17865c0f779d7a4dcd8032c8db47e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga1a17865c0f779d7a4dcd8032c8db47e0">operator+</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="separator:ga1a17865c0f779d7a4dcd8032c8db47e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga457719d6f977c0098a803fbcea835d78"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga457719d6f977c0098a803fbcea835d78">operator+</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> a, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
+<tr class="memitem:ga457719d6f977c0098a803fbcea835d78"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga457719d6f977c0098a803fbcea835d78">operator+</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
 <tr class="separator:ga457719d6f977c0098a803fbcea835d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga22ff20288f634793b805978bd7a28997"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga22ff20288f634793b805978bd7a28997">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, double &amp;b)</td></tr>
+<tr class="memitem:ga22ff20288f634793b805978bd7a28997"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga22ff20288f634793b805978bd7a28997">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double &amp;b)</td></tr>
 <tr class="separator:ga22ff20288f634793b805978bd7a28997"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga16917c9b75e4303c1d023b1013da091e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga16917c9b75e4303c1d023b1013da091e">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:ga16917c9b75e4303c1d023b1013da091e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga16917c9b75e4303c1d023b1013da091e">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="separator:ga16917c9b75e4303c1d023b1013da091e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2a033c1d6a2127e41be445803f38386c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2a033c1d6a2127e41be445803f38386c">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, const double *b)</td></tr>
+<tr class="memitem:ga2a033c1d6a2127e41be445803f38386c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2a033c1d6a2127e41be445803f38386c">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *b)</td></tr>
 <tr class="separator:ga2a033c1d6a2127e41be445803f38386c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae7c45337071aafdf1cfbfcee6d895961"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae7c45337071aafdf1cfbfcee6d895961">operator-</a> (const double *a, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> b)</td></tr>
+<tr class="memitem:gae7c45337071aafdf1cfbfcee6d895961"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae7c45337071aafdf1cfbfcee6d895961">operator-</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> b)</td></tr>
 <tr class="separator:gae7c45337071aafdf1cfbfcee6d895961"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae9d492b0ac74eb8e706de718f70b183c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae9d492b0ac74eb8e706de718f70b183c">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a)</td></tr>
+<tr class="memitem:gae9d492b0ac74eb8e706de718f70b183c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae9d492b0ac74eb8e706de718f70b183c">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="separator:gae9d492b0ac74eb8e706de718f70b183c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9da69b990a99174b25920688134ae690"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9da69b990a99174b25920688134ae690">operator-</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> a, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
+<tr class="memitem:ga9da69b990a99174b25920688134ae690"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9da69b990a99174b25920688134ae690">operator-</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
 <tr class="separator:ga9da69b990a99174b25920688134ae690"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaaaa6030c611e48db4f9aa05412938f98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaaa6030c611e48db4f9aa05412938f98">operator/</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, double b)</td></tr>
+<tr class="memitem:gaaaa6030c611e48db4f9aa05412938f98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaaa6030c611e48db4f9aa05412938f98">operator/</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:gaaaa6030c611e48db4f9aa05412938f98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabfa1e00b98924f7fa9c5b6f97aee258c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gabfa1e00b98924f7fa9c5b6f97aee258c">operator-=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:gabfa1e00b98924f7fa9c5b6f97aee258c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gabfa1e00b98924f7fa9c5b6f97aee258c">operator-=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="separator:gabfa1e00b98924f7fa9c5b6f97aee258c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga902fea6bb6e61cf743e467cbed0781f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga902fea6bb6e61cf743e467cbed0781f6">operator*=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;a, double b)</td></tr>
+<tr class="memitem:ga902fea6bb6e61cf743e467cbed0781f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga902fea6bb6e61cf743e467cbed0781f6">operator*=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:ga902fea6bb6e61cf743e467cbed0781f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3b8c22f5c690d4a8b55808de51eba514"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga3b8c22f5c690d4a8b55808de51eba514">operator*=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;a, double b)</td></tr>
+<tr class="memitem:ga3b8c22f5c690d4a8b55808de51eba514"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga3b8c22f5c690d4a8b55808de51eba514">operator*=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:ga3b8c22f5c690d4a8b55808de51eba514"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga15c12d1d7497612ebcbbc3125bdb22e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga15c12d1d7497612ebcbbc3125bdb22e8">operator+=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:ga15c12d1d7497612ebcbbc3125bdb22e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga15c12d1d7497612ebcbbc3125bdb22e8">operator+=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="separator:ga15c12d1d7497612ebcbbc3125bdb22e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa842801458d09899ca6e681b751d6d08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaa842801458d09899ca6e681b751d6d08">operator+=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;a, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
+<tr class="memitem:gaa842801458d09899ca6e681b751d6d08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaa842801458d09899ca6e681b751d6d08">operator+=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
 <tr class="separator:gaa842801458d09899ca6e681b751d6d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac070d9fad31720d75a7e30bb60ad065c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac070d9fad31720d75a7e30bb60ad065c">operator/=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;a, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
+<tr class="memitem:gac070d9fad31720d75a7e30bb60ad065c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac070d9fad31720d75a7e30bb60ad065c">operator/=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;b)</td></tr>
 <tr class="separator:gac070d9fad31720d75a7e30bb60ad065c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gada6fd765427386dc5fe1986812c283c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gada6fd765427386dc5fe1986812c283c2">operator/=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;a, double b)</td></tr>
+<tr class="memitem:gada6fd765427386dc5fe1986812c283c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gada6fd765427386dc5fe1986812c283c2">operator/=</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:gada6fd765427386dc5fe1986812c283c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9c97822fded3c812dae6b4b66e42bd5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9c97822fded3c812dae6b4b66e42bd5e">operator/=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;a, double b)</td></tr>
+<tr class="memitem:ga9c97822fded3c812dae6b4b66e42bd5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9c97822fded3c812dae6b4b66e42bd5e">operator/=</a> (<a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:ga9c97822fded3c812dae6b4b66e42bd5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf9fd69d1795a1447250686ba88916c3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf9fd69d1795a1447250686ba88916c3f">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> a, double b)</td></tr>
+<tr class="memitem:gaf9fd69d1795a1447250686ba88916c3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaf9fd69d1795a1447250686ba88916c3f">operator-</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b)</td></tr>
 <tr class="separator:gaf9fd69d1795a1447250686ba88916c3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaaa7b9468d130f166b7824411f23f35b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaa7b9468d130f166b7824411f23f35b9">ContactList&lt; d &gt;::insert</a> (const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a)</td></tr>
+<tr class="memitem:gaaa7b9468d130f166b7824411f23f35b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaa7b9468d130f166b7824411f23f35b9">ContactList&lt; d &gt;::insert</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:gaaa7b9468d130f166b7824411f23f35b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#gaaa7b9468d130f166b7824411f23f35b9">More...</a><br /></td></tr>
 <tr class="separator:gaaa7b9468d130f166b7824411f23f35b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">ContactListMesh&lt; d &gt;::insert</a> (const <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;a)</td></tr>
+<tr class="memitem:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">ContactListMesh&lt; d &gt;::insert</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.  <a href="group__DEM.html#ga9a6ec0e1f8f2f49751587ecde95ac31a">More...</a><br /></td></tr>
 <tr class="separator:ga9a6ec0e1f8f2f49751587ecde95ac31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad76a4d15d692f4f6b418dc729d495b21"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad76a4d15d692f4f6b418dc729d495b21">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="memitem:gad76a4d15d692f4f6b418dc729d495b21"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad76a4d15d692f4f6b418dc729d495b21">ContactList&lt; d &gt;::check_ghost_regular</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
 <tr class="memdesc:gad76a4d15d692f4f6b418dc729d495b21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.  <a href="group__DEM.html#gad76a4d15d692f4f6b418dc729d495b21">More...</a><br /></td></tr>
 <tr class="separator:gad76a4d15d692f4f6b418dc729d495b21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadefea27a55639d4a6304a1e5ef42942a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadefea27a55639d4a6304a1e5ef42942a">ContactList&lt; d &gt;::check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
+<tr class="memitem:gadefea27a55639d4a6304a1e5ef42942a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gadefea27a55639d4a6304a1e5ef42942a">ContactList&lt; d &gt;::check_ghost_LE</a> (<a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> gst, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, double r1, double r2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;tmpcp, int startd=0, double partialsum=0, <a class="el" href="group__DEM.html#gab4bc6d35a811dbdd4c1f943a6f679d63">bitdim</a> mask=0)</td></tr>
 <tr class="separator:gadefea27a55639d4a6304a1e5ef42942a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2b6fc11a9f73b813659147956d123d5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2b6fc11a9f73b813659147956d123d5e">ContactList&lt; d &gt;::check_ghost_dst</a> (uint32_t gst, int n, double partialsum, uint32_t mask, const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;contact)</td></tr>
+<tr class="memitem:ga2b6fc11a9f73b813659147956d123d5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2b6fc11a9f73b813659147956d123d5e">ContactList&lt; d &gt;::check_ghost_dst</a> (<a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> gst, int n, double partialsum, <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> mask, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;P, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X1, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;X2, <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;contact)</td></tr>
 <tr class="separator:ga2b6fc11a9f73b813659147956d123d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga56bdac21bdb7f45eddc38583694bf00d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga56bdac21bdb7f45eddc38583694bf00d">ContactList&lt; d &gt;::coordinance</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;Z)</td></tr>
 <tr class="memdesc:ga56bdac21bdb7f45eddc38583694bf00d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate and store coordination number in Z.  <a href="group__DEM.html#ga56bdac21bdb7f45eddc38583694bf00d">More...</a><br /></td></tr>
@@ -471,22 +478,22 @@ Variables</h2></td></tr>
 <tr class="separator:ga8ea08fae52aa4fecdf5e84c4558b9018"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaac07836563f36d81a08ad9bc9cd383e7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaac07836563f36d81a08ad9bc9cd383e7">Tools&lt; d &gt;::check_initialised</a> (int dd)</td></tr>
 <tr class="separator:gaac07836563f36d81a08ad9bc9cd383e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae977adf52f5f422922bb693a4196fcae"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae977adf52f5f422922bb693a4196fcae">Tools&lt; d &gt;::sgn</a> (uint8_t a)</td></tr>
+<tr class="memitem:gae977adf52f5f422922bb693a4196fcae"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae977adf52f5f422922bb693a4196fcae">Tools&lt; d &gt;::sgn</a> (<a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:gae977adf52f5f422922bb693a4196fcae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign function.  <a href="group__DEM.html#gae977adf52f5f422922bb693a4196fcae">More...</a><br /></td></tr>
 <tr class="separator:gae977adf52f5f422922bb693a4196fcae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaaa3b45bd0abef3f334d652091e36f886"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaa3b45bd0abef3f334d652091e36f886">Tools&lt; d &gt;::sgn</a> (double a)</td></tr>
+<tr class="memitem:gaaa3b45bd0abef3f334d652091e36f886"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gaaa3b45bd0abef3f334d652091e36f886">Tools&lt; d &gt;::sgn</a> (double <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:gaaa3b45bd0abef3f334d652091e36f886"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign function.  <a href="group__DEM.html#gaaa3b45bd0abef3f334d652091e36f886">More...</a><br /></td></tr>
 <tr class="separator:gaaa3b45bd0abef3f334d652091e36f886"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Saving and writing functions</h2></td></tr>
-<tr class="memitem:ga5e5d7c09c21dc9823729c0226c55f0c1"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5e5d7c09c21dc9823729c0226c55f0c1">Tools&lt; d &gt;::savetxt</a> (char path[], const <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;table, char const header[])</td></tr>
+<tr class="memitem:ga5e5d7c09c21dc9823729c0226c55f0c1"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5e5d7c09c21dc9823729c0226c55f0c1">Tools&lt; d &gt;::savetxt</a> (char path[], <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;table, char <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> header[])</td></tr>
 <tr class="separator:ga5e5d7c09c21dc9823729c0226c55f0c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab7d1b07c5a6724cad8a02b50d6b863cf"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gab7d1b07c5a6724cad8a02b50d6b863cf">Tools&lt; d &gt;::write1D</a> (char path[], <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> table)</td></tr>
 <tr class="separator:gab7d1b07c5a6724cad8a02b50d6b863cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga07442666c37f721179b94a93e3d52451"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga07442666c37f721179b94a93e3d52451">Tools&lt; d &gt;::savecsv</a> (char path[], <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;r, const vector&lt; uint32_t &gt; &amp;PBCFlags, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vmag, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;OmegaMag, [[maybe_unused]] <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Z)</td></tr>
+<tr class="memitem:ga07442666c37f721179b94a93e3d52451"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga07442666c37f721179b94a93e3d52451">Tools&lt; d &gt;::savecsv</a> (char path[], <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;r, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt; &amp;PBCFlags, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vmag, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;OmegaMag, [[maybe_unused]] <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Z)</td></tr>
 <tr class="memdesc:ga07442666c37f721179b94a93e3d52451"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the location and a few more informations in a CSV file.  <a href="group__DEM.html#ga07442666c37f721179b94a93e3d52451">More...</a><br /></td></tr>
 <tr class="separator:ga07442666c37f721179b94a93e3d52451"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga26a96cce1fcf9897ddbf12e2893c0a6b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga26a96cce1fcf9897ddbf12e2893c0a6b">Tools&lt; d &gt;::savecsv</a> (char path[], <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;V, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;r, const vector&lt; uint32_t &gt; &amp;PBCFlags, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vmag, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;OmegaMag, [[maybe_unused]] <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Z)</td></tr>
+<tr class="memitem:ga26a96cce1fcf9897ddbf12e2893c0a6b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga26a96cce1fcf9897ddbf12e2893c0a6b">Tools&lt; d &gt;::savecsv</a> (char path[], <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;V, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;r, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt; &amp;PBCFlags, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Vmag, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;OmegaMag, [[maybe_unused]] <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;Z)</td></tr>
 <tr class="memdesc:ga26a96cce1fcf9897ddbf12e2893c0a6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the location and a few more informations in a CSV file.  <a href="group__DEM.html#ga26a96cce1fcf9897ddbf12e2893c0a6b">More...</a><br /></td></tr>
 <tr class="separator:ga26a96cce1fcf9897ddbf12e2893c0a6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2f38d0e797d7b3954221685dee6229ae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2f38d0e797d7b3954221685dee6229ae">Tools&lt; d &gt;::savecsv</a> (char path[], <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;A)</td></tr>
@@ -515,59 +522,59 @@ Variables</h2></td></tr>
 <tr class="memitem:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafefafd3fbcebb8b8f1bd6dc12017a11c">Tools&lt; d &gt;::unitvec</a> (int n)</td></tr>
 <tr class="memdesc:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct &amp; return a unit vector.  <a href="group__DEM.html#gafefafd3fbcebb8b8f1bd6dc12017a11c">More...</a><br /></td></tr>
 <tr class="separator:gafefafd3fbcebb8b8f1bd6dc12017a11c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga227c6e8a510dcf612c48e14113e2f030"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga227c6e8a510dcf612c48e14113e2f030">Tools&lt; d &gt;::setzero</a> (<a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;a)</td></tr>
+<tr class="memitem:ga227c6e8a510dcf612c48e14113e2f030"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga227c6e8a510dcf612c48e14113e2f030">Tools&lt; d &gt;::setzero</a> (<a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga227c6e8a510dcf612c48e14113e2f030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a matrix to zero in-place.  <a href="group__DEM.html#ga227c6e8a510dcf612c48e14113e2f030">More...</a><br /></td></tr>
 <tr class="separator:ga227c6e8a510dcf612c48e14113e2f030"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga71426fc489b2402a49c06367d6edd0d0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga71426fc489b2402a49c06367d6edd0d0">Tools&lt; d &gt;::setzero</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;a)</td></tr>
+<tr class="memitem:ga71426fc489b2402a49c06367d6edd0d0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga71426fc489b2402a49c06367d6edd0d0">Tools&lt; d &gt;::setzero</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga71426fc489b2402a49c06367d6edd0d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a vector to zero in-place.  <a href="group__DEM.html#ga71426fc489b2402a49c06367d6edd0d0">More...</a><br /></td></tr>
 <tr class="separator:ga71426fc489b2402a49c06367d6edd0d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafb203c2bc8e3a924956443db4948635d"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafb203c2bc8e3a924956443db4948635d">Tools&lt; d &gt;::norm</a> (const vector&lt; double &gt; &amp;a)</td></tr>
+<tr class="memitem:gafb203c2bc8e3a924956443db4948635d"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafb203c2bc8e3a924956443db4948635d">Tools&lt; d &gt;::norm</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; double &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:gafb203c2bc8e3a924956443db4948635d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a vector.  <a href="group__DEM.html#gafb203c2bc8e3a924956443db4948635d">More...</a><br /></td></tr>
 <tr class="separator:gafb203c2bc8e3a924956443db4948635d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6afb94a90c262e1f3c56b77446b8e7ab"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga6afb94a90c262e1f3c56b77446b8e7ab">Tools&lt; d &gt;::norm</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;a)</td></tr>
+<tr class="memitem:ga6afb94a90c262e1f3c56b77446b8e7ab"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga6afb94a90c262e1f3c56b77446b8e7ab">Tools&lt; d &gt;::norm</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga6afb94a90c262e1f3c56b77446b8e7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a 2D-matrix, returns a 1D vector with the norms of the individual vectors.  <a href="group__DEM.html#ga6afb94a90c262e1f3c56b77446b8e7ab">More...</a><br /></td></tr>
 <tr class="separator:ga6afb94a90c262e1f3c56b77446b8e7ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">Tools&lt; d &gt;::normdiff</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
-<tr class="memdesc:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_1.png"/>.  <a href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">More...</a><br /></td></tr>
+<tr class="memitem:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">Tools&lt; d &gt;::normdiff</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memdesc:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_0.png"/>.  <a href="group__DEM.html#ga0e1ad09fa79cb0f5d7f5e7c9233aad41">More...</a><br /></td></tr>
 <tr class="separator:ga0e1ad09fa79cb0f5d7f5e7c9233aad41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga92a4a1e02af06e8f2f3d662374606623"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga92a4a1e02af06e8f2f3d662374606623">Tools&lt; d &gt;::normsq</a> (const vector&lt; double &gt; &amp;a)</td></tr>
+<tr class="memitem:ga92a4a1e02af06e8f2f3d662374606623"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga92a4a1e02af06e8f2f3d662374606623">Tools&lt; d &gt;::normsq</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; double &gt; &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga92a4a1e02af06e8f2f3d662374606623"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared.  <a href="group__DEM.html#ga92a4a1e02af06e8f2f3d662374606623">More...</a><br /></td></tr>
 <tr class="separator:ga92a4a1e02af06e8f2f3d662374606623"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6a0f473f0c13f047ab489d924b27630d"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">Tools&lt; d &gt;::normdiffsq</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
-<tr class="memdesc:ga6a0f473f0c13f047ab489d924b27630d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_2.png"/>.  <a href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">More...</a><br /></td></tr>
+<tr class="memitem:ga6a0f473f0c13f047ab489d924b27630d"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">Tools&lt; d &gt;::normdiffsq</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memdesc:ga6a0f473f0c13f047ab489d924b27630d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_1.png"/>.  <a href="group__DEM.html#ga6a0f473f0c13f047ab489d924b27630d">More...</a><br /></td></tr>
 <tr class="separator:ga6a0f473f0c13f047ab489d924b27630d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4b9f05b9049cdeba112378742e7787e0"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4b9f05b9049cdeba112378742e7787e0">Tools&lt; d &gt;::skewnorm</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a)</td></tr>
+<tr class="memitem:ga4b9f05b9049cdeba112378742e7787e0"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4b9f05b9049cdeba112378742e7787e0">Tools&lt; d &gt;::skewnorm</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga4b9f05b9049cdeba112378742e7787e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm of a skew-symetric matrix.  <a href="group__DEM.html#ga4b9f05b9049cdeba112378742e7787e0">More...</a><br /></td></tr>
 <tr class="separator:ga4b9f05b9049cdeba112378742e7787e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga631231156e8a1fbc297d1bb6ff9b4f55"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga631231156e8a1fbc297d1bb6ff9b4f55">Tools&lt; d &gt;::skewnormsq</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a)</td></tr>
+<tr class="memitem:ga631231156e8a1fbc297d1bb6ff9b4f55"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga631231156e8a1fbc297d1bb6ff9b4f55">Tools&lt; d &gt;::skewnormsq</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga631231156e8a1fbc297d1bb6ff9b4f55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm squared of a skew-symetrix matrix.  <a href="group__DEM.html#ga631231156e8a1fbc297d1bb6ff9b4f55">More...</a><br /></td></tr>
 <tr class="separator:ga631231156e8a1fbc297d1bb6ff9b4f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3491e0fbdc2d3b1bb0df674d2fea76b9"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga3491e0fbdc2d3b1bb0df674d2fea76b9">Tools&lt; d &gt;::dot</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:ga3491e0fbdc2d3b1bb0df674d2fea76b9"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga3491e0fbdc2d3b1bb0df674d2fea76b9">Tools&lt; d &gt;::dot</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="memdesc:ga3491e0fbdc2d3b1bb0df674d2fea76b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dot product.  <a href="group__DEM.html#ga3491e0fbdc2d3b1bb0df674d2fea76b9">More...</a><br /></td></tr>
 <tr class="separator:ga3491e0fbdc2d3b1bb0df674d2fea76b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga32f525cded0e29019acaa11931190452"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga32f525cded0e29019acaa11931190452">Tools&lt; d &gt;::vsqrt</a> (<a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;a)</td></tr>
+<tr class="memitem:ga32f525cded0e29019acaa11931190452"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga32f525cded0e29019acaa11931190452">Tools&lt; d &gt;::vsqrt</a> (<a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga32f525cded0e29019acaa11931190452"><td class="mdescLeft">&#160;</td><td class="mdescRight">Component-wise square root.  <a href="group__DEM.html#ga32f525cded0e29019acaa11931190452">More...</a><br /></td></tr>
 <tr class="separator:ga32f525cded0e29019acaa11931190452"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7696f20c078d6ea909861f69311930a5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga7696f20c078d6ea909861f69311930a5">Tools&lt; d &gt;::vsq</a> (<a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;a)</td></tr>
+<tr class="memitem:ga7696f20c078d6ea909861f69311930a5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#ga5d2a6c4d8d7894c4809a547bf179b696">v1f</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga7696f20c078d6ea909861f69311930a5">Tools&lt; d &gt;::vsq</a> (<a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga7696f20c078d6ea909861f69311930a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Component-wise squaring.  <a href="group__DEM.html#ga7696f20c078d6ea909861f69311930a5">More...</a><br /></td></tr>
 <tr class="separator:ga7696f20c078d6ea909861f69311930a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae580a0c4104608d38bc3b07d31a03180"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gae580a0c4104608d38bc3b07d31a03180">Tools&lt; d &gt;::surfacevelocity</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;p, double *com, double *vel_com, double *omega_com)</td></tr>
 <tr class="separator:gae580a0c4104608d38bc3b07d31a03180"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">Tools&lt; d &gt;::setgravity</a> (<a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;a, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;g, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;m)</td></tr>
-<tr class="memdesc:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_3.png"/>.  <a href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">More...</a><br /></td></tr>
+<tr class="memitem:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">Tools&lt; d &gt;::setgravity</a> (<a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;g, <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;m)</td></tr>
+<tr class="memdesc:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_2.png"/>.  <a href="group__DEM.html#gad1f0f6cfabfe20decb2e861a2b1fa4e9">More...</a><br /></td></tr>
 <tr class="separator:gad1f0f6cfabfe20decb2e861a2b1fa4e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader">Matrix operations, usually operating on flattened matrices, cf. the description for more information on matrix storage</h2></td></tr>
 <tr class="memitem:ga9cd3081ff3ad4c371d32973371f92897"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga9cd3081ff3ad4c371d32973371f92897">Tools&lt; d &gt;::skewmatvecmult</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;v)</td></tr>
 <tr class="memdesc:ga9cd3081ff3ad4c371d32973371f92897"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the skew symetric matrix M with vector v.  <a href="group__DEM.html#ga9cd3081ff3ad4c371d32973371f92897">More...</a><br /></td></tr>
 <tr class="separator:ga9cd3081ff3ad4c371d32973371f92897"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga88c76c641e12f2c381623a5d48297c6d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga88c76c641e12f2c381623a5d48297c6d">Tools&lt; d &gt;::skewmatvecmult</a> (const double *M, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;v)</td></tr>
+<tr class="memitem:ga88c76c641e12f2c381623a5d48297c6d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga88c76c641e12f2c381623a5d48297c6d">Tools&lt; d &gt;::skewmatvecmult</a> (<a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *M, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;v)</td></tr>
 <tr class="memdesc:ga88c76c641e12f2c381623a5d48297c6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the skew symetric matrix M with vector v.  <a href="group__DEM.html#ga88c76c641e12f2c381623a5d48297c6d">More...</a><br /></td></tr>
 <tr class="separator:ga88c76c641e12f2c381623a5d48297c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6fecb8ca189c660eb157c60b5dfa4893"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga6fecb8ca189c660eb157c60b5dfa4893">Tools&lt; d &gt;::skewmatvecmult</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;r, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;v)</td></tr>
 <tr class="memdesc:ga6fecb8ca189c660eb157c60b5dfa4893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the skew symetric matrix M with vector v in place.  <a href="group__DEM.html#ga6fecb8ca189c660eb157c60b5dfa4893">More...</a><br /></td></tr>
 <tr class="separator:ga6fecb8ca189c660eb157c60b5dfa4893"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2ed710cb2da26a5c0f4483e34f32cc03"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2ed710cb2da26a5c0f4483e34f32cc03">Tools&lt; d &gt;::skewmatvecmult</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;r, const double *M, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;v)</td></tr>
+<tr class="memitem:ga2ed710cb2da26a5c0f4483e34f32cc03"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2ed710cb2da26a5c0f4483e34f32cc03">Tools&lt; d &gt;::skewmatvecmult</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;r, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *M, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;v)</td></tr>
 <tr class="memdesc:ga2ed710cb2da26a5c0f4483e34f32cc03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the skew symetric matrix M with vector v in place (overload)  <a href="group__DEM.html#ga2ed710cb2da26a5c0f4483e34f32cc03">More...</a><br /></td></tr>
 <tr class="separator:ga2ed710cb2da26a5c0f4483e34f32cc03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga257ce2ef176ab44f5b352291c287356f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga257ce2ef176ab44f5b352291c287356f">Tools&lt; d &gt;::skewmatsquare</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;A)</td></tr>
@@ -591,10 +598,10 @@ Variables</h2></td></tr>
 <tr class="memitem:ga972c05a1aa844e7cfa19b03e75445237"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga972c05a1aa844e7cfa19b03e75445237">Tools&lt; d &gt;::matvecmult</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;A, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;B)</td></tr>
 <tr class="memdesc:ga972c05a1aa844e7cfa19b03e75445237"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply a matrix with a vector, in place.  <a href="group__DEM.html#ga972c05a1aa844e7cfa19b03e75445237">More...</a><br /></td></tr>
 <tr class="separator:ga972c05a1aa844e7cfa19b03e75445237"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2bb43593f1d230f8f07689499df967f9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2bb43593f1d230f8f07689499df967f9">Tools&lt; d &gt;::wedgeproduct</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:ga2bb43593f1d230f8f07689499df967f9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2bb43593f1d230f8f07689499df967f9">Tools&lt; d &gt;::wedgeproduct</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="memdesc:ga2bb43593f1d230f8f07689499df967f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wedge product of vectors.  <a href="group__DEM.html#ga2bb43593f1d230f8f07689499df967f9">More...</a><br /></td></tr>
 <tr class="separator:ga2bb43593f1d230f8f07689499df967f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga339cd5ee6b24f337a7f7be086a639546"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga339cd5ee6b24f337a7f7be086a639546">Tools&lt; d &gt;::wedgeproduct</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
+<tr class="memitem:ga339cd5ee6b24f337a7f7be086a639546"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga339cd5ee6b24f337a7f7be086a639546">Tools&lt; d &gt;::wedgeproduct</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;res, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;b)</td></tr>
 <tr class="memdesc:ga339cd5ee6b24f337a7f7be086a639546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wedge product in-place.  <a href="group__DEM.html#ga339cd5ee6b24f337a7f7be086a639546">More...</a><br /></td></tr>
 <tr class="separator:ga339cd5ee6b24f337a7f7be086a639546"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5fcdc60f0f4cb053cf43c54aaf7bc8ce"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga5fcdc60f0f4cb053cf43c54aaf7bc8ce">Tools&lt; d &gt;::det</a> (<a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;M)</td></tr>
@@ -609,10 +616,10 @@ Variables</h2></td></tr>
 <tr class="memitem:ga99ce0f2023777fee64aa1d05b72353ed"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga99ce0f2023777fee64aa1d05b72353ed">Tools&lt; d &gt;::inverse</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;M)</td></tr>
 <tr class="memdesc:ga99ce0f2023777fee64aa1d05b72353ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the matrix inverse (very slow and redundant calculation of the determinant for the comatrix, but shouldn't really really matters for the usage)  <a href="group__DEM.html#ga99ce0f2023777fee64aa1d05b72353ed">More...</a><br /></td></tr>
 <tr class="separator:ga99ce0f2023777fee64aa1d05b72353ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4701bf110c37993ad9615e4555a29d2f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4701bf110c37993ad9615e4555a29d2f">Tools&lt; d &gt;::transpose</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;a)</td></tr>
+<tr class="memitem:ga4701bf110c37993ad9615e4555a29d2f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4701bf110c37993ad9615e4555a29d2f">Tools&lt; d &gt;::transpose</a> (<a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:ga4701bf110c37993ad9615e4555a29d2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transposition.  <a href="group__DEM.html#ga4701bf110c37993ad9615e4555a29d2f">More...</a><br /></td></tr>
 <tr class="separator:ga4701bf110c37993ad9615e4555a29d2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacb5996f17ac96a69ec13b4bba73d0bd3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gacb5996f17ac96a69ec13b4bba73d0bd3">Tools&lt; d &gt;::transpose_inplace</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;a)</td></tr>
+<tr class="memitem:gacb5996f17ac96a69ec13b4bba73d0bd3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gacb5996f17ac96a69ec13b4bba73d0bd3">Tools&lt; d &gt;::transpose_inplace</a> (<a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="memdesc:gacb5996f17ac96a69ec13b4bba73d0bd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transpose in-place.  <a href="group__DEM.html#gacb5996f17ac96a69ec13b4bba73d0bd3">More...</a><br /></td></tr>
 <tr class="separator:gacb5996f17ac96a69ec13b4bba73d0bd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -707,6 +714,24 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="ga7e17245aaff48d106397c8ea949df656"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7e17245aaff48d106397c8ea949df656">&#9670;&nbsp;</a></span>STR_PROTECT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define STR_PROTECT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s</td><td>)</td>
+          <td>&#160;&#160;&#160;s</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="gab4bc6d35a811dbdd4c1f943a6f679d63"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gab4bc6d35a811dbdd4c1f943a6f679d63">&#9670;&nbsp;</a></span>bitdim</h2>
@@ -729,7 +754,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> =  const vector &lt;double&gt;</td>
+          <td class="memname">using <a class="el" href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a> =  <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector &lt;double&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -743,7 +768,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> =  const vector &lt;float&gt;</td>
+          <td class="memname">using <a class="el" href="group__DEM.html#ga00ee15069f11f61890fe822105202a1d">cv1f</a> =  <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector &lt;float&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -757,7 +782,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> =  const vector &lt; vector &lt;double&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> =  <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector &lt; vector &lt;double&gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -771,21 +796,21 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="group__DEM.html#ga8e600930c2fdf4b04114320045fbfdf9">cv3d</a> =  const vector&lt;vector&lt;vector&lt;double&gt; &gt;&gt;</td>
+          <td class="memname">using <a class="el" href="group__DEM.html#ga8e600930c2fdf4b04114320045fbfdf9">cv3d</a> =  <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt;vector&lt;vector&lt;double&gt; &gt;&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="gab701e3ac61a85b337ec5c1abaad6742d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab701e3ac61a85b337ec5c1abaad6742d">&#9670;&nbsp;</a></span>json</h2>
+<a id="gafcdeaab07a0630af78efe6b5e7003674"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafcdeaab07a0630af78efe6b5e7003674">&#9670;&nbsp;</a></span>json</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="group__DEM.html#gab701e3ac61a85b337ec5c1abaad6742d">json</a> =  <a class="el" href="namespacenlohmann.html#a9cc9a3033850a092f791d86854d117fc">nlohmann::json</a></td>
+          <td class="memname">using <a class="el" href="Dem_2json_8hpp.html#ae6eede511f01c9f33342044d36a388fa">json</a> =  <a class="el" href="namespacenddem.html#a78b4efed9bad8c635c3999b456d945c0">nddem::json</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -909,6 +934,7 @@ Variables</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga375410cc0bbd996376cbb08826d3b195aae60f6d4f25d2ffa4c1fd272ea4f22e4"></a>NAIVE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="gga375410cc0bbd996376cbb08826d3b195a8653d5a76f09db2c3ee8cc2abbe37565"></a>CELLS&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga375410cc0bbd996376cbb08826d3b195aabefbb1ea7a801b1b00c9b0709dcec50"></a>OCTREE&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -999,6 +1025,7 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="gga513959f26fd4469592593d8e13e8eba1acd9f1e7ebae4da08170f0d86a8778715"></a>FT_FRIC&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29"></a>FT_FRICTYPE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38"></a>CONTACTPOSITION&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga513959f26fd4469592593d8e13e8eba1acb6c2c4b3c8f95f9b58ad13f0a97245d"></a>MASS&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -1112,7 +1139,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::check_ghost_dst </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&#160;</td>
           <td class="paramname"><em>gst</em>, </td>
         </tr>
         <tr>
@@ -1130,13 +1157,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a>&#160;</td>
           <td class="paramname"><em>mask</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>P</em>, </td>
         </tr>
         <tr>
@@ -1164,7 +1191,7 @@ template&lt;int d&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Measure distance between a ghost and a particle </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Measure distance between a ghost and a particle </dd></dl>
 
 </div>
 </div>
@@ -1185,7 +1212,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>P</em>, </td>
         </tr>
         <tr>
@@ -1263,7 +1290,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>P</em>, </td>
         </tr>
         <tr>
@@ -1883,7 +1910,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">int <a class="el" href="classContactList.html">ContactList</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::insert </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1905,7 +1932,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">int <a class="el" href="classContactListMesh.html">ContactListMesh</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::insert </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcpm.html">cpm</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2144,7 +2171,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">static double <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::norm </td>
           <td>(</td>
-          <td class="paramtype">const vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; double &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2236,7 +2263,7 @@ template&lt;int d&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_1.png"/>. </p>
+<p>Norm of a vector difference <img class="formulaInl" alt="$|a-b|$" src="form_0.png"/>. </p>
 
 </div>
 </div>
@@ -2276,7 +2303,7 @@ template&lt;int d&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_2.png"/>. </p>
+<p>Norm squared of a vector difference <img class="formulaInl" alt="$|a-b|^2$" src="form_1.png"/>. </p>
 
 </div>
 </div>
@@ -2294,7 +2321,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">static double <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::normsq </td>
           <td>(</td>
-          <td class="paramtype">const vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; double &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2400,7 +2427,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -2735,7 +2762,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> operator- </td>
           <td>(</td>
-          <td class="paramtype">const double *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
@@ -2787,7 +2814,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -3066,13 +3093,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">bool operator&lt; </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -3142,13 +3169,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">bool operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classcp.html">cp</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -3288,7 +3315,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -3324,7 +3351,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a>&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -3794,7 +3821,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const vector&lt; uint32_t &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>PBCFlags</em>, </td>
         </tr>
         <tr>
@@ -3870,7 +3897,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const vector&lt; uint32_t &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> vector&lt; <a class="el" href="stdint_8h.html#a435d1572bf3f880d55459d9805097f62">uint32_t</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>PBCFlags</em>, </td>
         </tr>
         <tr>
@@ -3928,13 +3955,13 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> &amp;&#160;</td>
           <td class="paramname"><em>table</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char const&#160;</td>
+          <td class="paramtype">char <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a>&#160;</td>
           <td class="paramname"><em>header</em>[]&#160;</td>
         </tr>
         <tr>
@@ -4058,7 +4085,7 @@ template&lt;int d&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_3.png"/>. </p>
+<p>Set the gravity. <img class="formulaInl" alt="$\vec a_i = m_i * \vec g $" src="form_2.png"/>. </p>
 
 </div>
 </div>
@@ -4166,7 +4193,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname">static int <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::sgn </td>
           <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramtype"><a class="el" href="stdint_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>&#160;</td>
           <td class="paramname"><em>a</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4356,7 +4383,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a> <a class="el" href="classTools.html">Tools</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::skewmatvecmult </td>
           <td>(</td>
-          <td class="paramtype">const double *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *&#160;</td>
           <td class="paramname"><em>M</em>, </td>
         </tr>
         <tr>
@@ -4442,7 +4469,7 @@ template&lt;int d&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double *&#160;</td>
+          <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> double *&#160;</td>
           <td class="paramname"><em>M</em>, </td>
         </tr>
         <tr>

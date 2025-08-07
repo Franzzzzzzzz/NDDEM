@@ -67,6 +67,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
@@ -90,7 +91,7 @@ $(function() {
 <code>#include &quot;<a class="el" href="RigidBody_8h_source.html">RigidBody.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Mesh_8h_source.html">Mesh.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Boundaries_8h_source.html">Boundaries.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Dem_2json_8hpp_source.html">json.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Dem_2json__parser_8h_source.html">json_parser.h</a>&quot;</code><br />
 <code>#include &lt;boost/random.hpp&gt;</code><br />
 </div>
 <p><a href="Dem_2Parameters_8h_source.html">Go to the source code of this file.</a></p>
@@ -104,10 +105,15 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic class to handle the simulation set up.  <a href="classParameters.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:ga7e17245aaff48d106397c8ea949df656"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga7e17245aaff48d106397c8ea949df656">STR_PROTECT</a>(s)&#160;&#160;&#160;s</td></tr>
+<tr class="separator:ga7e17245aaff48d106397c8ea949df656"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:gab701e3ac61a85b337ec5c1abaad6742d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gab701e3ac61a85b337ec5c1abaad6742d">json</a> = <a class="el" href="namespacenlohmann.html#a9cc9a3033850a092f791d86854d117fc">nlohmann::json</a></td></tr>
-<tr class="separator:gab701e3ac61a85b337ec5c1abaad6742d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafcdeaab07a0630af78efe6b5e7003674"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafcdeaab07a0630af78efe6b5e7003674">json</a> = <a class="el" href="namespacenddem.html#a78b4efed9bad8c635c3999b456d945c0">nddem::json</a></td></tr>
+<tr class="separator:gafcdeaab07a0630af78efe6b5e7003674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -152,29 +158,30 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a9fb9e5882c920f3dd5b9a679e7c62f29">FT_FRICTYPE</a> =0x80000
 , <a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1a5af0efad5d44d75c923c707dccc76d38">CONTACTPOSITION</a> =0x100000
+, <a class="el" href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1acb6c2c4b3c8f95f9b58ad13f0a97245d">MASS</a> =0x200000
 <br />
  }</td></tr>
 <tr class="separator:ga513959f26fd4469592593d8e13e8eba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga2caeadcfa452ac674256b4871d0bb892"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2caeadcfa452ac674256b4871d0bb892">operator|=</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;a, const <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
+<tr class="memitem:ga2caeadcfa452ac674256b4871d0bb892"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga2caeadcfa452ac674256b4871d0bb892">operator|=</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
 <tr class="separator:ga2caeadcfa452ac674256b4871d0bb892"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac115dbe4a97a52220d086595d97a2291"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac115dbe4a97a52220d086595d97a2291">operator|=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, const <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:gac115dbe4a97a52220d086595d97a2291"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gac115dbe4a97a52220d086595d97a2291">operator|=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:gac115dbe4a97a52220d086595d97a2291"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga22604329959a9abf90486c1d826ca797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga22604329959a9abf90486c1d826ca797">operator|</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> a, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:ga22604329959a9abf90486c1d826ca797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga22604329959a9abf90486c1d826ca797">operator|</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:ga22604329959a9abf90486c1d826ca797"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4a60cd427d780d89fe12175089298f76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4a60cd427d780d89fe12175089298f76">operator~</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> a)</td></tr>
+<tr class="memitem:ga4a60cd427d780d89fe12175089298f76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga4a60cd427d780d89fe12175089298f76">operator~</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
 <tr class="separator:ga4a60cd427d780d89fe12175089298f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad190906fe03f04e2d11603662ba4606f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad190906fe03f04e2d11603662ba4606f">operator&amp;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, const <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:gad190906fe03f04e2d11603662ba4606f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gad190906fe03f04e2d11603662ba4606f">operator&amp;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:gad190906fe03f04e2d11603662ba4606f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0f19b7f91a6907aa7352b155a63b5d6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga0f19b7f91a6907aa7352b155a63b5d6a">operator&gt;&gt;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;w, int u)</td></tr>
 <tr class="separator:ga0f19b7f91a6907aa7352b155a63b5d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabcca36d4d2332cd109c7d86aab113171"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#gabcca36d4d2332cd109c7d86aab113171">operator&lt;&lt;=</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;w, int u)</td></tr>
 <tr class="separator:gabcca36d4d2332cd109c7d86aab113171"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8fd15d6056b5281f08d50a716c625b47"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8fd15d6056b5281f08d50a716c625b47">operator&amp;</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;a, <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
+<tr class="memitem:ga8fd15d6056b5281f08d50a716c625b47"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8fd15d6056b5281f08d50a716c625b47">operator&amp;</a> (<a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a> b)</td></tr>
 <tr class="separator:ga8fd15d6056b5281f08d50a716c625b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8c0827b1f1863fba2cdb02c9ca5c0bc2">operator&amp;</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;a, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
+<tr class="memitem:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__DEM.html#ga8c0827b1f1863fba2cdb02c9ca5c0bc2">operator&amp;</a> (<a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &amp;<a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> b)</td></tr>
 <tr class="separator:ga8c0827b1f1863fba2cdb02c9ca5c0bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafca03450931a610a6353b4b844cec366"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:gafca03450931a610a6353b4b844cec366"><td class="memTemplItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__DEM.html#gafca03450931a610a6353b4b844cec366">operator&gt;&gt;</a> (std::istream &amp;in, <a class="el" href="classnumber__gen.html">number_gen</a>&lt; T &gt; &amp;n)</td></tr>
