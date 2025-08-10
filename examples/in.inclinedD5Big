@@ -1,0 +1,35 @@
+# Incline plane flow
+directory Output
+dimensions 5 4000
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto inertia
+
+boundary 0 WALL 0 20
+boundary 1 PBC  0 10
+boundary 2 PBC  0 4
+boundary 3 PBC  0 4
+boundary 4 PBC  0 4
+
+auto location roughinclineplane
+
+ContactStrategy cells
+
+gravity -0.9 0.42 0 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+
+
+set T 10
+set dt 0.0001
+set dumps XML with 4 Position Velocity Omega Coordination
+set dumps CSV with 1 Orientation
+set dumps VTK with 1 Velocity
+set tdump 1000
+EOF

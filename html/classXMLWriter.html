@@ -76,8 +76,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8b995bd5846e792815934bac7f42bdc5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a8b995bd5846e792815934bac7f42bdc5">XMLWriter</a> (string path)</td></tr>
-<tr class="separator:a8b995bd5846e792815934bac7f42bdc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc011318026c5617573247c9b6c144ed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#abc011318026c5617573247c9b6c144ed">XMLWriter</a> (string path, std::optional&lt; size_t &gt; restart_location={})</td></tr>
+<tr class="separator:abc011318026c5617573247c9b6c144ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4783d887e10a57f8880790f618285edf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a4783d887e10a57f8880790f618285edf">header</a> (int dimension, string input)</td></tr>
 <tr class="separator:a4783d887e10a57f8880790f618285edf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b52391c183d510aafbe0ecf604f9a19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a6b52391c183d510aafbe0ecf604f9a19">writeTs</a> (double ts, tuple&lt; string, vector&lt; vector&lt; double &gt;&gt; *, <a class="el" href="Xml_8h.html#a6a03cb2a3ac6197231b65056e6b01ee9">ArrayType</a> &gt; <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>)</td></tr>
@@ -96,6 +96,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae531e18dff8af8a7b29b0893d7063837"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a137ae31754e6c7a8d7164c53276c5754"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a137ae31754e6c7a8d7164c53276c5754">emergencyclose</a> ()</td></tr>
 <tr class="separator:a137ae31754e6c7a8d7164c53276c5754"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95a176fcf74ec26b64da9c328c8d9908"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#a95a176fcf74ec26b64da9c328c8d9908">get_file_location</a> ()</td></tr>
+<tr class="separator:a95a176fcf74ec26b64da9c328c8d9908"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa313b95e73a1d5a3f9018f872ac080b"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#aaa313b95e73a1d5a3f9018f872ac080b">reader_rewind_line</a> (ifstream &amp;in)</td></tr>
+<tr class="separator:aaa313b95e73a1d5a3f9018f872ac080b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb9bb38ab7a3f0e3e470ee0b6158babe"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#acb9bb38ab7a3f0e3e470ee0b6158babe">get_restart_point</a> (string path)</td></tr>
+<tr class="separator:acb9bb38ab7a3f0e3e470ee0b6158babe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc9c9006dc4a19554adfc1d333f2df25"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#adc9c9006dc4a19554adfc1d333f2df25">openbranch</a> (string name, vector&lt; pair&lt; string, string &gt;&gt; attributes)</td></tr>
 <tr class="separator:adc9c9006dc4a19554adfc1d333f2df25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf328c905c7ed546ca40e9ac361a1ffb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXMLWriter.html#aaf328c905c7ed546ca40e9ac361a1ffb">openbranch</a> (string name)</td></tr>
@@ -135,8 +141,8 @@ Private Attributes</h2></td></tr>
 <tr class="separator:abe422805a2f47361a06d675f71129b90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8b995bd5846e792815934bac7f42bdc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b995bd5846e792815934bac7f42bdc5">&#9670;&nbsp;</a></span>XMLWriter()</h2>
+<a id="abc011318026c5617573247c9b6c144ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc011318026c5617573247c9b6c144ed">&#9670;&nbsp;</a></span>XMLWriter()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -148,8 +154,18 @@ Private Attributes</h2></td></tr>
           <td class="memname">XMLWriter::XMLWriter </td>
           <td>(</td>
           <td class="paramtype">string&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">std::optional&lt; size_t &gt;&#160;</td>
+          <td class="paramname"><em>restart_location</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -275,6 +291,49 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a95a176fcf74ec26b64da9c328c8d9908"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95a176fcf74ec26b64da9c328c8d9908">&#9670;&nbsp;</a></span>get_file_location()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t XMLWriter::get_file_location </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb9bb38ab7a3f0e3e470ee0b6158babe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb9bb38ab7a3f0e3e470ee0b6158babe">&#9670;&nbsp;</a></span>get_restart_point()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t XMLWriter::get_restart_point </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a4783d887e10a57f8880790f618285edf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4783d887e10a57f8880790f618285edf">&#9670;&nbsp;</a></span>header()</h2>
 
@@ -379,6 +438,24 @@ Private Attributes</h2></td></tr>
 <span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaa313b95e73a1d5a3f9018f872ac080b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa313b95e73a1d5a3f9018f872ac080b">&#9670;&nbsp;</a></span>reader_rewind_line()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string XMLWriter::reader_rewind_line </td>
+          <td>(</td>
+          <td class="paramtype">ifstream &amp;&#160;</td>
+          <td class="paramname"><em>in</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 </div>

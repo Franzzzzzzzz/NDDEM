@@ -96,6 +96,7 @@ int templatedmain (char * argv[])
          {
            S.load_restart(S.P.Directory + "/" + latest_file.value()) ; 
            S.ti++ ;
+           S.t += S.dt ;
            restarting = true ; 
          }
        }
@@ -125,12 +126,6 @@ int main (int argc, char *argv[])
  signal (SIGINT, sig_handler);   // Catch all signals ...
 
  // TEST
-/* v1d A = {0.8147,    0.6324,    0.9575,    0.9572,    0.9058,    0.0975,    0.9649,    0.4854,
-    0.1270,    0.2785,    0.1576,    0.8003,    0.9134,    0.5469,    0.9706,    0.1419} ; 
- Tools<4>::print(A) ; 
-    Tools<4>::print(Tools<4>::inverse(A)) ; 
- 
- std::exit(0) ;*/ 
  // END TEST
  
  

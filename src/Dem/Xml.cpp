@@ -59,6 +59,7 @@ void XMLWriter::startTS (double ts)
 void XMLWriter::stopTS ()
 {
   closebranch() ;
+  fic.flush() ; 
 }
 //----------------------------------------------------------------------------
 void XMLWriter::writeArray(string name, vector<vector<double>>*x, int beg, int length, ArrayType t, EncodingType te)
@@ -186,7 +187,62 @@ while (closebranch()) ;
 smallbranch("note", "Emergency finish at "+temp) ;
 fic.close() ;
 }
-
+//----------------------------------------------------------------
+string XMLWriter::reader_rewind_line(ifstream & in)
+{
+    char letter ; 
+    string line ; 
+    in.seekg(-1, std::ios_base::cur);
+    letter = in.peek() ; 
+    if (letter == '\n') 
+        in.seekg(-1, std::ios_base::cur); // skip the first newline if it is the first character
+    do
+    {
+        letter = in.peek() ; 
+        if (letter != '\n') 
+            line.insert(0, 1, letter) ; 
+        else
+            in.seekg(+2, std::ios_base::cur);
+        in.seekg(-1, std::ios_base::cur);
+    } while (letter != '\n') ; 
+    return line ; 
+}
+//----------------------------------------------------------------
+size_t XMLWriter::get_restart_point (string path)
+{
+    ifstream in ; 
+    in.open(path.c_str(), std::ios::ate) ;
+    /* Options: 
+        - last line is </timestep> : hard kill not during writing of the file. 
+        - last line is <note></note> : soft kill, previous one should be </demnd></timestep>
+        - Otherwise: kill was during writing. We will record the issue and let someone handle it manually */
+    if (! in.is_open()) {printf("WARN: cannot find expected dump.xml restart file\n") ; return 0 ; }
+    
+    string lastline = reader_rewind_line(in) ; 
+    size_t startingpoint ; 
+    if (lastline == "  </timestep>")
+    {
+        startingpoint = in.tellg() ; 
+    }
+    else if (lastline.find("<note>") != std::string::npos)
+    {
+        reader_rewind_line(in) ; 
+        reader_rewind_line(in) ; 
+        startingpoint = in.tellg() ; 
+    }
+    else
+    {
+        in.seekg(0, std::ios_base::end);
+        startingpoint = in.tellg() ; 
+        ofstream errorlog ; 
+        std::string errorpath = path + ".log" ; 
+        errorlog.open(errorpath.c_str(), std::ios::app) ; 
+        errorlog << "Cannot recover xml file from restart. We will just happen at the end. This will occur from position " << startingpoint << "\n" ;
+        errorlog.close() ;
+    }
+    in.close() ; 
+    return startingpoint ; 
+}
 
 //=========================================================================================
 XMLReader_base::XMLReader_base (string path)
@@ -254,6 +310,7 @@ string XMLReader_base::getcontent()
     fic.unget() ;
     return res ;
 }
+
 //============================================================
 int XMLReader::read_boundaries (vector <vector <double>> & boundaries)
 {

@@ -85,9 +85,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab3742432b2087ded9e2e5c9a15bfe763"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#ab3742432b2087ded9e2e5c9a15bfe763">reset_ND</a> (int NN)</td></tr>
 <tr class="memdesc:ab3742432b2087ded9e2e5c9a15bfe763"><td class="mdescLeft">&#160;</td><td class="mdescRight">reset the full simulation.  <a href="classParameters.html#ab3742432b2087ded9e2e5c9a15bfe763">More...</a><br /></td></tr>
 <tr class="separator:ab3742432b2087ded9e2e5c9a15bfe763"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4be3b1e84a1fe80a5989b84962a81b8a"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
-<tr class="memitem:a4be3b1e84a1fe80a5989b84962a81b8a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classParameters.html#a4be3b1e84a1fe80a5989b84962a81b8a">serialize</a> (Archive &amp;ar)</td></tr>
-<tr class="separator:a4be3b1e84a1fe80a5989b84962a81b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50e743a46674ad54bf7cde08c76f7b67"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
+<tr class="memitem:a50e743a46674ad54bf7cde08c76f7b67"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classParameters.html#a50e743a46674ad54bf7cde08c76f7b67">save</a> (Archive &amp;ar) <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a></td></tr>
+<tr class="separator:a50e743a46674ad54bf7cde08c76f7b67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73fc4eb056fdbf49b131d1e4e234ee48"><td class="memTemplParams" colspan="2">template&lt;class Archive &gt; </td></tr>
+<tr class="memitem:a73fc4eb056fdbf49b131d1e4e234ee48"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classParameters.html#a73fc4eb056fdbf49b131d1e4e234ee48">load</a> (Archive &amp;ar)</td></tr>
+<tr class="separator:a73fc4eb056fdbf49b131d1e4e234ee48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d880b12e436cfb1d597d8a946ec1738"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a7d880b12e436cfb1d597d8a946ec1738">set_boundaries</a> ()</td></tr>
 <tr class="memdesc:a7d880b12e436cfb1d597d8a946ec1738"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set default boundaries.  <a href="classParameters.html#a7d880b12e436cfb1d597d8a946ec1738">More...</a><br /></td></tr>
 <tr class="separator:a7d880b12e436cfb1d597d8a946ec1738"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -208,6 +211,16 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ae9dea3a3136542135ae052ff207f2aeb"><td class="memItemLeft" align="right" valign="top">vector&lt; std::pair&lt; <a class="el" href="group__DEM.html#ga6bd23bde1932319c9832c0129a94b307">ExportType</a>, <a class="el" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#ae9dea3a3136542135ae052ff207f2aeb">dumps</a></td></tr>
 <tr class="memdesc:ae9dea3a3136542135ae052ff207f2aeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector linking dump file and data dumped.  <a href="classParameters.html#ae9dea3a3136542135ae052ff207f2aeb">More...</a><br /></td></tr>
 <tr class="separator:ae9dea3a3136542135ae052ff207f2aeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b92dd8955440c8d8f836bb1bc3dfc19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classXMLWriter.html">XMLWriter</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a1b92dd8955440c8d8f836bb1bc3dfc19">xmlout</a> = nullptr</td></tr>
+<tr class="memdesc:a1b92dd8955440c8d8f836bb1bc3dfc19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the (optional) xml dump object.  <a href="classParameters.html#a1b92dd8955440c8d8f836bb1bc3dfc19">More...</a><br /></td></tr>
+<tr class="separator:a1b92dd8955440c8d8f836bb1bc3dfc19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acac975ea1c8645c6ea3de4a80810d697"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#acac975ea1c8645c6ea3de4a80810d697">xmlstarted</a> =false</td></tr>
+<tr class="memdesc:acac975ea1c8645c6ea3de4a80810d697"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bool whether the xml has already been started or not.  <a href="classParameters.html#acac975ea1c8645c6ea3de4a80810d697">More...</a><br /></td></tr>
+<tr class="separator:acac975ea1c8645c6ea3de4a80810d697"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5db4728f7b89b0d37c0ab2af1e8538f7"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a5db4728f7b89b0d37c0ab2af1e8538f7">xml_location</a></td></tr>
+<tr class="memdesc:a5db4728f7b89b0d37c0ab2af1e8538f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Temporary stores the already written locations in the xml, so that upon restart we can resume at the right place. Need to be mutable as Cereal save function has to be const. <br  />
+  <a href="classParameters.html#a5db4728f7b89b0d37c0ab2af1e8538f7">More...</a><br /></td></tr>
+<tr class="separator:a5db4728f7b89b0d37c0ab2af1e8538f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52c6d1cd8b99b54cb39761fb17b33b53"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53">r</a></td></tr>
 <tr class="memdesc:a52c6d1cd8b99b54cb39761fb17b33b53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Particle radii.  <a href="classParameters.html#a52c6d1cd8b99b54cb39761fb17b33b53">More...</a><br /></td></tr>
 <tr class="separator:a52c6d1cd8b99b54cb39761fb17b33b53"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,8 +293,6 @@ Public Attributes</h2></td></tr>
 <tr class="separator:af6cc72647b58869bb0b490030e3c54ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1da10af2dce557bb12397cd5c526e10f"><td class="memItemLeft" align="right" valign="top">void(Parameters::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a1da10af2dce557bb12397cd5c526e10f">update_gravity</a> )(double time) = &amp;<a class="el" href="classParameters.html#a06e126d3a37c952d69742063ce8de745">Parameters::do_nothing</a></td></tr>
 <tr class="separator:a1da10af2dce557bb12397cd5c526e10f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b92dd8955440c8d8f836bb1bc3dfc19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classXMLWriter.html">XMLWriter</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameters.html#a1b92dd8955440c8d8f836bb1bc3dfc19">xmlout</a></td></tr>
-<tr class="separator:a1b92dd8955440c8d8f836bb1bc3dfc19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;int d&gt;<br />
@@ -825,6 +836,36 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="a73fc4eb056fdbf49b131d1e4e234ee48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73fc4eb056fdbf49b131d1e4e234ee48">&#9670;&nbsp;</a></span>load()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<div class="memtemplate">
+template&lt;class Archive &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::load </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;&#160;</td>
+          <td class="paramname"><em>ar</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0c27d0ee94ac521382bfbe4b2f9513b6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0c27d0ee94ac521382bfbe4b2f9513b6">&#9670;&nbsp;</a></span>load_datafile()</h2>
 
@@ -876,9 +917,6 @@ template&lt;int d&gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::perform_forceinsphere </td>
@@ -888,11 +926,6 @@ template&lt;int d&gt; </div>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -1122,6 +1155,36 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="a50e743a46674ad54bf7cde08c76f7b67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50e743a46674ad54bf7cde08c76f7b67">&#9670;&nbsp;</a></span>save()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<div class="memtemplate">
+template&lt;class Archive &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::save </td>
+          <td>(</td>
+          <td class="paramtype">Archive &amp;&#160;</td>
+          <td class="paramname"><em>ar</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a717e168d77090ad64b8123e85881943c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a717e168d77090ad64b8123e85881943c">&#9670;&nbsp;</a></span>savecsvcontact()</h2>
 
@@ -1129,9 +1192,6 @@ template&lt;int d&gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;int d&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::savecsvcontact </td>
@@ -1163,41 +1223,6 @@ template&lt;int d&gt; </div>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4be3b1e84a1fe80a5989b84962a81b8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4be3b1e84a1fe80a5989b84962a81b8a">&#9670;&nbsp;</a></span>serialize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int d&gt; </div>
-<div class="memtemplate">
-template&lt;class Archive &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::serialize </td>
-          <td>(</td>
-          <td class="paramtype">Archive &amp;&#160;</td>
-          <td class="paramname"><em>ar</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -2014,6 +2039,33 @@ template&lt;int d&gt; </div>
 
 </div>
 </div>
+<a id="a5db4728f7b89b0d37c0ab2af1e8538f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5db4728f7b89b0d37c0ab2af1e8538f7">&#9670;&nbsp;</a></span>xml_location</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::xml_location</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">mutable</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Temporary stores the already written locations in the xml, so that upon restart we can resume at the right place. Need to be mutable as Cereal save function has to be const. <br  />
+ </p>
+
+</div>
+</div>
 <a id="a1b92dd8955440c8d8f836bb1bc3dfc19"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b92dd8955440c8d8f836bb1bc3dfc19">&#9670;&nbsp;</a></span>xmlout</h2>
 
@@ -2023,10 +2075,30 @@ template&lt;int d&gt; </div>
 template&lt;int d&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classXMLWriter.html">XMLWriter</a>* <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::xmlout</td>
+          <td class="memname"><a class="el" href="classXMLWriter.html">XMLWriter</a>* <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::xmlout = nullptr</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Pointer to the (optional) xml dump object. </p>
+
+</div>
+</div>
+<a id="acac975ea1c8645c6ea3de4a80810d697"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acac975ea1c8645c6ea3de4a80810d697">&#9670;&nbsp;</a></span>xmlstarted</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int d&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classParameters.html">Parameters</a>&lt; <a class="el" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> &gt;::xmlstarted =false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bool whether the xml has already been started or not. </p>
 
 </div>
 </div>
