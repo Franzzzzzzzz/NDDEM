@@ -187,8 +187,10 @@ public :
     ContactModels ContactModel=HOOKE ; ///< Model of interparticle contact
     ContactStrategies contact_strategy = NAIVE ; ///< Strategy for the contact detection
     vector <std::pair<ExportType,ExportData>> dumps ; ///< Vector linking dump file and data dumped
-    //ExportType dumpkind ;
-    //ExportData dumplist ;
+    XMLWriter * xmlout = nullptr ; ///< Pointer to the (optional) xml dump object
+    bool xmlstarted=false ; ///< Bool whether the xml has already been started or not
+    mutable size_t xml_location ; ///< Temporary stores the already written locations in the xml, so that upon restart we can resume at the right place. Need to be mutable as Cereal save function has to be const.  
+    
     vector <double> r ; ///< Particle radii
     vector <double> m ; ///< Particle mass
     vector <double> I ; ///< Particule moment of inertia
@@ -214,12 +216,28 @@ public :
     multimap<float, string> events ; ///< For storing events. first is the time at which the event triggers, second is the event command string, parsed on the fly when the event gets triggered.
     
     template <class Archive>
-    void serialize(Archive &ar) {
+    void save(Archive &ar) const {
+        if (xmlout != nullptr)
+          xml_location = xmlout->get_file_location() ; 
+          
         ar(N, tdump, tinfo, T, dt, rho, Kn, Kt, Gamman, Gammat, Mu, Mu_wall, damping, forceinsphere, cellsize, ContactModel, contact_strategy,
-           dumps, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
+           dumps, xmlstarted, xml_location, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
            graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events,
            n_restart, restart_filename, restart_flag 
            ) ; 
+    }
+    template <class Archive>
+    void load(Archive &ar) {
+        ar(N, tdump, tinfo, T, dt, rho, Kn, Kt, Gamman, Gammat, Mu, Mu_wall, damping, forceinsphere, cellsize, ContactModel, contact_strategy,
+           dumps, xmlstarted, xml_location, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
+           graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events,
+           n_restart, restart_filename, restart_flag 
+           ) ; 
+        // Handling potential XML restart
+        for (auto v : dumps)
+          if (v.first==ExportType::XML || v.first==ExportType::XMLbase64)
+              xmlout= new XMLWriter(Directory+"/dump.xml", xml_location) ;
+           
     }
 
 // Useful functions
@@ -228,32 +246,7 @@ public :
     void perform_PBC(v1d & X, uint32_t & PBCFlags) ; ///< Bring particle back in the simulation box if the grains cross the boundaries
     void perform_PBCLE_move() ;
     void perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag) ;
-    bool perform_forceinsphere(v1d & X)
-    {
-      bool res = false ;
-      if (! Boundaries[0].is_sphere())
-      { printf("ERR: forceinsphere expect the sphere to be the first wall.") ; return false ; }
-      
-      double dst = 0 ; 
-      for (int dd=0 ; dd<d ; dd++) dst += (X[dd]-Boundaries[0].center[dd])*(X[dd]-Boundaries[0].center[dd]) ; 
-      if (dst > Boundaries[0].radius*Boundaries[0].radius || std::isnan(dst))
-      {
-        printf("%g ", dst) ; fflush(stdout) ;
-        boost::random::mt19937 rng(++seed);
-        boost::random::uniform_01<boost::mt19937> rand(rng) ;
-        do {
-            dst=0 ;
-            for(int dd=0 ; dd < d ; dd++)
-            {
-              X[dd] = (rand()*Boundaries[0].radius*2-Boundaries[0].radius) + Boundaries[0].center[dd] ; 
-              dst += (Boundaries[0].center[dd]-X[dd])*(Boundaries[0].center[dd]-X[dd]) ;
-            }        
-         } while ( dst > Boundaries[0].radius * Boundaries[0].radius) ;
-        res = true ;
-        printf("[INFO] Bringing back in sphere forcibly. \n"); fflush(stdout) ;
-      }
-      return res ;
-    }
+    bool perform_forceinsphere(v1d & X) ; 
 
     void perform_MOVINGWALL() ; ///< Move the boundary wall if moving.
     int init_mass() ; ///< Initialise particle mass
@@ -279,96 +272,7 @@ public :
     void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
     int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP) ; ///< Dump writing functions
-    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
-    {
-     if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
-     if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
-     {
-         for (int dd = 0 ; dd<d ; dd++)
-             fprintf(out, "x%d_i, ", dd) ;
-         for (int dd = 0 ; dd<d ; dd++)
-             fprintf(out, "x%d_j, ", dd) ;
-     }
-     if (outflags & ExportData::FN)
-         for (int dd = 0 ; dd<d ; dd++)
-             fprintf(out, "Fn%d_i, ", dd) ;
-     if (outflags & ExportData::FT)
-         for (int dd = 0 ; dd<d ; dd++)
-             fprintf(out, "Ft%d_i, ", dd) ;
-     if (outflags & ExportData::TORQUE)
-     {
-         for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
-         {
-             auto val = Tools<d>::MASIndex[dd] ;
-             fprintf(out, "Torque%d:%d_i, ", val.first, val.second) ;
-         }
-         for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
-         {
-             auto val =  Tools<d>::MASIndex[dd] ;
-             fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
-         }
-     }
-     if (outflags & ExportData::GHOSTMASK)
-        fprintf(out, "GhostMask, ") ;
-     if (outflags & ExportData::GHOSTDIR)
-        fprintf(out, "GhostDir, ") ;
-     if (outflags & ExportData::BRANCHVECTOR)
-     {
-         for (int dd = 0 ; dd<d ; dd++)
-             fprintf(out, "lij%d, ", dd) ;
-     }
-
-     fseek (out, -2, SEEK_CUR) ;
-     fprintf(out, "\n") ;
-
-     for (auto & CLp : MP.CLp)
-     {
-         for (auto & contact: CLp.v)
-         {
-             if (outflags & ExportData::IDS)
-                fprintf(out, "%d %d ", contact.i, contact.j) ;
-             if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
-             {
-                 for (auto dd : X[contact.i])
-                  fprintf(out, "%g ", dd) ;
-                 for (auto dd : X[contact.j])
-                  fprintf(out, "%g ", dd) ;
-             }
-             if (outflags & ExportData::FN)
-                for (auto dd : contact.infos->Fn)
-                  fprintf(out, "%g ", dd) ;
-             if (outflags & ExportData::FT)
-                for (auto dd : contact.infos->Ft)
-                  fprintf(out, "%g ", dd) ;
-
-             if (outflags & ExportData::TORQUE)
-             {
-                for (auto dd : contact.infos->Torquei)
-                  fprintf(out, "%g ", dd) ;
-                for (auto dd : contact.infos->Torquej)
-                  fprintf(out, "%g ", dd) ;
-             }
-
-             if (outflags & ExportData::GHOSTMASK)
-                 fprintf(out, "%d ", contact.ghost) ;
-             if (outflags & ExportData::GHOSTDIR)
-                 fprintf(out, "%d ", contact.ghostdir) ;
-
-             if (outflags & ExportData::BRANCHVECTOR)
-             {
-                auto [loc,branch] = contact.compute_branchvector(X, *this) ; 
-               
-                for (int dd = 0 ; dd<d ; dd++) fprintf(out, "%g ", branch[dd]) ;
-             }
-         fprintf(out, "\n") ;
-         }
-     }
-     return 0 ;
-    }
-
-
-// For Xml Writing
-    XMLWriter * xmlout ;
+    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X) ;
 } ;
 /** @}*/
 
@@ -467,6 +371,35 @@ void Parameters<d>::perform_MOVINGWALL ()
   }
  }
 }
+//----------------------------------------------------
+template <int d>
+bool Parameters<d>::perform_forceinsphere(v1d & X)
+{
+  bool res = false ;
+  if (! Boundaries[0].is_sphere())
+  { printf("ERR: forceinsphere expect the sphere to be the first wall.") ; return false ; }
+  
+  double dst = 0 ; 
+  for (int dd=0 ; dd<d ; dd++) dst += (X[dd]-Boundaries[0].center[dd])*(X[dd]-Boundaries[0].center[dd]) ; 
+  if (dst > Boundaries[0].radius*Boundaries[0].radius || std::isnan(dst))
+  {
+    printf("%g ", dst) ; fflush(stdout) ;
+    boost::random::mt19937 rng(++seed);
+    boost::random::uniform_01<boost::mt19937> rand(rng) ;
+    do {
+        dst=0 ;
+        for(int dd=0 ; dd < d ; dd++)
+        {
+          X[dd] = (rand()*Boundaries[0].radius*2-Boundaries[0].radius) + Boundaries[0].center[dd] ; 
+          dst += (Boundaries[0].center[dd]-X[dd])*(Boundaries[0].center[dd]-X[dd]) ;
+        }        
+      } while ( dst > Boundaries[0].radius * Boundaries[0].radius) ;
+    res = true ;
+    printf("[INFO] Bringing back in sphere forcibly. \n"); fflush(stdout) ;
+  }
+  return res ;
+}
+
 //-----------------------------------------------------
 /*int Parameters::init_particles(v2d & X, v2d & A)
 {
@@ -515,10 +448,6 @@ void Parameters<d>::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
   {
     interpret_command(in, X, V, Omega) ;
   }
-
-  for (auto v : dumps)
-    if (v.first==ExportType::XML || v.first==ExportType::XMLbase64)
-      xmlout= new XMLWriter(Directory+"/dump.xml") ;
 
   in.close() ;
   // Self copy :)
@@ -1315,8 +1244,6 @@ void Parameters<d>::finalise()
 template <int d>
 int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP)
 {
-  static bool xmlstarted=false ;
-
   for (auto v : dumps)
   {
     if (v.first==ExportType::CSV)
@@ -1487,6 +1414,95 @@ int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2
 
   }
 return 0 ;
+}
+
+//------------------------------------------------------------------------------
+template <int d>
+int Parameters<d>::savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
+{
+  if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
+  if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
+  {
+      for (int dd = 0 ; dd<d ; dd++)
+          fprintf(out, "x%d_i, ", dd) ;
+      for (int dd = 0 ; dd<d ; dd++)
+          fprintf(out, "x%d_j, ", dd) ;
+  }
+  if (outflags & ExportData::FN)
+      for (int dd = 0 ; dd<d ; dd++)
+          fprintf(out, "Fn%d_i, ", dd) ;
+  if (outflags & ExportData::FT)
+      for (int dd = 0 ; dd<d ; dd++)
+          fprintf(out, "Ft%d_i, ", dd) ;
+  if (outflags & ExportData::TORQUE)
+  {
+      for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
+      {
+          auto val = Tools<d>::MASIndex[dd] ;
+          fprintf(out, "Torque%d:%d_i, ", val.first, val.second) ;
+      }
+      for (int dd = 0 ; dd<d*(d-1)/2 ; dd++)
+      {
+          auto val =  Tools<d>::MASIndex[dd] ;
+          fprintf(out, "Torque%d:%d_j, ", val.first, val.second) ;
+      }
+  }
+  if (outflags & ExportData::GHOSTMASK)
+    fprintf(out, "GhostMask, ") ;
+  if (outflags & ExportData::GHOSTDIR)
+    fprintf(out, "GhostDir, ") ;
+  if (outflags & ExportData::BRANCHVECTOR)
+  {
+      for (int dd = 0 ; dd<d ; dd++)
+          fprintf(out, "lij%d, ", dd) ;
+  }
+
+  fseek (out, -2, SEEK_CUR) ;
+  fprintf(out, "\n") ;
+
+  for (auto & CLp : MP.CLp)
+  {
+      for (auto & contact: CLp.v)
+      {
+          if (outflags & ExportData::IDS)
+            fprintf(out, "%d %d ", contact.i, contact.j) ;
+          if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)
+          {
+              for (auto dd : X[contact.i])
+              fprintf(out, "%g ", dd) ;
+              for (auto dd : X[contact.j])
+              fprintf(out, "%g ", dd) ;
+          }
+          if (outflags & ExportData::FN)
+            for (auto dd : contact.infos->Fn)
+              fprintf(out, "%g ", dd) ;
+          if (outflags & ExportData::FT)
+            for (auto dd : contact.infos->Ft)
+              fprintf(out, "%g ", dd) ;
+
+          if (outflags & ExportData::TORQUE)
+          {
+            for (auto dd : contact.infos->Torquei)
+              fprintf(out, "%g ", dd) ;
+            for (auto dd : contact.infos->Torquej)
+              fprintf(out, "%g ", dd) ;
+          }
+
+          if (outflags & ExportData::GHOSTMASK)
+              fprintf(out, "%d ", contact.ghost) ;
+          if (outflags & ExportData::GHOSTDIR)
+              fprintf(out, "%d ", contact.ghostdir) ;
+
+          if (outflags & ExportData::BRANCHVECTOR)
+          {
+            auto [loc,branch] = contact.compute_branchvector(X, *this) ; 
+            
+            for (int dd = 0 ; dd<d ; dd++) fprintf(out, "%g ", branch[dd]) ;
+          }
+      fprintf(out, "\n") ;
+      }
+  }
+  return 0 ;
 }
 
 #endif

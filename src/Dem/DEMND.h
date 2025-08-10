@@ -183,6 +183,9 @@ public:
             MP.CLp_it.init(P.N, MP.P) ; 
             MP.CLp_it.rebuild(MP.CLp) ; 
         }
+        
+        toclean = &(P.dumps) ;
+        xmlout = P.xmlout ;
     }    
     
     template <class Archive>
@@ -249,6 +252,10 @@ public:
     void finalise_init () {
         //if (strcmp(argv[3], "default"))
         //    P.load_datafile (argv[3], X, V, Omega) ;
+                
+        for (auto v : P.dumps)
+          if (v.first==ExportType::XML || v.first==ExportType::XMLbase64)
+            P.xmlout= new XMLWriter(P.Directory+"/dump.xml") ;
         toclean = &(P.dumps) ;
         xmlout = P.xmlout ;
 

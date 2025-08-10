@@ -1,0 +1,33 @@
+# Incline plane flow
+directory OutputTest
+dimensions 3 400
+
+#set adimensional
+radius -1 0.5
+mass -1 1
+auto rho
+auto mass
+auto inertia
+
+boundary 0 WALL 0 20
+boundary 1 WALL 0 10
+boundary 2 WALL -3 3
+
+auto location randomdrop
+
+gravity -1 0 0
+set Kn 2e5
+set Kt 8e4
+set GammaN 75
+set GammaT 75
+set Mu 0.5
+set Mu_wall 0.5
+
+
+set T 500
+set dt 0.0001
+set dumps VTK with 2 Velocity Coordination
+set tdump 1000
+event 20 boundary 1 WALL 100
+
+EOF

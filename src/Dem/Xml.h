@@ -17,6 +17,7 @@
 #include <map>
 #include <algorithm>
 #include <stack>
+#include <optional>
 
 #include "Typedefs.h"
 
@@ -27,7 +28,18 @@ enum class EncodingType {ascii, base64} ;
 class XMLWriter
 {
 public:
-    XMLWriter (string path) {fic.open(path.c_str()) ; if (!fic) printf("ERR: cannot open %s in writing \n", path.c_str()) ; }
+    XMLWriter (string path, std::optional<size_t> restart_location = {}) {
+        if (restart_location.has_value())
+        {
+            fic.open(path, std::ios::in | std::ios::out) ;    
+            fic.seekp(restart_location.value(), std::ios_base::beg) ; 
+        }
+        else 
+        {
+            fic.open(path.c_str()) ; 
+        }
+        if (!fic) printf("ERR: cannot open %s in writing \n", path.c_str()) ; 
+    }
     void header (int dimension, string input) ;
     void writeTs (double ts, tuple<string,vector<vector<double>>*, ArrayType> a);
     void startTS (double ts) ;
@@ -37,6 +49,9 @@ public:
     void stopTS () ;
     void close() ;
     void emergencyclose() ;
+    size_t get_file_location() {return fic.tellp() ; } 
+    string reader_rewind_line(ifstream & in) ; 
+    size_t get_restart_point(string path) ; 
 
     void openbranch (string name, vector < pair<string,string>> attributes) ;
     void openbranch (string name) {return openbranch(name, {}) ; }
@@ -45,7 +60,6 @@ public:
     bool closebranch() ;
 
     ofstream fic ;
-
 
 private:
     vector <pair<double,streampos>> index ;
