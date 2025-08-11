@@ -46,14 +46,17 @@ void XMLWriter::header (int dimension, string input)
 //----------------------------------------------------------------------------
 void XMLWriter::writeTs (double ts, tuple<string,vector<vector<double>>*, ArrayType> a)
 {
- index.push_back(make_pair(float(ts), fic.tellp())) ;
+ //index.push_back(make_pair(float(ts), fic.tellp())) ;
+ index_ts.push_back(ts) ; 
+ index_loc.push_back(static_cast<std::streamoff>(fic.tellp())) ; 
  openbranch("timestep", {make_pair("ts", to_string(ts))}) ;
  writeArray(get<0>(a), get<1>(a), get<2>(a) ) ;
  closebranch() ;
 }
 void XMLWriter::startTS (double ts)
 {
- index.push_back(make_pair(float(ts), fic.tellp())) ;
+ index_ts.push_back(ts) ; 
+ index_loc.push_back(static_cast<std::streamoff>(fic.tellp())) ; 
  openbranch("timestep", {make_pair("ts", to_string(ts))}) ;
 }
 void XMLWriter::stopTS ()
@@ -162,9 +165,9 @@ void XMLWriter::writeArray(string name, vector<double>*x, ArrayType t, EncodingT
 void XMLWriter::close ()
 {
  openbranch("index") ;
- for (auto v:index)
+ for (size_t i=0 ; i<index_ts.size() ; i++)
  {
-   smallbranch("entry",{make_pair("ts", to_string(v.first))}, v.second) ;
+   smallbranch("entry",{make_pair("ts", to_string(index_ts[i]))}, index_loc[i]) ;
  }
 
  std::time_t result = std::time(nullptr);
@@ -186,62 +189,6 @@ date[strlen(date)-1]=0 ; temp=date ;
 while (closebranch()) ;
 smallbranch("note", "Emergency finish at "+temp) ;
 fic.close() ;
-}
-//----------------------------------------------------------------
-string XMLWriter::reader_rewind_line(ifstream & in)
-{
-    char letter ; 
-    string line ; 
-    in.seekg(-1, std::ios_base::cur);
-    letter = in.peek() ; 
-    if (letter == '\n') 
-        in.seekg(-1, std::ios_base::cur); // skip the first newline if it is the first character
-    do
-    {
-        letter = in.peek() ; 
-        if (letter != '\n') 
-            line.insert(0, 1, letter) ; 
-        else
-            in.seekg(+2, std::ios_base::cur);
-        in.seekg(-1, std::ios_base::cur);
-    } while (letter != '\n') ; 
-    return line ; 
-}
-//----------------------------------------------------------------
-size_t XMLWriter::get_restart_point (string path)
-{
-    ifstream in ; 
-    in.open(path.c_str(), std::ios::ate) ;
-    /* Options: 
-        - last line is </timestep> : hard kill not during writing of the file. 
-        - last line is <note></note> : soft kill, previous one should be </demnd></timestep>
-        - Otherwise: kill was during writing. We will record the issue and let someone handle it manually */
-    if (! in.is_open()) {printf("WARN: cannot find expected dump.xml restart file\n") ; return 0 ; }
-    
-    string lastline = reader_rewind_line(in) ; 
-    size_t startingpoint ; 
-    if (lastline == "  </timestep>")
-    {
-        startingpoint = in.tellg() ; 
-    }
-    else if (lastline.find("<note>") != std::string::npos)
-    {
-        reader_rewind_line(in) ; 
-        reader_rewind_line(in) ; 
-        startingpoint = in.tellg() ; 
-    }
-    else
-    {
-        in.seekg(0, std::ios_base::end);
-        startingpoint = in.tellg() ; 
-        ofstream errorlog ; 
-        std::string errorpath = path + ".log" ; 
-        errorlog.open(errorpath.c_str(), std::ios::app) ; 
-        errorlog << "Cannot recover xml file from restart. We will just happen at the end. This will occur from position " << startingpoint << "\n" ;
-        errorlog.close() ;
-    }
-    in.close() ; 
-    return startingpoint ; 
 }
 
 //=========================================================================================

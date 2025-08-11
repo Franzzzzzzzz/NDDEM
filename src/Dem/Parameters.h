@@ -225,6 +225,9 @@ public :
            graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events,
            n_restart, restart_filename, restart_flag 
            ) ; 
+        
+        if (xmlout != nullptr)
+          xmlout->save(ar) ; 
     }
     template <class Archive>
     void load(Archive &ar) {
@@ -236,7 +239,10 @@ public :
         // Handling potential XML restart
         for (auto v : dumps)
           if (v.first==ExportType::XML || v.first==ExportType::XMLbase64)
+          {
               xmlout= new XMLWriter(Directory+"/dump.xml", xml_location) ;
+              xmlout->load(ar) ; 
+          }
            
     }
 

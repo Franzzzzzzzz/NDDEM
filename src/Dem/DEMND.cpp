@@ -87,9 +87,9 @@ int templatedmain (char * argv[])
             bool odd_exists  = fs::exists(odd_file);
 
             if (even_exists && (!odd_exists || fs::last_write_time(even_file) > fs::last_write_time(odd_file))) 
-                latest_file = even_file;
+                latest_file = S.P.restart_filename + "-even";
             else if (odd_exists)
-                latest_file = odd_file;
+                latest_file = S.P.restart_filename + "-odd";
          }
          
          if (latest_file.has_value())

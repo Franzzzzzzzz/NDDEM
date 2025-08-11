@@ -145,7 +145,7 @@ public:
   template <class Archive>
     void serialize( Archive & ar )
     {
-      ar(n_cell, cum_n_cell, CEREAL_NVP(origin), CEREAL_NVP(Delta), cells, delta, planesize) ; 
+      ar(n_cell, cum_n_cell, origin, Delta, cells, delta, planesize) ; 
     }
 } ; 
 
