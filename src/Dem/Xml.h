@@ -49,10 +49,8 @@ public:
     void stopTS () ;
     void close() ;
     void emergencyclose() ;
-    size_t get_file_location() {return fic.tellp() ; } 
-    string reader_rewind_line(ifstream & in) ; 
-    size_t get_restart_point(string path) ; 
-
+    streamoff get_file_location() {return static_cast<std::streamoff>(fic.tellp()) ; } 
+    
     void openbranch (string name, vector < pair<string,string>> attributes) ;
     void openbranch (string name) {return openbranch(name, {}) ; }
     template <class T> void smallbranch (string name, T value) ;
@@ -60,9 +58,21 @@ public:
     bool closebranch() ;
 
     ofstream fic ;
-
+    
+    template <class Archive>
+    void save(Archive &ar) const {
+        ar(index_ts, index_loc) ;
+    }
+    template <class Archive>
+    void load(Archive &ar) {
+        ar(index_ts, index_loc) ;
+        hierarchy.push("demnd") ; 
+    }
+    
 private:
-    vector <pair<double,streampos>> index ;
+    //vector <pair<double,streampos>> index ;
+    vector <double> index_ts ; 
+    vector <std::streamoff> index_loc ; 
     int encodebase64f (ostream &out, vector<double>& val) ;
     void encodebase64f_end (ostream &out) {static char lst[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" ; if (state!=0) out <<lst[remainer] ; remainer=state=0 ; }
     unsigned char state=0, remainer=0 ;
