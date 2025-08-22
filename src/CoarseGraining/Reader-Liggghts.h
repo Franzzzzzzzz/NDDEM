@@ -91,6 +91,7 @@ public:
                 else printf("Unknown extra: arbitrary liggghts extra fields are not implemented\n");
                 return nullptr ; 
             } break ; 
+            case DataValue::orient : return &(data[13][0]) ;
             
             default : return nullptr ; 
         }

@@ -36,6 +36,7 @@ FIELDS.push_back({FIELDS.back().flag<<1, "zT"   , TensorOrder::SCALAR, FieldType
 FIELDS.push_back({FIELDS.back().flag<<1, "zR"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass3});    //Eq 76
 
 FIELDS.push_back({FIELDS.back().flag<<1, "RADIUS"   , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});    //Eq 76
+FIELDS.push_back({FIELDS.back().flag<<1, "ORIENTATION"   , TensorOrder::TENSOR, FieldType::Defined, Pass::Pass1});
 
 // Post processing fields
 FIELDS.push_back({FIELDS.back().flag<<1, "TotalStress" ,     TensorOrder::TENSOR, FieldType::Defined, Pass::Pass5});
@@ -48,6 +49,9 @@ FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SC
 FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Magnitude",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Elevation",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Azimuth",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 
 return 0 ;
 } //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
@@ -532,12 +536,13 @@ return (res);
 int Coarsing::pass_1 ()
 {
 int i, dd, id ; double wp ;
-bool dorho=true, dovel=true, doomega=true, doI=true, doradius=true ;
+bool dorho=true, dovel=true, doomega=true, doI=true, doradius=true, doorient=true ;
 int rhoid=get_id("RHO") ; if (rhoid<0) {dorho=false ; return 0;} if (dorho && !data.check_field_availability("RHO")) {printf("Data missing for RHO\n") ; dorho=false ; }
 int Iid = get_id("I") ; if (Iid<0) doI=false ;           if (doI     && !data.check_field_availability("I")) {printf("Data missing for I\n") ; doI=false ; }
 int velid=get_id("VAVG"); if (velid<0)  dovel=false ;    if (dovel   && !data.check_field_availability("VAVG")) {printf("Data missing for VAVG\n") ; dovel=false ; }
 int omegaid=get_id("ROT");if (omegaid<0) doomega=false ; if (doomega && !data.check_field_availability("ROT")) {printf("Data missing for ROT\n") ; doomega=false ; }
 int radiusid = get_id("RADIUS") ; if (radiusid<0) doradius=false ; if (doradius && !data.check_field_availability("RADIUS")) {printf("Data missing for RADIUS\n") ; doradius=false ; }
+int orientid = get_id("ORIENTATION") ; if (orientid<0) doorient=false ; if (doorient && !data.check_field_availability("ORIENTATION")) {printf("Data missing for ORIENTATION\n") ; doorient=false ; }
 
 vector<int> extraid, extrancomp, extralocation ;
 for (auto &v: FIELDS)
@@ -560,6 +565,7 @@ if (dorho) for (int i=0 ; i<Npt ; CGP[i].fields[cT][rhoid]=0, i++) ;
 if (doI)   for (int i=0 ; i<Npt ; CGP[i].fields[cT][Iid]=0, i++) ;
 if (dovel) for (int dd=0 ; dd<d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][velid+dd]=0, i++) ;
 if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][omegaid+dd]=0, i++) ;
+if (doorient) for (int dd=0 ; dd<4 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][orientid+dd]=0, i++) ;
 if (doradius) for (int i=0 ; i<Npt ; CGP[i].fields[cT][radiusid]=0, i++) ;
 if (doextra)
     for (size_t v = 0 ; v<extraid.size() ; v++)
@@ -601,6 +607,9 @@ for (i=0 ; i<data.N ; i++)
          *(CGf+omegaid+dd) += wp * dm * dom[dd] * dI ;
      if (doradius)
        CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
+     if (doorient)
+       for (dd=0 ; dd<d*(d-1)/2; dd++)
+         CGP[*j].fields[cT][radiusid] += wp * dm * data.orient[dd][i] ; //TODO
      if (doextra)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
@@ -639,6 +648,7 @@ for (i=0 ; i<Npt ; i++)
       CGP[i].fields[cT][EKRid] /= 2.0 ;
     }
     if (doradius && rho!=0) {CGP[i].fields[cT][radiusid] /= rho ; }
+    if (doorient && rho!=0) {CGP[i].fields[cT][orientid] /= rho ; }
     if (doextra && rho!=0)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
@@ -846,7 +856,7 @@ return 0 ;
 //======================== PASS 5: post-processing of some fields ==================
 int Coarsing::pass_5()
 {
-bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true;
+bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true, doOrientMag=true, doOrientPhi=true, doOrientTheta=true;
 
 int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
 int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
@@ -967,9 +977,7 @@ for (int i=0 ; i< Npt ; i++)
             CGP[i].fields[cT][Gamtauid] += (gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric)*(gradient[dd] - ((dd/d==dd%d)?1:0)*volumetric) ;
         CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ;
      }
-
     }
-
 }
 
 
