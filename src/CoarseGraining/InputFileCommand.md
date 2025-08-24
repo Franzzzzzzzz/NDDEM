@@ -20,7 +20,11 @@ In the following:
 
 #### Defining the Coarse Graining
 - `dimension`: number of spatial dimensions
-- `fields`: array of fields to process. Recognised fields are the following: `RHO, I, VAVG, TC, TK, ROT, MC, MK, mC, EKT, eKT, EKR, eKR, qTC, qTK, qRC, qRK, zT, zR, RADIUS, TotalStress, Pressure, KineticPressure, ShearStress, StrainRate,VolumetricStrainRate, ShearStrainRate, RotationalVelocity, RotationalVelocityMag`.
+- `fields`: array of fields to process. 
+    - Recognised fields are the following: `RHO, I, VAVG, TC, TK, ROT, MC, MK, mC, EKT, eKT, EKR, eKR, qTC, qTK, qRC, qRK, zT, zR, RADIUS, TotalStress, Pressure, KineticPressure, ShearStress, StrainRate,VolumetricStrainRate, ShearStrainRate, RotationalVelocity, RotationalVelocityMag`.
+    - Tensor fields can be appended with parameter to extract tensor derived quantites (eg. `TC.ev1` for the first eigenvalue of the contact stress tensor TC). The possible parameters are:
+        - Eigenvalues and eigenvectors: `ev1, ev2, ev3, evec1, evec2, evec3`; 
+        - Invariants: `trace`, etc. 
 - `boxes`: array. Number of boxes in each dimension. 
 - `boundaries`: volume that is coarse-grained. Do not specify in order to process the whole simulation (if the simulation bounds are saved in the input file).
 - `window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]`: shape of the averaging window.

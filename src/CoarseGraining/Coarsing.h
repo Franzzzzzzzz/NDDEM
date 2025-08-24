@@ -38,6 +38,7 @@
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/crc.hpp>
 #include <map>
+#include <variant>
 
 #ifdef NETCDF
 #include <netcdf.h>
@@ -50,6 +51,10 @@
 #ifdef MATLAB
 #include "mat.h"
 #endif
+
+#include <Eigen/Dense>
+#include <Eigen/Geometry> 
+
 
 using namespace std ;
 
@@ -73,6 +78,7 @@ public :
     CGPoint(int dd, v1d loc) {d=dd ; location=loc ; }
 
     v2d fields ;    ///< 1st dimension is time, second are fields
+    v2d subfields ; ///< 1st dimension is time, second are subfields (ie. "TC.ev1")
     v1d location ;  ///< Location of the coarse graining point
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
@@ -171,8 +177,8 @@ public :
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; ///< Distances between CG points
     v2d box ; ///< CG point location
-    LibBase * Window = nullptr ; ///> Pointer to the averaging window
-
+    LibBase * Window = nullptr ; ///< Pointer to the averaging window
+    std::variant<Eigen::Matrix3d, Eigen::Quaternion<double>> original_orientation = Eigen::Quaternion<double>(0,0,0,1) ;     
 
     // Fields variable and function
     unsigned int flags ; ///< Flags deciding which fields to coarse-grain
@@ -184,6 +190,11 @@ public :
     struct Field * get_field(string nm) ; ///< Find Field from name
     Pass set_flags (vector <string> s) ; ///< Set the fields which are requested from the coarse-graining
 
+    // Subfield variables and functions
+    vector <struct Field> subfields ; ///< All allowed subfields
+    vector <std::pair<struct Field *, uint16_t>> subflags ; 
+    struct Field * get_subfield(string nm) ; ///< Find subfield from name
+    
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
     int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
@@ -205,6 +216,7 @@ public :
     v1d interpolate_rot_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the angular velocity
     v1d interpolate_vel_trilinear (int id, bool usetimeavg) ; ///< Tri-linear interpolation (only implemented in 3D, probably not too hard to implement in ND but annoying ...)
     template <int D> v1d interpolate_vel_multilinear (int id, bool usetimeavg);
+    template <typename T> void add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, T original) ; 
     
     int idx_FastFirst2SlowFirst (int n) ; ///< Change array traversing order
 

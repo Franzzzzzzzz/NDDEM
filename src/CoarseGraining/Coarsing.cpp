@@ -49,9 +49,16 @@ FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SC
 FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
-FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Magnitude",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
-FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Elevation",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
-FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Azimuth",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+
+// subfields
+subfield.push_back({                      1, "ev1", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ; 
+subfield.push_back({subfield.back().flag<<1, "ev2", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ; 
+subfield.push_back({subfield.back().flag<<1, "ev3", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ; 
+subfield.push_back({subfield.back().flag<<1, "evec1", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ; 
+subfield.push_back({subfield.back().flag<<1, "evec2", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ; 
+subfield.push_back({subfield.back().flag<<1, "evec3", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ; 
+
+}
 
 return 0 ;
 } //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
@@ -175,18 +182,48 @@ return 0 ;
 Pass Coarsing::set_flags (vector <string> s)
 {
  Pass Res = static_cast<Pass>(0) ;
- flags=0 ; Field * a;
+ flags=0 ; Field * a, *sub; 
+ std::string mainname, subname ; 
  for (auto i = s.begin() ; i<s.end() ; i++)
  {
-     a=get_field(*i) ;
+     std::size_t pos = i->find('.') ; 
+     if (pos != string::npos)
+     {
+       mainname = i.substr(0,pos) ; 
+       subname = i.substr(pos+1) ; 
+     }
+     else
+     {
+       mainname = *i ; 
+       subname = "" ; 
+     }
+   
+     a=get_field(mainname) ;
      if (a!=NULL)
      {
          flags |= a->flag ;
          Res = Res | a->passlevel ;
      }
+     
+     sub=get_subfield(subname) ;      
+     if (sub!=NULL)
+     {
+       bool done = false ; 
+       for (size_t j=0 ; j<subflags.size() ; j++)
+       {
+         if (std::get<0>(subflags[j])==a)
+         {
+           std::get<1>(subflags[j]) |= sub->flag ; 
+           Res = Res | sub->passlevel ;
+           done = true; 
+         }
+       }
+       if (!done)
+         subflags.push_back({a,static_cast<uint16_t>(sub->flag)}) ; 
+     }
  }
  printf("Flags: %X | Pipelines %X \n", flags, static_cast<int>(Res) ) ;
-return Res ;
+ return Res ;
 }
 
 //--------------------------------
@@ -339,6 +376,14 @@ int Coarsing::get_id(string nm)
 struct Field * Coarsing::get_field(string nm)
 {
     for (auto i=FIELDS.begin() ; i<FIELDS.end() ; i++)
+        if (i->name==nm)
+            return &(*i) ;
+    return NULL ;
+}
+//-----------------------------------------
+struct Field * Coarsing::get_subfield(string nm)
+{
+    for (auto i=subfields.begin() ; i<subfields.end() ; i++)
         if (i->name==nm)
             return &(*i) ;
     return NULL ;
@@ -530,6 +575,23 @@ if (pts[0][0]!=pts[2][0])
 vector<double> res = {Qs[0], Qs[4], Qs[8]} ;
 return (res);
 }
+//------------------------------------------------------------------------------------------------
+template <>
+void Coarsing::add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, Eigen::Quaternion<double> original)
+{
+  auto result = q*original*q.inverse() ; 
+  p[0] += weight * result.x()*result.x() ; p[1] += weight * result.x()*result.y() ; p[2] += weight * result.x()*result.z() ; 
+  p[3] += weight * result.y()*result.x() ; p[4] += weight * result.y()*result.y() ; p[5] += weight * result.y()*result.z() ; 
+  p[6] += weight * result.z()*result.x() ; p[7] += weight * result.z()*result.y() ; p[8] += weight * result.z()*result.z() ; 
+}
+template <>
+void Coarsing::add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, Eigen::Matrix3d original)
+{
+  auto rot=q.toRotationMatrix() ;
+  auto orient=rot*original*rot.transpose() ;
+  for (int dd=0 ; dd<9 ; dd++)
+    p[dd] += weight * orient(dd%3,dd/3) ; 
+}
 
 //================================= BEGINNING OF THE INTERESTING PART ================================
 //================ PASS 1 : "RHO", "VAVG", "ROT", "EKT", "EKR"==============================
@@ -608,8 +670,10 @@ for (i=0 ; i<data.N ; i++)
      if (doradius)
        CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
      if (doorient)
-       for (dd=0 ; dd<d*(d-1)/2; dd++)
-         CGP[*j].fields[cT][radiusid] += wp * dm * data.orient[dd][i] ; //TODO
+     {
+       Eigen::Quaternion<double> quat(data.orient[0][i], data.orient[1][i], data.orient[2][i], data.orient[3][i]) ; 
+       std::visit([&](auto&& val){ add_rotated_quat(CGf+orientid, wp * dm, quat, val); }, original_orientation);
+     }
      if (doextra)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
@@ -856,7 +920,7 @@ return 0 ;
 //======================== PASS 5: post-processing of some fields ==================
 int Coarsing::pass_5()
 {
-bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true, doOrientMag=true, doOrientPhi=true, doOrientTheta=true;
+bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true;
 
 int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
 int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
