@@ -16,7 +16,7 @@ using cv3d = const vector<vector<vector<double>>> ;
 using cv1f = const vector <float> ;
 using bitdim = unsigned int ;
 using v1i = vector <int> ;
-enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, lpq, fpq, mpq, mqp, extra_named} ;
+enum DataValue {radius, mass, Imom, pos, vel, omega, id1, id2, pospq, lpq, fpq, mpq, mqp, orient, extra_named} ;
 
 enum ContactModels {HOOKE=0, HERTZ} ; 
 enum ContactStrategies {NAIVE=0, CELLS=1, OCTREE=2} ; 

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['operator_8993',['Operator',['../classinternal_1_1GenericRegex.html#acd9c0338546415c6d6dabdb76f8be673',1,'internal::GenericRegex']]]
+  ['lexeme_5ft_30873',['lexeme_t',['../pugixml_8cpp.html#a1fdd6d0a63acbba1491ab331ddce4ac9',1,'pugixml.cpp']]]
 ];

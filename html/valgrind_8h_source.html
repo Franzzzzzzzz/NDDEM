@@ -3776,7 +3776,7 @@ $(function() {
 <div class="line"><a name="l03705"></a><span class="lineno"> 3705</span>&#160;<span class="comment">/* Modern GCC will optimize the static routine out if unused,</span></div>
 <div class="line"><a name="l03706"></a><span class="lineno"> 3706</span>&#160;<span class="comment">   and unused attribute will shut down warnings about it.  */</span></div>
 <div class="line"><a name="l03707"></a><span class="lineno"> 3707</span>&#160;<span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="valgrind_8h.html#a77ebc4a47c5f5bc03feec2ebb915a44c">VALGRIND_PRINTF</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...)</div>
-<div class="line"><a name="l03708"></a><span class="lineno"> 3708</span>&#160;   __attribute__((format(__printf__, 1, 2), __unused__));</div>
+<div class="line"><a name="l03708"></a><span class="lineno"> 3708</span>&#160;   <a class="code" href="namespaceEigen_1_1internal.html#ad941c176b6651f6d8b0f480a9722bfb8">__attribute__</a>((format(__printf__, 1, 2), __unused__));</div>
 <div class="line"><a name="l03709"></a><span class="lineno"> 3709</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l03710"></a><span class="lineno"> 3710</span>&#160;<span class="keyword">static</span> <span class="keywordtype">int</span></div>
 <div class="line"><a name="l03711"></a><span class="lineno"> 3711</span>&#160;<span class="preprocessor">#if defined(_MSC_VER)</span></div>
@@ -3814,7 +3814,7 @@ $(function() {
 <div class="line"><a name="l03743"></a><span class="lineno"> 3743</span>&#160; </div>
 <div class="line"><a name="l03744"></a><span class="lineno"> 3744</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(__INTEL_COMPILER)</span></div>
 <div class="line"><a name="l03745"></a><span class="lineno"> 3745</span>&#160;<span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="valgrind_8h.html#a33758625d2052a87fcb1460de6eb004b">VALGRIND_PRINTF_BACKTRACE</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...)</div>
-<div class="line"><a name="l03746"></a><span class="lineno"> 3746</span>&#160;   __attribute__((format(__printf__, 1, 2), __unused__));</div>
+<div class="line"><a name="l03746"></a><span class="lineno"> 3746</span>&#160;   <a class="code" href="namespaceEigen_1_1internal.html#ad941c176b6651f6d8b0f480a9722bfb8">__attribute__</a>((format(__printf__, 1, 2), __unused__));</div>
 <div class="line"><a name="l03747"></a><span class="lineno"> 3747</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l03748"></a><span class="lineno"> 3748</span>&#160;<span class="keyword">static</span> <span class="keywordtype">int</span></div>
 <div class="line"><a name="l03749"></a><span class="lineno"> 3749</span>&#160;<span class="preprocessor">#if defined(_MSC_VER)</span></div>
@@ -4130,6 +4130,7 @@ $(function() {
 <div class="line"><a name="l04059"></a><span class="lineno"> 4059</span>&#160; </div>
 <div class="line"><a name="l04060"></a><span class="lineno"> 4060</span>&#160;<span class="preprocessor">#endif   </span><span class="comment">/* __VALGRIND_H */</span><span class="preprocessor"></span></div>
 <div class="line"><a name="l04061"></a><span class="lineno"> 4061</span>&#160; </div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_ad941c176b6651f6d8b0f480a9722bfb8"><div class="ttname"><a href="namespaceEigen_1_1internal.html#ad941c176b6651f6d8b0f480a9722bfb8">Eigen::internal::__attribute__</a></div><div class="ttdeci">svint32_t PacketXi __attribute__((arm_sve_vector_bits(EIGEN_ARM64_SVE_VL)))</div><div class="ttdef"><b>Definition:</b> PacketMath.h:33</div></div>
 <div class="ttc" id="astdint_8h_html_a31b85deecb45924320becd11d3ee16ce"><div class="ttname"><a href="stdint_8h.html#a31b85deecb45924320becd11d3ee16ce">uintptr_t</a></div><div class="ttdeci">_W64 unsigned int uintptr_t</div><div class="ttdef"><b>Definition:</b> stdint.h:165</div></div>
 <div class="ttc" id="avalgrind_8h_html_a33758625d2052a87fcb1460de6eb004b"><div class="ttname"><a href="valgrind_8h.html#a33758625d2052a87fcb1460de6eb004b">VALGRIND_PRINTF_BACKTRACE</a></div><div class="ttdeci">static int VALGRIND_PRINTF_BACKTRACE(const char *format,...)</div><div class="ttdef"><b>Definition:</b> valgrind.h:3752</div></div>
 <div class="ttc" id="avalgrind_8h_html_a5d7c55a8826dffa95ee2cd85333073f6"><div class="ttname"><a href="valgrind_8h.html#a5d7c55a8826dffa95ee2cd85333073f6">Vg_ClientRequest</a></div><div class="ttdeci">Vg_ClientRequest</div><div class="ttdef"><b>Definition:</b> valgrind.h:3606</div></div>

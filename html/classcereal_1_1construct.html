@@ -134,24 +134,24 @@ class cereal::construct&lt; T &gt;</h3>
 <div class="line">  <span class="comment">// note the lack of default constructor</span></div>
 <div class="line">  MyType( <span class="keywordtype">int</span> xx, <span class="keywordtype">int</span> yy );</div>
 <div class="line"> </div>
-<div class="line">  <span class="keywordtype">int</span> x, y;</div>
+<div class="line">  <span class="keywordtype">int</span> x, <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a>;</div>
 <div class="line">  <span class="keywordtype">double</span> notInConstructor;</div>
 <div class="line"> </div>
 <div class="line">  <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
 <div class="line">  <span class="keywordtype">void</span> <a class="code" href="namespacecereal.html#a02f9cfc9a4055c8a49eb050b02cd3357">serialize</a>( Archive &amp; ar )</div>
 <div class="line">  {</div>
-<div class="line">    ar( x, y );</div>
+<div class="line">    ar( x, <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a> );</div>
 <div class="line">    ar( notInConstructor );</div>
 <div class="line">  }</div>
 <div class="line"> </div>
 <div class="line">  <span class="keyword">template</span> &lt;<span class="keyword">class</span> Archive&gt;</div>
 <div class="line">  <span class="keyword">static</span> <span class="keywordtype">void</span> load_and_construct( Archive &amp; ar, <a class="code" href="classcereal_1_1construct.html">cereal::construct&lt;MyType&gt;</a> &amp; <a class="code" href="classcereal_1_1construct.html#a90c3516e3d49a027d77206f38e4d1b57">construct</a> )</div>
 <div class="line">  {</div>
-<div class="line">    <span class="keywordtype">int</span> x, y;</div>
-<div class="line">    ar( x, y );</div>
+<div class="line">    <span class="keywordtype">int</span> x, <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a>;</div>
+<div class="line">    ar( x, <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a> );</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// use construct object to initialize with loaded data</span></div>
-<div class="line">    <a class="code" href="classcereal_1_1construct.html#a90c3516e3d49a027d77206f38e4d1b57">construct</a>( x, y );</div>
+<div class="line">    <a class="code" href="classcereal_1_1construct.html#a90c3516e3d49a027d77206f38e4d1b57">construct</a>( x, <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a> );</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// access to member variables and functions via -&gt; operator</span></div>
 <div class="line">    ar( <a class="code" href="classcereal_1_1construct.html#a90c3516e3d49a027d77206f38e4d1b57">construct</a>-&gt;notInConstructor );</div>
@@ -164,6 +164,7 @@ class cereal::construct&lt; T &gt;</h3>
 <div class="line">};</div>
 <div class="ttc" id="aclasscereal_1_1construct_html"><div class="ttname"><a href="classcereal_1_1construct.html">cereal::construct</a></div><div class="ttdoc">Used to construct types with no default constructor.</div><div class="ttdef"><b>Definition:</b> access.hpp:165</div></div>
 <div class="ttc" id="aclasscereal_1_1construct_html_a90c3516e3d49a027d77206f38e4d1b57"><div class="ttname"><a href="classcereal_1_1construct.html#a90c3516e3d49a027d77206f38e4d1b57">cereal::construct::construct</a></div><div class="ttdeci">construct(T *p)</div><div class="ttdef"><b>Definition:</b> access.hpp:210</div></div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_a3cc80fc03610837da180f7e6d8e7b3ec"><div class="ttname"><a href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">Eigen::internal::y</a></div><div class="ttdeci">const Scalar &amp; y</div><div class="ttdef"><b>Definition:</b> MathFunctions.h:821</div></div>
 <div class="ttc" id="anamespacecereal_html_a02f9cfc9a4055c8a49eb050b02cd3357"><div class="ttname"><a href="namespacecereal.html#a02f9cfc9a4055c8a49eb050b02cd3357">cereal::serialize</a></div><div class="ttdeci">void serialize(Archive &amp;, std::less&lt; T &gt; &amp;)</div><div class="ttdoc">Saving for std::less.</div><div class="ttdef"><b>Definition:</b> functional.hpp:39</div></div>
 </div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">

@@ -1198,7 +1198,7 @@ template&lt;typename BasicJsonType , typename InputAdapterType &gt; </div>
 </div><div class="memdoc">
 
 <p>scan a string literal </p>
-<p>This function scans a string according to Sect. 7 of RFC 8259. While scanning, bytes are escaped and copied into buffer token_buffer. Then the function returns successfully, token_buffer is <em>not</em> null-terminated (as it may contain \0 bytes), and token_buffer.size() is the number of bytes in the string.</p>
+<p>This function scans a string according to Sect. 7 of RFC 8259. While scanning, bytes are escaped and copied into buffer token_buffer. Then the function returns successfully, token_buffer is <em>not</em> null-terminated (as it may contain \0 bytes), and <a class="el" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">token_buffer.size()</a> is the number of bytes in the string.</p>
 <dl class="section return"><dt>Returns</dt><dd>token_type::value_string if string could be successfully scanned, token_type::parse_error otherwise</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>In case of errors, variable error_message contains a textual description. </dd></dl>
 

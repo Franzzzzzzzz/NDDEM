@@ -166,7 +166,7 @@ $(function() {
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacedetail.html">detail</a> {</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">struct </span>ci {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordtype">bool</span> operator()(<span class="keyword">const</span> std::string &amp;s1, <span class="keyword">const</span> std::string &amp;s2)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="IndexedViewMethods_8h.html#ab9334310fcc41ade942722cc85a87d74">operator()</a>(<span class="keyword">const</span> std::string &amp;s1, <span class="keyword">const</span> std::string &amp;s2)<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">return</span> std::lexicographical_compare(</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        s1.begin(), s1.end(), s2.begin(), s2.end(),</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        [](<span class="keywordtype">char</span> c1, <span class="keywordtype">char</span> c2) { return ::tolower(c1) &lt; ::tolower(c2); });</div>
@@ -243,7 +243,7 @@ $(function() {
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="keyword">class </span><a class="code" href="classrapidjson_1_1Stream.html">Stream</a> {</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classrapidjson_1_1Stream.html">Stream</a>() {}</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) = 0;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) = 0;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size1) = 0;</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr) = 0;</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <span class="keyword">virtual</span> std::string get_remote_addr() <span class="keyword">const</span> = 0;</div>
@@ -257,8 +257,8 @@ $(function() {
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  SocketStream(<a class="code" href="Server_8h.html#a30353f381f5fccbb956eea1f3a110b6c">socket_t</a> sock);</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="keyword">virtual</span> ~SocketStream();</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr);</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <span class="keyword">virtual</span> std::string get_remote_addr() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
@@ -271,8 +271,8 @@ $(function() {
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  BufferStream() {}</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keyword">virtual</span> ~BufferStream() {}</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr);</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keyword">virtual</span> std::string get_remote_addr() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
@@ -433,8 +433,8 @@ $(function() {
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  SSLSocketStream(<a class="code" href="Server_8h.html#a30353f381f5fccbb956eea1f3a110b6c">socket_t</a> sock, SSL *ssl);</div>
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <span class="keyword">virtual</span> ~SSLSocketStream();</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size);</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr);</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <span class="keyword">virtual</span> std::string get_remote_addr() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
@@ -526,7 +526,7 @@ $(function() {
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    }</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  }</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160; </div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  <span class="keywordtype">size_t</span> size()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <span class="keywordflow">if</span> (glowable_buffer_.empty()) {</div>
 <div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;      <span class="keywordflow">return</span> fixed_buffer_used_size_;</div>
 <div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    } <span class="keywordflow">else</span> {</div>
@@ -800,11 +800,11 @@ $(function() {
 <div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160; </div>
 <div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> read_file(<span class="keyword">const</span> std::string &amp;path, std::string &amp;out) {</div>
 <div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;  std::ifstream fs(path, std::ios_base::binary);</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;  fs.seekg(0, std::ios_base::end);</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="keyword">auto</span> size = fs.tellg();</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;  fs.seekg(0, <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::ios_base::end</a>);</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="keyword">auto</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a> = fs.tellg();</div>
 <div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  fs.seekg(0);</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;  out.resize(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(size));</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  fs.read(&amp;out[0], size);</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;  out.resize(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>));</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  fs.read(&amp;out[0], <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;}</div>
 <div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160; </div>
 <div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;<span class="keyword">inline</span> std::string file_extension(<span class="keyword">const</span> std::string &amp;path) {</div>
@@ -1002,7 +1002,7 @@ $(function() {
 <div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;    <span class="keywordflow">if</span> ((len &gt; payload_max_length) ||</div>
 <div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;        <span class="comment">// For 32-bit platform</span></div>
 <div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;        (<span class="keyword">sizeof</span>(<span class="keywordtype">size_t</span>) &lt; <span class="keyword">sizeof</span>(<a class="code" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a>) &amp;&amp;</div>
-<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;         len &gt; std::numeric_limits&lt;size_t&gt;::max())) {</div>
+<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;         len &gt; <a class="code" href="namespaceEigen_1_1bfloat16__impl.html#a0692dd9ecc1d14faef8764b5fe02e42c">std::numeric_limits&lt;size_t&gt;::max</a>())) {</div>
 <div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;      exceed_payload_max_length = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;      skip_content_with_length(strm, len);</div>
 <div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -1264,10 +1264,10 @@ $(function() {
 <div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;}</div>
 <div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160; </div>
-<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;<span class="keyword">inline</span> std::string to_lower(<span class="keyword">const</span> <span class="keywordtype">char</span> *beg, <span class="keyword">const</span> <span class="keywordtype">char</span> *end) {</div>
+<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;<span class="keyword">inline</span> std::string to_lower(<span class="keyword">const</span> <span class="keywordtype">char</span> *beg, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">end</a>) {</div>
 <div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;  std::string out;</div>
 <div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;  <span class="keyword">auto</span> it = beg;</div>
-<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;  <span class="keywordflow">while</span> (it != end) {</div>
+<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;  <span class="keywordflow">while</span> (it != <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">end</a>) {</div>
 <div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;    out += ::tolower(*it);</div>
 <div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;    it++;</div>
 <div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;  }</div>
@@ -1502,12 +1502,12 @@ $(function() {
 <div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160; </div>
 <div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;<span class="keyword">inline</span> SocketStream::~SocketStream() {}</div>
 <div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160; </div>
-<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SocketStream::read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) {</div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;  <span class="keywordflow">return</span> recv(sock_, ptr, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(size), 0);</div>
+<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SocketStream::read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) {</div>
+<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;  <span class="keywordflow">return</span> recv(sock_, ptr, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>), 0);</div>
 <div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;}</div>
 <div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160; </div>
-<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SocketStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) {</div>
-<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;  <span class="keywordflow">return</span> send(sock_, ptr, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(size), 0);</div>
+<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SocketStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) {</div>
+<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;  <span class="keywordflow">return</span> send(sock_, ptr, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>), 0);</div>
 <div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;}</div>
 <div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160; </div>
 <div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SocketStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr) {</div>
@@ -1519,23 +1519,23 @@ $(function() {
 <div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;}</div>
 <div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160; </div>
 <div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;<span class="comment">// Buffer stream implementation</span></div>
-<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> BufferStream::read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) {</div>
+<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> BufferStream::read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) {</div>
 <div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; _MSC_VER &lt; 1900</span></div>
-<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(buffer._Copy_s(ptr, size, size));</div>
+<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(buffer._Copy_s(ptr, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>));</div>
 <div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(buffer.copy(ptr, size));</div>
+<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(buffer.copy(ptr, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>));</div>
 <div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;}</div>
 <div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160; </div>
-<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> BufferStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) {</div>
-<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;  buffer.append(ptr, size);</div>
-<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(size);</div>
+<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> BufferStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) {</div>
+<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;  buffer.append(ptr, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
+<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;}</div>
 <div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160; </div>
 <div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> BufferStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr) {</div>
-<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;  <span class="keywordtype">size_t</span> size = strlen(ptr);</div>
-<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;  buffer.append(ptr, size);</div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(size);</div>
+<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;  <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a> = strlen(ptr);</div>
+<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;  buffer.append(ptr, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;}</div>
 <div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160; </div>
 <div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;<span class="keyword">inline</span> std::string BufferStream::get_remote_addr()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>; }</div>
@@ -1641,7 +1641,7 @@ $(function() {
 <div class="line"><a name="l01570"></a><span class="lineno"> 1570</span>&#160;    req.path = detail::decode_url(m[3]);</div>
 <div class="line"><a name="l01571"></a><span class="lineno"> 1571</span>&#160; </div>
 <div class="line"><a name="l01572"></a><span class="lineno"> 1572</span>&#160;    <span class="comment">// Parse query text</span></div>
-<div class="line"><a name="l01573"></a><span class="lineno"> 1573</span>&#160;    <span class="keyword">auto</span> len = std::distance(m[4].first, m[4].second);</div>
+<div class="line"><a name="l01573"></a><span class="lineno"> 1573</span>&#160;    <span class="keyword">auto</span> len = std::distance(m[4].<a class="code" href="namespaceEigen_1_1internal.html#aa931747bff074d6cacefff640074a4f9">first</a>, m[4].second);</div>
 <div class="line"><a name="l01574"></a><span class="lineno"> 1574</span>&#160;    <span class="keywordflow">if</span> (len &gt; 0) { detail::parse_query_text(m[4], req.params); }</div>
 <div class="line"><a name="l01575"></a><span class="lineno"> 1575</span>&#160; </div>
 <div class="line"><a name="l01576"></a><span class="lineno"> 1576</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
@@ -2099,7 +2099,7 @@ $(function() {
 <div class="line"><a name="l02028"></a><span class="lineno"> 2028</span>&#160;  <span class="comment">// Body</span></div>
 <div class="line"><a name="l02029"></a><span class="lineno"> 2029</span>&#160;  <span class="keywordflow">if</span> (req.method != <span class="stringliteral">&quot;HEAD&quot;</span>) {</div>
 <div class="line"><a name="l02030"></a><span class="lineno"> 2030</span>&#160;    <span class="keywordtype">bool</span> exceed_payload_max_length = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l02031"></a><span class="lineno"> 2031</span>&#160;    <span class="keywordflow">if</span> (!detail::read_content(strm, res, std::numeric_limits&lt;uint64_t&gt;::max(),</div>
+<div class="line"><a name="l02031"></a><span class="lineno"> 2031</span>&#160;    <span class="keywordflow">if</span> (!detail::read_content(strm, res, <a class="code" href="namespaceEigen_1_1bfloat16__impl.html#a0692dd9ecc1d14faef8764b5fe02e42c">std::numeric_limits&lt;uint64_t&gt;::max</a>(),</div>
 <div class="line"><a name="l02032"></a><span class="lineno"> 2032</span>&#160;                              exceed_payload_max_length, req.progress)) {</div>
 <div class="line"><a name="l02033"></a><span class="lineno"> 2033</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l02034"></a><span class="lineno"> 2034</span>&#160;    }</div>
@@ -2369,12 +2369,12 @@ $(function() {
 <div class="line"><a name="l02298"></a><span class="lineno"> 2298</span>&#160; </div>
 <div class="line"><a name="l02299"></a><span class="lineno"> 2299</span>&#160;<span class="keyword">inline</span> SSLSocketStream::~SSLSocketStream() {}</div>
 <div class="line"><a name="l02300"></a><span class="lineno"> 2300</span>&#160; </div>
-<div class="line"><a name="l02301"></a><span class="lineno"> 2301</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SSLSocketStream::read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) {</div>
-<div class="line"><a name="l02302"></a><span class="lineno"> 2302</span>&#160;  <span class="keywordflow">return</span> SSL_read(ssl_, ptr, size);</div>
+<div class="line"><a name="l02301"></a><span class="lineno"> 2301</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SSLSocketStream::read(<span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) {</div>
+<div class="line"><a name="l02302"></a><span class="lineno"> 2302</span>&#160;  <span class="keywordflow">return</span> SSL_read(ssl_, ptr, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l02303"></a><span class="lineno"> 2303</span>&#160;}</div>
 <div class="line"><a name="l02304"></a><span class="lineno"> 2304</span>&#160; </div>
-<div class="line"><a name="l02305"></a><span class="lineno"> 2305</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SSLSocketStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> size) {</div>
-<div class="line"><a name="l02306"></a><span class="lineno"> 2306</span>&#160;  <span class="keywordflow">return</span> SSL_write(ssl_, ptr, size);</div>
+<div class="line"><a name="l02305"></a><span class="lineno"> 2305</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SSLSocketStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr, <span class="keywordtype">size_t</span> <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>) {</div>
+<div class="line"><a name="l02306"></a><span class="lineno"> 2306</span>&#160;  <span class="keywordflow">return</span> SSL_write(ssl_, ptr, <a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>);</div>
 <div class="line"><a name="l02307"></a><span class="lineno"> 2307</span>&#160;}</div>
 <div class="line"><a name="l02308"></a><span class="lineno"> 2308</span>&#160; </div>
 <div class="line"><a name="l02309"></a><span class="lineno"> 2309</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> SSLSocketStream::write(<span class="keyword">const</span> <span class="keywordtype">char</span> *ptr) {</div>
@@ -2629,6 +2629,7 @@ $(function() {
 <div class="line"><a name="l02558"></a><span class="lineno"> 2558</span>&#160; </div>
 <div class="line"><a name="l02559"></a><span class="lineno"> 2559</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPPHTTPLIB_HTTPLIB_H</span></div>
 <div class="ttc" id="aDem_2json_8hpp_html_a5b9ca6dc52cf4226c68d67f895b2a1d4"><div class="ttname"><a href="Dem_2json_8hpp.html#a5b9ca6dc52cf4226c68d67f895b2a1d4">to_string</a></div><div class="ttdeci">NLOHMANN_BASIC_JSON_TPL_DECLARATION std::string to_string(const NLOHMANN_BASIC_JSON_TPL &amp;j)</div><div class="ttdoc">user-defined to_string function for JSON values</div><div class="ttdef"><b>Definition:</b> json.hpp:25318</div></div>
+<div class="ttc" id="aIndexedViewMethods_8h_html_ab9334310fcc41ade942722cc85a87d74"><div class="ttname"><a href="IndexedViewMethods_8h.html#ab9334310fcc41ade942722cc85a87d74">operator()</a></div><div class="ttdeci">internal::enable_if&lt; internal::valid_indexed_view_overload&lt; RowIndices, ColIndices &gt;::value &amp;&amp;internal::traits&lt; typename EIGEN_INDEXED_VIEW_METHOD_TYPE&lt; RowIndices, ColIndices &gt;::type &gt;::ReturnAsIndexedView, typename EIGEN_INDEXED_VIEW_METHOD_TYPE&lt; RowIndices, ColIndices &gt;::type &gt;::type operator()(const RowIndices &amp;rowIndices, const ColIndices &amp;colIndices) EIGEN_INDEXED_VIEW_METHOD_CONST</div><div class="ttdef"><b>Definition:</b> IndexedViewMethods.h:73</div></div>
 <div class="ttc" id="aServer_8h_html_a072f5426d033b6e9128a2f60e7952c8a"><div class="ttname"><a href="Server_8h.html#a072f5426d033b6e9128a2f60e7952c8a">CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND</a></div><div class="ttdeci">#define CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND</div><div class="ttdef"><b>Definition:</b> Server.h:88</div></div>
 <div class="ttc" id="aServer_8h_html_a20a3df3819479bbd53093ce5e6ef86d6"><div class="ttname"><a href="Server_8h.html#a20a3df3819479bbd53093ce5e6ef86d6">CPPHTTPLIB_PAYLOAD_MAX_LENGTH</a></div><div class="ttdeci">#define CPPHTTPLIB_PAYLOAD_MAX_LENGTH</div><div class="ttdef"><b>Definition:</b> Server.h:91</div></div>
 <div class="ttc" id="aServer_8h_html_a26769957ec1a2beaf223f33b66ee64ab"><div class="ttname"><a href="Server_8h.html#a26769957ec1a2beaf223f33b66ee64ab">INVALID_SOCKET</a></div><div class="ttdeci">#define INVALID_SOCKET</div><div class="ttdef"><b>Definition:</b> Server.h:59</div></div>
@@ -2641,6 +2642,10 @@ $(function() {
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431a6fcf6a44eeee46cc0e15d6f0300da3c8"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a6fcf6a44eeee46cc0e15d6f0300da3c8">pos</a></div><div class="ttdeci">@ pos</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
 <div class="ttc" id="aio_8h_html"><div class="ttname"><a href="io_8h.html">io.h</a></div></div>
+<div class="ttc" id="anamespaceEigen_1_1bfloat16__impl_html_a0692dd9ecc1d14faef8764b5fe02e42c"><div class="ttname"><a href="namespaceEigen_1_1bfloat16__impl.html#a0692dd9ecc1d14faef8764b5fe02e42c">Eigen::bfloat16_impl::max</a></div><div class="ttdeci">EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16() max(const bfloat16 &amp;a, const bfloat16 &amp;b)</div><div class="ttdef"><b>Definition:</b> BFloat16.h:576</div></div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_aa3c1588240009c3c17b3e477512b2ffd"><div class="ttname"><a href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">Eigen::internal::size</a></div><div class="ttdeci">EIGEN_CONSTEXPR Index size(const T &amp;x)</div><div class="ttdef"><b>Definition:</b> Meta.h:479</div></div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_aa931747bff074d6cacefff640074a4f9"><div class="ttname"><a href="namespaceEigen_1_1internal.html#aa931747bff074d6cacefff640074a4f9">Eigen::internal::first</a></div><div class="ttdeci">EIGEN_CONSTEXPR Index first(const T &amp;x) EIGEN_NOEXCEPT</div><div class="ttdef"><b>Definition:</b> IndexedViewHelper.h:81</div></div>
+<div class="ttc" id="anamespaceEigen_1_1placeholders_html_a24a00ff0f09137dcde6952ff29fb9f9d"><div class="ttname"><a href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">Eigen::placeholders::end</a></div><div class="ttdeci">static EIGEN_DEPRECATED const end_t end</div><div class="ttdef"><b>Definition:</b> IndexedViewHelper.h:181</div></div>
 <div class="ttc" id="anamespacecereal_1_1bitset__detail_html_a4f5825a3267dd05e798bed76cf7e29cc"><div class="ttname"><a href="namespacecereal_1_1bitset__detail.html#a4f5825a3267dd05e798bed76cf7e29cc">cereal::bitset_detail::type</a></div><div class="ttdeci">type</div><div class="ttdoc">The type the bitset is encoded with.</div><div class="ttdef"><b>Definition:</b> bitset.hpp:44</div></div>
 <div class="ttc" id="anamespacecereal_1_1traits_html_a32b99987a136bc56cb30707526c9ba2f"><div class="ttname"><a href="namespacecereal_1_1traits.html#a32b99987a136bc56cb30707526c9ba2f">cereal::traits::yes</a></div><div class="ttdeci">std::true_type yes</div><div class="ttdef"><b>Definition:</b> traits.hpp:49</div></div>
 <div class="ttc" id="anamespacedetail_html"><div class="ttname"><a href="namespacedetail.html">detail</a></div><div class="ttdoc">detail namespace with internal helper functions</div><div class="ttdef"><b>Definition:</b> json.hpp:260</div></div>

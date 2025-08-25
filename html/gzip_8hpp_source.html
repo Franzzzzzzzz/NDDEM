@@ -649,7 +649,7 @@ $(function() {
 <div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;            std::streamsize pbsize = </div>
 <div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;                <span class="keyword">static_cast&lt;</span>std::streamsize<span class="keyword">&gt;</span>(putback_.size());</div>
 <div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;            <span class="keywordflow">if</span> (offset_ &lt; pbsize) {</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;                result = (std::min)(n, pbsize - offset_);</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;                result = (<a class="code" href="namespaceEigen_1_1bfloat16__impl.html#a41e55ac364587c191883e83e43530c82">std::min</a>)(n, pbsize - offset_);</div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;                BOOST_IOSTREAMS_CHAR_TRAITS(<span class="keywordtype">char</span>)::copy(</div>
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;                    s, putback_.data() + offset_, result);</div>
 <div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;                offset_ += result;</div>
@@ -785,7 +785,7 @@ $(function() {
 <div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;{</div>
 <div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    std::streamsize avail =</div>
 <div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;        <span class="keyword">static_cast&lt;</span>std::streamsize<span class="keyword">&gt;</span>(str.size() - offset_);</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    std::streamsize amt = (std::min)(avail, n);</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    std::streamsize amt = (<a class="code" href="namespaceEigen_1_1bfloat16__impl.html#a41e55ac364587c191883e83e43530c82">std::min</a>)(avail, n);</div>
 <div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;    std::copy( str.data() + offset_,</div>
 <div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;               str.data() + offset_ + amt,</div>
 <div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;               s );</div>
@@ -828,6 +828,7 @@ $(function() {
 <div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// #ifndef BOOST_IOSTREAMS_GZIP_HPP_INCLUDED</span></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431a5e3e1897d5d84f0d4c01ed4b8cc4fa34">id2</a></div><div class="ttdeci">@ id2</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
 <div class="ttc" id="agroup__DEM_html_ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93"><div class="ttname"><a href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431abde9af85dfdf037ae10e81656336aa93">id1</a></div><div class="ttdeci">@ id1</div><div class="ttdef"><b>Definition:</b> Typedefs.h:19</div></div>
+<div class="ttc" id="anamespaceEigen_1_1bfloat16__impl_html_a41e55ac364587c191883e83e43530c82"><div class="ttname"><a href="namespaceEigen_1_1bfloat16__impl.html#a41e55ac364587c191883e83e43530c82">Eigen::bfloat16_impl::min</a></div><div class="ttdeci">EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16() min(const bfloat16 &amp;a, const bfloat16 &amp;b)</div><div class="ttdef"><b>Definition:</b> BFloat16.h:571</div></div>
 <div class="ttc" id="anamespacecereal_1_1bitset__detail_html_a4f5825a3267dd05e798bed76cf7e29cc"><div class="ttname"><a href="namespacecereal_1_1bitset__detail.html#a4f5825a3267dd05e798bed76cf7e29cc">cereal::bitset_detail::type</a></div><div class="ttdeci">type</div><div class="ttdoc">The type the bitset is encoded with.</div><div class="ttdef"><b>Definition:</b> bitset.hpp:44</div></div>
 <div class="ttc" id="anamespacecereal_html_aba657f7ef148daa498dc4fa9e579b01e"><div class="ttname"><a href="namespacecereal.html#aba657f7ef148daa498dc4fa9e579b01e">cereal::size_type</a></div><div class="ttdeci">CEREAL_SIZE_TYPE size_type</div><div class="ttdoc">The size type used by cereal.</div><div class="ttdef"><b>Definition:</b> helpers.hpp:61</div></div>
 <div class="ttc" id="anamespacedetail_html"><div class="ttname"><a href="namespacedetail.html">detail</a></div><div class="ttdoc">detail namespace with internal helper functions</div><div class="ttdef"><b>Definition:</b> json.hpp:260</div></div>

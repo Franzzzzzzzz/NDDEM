@@ -124,8 +124,8 @@ $(function() {
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  {</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    printf(<span class="stringliteral">&quot;DIMENSIONALITY: %d\n&quot;</span>, <a class="code" href="classMesh.html#a3df3578d0bd33fb7d4ba212b4d71954a">dimensionality</a>) ; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;orig: &quot;</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;y:<a class="code" href="classMesh.html#abe2cd2a75ca521a370fe38dc6ba0b66d">origin</a>)</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      std::cout &lt;&lt; y &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;<a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a>:<a class="code" href="classMesh.html#abe2cd2a75ca521a370fe38dc6ba0b66d">origin</a>)</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      std::cout &lt;&lt; <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> ; </div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>*<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; i++)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    {</div>
@@ -140,8 +140,8 @@ $(function() {
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp; w: <a class="code" href="classMesh.html#af77c4b95b7d72faa89102d14098b6948">submeshes</a>[i])</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      {</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;orig: &quot;</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;y:w.origin)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;          std::cout &lt;&lt; y &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;<a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a>:w.origin)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;          std::cout &lt;&lt; <a class="code" href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">y</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> ; </div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a>*<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; i++)</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        {</div>
@@ -239,8 +239,8 @@ $(function() {
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  </div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;dimensionality-1 ; i++)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <span class="keywordflow">if</span> (submeshes[i].size() != boost::math::binomial_coefficient&lt;double&gt;(dimensionality+1, i+1))</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        printf(<span class="stringliteral">&quot;ERR: the wrong number of submeshes %ld of dimensionality %d was generated ...\n&quot;</span>, submeshes[i].size(), i) ; </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <span class="keywordflow">if</span> (submeshes[i].<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>() != boost::math::binomial_coefficient&lt;double&gt;(dimensionality+1, i+1))</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        printf(<span class="stringliteral">&quot;ERR: the wrong number of submeshes %ld of dimensionality %d was generated ...\n&quot;</span>, submeshes[i].<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>(), i) ; </div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      </div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  }</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;}</div>
@@ -288,6 +288,8 @@ $(function() {
 <div class="ttc" id="agroup__DEM_html_gaa8e117446fe5e1ed1b76ff4dcfd83a89"><div class="ttname"><a href="group__DEM.html#gaa8e117446fe5e1ed1b76ff4dcfd83a89">cv1d</a></div><div class="ttdeci">const vector&lt; double &gt; cv1d</div><div class="ttdef"><b>Definition:</b> Typedefs.h:13</div></div>
 <div class="ttc" id="agroup__DEM_html_gafb203c2bc8e3a924956443db4948635d"><div class="ttname"><a href="group__DEM.html#gafb203c2bc8e3a924956443db4948635d">Tools::norm</a></div><div class="ttdeci">static double norm(const vector&lt; double &gt; &amp;a)</div><div class="ttdoc">Norm of a vector.</div><div class="ttdef"><b>Definition:</b> Tools.h:119</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_a3cc80fc03610837da180f7e6d8e7b3ec"><div class="ttname"><a href="namespaceEigen_1_1internal.html#a3cc80fc03610837da180f7e6d8e7b3ec">Eigen::internal::y</a></div><div class="ttdeci">const Scalar &amp; y</div><div class="ttdef"><b>Definition:</b> MathFunctions.h:821</div></div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_aa3c1588240009c3c17b3e477512b2ffd"><div class="ttname"><a href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">Eigen::internal::size</a></div><div class="ttdeci">EIGEN_CONSTEXPR Index size(const T &amp;x)</div><div class="ttdef"><b>Definition:</b> Meta.h:479</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

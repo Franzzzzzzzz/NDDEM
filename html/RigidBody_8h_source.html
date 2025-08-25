@@ -150,7 +150,7 @@ $(function() {
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;          F[<span class="keywordtype">id</span>][dd]=v.addforce[dd] + v.F[dd]/v.mass*m[<span class="keywordtype">id</span>] - g[dd]*(v.cancelgravity?1:0)*m[id] ; </div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <a class="code" href="group__DEM.html#ga227c6e8a510dcf612c48e14113e2f030">Tools&lt;d&gt;::setzero</a>(Torque[<span class="keywordtype">id</span>]) ;  </div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> dd = 0 ; dd&lt;<a class="code" href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a> ; dd++)</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;          <span class="keywordflow">if</span> (!isnan(v.setvel[dd]))</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;          <span class="keywordflow">if</span> (!<a class="code" href="namespaceEigen_1_1bfloat16__impl.html#ac9f6a8c5c1420c1418e70cd02459e20a">isnan</a>(v.setvel[dd]))</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;          {</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            F[id][dd]=0 ; </div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            V[id][dd]=v.setvel[dd] ; </div>
@@ -185,6 +185,7 @@ $(function() {
 <div class="ttc" id="agroup__DEM_html_gaaee07f7198d82fae2bc0b65da1c43582"><div class="ttname"><a href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a></div><div class="ttdeci">const vector&lt; vector&lt; double &gt; &gt; cv2d</div><div class="ttdef"><b>Definition:</b> Typedefs.h:14</div></div>
 <div class="ttc" id="agroup__DEM_html_gae570fe4d2fd13665912fabd3abd276b2"><div class="ttname"><a href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a></div><div class="ttdeci">vector&lt; double &gt; v1d</div><div class="ttdef"><b>Definition:</b> Typedefs.h:9</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
+<div class="ttc" id="anamespaceEigen_1_1bfloat16__impl_html_ac9f6a8c5c1420c1418e70cd02459e20a"><div class="ttname"><a href="namespaceEigen_1_1bfloat16__impl.html#ac9f6a8c5c1420c1418e70cd02459e20a">Eigen::bfloat16_impl::isnan</a></div><div class="ttdeci">EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool() isnan(const bfloat16 &amp;a)</div><div class="ttdef"><b>Definition:</b> BFloat16.h:480</div></div>
 <div class="ttc" id="apugixml_8cpp_html_a09a6af504e5bf26365ccb2d1c707ca48"><div class="ttname"><a href="pugixml_8cpp.html#a09a6af504e5bf26365ccb2d1c707ca48">sort</a></div><div class="ttdeci">PUGI_IMPL_FN void sort(I begin, I end, const Pred &amp;pred)</div><div class="ttdef"><b>Definition:</b> pugixml.cpp:7707</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

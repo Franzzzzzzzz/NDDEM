@@ -1337,10 +1337,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a89f967b745cf8df11ba9d59f93d97753"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail.html#a89f967b745cf8df11ba9d59f93d97753">detail::concat_into</a> (OutStringType &amp;)</td></tr>
 <tr class="separator:a89f967b745cf8df11ba9d59f93d97753"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa16fc2d4a149a0e3ac68ceb98b153815"><td class="memTemplParams" colspan="2">template&lt;typename OutStringType , typename Arg , typename... Args, enable_if_t&lt; !detect_string_can_append&lt; OutStringType, Arg &gt;::value &amp;&amp;detect_string_can_append_op&lt; OutStringType, Arg &gt;::value, int &gt;  = 0&gt; </td></tr>
-<tr class="memitem:aa16fc2d4a149a0e3ac68ceb98b153815"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail.html#aa16fc2d4a149a0e3ac68ceb98b153815">detail::concat_into</a> (OutStringType &amp;out, Arg &amp;&amp;arg, Args &amp;&amp;... rest)</td></tr>
+<tr class="memitem:aa16fc2d4a149a0e3ac68ceb98b153815"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail.html#aa16fc2d4a149a0e3ac68ceb98b153815">detail::concat_into</a> (OutStringType &amp;out, Arg &amp;&amp;<a class="el" href="ArrayCwiseUnaryOps_8h.html#a41ceecca5805bbcbeb0928339a0714da">arg</a>, Args &amp;&amp;... rest)</td></tr>
 <tr class="separator:aa16fc2d4a149a0e3ac68ceb98b153815"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78434fad7c03e66afdd06a6df628315a"><td class="memTemplParams" colspan="2">template&lt;typename OutStringType , typename Arg , typename... Args, enable_if_t&lt; !detect_string_can_append&lt; OutStringType, Arg &gt;::value &amp;&amp;!detect_string_can_append_op&lt; OutStringType, Arg &gt;::value &amp;&amp;detect_string_can_append_iter&lt; OutStringType, Arg &gt;::value, int &gt;  = 0&gt; </td></tr>
-<tr class="memitem:a78434fad7c03e66afdd06a6df628315a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail.html#a78434fad7c03e66afdd06a6df628315a">detail::concat_into</a> (OutStringType &amp;out, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Arg &amp;arg, Args &amp;&amp;... rest)</td></tr>
+<tr class="memitem:a78434fad7c03e66afdd06a6df628315a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail.html#a78434fad7c03e66afdd06a6df628315a">detail::concat_into</a> (OutStringType &amp;out, <a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> Arg &amp;<a class="el" href="ArrayCwiseUnaryOps_8h.html#a41ceecca5805bbcbeb0928339a0714da">arg</a>, Args &amp;&amp;... rest)</td></tr>
 <tr class="separator:a78434fad7c03e66afdd06a6df628315a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a266fb3d4bf633ad6c506434cc91164da"><td class="memTemplParams" colspan="2">template&lt;typename OutStringType  = std::string, typename... Args&gt; </td></tr>
 <tr class="memitem:a266fb3d4bf633ad6c506434cc91164da"><td class="memTemplItemLeft" align="right" valign="top">OutStringType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedetail.html#a266fb3d4bf633ad6c506434cc91164da">detail::concat</a> (Args &amp;&amp;... args)</td></tr>
@@ -19985,12 +19985,12 @@ Variables</h2></td></tr>
 <div class="line">        static_assert(<a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">std::is_enum&lt;ENUM_TYPE&gt;::value</a>, #ENUM_TYPE <span class="stringliteral">&quot; must be an enum!&quot;</span>);          \</div>
 <div class="line">        <span class="comment">/* NOLINTNEXTLINE(modernize-avoid-c-arrays) we don&#39;t want to depend on &lt;array&gt; */</span>       \</div>
 <div class="line">        static <span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt; m[] = __VA_ARGS__;                     \</div>
-<div class="line">        auto it = std::find_if(std::begin(m), std::end(m),                                      \</div>
+<div class="line">        auto it = std::find_if(std::begin(m), <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m),                                      \</div>
 <div class="line">                               [e](<span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt;&amp; ej_pair) -&gt; <span class="keywordtype">bool</span>  \</div>
 <div class="line">        {                                                                                       \</div>
 <div class="line">            return ej_pair.first == e;                                                          \</div>
 <div class="line">        });                                                                                     \</div>
-<div class="line">        j = ((it != std::end(m)) ? it : std::begin(m))-&gt;second;                                 \</div>
+<div class="line">        j = ((it != <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m)) ? it : std::begin(m))-&gt;second;                                 \</div>
 <div class="line">    }                                                                                           \</div>
 <div class="line">    template&lt;typename BasicJsonType&gt;                                                            \</div>
 <div class="line">    inline <span class="keywordtype">void</span> <a class="code" href="namespacenlohmann_1_1detail.html#aef5c8ea108f4d2b03fb4a635617510de">from_json</a>(<span class="keyword">const</span> BasicJsonType&amp; j, ENUM_TYPE&amp; e)                                 \</div>
@@ -19999,13 +19999,15 @@ Variables</h2></td></tr>
 <div class="line">        static_assert(<a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">std::is_enum&lt;ENUM_TYPE&gt;::value</a>, #ENUM_TYPE <span class="stringliteral">&quot; must be an enum!&quot;</span>);          \</div>
 <div class="line">        <span class="comment">/* NOLINTNEXTLINE(modernize-avoid-c-arrays) we don&#39;t want to depend on &lt;array&gt; */</span>       \</div>
 <div class="line">        static <span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt; m[] = __VA_ARGS__;                     \</div>
-<div class="line">        auto it = std::find_if(std::begin(m), std::end(m),                                      \</div>
+<div class="line">        auto it = std::find_if(std::begin(m), <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m),                                      \</div>
 <div class="line">                               [&amp;j](<span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt;&amp; ej_pair) -&gt; <span class="keywordtype">bool</span> \</div>
 <div class="line">        {                                                                                       \</div>
 <div class="line">            return ej_pair.second == j;                                                         \</div>
 <div class="line">        });                                                                                     \</div>
-<div class="line">        e = ((it != std::end(m)) ? it : std::begin(m))-&gt;first;                                  \</div>
+<div class="line">        e = ((it != <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m)) ? it : std::begin(m))-&gt;<a class="code" href="namespaceEigen_1_1internal.html#aa931747bff074d6cacefff640074a4f9">first</a>;                                  \</div>
 <div class="line">    }</div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_aa931747bff074d6cacefff640074a4f9"><div class="ttname"><a href="namespaceEigen_1_1internal.html#aa931747bff074d6cacefff640074a4f9">Eigen::internal::first</a></div><div class="ttdeci">EIGEN_CONSTEXPR Index first(const T &amp;x) EIGEN_NOEXCEPT</div><div class="ttdef"><b>Definition:</b> IndexedViewHelper.h:81</div></div>
+<div class="ttc" id="anamespaceEigen_1_1placeholders_html_a24a00ff0f09137dcde6952ff29fb9f9d"><div class="ttname"><a href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">Eigen::placeholders::end</a></div><div class="ttdeci">static EIGEN_DEPRECATED const end_t end</div><div class="ttdef"><b>Definition:</b> IndexedViewHelper.h:181</div></div>
 </div><!-- fragment -->
 <p>macro to briefly define a mapping between an enum and JSON </p>
 <dl class="section since"><dt>Since</dt><dd>version 3.4.0 </dd></dl>
@@ -20156,7 +20158,7 @@ template&lt;typename RefStringTypeLhs , typename RefStringTypeRhs &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool operator!= </td>
+          <td class="memname">bool <a class="el" href="ArrayCwiseUnaryOps_8h.html#aa198852a6b380257ea3e34c8f7e6e250">operator!</a>= </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classjson__pointer.html">json_pointer</a>&lt; RefStringTypeLhs &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
@@ -20195,7 +20197,7 @@ template&lt;typename RefStringTypeLhs , typename StringType  = typename json_poi
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool operator!= </td>
+          <td class="memname">bool <a class="el" href="ArrayCwiseUnaryOps_8h.html#aa198852a6b380257ea3e34c8f7e6e250">operator!</a>= </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> <a class="el" href="classjson__pointer.html">json_pointer</a>&lt; RefStringTypeLhs &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
@@ -20234,7 +20236,7 @@ template&lt;typename RefStringTypeRhs , typename StringType  = typename json_poi
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool operator!= </td>
+          <td class="memname">bool <a class="el" href="ArrayCwiseUnaryOps_8h.html#aa198852a6b380257ea3e34c8f7e6e250">operator!</a>= </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="zconf_8h.html#a2c212835823e3c54a8ab6d95c652660e">const</a> StringType &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>

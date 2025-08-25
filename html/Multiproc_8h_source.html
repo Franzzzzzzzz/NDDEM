@@ -98,7 +98,7 @@ $(function() {
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  {</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;it_array_beg.size() ; i++)</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      it_array_beg[i] = null_list.v.begin() ; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;size(CLp) ; i++)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0 ; i&lt;<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>(CLp) ; i++)</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    {</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keywordtype">int</span> curi = -1 ; </div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">auto</span> it = CLp[i].v.begin() ; it!=CLp[i].v.end() ; it++)</div>
@@ -315,7 +315,7 @@ $(function() {
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="comment">  }*/</span></div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  </div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="keywordtype">void</span> splitcells(<span class="keywordtype">int</span> C) ; </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keyword">auto</span> contacts2array (<a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> exp, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="code" href="classParameters.html">Parameters&lt;d&gt;</a> &amp;P) ; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keyword">auto</span> contacts2array (<a class="code" href="group__DEM.html#ga513959f26fd4469592593d8e13e8eba1">ExportData</a> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a2500b5d4f377a445cb98d3f1facfa1cf">exp</a>, <a class="code" href="group__DEM.html#gaaee07f7198d82fae2bc0b65da1c43582">cv2d</a> &amp;X, <a class="code" href="classParameters.html">Parameters&lt;d&gt;</a> &amp;P) ; </div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  </div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  </div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  </div>
@@ -414,17 +414,17 @@ $(function() {
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  </div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  Delta = 4*Nd*Nd + 4 * (-2 * Nd * share[i] + share[i]*double(share[i]) - 2 * Area) ; </div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  <span class="keywordflow">if</span> (Delta&lt;0) {printf(<span class="stringliteral">&quot;Error: Quadratic equation has no solution(multiproc)\n&quot;</span>) ; fflush(stdout)  ; fallback = true ; break ;}</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  b1=(Nd-sqrt(Delta)/2.) ;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  b2=(Nd+sqrt(Delta)/2.) ;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  b1=(Nd-<a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(Delta)/2.) ;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  b2=(Nd+<a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(Delta)/2.) ;</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="keywordflow">if</span> (b1&gt;=0 &amp;&amp; b1&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  {</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b1 %d %d\n&quot;</span>, i, <span class="keywordtype">int</span>(floor(b1)), <span class="keywordtype">int</span>(floor(b2))) ;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    share[i+1]=share[i]+int(floor(b1)) ;</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b1 %d %d\n&quot;</span>, i, <span class="keywordtype">int</span>(<a class="code" href="ArrayCwiseUnaryOps_8h.html#a3230e10964844c34fb73eaccc84dc8a7">floor</a>(b1)), <span class="keywordtype">int</span>(<a class="code" href="ArrayCwiseUnaryOps_8h.html#a3230e10964844c34fb73eaccc84dc8a7">floor</a>(b2))) ;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    share[i+1]=share[i]+int(<a class="code" href="ArrayCwiseUnaryOps_8h.html#a3230e10964844c34fb73eaccc84dc8a7">floor</a>(b1)) ;</div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  }</div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (b2&gt;=0 &amp;&amp; b2&lt;<a class="code" href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a>)</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  {</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b2 %d\n&quot;</span>, i, <span class="keywordtype">int</span>(floor(b2))) ;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    share[i+1]=share[i]+int(floor(b2)) ;</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    printf(<span class="stringliteral">&quot;%d Using b2 %d\n&quot;</span>, i, <span class="keywordtype">int</span>(<a class="code" href="ArrayCwiseUnaryOps_8h.html#a3230e10964844c34fb73eaccc84dc8a7">floor</a>(b2))) ;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    share[i+1]=share[i]+int(<a class="code" href="ArrayCwiseUnaryOps_8h.html#a3230e10964844c34fb73eaccc84dc8a7">floor</a>(b2)) ;</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  }</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keywordflow">else</span> printf(<span class="stringliteral">&quot;No solution ...&quot;</span>) ;</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;}</div>
@@ -449,7 +449,7 @@ $(function() {
 <div class="line"><a name="l00385"></a><span class="lineno"><a class="line" href="group__DEM.html#ga09cbf4014b6f64277c0cfd25c1caad11">  385</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#ga09cbf4014b6f64277c0cfd25c1caad11">Multiproc&lt;d&gt;::delaying</a> (<span class="keywordtype">int</span> ID, <span class="keywordtype">int</span> j, <a class="code" href="classAction.html">Action&lt;d&gt;</a> &amp; act)</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;{</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  delayed_size[ID]++ ;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keywordflow">if</span> (delayed_size[ID] &lt; delayedj[ID].size())</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keywordflow">if</span> (delayed_size[ID] &lt; delayedj[ID].<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>())</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  {</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    delayed[ID][delayed_size[ID]-1]=act ;</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    delayedj[ID][delayed_size[ID]-1]=j ;</div>
@@ -466,7 +466,7 @@ $(function() {
 <div class="line"><a name="l00402"></a><span class="lineno"><a class="line" href="group__DEM.html#gac8eab4d302e80bfdef717daddf7bc194">  402</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__DEM.html#gac8eab4d302e80bfdef717daddf7bc194">Multiproc&lt;d&gt;::delayingwall</a> (<span class="keywordtype">int</span> ID, <span class="keywordtype">int</span> j, <a class="code" href="classAction.html">Action&lt;d&gt;</a> &amp; act)</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;{</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  delayedwall_size[ID]++ ;</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  <span class="keywordflow">if</span> (delayedwall_size[ID] &lt; delayedwallj[ID].size())</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  <span class="keywordflow">if</span> (delayedwall_size[ID] &lt; delayedwallj[ID].<a class="code" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">size</a>())</div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  {</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    delayedwall[ID][delayedwall_size[ID]-1]=act ;</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    delayedwallj[ID][delayedwall_size[ID]-1]=j ;</div>
@@ -509,7 +509,7 @@ $(function() {
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  <span class="keywordtype">bool</span> doloadbalance = false ;</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) <span class="comment">// Checking that it&#39;s worth balancing the load</span></div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  {</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordflow">if</span> (abs(1-timing_forces[i]/num_time/target)&gt;0.1)</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">abs</a>(1-timing_forces[i]/num_time/target)&gt;0.1)</div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      doloadbalance = true ;</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  }</div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keywordflow">if</span> (!doloadbalance)</div>
@@ -586,7 +586,7 @@ $(function() {
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    <span class="keywordtype">bool</span> doloadbalance = false ;</div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0 ; i&lt;P ; i++) <span class="comment">// Checking that it&#39;s worth balancing the load</span></div>
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    {</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;      <span class="keywordflow">if</span> (abs(1-timing_contacts[i]/num_time/target)&gt;0.1)</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">abs</a>(1-timing_contacts[i]/num_time/target)&gt;0.1)</div>
 <div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;        doloadbalance = true ;</div>
 <div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    }</div>
 <div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    <span class="keywordflow">if</span> (!doloadbalance)</div>
@@ -696,6 +696,10 @@ $(function() {
 <div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;}</div>
 <div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160; </div>
+<div class="ttc" id="aArrayCwiseUnaryOps_8h_html_a2500b5d4f377a445cb98d3f1facfa1cf"><div class="ttname"><a href="ArrayCwiseUnaryOps_8h.html#a2500b5d4f377a445cb98d3f1facfa1cf">exp</a></div><div class="ttdeci">EIGEN_DEVICE_FUNC const ExpReturnType exp() const</div><div class="ttdef"><b>Definition:</b> ArrayCwiseUnaryOps.h:97</div></div>
+<div class="ttc" id="aArrayCwiseUnaryOps_8h_html_a3230e10964844c34fb73eaccc84dc8a7"><div class="ttname"><a href="ArrayCwiseUnaryOps_8h.html#a3230e10964844c34fb73eaccc84dc8a7">floor</a></div><div class="ttdeci">EIGEN_DEVICE_FUNC const FloorReturnType floor() const</div><div class="ttdef"><b>Definition:</b> ArrayCwiseUnaryOps.h:481</div></div>
+<div class="ttc" id="aArrayCwiseUnaryOps_8h_html_a35560f7dbf19244fda7e463d14157c43"><div class="ttname"><a href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">abs</a></div><div class="ttdeci">EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const AbsReturnType abs() const</div><div class="ttdef"><b>Definition:</b> ArrayCwiseUnaryOps.h:52</div></div>
+<div class="ttc" id="aArrayCwiseUnaryOps_8h_html_a656b9217a2fcb6de59dc8d1eb3079cc7"><div class="ttname"><a href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a></div><div class="ttdeci">EIGEN_DEVICE_FUNC const SqrtReturnType sqrt() const</div><div class="ttdef"><b>Definition:</b> ArrayCwiseUnaryOps.h:187</div></div>
 <div class="ttc" id="aCoarseGraining_2Parameters_8h_html"><div class="ttname"><a href="CoarseGraining_2Parameters_8h.html">Parameters.h</a></div></div>
 <div class="ttc" id="aContactList_8h_html"><div class="ttname"><a href="ContactList_8h.html">ContactList.h</a></div></div>
 <div class="ttc" id="aContacts_8h_html"><div class="ttname"><a href="Contacts_8h.html">Contacts.h</a></div></div>
@@ -761,6 +765,7 @@ $(function() {
 <div class="ttc" id="agroup__DEM_html_gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac"><div class="ttname"><a href="group__DEM.html#gga513959f26fd4469592593d8e13e8eba1afd0b2fc61973aa20e3b2cdc0c94746ac">ExportData::GHOSTDIR</a></div><div class="ttdeci">@ GHOSTDIR</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga234b9e563972a04e7cf0b991133f81fd"><div class="ttname"><a href="group__Texturing.html#ga234b9e563972a04e7cf0b991133f81fd">d</a></div><div class="ttdeci">uint d</div></div>
 <div class="ttc" id="agroup__Texturing_html_ga7722c8ecbb62d99aee7ce68b1752f337"><div class="ttname"><a href="group__Texturing.html#ga7722c8ecbb62d99aee7ce68b1752f337">N</a></div><div class="ttdeci">int N</div></div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_aa3c1588240009c3c17b3e477512b2ffd"><div class="ttname"><a href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">Eigen::internal::size</a></div><div class="ttdeci">EIGEN_CONSTEXPR Index size(const T &amp;x)</div><div class="ttdef"><b>Definition:</b> Meta.h:479</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdef"><b>Definition:</b> json.hpp:5678</div></div>
 <div class="ttc" id="astructCLp__it__t_html"><div class="ttname"><a href="structCLp__it__t.html">CLp_it_t</a></div><div class="ttdoc">Simple packing structure for the iterators to the contact list regions per particle.</div><div class="ttdef"><b>Definition:</b> Multiproc.h:23</div></div>
 <div class="ttc" id="astructCLp__it__t_html_a188cd8d27600cd8c5d2367fb9d92cb05"><div class="ttname"><a href="structCLp__it__t.html#a188cd8d27600cd8c5d2367fb9d92cb05">CLp_it_t::init</a></div><div class="ttdeci">void init(int N, int P)</div><div class="ttdef"><b>Definition:</b> Multiproc.h:24</div></div>

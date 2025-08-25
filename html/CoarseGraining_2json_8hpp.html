@@ -18545,25 +18545,27 @@ Variables</h2></td></tr>
 <div class="line">    {                                                                                           \</div>
 <div class="line">        static_assert(<a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">std::is_enum&lt;ENUM_TYPE&gt;::value</a>, #ENUM_TYPE <span class="stringliteral">&quot; must be an enum!&quot;</span>);          \</div>
 <div class="line">        static <span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt; m[] = __VA_ARGS__;                     \</div>
-<div class="line">        auto it = std::find_if(std::begin(m), std::end(m),                                      \</div>
+<div class="line">        auto it = std::find_if(std::begin(m), <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m),                                      \</div>
 <div class="line">                               [e](<span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt;&amp; ej_pair) -&gt; <span class="keywordtype">bool</span>  \</div>
 <div class="line">        {                                                                                       \</div>
 <div class="line">            return ej_pair.first == e;                                                          \</div>
 <div class="line">        });                                                                                     \</div>
-<div class="line">        j = ((it != std::end(m)) ? it : std::begin(m))-&gt;second;                                 \</div>
+<div class="line">        j = ((it != <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m)) ? it : std::begin(m))-&gt;second;                                 \</div>
 <div class="line">    }                                                                                           \</div>
 <div class="line">    template&lt;typename BasicJsonType&gt;                                                            \</div>
 <div class="line">    inline <span class="keywordtype">void</span> <a class="code" href="namespacenlohmann_1_1detail.html#aef5c8ea108f4d2b03fb4a635617510de">from_json</a>(<span class="keyword">const</span> BasicJsonType&amp; j, ENUM_TYPE&amp; e)                                 \</div>
 <div class="line">    {                                                                                           \</div>
 <div class="line">        static_assert(<a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">std::is_enum&lt;ENUM_TYPE&gt;::value</a>, #ENUM_TYPE <span class="stringliteral">&quot; must be an enum!&quot;</span>);          \</div>
 <div class="line">        static <span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt; m[] = __VA_ARGS__;                     \</div>
-<div class="line">        auto it = std::find_if(std::begin(m), std::end(m),                                      \</div>
+<div class="line">        auto it = std::find_if(std::begin(m), <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m),                                      \</div>
 <div class="line">                               [&amp;j](<span class="keyword">const</span> std::pair&lt;ENUM_TYPE, BasicJsonType&gt;&amp; ej_pair) -&gt; <span class="keywordtype">bool</span> \</div>
 <div class="line">        {                                                                                       \</div>
 <div class="line">            return ej_pair.second == j;                                                         \</div>
 <div class="line">        });                                                                                     \</div>
-<div class="line">        e = ((it != std::end(m)) ? it : std::begin(m))-&gt;first;                                  \</div>
+<div class="line">        e = ((it != <a class="code" href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">std::end</a>(m)) ? it : std::begin(m))-&gt;<a class="code" href="namespaceEigen_1_1internal.html#aa931747bff074d6cacefff640074a4f9">first</a>;                                  \</div>
 <div class="line">    }</div>
+<div class="ttc" id="anamespaceEigen_1_1internal_html_aa931747bff074d6cacefff640074a4f9"><div class="ttname"><a href="namespaceEigen_1_1internal.html#aa931747bff074d6cacefff640074a4f9">Eigen::internal::first</a></div><div class="ttdeci">EIGEN_CONSTEXPR Index first(const T &amp;x) EIGEN_NOEXCEPT</div><div class="ttdef"><b>Definition:</b> IndexedViewHelper.h:81</div></div>
+<div class="ttc" id="anamespaceEigen_1_1placeholders_html_a24a00ff0f09137dcde6952ff29fb9f9d"><div class="ttname"><a href="namespaceEigen_1_1placeholders.html#a24a00ff0f09137dcde6952ff29fb9f9d">Eigen::placeholders::end</a></div><div class="ttdeci">static EIGEN_DEPRECATED const end_t end</div><div class="ttdef"><b>Definition:</b> IndexedViewHelper.h:181</div></div>
 <div class="ttc" id="apointer_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; T2 value</div><div class="ttdef"><b>Definition:</b> pointer.h:1282</div></div>
 </div><!-- fragment -->
 <p>macro to briefly define a mapping between an enum and JSON </p>

@@ -258,11 +258,11 @@ $(function() {
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  {</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      <span class="keywordtype">double</span> Rstar = (ri*rj)/(ri+rj) ;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <span class="keywordtype">double</span> Mstar = (mi*mj)/(mi+mj) ;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = sqrt(ovlp*Rstar) ;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = <a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(ovlp*Rstar) ;</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      kn = P-&gt;Kn * sqrtovlpR;</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      kt = P-&gt;Kt * sqrtovlpR;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      gamman = P-&gt;Gamman * sqrt(Mstar * kn);</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      gammat = P-&gt;Gammat * sqrt(Mstar * kt);</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      gamman = P-&gt;Gamman * <a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(Mstar * kn);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      gammat = P-&gt;Gammat * <a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(Mstar * kt);</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  }</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  {</div>
@@ -341,7 +341,7 @@ $(function() {
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="keywordtype">double</span> kn, kt, gamman, gammat ;</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="keywordflow">if</span> (P-&gt;ContactModel == <a class="code" href="group__DEM.html#gga823000505b0f0b93416074a98e1b7078a2b65c81040f82876138e37991162eb62">HERTZ</a>)</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  {</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = sqrt(ovlp*ri) ;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = <a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(ovlp*ri) ;</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      kn = P-&gt;Kn * sqrtovlpR;</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      kt = P-&gt;Kt * sqrtovlpR;</div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      gamman = P-&gt;Gamman * mi * sqrtovlpR;</div>
@@ -411,7 +411,7 @@ $(function() {
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <span class="keywordtype">double</span> kn, kt, gamman, gammat ;</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="keywordflow">if</span> (P-&gt;ContactModel == <a class="code" href="group__DEM.html#gga823000505b0f0b93416074a98e1b7078a2b65c81040f82876138e37991162eb62">HERTZ</a>)</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  {</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = sqrt(ovlp*ri) ;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = <a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(ovlp*ri) ;</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;      kn = P-&gt;Kn * sqrtovlpR;</div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;      kt = P-&gt;Kt * sqrtovlpR;</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;      gamman = P-&gt;Gamman * mi * sqrtovlpR;</div>
@@ -482,7 +482,7 @@ $(function() {
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <span class="keywordtype">double</span> kn, kt, gamman, gammat ;</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="keywordflow">if</span> (P-&gt;ContactModel == <a class="code" href="group__DEM.html#gga823000505b0f0b93416074a98e1b7078a2b65c81040f82876138e37991162eb62">HERTZ</a>)</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  {</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = sqrt(ovlp*ri) ;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;      <span class="keywordtype">double</span> sqrtovlpR = <a class="code" href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a>(ovlp*ri) ;</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      kn = P-&gt;Kn * sqrtovlpR;</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;      kt = P-&gt;Kt * sqrtovlpR;</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      gamman = P-&gt;Gamman * mi * sqrtovlpR;</div>
@@ -536,6 +536,7 @@ $(function() {
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160; </div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aArrayCwiseUnaryOps_8h_html_a656b9217a2fcb6de59dc8d1eb3079cc7"><div class="ttname"><a href="ArrayCwiseUnaryOps_8h.html#a656b9217a2fcb6de59dc8d1eb3079cc7">sqrt</a></div><div class="ttdeci">EIGEN_DEVICE_FUNC const SqrtReturnType sqrt() const</div><div class="ttdef"><b>Definition:</b> ArrayCwiseUnaryOps.h:187</div></div>
 <div class="ttc" id="aCoarseGraining_2Parameters_8h_html"><div class="ttname"><a href="CoarseGraining_2Parameters_8h.html">Parameters.h</a></div></div>
 <div class="ttc" id="aCoarseGraining_2Typedefs_8h_html"><div class="ttname"><a href="CoarseGraining_2Typedefs_8h.html">Typedefs.h</a></div></div>
 <div class="ttc" id="aContactList_8h_html"><div class="ttname"><a href="ContactList_8h.html">ContactList.h</a></div></div>

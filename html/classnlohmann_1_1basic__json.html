@@ -1873,7 +1873,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 </blockquote>
 <p>When the default type is used, the maximal integer number that can be stored is <code>9223372036854775807</code> (INT64_MAX) and the minimal integer number that can be stored is <code>-9223372036854775808</code> (INT64_MIN). Integer numbers that are out of range will yield over/underflow when used in a constructor. During deserialization, too large or small integer numbers will be automatically be stored as <a class="el" href="classnlohmann_1_1basic__json.html#ae09af9c23351b7245d9be4d1b2035fef">number_unsigned_t</a> or <a class="el" href="classnlohmann_1_1basic__json.html#a5b8abaebd922d82d69756327c0c347e6">number_float_t</a>.</p>
 <p><a href="http://rfc7159.net/rfc7159">RFC 7159</a> further states: </p><blockquote class="doxtable">
-<p>Note that when such software is used, numbers that are integers and are in the range <img class="formulaInl" alt="$[-2^{53}+1, 2^{53}-1]$" src="form_8.png"/> are interoperable in the sense that implementations will agree exactly on their numeric values. </p>
+<p>Note that when such software is used, numbers that are integers and are in the range <img class="formulaInl" alt="$[-2^{53}+1, 2^{53}-1]$" src="form_188.png"/> are interoperable in the sense that implementations will agree exactly on their numeric values. </p>
 </blockquote>
 <p>As this range is a subrange of the exactly supported range [INT64_MIN, INT64_MAX], this class's integer type is interoperable.</p>
 <h4>Storage</h4>
@@ -1920,7 +1920,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 </blockquote>
 <p>When the default type is used, the maximal integer number that can be stored is <code>18446744073709551615</code> (UINT64_MAX) and the minimal integer number that can be stored is <code>0</code>. Integer numbers that are out of range will yield over/underflow when used in a constructor. During deserialization, too large or small integer numbers will be automatically be stored as <a class="el" href="classnlohmann_1_1basic__json.html#a11e390944da90db83089eb2426a749d3">number_integer_t</a> or <a class="el" href="classnlohmann_1_1basic__json.html#a5b8abaebd922d82d69756327c0c347e6">number_float_t</a>.</p>
 <p><a href="http://rfc7159.net/rfc7159">RFC 7159</a> further states: </p><blockquote class="doxtable">
-<p>Note that when such software is used, numbers that are integers and are in the range <img class="formulaInl" alt="$[-2^{53}+1, 2^{53}-1]$" src="form_8.png"/> are interoperable in the sense that implementations will agree exactly on their numeric values. </p>
+<p>Note that when such software is used, numbers that are integers and are in the range <img class="formulaInl" alt="$[-2^{53}+1, 2^{53}-1]$" src="form_188.png"/> are interoperable in the sense that implementations will agree exactly on their numeric values. </p>
 </blockquote>
 <p>As this range is a subrange (when considered in conjunction with the number_integer_t type) of the exactly supported range [0, UINT64_MAX], this class's integer type is interoperable.</p>
 <h4>Storage</h4>
@@ -2397,7 +2397,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <p>With the default values for <em>StringType</em> (<code>std::string</code>), the default value for <em>string_t</em> is:</p>
 <div class="fragment"><div class="line">std::string</div>
 </div><!-- fragment --><h4>Encoding</h4>
-<p>Strings are stored in UTF-8 encoding. Therefore, functions like <code>std::string::size()</code> or <code>std::string::length()</code> return the number of bytes in the string rather than the number of characters or glyphs.</p>
+<p>Strings are stored in UTF-8 encoding. Therefore, functions like <code><a class="el" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">std::string::size()</a></code> or <code>std::string::length()</code> return the number of bytes in the string rather than the number of characters or glyphs.</p>
 <h4>String comparison</h4>
 <p><a href="http://rfc7159.net/rfc7159">RFC 7159</a> states: </p><blockquote class="doxtable">
 <p>Software implementations are typically required to test names of object members for equality. Implementations that transform the textual representation into sequences of Unicode code units and then perform the comparison numerically, code unit by code unit, are interoperable in the sense that implementations will agree in all cases on equality or inequality of two strings. For example, implementations that compare strings with escaped characters unconverted may incorrectly find that <code>"a\\b"</code> and <code>"a\u005Cb"</code> are not equal. </p>
@@ -8450,7 +8450,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>iterator pointing to the first element inserted, or <em>pos</em> if <code>ilist</code> is empty</dd></dl>
-<p>@complexity Linear in <code>ilist.size()</code> plus linear in the distance between <em>pos</em> and end of the container.</p>
+<p>@complexity Linear in <code><a class="el" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">ilist.size()</a></code> plus linear in the distance between <em>pos</em> and end of the container.</p>
 <p>@liveexample{The example shows how <code><a class="el" href="classnlohmann_1_1basic__json.html#aeb86e8478e20d95970a8b61ff01dce3b" title="inserts element">insert()</a></code> is used.,insert__ilist}</p>
 <dl class="section since"><dt>Since</dt><dd>version 1.0.0 </dd></dl>
 
@@ -9229,7 +9229,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <p>@exceptionsafety Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
 <p>@complexity Constant.</p>
 <dl class="section note"><dt>Note</dt><dd>The name of this function is not yet final and may change in the future.</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000014">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in future 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#a916a6ba75ec7624e9c6c977a52d6fd17">items()</a> instead; that is, replace <code>json::iterator_wrapper(j)</code> with <code>j.items()</code>. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000051">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in future 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#a916a6ba75ec7624e9c6c977a52d6fd17">items()</a> instead; that is, replace <code>json::iterator_wrapper(j)</code> with <code>j.items()</code>. </dd></dl>
 
 </div>
 </div>
@@ -9289,7 +9289,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <p>@exceptionsafety Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
 <p>@complexity Constant.</p>
 <dl class="section note"><dt>Note</dt><dd>The name of this function is not yet final and may change in the future.</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000014">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in future 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#a916a6ba75ec7624e9c6c977a52d6fd17">items()</a> instead; that is, replace <code>json::iterator_wrapper(j)</code> with <code>j.items()</code>. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000051">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in future 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#a916a6ba75ec7624e9c6c977a52d6fd17">items()</a> instead; that is, replace <code>json::iterator_wrapper(j)</code> with <code>j.items()</code>. </dd></dl>
 
 </div>
 </div>
@@ -9824,7 +9824,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <p>@exceptionsafety No-throw guarantee: this function never throws exceptions.</p>
 <p>@requirement This function helps <code><a class="el" href="classnlohmann_1_1basic__json.html" title="a class to store JSON values">basic_json</a></code> satisfying the <a href="https://en.cppreference.com/w/cpp/named_req/Container">Container</a> requirements:</p><ul>
 <li>The complexity is constant.</li>
-<li>Has the semantics of returning <code>b.size()</code> where <code>b</code> is the largest possible JSON value.</li>
+<li>Has the semantics of returning <code><a class="el" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">b.size()</a></code> where <code>b</code> is the largest possible JSON value.</li>
 </ul>
 <dl class="section see"><dt>See also</dt><dd>see <a class="el" href="classnlohmann_1_1basic__json.html#a33c7c8638bb0b12e6d1b69d8106dd2e0">size()</a> &ndash; returns the number of elements</dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 1.0.0 </dd></dl>
@@ -9860,20 +9860,21 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <p>applies a JSON Merge Patch </p>
 <p>The merge patch format is primarily intended for use with the HTTP PATCH method as a means of describing a set of modifications to a target resource's content. This function applies a merge patch to the current JSON value.</p>
 <p>The function implements the following algorithm from Section 2 of <a href="https://tools.ietf.org/html/rfc7396">RFC 7396 (JSON Merge Patch)</a>:</p>
-<div class="fragment"><div class="line">define MergePatch(Target, Patch):</div>
+<div class="fragment"><div class="line">define MergePatch(<a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a>, Patch):</div>
 <div class="line">  if Patch is an Object:</div>
-<div class="line">    if Target is not an Object:</div>
-<div class="line">      Target = {} <span class="comment">// Ignore the contents and set it to an empty Object</span></div>
+<div class="line">    if <a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a> is not an Object:</div>
+<div class="line">      <a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a> = {} <span class="comment">// Ignore the contents and set it to an empty Object</span></div>
 <div class="line">    <span class="keywordflow">for each</span> Name/<a class="code" href="classGenericValue.html">Value</a> pair in Patch:</div>
 <div class="line">      <span class="keywordflow">if</span> <a class="code" href="classGenericValue.html">Value</a> is <span class="keyword">null</span>:</div>
-<div class="line">        <span class="keywordflow">if</span> Name exists in Target:</div>
-<div class="line">          remove the Name/<a class="code" href="classGenericValue.html">Value</a> pair from Target</div>
+<div class="line">        <span class="keywordflow">if</span> Name exists in <a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a>:</div>
+<div class="line">          remove the Name/<a class="code" href="classGenericValue.html">Value</a> pair from <a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a></div>
 <div class="line">      <span class="keywordflow">else</span>:</div>
-<div class="line">        Target[Name] = MergePatch(Target[Name], <a class="code" href="classGenericValue.html">Value</a>)</div>
-<div class="line">    <span class="keywordflow">return</span> Target</div>
+<div class="line">        <a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a>[Name] = MergePatch(<a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a>[Name], <a class="code" href="classGenericValue.html">Value</a>)</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Target</a></div>
 <div class="line">  <span class="keywordflow">else</span>:</div>
 <div class="line">    <span class="keywordflow">return</span> Patch</div>
 <div class="ttc" id="aclassGenericValue_html"><div class="ttname"><a href="classGenericValue.html">GenericValue</a></div><div class="ttdoc">Represents a JSON value. Use Value for UTF8 encoding and default allocator.</div><div class="ttdef"><b>Definition:</b> document.h:585</div></div>
+<div class="ttc" id="anamespaceEigen_1_1Architecture_html_ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7"><div class="ttname"><a href="namespaceEigen_1_1Architecture.html#ae54c092bdb3a978b9aa8cc50dcafc13cabc74b8591881b6f1d2c17bd0799362e7">Eigen::Architecture::Target</a></div><div class="ttdeci">@ Target</div><div class="ttdef"><b>Definition:</b> Constants.h:492</div></div>
 </div><!-- fragment --><p>Thereby, <code>Target</code> is the current object; that is, the patch is applied to the current value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -11763,9 +11764,9 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">binary   </td><td class="markdownTableBodyNone"><code>1</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">object   </td><td class="markdownTableBodyNone">result of function object_t::size()    </td></tr>
+<td class="markdownTableBodyNone">object   </td><td class="markdownTableBodyNone">result of function <a class="el" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">object_t::size()</a>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">array   </td><td class="markdownTableBodyNone">result of function array_t::size()   </td></tr>
+<td class="markdownTableBodyNone">array   </td><td class="markdownTableBodyNone">result of function <a class="el" href="namespaceEigen_1_1internal.html#aa3c1588240009c3c17b3e477512b2ffd">array_t::size()</a>   </td></tr>
 </table>
 </dd></dl>
 <p>@liveexample{The following code calls <code><a class="el" href="classnlohmann_1_1basic__json.html#a33c7c8638bb0b12e6d1b69d8106dd2e0" title="returns the number of elements">size()</a></code> on the different value types.,size}</p>
@@ -13681,7 +13682,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool operator!= </td>
+          <td class="memname">bool <a class="el" href="ArrayCwiseUnaryOps_8h.html#aa198852a6b380257ea3e34c8f7e6e250">operator!</a>= </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a>&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
@@ -13736,7 +13737,7 @@ template&lt;typename ScalarType , typename std::enable_if&lt; std::is_scalar&lt;
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool operator!= </td>
+          <td class="memname">bool <a class="el" href="ArrayCwiseUnaryOps_8h.html#aa198852a6b380257ea3e34c8f7e6e250">operator!</a>= </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a>&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
@@ -13791,7 +13792,7 @@ template&lt;typename ScalarType , typename std::enable_if&lt; std::is_scalar&lt;
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool operator!= </td>
+          <td class="memname">bool <a class="el" href="ArrayCwiseUnaryOps_8h.html#aa198852a6b380257ea3e34c8f7e6e250">operator!</a>= </td>
           <td>(</td>
           <td class="paramtype">ScalarType&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
@@ -14044,7 +14045,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 </div><div class="memdoc">
 
 <p>deserialize from stream </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000016">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in version 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#aaf363408931d76472ded14017e59c9e8">operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</a> instead; that is, replace calls like <code>j &lt;&lt; i;</code> with <code>i &gt;&gt; j;</code>. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000053">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in version 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#aaf363408931d76472ded14017e59c9e8">operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</a> instead; that is, replace calls like <code>j &lt;&lt; i;</code> with <code>i &gt;&gt; j;</code>. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 1.0.0; deprecated since version 3.0.0 </dd></dl>
 
 </div>
@@ -14319,8 +14320,9 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <dl class="section note"><dt>Note</dt><dd>Floating-point inside JSON values numbers are compared with <code>json::number_float_t::operator==</code> which is <code>double::operator==</code> by default. To compare floating-point while respecting an epsilon, an alternative <a href="https://github.com/mariokonrad/marnav/blob/master/include/marnav/math/floatingpoint.hpp#L34-#L39">comparison function</a> could be used, for instance <div class="fragment"><div class="line"><a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">template&lt;typename T, typename = typename std::enable_if&lt;std::is_floating_point&lt;T&gt;::value</a>, T&gt;<a class="code" href="classnlohmann_1_1basic__json.html#a5b7c4b35a0ad9f97474912a08965d7ad">::type</a>&gt;</div>
 <div class="line"><span class="keyword">inline</span> <span class="keywordtype">bool</span> is_same(T <a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, T b, T epsilon = std::numeric_limits&lt;T&gt;::epsilon()) noexcept</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordflow">return</span> std::abs(<a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> - b) &lt;= epsilon;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">std::abs</a>(<a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> - b) &lt;= epsilon;</div>
 <div class="line">}</div>
+<div class="ttc" id="aArrayCwiseUnaryOps_8h_html_a35560f7dbf19244fda7e463d14157c43"><div class="ttname"><a href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">abs</a></div><div class="ttdeci">EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const AbsReturnType abs() const</div><div class="ttdef"><b>Definition:</b> ArrayCwiseUnaryOps.h:52</div></div>
 <div class="ttc" id="apointer_8h_html_a32aff7c6c4cd253fdf6563677afab5ce"><div class="ttname"><a href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">value</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; T2 value</div><div class="ttdef"><b>Definition:</b> pointer.h:1282</div></div>
 <div class="ttc" id="apointer_8h_html_aeeddce917cf130d62c370b8f216026dd"><div class="ttname"><a href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a></div><div class="ttdeci">const GenericPointer&lt; typename T::ValueType &gt; T2 T::AllocatorType &amp; a</div><div class="ttdef"><b>Definition:</b> pointer.h:1181</div></div>
 </div><!-- fragment --> Or you can self-defined operator equal function like this: <div class="fragment"><div class="line"><span class="keywordtype">bool</span> my_equal(<a class="code" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a> lhs, <a class="code" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a> rhs) {</div>
@@ -14330,7 +14332,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 <div class="line">    <span class="keywordflow">switch</span>(lhs_type)</div>
 <div class="line">        <span class="comment">// self_defined case</span></div>
 <div class="line">        <span class="keywordflow">case</span> <a class="code" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985ad9966ecb59667235a57b4b999a649eef">value_t::number_float</a>:</div>
-<div class="line">            <span class="keywordflow">return</span> std::abs(lhs - rhs) &lt;= std::numeric_limits&lt;float&gt;::epsilon();</div>
+<div class="line">            <span class="keywordflow">return</span> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">std::abs</a>(lhs - rhs) &lt;= std::numeric_limits&lt;float&gt;::epsilon();</div>
 <div class="line">        <span class="comment">// other cases remain the same with the original</span></div>
 <div class="line">        ...</div>
 <div class="line">}</div>
@@ -14403,7 +14405,7 @@ template&lt;typename ScalarType , typename std::enable_if&lt; std::is_scalar&lt;
 <dl class="section note"><dt>Note</dt><dd>Floating-point inside JSON values numbers are compared with <code>json::number_float_t::operator==</code> which is <code>double::operator==</code> by default. To compare floating-point while respecting an epsilon, an alternative <a href="https://github.com/mariokonrad/marnav/blob/master/include/marnav/math/floatingpoint.hpp#L34-#L39">comparison function</a> could be used, for instance <div class="fragment"><div class="line"><a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">template&lt;typename T, typename = typename std::enable_if&lt;std::is_floating_point&lt;T&gt;::value</a>, T&gt;<a class="code" href="classnlohmann_1_1basic__json.html#a5b7c4b35a0ad9f97474912a08965d7ad">::type</a>&gt;</div>
 <div class="line"><span class="keyword">inline</span> <span class="keywordtype">bool</span> is_same(T <a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, T b, T epsilon = std::numeric_limits&lt;T&gt;::epsilon()) noexcept</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordflow">return</span> std::abs(<a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> - b) &lt;= epsilon;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">std::abs</a>(<a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> - b) &lt;= epsilon;</div>
 <div class="line">}</div>
 </div><!-- fragment --> Or you can self-defined operator equal function like this: <div class="fragment"><div class="line"><span class="keywordtype">bool</span> my_equal(<a class="code" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a> lhs, <a class="code" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a> rhs) {</div>
 <div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> lhs_type lhs.type();</div>
@@ -14412,7 +14414,7 @@ template&lt;typename ScalarType , typename std::enable_if&lt; std::is_scalar&lt;
 <div class="line">    <span class="keywordflow">switch</span>(lhs_type)</div>
 <div class="line">        <span class="comment">// self_defined case</span></div>
 <div class="line">        <span class="keywordflow">case</span> <a class="code" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985ad9966ecb59667235a57b4b999a649eef">value_t::number_float</a>:</div>
-<div class="line">            <span class="keywordflow">return</span> std::abs(lhs - rhs) &lt;= std::numeric_limits&lt;float&gt;::epsilon();</div>
+<div class="line">            <span class="keywordflow">return</span> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">std::abs</a>(lhs - rhs) &lt;= std::numeric_limits&lt;float&gt;::epsilon();</div>
 <div class="line">        <span class="comment">// other cases remain the same with the original</span></div>
 <div class="line">        ...</div>
 <div class="line">}</div>
@@ -14483,7 +14485,7 @@ template&lt;typename ScalarType , typename std::enable_if&lt; std::is_scalar&lt;
 <dl class="section note"><dt>Note</dt><dd>Floating-point inside JSON values numbers are compared with <code>json::number_float_t::operator==</code> which is <code>double::operator==</code> by default. To compare floating-point while respecting an epsilon, an alternative <a href="https://github.com/mariokonrad/marnav/blob/master/include/marnav/math/floatingpoint.hpp#L34-#L39">comparison function</a> could be used, for instance <div class="fragment"><div class="line"><a class="code" href="pointer_8h.html#a32aff7c6c4cd253fdf6563677afab5ce">template&lt;typename T, typename = typename std::enable_if&lt;std::is_floating_point&lt;T&gt;::value</a>, T&gt;<a class="code" href="classnlohmann_1_1basic__json.html#a5b7c4b35a0ad9f97474912a08965d7ad">::type</a>&gt;</div>
 <div class="line"><span class="keyword">inline</span> <span class="keywordtype">bool</span> is_same(T <a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, T b, T epsilon = std::numeric_limits&lt;T&gt;::epsilon()) noexcept</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordflow">return</span> std::abs(<a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> - b) &lt;= epsilon;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">std::abs</a>(<a class="code" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a> - b) &lt;= epsilon;</div>
 <div class="line">}</div>
 </div><!-- fragment --> Or you can self-defined operator equal function like this: <div class="fragment"><div class="line"><span class="keywordtype">bool</span> my_equal(<a class="code" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a> lhs, <a class="code" href="classnlohmann_1_1basic__json.html#ab8a1c33ee7b154fc41ca2545aa9724e6">const_reference</a> rhs) {</div>
 <div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> lhs_type lhs.type();</div>
@@ -14492,7 +14494,7 @@ template&lt;typename ScalarType , typename std::enable_if&lt; std::is_scalar&lt;
 <div class="line">    <span class="keywordflow">switch</span>(lhs_type)</div>
 <div class="line">        <span class="comment">// self_defined case</span></div>
 <div class="line">        <span class="keywordflow">case</span> <a class="code" href="namespacenlohmann_1_1detail.html#a1ed8fc6239da25abcaf681d30ace4985ad9966ecb59667235a57b4b999a649eef">value_t::number_float</a>:</div>
-<div class="line">            <span class="keywordflow">return</span> std::abs(lhs - rhs) &lt;= std::numeric_limits&lt;float&gt;::epsilon();</div>
+<div class="line">            <span class="keywordflow">return</span> <a class="code" href="ArrayCwiseUnaryOps_8h.html#a35560f7dbf19244fda7e463d14157c43">std::abs</a>(lhs - rhs) &lt;= std::numeric_limits&lt;float&gt;::epsilon();</div>
 <div class="line">        <span class="comment">// other cases remain the same with the original</span></div>
 <div class="line">        ...</div>
 <div class="line">}</div>
@@ -14879,7 +14881,7 @@ template&lt;template&lt; typename U, typename V, typename... Args &gt; class Obj
 </div><div class="memdoc">
 
 <p>serialize to stream </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000015">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in future 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#a5e34c5435e557d0bf666bd7311211405">operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</a> instead; that is, replace calls like <code>j &gt;&gt; o;</code> with <code>o &lt;&lt; j;</code>. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000052">Deprecated:</a></b></dt><dd>This stream operator is deprecated and will be removed in future 4.0.0 of the library. Please use <a class="el" href="classnlohmann_1_1basic__json.html#a5e34c5435e557d0bf666bd7311211405">operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</a> instead; that is, replace calls like <code>j &gt;&gt; o;</code> with <code>o &lt;&lt; j;</code>. </dd></dl>
 <dl class="section since"><dt>Since</dt><dd>version 1.0.0; deprecated since version 3.0.0 </dd></dl>
 
 </div>

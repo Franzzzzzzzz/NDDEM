@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['emfunction_9692',['EMFUNCTION',['../emscripten__specific_8h.html#a0ae6f97ee5d50488c0c319b42f351e55',1,'emscripten_specific.h']]],
-  ['emmacro_9693',['EMMACRO',['../emscripten__specific_8h.html#a341da5683935cc131139b5171f390695',1,'emscripten_specific.h']]],
-  ['emmacro2_9694',['EMMACRO2',['../emscripten__specific_8h.html#a08e8db96ae1a36a2430999a33346acb2',1,'emscripten_specific.h']]]
+  ['decl_5fgssvx_32277',['DECL_GSSVX',['../SuperLUSupport_8h.html#a26929c8b7d040ff746566d2843dd4ae5',1,'SuperLUSupport.h']]],
+  ['deflateinit_32278',['deflateInit',['../zlib_8h.html#ae7440c1c5a8becba6dbf410275dc0a5c',1,'zlib.h']]],
+  ['deflateinit2_32279',['deflateInit2',['../zlib_8h.html#a59b575a521efe7ea0d3b9dd3c8d315c1',1,'zlib.h']]],
+  ['dst_5fchan_32280',['DST_CHAN',['../AltiVec_2PacketMath_8h.html#a7f85720dc12243026a123c7e98d811a2',1,'PacketMath.h']]],
+  ['dst_5fctrl_32281',['DST_CTRL',['../AltiVec_2PacketMath_8h.html#a3979203d401ea4e810ebf5430258cfa2',1,'PacketMath.h']]]
 ];

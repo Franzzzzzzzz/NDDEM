@@ -251,11 +251,11 @@ int LiggghtsReader_particles::do_post_read()
     Nitem+=nadded ;
  }
 
- const int nvalue = 13 ;
- data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz
+ const int nvalue = 17 ;
+ data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz quat
  vector<string>::iterator it ;
  vector<int> lst ;
- vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz","type"} ;
+ vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz","type", "quat1", "quat2", "quat3", "quat4"} ;
  for (size_t i=0 ; i<flst.size() ; i++)
  {
     it=std::find(fields.begin(), fields.end(), flst[i] ) ;

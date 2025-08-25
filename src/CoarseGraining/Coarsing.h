@@ -100,6 +100,7 @@ double *Imom ; ///< Particle moment of inertia
 vector <double *> pos ; ///< Particle positions
 vector <double *> vel ;  ///<Particle velocity
 vector <double *> omega ; ///< Particle angular velocity
+vector <double *> orient ; ///< Particle angular velocity
 
 v2d vel_fluc ; ///< Fluctuating velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
 v2d rot_fluc ; ///< Fluctuating angular velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
