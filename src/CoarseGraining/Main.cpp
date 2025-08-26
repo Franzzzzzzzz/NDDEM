@@ -51,6 +51,7 @@ int main(int argc, char * argv[])
         printf("This is not a legal json file, here is what we already got:\n") ;
         cout << param ;
     }
+    //cout << param ;
 
     /*std::cout << ">>>" << std::getenv("AR") << "\n" ;
     process_envvar(param) ;

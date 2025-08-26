@@ -373,6 +373,10 @@ int Param::set_data(struct Data & D)
         D.mqp[dd]   = get_data(DataValue::mqp, dd) ;
     }
 
+    D.orient.resize(4) ;
+    for (int dd=0 ; dd<4 ; dd++)
+        D.orient[dd] = get_data(DataValue::orient, dd) ;
+
     for (auto &v: D.extrafields)
     {
         for (int dd=0 ; dd<std::get<1>(v) ; dd++)

@@ -181,18 +181,23 @@ public :
     std::variant<Eigen::Matrix3d, Eigen::Quaternion<double>> original_orientation = Eigen::Quaternion<double>(0,0,0,1) ;     
 
     // Fields variable and function
-    unsigned int flags ; ///< Flags deciding which fields to coarse-grain
-    vector <string> Fields, Fname ; ///< Flagged field names
-    vector <int> Fidx ;  ///< Where the fields is referenced in the fields vector in the CGPoint. -1 if not flagged
-    vector <TensorOrder> Ftype ; ///< Flagged field types
     vector <struct Field > FIELDS ; ///< All allowed fields (initialized in grid_getfields)
+    unsigned int flags ; ///< Flags deciding which fields to coarse-grain
+    vector <int> Fidx ;  ///< Where the fields is referenced in the fields vector in the CGPoint. -1 if not flagged
+    vector <std::pair<Field *, int>> Fcols ; ///< What the columns are in the CGPoint
+
+    //vector <string> Fields, Fname ; ///< Flagged field names
+    //vector <TensorOrder> Ftype ; ///< Flagged field types
     int get_id(string nm) ; ///< Find field ID from field name
     struct Field * get_field(string nm) ; ///< Find Field from name
     Pass set_flags (vector <string> s) ; ///< Set the fields which are requested from the coarse-graining
 
     // Subfield variables and functions
-    vector <struct Field> subfields ; ///< All allowed subfields
-    vector <std::pair<struct Field *, uint16_t>> subflags ; 
+    vector <struct Field> SUBFIELDS ; ///< All allowed subfields
+    vector <std::pair<struct Field *, uint64_t>> subflags ;
+    vector <std::pair<Field *, std::vector<std::pair<Field*, int>> >> SFcols ; ///< What the subcolumns are in the CGPoint
+    uint64_t sf_mask_eigen ;
+    int grid_getsubfields() ;
     struct Field * get_subfield(string nm) ; ///< Find subfield from name
     
     // Grid functions
@@ -205,7 +210,7 @@ public :
     int grid_generate() ; ///< Generate the coarse-graining grid
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
     std::map<std::string, size_t> grid_setfields() ; ///< Set the fields at each CG point
-    vector<FieldType> grid_getfields() ; ///< Extract fields from each CG point
+    int grid_getfields() ; ///< Build the array of fields for the CG points.
     v2d get_bounds() ; ///< Extract the simulation boundaries
     CGPoint * reverseloop (string type) ; ///< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ; ///< Find the closest CG point to a particle

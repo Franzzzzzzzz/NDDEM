@@ -252,7 +252,7 @@ int LiggghtsReader_particles::do_post_read()
  }
 
  const int nvalue = 17 ;
- data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz quat
+ data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz type quat
  vector<string>::iterator it ;
  vector<int> lst ;
  vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz","type", "quat1", "quat2", "quat3", "quat4"} ;

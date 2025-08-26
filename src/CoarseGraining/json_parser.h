@@ -89,7 +89,9 @@ struct JsonValue
     JsonObject & items() 
     {
       if (type!=Type::Object)
-        throw std::runtime_error(std::string("Cannot get map from a non object")); 
+      {
+        throw std::runtime_error(std::string("Cannot get map from a non object"));
+      }
       return object_value ;
     }
     
@@ -246,7 +248,7 @@ bool JsonValue::exist (std::string key)
 std::istream& operator>>(std::istream& in, JsonValue& value) {
     std::string content((std::istreambuf_iterator<char>(in)),
                          std::istreambuf_iterator<char>());
-    value.parse(content);
+    value=value.parse(content);
     return in ; 
 }
 
