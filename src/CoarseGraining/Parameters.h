@@ -20,6 +20,7 @@ public:
   string save="" ;
   vector<string> saveformat ;
   double default_density=-1, default_radius=-1 ;
+  std::vector<double> default_sqaxes{-1.,-1.,-1.}, default_sqpower{2,2,2} ; 
 
   AverageType timeaverage = AverageType::None ;
 
@@ -94,6 +95,8 @@ void Param::from_json(json &j)
             else if (v.value().get<string>() == "Final") timeaverage = AverageType::Final ;
             else if (v.value().get<string>() == "Intermediate") timeaverage = AverageType::Intermediate ;
             else if (v.value().get<string>() == "Intermediate and Final" || v.value().get<string>() =="Final and Intermediate") timeaverage = AverageType::Both ;
+            else if (v.value().get<string>() == "Pre pass 5") timeaverage = AverageType::Pre5 ;
+            else if (v.value().get<string>() == "Intermediate and pre pass 5") timeaverage = AverageType::IntermediateAndPre5 ;
             else
                 printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final'). Case sensitive\n") ;
         }
@@ -102,6 +105,10 @@ void Param::from_json(json &j)
         else if (v.key() == "density") { default_density=v.value().get<double>() ; }
         else if (v.key() == "radius") { default_radius=v.value().get<double>() ; }
         else if (v.key() == "diameter") { default_radius=v.value().get<double>()/2. ; }
+        else if (v.key() == "superquadric") {
+            default_sqaxes = v.value()["axes"].get<decltype(default_sqaxes)>() ; 
+            default_sqpower = v.value()["shapes"].get<decltype(default_sqpower)>() ; 
+        }
         else if (v.key() == "extra fields") { process_extrafields(v.value()) ; }
         else if (v.key() == "dimension") {dim = v.value().get<int>() ; requiredfieldset[v.key()] = true ; }
         else printf("Unknown json key: %s.\n", v.key().c_str()) ;
@@ -183,6 +190,10 @@ void Param::post_init()
     if (default_radius!=-1)
         for (auto &v: files)
             v.reader->set_default_radius(default_radius) ;
+    
+    if (default_sqaxes[0] != -1) 
+        for (auto &v: files)
+            v.reader->set_default_superquadric(default_sqaxes[0], default_sqaxes[1], default_sqaxes[2], default_sqpower[3], default_sqpower[4], default_sqpower[5]) ;
 
     for (auto &v: files)
       v.reader->post_init() ;
@@ -200,6 +211,7 @@ Windows Param::identify_window(std::string windowstr)
     else if ( windowstr=="Rect3DIntersect")  {printf("====> DEPRECATED: misleading name, use Sphere3DIntersect instead. <=======\n") ; return Windows::Sphere3DIntersect ;}
     else if ( windowstr=="Sphere3DIntersect") return Windows::Sphere3DIntersect ;
     else if ( windowstr=="SphereNDIntersect") return Windows::SphereNDIntersect ;
+    else if ( windowstr=="Sphere3DIntersect_MonteCarlo") return Windows::Sphere3DIntersect_MonteCarlo ; 
     else if ( windowstr=="Lucy3D") return Windows::Lucy3D ;
     else if ( windowstr=="Hann3D") return Windows::Hann3D ;
     else if ( windowstr=="RectND") return Windows::RectND ;
@@ -376,6 +388,10 @@ int Param::set_data(struct Data & D)
     D.orient.resize(4) ;
     for (int dd=0 ; dd<4 ; dd++)
         D.orient[dd] = get_data(DataValue::orient, dd) ;
+    
+    D.superquadric.resize(6) ; 
+    for (int dd=0 ; dd<6 ; dd++)
+        D.superquadric[dd] = get_data(DataValue::superquadric, dd) ; 
 
     for (auto &v: D.extrafields)
     {

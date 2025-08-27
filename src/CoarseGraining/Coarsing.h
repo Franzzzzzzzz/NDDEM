@@ -62,7 +62,7 @@ double Volume (int d , double R) ; ///< Compute a sphere volume in dimension D
 
 enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2} ;
 enum FieldType {Defined, Particle, Fluctuation, Contact} ;
-enum AverageType {None, Final, Intermediate, Both} ;
+enum AverageType {None, Final, Intermediate, Both, Pre5, IntermediateAndPre5} ;
 enum Pass {Pass1=1, Pass2=2, Pass3=4, Pass4=8, Pass5=16,
            VelFluct=256, RotFluct=512} ;
 
@@ -106,7 +106,10 @@ double *Imom ; ///< Particle moment of inertia
 vector <double *> pos ; ///< Particle positions
 vector <double *> vel ;  ///<Particle velocity
 vector <double *> omega ; ///< Particle angular velocity
-vector <double *> orient ; ///< Particle angular velocity
+vector <double *> orient ; ///< Particle orientation (quaternions)
+
+// Superquadrics
+vector <double *> superquadric ; ///< Superquadrics information
 
 v2d vel_fluc ; ///< Fluctuating velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
 v2d rot_fluc ; ///< Fluctuating angular velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
@@ -269,6 +272,7 @@ template <Windows W>
 int Coarsing::setWindow (double w)
 {
   static_assert(W != Windows::LucyND_Periodic) ;
+  printf("\n///%d///\n ", static_cast<int>(W)) ; fflush(stdout) ; 
   switch (W) {
       case Windows::Rect3D :
          Window=new LibRect3D (&data, w, d) ;
@@ -276,6 +280,9 @@ int Coarsing::setWindow (double w)
       case Windows::Sphere3DIntersect :
         Window=new LibSphere3DIntersect (&data, w, d) ;
         break ;
+      case Windows::Sphere3DIntersect_MonteCarlo:
+        Window= new LibSphere3DIntersect_MonteCarlo(&data, w, d) ; 
+        break ; 
       case Windows::SphereNDIntersect :
         Window=new LibSphereNDIntersect (&data, w, d) ;
         break ;

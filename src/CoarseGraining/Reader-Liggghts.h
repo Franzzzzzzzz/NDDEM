@@ -91,7 +91,10 @@ public:
                 else printf("Unknown extra: arbitrary liggghts extra fields are not implemented\n");
                 return nullptr ; 
             } break ; 
-            case DataValue::orient : return &(data[13][0]) ;
+            
+            case DataValue::orient : return &(data[13+dd][0]) ;
+            case DataValue::superquadric: if (is_superquadric) return &(data[17+dd][0]) ;  
+                                          else return nullptr ; 
             
             default : return nullptr ; 
         }

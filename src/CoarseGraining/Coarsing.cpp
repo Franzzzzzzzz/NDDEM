@@ -97,6 +97,9 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::Sphere3DIntersect :
     setWindow<Windows::Sphere3DIntersect> (w) ;
     break ;
+  case Windows::Sphere3DIntersect_MonteCarlo:
+    Window= new LibSphere3DIntersect_MonteCarlo(&data, w, d) ; 
+    break ; 
   case Windows::SphereNDIntersect :
     setWindow<Windows::SphereNDIntersect> (w) ;
     break ;
@@ -232,7 +235,7 @@ Pass Coarsing::set_flags (vector <string> s)
 std::map<std::string, size_t> Coarsing::grid_setfields()
 {
     int ncols = grid_getfields() ;
-    grid_getsubfields() ;
+    int nsubcols = grid_getsubfields() ;
     std::map<std::string, size_t> extrafields ;
 
     printf("Approximate memory required: %ld MB\n", Npt*ncols*Time*sizeof(double)/1024/1024) ; fflush(stdout) ;
@@ -242,7 +245,10 @@ std::map<std::string, size_t> Coarsing::grid_setfields()
         extrafields[std::get<0>(Fcols[i])->name] = i ;
 
     for (int i=0 ; i<Npt ; i++)
+    {
         CGP[i].fields.resize(Time, vector<double>(ncols,0)) ;
+        CGP[i].subfields.resize(Time, vector<double>(nsubcols, 0)) ; 
+    }
 
     return extrafields ;
 }
@@ -596,10 +602,13 @@ return (res);
 template <>
 void Coarsing::add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, Eigen::Quaternion<double> original)
 {
-  auto result = q*original*q.inverse() ; 
+  auto result = q * original * q.inverse() ;
+  //std::cout << q << "\n"; 
+  
   p[0] += weight * result.x()*result.x() ; p[1] += weight * result.x()*result.y() ; p[2] += weight * result.x()*result.z() ; 
   p[3] += weight * result.y()*result.x() ; p[4] += weight * result.y()*result.y() ; p[5] += weight * result.y()*result.z() ; 
   p[6] += weight * result.z()*result.x() ; p[7] += weight * result.z()*result.y() ; p[8] += weight * result.z()*result.z() ; 
+  //printf("%g %g %g\n", p[0], p[4], p[8]) ; 
 }
 template <>
 void Coarsing::add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, Eigen::Matrix3d original)
@@ -729,7 +738,9 @@ for (i=0 ; i<Npt ; i++)
       CGP[i].fields[cT][EKRid] /= 2.0 ;
     }
     if (doradius && rho!=0) {CGP[i].fields[cT][radiusid] /= rho ; }
-    if (doorient && rho!=0) {CGP[i].fields[cT][orientid] /= rho ; }
+    if (doorient && rho!=0) 
+      for (dd=0 ; dd<d*d ; dd++)
+        CGP[i].fields[cT][orientid+dd] /= rho ; 
     if (doextra && rho!=0)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
@@ -1061,7 +1072,7 @@ for (int i=0 ; i< Npt ; i++)
     }
 
     // Processing subfields
-    double ev[3] = {0,0,0}, evec[9]={0,0,0,0,0,0,0,0,0} ;
+    double ev[3] = {0,0,0}, evec[9]={0,0,0,0,0,0,0,0,0} ; std::array<unsigned char,3> sorting ; 
     for (size_t j=0 ; j<SFcols.size() ; j++)
     {
       auto [subfield_tensor, subfields] = SFcols[j] ;
@@ -1071,7 +1082,7 @@ for (int i=0 ; i< Npt ; i++)
       if ( (std::get<1>(subflags[j]) & sf_mask_eigen) > 0)
       {
         Eigen::Matrix3d tens ; tens<< value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8] ;
-        /*Eigen::EigenSolver<Eigen::Matrix3d> eigensolver(tens);
+        Eigen::EigenSolver<Eigen::Matrix3d> eigensolver(tens);
         if (eigensolver.info() != Eigen::Success) { ev[0]=ev[1]=ev[2]=NAN ; for (int vv=0 ; vv<9 ; vv++) evec[vv]=NAN ; }
         else
         {
@@ -1082,34 +1093,45 @@ for (int i=0 ; i< Npt ; i++)
           {
             evec[vv] = eigensolver.eigenvectors().col(vv/3)(vv%3).real() ;
           }
-          // sort_ev TODO
-        }*/
+          if (ev[0]>ev[1]) 
+          {
+            if (ev[1]>ev[2]) sorting={0,1,2} ; 
+            else if (ev[0]>ev[2]) sorting={0,2,1} ; 
+            else sorting={2,0,1} ; 
+          }
+          else
+          {
+            if (ev[2]>ev[1]) sorting={2,1,0} ;
+            else if (ev[2]>ev[0]) sorting={1,2,0} ;
+            else sorting={1,0,2} ;
+          }
+        }
       }
 
       for (size_t j=0 ; j<subfields.size() ; j++)
       {
         auto [subfield, sfcol_id] = subfields[j] ;
-
-            if (subfield->name == "ev1") CGP[i].subfields[cT][sfcol_id] = ev[0] ;
-        else if (subfield->name == "ev2") CGP[i].subfields[cT][sfcol_id] = ev[1] ;
-        else if (subfield->name == "ev3") CGP[i].subfields[cT][sfcol_id] = ev[2] ;
+        
+             if (subfield->name == "ev1") CGP[i].subfields[cT][sfcol_id] = ev[sorting[0]] ;
+        else if (subfield->name == "ev2") CGP[i].subfields[cT][sfcol_id] = ev[sorting[1]] ;
+        else if (subfield->name == "ev3") CGP[i].subfields[cT][sfcol_id] = ev[sorting[2]] ;
         else if (subfield->name == "evec1")
         {
-          CGP[i].subfields[cT][sfcol_id+0] = evec[0] ;
-          CGP[i].subfields[cT][sfcol_id+1] = evec[1] ;
-          CGP[i].subfields[cT][sfcol_id+2] = evec[2] ;
+          CGP[i].subfields[cT][sfcol_id+0] = evec[sorting[0]*3+0] ;
+          CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[0]*3+1] ;
+          CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[0]*3+2] ;
         }
         else if (subfield->name == "evec2")
         {
-          CGP[i].subfields[cT][sfcol_id+0] = evec[3] ;
-          CGP[i].subfields[cT][sfcol_id+1] = evec[4] ;
-          CGP[i].subfields[cT][sfcol_id+2] = evec[5] ;
+          CGP[i].subfields[cT][sfcol_id+0] = evec[sorting[1]*3+0] ;
+          CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[1]*3+1] ;
+          CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[1]*3+2] ;
         }
         else if (subfield->name == "evec3")
         {
-          CGP[i].subfields[cT][sfcol_id+0] = evec[6] ;
-          CGP[i].subfields[cT][sfcol_id+1] = evec[7] ;
-          CGP[i].subfields[cT][sfcol_id+2] = evec[8] ;
+          CGP[i].subfields[cT][sfcol_id+0] = evec[sorting[0]*3+0] ;
+          CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[1]*3+1] ;
+          CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[2]*3+2] ;
         }
         else if (subfield->name == "trace")
           CGP[i].subfields[cT][sfcol_id] = value[0]+value[4]+value[8] ;
@@ -1305,6 +1327,7 @@ bool Data::check_field_availability(string name)
  else if (name == "zT"  ) return (fpq[0] && vel[0]) ;
  else if (name == "zR"  ) return (mpq[0] && mqp[0] && omega[0]) ;
  else if (name == "RADIUS"  ) return (radius) ;
+ else if (name == "ORIENTATION"  ) return (orient[0]) ;
  else
      return (true) ;
 }
@@ -1342,7 +1365,7 @@ int Coarsing::mean_time(bool temporary)
         (*CGPtemp)[i].fields[0][f] /= Time;
         //CGP[i].fields.resize(1) ;
     }
-
+    
   if (!temporary) Time=1 ;
   return 0 ;
 }
@@ -1411,32 +1434,30 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
   for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
   dimensions[dimtime] = Time ;
 
-  for (size_t f=0 ; f<Fidx.size() ; f++)
+  for (size_t f=0 ; f<Fcols.size() ; f++)
   {
-    if (Fidx[f]<0) continue ;
-
     // Data are goind fast to slow in MATLAB ... so probably need some rewrite ...
-    switch (Ftype[f])
+    switch (std::get<0>(Fcols[f])->type)
     {
       case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
               outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
-                      outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
+                      outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])] ;
             break ;
       case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
               outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d ; j++)
-                          outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
+                          outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ;
             break ;
       case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
               outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d*d ; j++)
-                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
+                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ; // j/d*d!=j because of integer division
             break ;
       default: printf("ERR: this should never happen. \n") ;
     }
@@ -1447,9 +1468,52 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
 
     mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
     mxSetData (pm, outdata) ;
-    matPutVariable(pmat, Fname[f].c_str(), pm);
+    matPutVariable(pmat, std::get<0>(Fcols[f])->name.c_str(), pm);
     mxFree(outdata) ;
   }
+  
+  for (size_t f=0 ; f<SFcols.size() ; f++)
+  {
+    auto [tens_field, subfields] = SFcols[f] ;
+    for (size_t g=0 ; g<subfields.size() ; g++)
+    {    
+      switch (std::get<0>(subfields[g])->type)
+      {
+        case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
+                outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++)
+                        outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])] ;
+              break ;
+        case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
+                outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++)
+                        for (int j=0 ; j<d ; j++)
+                            outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])+j] ;
+              break ;
+        case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
+                outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++)
+                        for (int j=0 ; j<d*d ; j++)
+                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])+j] ; // j/d*d!=j because of integer division
+              break ;
+        default: printf("ERR: this should never happen. \n") ;
+      }
+
+      auto tmpdim = dimensions ;
+      if (squeeze)
+        tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
+
+      mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
+      mxSetData (pm, outdata) ;
+      std::string colname = tens_field->name + "_" + std::get<0>(subfields[g])->name ; 
+      matPutVariable(pmat, colname.c_str(), pm);
+      mxFree(outdata) ;
+    }
+  }
+  
 
   // Let's put the location array there as well
   dimensions[0]=d ; dimensions[1] = 1 ; dimensions.pop_back() ;

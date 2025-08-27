@@ -132,7 +132,7 @@ int CoarseGraining::process_timestep (int ts_abs, bool hasdonefirstpass)
     int ts = ts_abs - P.skipT ;
    
     bool avg=false ;
-    if (P.timeaverage == AverageType::Intermediate || P.timeaverage == AverageType::Both) avg=true ;
+    if (P.timeaverage == AverageType::Intermediate || P.timeaverage == AverageType::Both || P.timeaverage == AverageType::IntermediateAndPre5) avg=true ;
     P.read_timestep(ts+P.skipT) ; 
     C->cT = ts ;
     P.set_data (C->data) ;
@@ -143,7 +143,8 @@ int CoarseGraining::process_timestep (int ts_abs, bool hasdonefirstpass)
     if (pipeline & Pass::Pass2) C->pass_2() ;
     if (pipeline & Pass::Pass3) C->pass_3() ;
     if (pipeline & Pass::Pass4) C->pass_4() ;
-    if (pipeline & Pass::Pass5) C->pass_5() ;
+    if ( ! (P.timeaverage == AverageType::Pre5 || P.timeaverage==AverageType::IntermediateAndPre5))
+        if (pipeline & Pass::Pass5) C->pass_5() ;
     return 0 ;
 }
 //------------------------------------------------------------
@@ -178,8 +179,14 @@ void CoarseGraining::process_all ()
         printf("\rProcessing %d ", ts) ; fflush(stdout) ;
         process_timestep(ts+P.skipT, hasdonefirstpass) ;
     }
-    if (P.timeaverage == AverageType::Final || P.timeaverage == AverageType::Both)
+    if (P.timeaverage == AverageType::Final || P.timeaverage == AverageType::Both || P.timeaverage == AverageType::Pre5 || P.timeaverage == AverageType::IntermediateAndPre5)
         C->mean_time(false) ;
+    
+    if (P.timeaverage == AverageType::Pre5 || P.timeaverage == AverageType::IntermediateAndPre5)
+    {
+        C->cT=0 ; 
+        C->pass_5() ; 
+    }
 }
 //------------------------------------------------------
 void CoarseGraining::write ()

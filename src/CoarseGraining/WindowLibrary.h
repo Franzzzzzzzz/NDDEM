@@ -1,5 +1,5 @@
-
-enum class Windows {Rect3D, Sphere3DIntersect, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic} ;
+#include <random>
+enum class Windows {Rect3D, Sphere3DIntersect, Sphere3DIntersect_MonteCarlo, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic} ;
 
 /** \brief A window base class that needs to be specialised to a specific CG window
  */
@@ -275,6 +275,82 @@ public:
     }
     virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
 };
+//---------------------------------
+class LibSphere3DIntersect_MonteCarlo : public LibBase {
+public:
+    LibSphere3DIntersect_MonteCarlo (struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=1./(4./3.*M_PI*w*w*w) ; 
+        gen=std::mt19937(123457); random=std::uniform_real_distribution<double>(-1.0, 1.0) ; }
+    double cst ;
+    double result ;
+    double distance(int id, v1d loc)
+    {
+        if (data->superquadric.size()==0 || data->superquadric[0] == nullptr)
+        {
+            //printf("INFO: prefer LibSphere3DIntersect for spherical particles\n") ; 
+            int count=0 ; 
+            double k[3] = {loc[0]-data->pos[0][id], loc[1]-data->pos[1][id], loc[2]-data->pos[2][id]} ; 
+            double x, y, z ;             
+            for (int i=0 ; i<Nmc ; i++)
+            {
+                //x=random(gen) ; y=random(gen) ; z=random(gen) ; //[-1,1]
+                //if ( x*x+y*y+z*z<1)
+                double r = cbrt(abs(random(gen))) ; 
+                double costheta=random(gen) ; 
+                double phi = random(gen)*M_PI ; 
+                double sintheta = sqrt(1-costheta*costheta) ; 
+            
+                x = r*sintheta*cos(phi) ;
+                y = r*sintheta*sin(phi) ; 
+                z = r*costheta ;                 
+                if ( (x*data->radius[id] - k[0])*(x*data->radius[id] - k[0]) + 
+                         (y*data->radius[id] - k[1])*(y*data->radius[id] - k[1]) + 
+                         (z*data->radius[id] - k[2])*(z*data->radius[id] - k[2]) < w*w)
+                    {count ++ ;}
+            }
+            return cst * (count/(double)Nmc) ; 
+        }
+        else
+        {
+            Eigen::Quaternion<double> orient(data->orient[0][id], data->orient[1][id], data->orient[2][id], data->orient[3][id]) ; 
+            Eigen::Quaternion<double> k(0, loc[0]-data->pos[0][id], loc[1]-data->pos[1][id], loc[2]-data->pos[2][id]) ; 
+            Eigen::Quaternion<double> kprime = orient.inverse() * k * orient ; 
+            
+            if ( kprime.x()*kprime.x()+kprime.z()*kprime.z()+kprime.z()*kprime.z() > pow(w+std::max(data->superquadric[0][id], std::max(data->superquadric[1][id], data->superquadric[2][id])),2))
+                return 0 ; 
+            
+            double x, y, z ; int count=0 ; 
+            for (int i=0 ; i<Nmc ; i++)
+            {
+                x=random(gen) ; y=random(gen) ; z=random(gen) ; //[-1,1]
+                
+                if (pow(x, data->superquadric[3][id]) + pow(y, data->superquadric[4][id]) + pow(z, data->superquadric[5][id])<1) // In superquadric? 
+                 if ( (x*data->superquadric[0][id]-kprime.x())*(x*data->superquadric[0][id]-kprime.x()) + 
+                      (y*data->superquadric[1][id]-kprime.y())*(y*data->superquadric[1][id]-kprime.y()) + 
+                      (z*data->superquadric[2][id]-kprime.z())*(z*data->superquadric[2][id]-kprime.z()) < w*w ) // In sphere?
+                     count ++ ; 
+            }
+            return count / (double) Nmc / (8. * data->superquadric[0][id] * data->superquadric[1][id] * data->superquadric[2][id]) ;
+        }
+        
+    }
+    double cutoff (void) {
+        double maxr=0 ;
+        if (data->N==0) return 2*w ;
+        for (int i=0 ; i<data -> N ; i++)
+            if (maxr<data->radius[i])
+                maxr=data->radius[i] ;
+        return maxr+w ;
+    }
+    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
+    double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
+    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
+    
+private: 
+    int Nmc=100 ; 
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> random;
+};
+
 //---------------------
 class LibHann3D : public LibBase {
 public:

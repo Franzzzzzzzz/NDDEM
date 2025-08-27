@@ -295,6 +295,13 @@ int LiggghtsReader_particles::do_post_read()
          if (i==2) for (k=0 ; k<Nitem ; k++) data[i][k]=2/5. * data[1][k] * data[0][k] * data[0][k] ;
      }
  }
+ if (is_superquadric)
+ {
+   for (int i=0 ; i<6 ; i++)
+   {
+    data.push_back(std::vector<double>(Nitem, get_default_superquadric(i))) ; 
+   }
+ }
 
  return nadded ;
 }

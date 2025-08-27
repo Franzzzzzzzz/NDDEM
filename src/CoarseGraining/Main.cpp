@@ -37,6 +37,29 @@ return 0 ;
 //=======================================================
 int main(int argc, char * argv[])
 {
+    /* TEST */
+    /*struct Data D ; 
+    double r = 0.5 ; double pos[3] = {1,0.5,0.5} ; 
+    D.pos.resize(3) ; D.pos[0] = &pos[0] ; D.pos[1] = &pos[1] ; D.pos[2] = &pos[2] ; 
+    D.radius = &r ;     
+    LibSphere3DIntersect_MonteCarlo W1 (&D, 1, 3) ; 
+    LibSphere3DIntersect W2 (&D, 1, 3) ;
+    
+    std::mt19937 gen(1234);
+    
+    // Uniform distribution between -1.0 and 1.0
+    std::uniform_real_distribution<double> dist(-1.0, 1.0);
+    
+    for (int i=0 ; i<100 ; i++)
+    {
+        r= abs(dist(gen))/3. ;
+        pos[0] = dist(gen) ; 
+        pos[1] = dist(gen) ; 
+        pos[2] = dist(gen) ; 
+        printf("%g %g\n", W1.distance(0,{0.1,0.2,0.3}), W2.distance(0,{0.1,0.2,0.3})) ; 
+    }      
+    std::exit(0) ; */
+    
     if (argc<2) 
     {
         printf("Coarse graining was run without commandline argument. If you are running in webassembly, this is expected. If you are running standalone, you need to provide a json file as argument.\n") ; 
