@@ -7,36 +7,44 @@ module.exports = [{
     mode: "development",
     // mode: "production",
     entry: {
-        'uniaxial': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/uniaxial.js'],
-        'triaxial': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/triaxial.js'],
-        'isotropic': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/isotropic.js'],
-        'inclined-plane': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/inclined-plane.js'],
-        'lees-edwards': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/lees-edwards.js'],
-        'rotation': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/rotation.js'],
-        'rotating-drum-2d': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/rotating-drum-2d.js'],
-        '4d-pool': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/4d-pool.js'],
-        'no-friction-2d-pool': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/no-friction-2d-pool.js'],
-        'coarse-graining': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/coarse-graining.js'],
-        'rotation-matrix': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/rotation-matrix.js'],
-        'simple-shear': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/simple-shear.js'],
-        'hopper': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/hopper.js'],
-        'intruder': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/intruder.js'],
-        'anisotropy': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/anisotropy.js'],
-        'dam-break': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/dam-break.js'],
-        'dam-break-2d': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/dam-break-2d.js'],
-        'code': ['webpack-dev-server/client?http://localhost:8080', 'webpack/hot/only-dev-server', './live/src/code.js'],
+        'uniaxial': ['./live/src/uniaxial.js'],
+        'uniaxial_cylinder': ['./live/src/uniaxial_cylinder.js'],
+        'triaxial': ['./live/src/triaxial.js'],
+        'isotropic': ['./live/src/isotropic.js'],
+        'inclined-plane': ['./live/src/inclined-plane.js'],
+        'lees-edwards': ['./live/src/lees-edwards.js'],
+        'rotation': ['./live/src/rotation.js'],
+        'rotating-drum-2d': ['./live/src/rotating-drum-2d.js'],
+        '4d-pool': ['./live/src/4d-pool.js'],
+        'no-friction-2d-pool': ['./live/src/no-friction-2d-pool.js'],
+        'coarse-graining': ['./live/src/coarse-graining.js'],
+        'rotation-matrix': ['./live/src/rotation-matrix.js'],
+        'simple-shear': ['./live/src/simple-shear.js'],
+        'hopper': ['./live/src/hopper.js'],
+        'intruder': ['./live/src/intruder.js'],
+        'anisotropy': ['./live/src/anisotropy.js'],
+        'dam-break': ['./live/src/dam-break.js'],
+        'dam-break-2d': ['./live/src/dam-break-2d.js'],
+        'code': ['./live/src/code.js'],
     },
     plugins: [
         new webpack.ProvidePlugin({
             THREE: 'three'
         }),
-        new MonacoWebpackPlugin(),
+        // new MonacoWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'NDDEM Uniaxial compression',
             favicon: "./visualise/resources/favicon.ico",
             template: "live/plotly-template.html",
             filename: "uniaxial.html",
             chunks: ['uniaxial']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Uniaxial compression',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "uniaxial_cylinder.html",
+            chunks: ['uniaxial_cylinder']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Triaxial compression',
@@ -157,30 +165,35 @@ module.exports = [{
             filename: "code.html",
             chunks: ['code']
         }),
-        new webpack.HotModuleReplacementPlugin()
     ],
     output: {
         path: path.resolve(__dirname, 'live/deploy'),
         publicPath: '',
         filename: '[name]-bundle.js',
-        clean: true,
+        // clean: true,
     },
     devServer: {
         hot: true,
         // open: true,
-        static: {
-            directory: '.'
-        },
-        // watchFiles: ['live/src/**/*', 'visualise/**/*'],
-        watchFiles: ['live/src/**/*.js', 'visualise/**/*.{js,html,css}'],
-
+        watchFiles: ['live/src/*.js', 'visualise/**/*.{js,html,css}'],
+        static: [
+            {
+                directory: path.join(__dirname, 'live/deploy'),
+                publicPath: '/live/deploy',
+            },
+            {
+                directory: path.join(__dirname, 'deploy'),
+                publicPath: '/deploy',
+            }
+        ],
     },
     watchOptions: {
         ignored: [
             '**/node_modules',
             '**/build',
-            '**/src/Dem',
-            '**/src/CoarseGraining',
+            '**/Textures',
+            '**/Samples',
+            '/src/',
             '**/*.o',
             '**/*.a',
             '**/*.cmake',
@@ -188,8 +201,6 @@ module.exports = [{
             '**/deploy',
             '**/.git'
         ],
-        poll: 1000,
-        aggregateTimeout: 300,
     },
     module: {
         rules: [
@@ -221,14 +232,14 @@ module.exports = [{
     output: {
         path: path.resolve(__dirname, 'visualise/deploy'),
         filename: '[name]-bundle.js',
-        clean: true,
+        // clean: true,
     },
     watchOptions: {
         ignored: [
             '**/node_modules',
             '**/build',
-            '**/src/Dem',
-            '**/src/CoarseGraining',
+            '**/Textures',
+            '**/Samples',
             '**/*.o',
             '**/*.a',
             '**/*.cmake',
@@ -236,8 +247,6 @@ module.exports = [{
             '**/deploy',
             '**/.git'
         ],
-        poll: 1000,
-        aggregateTimeout: 300,
     },
     module: {
         rules: [
