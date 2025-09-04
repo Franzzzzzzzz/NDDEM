@@ -47,6 +47,9 @@ export const wall_material = new THREE.MeshLambertMaterial();
 wall_material.wireframe = true;
 wall_material.wireframeLinewidth = 3;
 
+const circle_geometry = new THREE.CircleGeometry(0.5, 32);
+circle_geometry.rotateX(-Math.PI / 2);
+
 const arrow_colour = 0xDDDDDD;
 const arrow_material = new THREE.MeshLambertMaterial({ color: arrow_colour });
 
@@ -83,19 +86,31 @@ export function add_right(params, scene) {
     scene.add(right);
 }
 
-export function add_floor(params, scene) {
+export function add_floor(params, scene, shape='square') {
     if (floor !== undefined) { scene.remove(floor); }
-    floor = new THREE.Mesh(wall_geometry, wall_material);
+
+    if (shape === 'circle') {
+        floor = new THREE.Mesh(circle_geometry, wall_material);
+    } else {
+        floor = new THREE.Mesh(wall_geometry, wall_material);
+    }
     floor.scale.y = params.thickness;
     floor.rotation.x = Math.PI / 2.;
     floor.position.z = - params.L * params.aspect_ratio - params.thickness / 2.;
+
+    scene.add(floor);
     // left.receiveShadow = true;
     scene.add(floor);
 }
 
-export function add_roof(params, scene) {
+export function add_roof(params, scene, shape='square') {
     if (roof !== undefined) { scene.remove(roof); }
-    roof = new THREE.Mesh(wall_geometry, wall_material);
+
+    if (shape === 'circle') {
+        roof = new THREE.Mesh(circle_geometry, wall_material);
+    } else {
+        roof = new THREE.Mesh(wall_geometry, wall_material);
+    }
     roof.scale.y = params.thickness;
     roof.rotation.x = Math.PI / 2.;
     roof.position.z = params.L * params.aspect_ratio + params.thickness / 2.;
@@ -121,6 +136,20 @@ export function add_back(params, scene) {
     back.position.x = -params.L - params.thickness / 2.;
     // front.receiveShadow = true;
     scene.add(back);
+}
+
+export function add_cylindrical_walls(params, scene) {
+
+    // const wall_geometry = new THREE.BoxGeometry( params.L*2 + params.thickness*2, params.thickness, params.L*2 + params.thickness*2 );
+    // const wall_material = new THREE.ShadowMaterial( )
+
+    // add_left(params, scene);
+    // add_right(params, scene);
+    add_floor(params, scene, 'circle');
+    add_roof(params, scene, 'circle');
+    // add_front(params, scene);
+    // add_back(params, scene);
+
 }
 
 export function add_cuboid_walls(params, scene) {
@@ -407,13 +436,17 @@ export function update_top_wall(params, S, scene, dt = 0.001) {
     var vert_walls = [left, right, front, back];
 
     vert_walls.forEach(function (mesh) {
-        mesh.scale.x = 2 * params.L + 2 * params.thickness;
-        mesh.scale.z = 2 * (params.L) + 2 * params.thickness;
+        if (mesh !== undefined) {
+            mesh.scale.x = 2 * params.L + 2 * params.thickness;
+            mesh.scale.z = 2 * (params.L) + 2 * params.thickness;
+        }
     });
 
     horiz_walls.forEach(function (mesh) {
-        mesh.scale.x = 2 * params.L + 2 * params.thickness;
-        mesh.scale.z = 2 * params.L + 2 * params.thickness;
+        if (mesh !== undefined) {
+            mesh.scale.x = 2 * params.L + 2 * params.thickness;
+            mesh.scale.z = 2 * params.L + 2 * params.thickness;
+        }
     });
 
     if (axesHelper !== undefined) { add_scale(params, scene); }
