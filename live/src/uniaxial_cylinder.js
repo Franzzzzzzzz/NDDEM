@@ -38,7 +38,7 @@ document.getElementById("canvas").style.width = String(100*(1-graph_fraction)) +
 var params = {
     dimension: 3,
     // L: 4, //system size
-    initial_packing_fraction: 0.4,
+    initial_packing_fraction: 0.5,
     N: 800,
     vertical_displacement: 0,
     gravity: true,
@@ -72,7 +72,14 @@ function set_derived_properties() {
     params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
     console.log('estimate of particle volume: ' + params.particle_volume*params.N)
     params.particle_mass = params.particle_volume * params.particle_density;
-    params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;
+    // use an initial aspect ratio of 2 (radius of system = params.L, the height)
+    // total volume = pi * R^2 * 2*L = pi * (L)^2 * 2*L = 2*pi * L^3
+    let total_volume = params.N*params.particle_volume / params.initial_packing_fraction;
+    params.L = Math.pow(total_volume/Math.PI/2, 1./3.);
+    // console.log(params.L);
+    // params.L = 0.03;
+
+    // params.L = Math.pow(params.particle_volume*params.N/params.initial_packing_fraction, 1./3.)/2.;
 
     params.loading_area = Math.PI * Math.pow(params.L, 2);
     params.F_mag_max = params.max_force/20.;//params.loading_area*params.target_stress
@@ -94,7 +101,7 @@ function reset_particles() {
     loading_direction = 1;
     set_derived_properties();
     SPHERES.randomise_particles(params, S);
-    WALLS.add_cuboid_walls(params,scene);
+    WALLS.add_cylindrical_walls(params,scene);
     WALLS.update_top_wall(params, S, scene);
     setup_CG();
     started = false;
@@ -134,7 +141,7 @@ async function init() {
     dirLight.shadow.camera.zoom = 2;
     scene.add( dirLight );
 
-    WALLS.add_cuboid_walls(params,scene);
+    WALLS.add_cylindrical_walls(params,scene);
     WALLS.update_top_wall(params, S, scene);
     WALLS.add_scale(params, scene);
 
