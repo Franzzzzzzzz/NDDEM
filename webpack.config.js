@@ -25,6 +25,7 @@ module.exports = [{
         'anisotropy': ['./live/src/anisotropy.js'],
         'dam-break': ['./live/src/dam-break.js'],
         'dam-break-2d': ['./live/src/dam-break-2d.js'],
+        'effective-stress': ['./live/src/effective-stress.js'],
         'code': ['./live/src/code.js'],
     },
     plugins: [
@@ -157,6 +158,13 @@ module.exports = [{
             template: "live/template.html",
             filename: "dam-break-2d.html",
             chunks: ['dam-break-2d']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Effective Stress',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "effective-stress.html",
+            chunks: ['effective-stress']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Editor',

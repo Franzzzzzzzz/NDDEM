@@ -100,6 +100,9 @@ export function animate_locked_particle() {
             } else if (params.boundary === 'Rectangle') {
                 ref_location.clamp(new Vector3(-params.L0 + params.r_max, -params.L1 + params.r_max, 0),
                     new Vector3(params.L0 - params.r_max, params.L1 - params.r_max, 0));
+            } else if (params.boundary === 'OffsetRectangleD0') {
+                ref_location.clamp(new Vector3(params.r_max, -params.L1 + params.r_max, 0),
+                    new Vector3(2 * params.L0 - params.r_max, params.L1 - params.r_max, 0));
             } else if (params.boundary === 'Triangle') {
                 ref_location.y = THREE.MathUtils.clamp(ref_location.y, -params.H / 2. + params.r_max, params.H / 2. - params.r_max);
                 // let x_max = (params.L - ref_location.y)/2.0;
