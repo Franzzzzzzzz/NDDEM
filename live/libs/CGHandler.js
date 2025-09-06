@@ -1,7 +1,7 @@
 import { Lut } from './Lut.js';
 import * as COLORBAR from './colorbar.js';
 
-let cg_mesh;
+export let cg_mesh;
 
 let sequential = new Lut('inferno', 512);
 let divergent  = new Lut('bkr', 512);
@@ -56,17 +56,68 @@ export function update_2d_cg_field(S, params) {
             lut.setMin(-Math.PI);
             lut.setMax( Math.PI);
             lut.units = 'Velocity direction (rad)';
-        }
-        else if ( params.cg_field === 'Pressure' ) {
-            // const stressTcxx=S.cg_get_result(0, "TC", 0) ;
-            // const stressTcyy=S.cg_get_result(0, "TC", 3) ;
-            // const stressTczz=S.cg_get_result(0, "TC", 6) ;
-            // val = new Array(stressTcxx.length);
-            // for (var i=0 ; i<stressTcxx.length ; i++)
-            // {
-            //     val[i]=(stressTcxx[i]+stressTcyy[i]+stressTczz[i])/3. ;
-            // }
+        } else if ( params.cg_field === 'Pressure' || params.cg_field === 'Effective Pressure' ) {
             val=S.cg_get_result(0, "Pressure", 0) ;
+            lut = sequential;
+            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+            lut.setMin(0);
+            lut.setMax( 0.9*maxVal);
+            lut.units = 'Pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
+        } else if ( params.cg_field === 'Total Pressure' ) {
+            val=S.cg_get_result(0, "Pressure", 0) ;
+            // now loop through and any positions below p.water_table, add the weight of the water, i.e. p += p.water_density * p.g_mag * p.x
+            let xmin = grid[0];
+            let dx = grid[3];
+            // let dy = grid[4];
+            let nx = grid[6];
+            let ny = grid[7];
+            for (let i = 0; i < nx; i++) {
+                for (let j = 0; j < ny; j++) {
+                    let index = i + j * nx;
+                    let x = xmin + (i + 0.5) * dx;
+                    // let y = grid.ymin + (j + 0.5) * grid.dy;
+                    if (params.dimension === 2) {
+                        if (x < params.water_table) {
+                            val[index] += params.water_density * params.g_mag * (params.water_table - x);
+                        }
+                        
+                    } else if (params.dimension === 3) {
+                        if (z < params.water_table) {
+                            val[index] += params.water_density * params.g_mag * (params.water_table - z);
+                        }
+                    }
+                }
+            }
+            
+            lut = sequential;
+            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
+            lut.setMin(0);
+            lut.setMax( 0.9*maxVal);
+            lut.units = 'Pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
+        } else if ( params.cg_field === 'Hydrostatic Pressure' ) {
+            val=S.cg_get_result(0, "Pressure", 0) ;
+            let xmin = grid[0];
+            let dx = grid[3];
+            // let dy = grid[4];
+            let nx = grid[6];
+            let ny = grid[7];
+            for (let i = 0; i < nx; i++) {
+                for (let j = 0; j < ny; j++) {
+                    let index = i + j * nx;
+                    let x = xmin + (i + 0.5) * dx;
+                    // let y = grid.ymin + (j + 0.5) * grid.dy;
+                    if (params.dimension === 2) {
+                        if (x < params.water_table) {
+                            val[index] = params.water_density * params.g_mag * (params.water_table - x);
+                        }
+                        
+                    } else if (params.dimension === 3) {
+                        if (z < params.water_table) {
+                            val[index] = params.water_density * params.g_mag * (params.water_table - z);
+                        }
+                    }
+                }
+            }
             lut = sequential;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
