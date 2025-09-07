@@ -24,8 +24,8 @@ let pressure;
 var params = {
     dimension: 2,
     L0: 0.12, //system size
-    L1: 0.08,
-    N: 600,
+    L1: 0.06,
+    N: 450,
     zoom: 800,
     // packing_fraction: 0.5,
     constant_volume: true,
@@ -47,15 +47,17 @@ var params = {
     cg_width: 50,
     cg_height: 50,
     cg_opacity: 0.2,
-    cg_window_size: 3,
+    cg_window_size: 5,
     particle_opacity: 0.5,
-    F_mag_max: 15,
+    F_mag_max: 150,
     aspect_ratio: 1,
     nogui: false,
     water_density: 1000,
+    graph_fraction: 0.5,
+
 }
 
-params.water_table = 2 * params.L0; // start with water table above the system
+params.water_table = params.L0; // start with water table in the middle
 params.average_radius = (params.r_min + params.r_max) / 2.;
 params.thickness = params.average_radius;
 
@@ -117,8 +119,8 @@ async function init() {
         (100 * aspect) / params.zoom,
         100 / params.zoom,
         -100 / params.zoom,
-        -1000,
-        1000
+        -10,
+        10
     );
     camera.position.set(params.L0, 0, -5 * params.L0);
     camera.up.set(0, 0, 1);
@@ -154,14 +156,8 @@ async function init() {
     CGHANDLER.add_cg_mesh(2 * params.L0, 2 * params.L1, scene);
     CGHANDLER.cg_mesh.position.x = params.L0;
 
-    // geometry = new THREE.PlaneGeometry( 2*params.L, 0.1*params.L );
-    // material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-    // colorbar_mesh = new THREE.Mesh( geometry, material );
-    // colorbar_mesh.position.y = -1.1*params.L;
-    // scene.add( colorbar_mesh );
-
     let water_geometry = new THREE.PlaneGeometry(1, 1);
-    let water_material = new THREE.MeshBasicMaterial({ color: 0x0000ff, side: THREE.DoubleSide });
+    let water_material = new THREE.MeshBasicMaterial({ color: 0x0000ff, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
     water_mesh = new THREE.Mesh(water_geometry, water_material);
     update_water_table();
     scene.add(water_mesh);
@@ -192,7 +188,8 @@ async function init() {
 
         ));
         gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
-        gui.add(params, 'cg_field', ['Density', 'Velocity', 'Total Pressure', 'Effective Pressure', 'Hydrostatic Pressure', 'Shear stress']).name('Field').listen();
+        // gui.add(params, 'cg_field', ['Density', 'Velocity', 'Total Pressure', 'Effective Pressure', 'Hydrostatic Pressure', 'DEM Pressure', 'Shear stress']).name('Field').listen();
+        gui.add(params, 'cg_field', ['Density', 'Velocity', 'DEM Pressure', 'Shear stress']).name('Field').listen();
         // gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
         //     update_cg_params(S, params);
         // });
@@ -233,14 +230,37 @@ function onWindowResize() {
 
     renderer.setSize(window.innerWidth / 2., window.innerHeight);
 
-    Plotly.relayout('stats', update);
+    // Plotly.relayout('stats', update_graph);
 }
 
 function update_water_table() {
     let height = params.water_table + 2 * params.thickness;
     let width = 2 * params.L1 + 2 * params.thickness;
     water_mesh.scale.set(height, width, 1);
-    water_mesh.position.set(height / 2., 0, 0);
+    water_mesh.position.set(height / 2., 0, 1);
+}
+
+function update_masses() {
+    let radii = S.simu_getRadii();
+    let x = S.simu_getX();
+    let buoyant_density = params.particle_density - params.water_density;
+
+    for (let i = 0; i < params.N; i++) {
+        let r = radii[i];
+        let vol;
+        if (params.dimension === 2) {
+            vol = Math.PI * r * r;
+        } else {
+            vol = 4 / 3 * Math.PI * r * r * r;
+        }
+        // console.log(x[i])
+        if (x[i][0] < params.water_table) {
+            S.simu_setMass(i, vol * buoyant_density);
+        }
+        else {
+            S.simu_setMass(i, vol * params.particle_density);
+        }
+    }
 }
 
 function animate() {
@@ -248,19 +268,21 @@ function animate() {
     SPHERES.move_spheres(S, params);
     // RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
     if (!params.paused) {
+        update_masses();
         S.simu_step_forward(15);
         CGHANDLER.update_2d_cg_field(S, params);
-        pressure = S.cg_get_result(0, "Pressure", 0);
     }
     update_graph();
     SPHERES.draw_force_network(S, params, scene);
     renderer.render(scene, camera);
 }
+
+
 function update_cg_params(S, params) {
     var cgparam = {};
     cgparam["file"] = [{ "filename": "none", "content": "particles", "format": "interactive", "number": 1 }];
+    // cgparam["density"] = params.particle_density;
     cgparam["boxes"] = [params.cg_width, params.cg_height];
-    // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
     cgparam["boundaries"] = [
         [0, -params.L1],
         [2 * params.L0, params.L1]];
@@ -269,7 +291,7 @@ function update_cg_params(S, params) {
     cgparam["max time"] = 1;
     cgparam["time average"] = "None";
     cgparam["fields"] = ["RHO", "VAVG", "TC", "Pressure", "Shear stress"];
-    cgparam["periodicity"] = [false, false];
+    cgparam["periodicity"] = [false, true];
     cgparam["window"] = "Lucy2D";
     cgparam["dimension"] = 2;
 
@@ -310,7 +332,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("radius -1 0.5");
         let m;
         if (params.dimension === 2) {
-            m = Math.PI * 0.5 * 0.5 * params.particle_density;
+            m = Math.PI * 0.5 * 0.5 * (params.particle_density - params.water_density);
         } else {
             m = 4. / 3. * Math.PI * 0.5 * 0.5 * 0.5 * params.particle_density;
         }
@@ -330,26 +352,12 @@ async function NDDEMCGPhysics() {
         if (params.dimension > 3) {
             S.simu_interpret_command("boundary 3 WALL -" + String(params.L3) + " " + String(params.L3));
         }
-        S.simu_interpret_command("gravity -1 " + "0 ".repeat(params.dimension - 2))
+        S.simu_interpret_command("gravity -" + String(params.g_mag) + " " + "0 ".repeat(params.dimension - 2));
 
         S.simu_interpret_command("auto location randomdrop");
 
-        // S.simu_interpret_command("ContactStrategy cells");
-
-        // S.simu_interpret_command("set Kn 2e5");
-        // S.simu_interpret_command("set Kt 8e4");
-        // S.simu_interpret_command("set GammaN 75");
-        // S.simu_interpret_command("set GammaT 75");
-        // S.simu_interpret_command("set Mu 1");
-        // S.simu_interpret_command("set Mu_wall 0");
-        // S.simu_interpret_command("set T 150");
-        // S.simu_interpret_command("set dt 0.0002");
-        // S.simu_interpret_command("set tdump 10"); // how often to calculate wall forces
-        // S.simu_interpret_command("auto skin");
-        // S.simu_finalise_init () ;
-
-        let tc = 1e-2;
-        let rest = 0.5; // super low restitution coeff to dampen out quickly
+        let tc = 1e-3;
+        let rest = 0.5;
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient(tc, rest, params.particle_mass)
 
         S.simu_interpret_command("set Kn " + String(vals.stiffness));
@@ -357,7 +365,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
-        S.simu_interpret_command("set damping 0.001");
+        // S.simu_interpret_command("set damping 0.001");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc / 20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -378,26 +386,63 @@ function update_graph() {
     let ny = grid[7];
 
     pressure = S.cg_get_result(0, "Pressure", 0);
+    let density = S.cg_get_result(0, "RHO", 0);
+
     // take an average along all same x values
-    let avgPressure = new Array(nx).fill(0);
+    let avgDensity = new Array(nx).fill(0);
+    let DEMPressure = new Array(nx).fill(0);
     let hydraulicPressure = new Array(nx).fill(0);
     let totalPressure = new Array(nx).fill(0);
     let xloc = new Array(nx).fill(0);
+    let solid_fraction = new Array(nx).fill(0);
+    let porosity = new Array(nx).fill(0);
+    let effectivePressure = new Array(nx).fill(0);
 
+    // first pass to get density profile
+    for (let i = 0; i < nx; i++) {
+        for (let j = 0; j < ny; j++) {
+            let index = i + j * nx;
+            // console.log(density[index], avgDensity[i])
+            if (isNaN(density[index])) {
+                avgDensity[i] += 0;
+            }
+            else {
+                avgDensity[i] += density[index];
+            }
+        }
+        avgDensity[i] /= ny;
+        solid_fraction[i] = avgDensity[i] / params.particle_density / 100;
+        // solid_fraction[i] = 0.6; // HACK!! THERE IS AN ISSUE WITH THE DENSITY FIELD BEING 100X TOO LARGE
+        porosity[i] = 1 - solid_fraction[i];
+    }
+
+    // now calculate total stress, water pressure and effective stress from density profile
+    let thisWeight;
+    for (let i = nx - 1; i >= 0; i--) {
+        let x = xmin + (i + 0.5) * dx;
+
+        if (x < params.water_table) { // below water table
+            thisWeight = (solid_fraction[i] * params.particle_density + porosity[i] * params.water_density) * params.g_mag * dx;
+            hydraulicPressure[i] = params.water_density * params.g_mag * (params.water_table - x);
+        }
+        else {
+            thisWeight = solid_fraction[i] * params.particle_density * params.g_mag * dx;
+            hydraulicPressure[i] = 0; // above water table
+        }
+        totalPressure[i - 1] = totalPressure[i] + thisWeight;
+        effectivePressure[i] = totalPressure[i] - hydraulicPressure[i];
+    }
 
     for (let i = 0; i < nx; i++) {
         let x = xmin + (i + 0.5) * dx;
         xloc[i] = x;
-        if (x < params.water_table) {
-            hydraulicPressure[i] = params.water_density * params.g_mag * (params.water_table - x);
-        }
 
         for (let j = 0; j < ny; j++) {
             let index = i + j * nx;
-            avgPressure[i] += pressure[index];
+            DEMPressure[i] += pressure[index];
         }
-        avgPressure[i] /= ny;
-        totalPressure[i] = avgPressure[i] + hydraulicPressure[i];
+        DEMPressure[i] /= ny * 100; // HACK!! THERE IS AN ISSUE WITH THE DENSITY FIELD BEING 100X TOO LARGE
+        // totalPressure[i] = avgPressure[i] + hydraulicPressure[i];
     }
 
 
@@ -410,13 +455,18 @@ function update_graph() {
 
     Plotly.update('stats', {
         'y': [xloc],
-        'x': [avgPressure],
+        'x': [effectivePressure],
     }, {}, [1])
 
     Plotly.update('stats', {
         'y': [xloc],
         'x': [hydraulicPressure],
     }, {}, [2])
+
+    Plotly.update('stats', {
+        'y': [xloc],
+        'x': [DEMPressure],
+    }, {}, [3])
 
     var update = {
         xaxis: {
@@ -428,15 +478,15 @@ function update_graph() {
 }
 
 function make_graph() {
-    let { data, layout } = LAYOUT.plotly_stress_graph('Stress (Pa)', 'Height (m)', ['Total Pressure (Pa)', 'Effective Pressure (Pa)', 'Hydraulic pressure (Pa)']);
-    var maxStress = 4 * params.L * params.particle_density * params.g_mag * 0.6;
-    layout.xaxis2 = {
-        range: [0, maxStress],
-        title: 'Stress (Pa)',
-        overlaying: 'x',
-        side: 'top',
-        rangemode: 'tozero',
-        color: 'blue'
-    }
+    let { data, layout } = LAYOUT.plotly_stress_graph('Stress (Pa)', 'Height (m)', ['Total Pressure (Pa)', 'Effective Pressure (Pa)', 'Hydraulic pressure (Pa)', 'DEM Pressure (Pa)']);
+    var maxStress = 4 * params.L0 * params.particle_density * params.g_mag * 0.6;
+    // layout.xaxis2 = {
+    //     range: [0, maxStress],
+    //     title: 'Stress (Pa)',
+    //     overlaying: 'x',
+    //     side: 'top',
+    //     rangemode: 'tozero',
+    //     color: 'blue'
+    // }
     Plotly.newPlot('stats', data, layout);
 }

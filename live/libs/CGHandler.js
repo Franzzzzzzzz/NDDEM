@@ -31,9 +31,11 @@ export function update_2d_cg_field(S, params) {
         if ( params.cg_field === 'Density' ) {
             val = S.cg_get_result(0, "RHO", 0);
             lut = sequential;
+            // val = val.map(x => x/60); // HACK!!!!
+            // console.log(val)
             // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
-            lut.setMax(params.particle_density*100);
+            lut.setMax(params.particle_density);
             lut.units = 'Density (kg/m<sup>'+String(params.dimension)+'</sup>)';
         } else if ( params.cg_field === 'Size' ) {
             val = S.cg_get_result(0, "RADIUS", 0);
@@ -56,7 +58,7 @@ export function update_2d_cg_field(S, params) {
             lut.setMin(-Math.PI);
             lut.setMax( Math.PI);
             lut.units = 'Velocity direction (rad)';
-        } else if ( params.cg_field === 'Pressure' || params.cg_field === 'Effective Pressure' ) {
+        } else if ( params.cg_field === 'Pressure' || params.cg_field === 'DEM Pressure' ) {
             val=S.cg_get_result(0, "Pressure", 0) ;
             lut = sequential;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
@@ -67,6 +69,7 @@ export function update_2d_cg_field(S, params) {
             val=S.cg_get_result(0, "Pressure", 0) ;
             // now loop through and any positions below p.water_table, add the weight of the water, i.e. p += p.water_density * p.g_mag * p.x
             let xmin = grid[0];
+            // let ymin = grid[1];
             let dx = grid[3];
             // let dy = grid[4];
             let nx = grid[6];
@@ -75,7 +78,7 @@ export function update_2d_cg_field(S, params) {
                 for (let j = 0; j < ny; j++) {
                     let index = i + j * nx;
                     let x = xmin + (i + 0.5) * dx;
-                    // let y = grid.ymin + (j + 0.5) * grid.dy;
+                    // let y = ymin + (j + 0.5) * dy;
                     if (params.dimension === 2) {
                         if (x < params.water_table) {
                             val[index] += params.water_density * params.g_mag * (params.water_table - x);
