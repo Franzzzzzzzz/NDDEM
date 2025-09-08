@@ -291,6 +291,9 @@ export function add_scale(params, scene) {
 }
 
 export function add_scale_undrained(params, scene) {
+    if (params.L_cur === undefined) { params.L_cur = params.L; }
+    if (params.R_cur === undefined) { params.R_cur = params.L; }
+
     var XYaxeslength = 2 * params.L - params.thickness / 2.; // length of axes vectors
 
     var fontsize = 0.1 * params.L; // font size
