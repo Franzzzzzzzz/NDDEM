@@ -5,7 +5,7 @@ import font_file from '../resources/helvetiker_bold.typeface.json';
 
 export let left, right, floor, roof, front, back;
 export let axesHelper, arrow_x, arrow_y, arrow_z;
-let arrow_body, arrow_head;
+let arrow_body, arrow_head, arrow_body_z;
 let textGeo_x, textGeo_y, textGeo_z;
 // let font;
 
@@ -55,7 +55,8 @@ const arrow_material = new THREE.MeshLambertMaterial({ color: arrow_colour });
 
 export function add_circle_wall(params, scene) {
     if (left !== undefined) { scene.remove(left); }
-    const circle_geometry = new THREE.RingGeometry(params.R, params.R + params.thickness, 100, 1);
+    if (circle_geometry) { circle_geometry.dispose(); }
+    circle_geometry = new THREE.RingGeometry(params.R, params.R + params.thickness, 100, 1);
     left = new THREE.Mesh(circle_geometry, wall_material);
     left.rotation.x = Math.PI;
     scene.add(left);
@@ -172,6 +173,14 @@ export function add_scale(params, scene) {
     var fontsize = 0.1 * params.L; // font size
     var thickness = 0.02 * params.L; // line thickness
 
+    // clean up any text geometries
+    if (textGeo_x !== undefined) { textGeo_x.dispose(); }
+    if (textGeo_y !== undefined) { textGeo_y.dispose(); }
+    if (textGeo_z !== undefined) { textGeo_z.dispose(); }
+    if (arrow_body !== undefined) { arrow_body.dispose(); }
+    if (arrow_head !== undefined) { arrow_head.dispose(); }
+    if (arrow_body_z !== undefined) { arrow_body_z.dispose(); }
+
     if (axesHelper !== undefined) {
         scene.remove(axesHelper);
     } //else {}
@@ -180,14 +189,14 @@ export function add_scale(params, scene) {
     axesHelper = new THREE.Group();
     scene.add(axesHelper);
 
-    let arrow_body = new THREE.CylinderGeometry(
+    arrow_body = new THREE.CylinderGeometry(
         thickness,
         thickness,
         XYaxeslength - 2 * thickness,
         Math.pow(2, params.quality),
         Math.pow(2, params.quality)
     );
-    let arrow_head = new THREE.CylinderGeometry(
+    arrow_head = new THREE.CylinderGeometry(
         0,
         2 * thickness,
         4 * thickness,
@@ -209,12 +218,11 @@ export function add_scale(params, scene) {
     arrow_x.add(arrow_head_x);
     arrow_y.add(arrow_head_y);
 
-    var textGeo_x = new TextGeometry(String((2 * params.L * 1e3).toFixed(2)) + " mm", {
+    textGeo_x = new TextGeometry(String((2 * params.L * 1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_x = new THREE.MeshLambertMaterial({ color: 0xff0000 });
     var mesh_x = new THREE.Mesh(textGeo_x, arrow_material);
     mesh_x.position.y = XYaxeslength / 2. - 6 * fontsize;
     mesh_x.position.x = 2 * fontsize;
@@ -224,12 +232,11 @@ export function add_scale(params, scene) {
     // mesh_x.position.y = XYaxeslength/2.;
     arrow_x.add(mesh_x);
 
-    var textGeo_y = new TextGeometry(String((2 * params.L * 1e3).toFixed(2)) + " mm", {
+    textGeo_y = new TextGeometry(String((2 * params.L * 1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_y = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
     var mesh_y = new THREE.Mesh(textGeo_y, arrow_material);
     // mesh_y.position.x = -0.15 * params.L;
     // mesh_y.position.y = XYaxeslength;// - fontsize*6;
@@ -251,7 +258,7 @@ export function add_scale(params, scene) {
     var fontsize = 0.1 * params.L; // font size
     var thickness = 0.02 * params.L; // line thickness
 
-    var arrow_body_z = new THREE.CylinderGeometry(
+    arrow_body_z = new THREE.CylinderGeometry(
         thickness,
         thickness,
         Zaxislength - 4 * thickness,
@@ -263,12 +270,11 @@ export function add_scale(params, scene) {
     arrow_head_z.position.y = Zaxislength / 2;
     arrow_z.add(arrow_head_z);
 
-    var textGeo_z = new TextGeometry(String(((params.L + params.L_cur) * 1e3).toFixed(2)) + " mm", {
+    textGeo_z = new TextGeometry(String(((params.L + params.L_cur) * 1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_z = new THREE.MeshLambertMaterial({ color: 0x0000ff });
     var mesh_z = new THREE.Mesh(textGeo_z, arrow_material);
     mesh_z.position.x = - 1.5 * fontsize;
     // mesh_z.position.y = fontsize / 4;
@@ -294,6 +300,14 @@ export function add_scale_undrained(params, scene) {
     if (params.L_cur === undefined) { params.L_cur = params.L; }
     if (params.R_cur === undefined) { params.R_cur = params.L; }
 
+    // clean up any text geometries
+    if (textGeo_x !== undefined) { textGeo_x.dispose(); }
+    if (textGeo_y !== undefined) { textGeo_y.dispose(); }
+    if (textGeo_z !== undefined) { textGeo_z.dispose(); }
+    if (arrow_body !== undefined) { arrow_body.dispose(); }
+    if (arrow_head !== undefined) { arrow_head.dispose(); }
+    if (arrow_body_z !== undefined) { arrow_body_z.dispose(); }
+
     var XYaxeslength = 2 * params.L - params.thickness / 2.; // length of axes vectors
 
     var fontsize = 0.1 * params.L; // font size
@@ -307,14 +321,14 @@ export function add_scale_undrained(params, scene) {
     axesHelper = new THREE.Group();
     scene.add(axesHelper);
 
-    let arrow_body = new THREE.CylinderGeometry(
+    arrow_body = new THREE.CylinderGeometry(
         thickness,
         thickness,
         XYaxeslength - 2 * thickness,
         Math.pow(2, params.quality),
         Math.pow(2, params.quality)
     );
-    let arrow_head = new THREE.CylinderGeometry(
+    arrow_head = new THREE.CylinderGeometry(
         0,
         2 * thickness,
         4 * thickness,
@@ -336,12 +350,12 @@ export function add_scale_undrained(params, scene) {
     arrow_x.add(arrow_head_x);
     arrow_y.add(arrow_head_y);
 
-    var textGeo_x = new TextGeometry(String((2 * params.R_cur * 1e3).toFixed(2)) + " mm", {
+    textGeo_x = new TextGeometry(String((2 * params.R_cur * 1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_x = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+
     var mesh_x = new THREE.Mesh(textGeo_x, arrow_material);
     mesh_x.position.y = XYaxeslength / 2. - 6 * fontsize;
     mesh_x.position.x = 2 * fontsize;
@@ -351,12 +365,12 @@ export function add_scale_undrained(params, scene) {
     // mesh_x.position.y = XYaxeslength/2.;
     arrow_x.add(mesh_x);
 
-    var textGeo_y = new TextGeometry(String((2 * params.R_cur * 1e3).toFixed(2)) + " mm", {
+    textGeo_y = new TextGeometry(String((2 * params.R_cur * 1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_y = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+
     var mesh_y = new THREE.Mesh(textGeo_y, arrow_material);
     // mesh_y.position.x = -0.15 * params.L;
     // mesh_y.position.y = XYaxeslength;// - fontsize*6;
@@ -378,7 +392,7 @@ export function add_scale_undrained(params, scene) {
     var fontsize = 0.1 * params.L; // font size
     var thickness = 0.02 * params.L; // line thickness
 
-    var arrow_body_z = new THREE.CylinderGeometry(
+    arrow_body_z = new THREE.CylinderGeometry(
         thickness,
         thickness,
         Zaxislength - 4 * thickness,
@@ -390,12 +404,12 @@ export function add_scale_undrained(params, scene) {
     arrow_head_z.position.y = Zaxislength / 2;
     arrow_z.add(arrow_head_z);
 
-    var textGeo_z = new TextGeometry(String(((params.L + params.L_cur) * 1e3).toFixed(2)) + " mm", {
+    textGeo_z = new TextGeometry(String(((params.L + params.L_cur) * 1e3).toFixed(2)) + " mm", {
         font: font,
         size: fontsize,
         height: fontsize / 5,
     });
-    var textMaterial_z = new THREE.MeshLambertMaterial({ color: 0x0000ff });
+
     var mesh_z = new THREE.Mesh(textGeo_z, arrow_material);
     mesh_z.position.x = - 1.5 * fontsize;
     // mesh_z.position.y = fontsize / 4;
@@ -827,7 +841,7 @@ export function add_scale_isotropic(params, scene) {
         size: fontsize,
         height: fontsize / 5,
     });
-    //var textMaterial_z = new THREE.MeshLambertMaterial({ color: 0x0000ff });
+
     var mesh_z = new THREE.Mesh(textGeo_z, arrow_material);
     mesh_z.position.x = - 1.5 * fontsize;
     // mesh_z.position.y = fontsize / 4;
