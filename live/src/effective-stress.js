@@ -19,7 +19,6 @@ let camera, scene, renderer, stats, panel, controls;
 let water_mesh;
 let gui;
 let S;
-let pressure;
 
 var params = {
     dimension: 2,
@@ -189,7 +188,7 @@ async function init() {
         ));
         gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
         // gui.add(params, 'cg_field', ['Density', 'Velocity', 'Total Pressure', 'Effective Pressure', 'Hydrostatic Pressure', 'DEM Pressure', 'Shear stress']).name('Field').listen();
-        gui.add(params, 'cg_field', ['Density', 'Velocity', 'DEM Pressure', 'Shear stress']).name('Field').listen();
+        gui.add(params, 'cg_field', ['Density', 'Velocity', 'DEM Stress', 'Shear stress']).name('Field').listen();
         // gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
         //     update_cg_params(S, params);
         // });
@@ -207,7 +206,7 @@ async function init() {
         gui.add(params, 'water_table', 0, 2 * params.L0).name('Water table (m)').listen().onChange(() => {
             update_water_table();
         });
-        gui.add(params, 'water_density', 0, 2000).name('Water density (kg/m<sup>3</sup>/m)').listen();
+        gui.add(params, 'water_density', 0, 1500).name('Water density (kg/m<sup>3</sup>/m)').listen();
     }
 
     window.addEventListener('resize', onWindowResize, false);
@@ -292,7 +291,7 @@ function update_cg_params(S, params) {
     cgparam["time average"] = "None";
     cgparam["fields"] = ["RHO", "VAVG", "TC", "Pressure", "Shear stress"];
     cgparam["periodicity"] = [false, true];
-    cgparam["window"] = "Lucy2D";
+    cgparam["window"] = "LucyND";
     cgparam["dimension"] = 2;
 
 
@@ -365,7 +364,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
-        // S.simu_interpret_command("set damping 0.001");
+        S.simu_interpret_command("set damping 0.001");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc / 20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
@@ -385,7 +384,8 @@ function update_graph() {
     let nx = grid[6];
     let ny = grid[7];
 
-    pressure = S.cg_get_result(0, "Pressure", 0);
+    // pressure = S.cg_get_result(0, "Pressure", 0);
+    let DEM_stress = S.cg_get_result(0, "TC", 0);
     let density = S.cg_get_result(0, "RHO", 0);
 
     // take an average along all same x values
@@ -411,8 +411,8 @@ function update_graph() {
             }
         }
         avgDensity[i] /= ny;
-        solid_fraction[i] = avgDensity[i] / params.particle_density / 100;
-        // solid_fraction[i] = 0.6; // HACK!! THERE IS AN ISSUE WITH THE DENSITY FIELD BEING 100X TOO LARGE
+        solid_fraction[i] = avgDensity[i] / params.particle_density;
+        // console.log(solid_fraction[i])
         porosity[i] = 1 - solid_fraction[i];
     }
 
@@ -439,10 +439,11 @@ function update_graph() {
 
         for (let j = 0; j < ny; j++) {
             let index = i + j * nx;
-            DEMPressure[i] += pressure[index];
+
+            DEMPressure[i] += DEM_stress[index];
+            // console.log(DEM_stress);
         }
-        DEMPressure[i] /= ny * 100; // HACK!! THERE IS AN ISSUE WITH THE DENSITY FIELD BEING 100X TOO LARGE
-        // totalPressure[i] = avgPressure[i] + hydraulicPressure[i];
+        DEMPressure[i] /= ny * 2; // HACK: FACTOR OF TWO FOR MYSTERIOIUS REASONS
     }
 
 
@@ -478,7 +479,7 @@ function update_graph() {
 }
 
 function make_graph() {
-    let { data, layout } = LAYOUT.plotly_stress_graph('Stress (Pa)', 'Height (m)', ['Total Pressure (Pa)', 'Effective Pressure (Pa)', 'Hydraulic pressure (Pa)', 'DEM Pressure (Pa)']);
+    let { data, layout } = LAYOUT.plotly_stress_graph('Stress (Pa)', 'Height (m)', ['Total Vertical Stress (Pa)', 'Effective Vertical Stress (Pa)', 'Pore water pressure (Pa)', 'DEM Vertical Stress (Pa)']);
     var maxStress = 4 * params.L0 * params.particle_density * params.g_mag * 0.6;
     // layout.xaxis2 = {
     //     range: [0, maxStress],

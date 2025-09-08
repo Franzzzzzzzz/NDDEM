@@ -32,7 +32,7 @@ export function update_2d_cg_field(S, params) {
             val = S.cg_get_result(0, "RHO", 0);
             lut = sequential;
             // val = val.map(x => x/60); // HACK!!!!
-            // console.log(val)
+            console.log(val)
             // let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax(params.particle_density);
