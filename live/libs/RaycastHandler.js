@@ -46,8 +46,24 @@ function onMouseMove(event) {
 
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
-    let new_x = (event.clientX / window.innerWidth) * 2 - 1;
-    let new_y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    let new_x, new_y;
+
+    if (params.graph_fraction !== undefined) {
+        // assume left part taken up by a graph (canvas takes right half of screen)
+        let canvas_width = window.innerWidth / 2.;
+        let canvas_offset_x = window.innerWidth / 2.; // canvas starts at middle of screen
+
+        // Adjust mouse coordinates to be relative to the canvas area only
+        let canvas_relative_x = event.clientX - canvas_offset_x;
+
+        new_x = (canvas_relative_x / canvas_width) * 2 - 1;
+        new_y = - (event.clientY / window.innerHeight) * 2 + 1;
+    } else {
+        // Full screen canvas
+        new_x = (event.clientX / window.innerWidth) * 2 - 1;
+        new_y = - (event.clientY / window.innerHeight) * 2 + 1;
+    }
     let dt = Date.now() - last_time;
     vel = [200 * (mouse.x - new_x) / dt, 200 * (new_y - mouse.y) / dt]; // NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
@@ -67,8 +83,23 @@ function onTouchMove(event) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
 
-    let new_x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
-    let new_y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    let new_x, new_y;
+
+    if (params.graph_fraction !== undefined) {
+        // assume left part taken up by a graph (canvas takes right half of screen)
+        let canvas_width = window.innerWidth / 2.;
+        let canvas_offset_x = window.innerWidth / 2.; // canvas starts at middle of screen
+
+        // Adjust touch coordinates to be relative to the canvas area only
+        let canvas_relative_x = event.touches[0].clientX - canvas_offset_x;
+
+        new_x = (canvas_relative_x / canvas_width) * 2 - 1;
+        new_y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    } else {
+        // Full screen canvas
+        new_x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+        new_y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    }
     let dt = Date.now() - last_time;
     vel = [200 * (mouse.x - new_x) / dt, 200 * (new_y - mouse.y) / dt]; // HACK: NEED TO SCALE FROM PIXELS TO METERS
     mouse.x = new_x;
@@ -171,8 +202,22 @@ function onSelectParticleMouse(event) {
 function onSelectParticleTouch(event) {
     // console.debug('select particle by touch');
     // console.debug(locked_particle, INTERSECTED)
-    mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+
+    if (params.graph_fraction !== undefined) {
+        // assume left part taken up by a graph (canvas takes right half of screen)
+        let canvas_width = window.innerWidth / 2.;
+        let canvas_offset_x = window.innerWidth / 2.; // canvas starts at middle of screen
+
+        // Adjust touch coordinates to be relative to the canvas area only
+        let canvas_relative_x = event.touches[0].clientX - canvas_offset_x;
+
+        mouse.x = (canvas_relative_x / canvas_width) * 2 - 1;
+        mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    } else {
+        // Full screen canvas
+        mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
+    }
     calculate_intersection(mouse)
     // if no particle is currently caught but I AM intersecting with something
     if (locked_particle === null && INTERSECTED !== null) {

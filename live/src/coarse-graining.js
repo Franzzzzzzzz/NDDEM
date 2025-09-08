@@ -34,7 +34,7 @@ var params = {
     d4: { cur: 0 },
     r_max: 0.0045,
     r_min: 0.0035,
-    particle_density: 1,
+    particle_density: 2700,
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -46,7 +46,7 @@ var params = {
     cg_opacity: 0.8,
     cg_window_size: 3,
     particle_opacity: 0.5,
-    F_mag_max: 0.005,
+    F_mag_max: 13.5,
     aspect_ratio: 1,
     nogui: false,
 }
@@ -244,7 +244,7 @@ function update_cg_params(S, params) {
     cgparam["time average"] = "None";
     cgparam["fields"] = ["RHO", "VAVG", "TC", "Pressure", "Shear stress"];
     cgparam["periodicity"] = [false, false];
-    cgparam["window"] = "Lucy2D";
+    cgparam["window"] = "LucyND";
     cgparam["dimension"] = 2;
 
 
@@ -331,7 +331,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
-        S.simu_interpret_command("set damping 0.001");
+        // S.simu_interpret_command("set damping 0.001");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc / 20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces

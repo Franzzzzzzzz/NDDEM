@@ -26,6 +26,7 @@ module.exports = [{
         'dam-break': ['./live/src/dam-break.js'],
         'dam-break-2d': ['./live/src/dam-break-2d.js'],
         'effective-stress': ['./live/src/effective-stress.js'],
+        // 'collision': ['./live/src/collision.js'],
         'code': ['./live/src/code.js'],
     },
     plugins: [
@@ -159,6 +160,13 @@ module.exports = [{
             filename: "dam-break-2d.html",
             chunks: ['dam-break-2d']
         }),
+        // new HtmlWebpackPlugin({
+        //     title: 'NDDEM Collision',
+        //     favicon: "./visualise/resources/favicon.ico",
+        //     template: "live/template.html",
+        //     filename: "collision.html",
+        //     chunks: ['collision']
+        // }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Effective Stress',
             favicon: "./visualise/resources/favicon.ico",
