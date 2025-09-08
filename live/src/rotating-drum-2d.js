@@ -408,7 +408,7 @@ function update_cg_params(S, params) {
     cgparam["time average"] = "None";
     cgparam["fields"] = ["RHO", "VAVG", "TC", "Pressure", "KineticPressure", "RADIUS"];
     cgparam["periodicity"] = [false, false];
-    cgparam["window"] = "Lucy2D";
+    cgparam["window"] = "LucyND";
     cgparam["dimension"] = 2;
 
 

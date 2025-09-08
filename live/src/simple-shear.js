@@ -30,14 +30,14 @@ let S;
 
 var params = {
     dimension: 2,
-    L: 16*0.004, //system size
+    L: 16 * 0.004, //system size
     initial_density: 0.90,
     zoom: 1000,
     aspect_ratio: 2,
     // paused: false,
     // g_mag: 1e3,
     // theta: 0, // slope angle in DEGREES
-    d4: {cur:0},
+    d4: { cur: 0 },
     r_max: 0.005,
     r_min: 0.003,
     particle_density: 2700,
@@ -55,45 +55,45 @@ var params = {
     particle_opacity: 0.5,
     F_mag_max: 1e1,
     audio: false,
-    audio_sensitivity : 1,
+    audio_sensitivity: 1,
 }
 
-let rainbow    = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
+let rainbow = new Lut("rainbow", 512); // options are rainbow, cooltowarm and blackbody
 let cooltowarm = new Lut("cooltowarm", 512); // options are rainbow, cooltowarm and blackbody
-let blackbody  = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
+let blackbody = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
-params.average_radius = (params.r_min + params.r_max)/2.;
+params.average_radius = (params.r_min + params.r_max) / 2.;
 params.thickness = params.average_radius;
 
 
-if ( urlParams.has('dimension') ) {
+if (urlParams.has('dimension')) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
-if ( params.dimension === 2) {
-    params.particle_volume = Math.PI*Math.pow(params.average_radius,2);
+if (params.dimension === 2) {
+    params.particle_volume = Math.PI * Math.pow(params.average_radius, 2);
 }
-else if ( params.dimension === 3 ) {
-    params.particle_volume = 4./3.*Math.PI*Math.pow(params.average_radius,3);
+else if (params.dimension === 3) {
+    params.particle_volume = 4. / 3. * Math.PI * Math.pow(params.average_radius, 3);
 }
-else if ( params.dimension === 4) {
+else if (params.dimension === 4) {
 
     params.L = 2.5;
     params.N = 300
-    params.particle_volume = Math.PI*Math.PI*Math.pow(params.average_radius,4)/2.;
+    params.particle_volume = Math.PI * Math.PI * Math.pow(params.average_radius, 4) / 2.;
 }
 
-params.N = Math.ceil( params.initial_density*4*params.L*params.L*params.aspect_ratio / params.particle_volume );
+params.N = Math.ceil(params.initial_density * 4 * params.L * params.L * params.aspect_ratio / params.particle_volume);
 
 params.particle_mass = params.particle_volume * params.particle_density;
 
-if ( urlParams.has('cg_width') ) { params.cg_width = parseInt(urlParams.get('cg_width')); }
-if ( urlParams.has('cg_height') ) { params.cg_height = parseInt(urlParams.get('cg_height')); }
-if ( urlParams.has('cg_opacity') ) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
-if ( urlParams.has('particle_opacity') ) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
+if (urlParams.has('cg_width')) { params.cg_width = parseInt(urlParams.get('cg_width')); }
+if (urlParams.has('cg_height')) { params.cg_height = parseInt(urlParams.get('cg_height')); }
+if (urlParams.has('cg_opacity')) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
+if (urlParams.has('particle_opacity')) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
 
-if ( urlParams.has('quality') ) { params.quality = parseInt(urlParams.get('quality')); }
+if (urlParams.has('quality')) { params.quality = parseInt(urlParams.get('quality')); }
 
-SPHERES.createNDParticleShader(params).then( init );
+SPHERES.createNDParticleShader(params).then(init);
 
 async function init() {
 
@@ -109,24 +109,24 @@ async function init() {
         -1000,
         1000
     );
-    camera.position.set( 0, 0, -5*params.L );
+    camera.position.set(0, 0, -5 * params.L);
     camera.up.set(0, 1, 0);
-    camera.lookAt(0,0,0);
+    camera.lookAt(0, 0, 0);
     // console.log(camera)
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x111 );
+    scene.background = new THREE.Color(0x111);
 
     const hemiLight = new THREE.HemisphereLight();
     hemiLight.intensity = 0.35;
-    scene.add( hemiLight );
+    scene.add(hemiLight);
 
     const dirLight = new THREE.DirectionalLight();
-    dirLight.position.set( 5, -5, -5 );
+    dirLight.position.set(5, -5, -5);
     dirLight.castShadow = true;
-    scene.add( dirLight );
+    scene.add(dirLight);
 
-    SPHERES.add_spheres(S,params,scene);
+    SPHERES.add_spheres(S, params, scene);
 
     // WALLS.add_back(params, scene);
     // WALLS.add_left(params, scene);
@@ -140,7 +140,7 @@ async function init() {
     //     mesh.scale.z = 2*params.L + 2*params.thickness;
     // });
 
-    CGHANDLER.add_cg_mesh(2*params.L*params.aspect_ratio, 2*params.L, scene);
+    CGHANDLER.add_cg_mesh(2 * params.L * params.aspect_ratio, 2 * params.L, scene);
 
     // geometry = new THREE.PlaneGeometry( 2*params.L, 0.1*params.L );
     // material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
@@ -149,44 +149,44 @@ async function init() {
     // scene.add( colorbar_mesh );
 
 
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
-    var container = document.getElementById( 'canvas' );
-    container.appendChild( renderer.domElement );
+    var container = document.getElementById('canvas');
+    container.appendChild(renderer.domElement);
 
     gui = new GUI();
     gui.width = 320;
 
-    if ( params.dimension == 4 ) {
-        gui.add( params.d4, 'cur', -params.L,params.L, 0.001)
-            .name( 'D4 location').listen()
-            .onChange( function () {
-                if ( urlParams.has('stl') ) {
-                    meshes = renderSTL( meshes, NDsolids, scene, material, params.d4.cur );
+    if (params.dimension == 4) {
+        gui.add(params.d4, 'cur', -params.L, params.L, 0.001)
+            .name('D4 location').listen()
+            .onChange(function () {
+                if (urlParams.has('stl')) {
+                    meshes = renderSTL(meshes, NDsolids, scene, material, params.d4.cur);
                 }
             });
     }
     // gui.add ( params, 'particle_opacity', 0, 1).name('Particle opacity').listen().onChange( () => SPHERES.update_particle_material(params,
-        // lut_folder
+    // lut_folder
     // ));
-    gui.add ( params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
-    gui.add ( params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
-    gui.add ( params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange( () => {
+    gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
+    gui.add(params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
+    gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
         update_cg_params(S, params);
     });
     // gui.add ( params, 'shear_rate', 0, 2, 0.001).name('Shear rate').listen().onChange( update_wall_particle_velocities );
-    gui.add ( params, 'shear_rate', {Slow : 1e-2, Medium: 1e-1, Fast: 1e0}).name('Shear rate').listen().onChange( update_wall_particle_velocities );
-    
-    
-    gui.add ( params, 'audio_sensitivity', 1, 1e3, 1).name('Audio sensitivity');
-    gui.add ( params, 'audio').name('Audio').listen().onChange(() => {
-        if ( AUDIO.listener === undefined ) {
-            AUDIO.make_listener( camera );
-            AUDIO.add_fixed_sound_source ( [0,0,0] );
+    gui.add(params, 'shear_rate', { Slow: 1e-2, Medium: 1e-1, Fast: 1e0 }).name('Shear rate').listen().onChange(update_wall_particle_velocities);
+
+
+    gui.add(params, 'audio_sensitivity', 1, 1e3, 1).name('Audio sensitivity');
+    gui.add(params, 'audio').name('Audio').listen().onChange(() => {
+        if (AUDIO.listener === undefined) {
+            AUDIO.make_listener(camera);
+            AUDIO.add_fixed_sound_source([0, 0, 0]);
             // SPHERES.add_normal_sound_to_all_spheres();
         } else {
             // AUDIO.remove_listener( camera ); // doesn't do anything at the moment...
@@ -194,12 +194,12 @@ async function init() {
         }
     });
 
-    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener('resize', onWindowResize, false);
 
     animate();
 }
 
-function onWindowResize(){
+function onWindowResize() {
 
     // camera.aspect = window.innerWidth / window.innerHeight;
     // camera.updateProjectionMatrix();
@@ -209,134 +209,134 @@ function onWindowResize(){
     camera.bottom = 100 / params.zoom;
     camera.top = -100 / params.zoom;
     camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
-    requestAnimationFrame( animate );
-    SPHERES.move_spheres(S,params);
-    if ( AUDIO.listener !== undefined ){
+    requestAnimationFrame(animate);
+    SPHERES.move_spheres(S, params);
+    if (AUDIO.listener !== undefined) {
         SPHERES.update_fixed_sounds(S, params);
     }
     RAYCAST.animate_locked_particle(S, camera, SPHERES.spheres, params);
-    if ( !params.paused ) {
+    if (!params.paused) {
         // let v = S.simu_getVelocity();
         // console.log(v);
 
         S.simu_step_forward(15);
-        CGHANDLER.update_2d_cg_field(S,params);
+        CGHANDLER.update_2d_cg_field(S, params);
 
     }
     SPHERES.draw_force_network(S, params, scene);
-    renderer.render( scene, camera );
+    renderer.render(scene, camera);
 }
 function update_cg_params(S, params) {
-    var cgparam ={} ;
-    cgparam["file"]=[{"filename":"none", "content": "particles", "format":"interactive", "number":1}] ;
-    cgparam["boxes"]=[params.cg_width,params.cg_height] ;
+    var cgparam = {};
+    cgparam["file"] = [{ "filename": "none", "content": "particles", "format": "interactive", "number": 1 }];
+    cgparam["boxes"] = [params.cg_width, params.cg_height];
     // cgparam["boundaries"]=[[-params.L,-params.L,-params.L],[params.L,params.L,params.L]] ;
-    cgparam["boundaries"]=[
-        [-params.L*params.aspect_ratio,-params.L],
-        [ params.L*params.aspect_ratio, params.L]] ;
-    cgparam["window size"]=params.cg_window_size*params.average_radius ;
-    cgparam["skip"]=0;
-    cgparam["max time"]=1 ;
-    cgparam["time average"]="None" ;
-    cgparam["fields"]=["RHO", "VAVG", "TC","Pressure","ShearStress"] ;
-    cgparam["periodicity"]=[false,false];
-    cgparam["window"]="Lucy2D";
-    cgparam["dimension"]=2;
+    cgparam["boundaries"] = [
+        [-params.L * params.aspect_ratio, -params.L],
+        [params.L * params.aspect_ratio, params.L]];
+    cgparam["window size"] = params.cg_window_size * params.average_radius;
+    cgparam["skip"] = 0;
+    cgparam["max time"] = 1;
+    cgparam["time average"] = "None";
+    cgparam["fields"] = ["RHO", "VAVG", "TC", "Pressure", "ShearStress"];
+    cgparam["periodicity"] = [false, false];
+    cgparam["window"] = "LucyND";
+    cgparam["dimension"] = 2;
 
 
     // console.log(JSON.stringify(cgparam)) ;
-    S.cg_param_from_json_string(JSON.stringify(cgparam)) ;
-    S.cg_setup_CG() ;
+    S.cg_param_from_json_string(JSON.stringify(cgparam));
+    S.cg_setup_CG();
 }
 
 async function NDDEMCGPhysics() {
 
-    if ( 'DEMCGND' in window === false ) {
+    if ('DEMCGND' in window === false) {
 
-        console.error( 'NDDEMPhysics: Couldn\'t find DEMCGND.js' );
+        console.error('NDDEMPhysics: Couldn\'t find DEMCGND.js');
         return;
 
     }
 
-    await DEMCGND().then( (NDDEMCGLib) => {
-        if ( params.dimension == 2 ) {
-            S = new NDDEMCGLib.DEMCG2D (params.N);
+    await DEMCGND().then((NDDEMCGLib) => {
+        if (params.dimension == 2) {
+            S = new NDDEMCGLib.DEMCG2D(params.N);
         }
-        else if ( params.dimension == 3 ) {
-            S = new NDDEMCGLib.DEMCG3D (params.N);
+        else if (params.dimension == 3) {
+            S = new NDDEMCGLib.DEMCG3D(params.N);
         }
-        else if ( params.dimension == 4 ) {
-            S = new NDDEMCGLib.DEMCG4D (params.N);
+        else if (params.dimension == 4) {
+            S = new NDDEMCGLib.DEMCG4D(params.N);
         }
-        else if ( params.dimension == 5 ) {
-            S = new NDDEMCGLib.DEMCG5D (params.N);
+        else if (params.dimension == 5) {
+            S = new NDDEMCGLib.DEMCG5D(params.N);
         }
         finish_setup();
-    } );
+    });
 
 
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
         S.simu_interpret_command("radius -1 0.5");
         let m;
-        if ( params.dimension === 2) {
-            m = Math.PI*0.5*0.5*params.particle_density;
+        if (params.dimension === 2) {
+            m = Math.PI * 0.5 * 0.5 * params.particle_density;
         } else {
-            m = 4./3.*Math.PI*0.5*0.5*0.5*params.particle_density;
+            m = 4. / 3. * Math.PI * 0.5 * 0.5 * 0.5 * params.particle_density;
         }
 
         S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
-        S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+        S.simu_interpret_command("auto radius uniform " + params.r_min + " " + params.r_max);
         S.simu_interpret_command("auto mass");
         S.simu_interpret_command("auto inertia");
         S.simu_interpret_command("auto skin");
 
         // console.log("boundary 0 MOVINGWALL -"+String(params.L)+" "+String(params.L) + " 0 " + String(2*params.L*params.shear_rate))
         // S.simu_interpret_command("boundary 0 MOVINGSIDEWAYSWALL -"+String(params.L)+" "+String(params.L) + " 0 " + String(-2*params.L*params.shear_rate));
-        S.simu_interpret_command("boundary 0 PBC -"+String(params.aspect_ratio*params.L)+" "+String(params.aspect_ratio*params.L));
-        S.simu_interpret_command("boundary 1 WALL -"+String(params.L)+" "+String(params.L));
-        
+        S.simu_interpret_command("boundary 0 PBC -" + String(params.aspect_ratio * params.L) + " " + String(params.aspect_ratio * params.L));
+        S.simu_interpret_command("boundary 1 WALL -" + String(params.L) + " " + String(params.L));
+
         // S.simu_interpret_command("gravity 0 -1 ");
 
         S.simu_interpret_command("auto location randomdrop");
 
         let tc = 1e-2;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
-        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient (tc, rest, params.particle_mass)
+        let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient(tc, rest, params.particle_mass)
 
         S.simu_interpret_command("set Kn " + String(vals.stiffness));
-        S.simu_interpret_command("set Kt " + String(0.8*vals.stiffness));
+        S.simu_interpret_command("set Kt " + String(0.8 * vals.stiffness));
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu 0.5");
         S.simu_interpret_command("set damping 0.01");
         S.simu_interpret_command("set T 1000000");
-        S.simu_interpret_command("set dt " + String(tc/20));
+        S.simu_interpret_command("set dt " + String(tc / 20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
         // S.simu_interpret_command("auto skin");
 
         // now fix the wall roughness
-        let n_wall = Math.ceil(2*params.aspect_ratio*params.L/(params.average_radius*2));
-        for ( var i=0; i<n_wall; i++ ) {
-            let d = params.average_radius - params.aspect_ratio**params.L + i*params.average_radius*2; // location in x1 of these particles
+        let n_wall = Math.ceil(2 * params.aspect_ratio * params.L / (params.average_radius * 2));
+        for (var i = 0; i < n_wall; i++) {
+            let d = params.average_radius - params.aspect_ratio ** params.L + i * params.average_radius * 2; // location in x1 of these particles
             console.log("radius " + String(i) + " " + String(params.average_radius));
             S.simu_interpret_command("location " + String(i) + " " + String(d) + " " + String(-params.L));
 
-            S.simu_setRadius(i,params.average_radius);
-            S.simu_setVelocity(i,[params.shear_rate*2*params.L,0]);
+            S.simu_setRadius(i, params.average_radius);
+            S.simu_setVelocity(i, [params.shear_rate * 2 * params.L, 0]);
             S.simu_setFrozen(i);
 
-            S.simu_interpret_command("location " + String(n_wall+i) + " " + String(d) + " " + String(params.L));
-            S.simu_setFrozen(n_wall+i);
-            S.simu_setRadius(n_wall+i,params.average_radius);
+            S.simu_interpret_command("location " + String(n_wall + i) + " " + String(d) + " " + String(params.L));
+            S.simu_setFrozen(n_wall + i);
+            S.simu_setRadius(n_wall + i, params.average_radius);
         }
 
-        S.simu_finalise_init () ;
+        S.simu_finalise_init();
 
         // let v = S.simu_getVelocity();
         // console.log(v);
@@ -347,8 +347,8 @@ async function NDDEMCGPhysics() {
 
 function update_wall_particle_velocities() {
     console.log(params.shear_rate)
-    let n_wall = Math.ceil(2*params.aspect_ratio*params.L/(params.average_radius*2));
-        for ( var i=0; i<n_wall; i++ ) {
-            S.simu_setVelocity(i,[params.shear_rate*2*params.L,0]);
-        }
+    let n_wall = Math.ceil(2 * params.aspect_ratio * params.L / (params.average_radius * 2));
+    for (var i = 0; i < n_wall; i++) {
+        S.simu_setVelocity(i, [params.shear_rate * 2 * params.L, 0]);
+    }
 }
