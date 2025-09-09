@@ -182,7 +182,7 @@ async function init() {
         // lut_folder
         // ));
         gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
-        gui.add(params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Shear stress']).name('Field').listen();
+        gui.add(params, 'cg_field', ['Density', 'Velocity', 'Pressure', 'Horizontal Stress', 'Vertical Stress', 'Shear stress']).name('Field').listen();
         gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
             update_cg_params(S, params);
         });
