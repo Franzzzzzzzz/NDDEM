@@ -202,6 +202,17 @@ async function init() {
     window.addEventListener('resize', onWindowResize, false);
     RAYCAST.update_world(S, camera, params);
 
+    // Handle tab visibility changes to prevent timing issues
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            params.paused = true;
+            console.log('tab hidden - pausing simulation');
+        } else {
+            // Tab became visible - resume simulation and reset timing
+            params.paused = false;
+        }
+    });
+
 
     animate();
 }
