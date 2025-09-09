@@ -170,8 +170,10 @@ async function init() {
 
     gui.add(params, 'initial_packing_fraction', 0.55, 0.65, 0.01)
         .name('Initial solids fraction').listen().onChange(reset_particles);
-    gui.add(params, 'loading_rate', 0.001, 0.1, 0.001).name('Loading rate (mm/s)');
-    gui.add(params, 'max_force', 0, 1e4).name('Max force (N)');
+    // gui.add(params, 'loading_rate', 0.001, 0.1, 0.001).name('Loading rate (mm/s)');
+    gui.add(params, 'max_force', 0, 1e4).name('Max force (N)').onChange(() => {
+        params.target_stress = params.max_force / params.loading_area;
+    });
     if (params.dimension == 4) {
         gui.add(params.d4, 'cur', -params.L, params.L, 0.001)
             .name('D4 location').listen()
