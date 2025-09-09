@@ -188,7 +188,7 @@ async function init() {
         ));
         gui.add(params, 'cg_opacity', 0, 1).name('Coarse grain opacity').listen();
         // gui.add(params, 'cg_field', ['Density', 'Velocity', 'Total Pressure', 'Effective Pressure', 'Hydrostatic Pressure', 'DEM Pressure', 'Shear stress']).name('Field').listen();
-        gui.add(params, 'cg_field', ['Density', 'Velocity', 'DEM Stress', 'Shear stress']).name('Field').listen();
+        gui.add(params, 'cg_field', ['Density', 'Velocity', 'Vertical Stress', 'Horizontal Stress', 'Pressure', 'Shear stress']).name('Field').listen();
         // gui.add(params, 'cg_window_size', 0.5, 6).name('Window size (radii)').listen().onChange(() => {
         //     update_cg_params(S, params);
         // });

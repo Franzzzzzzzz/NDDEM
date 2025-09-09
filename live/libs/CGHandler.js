@@ -58,7 +58,7 @@ export function update_2d_cg_field(S, params) {
             lut.setMin(-Math.PI);
             lut.setMax( Math.PI);
             lut.units = 'Velocity direction (rad)';
-        } else if ( params.cg_field === 'Pressure' || params.cg_field === 'DEM Pressure' ) {
+        } else if ( params.cg_field === 'Pressure' ) {
             val=S.cg_get_result(0, "Pressure", 0) ;
             lut = sequential;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
