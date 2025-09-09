@@ -49,7 +49,7 @@ function onMouseMove(event) {
 
     let new_x, new_y;
 
-    if (params.graph_fraction !== undefined) {
+    if (params && params.graph_fraction !== undefined) {
         // assume left part taken up by a graph (canvas takes right half of screen)
         let canvas_width = window.innerWidth / 2.;
         let canvas_offset_x = window.innerWidth / 2.; // canvas starts at middle of screen
@@ -85,7 +85,7 @@ function onTouchMove(event) {
 
     let new_x, new_y;
 
-    if (params.graph_fraction !== undefined) {
+    if (params && params.graph_fraction !== undefined) {
         // assume left part taken up by a graph (canvas takes right half of screen)
         let canvas_width = window.innerWidth / 2.;
         let canvas_offset_x = window.innerWidth / 2.; // canvas starts at middle of screen
@@ -203,7 +203,7 @@ function onSelectParticleTouch(event) {
     // console.debug('select particle by touch');
     // console.debug(locked_particle, INTERSECTED)
 
-    if (params.graph_fraction !== undefined) {
+    if (params && params.graph_fraction !== undefined) {
         // assume left part taken up by a graph (canvas takes right half of screen)
         let canvas_width = window.innerWidth / 2.;
         let canvas_offset_x = window.innerWidth / 2.; // canvas starts at middle of screen
