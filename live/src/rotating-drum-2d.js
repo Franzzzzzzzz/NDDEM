@@ -241,6 +241,16 @@ async function init() {
     }
 
     window.addEventListener('resize', onWindowResize, false);
+    // Handle tab visibility changes to prevent timing issues
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            params.paused = true;
+            console.log('tab hidden - pausing simulation');
+        } else {
+            // Tab became visible - resume simulation and reset timing
+            params.paused = false;
+        }
+    });
 
     update_Fr();
     // update_walls();

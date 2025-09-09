@@ -735,7 +735,6 @@ export function add_scale_isotropic(params, scene) {
     // if you haven't already made the axes
 
     axesHelper = new THREE.Group();
-    scene.add(axesHelper);
 
     let arrow_length = XYaxeslength - 2 * thickness;
     if (arrow_body === undefined) {
@@ -763,12 +762,12 @@ export function add_scale_isotropic(params, scene) {
 
     arrow_x = new THREE.Group();
     arrow_y = new THREE.Group();
+    arrow_z = new THREE.Group();
 
     let arrow_body_x = new THREE.Mesh(arrow_body, arrow_material);
     let arrow_body_y = new THREE.Mesh(arrow_body, arrow_material);
-    arrow_body_x.scale.y = arrow_length;
-    arrow_body_y.scale.y = arrow_length;
-
+    arrow_body_x.scale.z = arrow_length;
+    arrow_body_y.scale.z = arrow_length;
 
     arrow_x.add(arrow_body_x);
     arrow_y.add(arrow_body_y);
@@ -820,21 +819,18 @@ export function add_scale_isotropic(params, scene) {
     var fontsize = 0.1 * params.L; // font size
     var thickness = 0.02 * params.L; // line thickness
 
-    // var arrow_body_z = new THREE.CylinderGeometry(
-    //   thickness,
-    //   thickness,
-    //   Zaxislength - 4*thickness,
-    //   Math.pow(2, params.quality),
-    //   Math.pow(2, params.quality)
-    // );
-    let arrow_body_z = new THREE.Mesh(arrow_body, arrow_material);
-    arrow_body_z.scale.y = Zaxislength - 4 * thickness;
+    arrow_body_z = new THREE.CylinderGeometry(
+        thickness,
+        thickness,
+        Zaxislength - 4 * thickness,
+        Math.pow(2, params.quality),
+        Math.pow(2, params.quality)
+    );
+    arrow_z = new THREE.Mesh(arrow_body_z, arrow_material);
     var arrow_head_z = new THREE.Mesh(arrow_head, arrow_material);
     arrow_head_z.position.y = Zaxislength / 2;
-
-    arrow_z = new THREE.Group();
-    arrow_z.add(arrow_body_z);
     arrow_z.add(arrow_head_z);
+    
 
     textGeo_z = new TextGeometry(String((2 * params.H_cur * 1e3).toFixed(2)) + " mm", {
         font: font,
@@ -861,6 +857,9 @@ export function add_scale_isotropic(params, scene) {
     axesHelper.rotation.z = Math.PI;
     // axesLabels.position.set(-params.L, params.L, -params.L); // move to bottom left hand corner
     // axesLabels.rotation.z = -Math.PI/2;
+
+    console.log(axesHelper)
+    scene.add(axesHelper);
 }
 
 

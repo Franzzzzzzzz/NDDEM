@@ -206,6 +206,20 @@ async function init() {
     controls.update();
 
     window.addEventListener('resize', onWindowResize, false);
+    // Handle tab visibility changes to prevent timing issues
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            params.paused = true;
+            console.log('tab hidden - pausing simulation');
+        } else {
+            // Tab became visible - resume simulation and reset timing
+            params.paused = false;
+            // Reset old_time to current time to prevent large dt jumps
+            if (old_time) {
+                old_time = clock.getElapsedTime() - startTime;
+            }
+        }
+    });
 
     make_graph();
     WALLS.update_top_wall_drained(params, S, scene);
