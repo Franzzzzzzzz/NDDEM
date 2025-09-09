@@ -39,13 +39,13 @@ var params = {
         max: 0,
     },
 
-    strip : {
+    strip: {
         width: 0.1,
         height: 0.1,
-        x : 0,
-        y : 0.25,
-        vy : -0.1,
-        vx : 0,
+        x: 0,
+        y: 0.25,
+        vy: -0.1,
+        vx: 0,
     },
     // N: 400,
     gravity: true,
@@ -54,7 +54,7 @@ var params = {
     r_min: 0.01,
     r_max: 0.011,
     omega: 5, // rotation rate
-    lut: 'Size',
+    lut: 'None',
     quality: 5,
     vmax: 20, // max velocity to colour by
     omegamax: 20, // max rotation rate to colour by
@@ -63,7 +63,7 @@ var params = {
     target_nu: 0.8,
     show_gui: true,
     period: 5000,
-    damping: 0.01,
+    damping: 0.0,
     time: 0,
     particle_opacity: 0.8,
 }
@@ -115,11 +115,11 @@ async function init() {
     if ((top - bottom) > (right - left)) {
         left = zoom * params.boundary0.min;
         right = zoom * params.boundary0.max;
-        top = zoom * params.boundary1.max/ aspect;
-        bottom = zoom * params.boundary1.min/ aspect;
+        top = zoom * params.boundary1.max / aspect;
+        bottom = zoom * params.boundary1.min / aspect;
     } else {
-        left = zoom * params.boundary0.min/ aspect;
-        right = zoom * params.boundary0.max/ aspect;
+        left = zoom * params.boundary0.min / aspect;
+        right = zoom * params.boundary0.max / aspect;
         top = zoom * params.boundary1.max;
         bottom = zoom * params.boundary1.min;
     }
@@ -157,9 +157,9 @@ async function init() {
         gui = new GUI();
 
         gui.width = 300;
-        gui.add(params, 'damping', 0, 1, 0.001).name('Damping').listen().onChange(() => {
-            S.simu_interpret_command("set damping " + String(params.damping));
-        });
+        // gui.add(params, 'damping', 0, 1, 0.001).name('Damping').listen().onChange(() => {
+        //     S.simu_interpret_command("set damping " + String(params.damping));
+        // });
         gui.add(params, 'particle_opacity', 0, 1, 0.01).name('Particle opacity').listen();
     }
 
@@ -235,19 +235,19 @@ async function NDDEMPhysics() {
 
     function finish_setup() {
         S.simu_interpret_command("dimensions " + String(params.dimension) + " " + String(params.N));
-        let m = Math.PI*0.5*0.5*params.particle_density;
+        let m = Math.PI * 0.5 * 0.5 * params.particle_density;
         let min_mass = Math.PI * params.r_min * params.r_min * params.particle_density;
         S.simu_interpret_command("mass -1 " + String(m));
         S.simu_interpret_command("auto rho");
-        S.simu_interpret_command("auto radius uniform "+params.r_min+" "+params.r_max);
+        S.simu_interpret_command("auto radius uniform " + params.r_min + " " + params.r_max);
         S.simu_interpret_command("auto mass");
         S.simu_interpret_command("auto inertia");
 
         S.simu_interpret_command("boundary 0 " + String(params.boundary0.type) + " " + String(params.boundary0.min + params.r_max) + " " + String(params.boundary0.max - params.r_max));
         S.simu_interpret_command("boundary 1 " + String(params.boundary1.type) + " " + String(params.boundary1.min + params.r_max) + " " + String(params.boundary1.max - params.r_max));
 
-        // S.simu_interpret_command("auto location randomsquare");
-        S.simu_interpret_command("auto location randomdrop");
+        S.simu_interpret_command("auto location randomsquare");
+        // S.simu_interpret_command("auto location randomdrop");
         // S.simu_interpret_command("gravity 0 -10");
 
         S.simu_interpret_command("boundary 0 " + String(params.boundary0.type) + " " + String(params.boundary0.min) + " " + String(params.boundary0.max));

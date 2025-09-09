@@ -67,7 +67,7 @@ var params = {
     cg_window_size: 3,
     particle_opacity: 0.5,
     target_pressure: 1e4,
-    F_mag_max: 2e1,
+    F_mag_max: 1e3,
     audio: false,
     audio_sensitivity: 1,
     current_pressure: 0,
@@ -366,8 +366,8 @@ async function NDDEMCGPhysics() {
 
         S.simu_interpret_command("auto location randomdrop");
 
-        let tc = 1e-2;
-        let rest = 0.2; // super low restitution coeff to dampen out quickly
+        let tc = 2e-3;
+        let rest = 0.5; // super low restitution coeff to dampen out quickly
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient(tc, rest, params.particle_mass)
 
         S.simu_interpret_command("set Kn " + String(vals.stiffness));
@@ -375,7 +375,7 @@ async function NDDEMCGPhysics() {
         S.simu_interpret_command("set GammaN " + String(vals.dissipation));
         S.simu_interpret_command("set GammaT " + String(vals.dissipation));
         S.simu_interpret_command("set Mu " + String(params.friction));
-        S.simu_interpret_command("set damping 0.001");
+        // S.simu_interpret_command("set damping 0.001");
         S.simu_interpret_command("set T 150");
         S.simu_interpret_command("set dt " + String(tc / 20));
         S.simu_interpret_command("set tdump 1000000"); // how often to calculate wall forces
