@@ -72,7 +72,8 @@ $(function() {
 <div class="title">WindowLibrary.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;random&gt;</code><br />
+</div>
 <p><a href="WindowLibrary_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -92,11 +93,15 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLibSphereNDIntersect.html">LibSphereNDIntersect</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLibSphere3DIntersect__MonteCarlo.html">LibSphere3DIntersect_MonteCarlo</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLibHann3D.html">LibHann3D</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLibLucyND.html">LibLucyND</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLibLucyND__Periodic.html">LibLucyND_Periodic</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLibRVE.html">LibRVE</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -104,15 +109,17 @@ Enumerations</h2></td></tr>
 <tr class="memitem:af1edd7b7fcdf15ab1bff70cf1daf8ae5"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5">Windows</a> { <br />
 &#160;&#160;<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5af5c0ca398268843f716e8ee1094e3182">Rect3D</a>
 , <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5ae6415b0214d8702e02b90bc219b748b4">Sphere3DIntersect</a>
+, <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a96524f36483cf394f18d895b268c5488">Sphere3DIntersect_MonteCarlo</a>
 , <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a8618ba91cc64097daa8774b17c3882bc">SphereNDIntersect</a>
-, <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a1b3b979167a0fd5a913912cf4149f208">Lucy3D</a>
 , <br />
-&#160;&#160;<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a6e5ed1ce0b769c8c444a35b2fc20a4ee">Lucy3DFancyInt</a>
+&#160;&#160;<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a1b3b979167a0fd5a913912cf4149f208">Lucy3D</a>
+, <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a6e5ed1ce0b769c8c444a35b2fc20a4ee">Lucy3DFancyInt</a>
 , <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5afe7b889801e277901f8faed62485bd11">Hann3D</a>
 , <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5ad8025811ca754043afa5792fef28cfa8">RectND</a>
-, <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a6a15015269d4089e709d89ad88026eb8">LucyND</a>
 , <br />
-&#160;&#160;<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5">LucyND_Periodic</a>
+&#160;&#160;<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a6a15015269d4089e709d89ad88026eb8">LucyND</a>
+, <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5">LucyND_Periodic</a>
+, <a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5a5ef76c9773923904f04e797aa294379f">RVE</a>
 <br />
  }</td></tr>
 <tr class="separator:af1edd7b7fcdf15ab1bff70cf1daf8ae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,6 +147,7 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5af5c0ca398268843f716e8ee1094e3182"></a>Rect3D&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5ae6415b0214d8702e02b90bc219b748b4"></a>Sphere3DIntersect&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a96524f36483cf394f18d895b268c5488"></a>Sphere3DIntersect_MonteCarlo&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a8618ba91cc64097daa8774b17c3882bc"></a>SphereNDIntersect&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a1b3b979167a0fd5a913912cf4149f208"></a>Lucy3D&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a6e5ed1ce0b769c8c444a35b2fc20a4ee"></a>Lucy3DFancyInt&#160;</td><td class="fielddoc"></td></tr>
@@ -147,6 +155,7 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5ad8025811ca754043afa5792fef28cfa8"></a>RectND&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a6a15015269d4089e709d89ad88026eb8"></a>LucyND&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a84b30f291ff1edb0346d5932687f5cb5"></a>LucyND_Periodic&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="af1edd7b7fcdf15ab1bff70cf1daf8ae5a5ef76c9773923904f04e797aa294379f"></a>RVE&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>

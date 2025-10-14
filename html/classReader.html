@@ -122,6 +122,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a45bfbfd270d5b91078b597bb937a9e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c286adaab3b86a1bc2e5e7cd708327c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a2c286adaab3b86a1bc2e5e7cd708327c">set_default_density</a> (double density)</td></tr>
 <tr class="separator:a2c286adaab3b86a1bc2e5e7cd708327c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53a9fbc32219f7d908a1d88b6308138f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a53a9fbc32219f7d908a1d88b6308138f">set_default_superquadric</a> (double <a class="el" href="pointer_8h.html#aeeddce917cf130d62c370b8f216026dd">a</a>, double b, double c, double pa, double pb, double pc)</td></tr>
+<tr class="separator:a53a9fbc32219f7d908a1d88b6308138f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b319a5f754ce04da504070d6861c50e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a3b319a5f754ce04da504070d6861c50e">get_default_superquadric</a> (int component)</td></tr>
+<tr class="separator:a3b319a5f754ce04da504070d6861c50e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef8bd08b0948246665df3c294527cf0d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#aef8bd08b0948246665df3c294527cf0d">get_default_radius</a> ()</td></tr>
 <tr class="separator:aef8bd08b0948246665df3c294527cf0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f56bf03ab015f57952298d89289d666"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a9f56bf03ab015f57952298d89289d666">get_default_density</a> ()</td></tr>
@@ -139,6 +143,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a950f5832bcdde86759f55319da4a2a30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4742239d5b59a7ae72fcb5d2462ab67c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a4742239d5b59a7ae72fcb5d2462ab67c">is_fullymapped</a> = false</td></tr>
 <tr class="separator:a4742239d5b59a7ae72fcb5d2462ab67c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71df6591b1e3277f11584e910df522f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a71df6591b1e3277f11584e910df522f0">is_superquadric</a> = false</td></tr>
+<tr class="separator:a71df6591b1e3277f11584e910df522f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbb1526f698db4c1a56ea4c4973e644e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::optional&lt; std::streampos &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#adbb1526f698db4c1a56ea4c4973e644e">mapped_ts</a></td></tr>
 <tr class="separator:adbb1526f698db4c1a56ea4c4973e644e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a193d05da38524ffb275af65e9c55c712"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a193d05da38524ffb275af65e9c55c712">path</a></td></tr>
@@ -168,6 +174,8 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a679846d260ede5b522da376bab63be3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefaa372af939643579e5b6379cff6a11"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#aefaa372af939643579e5b6379cff6a11">Density</a> =-1</td></tr>
 <tr class="separator:aefaa372af939643579e5b6379cff6a11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68f156da743deeb03c9e87a853e38af1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classReader.html#a68f156da743deeb03c9e87a853e38af1">SuperQuadric</a> [6] = {1,1,1,2,2,2}</td></tr>
+<tr class="separator:a68f156da743deeb03c9e87a853e38af1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6fa3c27ee3b57206583615aba1c954a6"></a>
@@ -438,6 +446,32 @@ Private Attributes</h2></td></tr>
           <td class="memname">double Reader::get_default_radius </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3b319a5f754ce04da504070d6861c50e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b319a5f754ce04da504070d6861c50e">&#9670;&nbsp;</a></span>get_default_superquadric()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Reader::get_default_superquadric </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>component</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -752,6 +786,66 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a53a9fbc32219f7d908a1d88b6308138f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53a9fbc32219f7d908a1d88b6308138f">&#9670;&nbsp;</a></span>set_default_superquadric()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Reader::set_default_superquadric </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>c</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pa</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a656496d748c6f92e87670f333a828a6f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a656496d748c6f92e87670f333a828a6f">&#9670;&nbsp;</a></span>curts</h2>
@@ -881,6 +975,20 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a71df6591b1e3277f11584e910df522f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71df6591b1e3277f11584e910df522f0">&#9670;&nbsp;</a></span>is_superquadric</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Reader::is_superquadric = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aa5ee1a40b9cc040b5dc447921f00e18f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa5ee1a40b9cc040b5dc447921f00e18f">&#9670;&nbsp;</a></span>ismultifile</h2>
 
@@ -948,6 +1056,28 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">double Reader::Radius =-1</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a68f156da743deeb03c9e87a853e38af1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68f156da743deeb03c9e87a853e38af1">&#9670;&nbsp;</a></span>SuperQuadric</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Reader::SuperQuadric[6] = {1,1,1,2,2,2}</td>
         </tr>
       </table>
   </td>

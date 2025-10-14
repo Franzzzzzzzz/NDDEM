@@ -20,6 +20,7 @@ public:
   string save="" ;
   vector<string> saveformat ;
   double default_density=-1, default_radius=-1 ;
+  std::vector<double> default_sqaxes{-1.,-1.,-1.}, default_sqpower{2,2,2} ; 
 
   AverageType timeaverage = AverageType::None ;
 
@@ -58,6 +59,7 @@ public:
   int set_data (Data & cgdata) ;
   int get_num_particles () ;
   int get_num_contacts () ;
+  double get_volume() ;
   double * get_data(DataValue datavalue, int dd=0, std::string name="") ;
   void post_init () ;
 
@@ -94,14 +96,20 @@ void Param::from_json(json &j)
             else if (v.value().get<string>() == "Final") timeaverage = AverageType::Final ;
             else if (v.value().get<string>() == "Intermediate") timeaverage = AverageType::Intermediate ;
             else if (v.value().get<string>() == "Intermediate and Final" || v.value().get<string>() =="Final and Intermediate") timeaverage = AverageType::Both ;
+            else if (v.value().get<string>() == "Pre pass 5") timeaverage = AverageType::Pre5 ;
+            else if (v.value().get<string>() == "Intermediate and pre pass 5") timeaverage = AverageType::IntermediateAndPre5 ;
             else
-                printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final'). Case sensitive\n") ;
+                printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final', 'Pre pass 5', 'Intermediate and pre pass 5'). Case sensitive\n") ;
         }
         else if (v.key() == "window") {window = identify_window(v.value().get<string>()); }
         else if (v.key() == "periodicity") {periodicity = v.value().get<decltype(periodicity)>();}
         else if (v.key() == "density") { default_density=v.value().get<double>() ; }
         else if (v.key() == "radius") { default_radius=v.value().get<double>() ; }
         else if (v.key() == "diameter") { default_radius=v.value().get<double>()/2. ; }
+        else if (v.key() == "superquadric") {
+            default_sqaxes = v.value()["axes"].get<decltype(default_sqaxes)>() ; 
+            default_sqpower = v.value()["shapes"].get<decltype(default_sqpower)>() ;
+        }
         else if (v.key() == "extra fields") { process_extrafields(v.value()) ; }
         else if (v.key() == "dimension") {dim = v.value().get<int>() ; requiredfieldset[v.key()] = true ; }
         else printf("Unknown json key: %s.\n", v.key().c_str()) ;
@@ -146,8 +154,8 @@ void Param::post_init()
     }
     if (!requiredfieldset["boundaries"]) boundaries= files[0].reader->get_bounds() ;
 
-    if (boundaries.size() != 2 || boundaries[0].size() != static_cast<unsigned int>(dim) || boundaries[1].size()!=static_cast<unsigned int>(dim))
-        printf("ERR: dimension of the boundaries is not consistent (should be '2 x dimension')\n") ;
+    if ((boundaries.size() != 2 && boundaries.size() != 3) || boundaries[0].size() != static_cast<unsigned int>(dim) || boundaries[1].size()!=static_cast<unsigned int>(dim))
+        printf("ERR: dimension of the boundaries is not consistent (should be '2 x dimension' or '3 x dimension' if including delta)\n") ;
     if (boxes.size() != static_cast<unsigned int>(dim))
         printf("ERR: dimension of the boxes is not consistent (should be 'dimension')\n") ;
 
@@ -183,6 +191,10 @@ void Param::post_init()
     if (default_radius!=-1)
         for (auto &v: files)
             v.reader->set_default_radius(default_radius) ;
+    
+    if (default_sqaxes[0] != -1) 
+        for (auto &v: files)
+            v.reader->set_default_superquadric(default_sqaxes[0], default_sqaxes[1], default_sqaxes[2], default_sqpower[0], default_sqpower[1], default_sqpower[2]) ;
 
     for (auto &v: files)
       v.reader->post_init() ;
@@ -200,12 +212,14 @@ Windows Param::identify_window(std::string windowstr)
     else if ( windowstr=="Rect3DIntersect")  {printf("====> DEPRECATED: misleading name, use Sphere3DIntersect instead. <=======\n") ; return Windows::Sphere3DIntersect ;}
     else if ( windowstr=="Sphere3DIntersect") return Windows::Sphere3DIntersect ;
     else if ( windowstr=="SphereNDIntersect") return Windows::SphereNDIntersect ;
+    else if ( windowstr=="Sphere3DIntersect_MonteCarlo") return Windows::Sphere3DIntersect_MonteCarlo ; 
     else if ( windowstr=="Lucy3D") return Windows::Lucy3D ;
     else if ( windowstr=="Hann3D") return Windows::Hann3D ;
     else if ( windowstr=="RectND") return Windows::RectND ;
     else if ( windowstr=="LucyND") return Windows::LucyND ;
     else if ( windowstr=="LucyND_Periodic") return Windows::LucyND_Periodic ;
     else if ( windowstr=="Lucy3DFancyInt")  return Windows::Lucy3DFancyInt;
+    else if ( windowstr=="RVE")  return Windows::RVE;
     else {printf("Unknown windowing function.\n") ; return Windows::Lucy3D ; }
 }
 //-------------------------------------
@@ -373,6 +387,14 @@ int Param::set_data(struct Data & D)
         D.mqp[dd]   = get_data(DataValue::mqp, dd) ;
     }
 
+    D.orient.resize(4) ;
+    for (int dd=0 ; dd<4 ; dd++)
+        D.orient[dd] = get_data(DataValue::orient, dd) ;
+    
+    D.superquadric.resize(6) ; 
+    for (int dd=0 ; dd<6 ; dd++)
+        D.superquadric[dd] = get_data(DataValue::superquadric, dd) ; 
+
     for (auto &v: D.extrafields)
     {
         for (int dd=0 ; dd<std::get<1>(v) ; dd++)
@@ -394,6 +416,14 @@ int Param::get_num_contacts ()
         if (v.reader->get_num_contacts() != -1)
             return v.reader->get_num_contacts() ;
     return -1 ;
+}
+double Param::get_volume()
+{
+    auto bnds = files[0].reader->get_bounds() ;
+    double volume = 1 ;
+    for (size_t i=0; i<bnds[0].size() ; i++)
+        volume *= bnds[1][i]-bnds[0][i] ;
+    return volume ;
 }
 double * Param::get_data(DataValue datavalue, int dd, std::string name)
 {

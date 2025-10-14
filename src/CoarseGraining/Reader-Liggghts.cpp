@@ -3,22 +3,27 @@
 //-----------------------------------------------------------
 vector<vector<double>> LiggghtsReader::get_bounds()
 {
- vector<vector<double>> res(2, vector<double>(3,0)) ;
- string line ;
+  if (!has_bounds)
+  {
+    vector<vector<double>> res(2, vector<double>(3,0)) ;
+    string line ;
 
- do 
- {
-   getline(*in, line) ;
- }
- while ( in->good() && line.find("BOX BOUNDS")==string::npos) ; 
- 
- if (!in->good()) return {} ; 
- 
- *in >> res[0][0] >> res[1][0] ;
- *in >> res[0][1] >> res[1][1] ;
- *in >> res[0][2] >> res[1][2] ;
- reset() ; 
- return (res) ;
+    do
+    {
+      getline(*in, line) ;
+    }
+    while ( in->good() && line.find("BOX BOUNDS")==string::npos) ;
+
+    if (!in->good()) return {} ;
+
+    *in >> res[0][0] >> res[1][0] ;
+    *in >> res[0][1] >> res[1][1] ;
+    *in >> res[0][2] >> res[1][2] ;
+    reset() ;
+    return res ;
+  }
+  else
+    return boundaries ;
 }
 //-----------------------------------------------------------
 vector<double> LiggghtsReader::get_minmaxradius()
@@ -184,6 +189,7 @@ int LiggghtsReader::read_timestep_impl(int ts, bool skip)
      else periodicity[i]=false ; 
      *in >> boundaries[0][i] ; *in >> boundaries[1][i] ;
      boundaries[2][i]=boundaries[1][i]-boundaries[0][i] ; 
+     has_bounds=true ;
  }
  getline(*in, line) ;    
  }
@@ -231,7 +237,7 @@ int LiggghtsReader_particles::do_post_read()
     has_id_data=true ; 
     sort(tdata.begin(), tdata.end(), [=](auto v1, auto v2) {return v1[idloc] < v2[idloc] ; }); //WARNING idx 0 should be the particle ID
     
-    for (i=0, j=tdata.begin() ; i<Nitem ; i++, j++)
+    for (i=0, j=tdata.begin() ; j!=tdata.end() ; i++, j++)
     {
         if (i+1<(*j)[idloc])
         {
@@ -247,12 +253,12 @@ int LiggghtsReader_particles::do_post_read()
         if ( (*j)[idloc] != i)
             printf("ERR shouldn't happen %d %g\n", i, (*j)[idloc]) ;
     }
-    printf(" %d null atom / %d | ", nadded, Nitem) ;
+    printf(" %d null atom / %d | ", nadded, Nitem) ; fflush(stdout) ;
     Nitem+=nadded ;
  }
 
  const int nvalue = 17 ;
- data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz quat
+ data.resize(nvalue, v1d (0,0)) ; //Order: radius mass Imom posxyz velxyz omegaxyz type quat
  vector<string>::iterator it ;
  vector<int> lst ;
  vector<string> flst = {"radius", "mass", "I","x","y","z","vx","vy","vz","omegax","omegay","omegaz","type", "quat1", "quat2", "quat3", "quat4"} ;
@@ -273,9 +279,9 @@ int LiggghtsReader_particles::do_post_read()
            if (periodicity.size()>0 && (i==3 || i==4 || i==5) && (periodicity[i-3])) // Handle atom outside the simulation due to pbc. Important also for handling contact forces through PBC in the next function ...
            {
              if (tdata[k][lst[i]]<boundaries[0][i-3])
-               data[i][k]=tdata[k][lst[i]]+boundaries[2][i] ;
+               data[i][k]=tdata[k][lst[i]]+boundaries[2][i-3] ;
              else if (tdata[k][lst[i]]>boundaries[1][i-3])
-               data[i][k]=tdata[k][lst[i]]-boundaries[2][i] ;
+               data[i][k]=tdata[k][lst[i]]-boundaries[2][i-3] ;
              else
                data[i][k]=tdata[k][lst[i]] ;
            }
@@ -294,6 +300,13 @@ int LiggghtsReader_particles::do_post_read()
          if (i==1) for (k=0 ; k<Nitem ; k++) data[i][k]=4/3. * M_PI * data[0][k] * data[0][k] * data[0][k] * get_default_density() ;
          if (i==2) for (k=0 ; k<Nitem ; k++) data[i][k]=2/5. * data[1][k] * data[0][k] * data[0][k] ;
      }
+ }
+ if (is_superquadric)
+ {
+   for (int i=0 ; i<6 ; i++)
+   {
+    data.push_back(std::vector<double>(Nitem, get_default_superquadric(i))) ; 
+   }
  }
 
  return nadded ;
@@ -332,10 +345,10 @@ int LiggghtsReader_contacts::do_post_read()
  }
 
 
- int k=0 ;
+ int k=0 ; int corrected=0, correctedloc=0 ;
  for (int j=0 ; j<Nitem ; j++)
  {
-     if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
+     //if (tdata[j][lst[2]]==1) continue ; // Remove any chainforce going through the PBC
 
      if (tdata[j][lst[0]]>tdata[j][lst[1]]) swap=1 ;
      else swap = 0 ;
@@ -354,39 +367,60 @@ int LiggghtsReader_contacts::do_post_read()
      data[7][k]=  (dump->data[5][data[0][k]] - dump->data[5][data[1][k]]) ;      //lpq[2]
 
      // Let's handle the PBC now ...
-     if (tdata[j][lst[2]]==1)
-     {
-       bool corrected=false ;
-       for (size_t i=0 ; i<periodicity.size() ; i++)
-       {
-         if (periodicity[i])
-         {
-           if (fabs(fabs(dump->data[3+i][data[0][k]] - dump->data[3+i][data[1][k]]) - boundaries[2][i]) < fabs(data[5+i][k])) // Going through this PBC decreased the length of lpq
-           {
-             if (dump->data[3+i][data[0][k]] - dump->data[3+i][data[1][k]]<0) // it is either x1->x1+Delta or x2->x2-Delta
-             {
-               data[5+i][k] += boundaries[2][i]  ;
-               if (data[2+i][k]+boundaries[2][i]/2. >= boundaries[0][i] && data[2+i][k]+boundaries[2][i]/2.<= boundaries[1][i])
-                  data[2+i][k]+=boundaries[2][i]/2. ;
-               else
-                  data[2+i][k]-=boundaries[2][i]/2. ;
-             }
-             else // it is either x1->x1-Delta or x2->x2+Delta
-             {
-               data[5+i][k] -= boundaries[2][i]  ;
-               if (data[2+i][k]+boundaries[2][i]/2. >= boundaries[0][i] && data[2+i][k]+boundaries[2][i]/2.<= boundaries[1][i])
-                  data[2+i][k]+=boundaries[2][i]/2. ;
-               else
-                  data[2+i][k]-=boundaries[2][i]/2. ;
+     // ERROR: pbc flag unreliable...
+     // if (tdata[j][lst[2]]==1)
+     // {
+     //   bool corrected=false ;
+     //   for (size_t i=0 ; i<periodicity.size() ; i++)
+     //   {
+     //     if (periodicity[i])
+     //     {
+     //       if (fabs(fabs(dump->data[3+i][data[0][k]] - dump->data[3+i][data[1][k]]) - boundaries[2][i]) < fabs(data[5+i][k])) // Going through this PBC decreased the length of lpq
+     //       {
+     //         if (dump->data[3+i][data[0][k]] - dump->data[3+i][data[1][k]]<0) // it is either x1->x1+Delta or x2->x2-Delta
+     //         {
+     //           data[5+i][k] += boundaries[2][i]  ;
+     //           if (data[2+i][k]+boundaries[2][i]/2. >= boundaries[0][i] && data[2+i][k]+boundaries[2][i]/2.<= boundaries[1][i])
+     //              data[2+i][k]+=boundaries[2][i]/2. ;
+     //           else
+     //              data[2+i][k]-=boundaries[2][i]/2. ;
+     //         }
+     //         else // it is either x1->x1-Delta or x2->x2+Delta
+     //         {
+     //           data[5+i][k] -= boundaries[2][i]  ;
+     //           if (data[2+i][k]+boundaries[2][i]/2. >= boundaries[0][i] && data[2+i][k]+boundaries[2][i]/2.<= boundaries[1][i])
+     //              data[2+i][k]+=boundaries[2][i]/2. ;
+     //           else
+     //              data[2+i][k]-=boundaries[2][i]/2. ;
+     //
+     //         }
+     //       corrected=true ;
+     //       }
+     //     }
+     //   }
+     //   if (corrected==false)
+     //        printf("- WARN: a contact force traversing the PBC was not corrected. - ") ;
+     // }
 
-             }
-           corrected=true ;
-           }
-         }
-       }
-       if (corrected==false)
-            printf("- WARN: a contact force traversing the PBC was not corrected. - ") ;
+     // Handling crossing pbc's
+     for (size_t i=0 ; i<periodicity.size() ; i++)
+     {
+      if (!periodicity[i]) continue ;
+      double r1 = dump->data[0][data[0][k]] ;
+      double r2 = dump->data[0][data[1][k]] ;
+
+      if (fabs(data[5+i][k]) > (boundaries[2][i]-2*(r1+r2)) ) //times 2 just to get some leeway
+      {
+        data[5+i][k] -= boundaries[2][i] * (data[5+i][k]<0.?-1.:1.) ;
+        data[2+i][k] -= boundaries[2][i] * (data[5+i][k]<0.?-1.:1.) /2.0 ;
+        corrected++ ;
+      }
+
+      if (data[2+i][k] < boundaries[0][i]) {correctedloc++ ; data[2+i][k]+=boundaries[2][i] ; }
+      if (data[2+i][k] > boundaries[1][i]) {correctedloc++ ; data[2+i][k]-=boundaries[2][i] ; }
      }
+
+
 
      if (lst[3]>=-1) data[8][k]=  swap*tdata[j][lst[3]] ;                                     //f[0]
      if (lst[4]>=-1) data[9][k]=  swap*tdata[j][lst[4]] ;                                     //f[1]
@@ -406,7 +440,18 @@ int LiggghtsReader_contacts::do_post_read()
 
      k++ ;
  }
- printf("-%d per contacts /%d | ", Nitem-k, Nitem) ;
+ printf("| %d contact length, %d contact locations corrected for periodic contacts / %d ", corrected, correctedloc, Nitem) ; fflush(stdout) ;
  Nitem=k ;
+
+ /*FILE *log ;
+ log=fopen("Logging.txt", "w") ;
+ for (int i=0 ; i<Nitem ; i++)
+ {
+   //if (data[4][i]>1000)
+   //  printf("%g %g %g \n", data[0][i],data[1][i], data[4][i]) ;
+   fprintf(log, "%g, %g, %g, %g\n", data[2][i], data[3][i], data[4][i], sqrt(data[5][i]*data[5][i]+data[6][i]*data[6][i]+data[7][i]*data[7][i])) ;
+ }
+ fclose(log) ;*/
+
 return 0 ;
 }

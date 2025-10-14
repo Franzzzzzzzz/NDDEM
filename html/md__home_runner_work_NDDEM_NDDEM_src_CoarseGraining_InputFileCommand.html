@@ -71,6 +71,14 @@ $(function() {
 <li>double quotes are omitted when obvious</li>
 <li>the syntax <code>[ xxx | yyy | zzz]</code> in the following indicates a field that contain eiher <code>xxx</code>, <code>yyy</code>, or <code>zzz</code>.</li>
 </ul>
+<h2>Process</h2>
+<p>The actual coarse-graining is performed in 5 pass, refered as below. Each pass has a specific purpose, and not all of them are activated, it depends on the fields requested. As averages can occur between different passes, it is worth mentioning what each one is doing:</p><ol type="1">
+<li>Pass 1: Calculate particle related fields, such as density, velocity etc.</li>
+<li>Pass 2: Calculate fluctuating information (Kinetic stress TK in particular.</li>
+<li>Pass 3: Calculate contact information, such as the Contact stress TC.</li>
+<li>Pass 4: Calculate qTC and qRCn. Most commonly skipped.</li>
+<li>Pass 5: Calculate derived data, such as Pressure, eigenvalues etc.</li>
+</ol>
 <h2>Commands</h2>
 <h3>Input file description</h3>
 <ul>
@@ -85,14 +93,29 @@ $(function() {
 <li><code>density</code>: default density. Used if the particle mass is not available in the input file.</li>
 <li><code>radius</code>: default radius. Used if the particle diameter is not available in the input file.</li>
 <li><code>diameter</code>: default diameter. Used if the particle diameter is not available in the input file.</li>
+<li><code>superquadric</code>: object defining the default superquadric. Must contain two fields:<ul>
+<li><code>axes</code>: array of 3 values, corresponding to the x-axis, y-axis, z-axis length of the superquadric.</li>
+<li><code>shape</code>: array of 3 values, corresponding to the powers in the superquadric equation: $$x^\alpha + y^\beta + z^\gamma &lt;1$$</li>
+</ul>
+</li>
 </ul>
 <h3>Defining the Coarse Graining</h3>
 <ul>
 <li><code>dimension</code>: number of spatial dimensions</li>
-<li><code>fields</code>: array of fields to process. Recognised fields are the following: <code>RHO, I, VAVG, TC, TK, ROT, MC, MK, mC, EKT, eKT, EKR, eKR, qTC, qTK, qRC, qRK, zT, zR, RADIUS, TotalStress, Pressure, KineticPressure, ShearStress, StrainRate,VolumetricStrainRate, ShearStrainRate, RotationalVelocity, RotationalVelocityMag</code>.</li>
+<li><code>fields</code>: array of fields to process.<ul>
+<li>Recognised fields are the following: <code>RHO, I, VAVG, TC, TK, ROT, MC, MK, mC, EKT, eKT, EKR, eKR, qTC, qTK, qRC, qRK, zT, zR, RADIUS, TotalStress, Pressure, KineticPressure, ShearStress, StrainRate,VolumetricStrainRate, ShearStrainRate, RotationalVelocity, RotationalVelocityMag</code>.</li>
+<li>Tensor fields can be appended with parameter to extract tensor derived quantites (eg. <code>TC.ev1</code> for the first eigenvalue of the contact stress tensor TC). The possible parameters are:<ul>
+<li>Eigenvalues and eigenvectors: <code>ev1, ev2, ev3, evec1, evec2, evec3</code>.</li>
+<li>Angle of the eigenvector corresponding to the largest eigenvalue: <code>evec1_theta</code>, <code>evec1_phi</code>. Angles are in degrees, the spherical coordinates are theta the angle from the z direction, phi the angle in the xy plane counted from x.</li>
+<li>Invariants: <code>trace</code>, <code>pressure</code>, etc.</li>
+<li>Other: <code>dzeta</code>, with $$\dzeta = \sqrt{0.5 \left ( (ev1-ev2)^2 + (ev2-ev3)^2 + (ev3-ev1)^2 \right ) } $$.</li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>boxes</code>: array. Number of boxes in each dimension.</li>
 <li><code>boundaries</code>: volume that is coarse-grained. Do not specify in order to process the whole simulation (if the simulation bounds are saved in the input file).</li>
-<li><code>window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]</code>: shape of the averaging window.</li>
+<li><code>window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]</code>: shape of the averaging window. <code>Rect3D</code> is a misnommer, as it is actually a sphere 3D.</li>
 <li><code>window size</code>: size of the averaging window.</li>
 <li><code>extra fields</code>: array of extrafield objects, to allow for computation of arbitrary fields.<ul>
 <li><code>name</code>: name of the field to compute. Should be unique.</li>
@@ -105,7 +128,8 @@ $(function() {
 <ul>
 <li><code>skip</code>: number of timestep to skip</li>
 <li><code>max time</code>: number of timestep to process (total, including skip)</li>
-<li><code>time average: [None | Intermediate | Final | Intermediate and Final]</code>: when to time average. <code>Intermediate</code> averages before pass 2 to better calculate the fluctuations. <code>Final</code> averages the final fields.</li>
+<li><code>time average: [None | Intermediate | Final | Intermediate and Final | Pre pass 5 | Intermediate and pre pass 5]</code>: when to time average. <code>Intermediate</code> averages before pass 2 to better calculate the fluctuations. <code>Final</code> averages the final fields after having calculated derived fields. <code>Pre pass 5</code> perform the average first, and then calculate the derived fields. <br  />
+</li>
 <li><code>savefile</code>: name of the final file (no extension)</li>
 <li><code>saveformat: [mat | vtk | numpy | netCDF]</code>: output file format. Can be an array for multiple output format at once. </li>
 </ul>

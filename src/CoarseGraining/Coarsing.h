@@ -38,6 +38,7 @@
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/crc.hpp>
 #include <map>
+#include <variant>
 
 #ifdef NETCDF
 #include <netcdf.h>
@@ -51,13 +52,17 @@
 #include "mat.h"
 #endif
 
+#include "Eigen/Dense"
+#include "Eigen/Geometry"
+
+
 using namespace std ;
 
 double Volume (int d , double R) ; ///< Compute a sphere volume in dimension D
 
 enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2} ;
 enum FieldType {Defined, Particle, Fluctuation, Contact} ;
-enum AverageType {None, Final, Intermediate, Both} ;
+enum AverageType {None, Final, Intermediate, Both, Pre5, IntermediateAndPre5} ;
 enum Pass {Pass1=1, Pass2=2, Pass3=4, Pass4=8, Pass5=16,
            VelFluct=256, RotFluct=512} ;
 
@@ -73,6 +78,7 @@ public :
     CGPoint(int dd, v1d loc) {d=dd ; location=loc ; }
 
     v2d fields ;    ///< 1st dimension is time, second are fields
+    v2d subfields ; ///< 1st dimension is time, second are subfields (ie. "TC.ev1")
     v1d location ;  ///< Location of the coarse graining point
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
@@ -100,7 +106,10 @@ double *Imom ; ///< Particle moment of inertia
 vector <double *> pos ; ///< Particle positions
 vector <double *> vel ;  ///<Particle velocity
 vector <double *> omega ; ///< Particle angular velocity
-vector <double *> orient ; ///< Particle angular velocity
+vector <double *> orient ; ///< Particle orientation (quaternions)
+
+// Superquadrics
+vector <double *> superquadric ; ///< Superquadrics information
 
 v2d vel_fluc ; ///< Fluctuating velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
 v2d rot_fluc ; ///< Fluctuating angular velocity. Should not be externally provided but calculated, using the function *Coarsing::compute_fluc_vel()*
@@ -171,30 +180,41 @@ public :
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; ///< Distances between CG points
     v2d box ; ///< CG point location
-    LibBase * Window = nullptr ; ///> Pointer to the averaging window
-
+    LibBase * Window = nullptr ; ///< Pointer to the averaging window
+    std::variant<Eigen::Matrix3d, Eigen::Quaternion<double>> original_orientation = Eigen::Quaternion<double>(0,0,0,1) ;     
 
     // Fields variable and function
-    unsigned int flags ; ///< Flags deciding which fields to coarse-grain
-    vector <string> Fields, Fname ; ///< Flagged field names
-    vector <int> Fidx ;  ///< Where the fields is referenced in the fields vector in the CGPoint. -1 if not flagged
-    vector <TensorOrder> Ftype ; ///< Flagged field types
     vector <struct Field > FIELDS ; ///< All allowed fields (initialized in grid_getfields)
+    unsigned int flags ; ///< Flags deciding which fields to coarse-grain
+    vector <int> Fidx ;  ///< Where the fields is referenced in the fields vector in the CGPoint. -1 if not flagged
+    vector <std::pair<Field *, int>> Fcols ; ///< What the columns are in the CGPoint
+
+    //vector <string> Fields, Fname ; ///< Flagged field names
+    //vector <TensorOrder> Ftype ; ///< Flagged field types
     int get_id(string nm) ; ///< Find field ID from field name
     struct Field * get_field(string nm) ; ///< Find Field from name
     Pass set_flags (vector <string> s) ; ///< Set the fields which are requested from the coarse-graining
 
+    // Subfield variables and functions
+    vector <struct Field> SUBFIELDS ; ///< All allowed subfields
+    vector <std::pair<struct Field *, uint64_t>> subflags ;
+    vector <std::pair<Field *, std::vector<std::pair<Field*, int>> >> SFcols ; ///< What the subcolumns are in the CGPoint
+    uint64_t sf_mask_eigen ;
+    int grid_getsubfields() ;
+    struct Field * get_subfield(string nm) ; ///< Find subfield from name
+    
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
     int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
-    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}) ; ///< Set the windowing function, calling the templated version
+    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}, vector<vector<double>> bounds={{}}) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
     template <Windows W> int setWindow (double w) ; ///< Set the windowing function
+    template <Windows W> int setWindow (vector<vector<double>> &) ; ///< Set the windowing function for LibRVE
     template <Windows W> int setWindow (double w, vector<bool> per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function for the LibLucyND_Periodic (special one...)
     int grid_generate() ; ///< Generate the coarse-graining grid
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
     std::map<std::string, size_t> grid_setfields() ; ///< Set the fields at each CG point
-    vector<FieldType> grid_getfields() ; ///< Extract fields from each CG point
+    int grid_getfields() ; ///< Build the array of fields for the CG points.
     v2d get_bounds() ; ///< Extract the simulation boundaries
     CGPoint * reverseloop (string type) ; ///< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ; ///< Find the closest CG point to a particle
@@ -205,6 +225,7 @@ public :
     v1d interpolate_rot_nearest (int id, bool usetimeavg=false) ; ///< Nearest neighbor interpolation for the angular velocity
     v1d interpolate_vel_trilinear (int id, bool usetimeavg) ; ///< Tri-linear interpolation (only implemented in 3D, probably not too hard to implement in ND but annoying ...)
     template <int D> v1d interpolate_vel_multilinear (int id, bool usetimeavg);
+    template <typename T> void add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, T original) ; 
     
     int idx_FastFirst2SlowFirst (int n) ; ///< Change array traversing order
 
@@ -259,6 +280,9 @@ int Coarsing::setWindow (double w)
       case Windows::Sphere3DIntersect :
         Window=new LibSphere3DIntersect (&data, w, d) ;
         break ;
+      case Windows::Sphere3DIntersect_MonteCarlo:
+        Window= new LibSphere3DIntersect_MonteCarlo(&data, w, d) ; 
+        break ; 
       case Windows::SphereNDIntersect :
         Window=new LibSphereNDIntersect (&data, w, d) ;
         break ;
@@ -278,7 +302,7 @@ int Coarsing::setWindow (double w)
         Window=new LibLucyND (&data, w, d) ;
         break ;
       default:
-        printf("Unknown window, check Coarsing::setWindow") ;
+        printf("Unknown window, check Coarsing::setWindow #2") ;
   }
   cutoff = Window->cutoff() ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
@@ -301,6 +325,18 @@ int Coarsing::setWindow (double w, vector<bool> per, vector<int> boxes, vector<d
 return 0 ;
 }
 //-----------------------------------------------------------
+template <Windows W>
+int Coarsing::setWindow (vector<vector<double>> & bounds)
+{
+  static_assert(W == Windows::RVE) ;
+  double scale = 1 ;
+  for (size_t i =0 ; i<bounds.size() ; i++)
+      scale /= (bounds[i][1] - bounds[i][0]) ;
+
+  Window = new LibRVE (scale) ;
+return 0 ;
+}
+
 //-----------------------------------------------------------------------------------------
 template <int D>
 v1d Coarsing::interpolate_vel_multilinear (int id, bool usetimeavg)
@@ -308,7 +344,7 @@ v1d Coarsing::interpolate_vel_multilinear (int id, bool usetimeavg)
 int pts[1<<D][D] ;
 const static int idvel=get_id("VAVG") ;
 
-auto clip = [&](int a, int maxd){if (a<0) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (a) ; } ;
+auto clip = [&](double a, int maxd){if (a<0.) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (static_cast<int>(a)) ; } ;
 
 
 // Determine the floor and ceil indices in each dimension
@@ -317,6 +353,13 @@ for (int dd = 0; dd < D; ++dd) {
     double val = (data.pos[dd][id] - CGP[0].location[dd]) / dx[dd];
     i0[dd] = clip(std::floor(val), npt[dd]);
     i1[dd] = clip(std::ceil(val), npt[dd]);
+    if (npt[dd]==1) continue ; 
+    if (i0[dd]==i1[dd])
+    {
+      if (i0[dd]==0) i1[dd]++ ;
+      else if (i0[dd]==npt[dd]-1) i0[dd]-- ; 
+      else i1[dd] ++ ; // If we are exactly on a point, just push one of the corner. The weights should be 0 anyway for this point.  
+    }
 }
 
 // Construct all corner indices of the cube
@@ -336,16 +379,15 @@ for (int c = 0; c < n_corners; ++c) {
     lin_idx[c] = idx;
 }
 
-
 std::vector<double> weights(n_corners, 1.0);
 for (int i = 0; i < n_corners; ++i) {
     for (int j = 0; j < D; ++j) {
         double x0 = CGP[lin_idx[i]].location[j];
         double t = (data.pos[j][id] - x0) / dx[j];
         if (((i >> j) & 1) == 0)
-            weights[i] *= (1.0 - t);
+            weights[i] *= npt[j]==1?0.5:(1.0 - t);
         else
-            weights[i] *= t;
+            weights[i] *= npt[j]==1?0.5:(1.0 + t);
     }
 }
 
@@ -359,9 +401,9 @@ for (int i = 0; i < n_corners; ++i)
         val = (*CGPtemp)[lin_idx[i]].fields[0][idvel + j] ; 
       else 
         val = CGP[lin_idx[i]].fields[0][idvel + j];
-      
       result[j] += val * weights[i];
     }
+
 return result ; 
 }
 

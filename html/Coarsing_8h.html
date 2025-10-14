@@ -83,6 +83,9 @@ $(function() {
 <code>#include &lt;boost/math/special_functions/beta.hpp&gt;</code><br />
 <code>#include &lt;boost/crc.hpp&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
+<code>#include &lt;variant&gt;</code><br />
+<code>#include &quot;Eigen/Dense&quot;</code><br />
+<code>#include &quot;Eigen/Geometry&quot;</code><br />
 <code>#include &quot;<a class="el" href="WindowLibrary_8h_source.html">WindowLibrary.h</a>&quot;</code><br />
 </div>
 <p><a href="Coarsing_8h_source.html">Go to the source code of this file.</a></p>
@@ -116,10 +119,15 @@ Enumerations</h2></td></tr>
 , <a class="el" href="group__CoarseGraining.html#ggaa01498a3ceb2fa74dc9536c16caef1daa9c1d0d502acdb7e7eed8d86d264f55b5">Contact</a>
  }</td></tr>
 <tr class="separator:gaa01498a3ceb2fa74dc9536c16caef1da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2200b9a3f9233930001f6b02491c558e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga2200b9a3f9233930001f6b02491c558e">AverageType</a> { <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eac9d3e887722f2bc482bcca9d41c512af">None</a>
+<tr class="memitem:ga2200b9a3f9233930001f6b02491c558e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga2200b9a3f9233930001f6b02491c558e">AverageType</a> { <br />
+&#160;&#160;<a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eac9d3e887722f2bc482bcca9d41c512af">None</a>
 , <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eab068018251f551730c472862a3b2fca9">Final</a>
 , <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">Intermediate</a>
 , <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">Both</a>
+, <br />
+&#160;&#160;<a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558ea21f3821ba7d22655547db99262b4d7e9">Pre5</a>
+, <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eadf61589fed2f0b92cf49d75b39321d76">IntermediateAndPre5</a>
+<br />
  }</td></tr>
 <tr class="separator:ga2200b9a3f9233930001f6b02491c558e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabe77423eb27f643233ef051559a64882"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gabe77423eb27f643233ef051559a64882">Pass</a> { <br />

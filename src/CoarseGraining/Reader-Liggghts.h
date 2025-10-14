@@ -49,6 +49,7 @@ public:
     //int read_full_ts(bool keep) ;
     //int set_data(struct Data & D, std::map<string,size_t> extrafieldmap) ;
     std::vector<vector<double>> get_bounds () ;
+    bool has_bounds ;
     std::vector<double> get_minmaxradius() ; 
     int get_numts () ;
     int read_timestep (int ts) ; 
@@ -91,7 +92,10 @@ public:
                 else printf("Unknown extra: arbitrary liggghts extra fields are not implemented\n");
                 return nullptr ; 
             } break ; 
-            case DataValue::orient : return &(data[13][0]) ;
+            
+            case DataValue::orient : return &(data[13+dd][0]) ;
+            case DataValue::superquadric: if (is_superquadric) return &(data[17+dd][0]) ;  
+                                          else return nullptr ; 
             
             default : return nullptr ; 
         }

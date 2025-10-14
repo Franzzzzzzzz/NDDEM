@@ -101,10 +101,15 @@ Enumerations</h2></td></tr>
 , <a class="el" href="group__CoarseGraining.html#ggaa01498a3ceb2fa74dc9536c16caef1daa9c1d0d502acdb7e7eed8d86d264f55b5">Contact</a>
  }</td></tr>
 <tr class="separator:gaa01498a3ceb2fa74dc9536c16caef1da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2200b9a3f9233930001f6b02491c558e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga2200b9a3f9233930001f6b02491c558e">AverageType</a> { <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eac9d3e887722f2bc482bcca9d41c512af">None</a>
+<tr class="memitem:ga2200b9a3f9233930001f6b02491c558e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga2200b9a3f9233930001f6b02491c558e">AverageType</a> { <br />
+&#160;&#160;<a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eac9d3e887722f2bc482bcca9d41c512af">None</a>
 , <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eab068018251f551730c472862a3b2fca9">Final</a>
 , <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818">Intermediate</a>
 , <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4">Both</a>
+, <br />
+&#160;&#160;<a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558ea21f3821ba7d22655547db99262b4d7e9">Pre5</a>
+, <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eadf61589fed2f0b92cf49d75b39321d76">IntermediateAndPre5</a>
+<br />
  }</td></tr>
 <tr class="separator:ga2200b9a3f9233930001f6b02491c558e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabe77423eb27f643233ef051559a64882"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gabe77423eb27f643233ef051559a64882">Pass</a> { <br />
@@ -162,15 +167,20 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf8c2e651263289335d2138bf9d79ee1d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__CoarseGraining.html#gabe77423eb27f643233ef051559a64882">Pass</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaf8c2e651263289335d2138bf9d79ee1d">Coarsing::set_flags</a> (vector&lt; string &gt; s)</td></tr>
 <tr class="memdesc:gaf8c2e651263289335d2138bf9d79ee1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the fields which are requested from the coarse-graining.  <a href="group__CoarseGraining.html#gaf8c2e651263289335d2138bf9d79ee1d">More...</a><br /></td></tr>
 <tr class="separator:gaf8c2e651263289335d2138bf9d79ee1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga197087344253a6fef3e7563c0f700275"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga197087344253a6fef3e7563c0f700275">Coarsing::grid_getsubfields</a> ()</td></tr>
+<tr class="separator:ga197087344253a6fef3e7563c0f700275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac743da27d15cd9d74b9c0617360380a5"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structField.html">Field</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gac743da27d15cd9d74b9c0617360380a5">Coarsing::get_subfield</a> (string nm)</td></tr>
+<tr class="memdesc:gac743da27d15cd9d74b9c0617360380a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find subfield from name.  <a href="group__CoarseGraining.html#gac743da27d15cd9d74b9c0617360380a5">More...</a><br /></td></tr>
+<tr class="separator:gac743da27d15cd9d74b9c0617360380a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabcee764637d138553f56c1ebd7d776b2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gabcee764637d138553f56c1ebd7d776b2">Coarsing::set_field_struct</a> ()</td></tr>
 <tr class="memdesc:gabcee764637d138553f56c1ebd7d776b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the FIELDS structure, with all the different CG properties that can be computed.  <a href="group__CoarseGraining.html#gabcee764637d138553f56c1ebd7d776b2">More...</a><br /></td></tr>
 <tr class="separator:gabcee764637d138553f56c1ebd7d776b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1607b8efc6c6ed9b9930d5cbf3396c51"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga1607b8efc6c6ed9b9930d5cbf3396c51">Coarsing::add_extra_field</a> (string name, <a class="el" href="group__CoarseGraining.html#ga705449399d3fd8accc101dd2de5f1fb6">TensorOrder</a> order, <a class="el" href="group__CoarseGraining.html#gaa01498a3ceb2fa74dc9536c16caef1da">FieldType</a> type)</td></tr>
 <tr class="memdesc:ga1607b8efc6c6ed9b9930d5cbf3396c51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to add extra user-defined fields.  <a href="group__CoarseGraining.html#ga1607b8efc6c6ed9b9930d5cbf3396c51">More...</a><br /></td></tr>
 <tr class="separator:ga1607b8efc6c6ed9b9930d5cbf3396c51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab1a51138e5a8c3e8d7f750b7cfe55524"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gab1a51138e5a8c3e8d7f750b7cfe55524">Coarsing::setWindow</a> (<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5">Windows</a> win, double w, vector&lt; bool &gt; per={}, vector&lt; int &gt; boxes={}, vector&lt; double &gt; deltas={})</td></tr>
-<tr class="memdesc:gab1a51138e5a8c3e8d7f750b7cfe55524"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the windowing function, calling the templated version.  <a href="group__CoarseGraining.html#gab1a51138e5a8c3e8d7f750b7cfe55524">More...</a><br /></td></tr>
-<tr class="separator:gab1a51138e5a8c3e8d7f750b7cfe55524"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabea4d1e1cbe27efa2e8c6d45f18ec247"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gabea4d1e1cbe27efa2e8c6d45f18ec247">Coarsing::setWindow</a> (<a class="el" href="WindowLibrary_8h.html#af1edd7b7fcdf15ab1bff70cf1daf8ae5">Windows</a> win, double w, vector&lt; bool &gt; per={}, vector&lt; int &gt; boxes={}, vector&lt; double &gt; deltas={}, vector&lt; vector&lt; double &gt;&gt; bounds={{}})</td></tr>
+<tr class="memdesc:gabea4d1e1cbe27efa2e8c6d45f18ec247"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the windowing function, calling the templated version.  <a href="group__CoarseGraining.html#gabea4d1e1cbe27efa2e8c6d45f18ec247">More...</a><br /></td></tr>
+<tr class="separator:gabea4d1e1cbe27efa2e8c6d45f18ec247"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaed4cc5dd146d4c1bcd51e1bf064498f0"><td class="memTemplParams" colspan="2">template&lt;Windows W&gt; </td></tr>
 <tr class="memitem:gaed4cc5dd146d4c1bcd51e1bf064498f0"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaed4cc5dd146d4c1bcd51e1bf064498f0">Coarsing::setWindow</a> ()</td></tr>
 <tr class="memdesc:gaed4cc5dd146d4c1bcd51e1bf064498f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the windowing function.  <a href="group__CoarseGraining.html#gaed4cc5dd146d4c1bcd51e1bf064498f0">More...</a><br /></td></tr>
@@ -179,6 +189,10 @@ Functions</h2></td></tr>
 <tr class="memitem:ga3856287e6e3d560ffb251740550ba96b"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga3856287e6e3d560ffb251740550ba96b">Coarsing::setWindow</a> (double w)</td></tr>
 <tr class="memdesc:ga3856287e6e3d560ffb251740550ba96b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the windowing function.  <a href="group__CoarseGraining.html#ga3856287e6e3d560ffb251740550ba96b">More...</a><br /></td></tr>
 <tr class="separator:ga3856287e6e3d560ffb251740550ba96b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadfab4f587cf4f4ea4d3f8cc26295539d"><td class="memTemplParams" colspan="2">template&lt;Windows W&gt; </td></tr>
+<tr class="memitem:gadfab4f587cf4f4ea4d3f8cc26295539d"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gadfab4f587cf4f4ea4d3f8cc26295539d">Coarsing::setWindow</a> (vector&lt; vector&lt; double &gt;&gt; &amp;)</td></tr>
+<tr class="memdesc:gadfab4f587cf4f4ea4d3f8cc26295539d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the windowing function for <a class="el" href="classLibRVE.html">LibRVE</a>.  <a href="group__CoarseGraining.html#gadfab4f587cf4f4ea4d3f8cc26295539d">More...</a><br /></td></tr>
+<tr class="separator:gadfab4f587cf4f4ea4d3f8cc26295539d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga28f5dc6486e3a229603ea71ecb8b8667"><td class="memTemplParams" colspan="2">template&lt;Windows W&gt; </td></tr>
 <tr class="memitem:ga28f5dc6486e3a229603ea71ecb8b8667"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga28f5dc6486e3a229603ea71ecb8b8667">Coarsing::setWindow</a> (double w, vector&lt; bool &gt; per, vector&lt; int &gt; boxes, vector&lt; double &gt; deltas)</td></tr>
 <tr class="memdesc:ga28f5dc6486e3a229603ea71ecb8b8667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the windowing function for the <a class="el" href="classLibLucyND__Periodic.html">LibLucyND_Periodic</a> (special one...)  <a href="group__CoarseGraining.html#ga28f5dc6486e3a229603ea71ecb8b8667">More...</a><br /></td></tr>
@@ -192,9 +206,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga1742e7a20dc68bf013710a7c35cb7ea6"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga1742e7a20dc68bf013710a7c35cb7ea6">Coarsing::grid_setfields</a> ()</td></tr>
 <tr class="memdesc:ga1742e7a20dc68bf013710a7c35cb7ea6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the fields at each CG point.  <a href="group__CoarseGraining.html#ga1742e7a20dc68bf013710a7c35cb7ea6">More...</a><br /></td></tr>
 <tr class="separator:ga1742e7a20dc68bf013710a7c35cb7ea6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga397bc04e21b040c683f49853c5ffad29"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="group__CoarseGraining.html#gaa01498a3ceb2fa74dc9536c16caef1da">FieldType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga397bc04e21b040c683f49853c5ffad29">Coarsing::grid_getfields</a> ()</td></tr>
-<tr class="memdesc:ga397bc04e21b040c683f49853c5ffad29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract fields from each CG point.  <a href="group__CoarseGraining.html#ga397bc04e21b040c683f49853c5ffad29">More...</a><br /></td></tr>
-<tr class="separator:ga397bc04e21b040c683f49853c5ffad29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga683203b0a3b44a209b473b8f118697cc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga683203b0a3b44a209b473b8f118697cc">Coarsing::grid_getfields</a> ()</td></tr>
+<tr class="memdesc:ga683203b0a3b44a209b473b8f118697cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the array of fields for the CG points.  <a href="group__CoarseGraining.html#ga683203b0a3b44a209b473b8f118697cc">More...</a><br /></td></tr>
+<tr class="separator:ga683203b0a3b44a209b473b8f118697cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa1d830f97febf839e9bbb60d1012eb19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaa1d830f97febf839e9bbb60d1012eb19">Coarsing::get_bounds</a> ()</td></tr>
 <tr class="memdesc:gaa1d830f97febf839e9bbb60d1012eb19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the simulation boundaries.  <a href="group__CoarseGraining.html#gaa1d830f97febf839e9bbb60d1012eb19">More...</a><br /></td></tr>
 <tr class="separator:gaa1d830f97febf839e9bbb60d1012eb19"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -225,6 +239,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gaae3a8bfab41c6dcb3f89282cfa86d2de"><td class="memTemplParams" colspan="2">template&lt;int D&gt; </td></tr>
 <tr class="memitem:gaae3a8bfab41c6dcb3f89282cfa86d2de"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaae3a8bfab41c6dcb3f89282cfa86d2de">Coarsing::interpolate_vel_multilinear</a> (int id, bool usetimeavg)</td></tr>
 <tr class="separator:gaae3a8bfab41c6dcb3f89282cfa86d2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga432934a8574d47929f54d05d26faa698"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga432934a8574d47929f54d05d26faa698"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga432934a8574d47929f54d05d26faa698">Coarsing::add_rotated_quat</a> (double *p, double weight, <a class="el" href="classEigen_1_1Quaternion.html">Eigen::Quaternion</a>&lt; double &gt; q, T original)</td></tr>
+<tr class="separator:ga432934a8574d47929f54d05d26faa698"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga315f17f5e09d3169e6722b41b112aa98"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga315f17f5e09d3169e6722b41b112aa98">Coarsing::idx_FastFirst2SlowFirst</a> (int n)</td></tr>
 <tr class="memdesc:ga315f17f5e09d3169e6722b41b112aa98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change array traversing order.  <a href="group__CoarseGraining.html#ga315f17f5e09d3169e6722b41b112aa98">More...</a><br /></td></tr>
 <tr class="separator:ga315f17f5e09d3169e6722b41b112aa98"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,6 +297,9 @@ Variables</h2></td></tr>
 <tr class="memitem:gad0fd06c53bc917bdf91abbbdb4b8e4c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gad0fd06c53bc917bdf91abbbdb4b8e4c3">CGPoint::fields</a></td></tr>
 <tr class="memdesc:gad0fd06c53bc917bdf91abbbdb4b8e4c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">1st dimension is time, second are fields  <a href="group__CoarseGraining.html#gad0fd06c53bc917bdf91abbbdb4b8e4c3">More...</a><br /></td></tr>
 <tr class="separator:gad0fd06c53bc917bdf91abbbdb4b8e4c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5279fb0a19e83411f00529b5348210d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga5279fb0a19e83411f00529b5348210d8">CGPoint::subfields</a></td></tr>
+<tr class="memdesc:ga5279fb0a19e83411f00529b5348210d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">1st dimension is time, second are subfields (ie. "TC.ev1")  <a href="group__CoarseGraining.html#ga5279fb0a19e83411f00529b5348210d8">More...</a><br /></td></tr>
+<tr class="separator:ga5279fb0a19e83411f00529b5348210d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8b3032ef9cfc6f32d1cab9aa912ce82d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#gae570fe4d2fd13665912fabd3abd276b2">v1d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga8b3032ef9cfc6f32d1cab9aa912ce82d">CGPoint::location</a></td></tr>
 <tr class="memdesc:ga8b3032ef9cfc6f32d1cab9aa912ce82d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Location of the coarse graining point.  <a href="group__CoarseGraining.html#ga8b3032ef9cfc6f32d1cab9aa912ce82d">More...</a><br /></td></tr>
 <tr class="separator:ga8b3032ef9cfc6f32d1cab9aa912ce82d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -329,8 +349,11 @@ Variables</h2></td></tr>
 <tr class="memdesc:ga1cbe3b0b910376fe41418a80e8884f35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Particle angular velocity.  <a href="group__CoarseGraining.html#ga1cbe3b0b910376fe41418a80e8884f35">More...</a><br /></td></tr>
 <tr class="separator:ga1cbe3b0b910376fe41418a80e8884f35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7b64f06dd19e4bdc03f3b673c52ccfcd"><td class="memItemLeft" align="right" valign="top">vector&lt; double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga7b64f06dd19e4bdc03f3b673c52ccfcd">Data::orient</a></td></tr>
-<tr class="memdesc:ga7b64f06dd19e4bdc03f3b673c52ccfcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Particle angular velocity.  <a href="group__CoarseGraining.html#ga7b64f06dd19e4bdc03f3b673c52ccfcd">More...</a><br /></td></tr>
+<tr class="memdesc:ga7b64f06dd19e4bdc03f3b673c52ccfcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Particle orientation (quaternions)  <a href="group__CoarseGraining.html#ga7b64f06dd19e4bdc03f3b673c52ccfcd">More...</a><br /></td></tr>
 <tr class="separator:ga7b64f06dd19e4bdc03f3b673c52ccfcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga166f4ef849bcea91f3241a627a5d1f31"><td class="memItemLeft" align="right" valign="top">vector&lt; double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga166f4ef849bcea91f3241a627a5d1f31">Data::superquadric</a></td></tr>
+<tr class="memdesc:ga166f4ef849bcea91f3241a627a5d1f31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Superquadrics information.  <a href="group__CoarseGraining.html#ga166f4ef849bcea91f3241a627a5d1f31">More...</a><br /></td></tr>
+<tr class="separator:ga166f4ef849bcea91f3241a627a5d1f31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9943c2f12cbe674a2660d5e370ad6192"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga9943c2f12cbe674a2660d5e370ad6192">Data::vel_fluc</a></td></tr>
 <tr class="memdesc:ga9943c2f12cbe674a2660d5e370ad6192"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fluctuating velocity. Should not be externally provided but calculated, using the function <em><a class="el" href="group__CoarseGraining.html#ga15c929bd3c20fa272e52611ed84878dc" title="Velocity fluctuation computation.">Coarsing::compute_fluc_vel()</a></em>  <a href="group__CoarseGraining.html#ga9943c2f12cbe674a2660d5e370ad6192">More...</a><br /></td></tr>
 <tr class="separator:ga9943c2f12cbe674a2660d5e370ad6192"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -402,27 +425,32 @@ Variables</h2></td></tr>
 <tr class="memdesc:ga693207f9b72e42b89e1d68b9a6259fa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">CG point location.  <a href="group__CoarseGraining.html#ga693207f9b72e42b89e1d68b9a6259fa6">More...</a><br /></td></tr>
 <tr class="separator:ga693207f9b72e42b89e1d68b9a6259fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6bb37c3aaa9384284e20cfd762164810"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classLibBase.html">LibBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga6bb37c3aaa9384284e20cfd762164810">Coarsing::Window</a> = nullptr</td></tr>
+<tr class="memdesc:ga6bb37c3aaa9384284e20cfd762164810"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the averaging window.  <a href="group__CoarseGraining.html#ga6bb37c3aaa9384284e20cfd762164810">More...</a><br /></td></tr>
 <tr class="separator:ga6bb37c3aaa9384284e20cfd762164810"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga71f3970db217286403591f34bd51c2da"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga71f3970db217286403591f34bd51c2da">Coarsing::flags</a></td></tr>
-<tr class="memdesc:ga71f3970db217286403591f34bd51c2da"><td class="mdescLeft">&#160;</td><td class="mdescRight"><blockquote class="doxtable">
-<p>Pointer to the averaging window </p>
-</blockquote>
- <a href="group__CoarseGraining.html#ga71f3970db217286403591f34bd51c2da">More...</a><br /></td></tr>
-<tr class="separator:ga71f3970db217286403591f34bd51c2da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa2fe878237d61cfea5421bd433e1210d"><td class="memItemLeft" align="right" valign="top">vector&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaa2fe878237d61cfea5421bd433e1210d">Coarsing::Fields</a></td></tr>
-<tr class="separator:gaa2fe878237d61cfea5421bd433e1210d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga19637b8cc841bf3fd43305a844133af9"><td class="memItemLeft" align="right" valign="top">vector&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga19637b8cc841bf3fd43305a844133af9">Coarsing::Fname</a></td></tr>
-<tr class="memdesc:ga19637b8cc841bf3fd43305a844133af9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flagged field names.  <a href="group__CoarseGraining.html#ga19637b8cc841bf3fd43305a844133af9">More...</a><br /></td></tr>
-<tr class="separator:ga19637b8cc841bf3fd43305a844133af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga07ec285bd11033d10f7a27a38bd5fd62"><td class="memItemLeft" align="right" valign="top">vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga07ec285bd11033d10f7a27a38bd5fd62">Coarsing::Fidx</a></td></tr>
-<tr class="memdesc:ga07ec285bd11033d10f7a27a38bd5fd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Where the fields is referenced in the fields vector in the <a class="el" href="classCGPoint.html" title="Data computed for a single coarse graining point.">CGPoint</a>. -1 if not flagged.  <a href="group__CoarseGraining.html#ga07ec285bd11033d10f7a27a38bd5fd62">More...</a><br /></td></tr>
-<tr class="separator:ga07ec285bd11033d10f7a27a38bd5fd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0f643d1a54232ab019aea331803f0cb1"><td class="memItemLeft" align="right" valign="top">vector&lt; <a class="el" href="group__CoarseGraining.html#ga705449399d3fd8accc101dd2de5f1fb6">TensorOrder</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga0f643d1a54232ab019aea331803f0cb1">Coarsing::Ftype</a></td></tr>
-<tr class="memdesc:ga0f643d1a54232ab019aea331803f0cb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flagged field types.  <a href="group__CoarseGraining.html#ga0f643d1a54232ab019aea331803f0cb1">More...</a><br /></td></tr>
-<tr class="separator:ga0f643d1a54232ab019aea331803f0cb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga059133ce6bdebf218e74a7253de9a691"><td class="memItemLeft" align="right" valign="top">std::variant&lt; Eigen::Matrix3d, <a class="el" href="classEigen_1_1Quaternion.html">Eigen::Quaternion</a>&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga059133ce6bdebf218e74a7253de9a691">Coarsing::original_orientation</a> = <a class="el" href="classEigen_1_1Quaternion.html">Eigen::Quaternion</a>&lt;double&gt;(0,0,0,1)</td></tr>
+<tr class="separator:ga059133ce6bdebf218e74a7253de9a691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga56e5de2d000122cd6054017025e9634b"><td class="memItemLeft" align="right" valign="top">vector&lt; struct <a class="el" href="structField.html">Field</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga56e5de2d000122cd6054017025e9634b">Coarsing::FIELDS</a></td></tr>
 <tr class="memdesc:ga56e5de2d000122cd6054017025e9634b"><td class="mdescLeft">&#160;</td><td class="mdescRight">All allowed fields (initialized in grid_getfields)  <a href="group__CoarseGraining.html#ga56e5de2d000122cd6054017025e9634b">More...</a><br /></td></tr>
 <tr class="separator:ga56e5de2d000122cd6054017025e9634b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga71f3970db217286403591f34bd51c2da"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga71f3970db217286403591f34bd51c2da">Coarsing::flags</a></td></tr>
+<tr class="memdesc:ga71f3970db217286403591f34bd51c2da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags deciding which fields to coarse-grain.  <a href="group__CoarseGraining.html#ga71f3970db217286403591f34bd51c2da">More...</a><br /></td></tr>
+<tr class="separator:ga71f3970db217286403591f34bd51c2da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga07ec285bd11033d10f7a27a38bd5fd62"><td class="memItemLeft" align="right" valign="top">vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga07ec285bd11033d10f7a27a38bd5fd62">Coarsing::Fidx</a></td></tr>
+<tr class="memdesc:ga07ec285bd11033d10f7a27a38bd5fd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Where the fields is referenced in the fields vector in the <a class="el" href="classCGPoint.html" title="Data computed for a single coarse graining point.">CGPoint</a>. -1 if not flagged.  <a href="group__CoarseGraining.html#ga07ec285bd11033d10f7a27a38bd5fd62">More...</a><br /></td></tr>
+<tr class="separator:ga07ec285bd11033d10f7a27a38bd5fd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab987342799ce6db76f35af02c9c0e1db"><td class="memItemLeft" align="right" valign="top">vector&lt; std::pair&lt; <a class="el" href="structField.html">Field</a> *, int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gab987342799ce6db76f35af02c9c0e1db">Coarsing::Fcols</a></td></tr>
+<tr class="memdesc:gab987342799ce6db76f35af02c9c0e1db"><td class="mdescLeft">&#160;</td><td class="mdescRight">What the columns are in the <a class="el" href="classCGPoint.html" title="Data computed for a single coarse graining point.">CGPoint</a>.  <a href="group__CoarseGraining.html#gab987342799ce6db76f35af02c9c0e1db">More...</a><br /></td></tr>
+<tr class="separator:gab987342799ce6db76f35af02c9c0e1db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga065c2167361cec568bdabf1b51fd524d"><td class="memItemLeft" align="right" valign="top">vector&lt; struct <a class="el" href="structField.html">Field</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga065c2167361cec568bdabf1b51fd524d">Coarsing::SUBFIELDS</a></td></tr>
+<tr class="memdesc:ga065c2167361cec568bdabf1b51fd524d"><td class="mdescLeft">&#160;</td><td class="mdescRight">All allowed subfields.  <a href="group__CoarseGraining.html#ga065c2167361cec568bdabf1b51fd524d">More...</a><br /></td></tr>
+<tr class="separator:ga065c2167361cec568bdabf1b51fd524d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa96d42891de2060e2c09b1ae93956384"><td class="memItemLeft" align="right" valign="top">vector&lt; std::pair&lt; struct <a class="el" href="structField.html">Field</a> *, <a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaa96d42891de2060e2c09b1ae93956384">Coarsing::subflags</a></td></tr>
+<tr class="separator:gaa96d42891de2060e2c09b1ae93956384"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5381d471a3335f20b0908bb8c55b2483"><td class="memItemLeft" align="right" valign="top">vector&lt; std::pair&lt; <a class="el" href="structField.html">Field</a> *, std::vector&lt; std::pair&lt; <a class="el" href="structField.html">Field</a> *, int &gt; &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga5381d471a3335f20b0908bb8c55b2483">Coarsing::SFcols</a></td></tr>
+<tr class="memdesc:ga5381d471a3335f20b0908bb8c55b2483"><td class="mdescLeft">&#160;</td><td class="mdescRight">What the subcolumns are in the <a class="el" href="classCGPoint.html" title="Data computed for a single coarse graining point.">CGPoint</a>.  <a href="group__CoarseGraining.html#ga5381d471a3335f20b0908bb8c55b2483">More...</a><br /></td></tr>
+<tr class="separator:ga5381d471a3335f20b0908bb8c55b2483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaafc45a78f6d459d07152817fbdf928b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gaafc45a78f6d459d07152817fbdf928b3">Coarsing::sf_mask_eigen</a></td></tr>
+<tr class="separator:gaafc45a78f6d459d07152817fbdf928b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1b7f9fdd888fca0a1b512ed44b26c8a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#ga1b7f9fdd888fca0a1b512ed44b26c8a2">Coarsing::hasvelfluct</a> =false</td></tr>
 <tr class="separator:ga1b7f9fdd888fca0a1b512ed44b26c8a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab48a3849a19d6bf2b27cdfdc2b1048f7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__CoarseGraining.html#gab48a3849a19d6bf2b27cdfdc2b1048f7">Coarsing::hasrotfluct</a> =false</td></tr>
@@ -471,6 +499,8 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="gga2200b9a3f9233930001f6b02491c558eab068018251f551730c472862a3b2fca9"></a>Final&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="gga2200b9a3f9233930001f6b02491c558eaf8dcb4f22628cdc6439ce01a42c37818"></a>Intermediate&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="gga2200b9a3f9233930001f6b02491c558eaedf69634e61e7ec5d006874d299bc0d4"></a>Both&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga2200b9a3f9233930001f6b02491c558ea21f3821ba7d22655547db99262b4d7e9"></a>Pre5&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga2200b9a3f9233930001f6b02491c558eadf61589fed2f0b92cf49d75b39321d76"></a>IntermediateAndPre5&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -608,6 +638,48 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Used to add extra user-defined fields. </p>
+
+</div>
+</div>
+<a id="ga432934a8574d47929f54d05d26faa698"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga432934a8574d47929f54d05d26faa698">&#9670;&nbsp;</a></span>add_rotated_quat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void Coarsing::add_rotated_quat </td>
+          <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>weight</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classEigen_1_1Quaternion.html">Eigen::Quaternion</a>&lt; double &gt;&#160;</td>
+          <td class="paramname"><em>q</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>original</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -924,6 +996,26 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="gac743da27d15cd9d74b9c0617360380a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac743da27d15cd9d74b9c0617360380a5">&#9670;&nbsp;</a></span>get_subfield()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="structField.html">Field</a> * Coarsing::get_subfield </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>nm</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Find subfield from name. </p>
+
+</div>
+</div>
 <a id="ga8ea9edcad1f8b08efa58bff025d5632d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8ea9edcad1f8b08efa58bff025d5632d">&#9670;&nbsp;</a></span>grid_generate()</h2>
 
@@ -943,14 +1035,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ga397bc04e21b040c683f49853c5ffad29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga397bc04e21b040c683f49853c5ffad29">&#9670;&nbsp;</a></span>grid_getfields()</h2>
+<a id="ga683203b0a3b44a209b473b8f118697cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga683203b0a3b44a209b473b8f118697cc">&#9670;&nbsp;</a></span>grid_getfields()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">vector&lt; <a class="el" href="group__CoarseGraining.html#gaa01498a3ceb2fa74dc9536c16caef1da">FieldType</a> &gt; Coarsing::grid_getfields </td>
+          <td class="memname">int Coarsing::grid_getfields </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -958,7 +1050,24 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Extract fields from each CG point. </p>
+<p>Build the array of fields for the CG points. </p>
+
+</div>
+</div>
+<a id="ga197087344253a6fef3e7563c0f700275"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga197087344253a6fef3e7563c0f700275">&#9670;&nbsp;</a></span>grid_getsubfields()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Coarsing::grid_getsubfields </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -1593,7 +1702,7 @@ template&lt;int D&gt; </div>
 </div>
 </div>
 <a id="gaed4cc5dd146d4c1bcd51e1bf064498f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaed4cc5dd146d4c1bcd51e1bf064498f0">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#gaed4cc5dd146d4c1bcd51e1bf064498f0">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1611,7 +1720,7 @@ template&lt;Windows W&gt; </div>
 </div>
 </div>
 <a id="ga3856287e6e3d560ffb251740550ba96b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3856287e6e3d560ffb251740550ba96b">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[2/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3856287e6e3d560ffb251740550ba96b">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1633,7 +1742,7 @@ template&lt;Windows W&gt; </div>
 </div>
 </div>
 <a id="ga28f5dc6486e3a229603ea71ecb8b8667"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga28f5dc6486e3a229603ea71ecb8b8667">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[3/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga28f5dc6486e3a229603ea71ecb8b8667">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1676,8 +1785,30 @@ template&lt;Windows W&gt; </div>
 
 </div>
 </div>
-<a id="gab1a51138e5a8c3e8d7f750b7cfe55524"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab1a51138e5a8c3e8d7f750b7cfe55524">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[4/4]</span></h2>
+<a id="gadfab4f587cf4f4ea4d3f8cc26295539d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadfab4f587cf4f4ea4d3f8cc26295539d">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;Windows W&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">int Coarsing::setWindow </td>
+          <td>(</td>
+          <td class="paramtype">vector&lt; vector&lt; double &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>bounds</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the windowing function for <a class="el" href="classLibRVE.html">LibRVE</a>. </p>
+
+</div>
+</div>
+<a id="gabea4d1e1cbe27efa2e8c6d45f18ec247"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabea4d1e1cbe27efa2e8c6d45f18ec247">&#9670;&nbsp;</a></span>setWindow() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1710,7 +1841,13 @@ template&lt;Windows W&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">vector&lt; double &gt;&#160;</td>
-          <td class="paramname"><em>deltas</em> = <code>{}</code>&#160;</td>
+          <td class="paramname"><em>deltas</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vector&lt; vector&lt; double &gt;&gt;&#160;</td>
+          <td class="paramname"><em>bounds</em> = <code>{{}}</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2169,6 +2306,22 @@ template&lt;Windows W&gt; </div>
 
 </div>
 </div>
+<a id="gab987342799ce6db76f35af02c9c0e1db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab987342799ce6db76f35af02c9c0e1db">&#9670;&nbsp;</a></span>Fcols</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;std::pair&lt;<a class="el" href="structField.html">Field</a> *, int&gt; &gt; Coarsing::Fcols</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>What the columns are in the <a class="el" href="classCGPoint.html" title="Data computed for a single coarse graining point.">CGPoint</a>. </p>
+
+</div>
+</div>
 <a id="ga07ec285bd11033d10f7a27a38bd5fd62"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga07ec285bd11033d10f7a27a38bd5fd62">&#9670;&nbsp;</a></span>Fidx</h2>
 
@@ -2198,20 +2351,6 @@ template&lt;Windows W&gt; </div>
 </div><div class="memdoc">
 
 <p>1st dimension is time, second are fields </p>
-
-</div>
-</div>
-<a id="gaa2fe878237d61cfea5421bd433e1210d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa2fe878237d61cfea5421bd433e1210d">&#9670;&nbsp;</a></span>Fields</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;string&gt; Coarsing::Fields</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -2259,27 +2398,7 @@ template&lt;Windows W&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p><blockquote class="doxtable">
-<p>Pointer to the averaging window </p>
-</blockquote>
-</p>
-<p>Flags deciding which fields to coarse-grain </p>
-
-</div>
-</div>
-<a id="ga19637b8cc841bf3fd43305a844133af9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga19637b8cc841bf3fd43305a844133af9">&#9670;&nbsp;</a></span>Fname</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;string&gt; Coarsing::Fname</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Flagged field names. </p>
+<p>Flags deciding which fields to coarse-grain. </p>
 
 </div>
 </div>
@@ -2312,22 +2431,6 @@ template&lt;Windows W&gt; </div>
 </div><div class="memdoc">
 
 <p>Mainly used to identified the type of user defined fields. </p>
-
-</div>
-</div>
-<a id="ga0f643d1a54232ab019aea331803f0cb1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga0f643d1a54232ab019aea331803f0cb1">&#9670;&nbsp;</a></span>Ftype</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">vector&lt;<a class="el" href="group__CoarseGraining.html#ga705449399d3fd8accc101dd2de5f1fb6">TensorOrder</a>&gt; Coarsing::Ftype</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Flagged field types. </p>
 
 </div>
 </div>
@@ -2643,7 +2746,21 @@ template&lt;Windows W&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Particle angular velocity. </p>
+<p>Particle orientation (quaternions) </p>
+
+</div>
+</div>
+<a id="ga059133ce6bdebf218e74a7253de9a691"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga059133ce6bdebf218e74a7253de9a691">&#9670;&nbsp;</a></span>original_orientation</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::variant&lt;Eigen::Matrix3d, <a class="el" href="classEigen_1_1Quaternion.html">Eigen::Quaternion</a>&lt;double&gt; &gt; Coarsing::original_orientation = <a class="el" href="classEigen_1_1Quaternion.html">Eigen::Quaternion</a>&lt;double&gt;(0,0,0,1)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -2727,6 +2844,98 @@ template&lt;Windows W&gt; </div>
 
 </div>
 </div>
+<a id="gaafc45a78f6d459d07152817fbdf928b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaafc45a78f6d459d07152817fbdf928b3">&#9670;&nbsp;</a></span>sf_mask_eigen</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a> Coarsing::sf_mask_eigen</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga5381d471a3335f20b0908bb8c55b2483"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5381d471a3335f20b0908bb8c55b2483">&#9670;&nbsp;</a></span>SFcols</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;std::pair&lt;<a class="el" href="structField.html">Field</a> *, std::vector&lt;std::pair&lt;<a class="el" href="structField.html">Field</a>*, int&gt; &gt; &gt; &gt; Coarsing::SFcols</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>What the subcolumns are in the <a class="el" href="classCGPoint.html" title="Data computed for a single coarse graining point.">CGPoint</a>. </p>
+
+</div>
+</div>
+<a id="ga5279fb0a19e83411f00529b5348210d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5279fb0a19e83411f00529b5348210d8">&#9670;&nbsp;</a></span>subfields</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__DEM.html#ga0635bc41e0e88fb34a49d35e69cdab8f">v2d</a> CGPoint::subfields</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>1st dimension is time, second are subfields (ie. "TC.ev1") </p>
+
+</div>
+</div>
+<a id="ga065c2167361cec568bdabf1b51fd524d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga065c2167361cec568bdabf1b51fd524d">&#9670;&nbsp;</a></span>SUBFIELDS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;struct <a class="el" href="structField.html">Field</a>&gt; Coarsing::SUBFIELDS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>All allowed subfields. </p>
+
+</div>
+</div>
+<a id="gaa96d42891de2060e2c09b1ae93956384"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa96d42891de2060e2c09b1ae93956384">&#9670;&nbsp;</a></span>subflags</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;std::pair&lt;struct <a class="el" href="structField.html">Field</a> *, <a class="el" href="stdint_8h.html#aec6fcb673ff035718c238c8c9d544c47">uint64_t</a>&gt; &gt; Coarsing::subflags</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga166f4ef849bcea91f3241a627a5d1f31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga166f4ef849bcea91f3241a627a5d1f31">&#9670;&nbsp;</a></span>superquadric</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt;double *&gt; Data::superquadric</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Superquadrics information. </p>
+
+</div>
+</div>
 <a id="ga49f5477a50665dabd7c8d6ee05fbfb89"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga49f5477a50665dabd7c8d6ee05fbfb89">&#9670;&nbsp;</a></span>Time</h2>
 
@@ -2802,6 +3011,8 @@ template&lt;Windows W&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Pointer to the averaging window. </p>
 
 </div>
 </div>

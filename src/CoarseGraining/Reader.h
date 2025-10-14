@@ -44,6 +44,9 @@ public:
     void set_default_radiusdensity (double radius, double density) {Radius=radius ; Density=density ;}
     void set_default_radius (double radius) {Radius=radius ; }
     void set_default_density (double density) {Density=density ; }
+    void set_default_superquadric (double a, double b, double c, double pa, double pb, double pc) 
+            {is_superquadric = true ; SuperQuadric[0] = a ; SuperQuadric[1] = b ; SuperQuadric[2] = c ; SuperQuadric[3] = pa ; SuperQuadric[4] = pb ; SuperQuadric[5] = pc ;}
+    double get_default_superquadric(int component) {return SuperQuadric[component] ; }
     double get_default_radius ()
     {
         static bool info=true ;
@@ -79,6 +82,7 @@ public:
 
     bool is_seekable = false ;
     bool is_fullymapped = false ;
+    bool is_superquadric = false ; 
     std::vector <std::optional<std::streampos>> mapped_ts ;
 
     void build_pospqlpq_from_ids (v2d & contactarray , int idx_id1, int idx_id2, int idx_pospq, int idx_lpq,
@@ -169,6 +173,7 @@ protected:
 
 private:
     double Radius=-1, Density=-1 ;
+    double SuperQuadric[6] = {1,1,1,2,2,2} ; 
 } ;
 
 #endif

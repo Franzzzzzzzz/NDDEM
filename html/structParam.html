@@ -103,6 +103,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa5eb3d55ae7180934d8161fd9e7f6851"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac29ea6175d95c33007925608a500721"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#aac29ea6175d95c33007925608a500721">get_num_contacts</a> ()</td></tr>
 <tr class="separator:aac29ea6175d95c33007925608a500721"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d3823c2926e72535a2e900b0f0ac95e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#a7d3823c2926e72535a2e900b0f0ac95e">get_volume</a> ()</td></tr>
+<tr class="separator:a7d3823c2926e72535a2e900b0f0ac95e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f1db1b5fba4c59dca0b3c543c877202"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#a7f1db1b5fba4c59dca0b3c543c877202">get_data</a> (<a class="el" href="group__DEM.html#ga52b72596f946f6e47a9c5c9079071431">DataValue</a> datavalue, int dd=0, std::string name=&quot;&quot;)</td></tr>
 <tr class="separator:a7f1db1b5fba4c59dca0b3c543c877202"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aada6abb00bb83c905fb02b7216034965"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#aada6abb00bb83c905fb02b7216034965">post_init</a> ()</td></tr>
@@ -168,6 +170,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a36deac433146adc1eee0e5ad408e2adf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1d6b51d2534d302b7c65e1cc4408c61"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#af1d6b51d2534d302b7c65e1cc4408c61">default_radius</a> =-1</td></tr>
 <tr class="separator:af1d6b51d2534d302b7c65e1cc4408c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13ff58848b5c4890c69d024475856b39"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#a13ff58848b5c4890c69d024475856b39">default_sqaxes</a> {-1.,-1.,-1.}</td></tr>
+<tr class="separator:a13ff58848b5c4890c69d024475856b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4e9cf99668941db644f3830d017c07c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#ab4e9cf99668941db644f3830d017c07c">default_sqpower</a> {2,2,2}</td></tr>
+<tr class="separator:ab4e9cf99668941db644f3830d017c07c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75bf840de81b44e8b681cb64bbb199ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__CoarseGraining.html#ga2200b9a3f9233930001f6b02491c558e">AverageType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#a75bf840de81b44e8b681cb64bbb199ad">timeaverage</a> = <a class="el" href="group__CoarseGraining.html#gga2200b9a3f9233930001f6b02491c558eac9d3e887722f2bc482bcca9d41c512af">AverageType::None</a></td></tr>
 <tr class="separator:a75bf840de81b44e8b681cb64bbb199ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada71bde63a911d067e10abd63e243c1f"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParam.html#ada71bde63a911d067e10abd63e243c1f">requiredfieldset</a> = {{&quot;dimension&quot;, false}, {&quot;window size&quot;, false}, {&quot;fields&quot;, false}, {&quot;max time&quot;, false}, {&quot;boundaries&quot;, false}, {&quot;boxes&quot;, false}}</td></tr>
@@ -350,6 +356,23 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">int Param::get_num_particles </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7d3823c2926e72535a2e900b0f0ac95e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d3823c2926e72535a2e900b0f0ac95e">&#9670;&nbsp;</a></span>get_volume()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Param::get_volume </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -697,6 +720,34 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">double Param::default_radius =-1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a13ff58848b5c4890c69d024475856b39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13ff58848b5c4890c69d024475856b39">&#9670;&nbsp;</a></span>default_sqaxes</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; Param::default_sqaxes {-1.,-1.,-1.}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab4e9cf99668941db644f3830d017c07c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4e9cf99668941db644f3830d017c07c">&#9670;&nbsp;</a></span>default_sqpower</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; Param::default_sqpower {2,2,2}</td>
         </tr>
       </table>
 </div><div class="memdoc">
