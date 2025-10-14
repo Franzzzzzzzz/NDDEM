@@ -116,10 +116,10 @@ void CoarseGraining::setup_CG ()
     C = new Coarsing (P.dim, P.boxes, P.boundaries, P.maxT) ;
     for (auto i : P.extrafields)
         C->add_extra_field(i.name, i.order, i.type) ;
-    if (P.window == Windows::LucyND_Periodic)
-        C->setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta) ;
-    else
-        C->setWindow(P.window,P.windowsize) ;
+    //if (P.window == Windows::LucyND_Periodic)
+        C->setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta, P.boundaries) ;
+    //else
+    //    C->setWindow(P.window,P.windowsize) ;
     pipeline = C->set_flags(P.flags) ;
     auto extrafieldmap = C->grid_setfields() ;
     C->grid_neighbour() ;
@@ -136,6 +136,11 @@ int CoarseGraining::process_timestep (int ts_abs, bool hasdonefirstpass)
     P.read_timestep(ts+P.skipT) ; 
     C->cT = ts ;
     P.set_data (C->data) ;
+    if (P.window == Windows::RVE)
+    {
+        (static_cast<LibRVE*>(C->Window))->set_volume(P.get_volume()) ;
+        //printf("%g %g\n", P.get_volume(), (static_cast<LibRVE*>(C->Window))->scale) ;
+    }
 
     if (!hasdonefirstpass) if (pipeline & Pass::Pass1) C->pass_1() ;
     if (pipeline & Pass::VelFluct) C->compute_fluc_vel (avg) ;
@@ -158,7 +163,7 @@ int CoarseGraining::process_fluct_from_avg()
         C->pass_1() ;
         // printf("\r") ;
     }
-    if (P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) //Should be automatically verified when the function is called
+    if (P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both || P.timeaverage == AverageType::IntermediateAndPre5) //Should be automatically verified when the function is called
         C->mean_time(true) ;
     
     return 0 ;
@@ -167,7 +172,7 @@ int CoarseGraining::process_fluct_from_avg()
 void CoarseGraining::process_all ()
 {
     bool hasdonefirstpass = false ; 
-    if ((P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both) &&
+    if ((P.timeaverage == AverageType::Intermediate   || P.timeaverage == AverageType::Both || P.timeaverage == AverageType::IntermediateAndPre5) &&
         ((pipeline & Pass::VelFluct) || (pipeline & Pass::RotFluct)))
     {
         process_fluct_from_avg() ;

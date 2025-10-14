@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cctype>
 #include <cstdlib>
+#include <regex>
 
 namespace nddem {
 
@@ -102,7 +103,7 @@ struct JsonValue
       size_t pos = 0;
 
       public:
-        JsonValue parse(std::string txt) {text = txt ; return parse() ; }
+        JsonValue parse(std::string txt) {text = txt ; process_env(text) ; return parse() ; }
         JsonValue parse() ;
 
       private:
@@ -118,9 +119,28 @@ struct JsonValue
         JsonValue parse_string() ;
         JsonValue parse_array() ;
         JsonValue parse_object() ;
+
+        int process_env(std::string &in)
+        {
+          int replacements = 0;
+          std::regex reg("[$][a-zA-Z0-9]+");
+          auto envvar = std::sregex_iterator(in.begin(), in.end(), reg);
+          auto endenvvar = std::sregex_iterator();
+          while (envvar != endenvvar)
+          {
+              std::smatch match = *(envvar) ;
+              std::string val =std::string(std::getenv(match.str().substr(1).c_str())) ;
+              in=in.replace(match.position(), match.length(), val) ;
+              envvar = std::sregex_iterator(in.begin(), in.end(), reg);
+              replacements ++ ;
+          }
+          if (replacements>0) std::cout << "====Replaced\n" << in ;
+          return 0 ;
+        }
   };
     
   static JsonValue parse(std::string &val) {JsonValue res ; JsonParser parser ; res = parser.parse(val) ; return res ; }
+
 };
 // end JsonValue
 

@@ -52,8 +52,8 @@
 #include "mat.h"
 #endif
 
-#include <Eigen/Dense>
-#include <Eigen/Geometry> 
+#include "Eigen/Dense"
+#include "Eigen/Geometry"
 
 
 using namespace std ;
@@ -206,9 +206,10 @@ public :
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
     int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
-    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}) ; ///< Set the windowing function, calling the templated version
+    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}, vector<vector<double>> bounds={{}}) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
     template <Windows W> int setWindow (double w) ; ///< Set the windowing function
+    template <Windows W> int setWindow (vector<vector<double>> &) ; ///< Set the windowing function for LibRVE
     template <Windows W> int setWindow (double w, vector<bool> per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function for the LibLucyND_Periodic (special one...)
     int grid_generate() ; ///< Generate the coarse-graining grid
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
@@ -272,7 +273,6 @@ template <Windows W>
 int Coarsing::setWindow (double w)
 {
   static_assert(W != Windows::LucyND_Periodic) ;
-  printf("\n///%d///\n ", static_cast<int>(W)) ; fflush(stdout) ; 
   switch (W) {
       case Windows::Rect3D :
          Window=new LibRect3D (&data, w, d) ;
@@ -302,7 +302,7 @@ int Coarsing::setWindow (double w)
         Window=new LibLucyND (&data, w, d) ;
         break ;
       default:
-        printf("Unknown window, check Coarsing::setWindow") ;
+        printf("Unknown window, check Coarsing::setWindow #2") ;
   }
   cutoff = Window->cutoff() ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
@@ -325,6 +325,18 @@ int Coarsing::setWindow (double w, vector<bool> per, vector<int> boxes, vector<d
 return 0 ;
 }
 //-----------------------------------------------------------
+template <Windows W>
+int Coarsing::setWindow (vector<vector<double>> & bounds)
+{
+  static_assert(W == Windows::RVE) ;
+  double scale = 1 ;
+  for (size_t i =0 ; i<bounds.size() ; i++)
+      scale /= (bounds[i][1] - bounds[i][0]) ;
+
+  Window = new LibRVE (scale) ;
+return 0 ;
+}
+
 //-----------------------------------------------------------------------------------------
 template <int D>
 v1d Coarsing::interpolate_vel_multilinear (int id, bool usetimeavg)
@@ -332,7 +344,7 @@ v1d Coarsing::interpolate_vel_multilinear (int id, bool usetimeavg)
 int pts[1<<D][D] ;
 const static int idvel=get_id("VAVG") ;
 
-auto clip = [&](int a, int maxd){if (a<0) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (a) ; } ;
+auto clip = [&](double a, int maxd){if (a<0.) return(0) ; else if (a>=maxd) return (maxd-1) ; else return (static_cast<int>(a)) ; } ;
 
 
 // Determine the floor and ceil indices in each dimension
@@ -341,6 +353,13 @@ for (int dd = 0; dd < D; ++dd) {
     double val = (data.pos[dd][id] - CGP[0].location[dd]) / dx[dd];
     i0[dd] = clip(std::floor(val), npt[dd]);
     i1[dd] = clip(std::ceil(val), npt[dd]);
+    if (npt[dd]==1) continue ; 
+    if (i0[dd]==i1[dd])
+    {
+      if (i0[dd]==0) i1[dd]++ ;
+      else if (i0[dd]==npt[dd]-1) i0[dd]-- ; 
+      else i1[dd] ++ ; // If we are exactly on a point, just push one of the corner. The weights should be 0 anyway for this point.  
+    }
 }
 
 // Construct all corner indices of the cube
@@ -360,16 +379,15 @@ for (int c = 0; c < n_corners; ++c) {
     lin_idx[c] = idx;
 }
 
-
 std::vector<double> weights(n_corners, 1.0);
 for (int i = 0; i < n_corners; ++i) {
     for (int j = 0; j < D; ++j) {
         double x0 = CGP[lin_idx[i]].location[j];
         double t = (data.pos[j][id] - x0) / dx[j];
         if (((i >> j) & 1) == 0)
-            weights[i] *= (1.0 - t);
+            weights[i] *= npt[j]==1?0.5:(1.0 - t);
         else
-            weights[i] *= t;
+            weights[i] *= npt[j]==1?0.5:(1.0 + t);
     }
 }
 
@@ -383,9 +401,9 @@ for (int i = 0; i < n_corners; ++i)
         val = (*CGPtemp)[lin_idx[i]].fields[0][idvel + j] ; 
       else 
         val = CGP[lin_idx[i]].fields[0][idvel + j];
-      
       result[j] += val * weights[i];
     }
+
 return result ; 
 }
 

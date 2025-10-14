@@ -34,12 +34,13 @@ The actual coarse-graining is performed in 5 pass, refered as below. Each pass h
 - `fields`: array of fields to process. 
     - Recognised fields are the following: `RHO, I, VAVG, TC, TK, ROT, MC, MK, mC, EKT, eKT, EKR, eKR, qTC, qTK, qRC, qRK, zT, zR, RADIUS, TotalStress, Pressure, KineticPressure, ShearStress, StrainRate,VolumetricStrainRate, ShearStrainRate, RotationalVelocity, RotationalVelocityMag`.
     - Tensor fields can be appended with parameter to extract tensor derived quantites (eg. `TC.ev1` for the first eigenvalue of the contact stress tensor TC). The possible parameters are:
-        - Eigenvalues and eigenvectors: `ev1, ev2, ev3, evec1, evec2, evec3`; 
-        - Invariants: `trace`, etc.
+        - Eigenvalues and eigenvectors: `ev1, ev2, ev3, evec1, evec2, evec3`.
+        - Angle of the eigenvector corresponding to the largest eigenvalue: `evec1_theta`, `evec1_phi`. Angles are in degrees, the spherical coordinates are theta the angle from the z direction, phi the angle in the xy plane counted from x.
+        - Invariants: `trace`, `pressure`, etc.
         - Other: `dzeta`, with $$\dzeta = \sqrt{0.5 \left ( (ev1-ev2)^2 + (ev2-ev3)^2 + (ev3-ev1)^2 \right ) } $$.
 - `boxes`: array. Number of boxes in each dimension. 
 - `boundaries`: volume that is coarse-grained. Do not specify in order to process the whole simulation (if the simulation bounds are saved in the input file).
-- `window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]`: shape of the averaging window.
+- `window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]`: shape of the averaging window. `Rect3D` is a misnommer, as it is actually a sphere 3D.
 - `window size`: size of the averaging window.
 - `extra fields`: array of extrafield objects, to allow for computation of arbitrary fields. 
     - `name`: name of the field to compute. Should be unique.

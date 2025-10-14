@@ -1,5 +1,5 @@
 #include <random>
-enum class Windows {Rect3D, Sphere3DIntersect, Sphere3DIntersect_MonteCarlo, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic} ;
+enum class Windows {Rect3D, Sphere3DIntersect, Sphere3DIntersect_MonteCarlo, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic, RVE} ;
 
 /** \brief A window base class that needs to be specialised to a specific CG window
  */
@@ -321,15 +321,23 @@ public:
             double x, y, z ; int count=0 ; 
             for (int i=0 ; i<Nmc ; i++)
             {
-                x=random(gen) ; y=random(gen) ; z=random(gen) ; //[-1,1]
-                
+                double r = cbrt(abs(random(gen))) ;
+                double costheta=random(gen) ;
+                double phi = random(gen)*M_PI ;
+                double sintheta = sqrt(1-costheta*costheta) ;
+
+                x = r*sintheta*cos(phi) ;
+                y = r*sintheta*sin(phi) ;
+                z = r*costheta ;
+                //printf("%g %g %g %g %g %g\n", data->superquadric[0][id], data->superquadric[1][id], data->superquadric[2][id], data->superquadric[3][id], data->superquadric[4][id], data->superquadric[5][id]) ;
+
                 if (pow(x, data->superquadric[3][id]) + pow(y, data->superquadric[4][id]) + pow(z, data->superquadric[5][id])<1) // In superquadric? 
                  if ( (x*data->superquadric[0][id]-kprime.x())*(x*data->superquadric[0][id]-kprime.x()) + 
                       (y*data->superquadric[1][id]-kprime.y())*(y*data->superquadric[1][id]-kprime.y()) + 
                       (z*data->superquadric[2][id]-kprime.z())*(z*data->superquadric[2][id]-kprime.z()) < w*w ) // In sphere?
                      count ++ ; 
             }
-            return count / (double) Nmc / (8. * data->superquadric[0][id] * data->superquadric[1][id] * data->superquadric[2][id]) ;
+            return cst * (count/(double)Nmc) ;
         }
         
     }
@@ -346,7 +354,7 @@ public:
     virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
     
 private: 
-    int Nmc=100 ; 
+    int Nmc=100 ;
     std::mt19937 gen;
     std::uniform_real_distribution<double> random;
 };
@@ -403,3 +411,15 @@ class LibLucyND_Periodic : public LibLucyND
 
   int maskperiodic ;
 };
+//--------------------
+class LibRVE: public LibBase
+{
+public :
+    LibRVE (double s) { scale = s ; }
+
+    double window(double r) override  {return scale ;}
+    double distance (int id, v1d loc) override {return 0. ;}
+    void set_volume (double vol) { scale = 1./vol ; }
+
+    double scale=1 ;
+} ;

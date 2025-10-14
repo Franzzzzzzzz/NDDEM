@@ -51,15 +51,18 @@ FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VE
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 
 // subfields
-SUBFIELDS.push_back({                       1, "trace", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({                       1, "trace", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "pressure", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
 SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "ev1", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
 SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "ev2", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
 SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "ev3", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
 SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec1", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
 SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec2", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
 SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec3", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
-SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "dzeta", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
-sf_mask_eigen = ~(1ULL) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "dzeta", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec1_theta", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec1_phi", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+sf_mask_eigen = ~(3ULL) ;
 
 return 0 ;
 } //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
@@ -88,7 +91,7 @@ int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 }
 
 //-------------------------------------------------------
-int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas)
+int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas, vector<vector<double>> bounds)
 {
  switch (win) {
   case Windows::Rect3D :
@@ -121,8 +124,11 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::LucyND_Periodic:
     setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ;
     break ;
+  case Windows::RVE:
+    setWindow<Windows::RVE> (bounds) ;
+    break ;
   default:
-    printf("Unknown window, check Coarsing::setWindow\n") ;
+    printf("Unknown window, check Coarsing::setWindow #1\n") ;
  }
 return 0 ;
 }
@@ -224,6 +230,7 @@ Pass Coarsing::set_flags (vector <string> s)
        }
        if (!done)
          subflags.push_back({a,static_cast<uint16_t>(sub->flag)}) ; 
+       Res = Res | sub->passlevel ;
      }
  }
  printf("Flags: %X | Pipelines %X \n", flags, static_cast<int>(Res) ) ;
@@ -428,13 +435,14 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
     //auto vavg = interpolate_vel (i, usetimeavg) ;
     switch (d)
     {
-      case 2: vavg = interpolate_vel_multilinear<2>(i,usetimeavg) ; break ; 
-      case 3: vavg = interpolate_vel_trilinear(i,usetimeavg) ; break ; 
+      case 2: vavg = interpolate_vel_multilinear<2>(i,usetimeavg) ; break ;
+      case 3: //vavg = interpolate_vel_trilinear(i,usetimeavg) ; break ;
+              vavg = interpolate_vel_multilinear<3>(i,usetimeavg) ; break ;
       case 4: vavg = interpolate_vel_multilinear<4>(i,usetimeavg) ; break ; 
       case 5: vavg = interpolate_vel_multilinear<5>(i,usetimeavg) ; break ; 
       case 6: vavg = interpolate_vel_multilinear<6>(i,usetimeavg) ; break ; 
       case 7: vavg = interpolate_vel_multilinear<7>(i,usetimeavg) ; break ; 
-      case 8: vavg = interpolate_vel_multilinear<8>(i,usetimeavg) ; break ; 
+      case 8: vavg = interpolate_vel_multilinear<8>(i,usetimeavg) ; break ;
       default: 
         if (!once)
         {
@@ -666,6 +674,7 @@ double dm, dI=1.0 ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a
 vector<double> totweight(data.N,0) ;
 
 // printf(" -> Pass 1") ; fflush(stdout) ;
+//LibSphere3DIntersect WindowTest (&data, 0.0002, 3) ;
 
 for (i=0 ; i<data.N ; i++)
 {
@@ -678,6 +687,10 @@ for (i=0 ; i<data.N ; i++)
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
      wp=Window->window(Window->distance(i,CGP[*j].location)) ;
+
+     //double wp2=Window->distance(i,CGP[*j].location) ;
+
+
      totweight[i]+=wp ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
@@ -1073,6 +1086,7 @@ for (int i=0 ; i< Npt ; i++)
 
     // Processing subfields
     double ev[3] = {0,0,0}, evec[9]={0,0,0,0,0,0,0,0,0} ; std::array<unsigned char,3> sorting ; 
+
     for (size_t j=0 ; j<SFcols.size() ; j++)
     {
       auto [subfield_tensor, subfields] = SFcols[j] ;
@@ -1133,12 +1147,18 @@ for (int i=0 ; i< Npt ; i++)
           CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[1]*3+1] ;
           CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[2]*3+2] ;
         }
+        else if (subfield->name == "evec1_theta")
+          CGP[i].subfields[cT][sfcol_id] = acos(evec[sorting[0]*3+2])*180./M_PI ;
+        else if (subfield->name == "evec1_phi")
+          CGP[i].subfields[cT][sfcol_id] = atan2(evec[sorting[0]*3+1], evec[sorting[0]*3+0])*180./M_PI ;
         else if (subfield->name == "trace")
           CGP[i].subfields[cT][sfcol_id] = value[0]+value[4]+value[8] ;
+        else if (subfield->name == "pressure")
+          CGP[i].subfields[cT][sfcol_id] = (value[0]+value[4]+value[8])/(double) d ;
         else if (subfield->name == "dzeta")
           CGP[i].subfields[cT][sfcol_id] = sqrt(0.5 * ((ev[0]-ev[1])*(ev[0]-ev[1])+(ev[1]-ev[2])*(ev[1]-ev[2])+(ev[2]-ev[0])*(ev[2]-ev[0])));
         else
-          printf("ERROR: unkown subfield?? %s\n", subfield->name.c_str()) ;
+          printf("ERROR: unknown subfield?? %s\n", subfield->name.c_str()) ;
       }
     }
 
@@ -1416,6 +1436,41 @@ int Coarsing::write_vtk(string sout)
         default: printf("ERR: this should never happen. \n") ;
       }
       fprintf(out, "\n\n") ;
+    }
+    for (size_t f=0 ; f<SFcols.size() ; f++)
+    {
+      auto [thisfield, subfield] = SFcols[f] ;
+
+      for (size_t g=0 ; g<subfield.size() ; g++)
+      {
+        auto [thissubfield, idx] = subfield[g] ;
+        std::string name = thisfield->name + "_" + thissubfield->name ;
+        switch (thissubfield->type)
+        {
+          case TensorOrder::SCALAR : fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", name.c_str()) ;
+              for (int k=0 ; k<npt[2] ; k++)
+                for (int j=0 ; j<npt[1] ; j++)
+                  for (int i=0 ; i<npt[0] ; i++)
+                    fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].subfields[t][idx], i%90==89?'\n':' ') ;
+              break ;
+          case TensorOrder::VECTOR : fprintf(out, "VECTORS %s double \n", name.c_str()) ;
+              for (int k=0 ; k<npt[2] ; k++)
+                for (int j=0 ; j<npt[1] ; j++)
+                  for (int i=0 ; i<npt[0] ; i++)
+                    for (int dd=0 ; dd<std::min(d,3) ; dd++)
+                      fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].subfields[t][idx+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
+              break ;
+          case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", name.c_str()) ;
+              for (int k=0 ; k<npt[2] ; k++)
+                for (int j=0 ; j<npt[1] ; j++)
+                  for (int i=0 ; i<npt[0] ; i++)
+                    for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
+                      fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].subfields[t][idx+dd], (dd==d*d-1)?'\n':' ') ;
+              break ;
+          default: printf("ERR: this should never happen. \n") ;
+        }
+      fprintf(out, "\n\n") ;
+      }
     }
   fclose(out) ;
   }
