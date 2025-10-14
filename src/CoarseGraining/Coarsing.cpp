@@ -49,9 +49,20 @@ FIELDS.push_back({FIELDS.back().flag<<1, "VolumetricStrainRate", TensorOrder::SC
 FIELDS.push_back({FIELDS.back().flag<<1, "ShearStrainRate",      TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocity",   TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5});
 FIELDS.push_back({FIELDS.back().flag<<1, "RotationalVelocityMag",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
-FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Magnitude",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
-FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Elevation",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
-FIELDS.push_back({FIELDS.back().flag<<1, "Orientation_Azimuth",   TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5});
+
+// subfields
+SUBFIELDS.push_back({                       1, "trace", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "pressure", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "ev1", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "ev2", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "ev3", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec1", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec2", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec3", TensorOrder::VECTOR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "dzeta", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec1_theta", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+SUBFIELDS.push_back({SUBFIELDS.back().flag<<1, "evec1_phi", TensorOrder::SCALAR, FieldType::Defined, Pass::Pass5}) ;
+sf_mask_eigen = ~(3ULL) ;
 
 return 0 ;
 } //, "Pressure", "KineticPressure", "ShearStress", "VolumetricStrainRate", "ShearStrainRate"
@@ -80,7 +91,7 @@ int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 }
 
 //-------------------------------------------------------
-int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas)
+int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas, vector<vector<double>> bounds)
 {
  switch (win) {
   case Windows::Rect3D :
@@ -89,6 +100,9 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::Sphere3DIntersect :
     setWindow<Windows::Sphere3DIntersect> (w) ;
     break ;
+  case Windows::Sphere3DIntersect_MonteCarlo:
+    Window= new LibSphere3DIntersect_MonteCarlo(&data, w, d) ; 
+    break ; 
   case Windows::SphereNDIntersect :
     setWindow<Windows::SphereNDIntersect> (w) ;
     break ;
@@ -110,8 +124,11 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::LucyND_Periodic:
     setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ;
     break ;
+  case Windows::RVE:
+    setWindow<Windows::RVE> (bounds) ;
+    break ;
   default:
-    printf("Unknown window, check Coarsing::setWindow\n") ;
+    printf("Unknown window, check Coarsing::setWindow #1\n") ;
  }
 return 0 ;
 }
@@ -175,42 +192,76 @@ return 0 ;
 Pass Coarsing::set_flags (vector <string> s)
 {
  Pass Res = static_cast<Pass>(0) ;
- flags=0 ; Field * a;
+ flags=0 ; Field * a, *sub; 
+ std::string mainname, subname ; 
  for (auto i = s.begin() ; i<s.end() ; i++)
  {
-     a=get_field(*i) ;
+     std::size_t pos = i->find('.') ; 
+     if (pos != string::npos)
+     {
+       mainname = i->substr(0,pos) ;
+       subname = i->substr(pos+1) ;
+     }
+     else
+     {
+       mainname = *i ; 
+       subname = "" ; 
+     }
+   
+     a=get_field(mainname) ;
      if (a!=NULL)
      {
          flags |= a->flag ;
          Res = Res | a->passlevel ;
      }
+     
+     sub=get_subfield(subname) ;      
+     if (sub!=NULL)
+     {
+       bool done = false ; 
+       for (size_t j=0 ; j<subflags.size() ; j++)
+       {
+         if (std::get<0>(subflags[j])==a)
+         {
+           std::get<1>(subflags[j]) |= sub->flag ; 
+           Res = Res | sub->passlevel ;
+           done = true; 
+         }
+       }
+       if (!done)
+         subflags.push_back({a,static_cast<uint16_t>(sub->flag)}) ; 
+       Res = Res | sub->passlevel ;
+     }
  }
  printf("Flags: %X | Pipelines %X \n", flags, static_cast<int>(Res) ) ;
-return Res ;
+ return Res ;
 }
+
 
 //--------------------------------
 std::map<std::string, size_t> Coarsing::grid_setfields()
 {
-    vector<FieldType> tmp=grid_getfields() ;
+    int ncols = grid_getfields() ;
+    int nsubcols = grid_getsubfields() ;
     std::map<std::string, size_t> extrafields ;
 
-    printf("Approximate memory required: %ld MB\n", Npt*tmp.size()*Time*sizeof(double)/1024/1024) ; fflush(stdout) ;
+    printf("Approximate memory required: %ld MB\n", Npt*ncols*Time*sizeof(double)/1024/1024) ; fflush(stdout) ;
 
-    for (size_t i=0 ; i<tmp.size() ; i++)
-      if (tmp[i]!=FieldType::Defined)
-        extrafields[Fields[i]] = i ;
+    for (size_t i=0 ; i<Fcols.size() ; i++)
+      if (std::get<0>(Fcols[i])->ftype!=FieldType::Defined)
+        extrafields[std::get<0>(Fcols[i])->name] = i ;
 
     for (int i=0 ; i<Npt ; i++)
-        CGP[i].fields.resize(Time, vector<double>(tmp.size(),0)) ;
+    {
+        CGP[i].fields.resize(Time, vector<double>(ncols,0)) ;
+        CGP[i].subfields.resize(Time, vector<double>(nsubcols, 0)) ; 
+    }
 
     return extrafields ;
 }
 //--------------------------------
-vector<FieldType> Coarsing::grid_getfields()
+int Coarsing::grid_getfields()
 {
-vector<FieldType> res ;
-
 auto fl=flags ;
 int n=0 ;
 for (size_t i=0 ; i<FIELDS.size() ; i++)
@@ -219,49 +270,65 @@ for (size_t i=0 ; i<FIELDS.size() ; i++)
     {
         if (FIELDS[i].type== TensorOrder::SCALAR)
         {
-            Fields.push_back(FIELDS[i].name) ;
-            res.push_back(FIELDS[i].ftype) ;
+            Fcols.push_back({&(FIELDS[i]), n}) ;
             Fidx.push_back(n) ;
-            Ftype.push_back(TensorOrder::SCALAR) ;
-            Fname.push_back(FIELDS[i].name) ;
             n++ ;
         }
         else if (FIELDS[i].type==TensorOrder::VECTOR)
         {
-            for (int dd=0 ; dd<d ; dd++)
-            {
-             Fields.push_back(FIELDS[i].name+std::to_string(dd)) ;
-             res.push_back(FIELDS[i].ftype) ;
-            }
+            Fcols.push_back({&(FIELDS[i]), n}) ;
             Fidx.push_back(n) ;
-            Ftype.push_back(TensorOrder::VECTOR) ;
-            Fname.push_back(FIELDS[i].name) ;
             n+=d ;
         }
         else if (FIELDS[i].type==TensorOrder::TENSOR)
         {
-            for (int dd=0 ; dd<d*d ; dd++)
-            {
-             Fields.push_back(FIELDS[i].name+std::to_string(dd/d)+"x"+std::to_string(dd%d)) ;
-             res.push_back(FIELDS[i].ftype) ;
-            }
+            Fcols.push_back({&(FIELDS[i]), n}) ;
             Fidx.push_back(n) ;
-            Ftype.push_back(TensorOrder::TENSOR) ;
-            Fname.push_back(FIELDS[i].name) ;
             n+= d*d ;
         }
     }
     else
     {
         Fidx.push_back(-1) ;
-        Ftype.push_back(TensorOrder::NONE) ;
-        Fname.push_back("") ;
     }
 
     fl = fl >> 1 ;
 }
-return res ;
+return n ;
 }
+//--------------------------------
+int Coarsing::grid_getsubfields()
+{
+int n=0 ;
+for (size_t j=0 ; j<subflags.size() ; j++)
+{
+  auto [tensfield, subflag ] = subflags[j] ;
+  SFcols.push_back({tensfield, std::vector<std::pair<Field*, int>>() }) ;
+  for (size_t i=0 ; i<SUBFIELDS.size() ; i++)
+  {
+      if (subflag & SUBFIELDS[i].flag)
+      {
+          if (SUBFIELDS[i].type== TensorOrder::SCALAR)
+          {
+              std::get<1>(SFcols.back()).push_back({&SUBFIELDS[i], n}) ;
+              n++ ;
+          }
+          else if (SUBFIELDS[i].type==TensorOrder::VECTOR)
+          {
+              std::get<1>(SFcols.back()).push_back({&SUBFIELDS[i], n}) ;
+              n+=d ;
+          }
+          else if (SUBFIELDS[i].type==TensorOrder::TENSOR)
+          {
+              std::get<1>(SFcols.back()).push_back({&SUBFIELDS[i], n}) ;
+              n+= d*d ;
+          }
+      }
+  }
+}
+return n ;
+}
+
 //----------------------------------------
 v2d Coarsing::get_bounds ()
 {
@@ -343,6 +410,14 @@ struct Field * Coarsing::get_field(string nm)
             return &(*i) ;
     return NULL ;
 }
+//-----------------------------------------
+struct Field * Coarsing::get_subfield(string nm)
+{
+    for (auto i=SUBFIELDS.begin() ; i<SUBFIELDS.end() ; i++)
+        if (i->name==nm)
+            return &(*i) ;
+    return NULL ;
+}
 
 //===================================================
 int Coarsing::compute_fluc_vel (bool usetimeavg)
@@ -360,13 +435,14 @@ int Coarsing::compute_fluc_vel (bool usetimeavg)
     //auto vavg = interpolate_vel (i, usetimeavg) ;
     switch (d)
     {
-      case 2: vavg = interpolate_vel_multilinear<2>(i,usetimeavg) ; break ; 
-      case 3: vavg = interpolate_vel_trilinear(i,usetimeavg) ; break ; 
+      case 2: vavg = interpolate_vel_multilinear<2>(i,usetimeavg) ; break ;
+      case 3: //vavg = interpolate_vel_trilinear(i,usetimeavg) ; break ;
+              vavg = interpolate_vel_multilinear<3>(i,usetimeavg) ; break ;
       case 4: vavg = interpolate_vel_multilinear<4>(i,usetimeavg) ; break ; 
       case 5: vavg = interpolate_vel_multilinear<5>(i,usetimeavg) ; break ; 
       case 6: vavg = interpolate_vel_multilinear<6>(i,usetimeavg) ; break ; 
       case 7: vavg = interpolate_vel_multilinear<7>(i,usetimeavg) ; break ; 
-      case 8: vavg = interpolate_vel_multilinear<8>(i,usetimeavg) ; break ; 
+      case 8: vavg = interpolate_vel_multilinear<8>(i,usetimeavg) ; break ;
       default: 
         if (!once)
         {
@@ -530,6 +606,26 @@ if (pts[0][0]!=pts[2][0])
 vector<double> res = {Qs[0], Qs[4], Qs[8]} ;
 return (res);
 }
+//------------------------------------------------------------------------------------------------
+template <>
+void Coarsing::add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, Eigen::Quaternion<double> original)
+{
+  auto result = q * original * q.inverse() ;
+  //std::cout << q << "\n"; 
+  
+  p[0] += weight * result.x()*result.x() ; p[1] += weight * result.x()*result.y() ; p[2] += weight * result.x()*result.z() ; 
+  p[3] += weight * result.y()*result.x() ; p[4] += weight * result.y()*result.y() ; p[5] += weight * result.y()*result.z() ; 
+  p[6] += weight * result.z()*result.x() ; p[7] += weight * result.z()*result.y() ; p[8] += weight * result.z()*result.z() ; 
+  //printf("%g %g %g\n", p[0], p[4], p[8]) ; 
+}
+template <>
+void Coarsing::add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, Eigen::Matrix3d original)
+{
+  auto rot=q.toRotationMatrix() ;
+  auto orient=rot*original*rot.transpose() ;
+  for (int dd=0 ; dd<9 ; dd++)
+    p[dd] += weight * orient(dd%3,dd/3) ; 
+}
 
 //================================= BEGINNING OF THE INTERESTING PART ================================
 //================ PASS 1 : "RHO", "VAVG", "ROT", "EKT", "EKR"==============================
@@ -565,7 +661,7 @@ if (dorho) for (int i=0 ; i<Npt ; CGP[i].fields[cT][rhoid]=0, i++) ;
 if (doI)   for (int i=0 ; i<Npt ; CGP[i].fields[cT][Iid]=0, i++) ;
 if (dovel) for (int dd=0 ; dd<d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][velid+dd]=0, i++) ;
 if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][omegaid+dd]=0, i++) ;
-if (doorient) for (int dd=0 ; dd<4 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][orientid+dd]=0, i++) ;
+if (doorient) for (int dd=0 ; dd<d*d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][orientid+dd]=0, i++) ;
 if (doradius) for (int i=0 ; i<Npt ; CGP[i].fields[cT][radiusid]=0, i++) ;
 if (doextra)
     for (size_t v = 0 ; v<extraid.size() ; v++)
@@ -578,6 +674,7 @@ double dm, dI=1.0 ; v1d dv (d,0), dom(d,0) ; double * CGf ; // Speed things up a
 vector<double> totweight(data.N,0) ;
 
 // printf(" -> Pass 1") ; fflush(stdout) ;
+//LibSphere3DIntersect WindowTest (&data, 0.0002, 3) ;
 
 for (i=0 ; i<data.N ; i++)
 {
@@ -590,6 +687,10 @@ for (i=0 ; i<data.N ; i++)
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
      wp=Window->window(Window->distance(i,CGP[*j].location)) ;
+
+     //double wp2=Window->distance(i,CGP[*j].location) ;
+
+
      totweight[i]+=wp ;
      CGf = &(CGP[*j].fields[cT][0]) ;
      //if (*j>100) printf("%g %g %g | %g %g %g\n", CGP[*j].location[0], CGP[*j].location[1], CGP[*j].location[2], data.pos[0][i],  data.pos[1][i], data.pos[2][i]) ;
@@ -608,8 +709,10 @@ for (i=0 ; i<data.N ; i++)
      if (doradius)
        CGP[*j].fields[cT][radiusid] += wp * dm * data.radius[i] ;
      if (doorient)
-       for (dd=0 ; dd<d*(d-1)/2; dd++)
-         CGP[*j].fields[cT][radiusid] += wp * dm * data.orient[dd][i] ; //TODO
+     {
+       Eigen::Quaternion<double> quat(data.orient[0][i], data.orient[1][i], data.orient[2][i], data.orient[3][i]) ; 
+       std::visit([&](auto&& val){ add_rotated_quat(CGf+orientid, wp * dm, quat, val); }, original_orientation);
+     }
      if (doextra)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
@@ -648,7 +751,9 @@ for (i=0 ; i<Npt ; i++)
       CGP[i].fields[cT][EKRid] /= 2.0 ;
     }
     if (doradius && rho!=0) {CGP[i].fields[cT][radiusid] /= rho ; }
-    if (doorient && rho!=0) {CGP[i].fields[cT][orientid] /= rho ; }
+    if (doorient && rho!=0) 
+      for (dd=0 ; dd<d*d ; dd++)
+        CGP[i].fields[cT][orientid+dd] /= rho ; 
     if (doextra && rho!=0)
        for (size_t v = 0 ; v<extraid.size() ; v++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
@@ -856,7 +961,7 @@ return 0 ;
 //======================== PASS 5: post-processing of some fields ==================
 int Coarsing::pass_5()
 {
-bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true, doOrientMag=true, doOrientPhi=true, doOrientTheta=true;
+bool doSig=true, doP=true, doPk=true, doTau=true, doGamdot=true, doGamvdot=true, doGamtau=true, doOmega=true, doOmegaMag=true;
 
 int Sigid=get_id("TotalStress") ;    if (Sigid<0) doSig=false ;
 int Pid=get_id("Pressure") ;         if (Pid<0) doP=false ;
@@ -978,6 +1083,85 @@ for (int i=0 ; i< Npt ; i++)
         CGP[i].fields[cT][Gamtauid] = sqrt(CGP[i].fields[cT][Gamtauid]) ;
      }
     }
+
+    // Processing subfields
+    double ev[3] = {0,0,0}, evec[9]={0,0,0,0,0,0,0,0,0} ; std::array<unsigned char,3> sorting ; 
+
+    for (size_t j=0 ; j<SFcols.size() ; j++)
+    {
+      auto [subfield_tensor, subfields] = SFcols[j] ;
+      int col = Fidx[log2(subfield_tensor->flag)] ;
+      double * value = &(CGP[i].fields[cT][col]) ;
+
+      if ( (std::get<1>(subflags[j]) & sf_mask_eigen) > 0)
+      {
+        Eigen::Matrix3d tens ; tens<< value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8] ;
+        Eigen::EigenSolver<Eigen::Matrix3d> eigensolver(tens);
+        if (eigensolver.info() != Eigen::Success) { ev[0]=ev[1]=ev[2]=NAN ; for (int vv=0 ; vv<9 ; vv++) evec[vv]=NAN ; }
+        else
+        {
+          ev[0] = eigensolver.eigenvalues()[0].real() ;
+          ev[1] = eigensolver.eigenvalues()[1].real() ;
+          ev[2] = eigensolver.eigenvalues()[2].real() ;
+          for (int vv=0 ; vv<9 ; vv++)
+          {
+            evec[vv] = eigensolver.eigenvectors().col(vv/3)(vv%3).real() ;
+          }
+          if (ev[0]>ev[1]) 
+          {
+            if (ev[1]>ev[2]) sorting={0,1,2} ; 
+            else if (ev[0]>ev[2]) sorting={0,2,1} ; 
+            else sorting={2,0,1} ; 
+          }
+          else
+          {
+            if (ev[2]>ev[1]) sorting={2,1,0} ;
+            else if (ev[2]>ev[0]) sorting={1,2,0} ;
+            else sorting={1,0,2} ;
+          }
+        }
+      }
+
+      for (size_t j=0 ; j<subfields.size() ; j++)
+      {
+        auto [subfield, sfcol_id] = subfields[j] ;
+        
+             if (subfield->name == "ev1") CGP[i].subfields[cT][sfcol_id] = ev[sorting[0]] ;
+        else if (subfield->name == "ev2") CGP[i].subfields[cT][sfcol_id] = ev[sorting[1]] ;
+        else if (subfield->name == "ev3") CGP[i].subfields[cT][sfcol_id] = ev[sorting[2]] ;
+        else if (subfield->name == "evec1")
+        {
+          CGP[i].subfields[cT][sfcol_id+0] = evec[sorting[0]*3+0] ;
+          CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[0]*3+1] ;
+          CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[0]*3+2] ;
+        }
+        else if (subfield->name == "evec2")
+        {
+          CGP[i].subfields[cT][sfcol_id+0] = evec[sorting[1]*3+0] ;
+          CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[1]*3+1] ;
+          CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[1]*3+2] ;
+        }
+        else if (subfield->name == "evec3")
+        {
+          CGP[i].subfields[cT][sfcol_id+0] = evec[sorting[0]*3+0] ;
+          CGP[i].subfields[cT][sfcol_id+1] = evec[sorting[1]*3+1] ;
+          CGP[i].subfields[cT][sfcol_id+2] = evec[sorting[2]*3+2] ;
+        }
+        else if (subfield->name == "evec1_theta")
+          CGP[i].subfields[cT][sfcol_id] = acos(evec[sorting[0]*3+2])*180./M_PI ;
+        else if (subfield->name == "evec1_phi")
+          CGP[i].subfields[cT][sfcol_id] = atan2(evec[sorting[0]*3+1], evec[sorting[0]*3+0])*180./M_PI ;
+        else if (subfield->name == "trace")
+          CGP[i].subfields[cT][sfcol_id] = value[0]+value[4]+value[8] ;
+        else if (subfield->name == "pressure")
+          CGP[i].subfields[cT][sfcol_id] = (value[0]+value[4]+value[8])/(double) d ;
+        else if (subfield->name == "dzeta")
+          CGP[i].subfields[cT][sfcol_id] = sqrt(0.5 * ((ev[0]-ev[1])*(ev[0]-ev[1])+(ev[1]-ev[2])*(ev[1]-ev[2])+(ev[2]-ev[0])*(ev[2]-ev[0])));
+        else
+          printf("ERROR: unknown subfield?? %s\n", subfield->name.c_str()) ;
+      }
+    }
+
 }
 
 
@@ -1163,6 +1347,7 @@ bool Data::check_field_availability(string name)
  else if (name == "zT"  ) return (fpq[0] && vel[0]) ;
  else if (name == "zR"  ) return (mpq[0] && mqp[0] && omega[0]) ;
  else if (name == "RADIUS"  ) return (radius) ;
+ else if (name == "ORIENTATION"  ) return (orient[0]) ;
  else
      return (true) ;
 }
@@ -1200,7 +1385,7 @@ int Coarsing::mean_time(bool temporary)
         (*CGPtemp)[i].fields[0][f] /= Time;
         //CGP[i].fields.resize(1) ;
     }
-
+    
   if (!temporary) Time=1 ;
   return 0 ;
 }
@@ -1223,34 +1408,69 @@ int Coarsing::write_vtk(string sout)
        fprintf(out, "%g ", CGP[i*npt[1]*npt[2]+j*npt[2]+k].phi) ;
     fprintf(out,"\n\n") ; */
 
-    for (size_t f=0 ; f<Fidx.size() ; f++)
+    for (size_t f=0 ; f<Fcols.size() ; f++)
     {
-      if (Fidx[f]<0) continue ;
-      switch (Ftype[f])
+      auto [thisfield, idx] = Fcols[f] ;
+      switch (thisfield->type)
       {
-        case TensorOrder::SCALAR : fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", Fname[f].c_str()) ;
+        case TensorOrder::SCALAR : fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", thisfield->name.c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
-               fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]], i%90==89?'\n':' ') ;
+               fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][idx], i%90==89?'\n':' ') ;
             break ;
-        case TensorOrder::VECTOR : fprintf(out, "VECTORS %s double \n", Fname[f].c_str()) ;
+        case TensorOrder::VECTOR : fprintf(out, "VECTORS %s double \n", thisfield->name.c_str()) ;
              for (int k=0 ; k<npt[2] ; k++)
               for (int j=0 ; j<npt[1] ; j++)
                for (int i=0 ; i<npt[0] ; i++)
                 for (int dd=0 ; dd<std::min(d,3) ; dd++)
-                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
+                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][idx+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
              break ;
-        case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", Fname[f].c_str()) ;
+        case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", thisfield->name.c_str()) ;
             for (int k=0 ; k<npt[2] ; k++)
              for (int j=0 ; j<npt[1] ; j++)
               for (int i=0 ; i<npt[0] ; i++)
                for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
-                fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][Fidx[f]+dd], (dd==d*d-1)?'\n':' ') ;
+                fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][idx+dd], (dd==d*d-1)?'\n':' ') ;
             break ;
         default: printf("ERR: this should never happen. \n") ;
       }
       fprintf(out, "\n\n") ;
+    }
+    for (size_t f=0 ; f<SFcols.size() ; f++)
+    {
+      auto [thisfield, subfield] = SFcols[f] ;
+
+      for (size_t g=0 ; g<subfield.size() ; g++)
+      {
+        auto [thissubfield, idx] = subfield[g] ;
+        std::string name = thisfield->name + "_" + thissubfield->name ;
+        switch (thissubfield->type)
+        {
+          case TensorOrder::SCALAR : fprintf(out, "SCALARS %s double \nLOOKUP_TABLE default \n", name.c_str()) ;
+              for (int k=0 ; k<npt[2] ; k++)
+                for (int j=0 ; j<npt[1] ; j++)
+                  for (int i=0 ; i<npt[0] ; i++)
+                    fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].subfields[t][idx], i%90==89?'\n':' ') ;
+              break ;
+          case TensorOrder::VECTOR : fprintf(out, "VECTORS %s double \n", name.c_str()) ;
+              for (int k=0 ; k<npt[2] ; k++)
+                for (int j=0 ; j<npt[1] ; j++)
+                  for (int i=0 ; i<npt[0] ; i++)
+                    for (int dd=0 ; dd<std::min(d,3) ; dd++)
+                      fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].subfields[t][idx+dd], (i%30==29&&dd==d-1)?'\n':' ') ;
+              break ;
+          case TensorOrder::TENSOR : fprintf(out, "TENSORS %s double \n", name.c_str()) ;
+              for (int k=0 ; k<npt[2] ; k++)
+                for (int j=0 ; j<npt[1] ; j++)
+                  for (int i=0 ; i<npt[0] ; i++)
+                    for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
+                      fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].subfields[t][idx+dd], (dd==d*d-1)?'\n':' ') ;
+              break ;
+          default: printf("ERR: this should never happen. \n") ;
+        }
+      fprintf(out, "\n\n") ;
+      }
     }
   fclose(out) ;
   }
@@ -1269,32 +1489,30 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
   for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
   dimensions[dimtime] = Time ;
 
-  for (size_t f=0 ; f<Fidx.size() ; f++)
+  for (size_t f=0 ; f<Fcols.size() ; f++)
   {
-    if (Fidx[f]<0) continue ;
-
     // Data are goind fast to slow in MATLAB ... so probably need some rewrite ...
-    switch (Ftype[f])
+    switch (std::get<0>(Fcols[f])->type)
     {
       case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
               outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
-                      outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
+                      outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])] ;
             break ;
       case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
               outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d ; j++)
-                          outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
+                          outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ;
             break ;
       case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
               outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
               for (int t=0 ; t<Time ; t++)
                   for (int i=0 ; i<Npt ; i++)
                       for (int j=0 ; j<d*d ; j++)
-                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
+                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ; // j/d*d!=j because of integer division
             break ;
       default: printf("ERR: this should never happen. \n") ;
     }
@@ -1305,9 +1523,52 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
 
     mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
     mxSetData (pm, outdata) ;
-    matPutVariable(pmat, Fname[f].c_str(), pm);
+    matPutVariable(pmat, std::get<0>(Fcols[f])->name.c_str(), pm);
     mxFree(outdata) ;
   }
+  
+  for (size_t f=0 ; f<SFcols.size() ; f++)
+  {
+    auto [tens_field, subfields] = SFcols[f] ;
+    for (size_t g=0 ; g<subfields.size() ; g++)
+    {    
+      switch (std::get<0>(subfields[g])->type)
+      {
+        case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
+                outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++)
+                        outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])] ;
+              break ;
+        case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
+                outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++)
+                        for (int j=0 ; j<d ; j++)
+                            outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])+j] ;
+              break ;
+        case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
+                outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
+                for (int t=0 ; t<Time ; t++)
+                    for (int i=0 ; i<Npt ; i++)
+                        for (int j=0 ; j<d*d ; j++)
+                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])+j] ; // j/d*d!=j because of integer division
+              break ;
+        default: printf("ERR: this should never happen. \n") ;
+      }
+
+      auto tmpdim = dimensions ;
+      if (squeeze)
+        tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
+
+      mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
+      mxSetData (pm, outdata) ;
+      std::string colname = tens_field->name + "_" + std::get<0>(subfields[g])->name ; 
+      matPutVariable(pmat, colname.c_str(), pm);
+      mxFree(outdata) ;
+    }
+  }
+  
 
   // Let's put the location array there as well
   dimensions[0]=d ; dimensions[1] = 1 ; dimensions.pop_back() ;
@@ -1345,9 +1606,8 @@ int Coarsing::write_numpy (string path, bool squeeze)
   uint8_t *centraldir=nullptr, *centraldirbeg=nullptr ;
 
   uint16_t nfiles = 0 ;
-  for (int f=-1 ; f<static_cast<int>(Fidx.size()) ; f++) //f==-1 is for the location array
+  for (int f=-1 ; f<static_cast<int>(Fcols.size()) ; f++) //f==-1 is for the location array
   {
-    if (f>-1 && Fidx[f]<0) continue ;
     nfiles++ ;
 
     uint32_t offset = ftell(out) ;
@@ -1371,12 +1631,12 @@ int Coarsing::write_numpy (string path, bool squeeze)
     if (f==-1)
       write_short(3 +4) ; //"LOC".length()=3 but this is not correct cpp.
     else
-      write_short(Fname[f].length() + 4) ;
+      write_short(std::get<0>(Fcols[f])->name.length() + 4) ;
     write_short(20) ;
     if (f==-1)
       fwrite ("LOC", 1, 3, out) ;
     else
-      fwrite (Fname[f].data(), 1, Fname[f].length(), out) ;
+      fwrite (std::get<0>(Fcols[f])->name.data(), 1, std::get<0>(Fcols[f])->name.length() , out) ;
     fwrite (".npy", 1, 4, out);
 
     // Not too sure why we need the extended field but ok ...
@@ -1394,7 +1654,7 @@ int Coarsing::write_numpy (string path, bool squeeze)
       if (f==-1)
         centraldir = static_cast<uint8_t*> (malloc(46+3+4)) ;
       else
-        centraldir = static_cast<uint8_t*> (malloc(46+Fname[f].length()+4)) ;
+        centraldir = static_cast<uint8_t*> (malloc(46+std::get<0>(Fcols[f])->name.length()+4)) ;
       centraldirbeg = centraldir ;
     }
     else
@@ -1403,7 +1663,7 @@ int Coarsing::write_numpy (string path, bool squeeze)
         if (f==-1)
           centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+3+4));
         else
-          centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+Fname[f].length()+4));
+          centraldirbeg=static_cast<uint8_t*>(realloc(centraldirbeg, off+46+std::get<0>(Fcols[f])->name.length()+4));
         centraldir = centraldirbeg + off ;
     }
     memcpy(centraldir, "\x50\x4b\x01\x02", 4) ; centraldir+=4 ;
@@ -1416,7 +1676,7 @@ int Coarsing::write_numpy (string path, bool squeeze)
     memcpy(centraldir, &crc, 4) ; centraldir +=4 ; //CRC TODO
     memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
     memcpy(centraldir, &numbytes, 4) ; centraldir +=4 ;
-    uint16_t tmps = ((f==-1)?3:Fname[f].length()) + 4 ;
+    uint16_t tmps = ((f==-1)?3:std::get<0>(Fcols[f])->name.length()) + 4 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
     tmps=0 ;
     memcpy(centraldir, &tmps, 2) ; centraldir +=2 ;
@@ -1432,7 +1692,7 @@ int Coarsing::write_numpy (string path, bool squeeze)
     if (f==-1)
       {memcpy(centraldir, "LOC", 3) ; centraldir += 3 ;}
     else
-      {memcpy(centraldir, Fname[f].data(), Fname[f].length()) ; centraldir += Fname[f].length() ;}
+      {memcpy(centraldir, std::get<0>(Fcols[f])->name.data(), std::get<0>(Fcols[f])->name.length()) ; centraldir += std::get<0>(Fcols[f])->name.length() ;}
     memcpy(centraldir, ".npy", 4) ; centraldir += 4 ;
   }
 
@@ -1465,7 +1725,7 @@ int Coarsing::write_numpy_npy (string path, bool squeeze)
  {
    if (Fidx[f]<0) continue ;
 
-   auto outpath = path + "-" + Fname[f] + ".npy" ;
+   auto outpath = path + "-" + std::get<0>(Fcols[f])->name + ".npy" ;
    FILE * out = fopen(outpath.c_str(), "wb") ;
    if (out ==nullptr)
    {
@@ -1498,7 +1758,7 @@ if (id == -2)
 }
 else
 {
-  switch (Ftype[id])
+  switch (std::get<0>(Fcols[id])->type)
   {
       case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ;
       case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ;
@@ -1539,7 +1799,7 @@ else
       for (long unsigned int j=0 ; j<dimensions[1] ; j++)
           for (int i=0 ; i<Npt ; i++)
               for (int t=0 ; t<Time ; t++, numbytes += 8)
-                  memcpy(outarray+numbytes, &(CGP[i].fields[t][Fidx[id]+j*d+k]), 8) ;
+                  memcpy(outarray+numbytes, &(CGP[i].fields[t][std::get<1>(Fcols[id])+j*d+k]), 8) ;
 
 return (std::make_pair(numbytes, outarray)) ;
 }
@@ -1593,33 +1853,30 @@ int Coarsing ::write_NrrdIO ([[maybe_unused]] string path)
     nrrdAxisInfoSet_nva(nval, nrrdAxisInfoMax, nrrdmax.data());
     nrrdAxisInfoSet_nva(nval, nrrdAxisInfoSpacing, nrrdspacing.data());
 
-    for (size_t f=0 ; f<Fidx.size() ; f++)
+    for (size_t f=0 ; f<Fcols.size() ; f++)
     {
-      if (Fidx[f]<0) continue ;
-
-
-    // Data are goind fast to slow in NrrdIO ... so probably need some rewrite ...
-      switch (Ftype[f])
+      // Data are goind fast to slow in NrrdIO ... so probably need some rewrite ...
+      switch (std::get<0>(Fcols[f])->type)
       {
         case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
                 outdata=(double *) malloc(sizeof(double) * 1 * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
-                        outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]] ;
+                        outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])] ;
               break ;
         case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
                 outdata=(double *) malloc(sizeof(double) * d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d ; j++)
-                            outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ;
+                            outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ;
               break ;
         case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
                 outdata=(double *) malloc(sizeof(double) * d*d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
                     for (int i=0 ; i<Npt ; i++)
                         for (int j=0 ; j<d*d ; j++)
-                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][Fidx[f]+j] ; // j/d*d!=j because of integer division
+                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ; // j/d*d!=j because of integer division
               break ;
         default:
             outdata=nullptr ;
@@ -1628,7 +1885,7 @@ int Coarsing ::write_NrrdIO ([[maybe_unused]] string path)
 
       nrrdWrap_nva(nval, outdata, nrrdTypeDouble, d+3, dimensions.data());
       string fullpath ;
-      fullpath = path + Fname[f] + ".nrrd" ;
+      fullpath = path + std::get<0>(Fcols[f])->name + ".nrrd" ;
       nrrdSave(fullpath.c_str(), nval, nio);
       free(outdata) ;
 
@@ -1664,22 +1921,21 @@ int Coarsing::write_netCDF ([[maybe_unused]] string sout)
  nc_def_var(ncid, "CGPointsLocation", NC_FLOAT, 2, dimids, &(varid[0])) ;
  nc_def_var(ncid, "CGGrid", NC_INT, 1, &dim2v, &(varid[1])) ;
 
- for (int f=0 ; f<Fidx.size() ; f++)
+ for (int f=0 ; f<Fcols.size() ; f++)
  {
-   if (Fidx[f]<0) continue ;
-   switch (Ftype[f])
+   switch (std::get<0>(Fcols[f])->type)
    {
-    case 1:  dimids[0]=dim3 ; dimids[1]=dim2s ; dimids[2]=dim1 ;
+    case TensorOrder::SCALAR:  dimids[0]=dim3 ; dimids[1]=dim2s ; dimids[2]=dim1 ;
              varid.push_back(0) ;
-             nc_def_var(ncid, Fname[f].c_str(), NC_FLOAT, 3, dimids, &(varid[varid.size()-1])) ;
+             nc_def_var(ncid, std::get<0>(Fcols[f])->name.c_str(), NC_FLOAT, 3, dimids, &(varid[varid.size()-1])) ;
              break ;
-    case 2:  dimids[0]=dim3 ; dimids[1]=dim2v ; dimids[2]=dim1 ;
+    case TensorOrder::VECTOR:  dimids[0]=dim3 ; dimids[1]=dim2v ; dimids[2]=dim1 ;
              varid.push_back(0) ;
-             err = nc_def_var(ncid, Fname[f].c_str(), NC_FLOAT, 3, dimids, &(varid[varid.size()-1])) ;
+             err = nc_def_var(ncid, std::get<0>(Fcols[f])->name.c_str(), NC_FLOAT, 3, dimids, &(varid[varid.size()-1])) ;
              break ;
-    case 3 : dimids[0]=dim3 ; dimids[1]=dim2t ; dimids[2]=dim1 ;
+    case TensorOrder::TENSOR : dimids[0]=dim3 ; dimids[1]=dim2t ; dimids[2]=dim1 ;
              varid.push_back(0) ;
-             err = nc_def_var(ncid, Fname[f].c_str(), NC_FLOAT, 3, dimids, &(varid[varid.size()-1])) ;
+             err = nc_def_var(ncid, std::get<0>(Fcols[f])->name.c_str(), NC_FLOAT, 3, dimids, &(varid[varid.size()-1])) ;
              break ;
     default : printf("ERR: this should never happen. (netCDF write)\n") ;
    }
@@ -1697,33 +1953,33 @@ int Coarsing::write_netCDF ([[maybe_unused]] string sout)
  nc_put_vara_int(ncid, varid[1], zeros, &uld, &(npt[0])) ;
 
  sizes[0]=Time ; sizes[2]=Npt ;
- for (int f=0, v=2 ; f<Fidx.size() ; f++)
+ for (int f=0, v=2 ; f<Fcols.size() ; f++)
  {
    if (Fidx[f]<0) continue ;
-   switch (Ftype[f])
+   switch (std::get<1>(Fcols[f])->type)
    {
-     case 1: res=(float*)realloc(res, sizeof(float)*Time*Npt*1) ;
+     case TensorOrder::SCALAR: res=(float*)realloc(res, sizeof(float)*Time*Npt*1) ;
              for (int t=0, n=0 ; t<Time ; t++)
                for (int i=0 ; i<Npt ; i++, n++)
-                  res[n]=CGP[i].fields[t][Fidx[f]] ;
+                  res[n]=CGP[i].fields[t][std::get<1>(Fcols[f])->name] ;
              sizes[1]=1 ;
              err=nc_put_vara_float(ncid, varid[v], zeros, sizes, res) ;
              v++ ;
        break ;
-     case 2: res=(float*)realloc(res, sizeof(float)*Time*Npt*d) ;
+     case TensorOrder::VECTOR: res=(float*)realloc(res, sizeof(float)*Time*Npt*d) ;
              for (int t=0,n=0 ; t<Time ; t++)
                for (int dd=0 ; dd<d ; dd++)
                  for (int i=0 ; i<Npt ; i++, n++)
-                   res[n]=CGP[i].fields[t][Fidx[f]+dd] ;
+                   res[n]=CGP[i].fields[t][std::get<1>(Fcols[f])->name+dd] ;
              sizes[1]=d ;
              nc_put_vara_float(ncid, varid[v], zeros, sizes, res)  ;
              v++ ;
        break ;
-     case 3: res=(float*)realloc(res, sizeof(float)*Time*Npt*d*d) ;
+     case TensorOrder::TENSOR: res=(float*)realloc(res, sizeof(float)*Time*Npt*d*d) ;
              for (int t=0,n=0 ; t<Time ; t++)
                for (int dd=0 ; dd<d*d ; dd++)
                  for (int i=0 ; i<Npt ; i++, n++)
-                   res[n]=CGP[i].fields[t][Fidx[f]+dd] ;
+                   res[n]=CGP[i].fields[t][std::get<1>(Fcols[f])->name+dd] ;
              sizes[1]=d*d ;
              nc_put_vara_float(ncid, varid[v], zeros, sizes, res) ;
              v++ ;
