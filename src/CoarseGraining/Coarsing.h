@@ -60,7 +60,7 @@ using namespace std ;
 
 double Volume (int d , double R) ; ///< Compute a sphere volume in dimension D
 
-enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2} ;
+enum TensorOrder {NONE=-1, SCALAR=0, VECTOR=1, TENSOR=2, TENSOR_SKEW=3, TENSOR_SYM=4} ;
 enum FieldType {Defined, Particle, Fluctuation, Contact} ;
 enum AverageType {None, Final, Intermediate, Both, Pre5, IntermediateAndPre5} ;
 enum Pass {Pass1=1, Pass2=2, Pass3=4, Pass4=8, Pass5=16,
@@ -227,6 +227,8 @@ public :
     template <int D> v1d interpolate_vel_multilinear (int id, bool usetimeavg);
     template <typename T> void add_rotated_quat(double * p, double weight, Eigen::Quaternion<double> q, T original) ; 
     
+    static int idx2skewid(int dd, int d) ; ///< Convert tensor indices to skew-symmetric matrix index
+    static int idx2symid(int dd, int d) ; ///< Convert tensor indices to symmetric matrix index
     int idx_FastFirst2SlowFirst (int n) ; ///< Change array traversing order
 
     // Windowing functions

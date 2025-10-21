@@ -16,11 +16,11 @@ int Coarsing::set_field_struct()
  * idx 0x04hhhhhhhh are contact base (pass 3) user defined fields
  */
 FIELDS.push_back({                    1, "RHO"  , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});                        //Eq 36 Density
-FIELDS.push_back({FIELDS.back().flag<<1, "I"    , TensorOrder::SCALAR, FieldType::Defined, Pass::Pass1});    //Eq 65 Moment of Inertia
+FIELDS.push_back({FIELDS.back().flag<<1, "I"    , TensorOrder::TENSOR_SYM, FieldType::Defined, Pass::Pass1});    //Eq 65 Moment of Inertia
 FIELDS.push_back({FIELDS.back().flag<<1, "VAVG" , TensorOrder::VECTOR, FieldType::Defined, Pass::Pass1});    //Eq 38 Average Velocity
 FIELDS.push_back({FIELDS.back().flag<<1, "TC"   , TensorOrder::TENSOR, FieldType::Defined, Pass::Pass3});    //Eq 63 Contact stress
 FIELDS.push_back({FIELDS.back().flag<<1, "TK"   , TensorOrder::TENSOR, FieldType::Defined, Pass::VelFluct|Pass::Pass2|Pass::Pass1});    //Eq 62 Kinetic stress
-FIELDS.push_back({FIELDS.back().flag<<1, "ROT"  , TensorOrder::VECTOR, FieldType::Defined, Pass::Pass1});    //Eq 64 Internal spin density
+FIELDS.push_back({FIELDS.back().flag<<1, "ROT"  , TensorOrder::TENSOR_SKEW, FieldType::Defined, Pass::Pass1});    //Eq 64 Internal spin density
 FIELDS.push_back({FIELDS.back().flag<<1, "MC"   , TensorOrder::TENSOR, FieldType::Defined, Pass::Pass3});    //Eq 67 Contact couple stress tensor
 FIELDS.push_back({FIELDS.back().flag<<1, "MK"   , TensorOrder::TENSOR, FieldType::Defined, Pass::VelFluct|Pass::RotFluct|Pass::Pass2|Pass::Pass1});    //Eq 66 Kinetic couple stress tensor
 FIELDS.push_back({FIELDS.back().flag<<1, "mC"   , TensorOrder::VECTOR, FieldType::Defined, Pass::Pass3});    //Eq 68 spin supply from contacts
@@ -286,6 +286,18 @@ for (size_t i=0 ; i<FIELDS.size() ; i++)
             Fidx.push_back(n) ;
             n+= d*d ;
         }
+        else if (FIELDS[i].type==TensorOrder::TENSOR_SKEW)
+        {
+            Fcols.push_back({&(FIELDS[i]), n}) ;
+            Fidx.push_back(n) ;
+            n+= d*(d-1)/2 ;
+        }
+        else if (FIELDS[i].type==TensorOrder::TENSOR_SYM)
+        {
+            Fcols.push_back({&(FIELDS[i]), n}) ;
+            Fidx.push_back(n) ;
+            n+= (d*(d+1))/2 ;
+        }
     }
     else
     {
@@ -322,6 +334,16 @@ for (size_t j=0 ; j<subflags.size() ; j++)
           {
               std::get<1>(SFcols.back()).push_back({&SUBFIELDS[i], n}) ;
               n+= d*d ;
+          }
+          else if(SUBFIELDS[i].type==TensorOrder::TENSOR_SKEW)
+          {
+              std::get<1>(SFcols.back()).push_back({&SUBFIELDS[i], n}) ;
+              n+= d*(d-1)/2 ;
+          }
+          else if (SUBFIELDS[i].type==TensorOrder::TENSOR_SYM)
+          {
+              std::get<1>(SFcols.back()).push_back({&SUBFIELDS[i], n}) ;
+              n+= (d*(d+1))/2 ;
           }
       }
   }
@@ -650,6 +672,8 @@ for (auto &v: FIELDS)
     case TensorOrder::SCALAR: extrancomp.push_back(1) ; break ;
     case TensorOrder::VECTOR: extrancomp.push_back(d) ; break ;
     case TensorOrder::TENSOR: extrancomp.push_back(d*d) ; break ;
+    case TensorOrder::TENSOR_SKEW: extrancomp.push_back(d*(d-1)/2) ; break ;
+    case TensorOrder::TENSOR_SYM: extrancomp.push_back((d*(d+1))/2) ; break ;
     default : extraid.pop_back() ; continue ; 
   }
   extralocation.push_back(v.datalocation) ; 
@@ -658,7 +682,7 @@ bool doextra = (extraid.size()>0)?true:false ;
 
 // Clearing stuff
 if (dorho) for (int i=0 ; i<Npt ; CGP[i].fields[cT][rhoid]=0, i++) ;
-if (doI)   for (int i=0 ; i<Npt ; CGP[i].fields[cT][Iid]=0, i++) ;
+if (doI)   for (int dd=0 ; dd<d*d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][Iid+dd]=0, i++) ;
 if (dovel) for (int dd=0 ; dd<d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][velid+dd]=0, i++) ;
 if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][omegaid+dd]=0, i++) ;
 if (doorient) for (int dd=0 ; dd<d*d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][orientid+dd]=0, i++) ;
@@ -1433,6 +1457,25 @@ int Coarsing::write_vtk(string sout)
                for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
                 fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][idx+dd], (dd==d*d-1)?'\n':' ') ;
             break ;
+        case TensorOrder::TENSOR_SKEW : fprintf(out, "TENSORS %s double \n", thisfield->name.c_str()) ;
+            for (int k=0 ; k<npt[2] ; k++)
+             for (int j=0 ; j<npt[1] ; j++)
+              for (int i=0 ; i<npt[0] ; i++)
+               for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
+               {
+                if ( (dd%d)==(dd/d) ) // diagonal element
+                  fprintf(out, "0%c", (dd==d*d-1)?'\n':' ') ;
+                else
+                  fprintf(out, "%g%c", - CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][idx+idx2skewid(dd,d)], (dd==d*d-1)?'\n':' ') ;
+               }
+            break ;
+        case TensorOrder::TENSOR_SYM : fprintf(out, "TENSORS %s double \n", thisfield->name.c_str()) ;
+            for (int k=0 ; k<npt[2] ; k++)
+             for (int j=0 ; j<npt[1] ; j++)
+              for (int i=0 ; i<npt[0] ; i++)
+               for (int dd=0 ; dd<std::min(d*d,3*3) ; dd++)
+                  fprintf(out, "%g%c", CGP[i*npt[1]*npt[2]+j*npt[2]+k].fields[t][idx+idx2symid(dd,d)], (dd==d*d-1)?'\n':' ') ;
+            break ;
         default: printf("ERR: this should never happen. \n") ;
       }
       fprintf(out, "\n\n") ;
@@ -1514,6 +1557,25 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
                       for (int j=0 ; j<d*d ; j++)
                           outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ; // j/d*d!=j because of integer division
             break ;
+      case TensorOrder::TENSOR_SKEW : dimensions[0]=dimensions[1]=d ; //Tensor
+              outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
+              for (int t=0 ; t<Time ; t++)
+                  for (int i=0 ; i<Npt ; i++)
+                      for (int j=0 ; j<d*d ; j++)
+                      {
+                        if ( (j%d)==(j/d) ) // diagonal element
+                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=0 ;
+                        else  
+                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+idx2skewid(dd,d)] ; // j/d*d!=j because of integer division
+                      }
+            break ;
+      case TensorOrder::TENSOR_SYM : dimensions[0]=dimensions[1]=d ; //Tensor
+        outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
+        for (int t=0 ; t<Time ; t++)
+            for (int i=0 ; i<Npt ; i++)
+                for (int j=0 ; j<d*d ; j++)
+                    outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+idx2symid(dd,d)] ; // j/d*d!=j because of integer division
+        break ;
       default: printf("ERR: this should never happen. \n") ;
     }
 
@@ -1750,6 +1812,9 @@ vector <long unsigned int> dimensions (3+d, 0) ; // This type to please matlab
 for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
 dimensions[dimtime] = Time ;
 
+auto idx_identity = [](int i, int d) { return i ; } ;
+int (*idxconv)(int, int) = idx_identity;
+bool isskew=false ; 
 if (id == -2)
 {
   dimensions[0]=d ;
@@ -1763,6 +1828,10 @@ else
       case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1     ; break ;
       case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; break ;
       case TensorOrder::TENSOR : dimensions[0]=d ; dimensions[1]=d ; break ;
+      case TensorOrder::TENSOR_SKEW: dimensions[0]=d ; dimensions[1]=d ;
+                                     idxconv = idx2skewid ; isskew=true; break ;
+      case TensorOrder::TENSOR_SYM : dimensions[0]=d ; dimensions[1]=d ; 
+                                     idxconv = idx2symid ; break ;
       default: printf("ERR: this should never happen. (wrong TensorOrder...)\n") ;
   }
 }
@@ -1798,8 +1867,16 @@ else
   for (long unsigned int k=0 ; k<dimensions[0] ; k++)
       for (long unsigned int j=0 ; j<dimensions[1] ; j++)
           for (int i=0 ; i<Npt ; i++)
-              for (int t=0 ; t<Time ; t++, numbytes += 8)
-                  memcpy(outarray+numbytes, &(CGP[i].fields[t][std::get<1>(Fcols[id])+j*d+k]), 8) ;
+              for (int t=0 ; t<Time ; t++, numbytes += 8) 
+              {
+                if (isskew && (k==j))
+                {
+                  double z=0.0 ;
+                  memcpy(outarray+numbytes, &z, 8) ;
+                }
+                else
+                  memcpy(outarray+numbytes, &(CGP[i].fields[t][std::get<1>(Fcols[id])+idxconv(j*d+k, d)]), 8) ;
+              }
 
 return (std::make_pair(numbytes, outarray)) ;
 }
@@ -1998,8 +2075,6 @@ return 1 ;
 #endif
 }
 //==================================
-
-
 int Coarsing::idx_FastFirst2SlowFirst (int n)
 {
   // Get an Integer in [0, Ncpt] going 1st dimension fast, convert in idx list, then back to an integer between 0 & Ncpt, but with first dimension slow
@@ -2012,7 +2087,24 @@ int Coarsing::idx_FastFirst2SlowFirst (int n)
     res += idx[i]*nptcum[i] ;
   return res ;
 }
-
+//-----------------------------------------------
+int Coarsing::idx2skewid (int dd, int d)
+{
+  if ( (dd%d)<(dd/d) ) // element below diagonal
+    return  (d-2)*(dd%d) - ((dd%d)*(dd%d-1))/2 + (dd/d) -1 ;
+  else if (dd%d>dd/d) // element above diagonal
+    return (d-2)*(dd/d) - ((dd/d)*(dd/d-1))/2 + (dd%d) -1 ;
+  else // diagonal element
+    throw std::invalid_argument( "ERR: diagonal element does not have a skew index." ) ;
+}
+//-----------------------------------------------
+int Coarsing::idx2symid(int dd, int d)
+{
+  if (dd/d<=dd%d) // upper triangular and diagonal
+    return (d-1)*(dd/d) - ((dd/d)*(dd/d-1))/2 + dd%d   ;
+  else // lower triangular
+    return (d-1)*(dd%d) - ((dd%d)*(dd%d-1))/2 + dd/d   ;
+}
 //-----------------------------------------------
 CGPoint * Coarsing::reverseloop (string type)
 {
