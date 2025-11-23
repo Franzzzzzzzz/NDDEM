@@ -105,6 +105,9 @@ if (urlParams.has('r_min')) {
 if (urlParams.has('r_max')) {
     params.r_max = parseFloat(urlParams.get('r_max'));
 }
+if (urlParams.has('F_mag_max')) {
+    params.F_mag_max = parseFloat(urlParams.get('F_mag_max'));
+}
 
 params.boundary = 'Rectangle';
 
