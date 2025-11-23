@@ -35,6 +35,7 @@ var params = {
     r_max: 0.0045,
     r_min: 0.0035,
     particle_density: 2700,
+    tc: 1e-2, // collision time
     freq: 0.05,
     new_line: false,
     shear_rate: 10,
@@ -60,10 +61,10 @@ if (urlParams.has('dimension')) {
     params.dimension = parseInt(urlParams.get('dimension'));
 }
 if (params.dimension === 2) {
-    params.particle_volume = Math.PI * Math.pow(params.average_radius, 2);
+    params.particle_volume = Math.PI * Math.pow(params.r_min, 2);
 }
 else if (params.dimension === 3) {
-    params.particle_volume = 4. / 3. * Math.PI * Math.pow(params.average_radius, 3);
+    params.particle_volume = 4. / 3. * Math.PI * Math.pow(params.r_min, 3);
 }
 else if (params.dimension === 4) {
 
@@ -107,6 +108,9 @@ if (urlParams.has('r_max')) {
 }
 if (urlParams.has('F_mag_max')) {
     params.F_mag_max = parseFloat(urlParams.get('F_mag_max'));
+}
+if (urlParams.has('tc')) {
+    params.tc = parseFloat(urlParams.get('tc'));
 }
 
 params.boundary = 'Rectangle';
@@ -345,7 +349,7 @@ async function NDDEMCGPhysics() {
         // S.simu_interpret_command("auto skin");
         // S.simu_finalise_init () ;
 
-        let tc = 1e-2;
+        let tc = params.tc;
         let rest = 0.5; // super low restitution coeff to dampen out quickly
         let vals = SPHERES.setCollisionTimeAndRestitutionCoefficient(tc, rest, params.particle_mass)
 
