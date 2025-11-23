@@ -96,6 +96,15 @@ if (!urlParams.has('noinfo')) {
     info_div.innerHTML = "Click on a particle to grab it"
     document.body.appendChild(info_div);
 }
+if (urlParams.has('lut')) {
+    params.lut = urlParams.get('lut');
+}
+if (urlParams.has('r_min')) {
+    params.r_min = parseFloat(urlParams.get('r_min'));
+}
+if (urlParams.has('r_max')) {
+    params.r_max = parseFloat(urlParams.get('r_max'));
+}
 
 params.boundary = 'Rectangle';
 
@@ -203,7 +212,7 @@ async function init() {
     RAYCAST.update_world(S, camera, params);
 
     // Handle tab visibility changes to prevent timing issues
-    document.addEventListener('visibilitychange', function() {
+    document.addEventListener('visibilitychange', function () {
         if (document.hidden) {
             params.paused = true;
             console.log('tab hidden - pausing simulation');
