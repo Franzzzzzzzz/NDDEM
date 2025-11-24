@@ -141,7 +141,7 @@ async function init() {
     scene.background = new THREE.Color(0x111);
 
     const hemiLight = new THREE.HemisphereLight();
-    hemiLight.intensity = 0.35;
+    hemiLight.intensity = 1.5;
     scene.add(hemiLight);
 
     const dirLight = new THREE.DirectionalLight();
