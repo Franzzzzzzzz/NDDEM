@@ -74,45 +74,36 @@ else if (params.dimension === 4) {
 
 params.particle_mass = params.particle_volume * params.particle_density;
 
-if (urlParams.has('cg_width')) { params.cg_width = parseInt(urlParams.get('cg_width')); }
-if (urlParams.has('cg_height')) { params.cg_height = parseInt(urlParams.get('cg_height')); }
-if (urlParams.has('cg_opacity')) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
-if (urlParams.has('cg_field')) { params.cg_field = urlParams.get('cg_field'); }
-if (urlParams.has('cg_window_size')) { params.cg_window_size = parseFloat(urlParams.get('cg_window_size')); }
-if (urlParams.has('quality')) { params.quality = parseInt(urlParams.get('quality')); }
+// Parse URL parameters and update params object
+Object.keys(params).forEach(key => {
+    if (urlParams.has(key)) {
+        const value = urlParams.get(key);
+        const paramValue = params[key];
 
-if (urlParams.has('particle_opacity')) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
-if (urlParams.has('zoom')) {
-    params.zoom = parseFloat(urlParams.get('zoom'));
+        // Determine type and parse accordingly
+        if (typeof paramValue === 'number') {
+            params[key] = parseFloat(value);
+        } else if (typeof paramValue === 'boolean') {
+            params[key] = value === 'true' || value === '1';
+        } else if (typeof paramValue === 'string') {
+            params[key] = value;
+        } else if (typeof paramValue === 'object' && paramValue !== null) {
+            // Skip objects like d4: { cur: 0 }
+            return;
+        }
+    }
+});
+
+// Handle special cases
+if (urlParams.has('nogui')) {
+    params.nogui = true;
 }
-if (urlParams.has('L0')) {
-    params.L0 = parseFloat(urlParams.get('L0'));
-}
-if (urlParams.has('L1')) {
-    params.L1 = parseFloat(urlParams.get('L1'));
-}
-if (urlParams.has('N')) { params.N = parseFloat(urlParams.get('N')); }
-if (urlParams.has('nogui')) { params.nogui = true; }
+
 if (!urlParams.has('noinfo')) {
-    let info_div = document.createElement("div")
+    let info_div = document.createElement("div");
     info_div.id = 'info_div';
-    info_div.innerHTML = "Click on a particle to grab it"
+    info_div.innerHTML = "Click on a particle to grab it";
     document.body.appendChild(info_div);
-}
-if (urlParams.has('lut')) {
-    params.lut = urlParams.get('lut');
-}
-if (urlParams.has('r_min')) {
-    params.r_min = parseFloat(urlParams.get('r_min'));
-}
-if (urlParams.has('r_max')) {
-    params.r_max = parseFloat(urlParams.get('r_max'));
-}
-if (urlParams.has('F_mag_max')) {
-    params.F_mag_max = parseFloat(urlParams.get('F_mag_max'));
-}
-if (urlParams.has('tc')) {
-    params.tc = parseFloat(urlParams.get('tc'));
 }
 
 params.boundary = 'Rectangle';
