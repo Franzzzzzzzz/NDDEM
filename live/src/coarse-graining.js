@@ -77,6 +77,8 @@ params.particle_mass = params.particle_volume * params.particle_density;
 if (urlParams.has('cg_width')) { params.cg_width = parseInt(urlParams.get('cg_width')); }
 if (urlParams.has('cg_height')) { params.cg_height = parseInt(urlParams.get('cg_height')); }
 if (urlParams.has('cg_opacity')) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
+if (urlParams.has('cg_field')) { params.cg_field = urlParams.get('cg_field'); }
+if (urlParams.has('cg_window_size')) { params.cg_window_size = parseFloat(urlParams.get('cg_window_size')); }
 if (urlParams.has('quality')) { params.quality = parseInt(urlParams.get('quality')); }
 
 if (urlParams.has('particle_opacity')) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
