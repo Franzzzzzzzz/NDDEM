@@ -18,7 +18,7 @@
     "three-bvh-csg": "^0.0.16"
   },
   "devDependencies": {
-    "@nightwatch/mobile-helper": "^0.1.12",
+    "@nightwatch/mobile-helper": "^2.0.0",
     "chromedriver": "^119.0.1",
     "css-loader": "^6.7.1",
     "geckodriver": "^4.0.4",
