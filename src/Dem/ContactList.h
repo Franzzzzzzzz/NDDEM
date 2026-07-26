@@ -64,7 +64,7 @@ public :
  *  \warning The number of dimensions is limited to sizeof(uint32_t) because of these ghost, as they are using 32 bit datatype. There is a risk of overflowing the datatype if using PBC at higher than 32 dimensions, or if using a PBC in dimension 32 (since the last bit could be interpreted as a sign bit). Walls in dimensions higher than 32 may be ok, but without guarantee.
  *  \todo Ghosts should be improved in order to use either a bitset datatype, or a custom datatype, to avoid the limitation to sizeof(uint32_t) in the number of dimension.
  */
-template <int d>
+template <int d, bool inertiatensor>
 class cp
 {
 public:
@@ -136,7 +136,7 @@ public:
         }
     }
  
- std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, Parameters<d> &P)
+ std::pair<vector<double>,vector<double>> compute_branchvector (cv2d &X, Parameters<d,inertiatensor> &P)
  {
     vector <double> loc (d, 0), branch (d, 0)  ;
     if ( P.Boundaries[0].Type != WallType::PBC_LE || (ghost & 1)==0)
@@ -173,16 +173,16 @@ public:
 } ;
 
 /** \brief Contact properties for mesh contacts (mainly), including contact point location, specialising cp. */
-template <int d>
-class cpm : public cp<d> {
+template <int d, bool inertiatensor>
+class cpm : public cp<d,inertiatensor> {
 public: 
     cpm () {} ///< Only for use when restarting
-    cpm (int ii, int jj, int sid, double ctlength, Action<d> * default_action) : cp<d>(ii,jj,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
-    cpm(const cpm& v): cp<d>(v) {*this=v ;}
+    cpm (int ii, int jj, int sid, double ctlength, Action<d> * default_action) : cp<d,inertiatensor>(ii,jj,ctlength,default_action), contactpoint(std::vector<double>(d,0)), submeshid(sid){} ///< New contact creation
+    cpm(const cpm& v): cp<d,inertiatensor>(v) {*this=v ;}
     ~cpm () {} ///< Remove & clean contact
     cpm & operator= (const cpm & c)
     {
-     cp<d>::operator=(c);
+     cp<d,inertiatensor>::operator=(c);
      contactpoint = c.contactpoint ;
      submeshid = c.submeshid ; 
      return *this ;
@@ -192,24 +192,24 @@ public:
     
     template <class Archive>
     void load (Archive &ar) {
-        ar( cereal::base_class<cp<d>>( this ), contactpoint, submeshid );
+        ar( cereal::base_class<cp<d,inertiatensor>>( this ), contactpoint, submeshid );
     }
     template <class Archive>
     void save (Archive &ar) const {
-        ar( cereal::base_class<cp<d>>( this ), contactpoint, submeshid );
+        ar( cereal::base_class<cp<d,inertiatensor>>( this ), contactpoint, submeshid );
     }
 } ; 
 
 // ------------------------------------ Contact List class -------------------------------------------
 /** \brief Handles lists of contacts
  */
-template <int d>
+template <int d, bool inertiatensor>
 class ContactList
 {
 public:
  ContactList () {check_ghost=&ContactList::check_ghost_LE;}
  void reset() {it = v.begin() ;}  ///< Go to the contact list beginning
- int insert(const cp<d>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
+ int insert(const cp<d,inertiatensor>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
  void finalise () { while (it!=v.end()) it=v.erase(it) ; } ///< Go to the end of the contact list, erasing any remaining contact which opened.
  
  // Functions for Cell contact detections
@@ -263,51 +263,51 @@ public:
  }*/
  
  //void check_ghost    (uint32_t gst, double partialsum, const Parameters & P, cv1d &X1, cv1d &X2, double R, cp & tmpcp) ;
- void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact) ; ///< \deprecated Measure distance between a ghost and a particle
- bool check_ghost_regular (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
+ void check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d,inertiatensor> & P, cv1d &X1, cv1d &X2, cp<d,inertiatensor> & contact) ; ///< \deprecated Measure distance between a ghost and a particle
+ bool check_ghost_regular (bitdim gst, const Parameters<d,inertiatensor> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d,inertiatensor> & tmpcp,
                    int startd=0, double partialsum=0, bitdim mask=0) ; ///< Find ghost-particle contact, going though pbc recursively. A beautiful piece of optimised algorithm if I may say so myself.
- bool check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
- bool (ContactList::*check_ghost) (bitdim , const Parameters<d> & , cv1d &, cv1d &, double, double, cp<d> &,int startd, double partialsum, bitdim mask) ;
+ bool check_ghost_LE (bitdim gst, const Parameters<d,inertiatensor> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d,inertiatensor> & tmpcp, int startd=0, double partialsum=0, bitdim mask=0) ;
+ bool (ContactList::*check_ghost) (bitdim , const Parameters<d,inertiatensor> & , cv1d &, cv1d &, double, double, cp<d,inertiatensor> &,int startd, double partialsum, bitdim mask) ;
  void coordinance (v1d &Z) ; ///< Calculate and store coordination number in Z.
  Action<d> * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
   
  template <class Archive>
  void serialize(Archive &ar) {ar(v, cid) ; }
  
- list <cp<d>> v ; ///< Contains the list of contact
+ list <cp<d,inertiatensor>> v ; ///< Contains the list of contact
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
- //std::vector<typename list<cp<d>>::iterator> it_array_beg, it_array_end ;
+ //std::vector<typename list<cp<d,inertiatensor>>::iterator> it_array_beg, it_array_end ;
  
 private:
- typename list<cp<d>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
+ typename list<cp<d,inertiatensor>>::iterator it ; ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
  Action<d> def ; ///< Default action
 
- list<cp<d>> null_list ; 
+ list<cp<d,inertiatensor>> null_list ; 
 };
 
-template <int d>
-inline bool operator< (const cp<d> &a, const cp<d> &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; } ///< The contact list is order in increasing order of index i, and for two identical i in increasing order of j.
-template <int d>
-inline bool operator== (const cp<d> &a, const cp<d> &b) {return (a.i==b.i && a.j==b.j) ; } ///< Contact equivalence is based solely on the index of objects in contact i and j.
+template <int d, bool inertiatensor=false>
+inline bool operator< (const cp<d,inertiatensor> &a, const cp<d,inertiatensor> &b) {if (a.i==b.i) return (a.j<b.j) ; return a.i<b.i ; } ///< The contact list is order in increasing order of index i, and for two identical i in increasing order of j.
+template <int d, bool inertiatensor=false>
+inline bool operator== (const cp<d,inertiatensor> &a, const cp<d,inertiatensor> &b) {return (a.i==b.i && a.j==b.j) ; } ///< Contact equivalence is based solely on the index of objects in contact i and j.
 
 //-------------------------------------------------
 /** \brief Handles lists of contacts with meshes
  */
-template <int d>
+template <int d, bool inertiatensor>
 class ContactListMesh
 {
 public:
- list <cpm<d>> v ;    
+ list <cpm<d,inertiatensor>> v ;    
  Action<d> * default_action () {return (&def) ; } ///< Easy allocation of a default contact to initialise new contacts.
  void reset() {it = v.begin() ;} ///< Go to the contact list beginning
  void finalise () { while (it!=v.end()) it=v.erase(it) ; }
- int insert(const cpm<d>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
+ int insert(const cpm<d,inertiatensor>& a) ; ///< Insert a contact, maintaining sorting with increasing i, and removing missing contacts on traversal.
  int cid=0 ; ///< \deprecated not used for anything anymore I think.
  
  template <class Archive>
  void serialize(Archive &ar) {ar(v, cid) ; }
  
- bool check_mesh_dst_contact (Mesh<d> &mesh, cv1d & Xo, double r, cpm<d> & c)
+ bool check_mesh_dst_contact (Mesh<d> &mesh, cv1d & Xo, double r, cpm<d,inertiatensor> & c)
  {     
   std::vector<double> dotproducts (d) ;
   auto X = Xo-mesh.origin ;
@@ -411,7 +411,7 @@ public:
  }
   
 private: 
- typename list<cpm<d>>::iterator it ;  ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
+ typename list<cpm<d,inertiatensor>>::iterator it ;  ///< Iterator to the list to allow easy traversal, insertion & deletion while maintening ordering.
  Action<d> def ; ///< Default action
 } ; 
 
@@ -426,8 +426,8 @@ private:
  *                                                                                                   *
  * ***************************************************************************************************/
 
-template <int d>
-int ContactList<d>::insert(const cp<d> &a)
+template <int d, bool inertiatensor>
+int ContactList<d,inertiatensor>::insert(const cp<d,inertiatensor> &a)
 {
     while (it!=v.end() && (*it) < a)
     { it= v.erase(it) ; }
@@ -447,8 +447,8 @@ int ContactList<d>::insert(const cp<d> &a)
     return (cid++) ;
 }
 //----------------------------------------------
-template <int d>
-int ContactListMesh<d>::insert(const cpm<d> &a)
+template <int d, bool inertiatensor>
+int ContactListMesh<d,inertiatensor>::insert(const cpm<d,inertiatensor> &a)
 {
     while (it!=v.end() && (*it) < a)
     { it= v.erase(it) ; }
@@ -470,10 +470,10 @@ int ContactListMesh<d>::insert(const cpm<d> &a)
 }
 
 //-----------------------------------Fastest version so far ...
-template <int d>
-bool ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P, 
+template <int d, bool inertiatensor>
+bool ContactList<d,inertiatensor>::check_ghost_regular (bitdim gst, const Parameters<d,inertiatensor> & P, 
                                           cv1d &X1, cv1d &X2, double r1, double r2, 
-                                          cp<d> & tmpcp, int startd, double partialsum, bitdim mask)
+                                          cp<d,inertiatensor> & tmpcp, int startd, double partialsum, bitdim mask)
 {
     double sum=partialsum ;
     double rr = (r1+r2)*(r1+r2) ; 
@@ -505,8 +505,8 @@ bool ContactList<d>::check_ghost_regular (bitdim gst, const Parameters<d> & P,
 }
 
 //--------------------------------------------------------------------
-template <int d>
-bool ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d> & tmpcp,
+template <int d, bool inertiatensor>
+bool ContactList<d,inertiatensor>::check_ghost_LE (bitdim gst, const Parameters<d,inertiatensor> & P, cv1d &X1, cv1d &X2, double r1, double r2, cp<d,inertiatensor> & tmpcp,
                                      [[maybe_unused]] int startd, [[maybe_unused]]double partialsum, [[maybe_unused]]bitdim mask)
 {
     if (P.Boundaries[0].Type != WallType::PBC_LE)
@@ -549,8 +549,8 @@ bool ContactList<d>::check_ghost_LE (bitdim gst, const Parameters<d> & P, cv1d &
 }
 
 //----------------------------------------
-template <int d>
-void ContactList<d>::check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d> & P, cv1d &X1, cv1d &X2, cp<d> & contact)
+template <int d, bool inertiatensor>
+void ContactList<d,inertiatensor>::check_ghost_dst(uint32_t gst, int n, double partialsum, uint32_t mask, const Parameters<d,inertiatensor> & P, cv1d &X1, cv1d &X2, cp<d,inertiatensor> & contact)
 {
   if (gst==0) return ;
   else
@@ -569,8 +569,8 @@ void ContactList<d>::check_ghost_dst(uint32_t gst, int n, double partialsum, uin
 }
 
 //-----------------------------------
-template <int d>
-void ContactList<d>::coordinance (v1d &Z)
+template <int d, bool inertiatensor>
+void ContactList<d,inertiatensor>::coordinance (v1d &Z)
 {
   for (auto & w : v)
   {

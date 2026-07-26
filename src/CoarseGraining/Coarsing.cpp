@@ -91,38 +91,45 @@ int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 }
 
 //-------------------------------------------------------
-int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas, vector<vector<double>> bounds)
-{
+int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas, vector<vector<double>> bounds, bool convolutionwindow)
+{  
+ LibBase ** winptr = nullptr ; 
+ if (convolutionwindow)
+ {
+   setWindow<Windows::MonteCarloIntersect3D> (w, nullptr) ; 
+   winptr = &( (static_cast<LibMonteCarloIntersect3D*>(Window))->win) ; 
+ } 
+  
  switch (win) {
   case Windows::Rect3D :
-    setWindow<Windows::Rect3D> (w) ;
+    setWindow<Windows::Rect3D> (w, winptr) ;
     break ;
   case Windows::Sphere3DIntersect :
-    setWindow<Windows::Sphere3DIntersect> (w) ;
+    setWindow<Windows::Sphere3DIntersect> (w,winptr) ;
     break ;
-  case Windows::Sphere3DIntersect_MonteCarlo:
-    Window= new LibSphere3DIntersect_MonteCarlo(&data, w, d) ; 
-    break ; 
   case Windows::SphereNDIntersect :
-    setWindow<Windows::SphereNDIntersect> (w) ;
+    setWindow<Windows::SphereNDIntersect> (w, nullptr) ; // Only 3D windows can use the convolution window currently. 
     break ;
   case Windows::Lucy3D :
-    setWindow<Windows::Lucy3D> (w) ;
+    setWindow<Windows::Lucy3D> (w, winptr) ;
     break ;
   case Windows::Lucy3DFancyInt:
-    setWindow<Windows::Lucy3DFancyInt> (w) ;
+    setWindow<Windows::Lucy3DFancyInt> (w, winptr) ;
     break ;
   case Windows::Hann3D :
-    setWindow<Windows::Hann3D> (w) ;
+    setWindow<Windows::Hann3D> (w, winptr) ;
     break ;
   case Windows::RectND :
-    setWindow<Windows::RectND> (w) ;
+    setWindow<Windows::RectND> (w, nullptr) ;
     break ;
   case Windows::LucyND :
-    setWindow<Windows::LucyND> (w) ;
+    setWindow<Windows::LucyND> (w, nullptr) ;
     break ;
   case Windows::LucyND_Periodic:
     setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ;
+    break ;
+  case Windows::Dirac3D:
+    setWindow<Windows::Dirac3D> (w, nullptr) ;
     break ;
   case Windows::RVE:
     setWindow<Windows::RVE> (bounds) ;

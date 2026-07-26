@@ -52,8 +52,8 @@
 #include "mat.h"
 #endif
 
-#include "Eigen/Dense"
-#include "Eigen/Geometry"
+#include "../Eigen/Dense"
+#include "../Eigen/Geometry"
 
 
 using namespace std ;
@@ -206,9 +206,9 @@ public :
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
     int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
-    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}, vector<vector<double>> bounds={{}}) ; ///< Set the windowing function, calling the templated version
+    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}, vector<vector<double>> bounds={{}}, bool convolutionwindow=false) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
-    template <Windows W> int setWindow (double w) ; ///< Set the windowing function
+    template <Windows W> int setWindow (double w, LibBase ** winptr) ; ///< Set the windowing function
     template <Windows W> int setWindow (vector<vector<double>> &) ; ///< Set the windowing function for LibRVE
     template <Windows W> int setWindow (double w, vector<bool> per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function for the LibLucyND_Periodic (special one...)
     int grid_generate() ; ///< Generate the coarse-graining grid
@@ -270,41 +270,47 @@ int Coarsing::setWindow ()
   setWindow<W>(w) ; return 0 ; }
 //-------------------------------------------------------
 template <Windows W>
-int Coarsing::setWindow (double w)
+int Coarsing::setWindow (double w, LibBase ** winptr)
 {
+  if (winptr==nullptr)
+    winptr = &Window ; 
+  
   static_assert(W != Windows::LucyND_Periodic) ;
   switch (W) {
       case Windows::Rect3D :
-         Window=new LibRect3D (&data, w, d) ;
+         *winptr=new LibRect3D (&data, w, d) ;
         break ;
       case Windows::Sphere3DIntersect :
-        Window=new LibSphere3DIntersect (&data, w, d) ;
+        *winptr=new LibSphere3DIntersect (&data, w, d) ;
         break ;
-      case Windows::Sphere3DIntersect_MonteCarlo:
-        Window= new LibSphere3DIntersect_MonteCarlo(&data, w, d) ; 
-        break ; 
       case Windows::SphereNDIntersect :
-        Window=new LibSphereNDIntersect (&data, w, d) ;
+        *winptr=new LibSphereNDIntersect (&data, w, d) ;
         break ;
       case Windows::Lucy3D :
-        Window=new LibLucy3D (&data, w, d) ;
+        *winptr=new LibLucy3D (&data, w, d) ;
         break ;
       case Windows::Lucy3DFancyInt :
-        Window=new LibLucy3DFancyInt (&data, w, d) ;
+        *winptr=new LibLucy3DFancyInt (&data, w, d) ;
         break ;
       case Windows::Hann3D :
-        Window=new LibHann3D (&data, w, d) ;
+        *winptr=new LibHann3D (&data, w, d) ;
         break ;
       case Windows::RectND :
-        Window=new LibRectND (&data, w, d) ;
+        *winptr=new LibRectND (&data, w, d) ;
         break ;
       case Windows::LucyND :
-        Window=new LibLucyND (&data, w, d) ;
+        *winptr=new LibLucyND (&data, w, d) ;
         break ;
+      case Windows::Dirac3D:
+        *winptr=new LibDirac3D(&data, w, d) ;
+        break ; 
+      case Windows::MonteCarloIntersect3D:
+        *winptr=new LibMonteCarloIntersect3D(&data, w, d) ;
+        break ; 
       default:
-        printf("Unknown window, check Coarsing::setWindow #2") ;
+        printf("Unknown window, check Coarsing::setWindow #2 %d\n", static_cast<int>(W)) ;
   }
-  cutoff = Window->cutoff() ;
+  cutoff = (*winptr)->cutoff() ;
   printf("Window and cutoff: %g %g \n", w, cutoff) ;
   return 0 ;
 }

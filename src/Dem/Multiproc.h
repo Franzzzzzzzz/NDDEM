@@ -19,7 +19,7 @@ using namespace std ;
 
 /** \brief Simple packing structure for the iterators to the contact list regions per particle. 
  */
-template<int d>
+template <int d, bool inertiatensor>
 struct CLp_it_t {
   void init (int N, int P)
   {
@@ -28,7 +28,7 @@ struct CLp_it_t {
     //it_array_end.resize(N,null_list.v.begin()) ;
   }
   
-  void rebuild ( vector <ContactList<d>> & CLp )
+  void rebuild ( vector <ContactList<d,inertiatensor>> & CLp )
   {
     for (size_t i=0 ; i<it_array_beg.size() ; i++)
       it_array_beg[i] = null_list.v.begin() ; 
@@ -46,21 +46,21 @@ struct CLp_it_t {
     }
   }
   
-  std::vector<typename list<cp<d>>::iterator> it_array_beg/*, it_array_end */; ///< Contains iterator related to each particle contacts
-  std::vector<typename list<cp<d>>::iterator> it_ends ; 
-  ContactList<d> null_list ; ///< Empty list, effectively providing a null iterator. 
+  std::vector<typename list<cp<d,inertiatensor>>::iterator> it_array_beg/*, it_array_end */; ///< Contains iterator related to each particle contacts
+  std::vector<typename list<cp<d,inertiatensor>>::iterator> it_ends ; 
+  ContactList<d,inertiatensor> null_list ; ///< Empty list, effectively providing a null iterator. 
 } ;
 
 
 
 /** \brief Manual multiprocessor handling for OpenMP, for max efficiency & avoiding bugs & race conditions, hopefully. 
  */
-template <int d>
+template <int d, bool inertiatensor>
 class Multiproc
 {
 public:
   
-  void initialise (int NN, int PP, Parameters<d> & Param) {
+  void initialise (int NN, int PP, Parameters<d,inertiatensor> & Param) {
     share.resize(PP+1,0) ; 
     sharecell.resize(PP+1,0) ; 
     num_time=0 ; 
@@ -69,11 +69,11 @@ public:
     share[share.size()-1]=NN ;
     split(N,P) ;
     disp_share() ;
-    CLp.resize(P,ContactList<d>()) ;
-    CLp_new.resize(P,ContactList<d>()) ;
-    CLw.resize(P,ContactList<d>()) ;
-    CLm.resize(P,ContactListMesh<d>()) ; 
-    C.resize(P, Contacts<d>(Param)) ;
+    CLp.resize(P,ContactList<d,inertiatensor>()) ;
+    CLp_new.resize(P,ContactList<d,inertiatensor>()) ;
+    CLw.resize(P,ContactList<d,inertiatensor>()) ;
+    CLm.resize(P,ContactListMesh<d,inertiatensor>()) ; 
+    C.resize(P, Contacts<d,inertiatensor>(Param)) ;
     delayed.resize(P) ;
     delayedj.resize(P) ;
     delayed_size.resize(P,0) ;
@@ -93,7 +93,7 @@ public:
   //-----------------------------------
   void merge_newcontacts()
   {
-    list <cp<d>> insertions ; 
+    list <cp<d,inertiatensor>> insertions ; 
     for (int p=0 ; p<P ; p++)
     {
       insertions.splice(insertions.end(), CLp_new[p].v) ; 
@@ -251,7 +251,7 @@ public:
   }*/
   
   void splitcells(int C) ; 
-  auto contacts2array (ExportData exp, cv2d &X, Parameters<d> &P) ; ///< pack the contact data in a 2d array
+  auto contacts2array (ExportData exp, cv2d &X, Parameters<d,inertiatensor> &P) ; ///< pack the contact data in a 2d array
   
   
   
@@ -267,17 +267,17 @@ public:
     }
   
   //------------------------------------------------
-  //ContactList<d> CLp_all ; ///< Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). 
-  vector <ContactList<d>> CLp ; ///< ContactList particle-particle for each processor
-  vector <ContactList<d>> CLp_new ; ///< New particle-particle contacts for each processor
-  vector <ContactList<d>> CLw ; ///< ContactList particle-wall for each processor
-  vector <ContactListMesh<d>> CLm ; ///< ContactList particle-mesh for each processor
-  vector <Contacts<d>> C ; ///< Dummy Contacts for independent calculation per processor
+  //ContactList<d,inertiatensor> CLp_all ; ///< Full contact list merged for all processor (to go from per cell CLp lists to globally atom sorted, and back to per proc). 
+  vector <ContactList<d,inertiatensor>> CLp ; ///< ContactList particle-particle for each processor
+  vector <ContactList<d,inertiatensor>> CLp_new ; ///< New particle-particle contacts for each processor
+  vector <ContactList<d,inertiatensor>> CLw ; ///< ContactList particle-wall for each processor
+  vector <ContactListMesh<d,inertiatensor>> CLm ; ///< ContactList particle-mesh for each processor
+  vector <Contacts<d,inertiatensor>> C ; ///< Dummy Contacts for independent calculation per processor
   vector <int> share ; ///< Particle share between threads. A thread ID own particles with index between share[ID] and share[ID+1]. size(share)=P+1. 
   vector <int> sharecell ; ///< Cell share between threads (for contact detection based on cells). A thread ID own cells with index between share[ID] and share[ID+1]. size(share)=P+1. 
   vector <double> timing_contacts, timing_forces ; ///< Used to record the time spent by each thread.
   int num_time ; ///< Number of sample of time spent. Resets when load_balance() is called. 
-  CLp_it_t<d> CLp_it ; ///< Iterator list for fast access to particle contacts
+  CLp_it_t<d,inertiatensor> CLp_it ; ///< Iterator list for fast access to particle contacts
   
   // Array for temporary storing the reaction forces in the parallel part, to run sequencially after, to avoid data race
   vector <vector <Action<d>> > delayed ; ///< Records the delayed Action
@@ -306,8 +306,8 @@ private:
  *                                                                                                   *
  * ***************************************************************************************************/
 
-template <int d>
-void Multiproc<d>::disp_share()
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::disp_share()
 {
   printf("Processor share [%d threads]:\n", P) ;
   for (auto i : share)
@@ -318,8 +318,8 @@ void Multiproc<d>::disp_share()
   printf("\n--------\n") ;
 }
 //=====================================================
-template <int d>
-void Multiproc<d>::split(int N, int P)
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::split(int N, int P)
 {
 double Delta,b1,b2 ;
 double Nd=N ;
@@ -372,8 +372,8 @@ if (fallback)
 share[P]=N ;
 }
 //=====================================================
-template <int d>
-void Multiproc<d>::splitcells(int C)
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::splitcells(int C)
 {
   for (int p=0 ; p<P ; p++)
     sharecell[p] = p*(C/P) ; 
@@ -381,8 +381,8 @@ void Multiproc<d>::splitcells(int C)
 }
 
 //-------------------------------------------------
-template <int d>
-void Multiproc<d>::delaying (int ID, int j, Action<d> & act)
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::delaying (int ID, int j, Action<d> & act)
 {
   delayed_size[ID]++ ;
   if (delayed_size[ID] < delayedj[ID].size())
@@ -398,8 +398,8 @@ void Multiproc<d>::delaying (int ID, int j, Action<d> & act)
     //delayedj[ID].push_back(j) ;
   }
 }
-template <int d>
-void Multiproc<d>::delayingwall (int ID, int j, Action<d> & act)
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::delayingwall (int ID, int j, Action<d> & act)
 {
   delayedwall_size[ID]++ ;
   if (delayedwall_size[ID] < delayedwallj[ID].size())
@@ -416,16 +416,16 @@ void Multiproc<d>::delayingwall (int ID, int j, Action<d> & act)
   }
 }
 //---------------------------------------------
-template <int d>
-void Multiproc<d>::delayed_clean()
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::delayed_clean()
 {
   for (auto & val : delayed_size)
   {
     val=0 ;
   }
 }
-template <int d>
-void Multiproc<d>::delayedwall_clean()
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::delayedwall_clean()
 {
   for (auto & val : delayedwall_size)
   {
@@ -433,8 +433,8 @@ void Multiproc<d>::delayedwall_clean()
   }
 }
 //--------------------------------------------
-template <int d>
-void Multiproc<d>::load_balance(ContactStrategies contactstrategy)
+template <int d, bool inertiatensor>
+void Multiproc<d,inertiatensor>::load_balance(ContactStrategies contactstrategy)
 {
   if (contactstrategy == NAIVE)
     for (int i=0 ; i<P ; i++)
@@ -492,7 +492,7 @@ void Multiproc<d>::load_balance(ContactStrategies contactstrategy)
     printf("\n") ; fflush(stdout) ;*/
 
     share=newshare ;
-    ContactList<d> temp_p, temp_w ;
+    ContactList<d,inertiatensor> temp_p, temp_w ;
 
     for (int i=0 ; i<P ; i++)
     {
@@ -564,8 +564,8 @@ void Multiproc<d>::load_balance(ContactStrategies contactstrategy)
   }
 }
 //--------------------------------------------------------------------------------
-template <int d>
-auto Multiproc<d>::contacts2array (ExportData exprt, cv2d &X, Parameters<d> & P)
+template <int d, bool inertiatensor>
+auto Multiproc<d,inertiatensor>::contacts2array (ExportData exprt, cv2d &X, Parameters<d,inertiatensor> & P)
 {
   vector<vector<double>> res ;
   vector<std::pair<ExportData, int>> contactmapping ; 

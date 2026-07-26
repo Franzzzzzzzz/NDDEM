@@ -112,10 +112,10 @@ extern vector <std::pair<ExportType,ExportData>> * toclean ;
 extern XMLWriter * xmlout ;
 
 
-template <int d>
+template <int d, bool inertiatensor=false>
 class Simulation {
 public:
-    Parameters<d> P ;
+    Parameters<d, inertiatensor> P ;
     int N ;
     std::vector < std::vector <double> > X ;
     std::vector < std::vector <double> > V ;
@@ -145,9 +145,9 @@ public:
     v1d Atmp ;
 
     int numthread=1 ;
-    Multiproc<d> MP ;
-    Cells<d> cells ; 
-    Octree<d> octree ; 
+    Multiproc<d,inertiatensor> MP ;
+    Cells<d,inertiatensor> cells ; 
+    Octree<d,inertiatensor> octree ; 
 
     double t ; int ti ;
     double dt ;
@@ -175,7 +175,7 @@ public:
           omp_set_num_threads(numthread) ;
         #endif
         
-        MP.C.resize(MP.P, Contacts<d>(P)) ; // Empty default contacts are not saved. Need to rebuild them.
+        MP.C.resize(MP.P, Contacts<d,inertiatensor>(P)) ; // Empty default contacts are not saved. Need to rebuild them.
         
         // Iterators are invalidated when saving, need to rebuild them
         if (P.contact_strategy == ContactStrategies::CELLS || P.contact_strategy == ContactStrategies::OCTREE)
@@ -202,7 +202,7 @@ public:
     
     //==========================================================
     Simulation(int NN) {
-        P = Parameters<d>(NN) ;
+        P = Parameters<d, inertiatensor>(NN) ;
         Tools<d>::initialise() ;
         if (!Tools<d>::check_initialised(d)) printf("ERR: Something terribly wrong happened\n") ;
         assert(d<(static_cast<int>(sizeof(int))*8-1)) ; //TODO
@@ -289,7 +289,7 @@ public:
         dt=P.dt ;
         t=0 ; ti=0 ;
         tprevious=clock() ;
-        printf("[INFO] Orientation tracking is %s\n", P.orientationtracking?"True":"False") ;
+        printf("[INFO] Orientation tracking is %d\n", static_cast<int>(P.orientationtracking)) ;
     }
     //-------------------------------------------------------------------
     /** \brief Interpret individual script command from string
@@ -349,7 +349,7 @@ public:
             //if (displacement[i] > maxdisp[0]) {maxdisp[1]=maxdisp[0] ; maxdisp[0]=displacement[i] ; } // ERROR RACE CONDITION ON MAXDISP
 
             // Simpler version to make A evolve (Euler, doesn't need to be accurate actually, A is never used for the dynamics), and Gram-Shmidt orthonormalising after ...
-            if (P.orientationtracking)
+            if (P.orientationtracking == OrientationStrategy::EULER)
             {
                 v1d tmpO (d*d,0), tmpterm1 (d*d,0) ;
                 Tools<d>::skewexpand(tmpO, Omega[i]) ;
@@ -357,6 +357,14 @@ public:
                 for (int dd=0 ; dd<d*d ; dd++)
                     A[i][dd] -= tmpterm1[dd] * dt ;
                 Tools<d>::orthonormalise(A[i]) ;
+            }
+            else if (P.orientationtracking == OrientationStrategy::CAYLEY)
+            {
+                //TODO
+            }
+            else if (P.orientationtracking == OrientationStrategy::EXP)
+            {
+                //TODO
             }
 
             // Boundary conditions ...
@@ -415,10 +423,10 @@ public:
          int ID = omp_get_thread_num();
          double timebeg = omp_get_wtime();
          #endif
-         cpm<d> tmpcpm(0,0,0,0,nullptr) ; 
-         cp<d> tmpcp(0,0,0,nullptr) ; double sum=0 ;
+         cpm<d,inertiatensor> tmpcpm(0,0,0,0,nullptr) ; 
+         cp<d,inertiatensor> tmpcp(0,0,0,nullptr) ; double sum=0 ;
          
-         ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
+         ContactList<d,inertiatensor> & CLw = MP.CLw[ID] ; ContactListMesh<d,inertiatensor> & CLm = MP.CLm[ID] ; 
          CLw.reset(); CLm.reset() ; 
         
          if (P.contact_strategy == ContactStrategies::CELLS)
@@ -431,7 +439,7 @@ public:
          }
          else
          {
-            ContactList<d> & CLp = MP.CLp[ID] ;
+            ContactList<d,inertiatensor> & CLp = MP.CLp[ID] ;
             CLp.reset() ; 
             
             for (int i=MP.share[ID] ; i<MP.share[ID+1] ; i++)
@@ -609,8 +617,8 @@ public:
             int ID = omp_get_thread_num();
             double timebeg = omp_get_wtime();
           #endif
-            ContactList<d> & CLp = MP.CLp[ID] ; ContactList<d> & CLw = MP.CLw[ID] ; ContactListMesh<d> & CLm = MP.CLm[ID] ; 
-            Contacts<d> & C =MP.C[ID] ;
+            ContactList<d,inertiatensor> & CLp = MP.CLp[ID] ; ContactList<d,inertiatensor> & CLw = MP.CLw[ID] ; ContactListMesh<d,inertiatensor> & CLm = MP.CLm[ID] ; 
+            Contacts<d,inertiatensor> & C =MP.C[ID] ;
             v1d tmpcn (d,0) ; v1d tmpvel (d,0) ;
 
             // Particle-particle contacts
@@ -769,7 +777,12 @@ public:
             if (P.Frozen[i]) {Tools<d>::setzero(TorqueOld[i]) ; Tools<d>::setzero(F[i]) ; Tools<d>::setzero(FOld[i]) ; /*Tools<d>::setzero(V[i]) ; */ Tools<d>::setzero(Omega[i]) ; }
             
             Tools<d>::vAddScaled(V[i], dt/2./P.m[i], F[i], FOld[i]) ; //V[i] += (F[i] + FOld[i])*(dt/2./P.m[i]) ;
-            Tools<d>::vAddScaled(Omega[i], dt/2./P.I[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
+            
+            if constexpr (!inertiatensor)
+                Tools<d>::vAddScaled(Omega[i], dt/2. * P.Iinv[i], Torque[i], TorqueOld[i]) ; // Omega[i] += (Torque[i]+TorqueOld[i])*(dt/2./P.I[i]) ;
+            else
+                Tools<d>::vEvolveOmega(Omega[i], A[i], P.Iinv[i], Torque[i], TorqueOld[i], dt/2.) ; 
+            
             if ( !P.Frozen[i] && P.damping > 0.0 ) { 
                 Tools<d>::vSubScaled(Omega[i], P.damping, Omega[i]) ; // BENJY - add damping to Omega
                 Tools<d>::vSubScaled(V[i], P.damping, V[i]) ; // BENJY - add damping to velocity

@@ -17,6 +17,8 @@
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/random.hpp>
 
+#include "../Eigen/Dense"
+
 #define MAXDEFDIM 30 ///< For larger number of dimension,  be taken in particular for periodic boundary conditions
 
 
@@ -184,6 +186,73 @@ static void vAddScaled (v1d &res , double v, cv1d &a, cv1d &b) {for (uint i=0 ; 
 static void vAddScaled (v1d &res , double v, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] += v*a[i] ; } ///< Addition of a scaled vector \f$ res := res + v*a\f$
 static void vSubFew (v1d &res , cv1d &a, cv1d &b)                 {for (uint i=0 ; i<a.size() ; i++) res[i] -= (a[i]+b[i]) ; } ///< Subtraction of 2 vectors \f$ res := res - a - b\f$
 static void vSubScaled (v1d &res , double v, cv1d &a)          {for (uint i=0 ; i<a.size() ; i++) res[i] -= v*a[i] ; } ///< Subtraction of a scaled vector \f$ res := res - v*a\f$
+static void vEvolveOmega (v1d & Omega, cv1d & A, cv1d & Iinv, cv1d & Mnew, cv1d & Mold, double dtover2) 
+{
+  constexpr int dr = d*(d-1)/2 ;
+  std::array<double, dr*dr> Lambda ;
+  std::array<double, dr> tmp1, tmp2 ;
+
+  for (uint i=0 ; i<dr ; i++)
+    tmp1[i] = (Mnew[i] + Mold[i])*dtover2 ;
+
+  for (uint i=0 ; i < dr ; i++) 
+    for (uint j=0 ; j < dr ; j++) 
+    {
+      auto p1 = MASIndex[i]  ;
+      auto p2 = MASIndex[j]  ;
+      Lambda[i*dr+j] = A[p1.first*d+p2.first]*A[p1.second*d+p2.second]-
+                       A[p1.first*d+p2.second]*A[p1.second*d+p2.first] ;
+    }
+
+  for (uint i=0 ; i < dr ; i++)  //Lambda^T x M
+  {
+    tmp2[i] = 0 ;
+    for (uint j=0 ; j < dr ; j++) 
+      tmp2[i] += Lambda[j*dr+i]*tmp1[j] ;
+  }
+
+  for (uint i=0 ; i < dr ; i++)  // I^(-1) x Lambda^T x M
+  {
+    tmp1[i] = 0 ;
+    for (uint j=0 ; j < dr ; j++) 
+      tmp1[i] += Iinv[i*dr+j]*tmp2[j] ;
+  }
+
+  for (uint i=0 ; i < dr ; i++)  // Lambda x I^(-1) x Lambda^T x M
+  {
+    tmp2[i] = 0 ;
+    for (uint j=0 ; j < dr ; j++) 
+      tmp2[i] += Lambda[i*dr+j]*tmp1[j] ;
+    Omega[i] += tmp2[i] ;
+  }
+} 
+
+static void CayleyUpdateOrientation(v1d &R, cv1d &omega, double dt) ///< Update the orientation using the Cayley formula, cf. the class description
+{
+  using MatrixRM = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+  Eigen::Map<MatrixRM> Rmat(R.data(), d, d);
+  thread_local Eigen::MatrixXd Omega(d,d) ;
+
+  int k = 0;
+  for(int i=0;i<d;i++)
+  {
+    Omega(i,i) = 0 ;
+    for(int j=i+1;j<d;j++)
+    {
+        Omega(i,j) = omega[k];
+        Omega(j,i) = -omega[k];
+        ++k;
+    }
+  }
+  
+  thread_local Eigen::MatrixXd A, B, BR ; 
+  A = Eigen::MatrixXd::Identity(d,d) - 0.5*dt*Omega;
+  B = Eigen::MatrixXd::Identity(d,d) + 0.5*dt*Omega;
+  BR = B * Rmat;
+  Rmat = A.partialPivLu().solve(BR);
+}
+///< Evolve the angular velocity using the formula \f$ \Omega := \Omega + \Lambda I^{-1} \Lambda^T M \f$ where \f$ 
+  /// FROM HERE ON THE COMMENT IS AI GENERATED. \Lambda_{ij} = A_{p(i,1)p(j,1)}A_{p(i,2)p(j,2)}-A_{p(i,1)p(j,2)}A_{p(i,2)p(j,1)} \f$ and \f$ p(i) \f$ is the pair of indices corresponding to the i-th component of the skew-symmetric matrix, cf. the class description for more details on matrix storage. This is used to evolve the angular velocity of a particle with a non-scalar inertia tensor, and is based on the formula given in the paper by David Baraff, "Rigid Body Simulation", SIGGRAPH 1997, section 4.3.
 ///@}
 
 /** @name Faster vector operations with error corrections (Kahan summation algorithm)

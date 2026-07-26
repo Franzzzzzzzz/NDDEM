@@ -44,6 +44,7 @@ using json = nddem::json ;
 using namespace std ;
 enum class ExportType {NONE=0, CSV=1, VTK=2, NETCDFF=4, XML=8, XMLbase64=16, CSVA=32, CSVCONTACT=64} ;
 enum class ExportData {NONE=0, POSITION=0x1, VELOCITY=0x2, OMEGA=0x4, OMEGAMAG=0x8, ORIENTATION=0x10, COORDINATION=0x20, RADIUS=0x40, IDS=0x80, FN=0x100, FT=0x200, TORQUE=0x400, GHOSTMASK=0x800, GHOSTDIR=0x1000, BRANCHVECTOR=0x2000, FN_EL=0x4000, FN_VISC=0x8000, FT_EL=0x10000, FT_VISC=0x20000, FT_FRIC=0x40000, FT_FRICTYPE=0x80000, CONTACTPOSITION=0x100000, MASS=0x200000} ; ///< Flags for export data control
+enum class OrientationStrategy {NONE=0, EULER=1, CAYLEY=2, EXP=3} ; ///< Strategy for orientation tracking
 inline ExportType & operator|=(ExportType & a, const ExportType b) {a= static_cast<ExportType>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData & operator|=(ExportData & a, const ExportData b) {a= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return a ; }
 inline ExportData   operator| (ExportData a, ExportData b) {auto c= static_cast<ExportData>(static_cast<int>(a) | static_cast<int>(b)); return c ; }
@@ -54,7 +55,7 @@ inline ExportData & operator<<= (ExportData& w, int u) {w=static_cast<ExportData
 inline bool operator& (ExportType & a, ExportType b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 inline bool operator& (ExportData & a, ExportData b) {return (static_cast<int>(a) & static_cast<int>(b)) ; }
 
-template <int d>
+template <int d, bool inertiatensor>
 class Multiproc ;
 
 /** \brief Small class to handle number generator (ie. first:step:last syntax) */
@@ -124,7 +125,7 @@ std::istream & operator>> (std::istream & in, number_gen<T> & n) {std::string s;
 /** \brief Generic class to handle the simulation set up
  *
  */
-template <int d>
+template <int d, bool inertiatensor>
 class Parameters {
 public :
     Parameters () {Parameters(0) ; }
@@ -148,7 +149,7 @@ public :
         //dumpkind(ExportType::NONE),    //How to dump: 0=nothing, 1=csv, 2=vtk
         //dumplist(ExportData::POSITION),
         Directory ("Output"),
-        orientationtracking(true),
+        orientationtracking(OrientationStrategy::NONE),
         wallforcecompute(false),
         wallforcerequested(false),
         wallforcecomputed(false),
@@ -162,7 +163,10 @@ public :
     {
      N=NN ; r.resize(N,0.5) ; //particle size
      m.resize(N, 1e-2); // Set the masses directly
-     I.resize(N,1) ; //Momentum of inertia (particles are sphere)
+     if constexpr (inertiatensor)
+       Iinv.resize(N, vector<double>(d*(d+1)/2,0)) ; // Inertia tensor
+     else
+       Iinv.resize(N, 0) ; // Inertia momentum
      g.resize(d,0) ; // Initialise gravity
      Frozen.resize(N,false) ;
 
@@ -193,12 +197,12 @@ public :
     
     vector <double> r ; ///< Particle radii
     vector <double> m ; ///< Particle mass
-    vector <double> I ; ///< Particule moment of inertia
+    std::conditional_t<inertiatensor, vector<vector<double>>, vector<double>> Iinv ; ///< Particule moment of inertia (tensor if inertiatensor=true, scalar otherwise)
     vector <double> g ; ///< Gravity vector
     vector <bool> Frozen ; ///< Frozen atom if true
     vector < Boundary<d> > Boundaries ; ///< List of boundaries. Second dimension is {min, max, length, type}.
     string Directory ; ///< Saving directory
-    bool orientationtracking ; ///< Track orientation?
+    OrientationStrategy orientationtracking ; ///< Track orientation?
     bool wallforcecompute ; ///< Compute for on the wall?
     bool wallforcerequested ; ///< Compute for on the wall?
     bool wallforcecomputed ; ///< Compute for on the wall?
@@ -221,7 +225,7 @@ public :
           xml_location = xmlout->get_file_location() ; 
           
         ar(N, tdump, tinfo, T, dt, rho, Kn, Kt, Gamman, Gammat, Mu, Mu_wall, damping, forceinsphere, cellsize, ContactModel, contact_strategy,
-           dumps, xmlstarted, xml_location, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
+           dumps, xmlstarted, xml_location, r, m, Iinv, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
            graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events,
            n_restart, restart_filename, restart_flag 
            ) ; 
@@ -232,7 +236,7 @@ public :
     template <class Archive>
     void load(Archive &ar) {
         ar(N, tdump, tinfo, T, dt, rho, Kn, Kt, Gamman, Gammat, Mu, Mu_wall, damping, forceinsphere, cellsize, ContactModel, contact_strategy,
-           dumps, xmlstarted, xml_location, r, m, I, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
+           dumps, xmlstarted, xml_location, r, m, Iinv, g, Frozen, Boundaries, Directory, orientationtracking, wallforcecompute, wallforcerequested, wallforcecomputed, 
            graddesc_gamma, graddesc_tol, contactforcedump, seed, gravityrotateangle, RigidBodies, Meshes, events,
            n_restart, restart_filename, restart_flag 
            ) ; 
@@ -277,8 +281,8 @@ public :
     void quit_cleanly() ; ///< Close opened dump files in the event of an emergency quit (usually a SIGINT signal to the process)
     void finalise(); ///< Close opened dump files
     void xml_header () ; ///< Write the Xml header (should go into a file dedicated to the writing though ...)
-    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP) ; ///< Dump writing functions
-    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X) ;
+    int dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d,inertiatensor> & MP) ; ///< Dump writing functions
+    int savecsvcontact (FILE * out, ExportData outflags, Multiproc<d,inertiatensor> & MP, cv2d & X) ;
 } ;
 /** @}*/
 
@@ -304,8 +308,8 @@ double nan_or_double (istream & in)
 
 
 /// Some Infos on set_boundaries
-template <int d>
-int Parameters<d>::set_boundaries()
+template <int d, bool inertiatensor>
+int Parameters<d,inertiatensor>::set_boundaries()
 {
     for (int i=0 ; i<d ; i++)
     {
@@ -318,8 +322,8 @@ int Parameters<d>::set_boundaries()
     return 0 ;
 }
 //----------------------------------------------------
-template <int d>
-void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::perform_PBC (v1d & X, uint32_t & PBCFlag)
 {
  for (size_t j=0 ; j<Boundaries.size() ; j++)
  {
@@ -331,8 +335,8 @@ void Parameters<d>::perform_PBC (v1d & X, uint32_t & PBCFlag)
  }
 }
 //----------------------------------------------------
-template <int d>
-void Parameters<d>::perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag)
 {
     if (Boundaries[0].Type == WallType::PBC_LE)
     {
@@ -354,8 +358,8 @@ void Parameters<d>::perform_PBCLE (v1d & X, v1d & V, uint32_t & PBCFlag)
     }
 }
 //----------------------------------------------------
-template <int d>
-void Parameters<d>::perform_PBCLE_move ()
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::perform_PBCLE_move ()
 {
     if (Boundaries[0].Type==WallType::PBC_LE)
     {
@@ -365,8 +369,8 @@ void Parameters<d>::perform_PBCLE_move ()
     }
 }
 //----------------------------------------------------
-template <int d>
-void Parameters<d>::perform_MOVINGWALL ()
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::perform_MOVINGWALL ()
 {
  for (size_t j=0 ; j<Boundaries.size() ; j++)
  {
@@ -378,8 +382,8 @@ void Parameters<d>::perform_MOVINGWALL ()
  }
 }
 //----------------------------------------------------
-template <int d>
-bool Parameters<d>::perform_forceinsphere(v1d & X)
+template <int d, bool inertiatensor>
+bool Parameters<d,inertiatensor>::perform_forceinsphere(v1d & X)
 {
   bool res = false ;
   if (! Boundaries[0].is_sphere())
@@ -424,26 +428,31 @@ bool Parameters<d>::perform_forceinsphere(v1d & X)
  //X[1][:]=np.array([0.21,0.21,0.9,0.2]) ;
  return 0 ;
 }*/
-template <int d>
-int Parameters<d>::init_mass ()
+template <int d, bool inertiatensor>
+int Parameters<d,inertiatensor>::init_mass ()
 {
  for (int i=0 ; i<N ; i++)
    m[i]=rho*Tools<d>::Volume(r[i]) ;
 return 0 ;
 }
 
-template <int d>
-int Parameters<d>::init_inertia ()
+template <int d, bool inertiatensor>
+int Parameters<d,inertiatensor>::init_inertia ()
 {
- for (int i=0; i<N ; i++)
- {
-   I[i]=Tools<d>::InertiaMomentum (r[i], rho) ;
- }
+  if constexpr (!inertiatensor)
+  {
+    for (int i=0; i<N ; i++)
+    {
+      Iinv[i]=1./Tools<d>::InertiaMomentum(r[i], rho) ;
+    }
+  }
+  else
+    printf("[WARN] Inertia tensor initialisation not implemented yet. \n") ;
  return 0 ;
 }
 //---------------------------------------------------
-template <int d>
-void Parameters<d>::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
 {
   ifstream in ;
 
@@ -462,8 +471,8 @@ void Parameters<d>::load_datafile (char path[], v2d & X, v2d & V, v2d & Omega)
   copy_file(p,pcp, fs::copy_options::overwrite_existing);
 }
 //-------------------------------------------------
-template <int d>
-void Parameters<d>::check_events(float time, v2d & X, v2d & V, v2d & Omega)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::check_events(float time, v2d & X, v2d & V, v2d & Omega)
 {
   while (events.size()>0 && events.begin()->first < time)
   {
@@ -486,14 +495,14 @@ std::istream& operator>>(std::istream& in, std::variant<int*,double*,bool*> v)
   }
   return(in) ;}
 //------------------------------------------------------
-template <int d>
-void Parameters<d>::interpret_command (string &in, v2d & X, v2d & V, v2d & Omega)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::interpret_command (string &in, v2d & X, v2d & V, v2d & Omega)
 {
     stringstream B(in) ;
     return (interpret_command(B, X, V, Omega)) ;
 }
-template <int d>
-void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Omega)
 {
   map <string, std::variant<int*,double*,bool*>> SetValueMap = {
      {"Kn",&Kn},
@@ -506,7 +515,6 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
      {"damping",&damping},
      {"T",&T},
      {"tdump",&tdump},
-     {"orientationtracking",&orientationtracking},
      {"tinfo",&tinfo},
      {"dt",&dt},
      //{"skin", &skin},
@@ -578,7 +586,8 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
          else if (word =="OmegaMag") dumplist |= ExportData::OMEGAMAG ;
          else if (word =="Orientation")
          {
-           orientationtracking=true ;
+           if (orientationtracking==OrientationStrategy::NONE) 
+             orientationtracking=OrientationStrategy::EULER ; 
            dumplist |= ExportData::ORIENTATION ;
          }
          else if (word =="Coordination") dumplist |= ExportData::COORDINATION ;
@@ -659,6 +668,11 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
                                                             else if (s=="cells") {contact_strategy = ContactStrategies::CELLS  ; } 
                                                             else if (s=="octree") {contact_strategy = ContactStrategies::OCTREE ; }
                                                             else {printf("[WARN] Unknown contact strategy\n") ; }} ;
+ Lvl0["OrientationTracking"] = [&](){ std::string s ; in >> s ; if (s=="none") orientationtracking=OrientationStrategy::NONE ;
+                                                            else if (s=="euler") orientationtracking=OrientationStrategy::EULER ;
+                                                            else if (s=="cayley") orientationtracking=OrientationStrategy::CAYLEY ;
+                                                            else if (s=="exponential") orientationtracking=OrientationStrategy::EXP ;
+                                                            else {printf("[WARN] Unknown orientation tracking strategy\n") ; }} ;
  Lvl0["gravityangle"] = [&](){ double intensity, angle ; in >> intensity >> angle ;
     Tools<d>::setzero(g) ;
     g[0] = -intensity * cos(angle / 180. * M_PI) ;
@@ -838,27 +852,27 @@ void Parameters<d>::interpret_command (istream & in, v2d & X, v2d & V, v2d & Ome
 //================================================================================================================================================
 
 //=====================================
-template <int d>
-void Parameters<d>::remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::remove_particle (int idx, v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld)
 {
     printf("WARN: it is probably a bad idea to use remove particle which hasn't been tested ... \n") ;
     X.erase (X.begin()+idx) ; V.erase (V.begin()+idx) ;
     A.erase (A.begin()+idx) ; Omega.erase (Omega.begin()+idx) ;
     F.erase (F.begin()+idx) ; FOld.erase (FOld.begin()+idx) ;
     Torque.erase (Torque.begin()+idx) ; TorqueOld.erase (TorqueOld.begin()+idx) ;
-    I.erase(I.begin()+idx) ; m.erase(m.begin()+idx) ; r.erase(r.begin()+idx) ;
+    Iinv.erase(Iinv.begin()+idx) ; m.erase(m.begin()+idx) ; r.erase(r.begin()+idx) ;
     Frozen.erase(Frozen.begin()+idx) ;
     N-- ;
 }
 //--------------------
-template <int d>
-void Parameters<d>::add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::add_particle (/*v2d & X, v2d & V, v2d & A, v2d & Omega, v2d & F, v2d & FOld, v2d & Torque, v2d & TorqueOld*/)
 {
     printf("add_particle NOT IMPLEMENTED YET\n") ;
 }
 //----------------
-template <int d>
-void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::init_locations (char *line, v2d & X, char *extras)
 {
     boost::random::mt19937 rng(seed);
     boost::random::uniform_01<boost::mt19937> rand(rng) ;
@@ -1122,8 +1136,8 @@ void Parameters<d>::init_locations (char *line, v2d & X, char *extras)
         printf("ERR: undefined initial location function.\n") ;
 }
 //-----------------------------
-template <int d>
-void Parameters<d>::init_radii (char line[], v1d & r)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::init_radii (char line[], v1d & r)
 {
   std::istringstream s(line) ;
   std::string word ;
@@ -1172,8 +1186,8 @@ void Parameters<d>::init_radii (char line[], v1d & r)
 
 
 //======================================
-template <int d>
-void Parameters<d>::display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int nct, int ngst)
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::display_info(int tint, v2d& V, v2d& Omega, v2d& F, v2d& Torque, int nct, int ngst)
 {
 static bool first=true ;
 static double Rmax, mmax ;
@@ -1214,8 +1228,8 @@ fflush(stdout) ;
 if (first) first=false ;
 }
 //------------------------------------------
-template <int d>
-void Parameters<d>::xml_header ()
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::xml_header ()
 {
    xmlout->openbranch("boundaries", {make_pair("length", to_string(d*2))}) ;
    if (Boundaries[0].Type==WallType::ROTATINGSPHERE)
@@ -1230,15 +1244,15 @@ void Parameters<d>::xml_header ()
 }
 
 //-----------------------------------------
-template <int d>
-void Parameters<d>::quit_cleanly()
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::quit_cleanly()
 {
   for (auto v : dumps)
     if ((v.first == ExportType::XML) || (v.first == ExportType::XMLbase64))
       xmlout->emergencyclose() ;
 }
-template <int d>
-void Parameters<d>::finalise()
+template <int d, bool inertiatensor>
+void Parameters<d,inertiatensor>::finalise()
 {
   for (auto v : dumps)
     if ((v.first == ExportType::XML) || (v.first == ExportType::XMLbase64))
@@ -1247,8 +1261,8 @@ void Parameters<d>::finalise()
 
 
 //========================================
-template <int d>
-int Parameters<d>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d> & MP)
+template <int d, bool inertiatensor>
+int Parameters<d,inertiatensor>::dumphandling (int ti, double t, v2d &X, v2d &V, v1d &Vmag, v2d &A, v2d &Omega, v1d &OmegaMag, vector<uint32_t> &PBCFlags, v1d & Z, Multiproc<d,inertiatensor> & MP)
 {
   for (auto v : dumps)
   {
@@ -1423,8 +1437,8 @@ return 0 ;
 }
 
 //------------------------------------------------------------------------------
-template <int d>
-int Parameters<d>::savecsvcontact (FILE * out, ExportData outflags, Multiproc<d> & MP, cv2d & X)
+template <int d, bool inertiatensor>
+int Parameters<d,inertiatensor>::savecsvcontact (FILE * out, ExportData outflags, Multiproc<d,inertiatensor> & MP, cv2d & X)
 {
   if (outflags & ExportData::IDS) fprintf(out, "id_i, id_j, ") ;
   if (outflags & ExportData::CONTACTPOSITION || outflags & ExportData::POSITION)

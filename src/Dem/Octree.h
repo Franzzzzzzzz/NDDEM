@@ -7,7 +7,7 @@
 
 
 
-template <int d>
+template <int d, bool inertiatensor>
 class Octree {
 public:  
   int init_cells (std::vector<Boundary<d>> &boundaries, std::vector<double> & r)
@@ -22,7 +22,7 @@ public:
     double smallestdim ; 
     
     do {
-      octree.push_back(Cells<d>()) ; 
+      octree.push_back(Cells<d,inertiatensor>()) ; 
       
       if (lvl==0) octree[lvl].init_cells(boundaries, ds) ; 
       else octree[lvl].init_subcells(boundaries, octree[lvl-1].delta, octree[lvl-1].n_cell) ; 
@@ -75,7 +75,7 @@ public:
     return 0;
   }
   //------------------------------------------------------------
-  int contacts(int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it, ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
+  int contacts(int ID, std::pair<int,int> bounds, CLp_it_t<d,inertiatensor> & CLp_it, ContactList<d,inertiatensor> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
   {
     
     for (char lvl = max_lvl - 1 ; lvl>=0 ; lvl--)
@@ -94,7 +94,7 @@ public:
   }
   
   
-  std::vector<Cells<d>> octree ; 
+  std::vector<Cells<d,inertiatensor>> octree ; 
   std::vector<char> lvl_tree ; 
   char max_lvl=-1 ;   
   

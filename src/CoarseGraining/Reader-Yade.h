@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include "zlib.h"
+#include <cstdint>
 
 class YadeReader : public Reader {
 public:

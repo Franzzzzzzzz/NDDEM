@@ -117,7 +117,7 @@ void CoarseGraining::setup_CG ()
     for (auto i : P.extrafields)
         C->add_extra_field(i.name, i.order, i.type) ;
     //if (P.window == Windows::LucyND_Periodic)
-        C->setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta, P.boundaries) ;
+        C->setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta, P.boundaries, P.convolvingwindow) ;
     //else
     //    C->setWindow(P.window,P.windowsize) ;
     pipeline = C->set_flags(P.flags) ;

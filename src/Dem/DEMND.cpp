@@ -13,9 +13,30 @@
 #ifndef MAXDIM 
 #define MAXDIM 4
 #endif
+#ifndef INERTIATENSOR_MODE
+#define INERTIATENSOR_MODE 0  // Default: false
+#endif
 #include "Preprocessor_macros.h"
-#define MACRO(r, state) \
-    case BOOST_PP_TUPLE_ELEM(2, 0, state): templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state)>(argv);break;
+
+// Macro definitions for templatedmain instantiation
+#if INERTIATENSOR_MODE == 0
+    // Only false
+    #define MACRO(r, state) \
+        case BOOST_PP_TUPLE_ELEM(2, 0, state): templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state), false>(argv);break;
+#elif INERTIATENSOR_MODE == 1
+    // Only true
+    #define MACRO(r, state) \
+        case BOOST_PP_TUPLE_ELEM(2, 0, state): templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state), true>(argv);break;
+#else
+    // Both false and true - need to handle with a wrapper
+    #define MACRO(r, state) \
+        case BOOST_PP_TUPLE_ELEM(2, 0, state): { \
+            int inertia_mode = std::getenv("INERTIATENSOR") ? atoi(std::getenv("INERTIATENSOR")) : 0; \
+            if (inertia_mode == 0) templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state), false>(argv); \
+            else templatedmain<BOOST_PP_TUPLE_ELEM(2, 0, state), true>(argv); \
+            break; \
+        }
+#endif
 
 //===================================================================================================
 vector <std::pair<ExportType,ExportData>> * toclean ;
@@ -35,11 +56,11 @@ void sig_handler (int p)
 
 /** \brief Main simulation run. All the simulation is handled by this function.
  */
-template <int d>
+template <int d, bool inertiatensor = false>
 int templatedmain (char * argv[])
 {
     int NN=atoi(argv[2]) ;
-    Simulation<d> S(NN) ;
+    Simulation<d, inertiatensor> S(NN) ;
     if (strcmp(argv[3], "default"))
         S.init_from_file (argv[3]) ;
     

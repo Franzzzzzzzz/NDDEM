@@ -7,6 +7,28 @@
 set (max_dimension "5" CACHE STRING "Maximum simulation dimension. Higher requires more compile time, and lead to larger executable.")
 add_compile_definitions(MAXDIM=${max_dimension})
 
+# Inertia tensor option
+# Usage: cmake -DINERTIATENSOR=false|true|both
+# - false: Only compile with inertiatensor=false (default, fastest compilation)
+# - true:  Only compile with inertiatensor=true
+# - both:  Compile both versions and runtime selection via INERTIATENSOR environment variable
+set(INERTIATENSOR "false" CACHE STRING "Inertia tensor parameter: false, true, or both")
+set_property(CACHE INERTIATENSOR PROPERTY STRINGS "false" "true" "both")
+
+if(INERTIATENSOR STREQUAL "false")
+    add_compile_definitions(INERTIATENSOR_MODE=0)
+    message(STATUS "Building with inertiatensor = false")
+elseif(INERTIATENSOR STREQUAL "true")
+    add_compile_definitions(INERTIATENSOR_MODE=1)
+    message(STATUS "Building with inertiatensor = true")
+elseif(INERTIATENSOR STREQUAL "both")
+    add_compile_definitions(INERTIATENSOR_MODE=2)
+    message(STATUS "Building with inertiatensor = both (false and true)")
+else()
+    message(FATAL_ERROR "INERTIATENSOR must be 'false', 'true', or 'both'")
+endif()
+
+
 
 set(VALID_BUILD_TYPES "Debug" "RelWithDebInfo" "Release" "PerfTracking")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${VALID_BUILD_TYPES})

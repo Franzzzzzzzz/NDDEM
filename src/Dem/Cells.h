@@ -40,7 +40,7 @@ public:
 /** \brief All the cells making the space, with related function for creating the cell array, neighbour arrays etc. 
  * Currently non implemented TODO: no pbc handling, no handling of moving boundaries. 
  */
-template <int d>
+template <int d, bool inertiatensor>
 class Cells {
 public: 
   int init_cells (std::vector<Boundary<d>> &boundaries, double ds) ; 
@@ -51,16 +51,16 @@ public:
   std::vector<std::vector<double>> boundary_handler (std::vector<Boundary<d>> &boundaries) ;
   int allocate_to_cells (std::vector<std::vector<double>> & X) ; 
   int allocate_single (std::vector<double> & X, int grainid) ; 
-  int contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
-                ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ; 
-  int contacts_external (int ID, Cells<d> &ocell, int delta_lvl, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
-                         ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ;
-  int contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d> & CLp_it, 
-                          ContactList<d> & CLnew,std::vector<std::vector<double>> const & X, 
-                          std::vector<double> const &r, cp<d> & tmpcp ) ; 
-  int contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, CLp_it_t<d> & CLp_it, 
-                               ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp ) ;
-  bool cell_contact_insert (int ID, CLp_it_t<d> & CLp_it, const cp<d>& a) ; 
+  int contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d,inertiatensor> & CLp_it,
+                ContactList<d,inertiatensor> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ; 
+  int contacts_external (int ID, Cells<d,inertiatensor> &ocell, int delta_lvl, std::pair<int,int> bounds, CLp_it_t<d,inertiatensor> & CLp_it,
+                         ContactList<d,inertiatensor> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement) ;
+  int contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d,inertiatensor> & CLp_it, 
+                          ContactList<d,inertiatensor> & CLnew,std::vector<std::vector<double>> const & X, 
+                          std::vector<double> const &r, cp<d,inertiatensor> & tmpcp ) ; 
+  int contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, CLp_it_t<d,inertiatensor> & CLp_it, 
+                               ContactList<d,inertiatensor> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d,inertiatensor> & tmpcp ) ;
+  bool cell_contact_insert (int ID, CLp_it_t<d,inertiatensor> & CLp_it, const cp<d,inertiatensor>& a) ; 
   int clear_all () ; 
   
   //-------------------------------------------
@@ -161,8 +161,8 @@ public:
  *                                                                                                   *
  * ***************************************************************************************************/
 
-template <int d>
-std::vector<std::vector<double>> Cells<d>::boundary_handler (std::vector<Boundary<d>> &boundaries)
+template <int d, bool inertiatensor>
+std::vector<std::vector<double>> Cells<d,inertiatensor>::boundary_handler (std::vector<Boundary<d>> &boundaries)
 {
   std::vector<std::vector<double>> res (d, std::vector<double>(2,0)) ;
 
@@ -218,8 +218,8 @@ std::vector<std::vector<double>> Cells<d>::boundary_handler (std::vector<Boundar
 }
 
 //------------------------------------------------------------------------------------
-template <int d>
-int Cells<d>::init_subcells (std::vector<Boundary<d>> &bounds, double delta_super[], const std::vector<int> & n_cell_super)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::init_subcells (std::vector<Boundary<d>> &bounds, double delta_super[], const std::vector<int> & n_cell_super)
 {
   init_allocate() ; 
   for (int i=0 ; i<d ; i++)
@@ -232,8 +232,8 @@ int Cells<d>::init_subcells (std::vector<Boundary<d>> &bounds, double delta_supe
   return 0; 
 }
 //-------------------------------------------
-template <int d>
-int Cells<d>::init_cells(std::vector<Boundary<d>> &bounds, double ds)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::init_cells(std::vector<Boundary<d>> &bounds, double ds)
 {
   printf("CELL SIZE: %g\n", ds) ; 
 
@@ -250,8 +250,8 @@ int Cells<d>::init_cells(std::vector<Boundary<d>> &bounds, double ds)
   return 0 ; 
 }  
 //-------------------------------------------
-template <int d>
-int Cells<d>:: init_allocate ()
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>:: init_allocate ()
 {
   n_cell.resize(d,0);
   cum_n_cell.resize(d+1,0) ; 
@@ -259,8 +259,8 @@ int Cells<d>:: init_allocate ()
   return 0; 
 }
 //-------------------------------------------
-template <int d>
-int Cells<d>::init_finalise(std::vector<Boundary<d>> &bounds)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::init_finalise(std::vector<Boundary<d>> &bounds)
 {
   auto boundaries = boundary_handler(bounds) ;
   cum_n_cell[0] = 1 ; 
@@ -428,8 +428,8 @@ int Cells<d>::init_finalise(std::vector<Boundary<d>> &bounds)
   return 0 ; 
 }
 //=================================================================
-template <int d>
-int Cells<d>::allocate_to_cells (std::vector<std::vector<double>> & X)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::allocate_to_cells (std::vector<std::vector<double>> & X)
 {
   std::vector<int> v (d,0) ; 
   
@@ -451,8 +451,8 @@ int Cells<d>::allocate_to_cells (std::vector<std::vector<double>> & X)
   return 0 ; 
 }
 //=================================================================
-template <int d>
-int Cells<d>::clear_all ()
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::clear_all ()
 {
   //printf("==> %ld ", cells.size()) ; fflush(stdout) ; 
   for (size_t i=0 ; i<cells.size() ; i++) 
@@ -460,8 +460,8 @@ int Cells<d>::clear_all ()
   return 0 ;
 }
 //=================================================================
-template <int d>
-int Cells<d>::allocate_single (std::vector<double> & X, int grainid)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::allocate_single (std::vector<double> & X, int grainid)
 {
   std::vector<int> v (d,0) ; 
   
@@ -478,13 +478,13 @@ int Cells<d>::allocate_single (std::vector<double> & X, int grainid)
   return id ; 
 }
 //=================================================================
-template <int d>
-int Cells<d>::contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
-                        ContactList<d> & CLnew, 
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d,inertiatensor> & CLp_it,
+                        ContactList<d,inertiatensor> & CLnew, 
                         std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
 {
   auto [cell_first, cell_last] = bounds ; 
-  cp<d> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
+  cp<d,inertiatensor> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
   double sum=0 ;
   int ncontact=0 ; 
   //printf("B%d ", ID) ; fflush(stdout) ; 
@@ -591,8 +591,8 @@ int Cells<d>::contacts (int ID, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
   return 0 ; 
 }
 //-----------------------------------------------------------------------------
-template <int d>
-bool Cells<d>::cell_contact_insert (int ID, CLp_it_t<d> & CLp_it, const cp<d>& a)
+template <int d, bool inertiatensor>
+bool Cells<d,inertiatensor>::cell_contact_insert (int ID, CLp_it_t<d,inertiatensor> & CLp_it, const cp<d,inertiatensor>& a)
  { 
      if (CLp_it.it_array_beg[a.i] == CLp_it.null_list.v.begin()) return false ; 
      //for (auto it = CLp_it.it_array_beg[a.i] ; it != CLp_it.it_array_end[a.i] ; it++)
@@ -611,10 +611,10 @@ bool Cells<d>::cell_contact_insert (int ID, CLp_it_t<d> & CLp_it, const cp<d>& a
  }
 
 //========================================================================================
-template <int d>
-int Cells<d>::contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d> & CLp_it, 
-                                  ContactList<d> & CLnew, 
-                                  std::vector<std::vector<double>> const & X, std::vector<double> const &r, cp<d> & tmpcp)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d,inertiatensor> & CLp_it, 
+                                  ContactList<d,inertiatensor> & CLnew, 
+                                  std::vector<std::vector<double>> const & X, std::vector<double> const &r, cp<d,inertiatensor> & tmpcp)
 {
  double sum ;
  for (size_t ii=0 ; ii<c1.incell.size() ; ii++)
@@ -636,9 +636,9 @@ int Cells<d>::contacts_cell_cell (int ID, Cell & c1, Cell & c2, CLp_it_t<d> & CL
   return 0;
 }
 //-------------------------------------------------------------------
-template <int d>
-int Cells<d>::contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, CLp_it_t<d> & CLp_it,
-                                       ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d> & tmpcp)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghost, bitdim ghostdir, CLp_it_t<d,inertiatensor> & CLp_it,
+                                       ContactList<d,inertiatensor> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement, cp<d,inertiatensor> & tmpcp)
 {      
  double sum ; 
  for (size_t ii=0 ; ii<c1.incell.size() ; ii++)
@@ -665,12 +665,12 @@ int Cells<d>::contacts_cell_ghostcell (int ID, Cell & c1, Cell & c2, bitdim ghos
  return 0;
 }
 //=========================================================================================
-template <int d>
-int Cells<d>::contacts_external (int ID, Cells<d> &ocell, int delta_lvl, std::pair<int,int> bounds, CLp_it_t<d> & CLp_it,
-                                 ContactList<d> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
+template <int d, bool inertiatensor>
+int Cells<d,inertiatensor>::contacts_external (int ID, Cells<d,inertiatensor> &ocell, int delta_lvl, std::pair<int,int> bounds, CLp_it_t<d,inertiatensor> & CLp_it,
+                                 ContactList<d,inertiatensor> & CLnew, std::vector<std::vector<double>> const & X, std::vector<double> const &r, double LE_displacement)
 {
   auto [cell_first, cell_last] = bounds ; 
-  cp<d> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
+  cp<d,inertiatensor> tmpcp(0,0,0,nullptr) ; tmpcp.persisting = true ; 
 
   for (int c=cell_first ; c<cell_last ; c++)
   {

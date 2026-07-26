@@ -30,7 +30,7 @@ First indentation level keyword must be followed by one of the second level inde
   - `Mu`: friction coefficient between grains
   - `Mu_wall`: friction coefficient between wall and grains
   - `damping`: global damping coefficient
-  - `orientationtracking`: calculate grain orientation or not (expect a true or false value)
+  - `orientationtracking`: calculate grain orientation or not (integer value: 0 does not evolve orientation, 1 uses Euler integration and Graham Shmidt renormalisation, 2 uses Caylan integration, 3 uses exponential integration)
   - `skin`: skin size [DEPRECATED, DO NOT USE]
   - `gradientdescent_gamma`: decay rate when used for gradient descent algorithm (only for wall ELLIPSE currently)
   - `gradientdescent_tol`: tolerance for stopping the gradient descent algo. 

@@ -23,7 +23,9 @@ vector<vector<double>> LiggghtsReader::get_bounds()
     return res ;
   }
   else
+  {
     return boundaries ;
+  }
 }
 //-----------------------------------------------------------
 vector<double> LiggghtsReader::get_minmaxradius()

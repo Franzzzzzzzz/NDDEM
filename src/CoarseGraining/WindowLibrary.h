@@ -1,5 +1,5 @@
 #include <random>
-enum class Windows {Rect3D, Sphere3DIntersect, Sphere3DIntersect_MonteCarlo, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic, RVE} ;
+enum class Windows {Rect3D, Sphere3DIntersect, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic, RVE, Dirac3D, MonteCarloIntersect3D} ;
 
 /** \brief A window base class that needs to be specialised to a specific CG window
  */
@@ -90,6 +90,27 @@ public:
   LibRectND(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
   double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) {} return 1/a ;}}
 };
+//---------------------
+class LibDirac3D : public LibBase {
+public:
+    LibDirac3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ;}    
+    double distance(int id, v1d loc)
+    {
+        double dst=0 ;
+        for (int i=0 ; i<d ; i++)
+            dst+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ;
+        dst= sqrt(dst) ;
+        double r = data->radius[id] ;
+        if (dst > r)
+            return 0;
+        else
+        {
+            return data->mass[id] / (4./3.*M_PI*r*r*r) ; 
+        }
+    }
+    
+    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
+} ; 
 //---------------------
 class LibSphere3DIntersect : public LibBase {
 public:
@@ -276,18 +297,19 @@ public:
     virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
 };
 //---------------------------------
-class LibSphere3DIntersect_MonteCarlo : public LibBase {
-public:
-    LibSphere3DIntersect_MonteCarlo (struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=1./(4./3.*M_PI*w*w*w) ; 
+class LibMonteCarloIntersect3D : public LibBase {
+public: 
+    LibMonteCarloIntersect3D (struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; 
         gen=std::mt19937(123457); random=std::uniform_real_distribution<double>(-1.0, 1.0) ; }
-    double cst ;
-    double result ;
-    double distance(int id, v1d loc)
+    
+    double distance (int id, v1d loc)
     {
+        if (win == nullptr) printf("ERROR: window needs to be set to use the LibMonteCarlo Intersect") ; 
+        
         if (data->superquadric.size()==0 || data->superquadric[0] == nullptr)
         {
             //printf("INFO: prefer LibSphere3DIntersect for spherical particles\n") ; 
-            int count=0 ; 
+            double weight=0 ;
             double k[3] = {loc[0]-data->pos[0][id], loc[1]-data->pos[1][id], loc[2]-data->pos[2][id]} ; 
             double x, y, z ;             
             for (int i=0 ; i<Nmc ; i++)
@@ -305,9 +327,9 @@ public:
                 if ( (x*data->radius[id] - k[0])*(x*data->radius[id] - k[0]) + 
                          (y*data->radius[id] - k[1])*(y*data->radius[id] - k[1]) + 
                          (z*data->radius[id] - k[2])*(z*data->radius[id] - k[2]) < w*w)
-                    {count ++ ;}
+                    {weight += win->window(r) ;}
             }
-            return cst * (count/(double)Nmc) ; 
+            return weight/(double)Nmc ; 
         }
         else
         {
@@ -318,7 +340,8 @@ public:
             if ( kprime.x()*kprime.x()+kprime.z()*kprime.z()+kprime.z()*kprime.z() > pow(w+std::max(data->superquadric[0][id], std::max(data->superquadric[1][id], data->superquadric[2][id])),2))
                 return 0 ; 
             
-            double x, y, z ; int count=0 ; 
+            double weight=0 ;
+            double x, y, z ; 
             for (int i=0 ; i<Nmc ; i++)
             {
                 double r = cbrt(abs(random(gen))) ;
@@ -335,12 +358,11 @@ public:
                  if ( (x*data->superquadric[0][id]-kprime.x())*(x*data->superquadric[0][id]-kprime.x()) + 
                       (y*data->superquadric[1][id]-kprime.y())*(y*data->superquadric[1][id]-kprime.y()) + 
                       (z*data->superquadric[2][id]-kprime.z())*(z*data->superquadric[2][id]-kprime.z()) < w*w ) // In sphere?
-                     count ++ ; 
+                      {weight += win->window(r) ;}
             }
-            return cst * (count/(double)Nmc) ;
+            return weight/(double)Nmc ;
         }
-        
-    }
+    }    
     double cutoff (void) {
         double maxr=0 ;
         if (data->N==0) return 2*w ;
@@ -350,13 +372,16 @@ public:
         return maxr+w ;
     }
     double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
-    double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
+    double windowreal (double r) {return win->window(r) ; }
     virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
+    
+    LibBase * win = nullptr ; 
     
 private: 
     int Nmc=100 ;
     std::mt19937 gen;
-    std::uniform_real_distribution<double> random;
+    std::uniform_real_distribution<double> random;    
+    
 };
 
 //---------------------

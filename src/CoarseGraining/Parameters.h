@@ -26,6 +26,7 @@ public:
 
   Windows window = Windows::Lucy3D ;
   double windowsize ;
+  bool convolvingwindow=false ; 
   vector<bool> periodicity ;
   vector<double>delta ;
 
@@ -102,6 +103,7 @@ void Param::from_json(json &j)
                 printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final', 'Pre pass 5', 'Intermediate and pre pass 5'). Case sensitive\n") ;
         }
         else if (v.key() == "window") {window = identify_window(v.value().get<string>()); }
+        else if (v.key() == "windowconvolution") { convolvingwindow = true ;}
         else if (v.key() == "periodicity") {periodicity = v.value().get<decltype(periodicity)>();}
         else if (v.key() == "density") { default_density=v.value().get<double>() ; }
         else if (v.key() == "radius") { default_radius=v.value().get<double>() ; }
@@ -152,7 +154,8 @@ void Param::post_init()
         printf("//%d//", maxT) ;
         if (maxT<0) maxT=0 ;
     }
-    if (!requiredfieldset["boundaries"]) boundaries= files[0].reader->get_bounds() ;
+    if (!requiredfieldset["boundaries"]) {boundaries= files[0].reader->get_bounds() ; 
+    printf("%g %g %g %g %g %g\n", boundaries[0][0], boundaries[0][1], boundaries[0][2], boundaries[1][0], boundaries[1][1], boundaries[1][2]) ; fflush(stdout) ; }
 
     if ((boundaries.size() != 2 && boundaries.size() != 3) || boundaries[0].size() != static_cast<unsigned int>(dim) || boundaries[1].size()!=static_cast<unsigned int>(dim))
         printf("ERR: dimension of the boundaries is not consistent (should be '2 x dimension' or '3 x dimension' if including delta)\n") ;
@@ -212,10 +215,10 @@ Windows Param::identify_window(std::string windowstr)
     else if ( windowstr=="Rect3DIntersect")  {printf("====> DEPRECATED: misleading name, use Sphere3DIntersect instead. <=======\n") ; return Windows::Sphere3DIntersect ;}
     else if ( windowstr=="Sphere3DIntersect") return Windows::Sphere3DIntersect ;
     else if ( windowstr=="SphereNDIntersect") return Windows::SphereNDIntersect ;
-    else if ( windowstr=="Sphere3DIntersect_MonteCarlo") return Windows::Sphere3DIntersect_MonteCarlo ; 
     else if ( windowstr=="Lucy3D") return Windows::Lucy3D ;
     else if ( windowstr=="Hann3D") return Windows::Hann3D ;
     else if ( windowstr=="RectND") return Windows::RectND ;
+    else if ( windowstr=="Dirac3D") return Windows::Dirac3D ;
     else if ( windowstr=="LucyND") return Windows::LucyND ;
     else if ( windowstr=="LucyND_Periodic") return Windows::LucyND_Periodic ;
     else if ( windowstr=="Lucy3DFancyInt")  return Windows::Lucy3DFancyInt;

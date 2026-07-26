@@ -18,30 +18,30 @@
 
 /** \brief Calculate contact forces
  */
-template <int d>
+template <int d, bool inertiatensor=false>
 class Contacts
 {
 public:
-    Contacts (Parameters<d> &PP) ;
+    Contacts (Parameters<d,inertiatensor> &PP) ;
 
     //int N ; ///< Number of particles // These and following should really be const but that's a pain for assignements
-    Parameters<d> *P ; ///< Pointer to the Parameters structure.
+    Parameters<d,inertiatensor> *P ; ///< Pointer to the Parameters structure.
     vector < double > Torquei ; ///< Torque on particle i
     vector < double > Torquej ; ///< Torque on particle j
     vector < double > vrel ; ///< Relative velocity
 
     void particle_particle   ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) ; ///< Force & torque between 2 particles
+                               cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d,inertiatensor> & Contact, bool isdumptime) ; ///< Force & torque between 2 particles
     void particle_wall       ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                               cv1d & cn, cp<d> & Contact) ; ///< Force & torque between a particle and a wall
+                               cv1d & cn, cp<d,inertiatensor> & Contact) ; ///< Force & torque between a particle and a wall
     void particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                               cv1d & cn, cv1d & Vj, cp<d> & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
-    void particle_mesh       ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm<d> & Contact) ; ///< Force & torque between particle and mesh
+                               cv1d & cn, cv1d & Vj, cp<d,inertiatensor> & Contact) ; ///< Force & torque between a particle and a moving wall. Vj is the velocity of the wall at the contact point.
+    void particle_mesh       ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm<d,inertiatensor> & Contact) ; ///< Force & torque between particle and mesh
     void (Contacts::*particle_ghost) (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
+                                      cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d,inertiatensor> & Contact, bool isdumptime) ; ///< Function pointer to the function to calculate the ghost-to-particle contact forces
 
     void particle_ghost_regular (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime)
+                                 cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d,inertiatensor> & Contact, bool isdumptime)
     {
         vector <double> loc (d, 0) ;
         loc=Xj ;
@@ -57,7 +57,7 @@ public:
 
 
     void particle_ghost_LE (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
+                            cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d,inertiatensor> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
     {
         vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ; 
@@ -91,7 +91,7 @@ public:
     } ///< Calculate the particle to (potentially) Lees-Edward ghost contact
 
     void particle_ghost_LE_cells (cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                  cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
+                                  cv1d & Xj, cv1d & Vj, cv1d &Omegaj, double rj, double mj, cp<d,inertiatensor> & Contact, bool isdumptime) /*, FILE * debug = nullptr*/
     {
         vector <double> loc (d, 0) ;
         //if (debug == nullptr) n= 1 ;
@@ -146,8 +146,8 @@ private:
  *                                                                                                   *
  * ***************************************************************************************************/
 
-template <int d>
-Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
+template <int d, bool inertiatensor>
+Contacts<d,inertiatensor>::Contacts (Parameters<d,inertiatensor> &PP) : P(&PP)
 {
 
   Torquei.resize(d*(d-1)/2, 0) ;
@@ -167,9 +167,9 @@ Contacts<d>::Contacts (Parameters<d> &PP) : P(&PP)
 
 //--------------------------------------------------------------------------------------
 //---------------------- particle particle contact ----------------------------
-template <int d>
-void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp<d> & Contact, bool isdumptime)
+template <int d, bool inertiatensor>
+void Contacts<d,inertiatensor>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double ri, double mi,
+                                     cv1d & Xj, cv1d & Vj, cv1d & Omegaj, double rj, double mj, cp<d,inertiatensor> & Contact, bool isdumptime)
 {
   double kn, kt, gamman, gammat ;
   contactlength=Contact.contactlength ;
@@ -257,9 +257,9 @@ void Contacts<d>::particle_particle (cv1d & Xi, cv1d & Vi, cv1d & Omegai, double
 }
 
 //---------------------- particle wall contact ----------------------------
-template <int d>
-void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
-                                  cv1d & cn, cp<d> & Contact)
+template <int d, bool inertiatensor>
+void Contacts<d,inertiatensor>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
+                                  cv1d & cn, cp<d, inertiatensor> & Contact)
                                   //int j, int orient, cp & Contact)
 {
   contactlength=Contact.contactlength ;
@@ -327,9 +327,9 @@ void Contacts<d>::particle_wall ( cv1d & Vi, cv1d &Omegai, double ri, double mi,
 }
 
 //---------------------- particle moving wall contact ----------------------------
-template <int d>
-void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
-                                        cv1d & cn, cv1d & Vj, cp<d> & Contact)
+template <int d, bool inertiatensor>
+void Contacts<d,inertiatensor>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, double mi,
+                                        cv1d & cn, cv1d & Vj, cp<d, inertiatensor> & Contact)
 {
   contactlength=Contact.contactlength ;
 
@@ -397,8 +397,8 @@ void Contacts<d>::particle_movingwall ( cv1d & Vi, cv1d & Omegai, double ri, dou
 }
 
 //------------------------- Particle mesh contact --------------------------------------
-template <int d>
-void Contacts<d>::particle_mesh ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm<d> & Contact)
+template <int d, bool inertiatensor>
+void Contacts<d,inertiatensor>::particle_mesh ( cv1d & Xi, cv1d & Vi, cv1d &Omegai, double ri, double mi, cpm<d,inertiatensor> & Contact)
 {
   contactlength=Contact.contactlength ;
 
