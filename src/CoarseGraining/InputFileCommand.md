@@ -38,16 +38,20 @@ The actual coarse-graining is performed in 5 pass, refered as below. Each pass h
         - Angle of the eigenvector corresponding to the largest eigenvalue: `evec1_theta`, `evec1_phi`. Angles are in degrees, the spherical coordinates are theta the angle from the z direction, phi the angle in the xy plane counted from x.
         - Invariants: `trace`, `pressure`, etc.
         - Other: `dzeta`, with $$\dzeta = \sqrt{0.5 \left ( (ev1-ev2)^2 + (ev2-ev3)^2 + (ev3-ev1)^2 \right ) } $$.
-- `boxes`: array. Number of boxes in each dimension. 
+- `boxes`: array. Number of boxes in each dimension. `[[x0min, x1min, x2min ...], [x0max, x1max, x2max ...]]`
 - `boundaries`: volume that is coarse-grained. Do not specify in order to process the whole simulation (if the simulation bounds are saved in the input file).
 - `window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]`: shape of the averaging window. `Rect3D` is a misnommer, as it is actually a sphere 3D.
 - `window size`: size of the averaging window.
+- `save window`: integer. for debugging mostly, export a vtk file of the window corresponding to the coarse graining point indicated. 
 - `extra fields`: array of extrafield objects, to allow for computation of arbitrary fields. 
     - `name`: name of the field to compute. Should be unique.
     - `type: [Particle | Contact | Fluctuation]` -- Type of field. `Particle` will be calculated during Pass 1, `Contact` and `Fluctuation` are not implemented as of 2022-09-26.
     - `tensor order: [0|1|2]` -- 0 is scalar, 1 is vector, 2 is second order tensor. 
     
-
+##### Advanced features
+- `windowconvolution`: the window used will be convolved with the actual particle shape. Currently the integral is performed through Monte-Carlo integration. 
+- `euler angle boxes`: allow for coarse-graining along different window orientation. Three integer representing the number of angles along the roll, pitch, yaw, in that order. 
+- `euler angle boundaries`: ranges to use for the euler angles, in degrees. The full range is used (ie. there are boxes with center at the min and max). 
 
 #### Time handling
 - `skip`: number of timestep to skip
@@ -55,4 +59,6 @@ The actual coarse-graining is performed in 5 pass, refered as below. Each pass h
 - `time average: [None | Intermediate | Final | Intermediate and Final | Pre pass 5 | Intermediate and pre pass 5]`: when to time average. `Intermediate` averages before pass 2 to better calculate the fluctuations. `Final` averages the final fields after having calculated derived fields. `Pre pass 5` perform the average first, and then calculate the derived fields.  
 
 - `savefile`: name of the final file (no extension)
-- `saveformat: [mat | vtk | numpy | netCDF]`: output file format. Can be an array for multiple output format at once. 
+- `saveformat: [csv | mat | vtk | numpy | netCDF]`: output file format. Can be an array for multiple output format at once. 
+    - `csv` can be given `stdout` or `stderr` to write to the terminal, or pipe
+    -  ̀vtk` only properly works in 3D

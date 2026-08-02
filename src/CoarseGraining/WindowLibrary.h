@@ -1,6 +1,10 @@
 #include <random>
-enum class Windows {Rect3D, Sphere3DIntersect, SphereNDIntersect, Lucy3D, Lucy3DFancyInt,  Hann3D, RectND, LucyND, LucyND_Periodic, RVE, Dirac3D, MonteCarloIntersect3D} ;
-
+#include <optional>
+enum class Windows {Rect3D, RectND, Hann3D,
+                    Sphere3DIntersect, SphereNDIntersect, 
+                    Lucy3D, Lucy3DFancyInt, Lucy3D_half, Lucy3D_scale, LucyND, LucyND_Periodic,
+                    Dirac3D, MonteCarloIntersect3D, RVE} ;
+using cquat = const Eigen::Quaternion<double> ;
 /** \brief A window base class that needs to be specialised to a specific CG window
  */
 class LibBase {
@@ -11,19 +15,58 @@ public:
 
     struct Data * data ;
     double w, d ;
+    std::optional<std::array<double,3>> mainaxis={} ; 
 
-    virtual double window (double) = 0 ;  //Purely virtual, need to be defined in derived classes
-    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc) {
-        double rp=distance(p, loc) ;
-        double rq=distance(q, loc) ;
-        double wpqs = window_avg (rp, rq) ;
-        double wpqf = window_int (rp, rq) ;
+    virtual double window_weight (int, cv1d &, cquat &) = 0 ;  //Purely virtual, need to be defined in derived classes
+    virtual std::pair<double,double> window_contact_weight (int p, int q, cv1d & loc, cquat & orient ) {
+        double wpqs = window_avg (p, q, loc, orient) ;
+        double wpqf = window_int (p, q, loc, orient) ;
         return (make_pair(wpqs, wpqf)) ;
-    }
-    virtual double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
-    virtual double window_avg (double r1, double r2) {return (0.5*(window(r1)+window(r2))) ; }
-    virtual double distance (int id, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ; return sqrt(res) ; } ///< function for mixed particle id / vector informations.
+    }    
+    virtual double distance (int id, cv1d &loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ; return sqrt(res) ; } ///< function for mixed particle id / vector informations.
     virtual double cutoff (void) {return 2.5*w ;}
+    virtual double window_function(double r) {return 0 ;} ; 
+    
+    int export_window (std::string filename, cv1d & loc, cquat & orient)
+    {
+        int npts = 21 ;
+        double dx=2*w/(double)(npts-1) ; 
+        double radius = data->radius[0] ; 
+        struct Data * backup = data ; 
+        data = new struct Data ; 
+        double location[3][1] ;
+        data->pos.push_back(&location[0][0]) ;
+        data->pos.push_back(&location[1][0]) ;
+        data->pos.push_back(&location[2][0]) ;
+        data->radius = &radius ; 
+        
+        FILE *out ; 
+        out=fopen((filename+"-window.vtk").c_str(), "w") ;
+        if (out==NULL) {printf("ERR: Cannot open file to write to.") ; return 1 ; }
+        fprintf(out, "# vtk DataFile Version 2.0\nWindowFunction\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\nORIGIN %g %g %g\nSPACING %g %g %g\n", npts, npts, npts, loc[0]-w, loc[1]-w, loc[2]-w, dx, dx, dx) ;
+        fprintf(out, "POINT_DATA %d\n", npts*npts*npts) ;
+        fprintf(out, "SCALARS windowvalue double \nLOOKUP_TABLE default \n") ;
+        for (int z=0 ; z<npts ; z++)
+        {
+          for (int y=0 ; y<npts ; y++)
+              for (int x=0 ; x<npts ; x++)
+              {
+                  location[0][0] = loc[0]-w + x*dx ; 
+                  location[1][0] = loc[1]-w + y*dx ; 
+                  location[2][0] = loc[2]-w + z*dx ; 
+                  fprintf(out, "%g ", window_weight(0, loc, orient)) ; 
+              }
+          fprintf(out, "\n") ;
+        }
+        delete data ; 
+        data = backup ; 
+        fclose(out) ; 
+        return 0 ; 
+    }
+    
+protected: 
+    virtual double window_int(int p, int q, cv1d & loc, cquat & orient) {return window_avg(p, q, loc, orient) ; }
+    virtual double window_avg (int p, int q, cv1d & loc, cquat & orient) {return (0.5*(window_weight(p, loc, orient)+window_weight(q, loc, orient))) ; }
 } ;
 //---------------------
 class LibLucy3D : public LibBase {
@@ -31,7 +74,8 @@ public :
     LibLucy3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=105./(16*M_PI*w*w*w) ; }
     LibLucy3D() {} ;
     double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (cst*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
-    double window(double r) { return (Lucy(r)) ;}
+    double window_function(double r) {return Lucy(r) ; }
+    double window_weight(int id, cv1d & loc, cquat & orient) { return Lucy(distance(id,loc)) ;}
     double cutoff (void) {return 2*w ;} // added by benjy to get rid of extra (hopefully useless) data
     //double window_int(double r1, double r2) {return window_avg(r1, r2) ; }
     //double window_avg (double r1, double r2) {return (0.5*(Lucy(r1)+Lucy(r2))) ; }
@@ -39,10 +83,40 @@ public :
     double cst ;
 };
 //--------------------
+class LibLucy3D_half : public LibLucy3D {
+public:     
+    LibLucy3D_half(struct Data * D, double ww, double dd) : LibLucy3D(D, ww, dd) {mainaxis={1.,0.,0.} ; }
+    double window_weight(int id, cv1d & loc, cquat & orient)
+    {
+        Eigen::Vector3d v(loc[0]-data->pos[0][id], loc[1]-data->pos[1][id], loc[2]-data->pos[2][id]);
+        Eigen::Vector3d rotated = orient.conjugate() * v ; // Maybe is orient^-1 // .conjugate to do that
+        if (rotated[0]<0) return Lucy(rotated.norm())*2 ; 
+        else return 0 ;    
+    }
+    
+} ;
+//--------------------
+class LibLucy3D_scale : public LibLucy3D {
+public:     
+    LibLucy3D_scale(struct Data * D, double ww, double dd) : LibLucy3D(D, ww, dd) {}
+    double window_weight(int id, cv1d & loc, cquat & orient)
+    {
+        Eigen::Vector3d v(loc[0]-data->pos[0][id], loc[1]-data->pos[1][id], loc[2]-data->pos[2][id]);
+        Eigen::Vector3d rotated = orient * v ; // Maybe is orient^-1 // .conjugate to do that
+        rotated[0] *= scalex ; 
+        rotated[1] *= scaley ; 
+        rotated[2] *= scalez ; 
+        return Lucy(rotated.norm()) ;
+    }
+
+private: 
+    double scalex=1., scaley=1., scalez=1. ; 
+} ;
+//--------------------
 class LibLucy3DFancyInt : public LibLucy3D {
 public :
     LibLucy3DFancyInt (struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=105./(16*M_PI*w*w*w) ;}
-    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
+    std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc, cquat & orient)
     {
       double res = 0 ;
       double prev, cur, first ;
@@ -67,7 +141,7 @@ public :
         prev=cur ;
       }
       //printf("%g %g \n", res, LibLucy3D::window_int(distance(p,loc),distance(q,loc))) ;
-      return (make_pair(window_avg(first,cur),res)) ;
+      return make_pair((Lucy(first)+Lucy(cur))/2.0,res) ;
     }
     double distancevec (v1d l1, v1d loc) {double res=0 ; for (int i=0 ; i<d ; i++) res+=(loc[i]-l1[i])*(loc[i]-l1[i]) ; return sqrt(res) ;}
     void set_integrationsteps (int steps) {if (steps<1) printf("Less than 1 step is not meaningful.") ; if (steps>1000) printf("You've chosen a very large number of integration steps, you may want to reconsider") ; Nsteps=steps ; }
@@ -82,34 +156,30 @@ class LibRect3D : public LibBase {
 public:
     LibRect3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst= 1./(4./3.*M_PI*w*w*w) ; }
     double cst ;
-    double window (double r) {if (r>=w) return 0 ; else return cst ;}
+    double window_weight(int id, cv1d & loc, cquat & orient) {double r=distance(id, loc) ; return window_function(r) ; }
+    double window_function(double r) {if (r>=w) return 0 ; else return cst ; }
 };
 //---------------------
 class LibRectND : public LibBase {
 public:
   LibRectND(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; }
-  double window (double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) {} return 1/a ;}}
+  double window_weight(int id, cv1d & loc, cquat & orient) {double r=distance(id, loc) ; return window_function(r) ; }
+    double window_function(double r) {if (r>=w) return 0 ; else {double a =1 ; for (int b=0 ; b<d ; b++,a*=w) {} return 1/a ;} }
 };
 //---------------------
 class LibDirac3D : public LibBase {
 public:
-    LibDirac3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ;}    
-    double distance(int id, v1d loc)
+    LibDirac3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ;}   
+    
+    double window_weight (int id, cv1d &loc, cquat & orient)
     {
-        double dst=0 ;
-        for (int i=0 ; i<d ; i++)
-            dst+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ;
-        dst= sqrt(dst) ;
         double r = data->radius[id] ;
+        double dst = distance(id, loc) ;
         if (dst > r)
             return 0;
         else
-        {
             return data->mass[id] / (4./3.*M_PI*r*r*r) ; 
-        }
     }
-    
-    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
 } ; 
 //---------------------
 class LibSphere3DIntersect : public LibBase {
@@ -117,12 +187,9 @@ public:
     LibSphere3DIntersect(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst=1./(4./3.*M_PI*w*w*w) ; }
     double cst ;
     double result ;
-    double distance(int id, v1d loc)
+    double window_weight(int id, cv1d &loc, cquat & orient)
     {
-        double dst=0 ;
-        for (int i=0 ; i<d ; i++)
-            dst+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ;
-        dst= sqrt(dst) ;
+        double dst=distance(id, loc) ; 
         double r = data->radius[id] ;
         if (dst>w+r) return 0 ;
         else if (dst<=fabs(w-r))
@@ -147,13 +214,9 @@ public:
                 maxr=data->radius[i] ;
         return maxr+w ;
     }
-    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
-    double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
-    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
+    virtual std::pair<double,double> window_contact_weight (int p, int q, cv1d & loc, cquat & orient)
     {
-        double rp=LibBase::distance(p, loc) ;
-        double rq=LibBase::distance(q, loc) ;
-        double wpqs = window_avg (rp, rq) ;
+        double wpqs = window_avg (p, q, loc, orient) ;
         double wpqf = 0 ;
 
         v1d locp (d,0) ;
@@ -192,7 +255,6 @@ public:
         }
         return (make_pair(wpqs,wpqf)) ;
     }
-    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
 };
 //------------------------------------------
 class LibSphereNDIntersect : public LibBase {
@@ -216,12 +278,9 @@ public:
     }
     double cst ;
     double result ;
-    double distance(int id, v1d loc)
+    double window_weight (int id, cv1d & loc, cquat & orient)
     {
-        double r=0 ;
-        for (int i=0 ; i<d ; i++)
-            r+=(loc[i]-data->pos[i][id])*(loc[i]-data->pos[i][id]) ;
-        r = sqrt(r) ;
+        double r=distance(id, loc) ;
         double r2 = data->radius[id] ;
         double &r1 = w ;
         if (r>r1+r2) return 0 ;
@@ -249,13 +308,9 @@ public:
                 maxr=data->radius[i] ;
         return maxr+w ;
     }
-    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
-    double windowreal (double r) {if (r>=w) return 0 ; else return cst ;}
-    virtual std::pair<double,double> window_contact_weight (int p, int q, const v1d & loc)
+    virtual std::pair<double,double> window_contact_weight (int p, int q, cv1d & loc, cquat & orient)
     {
-        double rp=LibBase::distance(p, loc) ;
-        double rq=LibBase::distance(q, loc) ;
-        double wpqs = window_avg (rp, rq) ;
+        double wpqs = window_avg (p, q, loc, orient) ;
         double wpqf = 0 ;
 
         v1d locp (d,0) ;
@@ -294,7 +349,6 @@ public:
         }
         return (make_pair(wpqs,wpqf)) ;
     }
-    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
 };
 //---------------------------------
 class LibMonteCarloIntersect3D : public LibBase {
@@ -302,7 +356,7 @@ public:
     LibMonteCarloIntersect3D (struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; 
         gen=std::mt19937(123457); random=std::uniform_real_distribution<double>(-1.0, 1.0) ; }
     
-    double distance (int id, v1d loc)
+    double window_weight (int id, cv1d & loc, cquat & orient)
     {
         if (win == nullptr) printf("ERROR: window needs to be set to use the LibMonteCarlo Intersect") ; 
         
@@ -327,7 +381,7 @@ public:
                 if ( (x*data->radius[id] - k[0])*(x*data->radius[id] - k[0]) + 
                          (y*data->radius[id] - k[1])*(y*data->radius[id] - k[1]) + 
                          (z*data->radius[id] - k[2])*(z*data->radius[id] - k[2]) < w*w)
-                    {weight += win->window(r) ;}
+                    {weight += win->window_function(r) ;}
             }
             return weight/(double)Nmc ; 
         }
@@ -358,7 +412,7 @@ public:
                  if ( (x*data->superquadric[0][id]-kprime.x())*(x*data->superquadric[0][id]-kprime.x()) + 
                       (y*data->superquadric[1][id]-kprime.y())*(y*data->superquadric[1][id]-kprime.y()) + 
                       (z*data->superquadric[2][id]-kprime.z())*(z*data->superquadric[2][id]-kprime.z()) < w*w ) // In sphere?
-                      {weight += win->window(r) ;}
+                      {weight += win->window_function(r) ;}
             }
             return weight/(double)Nmc ;
         }
@@ -371,9 +425,8 @@ public:
                 maxr=data->radius[i] ;
         return maxr+w ;
     }
-    double window (double r) {return r ; } // The value calculated by the distance measurement is the one returned, a bit of a hack there ...
-    double windowreal (double r) {return win->window(r) ; }
-    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; }
+    double windowreal (double r) {return win->window_function(r) ; }
+    virtual double window_avg (double r1, double r2) {return (0.5*(windowreal(r1)+windowreal(r2))) ; } // TODO this may be quite wrong, unclear.
     
     LibBase * win = nullptr ; 
     
@@ -389,7 +442,8 @@ class LibHann3D : public LibBase {
 public:
     LibHann3D(struct Data * D, double ww, double dd) { data=D; w=ww ; d=dd ; cst= 3*M_PI/(2.*(M_PI*M_PI-6)*w*w*w) ; }
     double cst ;
-    double window (double r) {if (r>=w) return 0 ; else return cst*pow(cos(M_PI*r/(2.*w)),2) ;}
+    double window_weight (int id, cv1d & loc, cquat & orient) {double r = distance(id, loc) ; return window_function(r) ; }
+    double window_function (double r) {if (r>=w) return 0 ; else return cst*pow(cos(M_PI*r/(2.*w)),2) ;}
 } ;
 //---------------------
 class LibLucyND : public LibBase {
@@ -405,7 +459,8 @@ public:
     }
   double scale ;
   double Lucy (double r) {if (r>=w) return 0 ; else {double f=r/w ; return (scale*(-3*f*f*f*f + 8*f*f*f - 6*f*f +1)) ; }}
-  double window(double r) override {return (Lucy(r)) ;}
+  double windows_function(double r) {return Lucy(r) ; }
+  double window_weight (int id, cv1d & loc, cquat & orient) override {double r=distance(id, loc) ; return (Lucy(r)) ;}
 } ;
 //---------------------
 class LibLucyND_Periodic : public LibLucyND
@@ -425,7 +480,7 @@ class LibLucyND_Periodic : public LibLucyND
     printf("NB: do not use periodic_atoms with LibLucyND_Periodic! %g \n", scale) ;
   }
 
-  double distance (int id, v1d loc) override
+  double distance (int id, cv1d & loc) override
   {
     double res=0 ;
     for (int i=0 ; i<d ; i++)
@@ -442,8 +497,8 @@ class LibRVE: public LibBase
 public :
     LibRVE (double s) { scale = s ; }
 
-    double window(double r) override  {return scale ;}
-    double distance (int id, v1d loc) override {return 0. ;}
+    double window_weight(int id, cv1d & loc, cquat & orient) override {return scale ;}
+    double distance (int id, cv1d & loc) override {return 0. ;}
     void set_volume (double vol) { scale = 1./vol ; }
 
     double scale=1 ;

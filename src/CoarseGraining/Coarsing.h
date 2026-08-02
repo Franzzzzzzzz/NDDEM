@@ -80,6 +80,7 @@ public :
     v2d fields ;    ///< 1st dimension is time, second are fields
     v2d subfields ; ///< 1st dimension is time, second are subfields (ie. "TC.ev1")
     v1d location ;  ///< Location of the coarse graining point
+    Eigen::Quaternion<double> orientation={1,0,0,0}; 
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
     int d ; ///< Dimension
@@ -180,6 +181,8 @@ public :
     vector <int> nptcum ; ///< Cumulated number of points per dimensions (usefull for quick finding of the closest CG for a grain)
     v1d dx ; ///< Distances between CG points
     v2d box ; ///< CG point location
+    int NptAngles=1 ; ///< Cumulative number of additional angles
+    
     LibBase * Window = nullptr ; ///< Pointer to the averaging window
     std::variant<Eigen::Matrix3d, Eigen::Quaternion<double>> original_orientation = Eigen::Quaternion<double>(0,0,0,1) ;     
 
@@ -212,6 +215,7 @@ public :
     template <Windows W> int setWindow (vector<vector<double>> &) ; ///< Set the windowing function for LibRVE
     template <Windows W> int setWindow (double w, vector<bool> per, vector<int> boxes, vector<double> deltas) ; ///< Set the windowing function for the LibLucyND_Periodic (special one...)
     int grid_generate() ; ///< Generate the coarse-graining grid
+    int grid_orientation(std::vector<int> nangles, v2d boxes) ; ///< Generate an angular coarse graining grid
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
     std::map<std::string, size_t> grid_setfields() ; ///< Set the fields at each CG point
     int grid_getfields() ; ///< Build the array of fields for the CG points.
@@ -253,6 +257,7 @@ public :
     // Time and output handling
     int mean_time(bool temporary=false) ; ///< Perform a time average of the coarse-grained data
     int write_vtk(string sout) ; ///< Write CG data as VTK
+    int write_csv (string path) ; ///< Write CG data as csv. If the path is stdout or stderr, write to these file descriptors instead. 
     int write_netCDF (string sout) ; ///< \deprecated Write CG data as netCDF
     int write_NrrdIO (string path) ; ///< Write CG data as NrrdIO file format
     int write_matlab (string path, bool squeeze = false) ; ///< Write CG data as Matlab file
@@ -288,6 +293,12 @@ int Coarsing::setWindow (double w, LibBase ** winptr)
         break ;
       case Windows::Lucy3D :
         *winptr=new LibLucy3D (&data, w, d) ;
+        break ;
+      case Windows::Lucy3D_half :
+        *winptr=new LibLucy3D_half (&data, w, d) ;
+        break ;
+      case Windows::Lucy3D_scale :
+        *winptr=new LibLucy3D_scale (&data, w, d) ;
         break ;
       case Windows::Lucy3DFancyInt :
         *winptr=new LibLucy3DFancyInt (&data, w, d) ;

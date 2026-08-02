@@ -113,6 +113,12 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::Lucy3D :
     setWindow<Windows::Lucy3D> (w, winptr) ;
     break ;
+  case Windows::Lucy3D_half :
+    setWindow<Windows::Lucy3D_half> (w, winptr) ;
+    break ;
+  case Windows::Lucy3D_scale :
+    setWindow<Windows::Lucy3D_scale> (w, winptr) ;
+    break ;
   case Windows::Lucy3DFancyInt:
     setWindow<Windows::Lucy3DFancyInt> (w, winptr) ;
     break ;
@@ -174,6 +180,30 @@ int Coarsing::grid_generate()
     }
     return check ;
 }
+//-------------------------------------------------------
+int Coarsing::grid_orientation(std::vector<int> nangles, v2d boxes)
+{
+  for (int i=0 ; i<nangles[0] ; i++)
+    for (int j=0; j<nangles[1] ; j++)
+      for (int k=0 ; k<nangles[2] ; k++)
+      {
+        double roll  = nangles[0]==1?boxes[0][0]:(boxes[0][0] + (boxes[1][0]-boxes[0][0])/(nangles[0]-1)*i)*M_PI/180. ; 
+        double pitch = nangles[1]==1?boxes[0][1]:(boxes[0][1] + (boxes[1][1]-boxes[0][1])/(nangles[1]-1)*j)*M_PI/180. ; 
+        double yaw   = nangles[2]==1?boxes[0][2]:(boxes[0][2] + (boxes[1][2]-boxes[0][2])/(nangles[2]-1)*k)*M_PI/180. ; 
+        
+        Eigen::Quaterniond q;
+        q = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
+        
+        for (int cg=0 ; cg<Npt ; cg++)
+        {
+          CGP.push_back(CGP[cg]) ;
+          CGP[CGP.size()-1].orientation = q ; 
+        }        
+      }
+      
+  NptAngles = nangles[0] * nangles[1] *nangles[2] + 1 ;  
+  return NptAngles ; 
+}
 //--------------------------------
 int Coarsing::grid_neighbour ()
 {
@@ -182,7 +212,7 @@ int Coarsing::grid_neighbour ()
     {
         CGP[i].neighbors.clear() ;
         CGP[i].neighbors.push_back(i) ;
-        for (int j=0 ; j<Npt ; j++)
+        for (int j=0 ; j<Npt*NptAngles ; j++)
         {
             if (j==i) continue ;
             dst = normdiff(CGP[i].location, CGP[j].location) ;
@@ -252,13 +282,13 @@ std::map<std::string, size_t> Coarsing::grid_setfields()
     int nsubcols = grid_getsubfields() ;
     std::map<std::string, size_t> extrafields ;
 
-    printf("Approximate memory required: %ld MB\n", Npt*ncols*Time*sizeof(double)/1024/1024) ; fflush(stdout) ;
+    printf("Approximate memory required: %ld MB\n", Npt*NptAngles*ncols*Time*sizeof(double)/1024/1024) ; fflush(stdout) ;
 
     for (size_t i=0 ; i<Fcols.size() ; i++)
       if (std::get<0>(Fcols[i])->ftype!=FieldType::Defined)
         extrafields[std::get<0>(Fcols[i])->name] = i ;
 
-    for (int i=0 ; i<Npt ; i++)
+    for (int i=0 ; i<Npt*NptAngles ; i++)
     {
         CGP[i].fields.resize(Time, vector<double>(ncols,0)) ;
         CGP[i].subfields.resize(Time, vector<double>(nsubcols, 0)) ; 
@@ -664,16 +694,16 @@ for (auto &v: FIELDS)
 bool doextra = (extraid.size()>0)?true:false ;
 
 // Clearing stuff
-if (dorho) for (int i=0 ; i<Npt ; CGP[i].fields[cT][rhoid]=0, i++) ;
-if (doI)   for (int i=0 ; i<Npt ; CGP[i].fields[cT][Iid]=0, i++) ;
-if (dovel) for (int dd=0 ; dd<d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][velid+dd]=0, i++) ;
-if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][omegaid+dd]=0, i++) ;
-if (doorient) for (int dd=0 ; dd<d*d ; dd++) for (int i=0 ; i<Npt ; CGP[i].fields[cT][orientid+dd]=0, i++) ;
-if (doradius) for (int i=0 ; i<Npt ; CGP[i].fields[cT][radiusid]=0, i++) ;
+if (dorho) for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][rhoid]=0, i++) ;
+if (doI)   for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][Iid]=0, i++) ;
+if (dovel) for (int dd=0 ; dd<d ; dd++) for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][velid+dd]=0, i++) ;
+if (doomega) for (int dd=0 ; dd<d*(d-1)/2 ; dd++) for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][omegaid+dd]=0, i++) ;
+if (doorient) for (int dd=0 ; dd<d*d ; dd++) for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][orientid+dd]=0, i++) ;
+if (doradius) for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][radiusid]=0, i++) ;
 if (doextra)
     for (size_t v = 0 ; v<extraid.size() ; v++)
       for (int w = 0 ; w<extrancomp[v] ; w++)
-        for (int i=0 ; i<Npt ; CGP[i].fields[cT][extraid[v]+w]=0, i++) ;
+        for (int i=0 ; i<Npt*NptAngles ; CGP[i].fields[cT][extraid[v]+w]=0, i++) ;
 
 //printf("Starting pass 1...\r") ; fflush(stdout) ;
 
@@ -693,7 +723,7 @@ for (i=0 ; i<data.N ; i++)
 
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
-     wp=Window->window(Window->distance(i,CGP[*j].location)) ;
+     wp=Window->window_weight(i,CGP[*j].location, CGP[*j].orientation) ;
 
      //double wp2=Window->distance(i,CGP[*j].location) ;
 
@@ -738,7 +768,7 @@ bool doEKT=true, doEKR=true ;
 int EKTid=get_id("EKT") ; if (EKTid<0) doEKT=false ;
 int EKRid=get_id("EKR") ; if (EKRid<0) doEKR=false ;
 //printf("Starting intermediate pass 1...\r") ; fflush(stdout) ;
-for (i=0 ; i<Npt ; i++)
+for (i=0 ; i<Npt*NptAngles ; i++)
 {
     double rho, Imom=0 ;
     rho = CGP[i].fields[cT][rhoid] ;
@@ -805,7 +835,7 @@ for (i=0 ; i<data.N ; i++)
 
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
-     wp=Window->window(Window->distance(i,CGP[*j].location)) ;
+     wp=Window->window_weight(i,CGP[*j].location, CGP[*j].orientation) ;
 
      if (doeKT)
          CGP[*j].fields[cT][eKTid] += wp * data.mass[i] * velfluc ;
@@ -827,7 +857,7 @@ for (i=0 ; i<data.N ; i++)
 }
 // Intermediate pass (cg points): devide by rho when needed
 // printf(" -> subpass 2") ; fflush(stdout) ;
-for (i=0 ; i<Npt ; i++)
+for (i=0 ; i<Npt*NptAngles ; i++)
 {
     double tworho ;
     if (usetimeavg)
@@ -868,7 +898,7 @@ for (i=0 ; i<data.Ncf ; i++)
   rq=Window->distance(q, CGP[*j].location) ;
   wpqs = Window->window_avg (rp, rq) ;
   wpqf = Window->window_int (rp, rq) ;*/
-  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location) ;
+  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location, CGP[*j].orientation) ;
   //printf("%g %g %g", rp, rq, wpqf) ;
   if (dozT)
   {
@@ -906,7 +936,7 @@ for (i=0 ; i<data.Ncf ; i++)
 
 //Last intermediate pass
 // printf(" -> subpass 3") ; fflush(stdout) ;
-for (i=0 ; i<Npt ; i++)
+for (i=0 ; i<Npt*NptAngles ; i++)
 {
   //printf("%g %g %g %g %g %g %g %g\n", CGP[i].fields[cT][TCid+0], CGP[i].fields[cT][TCid+1],CGP[i].fields[cT][TCid+2],CGP[i].fields[cT][TCid+3]
   //  , CGP[i].fields[cT][TCid+4], CGP[i].fields[cT][TCid+5], CGP[i].fields[cT][TCid+6], CGP[i].fields[cT][TCid+7], CGP[i].fields[cT][TCid+8]);
@@ -934,7 +964,7 @@ for (i=0 ; i<data.Ncf ; i++)
   rq=Window->distance(q, CGP[*j].location) ;
   wpqs = Window->window_avg (rp, rq) ;
   wpqf = Window->window_int (rp, rq) ;*/
-  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location) ;
+  auto [wpqs, wpqf] = Window->window_contact_weight(p, q, CGP[*j].location, CGP[*j].orientation) ;
   //printf("%g %g %g", rp, rq, wpqf) ;
   if (doqTC)
   {
@@ -955,7 +985,7 @@ for (i=0 ; i<data.Ncf ; i++)
 
 //Last intermediate pass
 // printf(" -> subpass 4") ; fflush(stdout) ;
-for (i=0 ; i<Npt ; i++)
+for (i=0 ; i<Npt*NptAngles ; i++)
 {
     if (doqTC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qTCid] *= 0.5 ;
     if (doqRC) for (dd=0 ; dd<d ; dd++) CGP[i].fields[cT][qRCid] *= 0.5 ;
@@ -989,7 +1019,7 @@ if ((doGamdot || doGamvdot || doGamtau || doOmega || doOmegaMag) && VAVGid == -1
 
 // printf(" -> Pass 5 ") ; fflush(stdout) ;
 
-for (int i=0 ; i< Npt ; i++)
+for (int i=0 ; i< Npt*NptAngles ; i++)
 {
     if (doSig)
         for (int dd=0 ; dd<d*d ; dd++)
@@ -1379,14 +1409,14 @@ int Coarsing::mean_time(bool temporary)
     CGPtemp = &CGP ;
 
   int tf=(*CGPtemp)[0].fields[0].size() ;
-  for (int i=0 ; i<Npt ; i++)
+  for (int i=0 ; i<Npt*NptAngles ; i++)
     for (int t=1 ; t<Time ; t++)
     {
       printf("\rAveraging ... %d", t) ; fflush(stdout) ;
       for (int f=0 ; f<tf ; f++)
         (*CGPtemp)[i].fields[0][f]+=CGP[i].fields[t][f] ;
     }
-  for (int i=0 ; i<Npt ; i++)
+  for (int i=0 ; i<Npt*NptAngles ; i++)
     for (int f=0 ; f<tf ; f++)
     {
         (*CGPtemp)[i].fields[0][f] /= Time;
@@ -1495,39 +1525,46 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
   vector <long unsigned int> dimensions (3+d, 0) ; // This type to please matlab
   for (int dd=0 ; dd<d ; dd++) dimensions[dd+2] = npt[dd] ;
   dimensions[dimtime] = Time ;
-
+  
   for (size_t f=0 ; f<Fcols.size() ; f++)
   {
     // Data are goind fast to slow in MATLAB ... so probably need some rewrite ...
     switch (std::get<0>(Fcols[f])->type)
     {
       case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
-              outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
+              outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * NptAngles * Time) ;
               for (int t=0 ; t<Time ; t++)
-                  for (int i=0 ; i<Npt ; i++)
-                      outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])] ;
+                for (int i=0 ; i<Npt ; i++)
+                  for (int a=0 ; a<NptAngles; a++)
+                    outdata[t*Npt*NptAngles+i*NptAngles+a]=CGP[idx_FastFirst2SlowFirst(i)+a*Npt].fields[t][std::get<1>(Fcols[f])] ;  
             break ;
       case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
-              outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
+              outdata=(double *) mxMalloc(sizeof(double) * d * Npt * NptAngles * Time) ;
               for (int t=0 ; t<Time ; t++)
-                  for (int i=0 ; i<Npt ; i++)
-                      for (int j=0 ; j<d ; j++)
-                          outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ;
+                for (int i=0 ; i<Npt ; i++)
+                  for (int a=0 ; a<NptAngles ; a++)
+                    for (int j=0 ; j<d ; j++)
+                      outdata[t*Npt*NptAngles*d + i*NptAngles*d + a*d +j]=CGP[idx_FastFirst2SlowFirst(i)+a*Npt].fields[t][std::get<1>(Fcols[f])+j] ;
             break ;
       case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
-              outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
+              outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * NptAngles * Time) ;
               for (int t=0 ; t<Time ; t++)
-                  for (int i=0 ; i<Npt ; i++)
-                      for (int j=0 ; j<d*d ; j++)
-                          outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].fields[t][std::get<1>(Fcols[f])+j] ; // j/d*d!=j because of integer division
+                for (int i=0 ; i<Npt ; i++)
+                  for (int a=0 ; a<NptAngles ; a++)
+                    for (int j=0 ; j<d*d ; j++)
+                      outdata[t*Npt*NptAngles*d*d + i*NptAngles*d*d + a*d*d + j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)+a*Npt].fields[t][std::get<1>(Fcols[f])+j] ; // j/d*d!=j because of integer division
             break ;
       default: printf("ERR: this should never happen. \n") ;
     }
 
     auto tmpdim = dimensions ;
+    if (NptAngles>1)
+      tmpdim.insert(tmpdim.begin()+2,NptAngles); 
     if (squeeze)
       tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
-
+    if (tmpdim.size()==0) // too much squeezing, nothing left!
+      tmpdim.push_back(1) ; 
+    
     mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
     mxSetData (pm, outdata) ;
     matPutVariable(pmat, std::get<0>(Fcols[f])->name.c_str(), pm);
@@ -1544,29 +1581,36 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
         case TensorOrder::SCALAR : dimensions[0]=dimensions[1]=1 ;  //Scalar
                 outdata=(double *) mxMalloc(sizeof(double) * 1 * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
-                    for (int i=0 ; i<Npt ; i++)
-                        outdata[t*Npt+i]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])] ;
+                  for (int i=0 ; i<Npt ; i++)
+                    for (int a=0 ; a<NptAngles; a++)
+                      outdata[t*Npt*NptAngles+i*NptAngles+a]=CGP[idx_FastFirst2SlowFirst(i)+a*Npt].subfields[t][std::get<1>(subfields[g])] ;
               break ;
         case TensorOrder::VECTOR : dimensions[0]=d ; dimensions[1]=1 ; // Vector
                 outdata=(double *) mxMalloc(sizeof(double) * d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
-                    for (int i=0 ; i<Npt ; i++)
-                        for (int j=0 ; j<d ; j++)
-                            outdata[t*Npt*d + i*d +j]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])+j] ;
+                  for (int i=0 ; i<Npt ; i++)
+                    for (int a=0 ; a<NptAngles; a++)
+                      for (int j=0 ; j<d ; j++)
+                        outdata[t*Npt*NptAngles*d + i*NptAngles*d + a*d +j]=CGP[idx_FastFirst2SlowFirst(i) + a*Npt].subfields[t][std::get<1>(subfields[g])+j] ;
               break ;
         case TensorOrder::TENSOR : dimensions[0]=dimensions[1]=d ; //Tensor
                 outdata=(double *) mxMalloc(sizeof(double) * d*d * Npt * Time) ;
                 for (int t=0 ; t<Time ; t++)
-                    for (int i=0 ; i<Npt ; i++)
-                        for (int j=0 ; j<d*d ; j++)
-                            outdata[t*Npt*d*d + i*d*d +j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i)].subfields[t][std::get<1>(subfields[g])+j] ; // j/d*d!=j because of integer division
+                  for (int i=0 ; i<Npt ; i++)
+                    for (int a=0 ; a<NptAngles; a++)
+                      for (int j=0 ; j<d*d ; j++)
+                        outdata[t*Npt*NptAngles*d*d + i*NptAngles*d*d + a*d*d + j/d*d + j%d]=CGP[idx_FastFirst2SlowFirst(i) + a*Npt].subfields[t][std::get<1>(subfields[g])+j] ; // j/d*d!=j because of integer division
               break ;
         default: printf("ERR: this should never happen. \n") ;
       }
 
       auto tmpdim = dimensions ;
+      if (NptAngles>1)
+        tmpdim.insert(tmpdim.begin()+2,NptAngles); 
       if (squeeze)
         tmpdim.erase(std::remove(tmpdim.begin(), tmpdim.end(), 1), tmpdim.end()) ;
+      if (tmpdim.size()==0) // too much squeezing, nothing left!
+        tmpdim.push_back(1) ; 
 
       mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
       mxSetData (pm, outdata) ;
@@ -1574,8 +1618,7 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
       matPutVariable(pmat, colname.c_str(), pm);
       mxFree(outdata) ;
     }
-  }
-  
+  }  
 
   // Let's put the location array there as well
   dimensions[0]=d ; dimensions[1] = 1 ; dimensions.pop_back() ;
@@ -1589,6 +1632,44 @@ int Coarsing::write_matlab ([[maybe_unused]] string path, [[maybe_unused]] bool 
   mxSetData (pm, outdata) ;
   matPutVariable(pmat, "GridLocation", pm);
   mxFree(outdata) ;
+  
+  // And the euler angle array if relevent ...
+  if (NptAngles>1)
+  {
+    dimensions[0]=3 ; dimensions[1] = NptAngles ; dimensions.resize(2) ;
+    auto tmpdim = dimensions ;
+    mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
+    outdata=(double *) mxMalloc(sizeof(double) * 3 * NptAngles) ;
+    for (int i=0 ; i<NptAngles ; i++)
+    {
+      auto euler = CGP[Npt*i].orientation.toRotationMatrix().eulerAngles(2, 1, 0);
+      outdata[i*3+0]=euler[0]*180./M_PI;
+      outdata[i*3+1]=euler[1]*180./M_PI;
+      outdata[i*3+2]=euler[2]*180./M_PI;
+    }
+    mxSetData (pm, outdata) ;
+    matPutVariable(pmat, "GridAnglesEuler", pm);
+    mxFree(outdata) ;
+    
+    if (Window->mainaxis.has_value())
+    {
+      dimensions[0]=2 ; dimensions[1] = NptAngles ; dimensions.resize(2) ;
+      auto tmpdim = dimensions ;
+      mxArray * pm = mxCreateNumericArray(tmpdim.size(), tmpdim.data(), mxDOUBLE_CLASS, mxREAL);
+      outdata=(double *) mxMalloc(sizeof(double) * 3 * NptAngles) ;
+      Eigen::Vector3d axis={Window->mainaxis.value()[0], Window->mainaxis.value()[1], Window->mainaxis.value()[2]} ; 
+      for (int i=0 ; i<NptAngles ; i++)
+      {
+        auto rotatedaxis=CGP[Npt*i].orientation*axis ;
+        outdata[i*2+0]=atan2(rotatedaxis(1), rotatedaxis(0))*180./M_PI;
+        outdata[i*2+1]=acos(rotatedaxis(2))*180./M_PI;
+      }
+      mxSetData (pm, outdata) ;
+      matPutVariable(pmat, "GridAnglesSpherical", pm);
+      mxFree(outdata) ;
+    }
+  }
+  
 
   matClose(pmat) ;
 #else
@@ -1811,8 +1892,6 @@ else
 return (std::make_pair(numbytes, outarray)) ;
 }
 
-
-
 //--------------------------------------------------------
 int Coarsing ::write_NrrdIO ([[maybe_unused]] string path)
 {
@@ -2003,6 +2082,80 @@ int Coarsing::write_netCDF ([[maybe_unused]] string sout)
 printf("Coarsing not compile with netCDF support. Use the macro -DNETCDF at the compiling stage to enable such suppport. Writing aborted.\n") ;
 return 1 ;
 #endif
+}
+//=================================================
+int Coarsing ::write_csv (string path)
+{  
+  if (d!=3) printf("WARN: the write_csv function hasn't been implement for dimension different from 3. \n") ;
+  
+  FILE*out ; 
+  if (path=="stdout")
+    out = stdout ; 
+  else if (path=="stderr")
+    out = stderr ; 
+  else
+  {
+    out = fopen((path+".csv").c_str(), "w") ; 
+  }
+  
+  for (int t=0 ; t<Time ; t++)
+    for (int i=0 ; i<Npt ; i++)
+      for (int a=0 ; a<NptAngles; a++)
+      {
+        fprintf(out, "%d, %g, %g, %g", t, CGP[i+Npt*a].location[0], CGP[i+Npt*a].location[1], CGP[Npt*i+a].location[2]) ;
+        if (NptAngles>1)
+        {
+          auto euler = CGP[i+Npt*a].orientation.toRotationMatrix().eulerAngles(2, 1, 0);
+          fprintf(out, ", %g, %g, %g", euler[2]*180./M_PI, euler[1]*180./M_PI, euler[0]*180./M_PI) ;  
+          //Eigen::Vector3d aa={1,0,0} ; 
+          //auto b=CGP[i+Npt*a].orientation*aa ;
+          //fprintf(out, ", %g, %g", atan2(b(1), b(0))*180./M_PI, acos(b(2))*180./M_PI) ;  
+        }
+        for (size_t f=0 ; f<Fcols.size() ; f++)
+        {
+          switch (std::get<0>(Fcols[f])->type)
+          {
+            case TensorOrder::SCALAR :         
+                  fprintf(out, ", %g", CGP[i+a*Npt].fields[t][std::get<1>(Fcols[f])]) ;
+                  break ;
+            case TensorOrder::VECTOR :
+                  for (int j=0 ; j<d ; j++)         
+                    fprintf(out, ", %g", CGP[i+a*Npt].fields[t][std::get<1>(Fcols[f])+j]) ;
+                  break ;
+            case TensorOrder::TENSOR : 
+                  for (int j=0 ; j<d*d ; j++)
+                    fprintf(out, ", %g", CGP[i+a*Npt].fields[t][std::get<1>(Fcols[f])+j]) ;
+                  break ;
+            default:
+                printf("ERR: this should never happen. \n") ;
+          }
+        }
+        for (size_t f=0 ; f<SFcols.size() ; f++)
+        {
+          auto [tens_field, subfields] = SFcols[f] ;
+          for (size_t g=0 ; g<subfields.size() ; g++)
+          {
+            switch (std::get<0>(Fcols[f])->type)
+            {
+              case TensorOrder::SCALAR :           
+                    fprintf(out, ", %g", CGP[i+a*Npt].subfields[t][std::get<1>(subfields[g])]) ;
+                    break ;
+              case TensorOrder::VECTOR :
+                    for (int j=0 ; j<d ; j++)         
+                      fprintf(out, ", %g", CGP[i+a*Npt].subfields[t][std::get<1>(subfields[g])+j]) ;
+                    break ;
+              case TensorOrder::TENSOR : 
+                    for (int j=0 ; j<d*d ; j++)
+                      fprintf(out, ", %g", CGP[i+a*Npt].subfields[t][std::get<1>(subfields[g])+j]) ;
+                    break ;
+              default:
+                  printf("ERR: this should never happen. \n") ;
+            }
+          }
+        }
+      fprintf(out, "\n") ; 
+      }
+return 0 ;
 }
 //==================================
 

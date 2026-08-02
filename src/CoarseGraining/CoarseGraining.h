@@ -114,6 +114,9 @@ void CoarseGraining::setup_CG ()
         delete C ;
 
     C = new Coarsing (P.dim, P.boxes, P.boundaries, P.maxT) ;
+    if (P.eulerboxes.size()==3)
+        C->grid_orientation(P.eulerboxes, P.eulerboundaries) ; 
+    
     for (auto i : P.extrafields)
         C->add_extra_field(i.name, i.order, i.type) ;
     //if (P.window == Windows::LucyND_Periodic)
@@ -192,12 +195,16 @@ void CoarseGraining::process_all ()
         C->cT=0 ; 
         C->pass_5() ; 
     }
+    
+    if (P.savewindow >= 0)
+        C->Window->export_window(P.save, C->CGP[P.savewindow].location, C->CGP[P.savewindow].orientation) ; 
 }
 //------------------------------------------------------
 void CoarseGraining::write ()
 {
     if (std::find(P.saveformat.begin(), P.saveformat.end(), "netCDF")!=P.saveformat.end())   C->write_netCDF(P.save) ;
     if (std::find(P.saveformat.begin(), P.saveformat.end(), "vtk")!=P.saveformat.end()) C->write_vtk (P.save) ;
+    if (std::find(P.saveformat.begin(), P.saveformat.end(), "csv")!=P.saveformat.end()) C->write_csv (P.save) ;
     if (std::find(P.saveformat.begin(), P.saveformat.end(), "mat")!=P.saveformat.end()) C->write_matlab(P.save, true) ;
     if (std::find(P.saveformat.begin(), P.saveformat.end(), "numpy")!=P.saveformat.end()) C->write_numpy(P.save, true) ;
 }

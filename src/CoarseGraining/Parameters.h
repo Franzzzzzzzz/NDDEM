@@ -17,10 +17,13 @@ public:
   int dim=-1 ;
   vector <int> boxes ;
   vector <vector <double> > boundaries ;
+  vector <int> eulerboxes ;
+  vector <vector <double> > eulerboundaries ;
   string save="" ;
   vector<string> saveformat ;
   double default_density=-1, default_radius=-1 ;
   std::vector<double> default_sqaxes{-1.,-1.,-1.}, default_sqpower{2,2,2} ; 
+  int savewindow=-1 ; 
 
   AverageType timeaverage = AverageType::None ;
 
@@ -84,6 +87,7 @@ void Param::from_json(json &j)
             try {saveformat = v.value().get<vector<string>>();}
             catch(...) {string a = v.value().get<string>(); saveformat.push_back(a) ; }
         }
+        else if (v.key() == "save window") { savewindow = v.value().get<int>() ; }
         else if (v.key() == "window size")
         { windowsize = v.value().get<double>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "skip") skipT = v.value().get<int>() ;
@@ -91,6 +95,8 @@ void Param::from_json(json &j)
         else if (v.key() == "fields") { flags = v.value().get<vector<string>>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boxes")  {boxes = v.value().get<decltype(boxes)>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boundaries") {boundaries = v.value().get<decltype(boundaries)>(); requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "euler angles boxes")  {eulerboxes = v.value().get<decltype(eulerboxes)>(); requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "euler angles boundaries") {eulerboundaries = v.value().get<decltype(eulerboundaries)>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "time average")
         {
             if (v.value().get<string>() == "None") timeaverage = AverageType::None ;
@@ -216,6 +222,8 @@ Windows Param::identify_window(std::string windowstr)
     else if ( windowstr=="Sphere3DIntersect") return Windows::Sphere3DIntersect ;
     else if ( windowstr=="SphereNDIntersect") return Windows::SphereNDIntersect ;
     else if ( windowstr=="Lucy3D") return Windows::Lucy3D ;
+    else if ( windowstr=="Lucy3D_half") return Windows::Lucy3D_half ;
+    else if ( windowstr=="Lucy3D_scale") return Windows::Lucy3D_scale ;
     else if ( windowstr=="Hann3D") return Windows::Hann3D ;
     else if ( windowstr=="RectND") return Windows::RectND ;
     else if ( windowstr=="Dirac3D") return Windows::Dirac3D ;
