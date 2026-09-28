@@ -125,7 +125,7 @@ eval("{__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpa
   \*****************************************************************************************************/
 (module, __unused_webpack_exports, __webpack_require__) {
 
-eval("{var map = {\n\t\"./1DShader.js\": [\n\t\t\"./live/libs/shaders/1DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_1DShader_js\"\n\t\t]\n\t],\n\t\"./2DShader.js\": [\n\t\t\"./live/libs/shaders/2DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_2DShader_js\"\n\t\t]\n\t],\n\t\"./3DShader.js\": [\n\t\t\"./live/libs/shaders/3DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_3DShader_js\"\n\t\t]\n\t],\n\t\"./4DShader.js\": [\n\t\t\"./live/libs/shaders/4DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_4DShader_js\"\n\t\t]\n\t],\n\t\"./5DShader.js\": [\n\t\t\"./live/libs/shaders/5DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_5DShader_js\"\n\t\t]\n\t],\n\t\"./6DShader.js\": [\n\t\t\"./live/libs/shaders/6DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_6DShader_js\"\n\t\t]\n\t]\n};\nfunction webpackAsyncContext(req) {\n\tif(!__webpack_require__.o(map, req)) {\n\t\treturn Promise.resolve().then(() => {\n\tvar e = new Error(\"Cannot find module '\" + req + \"'\");\n\te.code = 'MODULE_NOT_FOUND';\n\tthrow e;\n});\n\t}\n\n\tvar ids = map[req], id = ids[0];\n\treturn __webpack_require__.e(ids[1][0]).then(() => (__webpack_require__(id)));\n}\nwebpackAsyncContext.keys = () => (Object.keys(map));\nwebpackAsyncContext.id = \"./live/libs/shaders lazy recursive ^\\\\.\\\\/.*DShader\\\\.js$ referencedExports: NDDEMShader\";\nmodule.exports = webpackAsyncContext;\n\n//# sourceURL=webpack://nddem/./live/libs/shaders/_lazy_^\\.\\/.*DShader\\.js$_referencedExports:_NDDEMShader_namespace_object?\n}");
+eval("{const map = {\n\t\"./1DShader.js\": [\n\t\t\"./live/libs/shaders/1DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_1DShader_js\"\n\t\t]\n\t],\n\t\"./2DShader.js\": [\n\t\t\"./live/libs/shaders/2DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_2DShader_js\"\n\t\t]\n\t],\n\t\"./3DShader.js\": [\n\t\t\"./live/libs/shaders/3DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_3DShader_js\"\n\t\t]\n\t],\n\t\"./4DShader.js\": [\n\t\t\"./live/libs/shaders/4DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_4DShader_js\"\n\t\t]\n\t],\n\t\"./5DShader.js\": [\n\t\t\"./live/libs/shaders/5DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_5DShader_js\"\n\t\t]\n\t],\n\t\"./6DShader.js\": [\n\t\t\"./live/libs/shaders/6DShader.js\",\n\t\t[\n\t\t\t\"live_libs_shaders_6DShader_js\"\n\t\t]\n\t]\n};\nfunction webpackAsyncContext(req) {\n\ttry {\n\t\tif(!__webpack_require__.o(map, req)) {\n\t\t\treturn Promise.resolve().then(() => {\n\tconst e = new Error(\"Cannot find module '\" + req + \"'\");\n\te.code = 'MODULE_NOT_FOUND';\n\tthrow e;\n});\n\t\t}\n\t} catch(err) {\n\t\treturn Promise.reject(err);\n\t}\n\n\tconst ids = map[req], id = ids[0];\n\treturn __webpack_require__.e(ids[1][0]).then(() => (__webpack_require__(id)));\n}\nwebpackAsyncContext.keys = () => (Object.keys(map));\nwebpackAsyncContext.id = \"./live/libs/shaders lazy recursive ^\\\\.\\\\/.*DShader\\\\.js$ referencedExports: NDDEMShader\";\nmodule.exports = webpackAsyncContext;\n\n//# sourceURL=webpack://nddem/./live/libs/shaders/_lazy_^\\.\\/.*DShader\\.js$_referencedExports:_NDDEMShader_namespace_object?\n}");
 
 /***/ },
 
@@ -362,29 +362,29 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 	});
 /************************************************************************/
 /******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
+/******/ 	const __webpack_module_cache__ = {};
 /******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
 /******/ 		if (cachedModule !== undefined) {
 /******/ 			return cachedModule.exports;
 /******/ 		}
-/******/ 		// Check if module exists (development only)
-/******/ 		if (__webpack_modules__[moduleId] === undefined) {
-/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
-/******/ 			e.code = 'MODULE_NOT_FOUND';
-/******/ 			throw e;
-/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 		const module = __webpack_module_cache__[moduleId] = {
 /******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			const e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
@@ -396,68 +396,54 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = (module) => {
+/******/ 		const getter = module && module.__esModule ?
+/******/ 			() => (module['default']) :
+/******/ 			() => (module);
+/******/ 		__webpack_require__.d(getter, { a: getter });
+/******/ 		return getter;
+/******/ 	};
 /******/ 	
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
+/******/ 	// define getter/value functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 			}
-/******/ 		};
-/******/ 	})();
+/******/ 		}
+/******/ 	};
 /******/ 	
 /******/ 	/* webpack/runtime/ensure chunk */
-/******/ 	(() => {
-/******/ 		__webpack_require__.f = {};
-/******/ 		// This file contains only the entry chunk.
-/******/ 		// The chunk loading function for additional chunks
-/******/ 		__webpack_require__.e = (chunkId) => {
-/******/ 			return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
-/******/ 				__webpack_require__.f[key](chunkId, promises);
-/******/ 				return promises;
-/******/ 			}, []));
-/******/ 		};
-/******/ 	})();
+/******/ 	__webpack_require__.f = {};
+/******/ 	// This file contains only the entry chunk.
+/******/ 	// The chunk loading function for additional chunks
+/******/ 	__webpack_require__.e = (chunkId) => {
+/******/ 		const promises = [];
+/******/ 		__webpack_require__.f.j(chunkId, promises);
+/******/ 		return Promise.all(promises);
+/******/ 	};
 /******/ 	
 /******/ 	/* webpack/runtime/get javascript chunk filename */
-/******/ 	(() => {
-/******/ 		// This function allow to reference async chunks
-/******/ 		__webpack_require__.u = (chunkId) => {
-/******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + "-bundle.js";
-/******/ 		};
-/******/ 	})();
+/******/ 	// This function allow to reference async chunks
+/******/ 	__webpack_require__.u = (chunkId) => (chunkId + "-bundle.js");
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop));
 /******/ 	
 /******/ 	/* webpack/runtime/load script */
 /******/ 	(() => {
-/******/ 		var inProgress = {};
-/******/ 		var dataWebpackPrefix = "nddem:";
+/******/ 		const inProgress = {};
+/******/ 		const dataWebpackPrefix = "nddem:";
 /******/ 		// loadScript function to load a script via script tag
 /******/ 		__webpack_require__.l = (url, done, key, chunkId) => {
 /******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
-/******/ 			var script, needAttach;
+/******/ 			let script, needAttach;
 /******/ 			if(key !== undefined) {
-/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				const scripts = document.getElementsByTagName("script");
 /******/ 				for(var i = 0; i < scripts.length; i++) {
-/******/ 					var s = scripts[i];
+/******/ 					const s = scripts[i];
 /******/ 					if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
 /******/ 				}
 /******/ 			}
@@ -474,17 +460,17 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 				script.src = url;
 /******/ 			}
 /******/ 			inProgress[url] = [done];
-/******/ 			var onScriptComplete = (prev, event) => {
+/******/ 			const onScriptComplete = (prev, event) => {
 /******/ 				// avoid mem leaks in IE.
 /******/ 				script.onerror = script.onload = null;
 /******/ 				clearTimeout(timeout);
-/******/ 				var doneFns = inProgress[url];
+/******/ 				const doneFns = inProgress[url];
 /******/ 				delete inProgress[url];
-/******/ 				script.parentNode && script.parentNode.removeChild(script);
-/******/ 				doneFns && doneFns.forEach((fn) => (fn(event)));
+/******/ 				script.parentNode?.removeChild(script);
+/******/ 				doneFns?.forEach((fn) => (fn(event)));
 /******/ 				if(prev) return prev(event);
 /******/ 			}
-/******/ 			var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+/******/ 			const timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
 /******/ 			script.onerror = onScriptComplete.bind(null, script.onerror);
 /******/ 			script.onload = onScriptComplete.bind(null, script.onload);
 /******/ 			needAttach && document.head.appendChild(script);
@@ -492,20 +478,14 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = (exports) => {
+/******/ 		Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
-/******/ 	(() => {
-/******/ 		__webpack_require__.p = "";
-/******/ 	})();
+/******/ 	__webpack_require__.p = "";
 /******/ 	
 /******/ 	/* webpack/runtime/jsonp chunk loading */
 /******/ 	(() => {
@@ -514,13 +494,13 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 		// object to store loaded and loading chunks
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
-/******/ 		var installedChunks = {
+/******/ 		const installedChunks = {
 /******/ 			"effective-stress": 0
 /******/ 		};
 /******/ 		
 /******/ 		__webpack_require__.f.j = (chunkId, promises) => {
 /******/ 				// JSONP chunk loading for javascript
-/******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
+/******/ 				let installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
 /******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
 /******/ 		
 /******/ 					// a Promise means "currently loading".
@@ -529,29 +509,28 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 					} else {
 /******/ 						if(true) { // all chunks have JS
 /******/ 							// setup Promise in chunk cache
-/******/ 							var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
+/******/ 							const promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
 /******/ 							promises.push(installedChunkData[2] = promise);
 /******/ 		
-/******/ 							// start chunk loading
-/******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
 /******/ 							// create error before stack unwound to get useful stacktrace later
-/******/ 							var error = new Error();
-/******/ 							var loadingEnded = (event) => {
+/******/ 							const error = new Error();
+/******/ 							const loadingEnded = (event) => {
 /******/ 								if(__webpack_require__.o(installedChunks, chunkId)) {
 /******/ 									installedChunkData = installedChunks[chunkId];
 /******/ 									if(installedChunkData !== 0) installedChunks[chunkId] = undefined;
 /******/ 									if(installedChunkData) {
-/******/ 										var errorType = event && (event.type === 'load' ? 'missing' : event.type);
-/******/ 										var realSrc = event && event.target && event.target.src;
+/******/ 										const errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 										const realSrc = event && event.target && event.target.src;
 /******/ 										error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
 /******/ 										error.name = 'ChunkLoadError';
 /******/ 										error.type = errorType;
 /******/ 										error.request = realSrc;
+/******/ 										error.event = event;
 /******/ 										installedChunkData[1](error);
 /******/ 									}
 /******/ 								}
 /******/ 							};
-/******/ 							__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
+/******/ 							__webpack_require__.l(__webpack_require__.p + __webpack_require__.u(chunkId), loadingEnded, "chunk-" + chunkId, chunkId);
 /******/ 						}
 /******/ 					}
 /******/ 				}
@@ -568,8 +547,8 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 		// no on chunks loaded
 /******/ 		
 /******/ 		// install a JSONP callback for chunk loading
-/******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
-/******/ 			var [chunkIds, moreModules, runtime] = data;
+/******/ 		const webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 			let [chunkIds, moreModules, runtime] = data;
 /******/ 			// add "moreModules" to the modules object,
 /******/ 			// then flag all "chunkIds" as loaded and fire callback
 /******/ 			var moduleId, chunkId, i = 0;
@@ -592,22 +571,20 @@ eval("{module.exports = /*#__PURE__*/JSON.parse('{\"glyphs\":{\"0\":{\"x_min\":5
 /******/ 		
 /******/ 		}
 /******/ 		
-/******/ 		var chunkLoadingGlobal = self["webpackChunknddem"] = self["webpackChunknddem"] || [];
+/******/ 		const chunkLoadingGlobal = self["webpackChunknddem"] = self["webpackChunknddem"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/nonce */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nc = undefined;
-/******/ 	})();
+/******/ 	__webpack_require__.nc = undefined;
 /******/ 	
 /************************************************************************/
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./live/src/effective-stress.js");
+/******/ 	let __webpack_exports__ = __webpack_require__("./live/src/effective-stress.js");
 /******/ 	
 /******/ })()
 ;
