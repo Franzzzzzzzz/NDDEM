@@ -23,6 +23,7 @@ module.exports = [{
         'hopper': ['./live/src/hopper.js'],
         'intruder': ['./live/src/intruder.js'],
         'anisotropy': ['./live/src/anisotropy.js'],
+        'tilt': ['./live/src/tilt.js'],
         'dam-break': ['./live/src/dam-break.js'],
         'dam-break-2d': ['./live/src/dam-break-2d.js'],
         'effective-stress': ['./live/src/effective-stress.js'],
@@ -146,6 +147,13 @@ module.exports = [{
             template: "live/plotly-template.html",
             filename: "anisotropy.html",
             chunks: ['anisotropy']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM The Tilt of the Stress',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "tilt.html",
+            chunks: ['tilt']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Dam Break',
