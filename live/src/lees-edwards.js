@@ -243,7 +243,9 @@ function animate() {
         params.current_pressure = pressure.reduce((a, b) => a + b, 0) / pressure.length; // average vertical stress
         // let dt = 1e-3;
         params.wall_mass = params.N*params.particle_mass;
-        WALLS.update_damped_wall(params.current_pressure, params.target_pressure, params, S, 5*1e-3/20.);
+        if ( S.simu_getTime() > 0.1 ) {
+            WALLS.update_damped_wall(params.current_pressure, params.target_pressure, params, S, 5*1e-3/20.);
+        }
         
         update_graph();
         SPHERES.draw_force_network(S, params, scene);
@@ -326,7 +328,7 @@ async function NDDEMCGPhysics() {
         cgparam["time average"]="None" ;
         cgparam["fields"]=["RHO", "VAVG", "TC","Pressure","ShearStress"] ;
         cgparam["periodicity"]=Array(params.dimension).fill(true);
-        cgparam["window"]="Lucy3D";
+        cgparam["window"]="LucyND";
         cgparam["dimension"]=params.dimension;
 
 
