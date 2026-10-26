@@ -21,6 +21,7 @@ module.exports = [{
         'rotation-matrix': ['./live/src/rotation-matrix.js'],
         'simple-shear': ['./live/src/simple-shear.js'],
         'hopper': ['./live/src/hopper.js'],
+        'earth-pressure-2d': ['./live/src/earth-pressure-2d.js'],
         'intruder': ['./live/src/intruder.js'],
         'anisotropy': ['./live/src/anisotropy.js'],
         'tilt': ['./live/src/tilt.js'],
@@ -77,6 +78,13 @@ module.exports = [{
             template: "live/template.html",
             filename: "hopper-2d.html",
             chunks: ['hopper']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Active and Passive Earth Pressure',
+            favicon: './visualise/resources/favicon.ico',
+            template: 'live/template.html',
+            filename: 'earth-pressure-2d.html',
+            chunks: ['earth-pressure-2d']
         }),
         new HtmlWebpackPlugin({
             title: "NDDEM Inclined plane",

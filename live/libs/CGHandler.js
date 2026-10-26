@@ -65,20 +65,16 @@ export function update_2d_cg_field(S, params) {
             lut.setMin(0);
             lut.setMax( 0.9*maxVal);
             lut.units = 'Pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
-        } else if ( params.cg_field === 'Vertical Stress' ) {
-            val=S.cg_get_result(0, "TC", 0) ; // ONLY TRUE in 2D WITH FIRST AXIS VERTICAL!!!! FIXME LATER
+        } else if ( params.cg_field === 'Vertical Stress' || params.cg_field === 'Horizontal Stress' ) {
+            // Existing examples use x as vertical; allow y-vertical experiments too.
+            const verticalAxis = params.cg_vertical_axis ?? 0;
+            const axis = params.cg_field === 'Vertical Stress' ? verticalAxis : 1 - verticalAxis;
+            val = S.cg_get_result(0, "TC", axis * 3); // 2D tensor: xx, xy, yx, yy.
             lut = sequential;
             let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
             lut.setMin(0);
             lut.setMax( 0.9*maxVal);
-            lut.units = 'Pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
-        } else if ( params.cg_field === 'Horizontal Stress' ) {
-            val=S.cg_get_result(0, "TC", 3) ; // ONLY TRUE in 2D WITH FIRST AXIS VERTICAL!!!! FIXME LATER
-            lut = sequential;
-            let maxVal = val.reduce(function(a, b) { return Math.max(Math.abs(a), Math.abs(b)) }, 0);
-            lut.setMin(0);
-            lut.setMax( 0.9*maxVal);
-            lut.units = 'Pressure (N/m<sup>'+String(params.dimension-1)+'</sup>)';
+            lut.units = params.cg_field + ' (N/m<sup>'+String(params.dimension-1)+'</sup>)';
         } else if ( params.cg_field === 'Total Pressure' ) {
             val=S.cg_get_result(0, "Pressure", 0) ;
             // now loop through and any positions below p.water_table, add the weight of the water, i.e. p += p.water_density * p.g_mag * p.x
