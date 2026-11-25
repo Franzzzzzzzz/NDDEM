@@ -28,8 +28,13 @@ public:
   AverageType timeaverage = AverageType::None ;
 
   Windows window = Windows::Lucy3D ;
+  Shapes shape = Shapes::Dirac ; 
+  AngularWindows angularwindow = AngularWindows::World ; 
   double windowsize ;
-  bool convolvingwindow=false ; 
+  double angularwindowsize = M_PI/4. ; 
+  bool forcemc = false ; 
+  int n_mc = 100 ; 
+  vector<double> window_scaling ; 
   vector<bool> periodicity ;
   vector<double>delta ;
 
@@ -55,7 +60,7 @@ public:
   } ;
   vector<ExtaField> extrafields ;
 
-  int curts=0 ;
+  int curts=-1 ;
   bool tsread = false ;
 
   void from_json (json & j) ;
@@ -88,15 +93,14 @@ void Param::from_json(json &j)
             catch(...) {string a = v.value().get<string>(); saveformat.push_back(a) ; }
         }
         else if (v.key() == "save window") { savewindow = v.value().get<int>() ; }
-        else if (v.key() == "window size")
-        { windowsize = v.value().get<double>(); requiredfieldset[v.key()] = true ; }
+        
         else if (v.key() == "skip") skipT = v.value().get<int>() ;
         else if (v.key() == "max time") { maxT = v.value().get<int>() ; requiredfieldset[v.key()] = true ;}
         else if (v.key() == "fields") { flags = v.value().get<vector<string>>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boxes")  {boxes = v.value().get<decltype(boxes)>(); requiredfieldset[v.key()] = true ; }
         else if (v.key() == "boundaries") {boundaries = v.value().get<decltype(boundaries)>(); requiredfieldset[v.key()] = true ; }
-        else if (v.key() == "euler angles boxes")  {eulerboxes = v.value().get<decltype(eulerboxes)>(); requiredfieldset[v.key()] = true ; }
-        else if (v.key() == "euler angles boundaries") {eulerboundaries = v.value().get<decltype(eulerboundaries)>(); requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "euler angles boxes")  {eulerboxes = v.value().get<decltype(eulerboxes)>(); }
+        else if (v.key() == "euler angles boundaries") {eulerboundaries = v.value().get<decltype(eulerboundaries)>(); }
         else if (v.key() == "time average")
         {
             if (v.value().get<string>() == "None") timeaverage = AverageType::None ;
@@ -109,7 +113,37 @@ void Param::from_json(json &j)
                 printf("WARN: unknown average type (allowed: 'None', 'Final', 'Intermediate', 'Intermediate and Final', 'Pre pass 5', 'Intermediate and pre pass 5'). Case sensitive\n") ;
         }
         else if (v.key() == "window") {window = identify_window(v.value().get<string>()); }
-        else if (v.key() == "windowconvolution") { convolvingwindow = true ;}
+        else if (v.key() == "window size") { windowsize = v.value().get<double>(); requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "angular window") 
+        { 
+            if (v.value().get<string>() == "RectAxiSymmetric")
+                angularwindow = AngularWindows::RectAxiSymmetric ;
+            else if (v.value().get<string>() == "LucyAxiSymmetric")
+                angularwindow = AngularWindows::LucyAxiSymmetric ;
+            else 
+            {
+                if (v.value().get<string>() != "World")
+                    printf("Error: unknown angular window, defaulting to World.\n") ; 
+                angularwindow = AngularWindows::World ;
+            }
+        }
+        else if (v.key() == "angular window size") { angularwindowsize = v.value().get<double>() /180. * M_PI; requiredfieldset[v.key()] = true ; }
+        else if (v.key() == "particle shape") 
+        {
+            if (v.value().get<string>() == "Sphere")
+                shape = Shapes::Sphere ;
+            else if (v.value().get<string>() == "Ellipsoid")
+                shape = Shapes::Ellipsoid ;
+            else 
+            {
+                if (v.value().get<string>() != "Dirac")
+                    printf("Error: unknown particle shape, defaulting to Dirac") ; 
+                shape = Shapes::Dirac ;
+            }
+        }
+        else if (v.key() == "force mc") { forcemc = v.value().get<bool>() ; ; }
+        else if (v.key() == "monte-carlo samples") { n_mc = v.value().get<int>() ; }
+        else if (v.key() == "window scaling") { window_scaling= v.value().get<decltype(window_scaling)>() ;}
         else if (v.key() == "periodicity") {periodicity = v.value().get<decltype(periodicity)>();}
         else if (v.key() == "density") { default_density=v.value().get<double>() ; }
         else if (v.key() == "radius") { default_radius=v.value().get<double>() ; }
@@ -131,11 +165,13 @@ void Param::from_json(json &j)
 //-----------------------------------------------
 int Param::read_timestep (int ts, bool particleonly)
 {
-    if (curts == ts && tsread) return 0 ; //Already read and all
+    printf("===>%d \n", curts) ; fflush(stdout) ; 
+    if (curts == ts) return 0 ; //Already read and all
     printf("%d ", ts) ;fflush(stdout) ;
     for (auto & v: files)
     {
      v.reader->read_timestep(ts) ;
+     curts=ts ; 
     }
     return 1 ;
 }
@@ -217,12 +253,16 @@ return -1 ;
 //----------------------------------------------------------
 Windows Param::identify_window(std::string windowstr)
 {
-         if ( windowstr=="Rect3D") return Windows::Rect3D ;
+         if ( windowstr=="Rect3D") return Windows::Rect3D ;         
+    else if ( windowstr=="Rect3D_half") return Windows::Rect3D_half ;
+    else if ( windowstr=="Rect3D_interface") return Windows::Rect3D_halfinterface ;
+    else if ( windowstr=="Rect3D_scale" || windowstr=="Ellipsoid") return Windows::Rect3D_scale ;
     else if ( windowstr=="Rect3DIntersect")  {printf("====> DEPRECATED: misleading name, use Sphere3DIntersect instead. <=======\n") ; return Windows::Sphere3DIntersect ;}
-    else if ( windowstr=="Sphere3DIntersect") return Windows::Sphere3DIntersect ;
+    else if ( windowstr=="Sphere3DIntersect") {printf("====> DEPRECATED: use 'Rect3D' and 'shape particle: sphere' instead. <=======\n") ;  return Windows::Sphere3DIntersect ; }
     else if ( windowstr=="SphereNDIntersect") return Windows::SphereNDIntersect ;
     else if ( windowstr=="Lucy3D") return Windows::Lucy3D ;
     else if ( windowstr=="Lucy3D_half") return Windows::Lucy3D_half ;
+    else if ( windowstr=="Lucy3D_interface") return Windows::Lucy3D_halfinterface ;
     else if ( windowstr=="Lucy3D_scale") return Windows::Lucy3D_scale ;
     else if ( windowstr=="Hann3D") return Windows::Hann3D ;
     else if ( windowstr=="RectND") return Windows::RectND ;

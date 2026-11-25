@@ -91,24 +91,88 @@ int Coarsing::add_extra_field(string name, TensorOrder order, FieldType type)
 }
 
 //-------------------------------------------------------
-int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> boxes, vector<double> deltas, vector<vector<double>> bounds, bool convolutionwindow)
+int Coarsing::setWindow (Windows win, Shapes shape, double w, vector <bool> per, vector<int> boxes, vector<double> deltas, vector<vector<double>> bounds, 
+                         bool forcemc, int n_mc, std::vector<double> scaling, AngularWindows angularwindow, double angularwindowsize)
 {  
- LibBase ** winptr = nullptr ; 
- if (convolutionwindow)
+ LibBase ** winptr = &Window  ; 
+ 
+ if (angularwindow != AngularWindows::World) // There is an angular window ...
  {
-   setWindow<Windows::MonteCarloIntersect3D> (w, nullptr) ; 
-   winptr = &( (static_cast<LibMonteCarloIntersect3D*>(Window))->win) ; 
+   *winptr=new LibAngular (&data, w, d) ;
+   switch (angularwindow) {
+     case AngularWindows::RectAxiSymmetric:
+       static_cast<LibAngular*>(*winptr)->angularwin = new LibRect_AngularAxisymmetric(&data, angularwindowsize, d) ; 
+       if (shape == Shapes::Dirac)
+         static_cast<LibRect_AngularAxisymmetric*>(static_cast<LibAngular*>(*winptr)->angularwin)->shape = new LibShapeDirac (&data) ; 
+       else
+         static_cast<LibRect_AngularAxisymmetric*>(static_cast<LibAngular*>(*winptr)->angularwin)->shape = new LibShapeEllipsoid (&data) ; 
+     
+       break ; 
+     case AngularWindows::LucyAxiSymmetric:
+       static_cast<LibAngular*>(*winptr)->angularwin = new LibLucy_AngularAxisymmetric(&data, angularwindowsize, d) ; 
+       if (shape == Shapes::Dirac)
+         static_cast<LibLucy_AngularAxisymmetric*>(static_cast<LibAngular*>(*winptr)->angularwin)->shape = new LibShapeDirac (&data) ;  
+       else
+         static_cast<LibLucy_AngularAxisymmetric*>(static_cast<LibAngular*>(*winptr)->angularwin)->shape = new LibShapeEllipsoid (&data) ;        
+       break ; 
+     default: 
+       printf("Unexpected default angular window. Skipping angular window definition.\n") ;        
+   }
+   if (shape != Shapes::Ellipsoid)
+      printf("ERROR: Angular window are mainly defined for ellipsoid shape, if you are using another shape it needs to provide orientation\n") ;
+   
+   winptr = &(static_cast<LibAngular*>(*winptr)->spatialwin) ; 
  } 
-  
+ 
+ if ( (win != Windows::Dirac3D && shape != Shapes::Dirac) || forcemc )
+ {
+   if (!forcemc && shape == Shapes::Sphere && win == Windows::Rect3D)
+   {
+    setWindow<Windows::Sphere3DIntersect>(w, winptr) ;   
+    cutoff = Window -> cutoff() ;  
+    printf("Window and cutoff: %g %g \n", w, cutoff) ;
+    return 1 ; 
+   }
+   else if (!forcemc && shape == Shapes::Sphere && win == Windows::RectND)
+   {
+    setWindow<Windows::SphereNDIntersect>(w, winptr) ;    
+    cutoff = Window -> cutoff() ;  
+    printf("Window and cutoff: %g %g \n", w, cutoff) ; 
+    return 2 ; 
+   }
+   else
+   {   
+    setWindow<Windows::MonteCarloIntersect3D>(w, winptr) ;
+    static_cast<LibMonteCarloIntersect3D*>(*winptr)->set_nsample(n_mc) ; 
+    if (shape == Shapes::Sphere)
+      static_cast<LibMonteCarloIntersect3D*>(*winptr)->shape = new LibShapeSphere (&data) ; 
+    else if (shape == Shapes::Ellipsoid)
+      static_cast<LibMonteCarloIntersect3D*>(*winptr)->shape = new LibShapeEllipsoid (&data) ; 
+    else
+      printf("ERROR: Unknown particle shape\n") ;
+    winptr = &( (static_cast<LibMonteCarloIntersect3D*>(*winptr))->win) ; 
+   }
+ }
+ 
  switch (win) {
   case Windows::Rect3D :
     setWindow<Windows::Rect3D> (w, winptr) ;
+    break ;    
+  case Windows::Rect3D_half :
+    setWindow<Windows::Rect3D_half> (w, winptr) ; 
+    break ;
+  case Windows::Rect3D_halfinterface :
+    setWindow<Windows::Rect3D_halfinterface> (w, winptr) ; 
+    break ;
+  case Windows::Rect3D_scale :
+    setWindow<Windows::Rect3D_scale> (w, winptr) ; 
+    static_cast<LibRect3D_scale *>(*winptr)->set_scale(scaling[0], scaling[1], scaling[2]) ; 
     break ;
   case Windows::Sphere3DIntersect :
     setWindow<Windows::Sphere3DIntersect> (w,winptr) ;
     break ;
   case Windows::SphereNDIntersect :
-    setWindow<Windows::SphereNDIntersect> (w, nullptr) ; // Only 3D windows can use the convolution window currently. 
+    setWindow<Windows::SphereNDIntersect> (w, winptr) ; // Only 3D windows can use the convolution window currently. 
     break ;
   case Windows::Lucy3D :
     setWindow<Windows::Lucy3D> (w, winptr) ;
@@ -116,8 +180,12 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   case Windows::Lucy3D_half :
     setWindow<Windows::Lucy3D_half> (w, winptr) ;
     break ;
+  case Windows::Lucy3D_halfinterface :
+    setWindow<Windows::Lucy3D_halfinterface> (w, winptr) ;
+    break ;
   case Windows::Lucy3D_scale :
     setWindow<Windows::Lucy3D_scale> (w, winptr) ;
+    static_cast<LibLucy3D_scale *>(*winptr)->set_scale(scaling[0], scaling[1], scaling[2]) ; 
     break ;
   case Windows::Lucy3DFancyInt:
     setWindow<Windows::Lucy3DFancyInt> (w, winptr) ;
@@ -126,16 +194,22 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
     setWindow<Windows::Hann3D> (w, winptr) ;
     break ;
   case Windows::RectND :
-    setWindow<Windows::RectND> (w, nullptr) ;
+    setWindow<Windows::RectND> (w, winptr) ;
     break ;
   case Windows::LucyND :
-    setWindow<Windows::LucyND> (w, nullptr) ;
+    setWindow<Windows::LucyND> (w, winptr) ;
     break ;
   case Windows::LucyND_Periodic:
     setWindow<Windows::LucyND_Periodic> (w, per, boxes, deltas) ;
     break ;
   case Windows::Dirac3D:
-    setWindow<Windows::Dirac3D> (w, nullptr) ;
+    setWindow<Windows::Dirac3D> (w, winptr) ;
+    if (shape == Shapes::Sphere)
+      static_cast<LibDirac3D*>(*winptr)->shape = new LibShapeSphere (&data) ; 
+    else if (shape == Shapes::Ellipsoid)
+      static_cast<LibDirac3D*>(*winptr)->shape = new LibShapeEllipsoid (&data) ; 
+    else
+      printf("ERROR: Unknown particle shape or Dirac, which is not working with Dirac3D windows\n") ;
     break ;
   case Windows::RVE:
     setWindow<Windows::RVE> (bounds) ;
@@ -143,6 +217,9 @@ int Coarsing::setWindow (Windows win, double w, vector <bool> per, vector<int> b
   default:
     printf("Unknown window, check Coarsing::setWindow #1\n") ;
  }
+
+ cutoff = Window -> cutoff() ;  
+ printf("Window and cutoff: %g %g \n", w, cutoff) ;
 return 0 ;
 }
 
@@ -216,7 +293,7 @@ int Coarsing::grid_neighbour ()
         {
             if (j==i) continue ;
             dst = normdiff(CGP[i].location, CGP[j].location) ;
-            if (dst < cutoff) CGP[i].neighbors.push_back(j) ;
+            if (dst < 2*cutoff) CGP[i].neighbors.push_back(j) ;
         }
     }
     double nsz=0 ;
@@ -364,25 +441,6 @@ for (size_t j=0 ; j<subflags.size() ; j++)
   }
 }
 return n ;
-}
-
-//----------------------------------------
-v2d Coarsing::get_bounds ()
-{
- v2d res (2, v1d (d)) ; // vector 2xd, min & max reach of the CG points
-
- for (auto & v : res[0]) v=+std::numeric_limits<double>::infinity() ;
- for (auto & v : res[1]) v=-std::numeric_limits<double>::infinity() ;
-
- for (auto & v : CGP)
-     for (int i=0 ; i<d ; i++)
-     {
-         if (v.location[i]<res[0][i]) res[0][i]= v.location[i] ;
-         if (v.location[i]>res[1][i]) res[1][i]= v.location[i] ;
-     }
- for (auto & v : res[0]) v -= cutoff ;
- for (auto & v : res[1]) v += cutoff ;
- return res ;
 }
 //----------------------------------------
 int Coarsing::find_closest(int id)
@@ -724,7 +782,6 @@ for (i=0 ; i<data.N ; i++)
  for (auto j=CGP[id].neighbors.begin() ; j<CGP[id].neighbors.end() ; j++)
  {
      wp=Window->window_weight(i,CGP[*j].location, CGP[*j].orientation) ;
-
      //double wp2=Window->distance(i,CGP[*j].location) ;
 
 
@@ -755,7 +812,6 @@ for (i=0 ; i<data.N ; i++)
          for (int w = 0 ; w<extrancomp[v] ; w++)
            *(CGf+extraid[v]+w) += wp * dm * data.extra[extralocation[v]+w][i] ;
  }
-
 }
 
 /*int nbzero = 0 ;
@@ -2102,14 +2158,14 @@ int Coarsing ::write_csv (string path)
     for (int i=0 ; i<Npt ; i++)
       for (int a=0 ; a<NptAngles; a++)
       {
-        fprintf(out, "%d, %g, %g, %g", t, CGP[i+Npt*a].location[0], CGP[i+Npt*a].location[1], CGP[Npt*i+a].location[2]) ;
+        fprintf(out, "%d, %g, %g, %g", t, CGP[i+Npt*a].location[0], CGP[i+Npt*a].location[1], CGP[i+Npt*a].location[2]) ;
         if (NptAngles>1)
         {
-          auto euler = CGP[i+Npt*a].orientation.toRotationMatrix().eulerAngles(2, 1, 0);
-          fprintf(out, ", %g, %g, %g", euler[2]*180./M_PI, euler[1]*180./M_PI, euler[0]*180./M_PI) ;  
-          //Eigen::Vector3d aa={1,0,0} ; 
-          //auto b=CGP[i+Npt*a].orientation*aa ;
-          //fprintf(out, ", %g, %g", atan2(b(1), b(0))*180./M_PI, acos(b(2))*180./M_PI) ;  
+          //auto euler = CGP[i+Npt*a].orientation.toRotationMatrix().eulerAngles(2, 1, 0);
+          //fprintf(out, ", %g, %g, %g", euler[2]*180./M_PI, euler[1]*180./M_PI, euler[0]*180./M_PI) ;  
+          Eigen::Vector3d aa={1,0,0} ; 
+          auto b=CGP[i+Npt*a].orientation*aa ;
+          fprintf(out, ", %g, %g", atan2(b(1), b(0))*180./M_PI, acos(b(2))*180./M_PI) ;  
         }
         for (size_t f=0 ; f<Fcols.size() ; f++)
         {

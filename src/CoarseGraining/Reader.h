@@ -145,24 +145,25 @@ public:
     } filenumbering ; 
     std::string getpath (int ts) 
     {
-        char * tmp = nullptr ; 
         size_t pos = path.find('%') ;
+        std::vector<char> tmp ; 
         for ( ; !isalpha(path[pos]) ; pos++) ;
         if (path[pos]=='e' || path[pos]=='f' || path[pos]=='g' || path[pos]=='E' || path[pos]=='F' || path[pos]=='G') 
         {
             int len = snprintf(NULL, 0, path.c_str(), filenumbering.initial+filenumbering.delta*ts) ; 
-            tmp = (char*) malloc(len) ;
-            sprintf(tmp, path.c_str(), filenumbering.initial+filenumbering.delta*ts) ; 
+            tmp.resize(len+1) ;
+            //tmp = (char*) malloc(len) ;
+            sprintf(tmp.data(), path.c_str(), filenumbering.initial+filenumbering.delta*ts) ; 
         }
         else if (path[pos]=='d'|| path[pos]=='i' || path[pos]=='u' || path[pos]=='h' || path[pos]=='l' || path[pos]=='j' || path[pos]=='z')
         {
             int len = snprintf(NULL, 0, path.c_str(), static_cast<long long int>(filenumbering.initial+filenumbering.delta*ts)) ; 
-            tmp = (char*) malloc(len+1) ;
-            sprintf(tmp, path.c_str(), static_cast<long long int>(filenumbering.initial+filenumbering.delta*ts)) ;             
+            tmp.resize(len+10) ; 
+            //tmp = (char*) malloc(len+1) ;
+            sprintf(tmp.data(), path.c_str(), static_cast<long long int>(filenumbering.initial+filenumbering.delta*ts)) ;             
         }
         else printf("ERR: unknown format specifier in file path: %c.\n", path[pos]) ; 
-        std::string res = tmp ; 
-        free(tmp) ; 
+        std::string res = tmp.data() ; 
         return res ;
     }
 

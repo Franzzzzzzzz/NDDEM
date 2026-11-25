@@ -8,14 +8,14 @@ set_property(TARGET CoarseGraining PROPERTY CXX_STANDARD 17)
 
 if(EMSCRIPTEN)
  target_compile_options(CoarseGraining PUBLIC -O3 ${Matlab_Macro} -Wall -DUSEBINDINGS)
- target_link_libraries(CoarseGraining PUBLIC -O3 -lz -lm -Wall -DUSEBINDINGS)
+ target_link_libraries(CoarseGraining PUBLIC -O3 -lm -Wall -DUSEBINDINGS)
  set(MODULARIZE "1")
  set(EXPORT_NAME "CoarseGraining")
  set_target_properties(
     CoarseGraining
     PROPERTIES
     LINK_FLAGS
-    "-O3 -lnodefs.js -lworkerfs.js -sNO_DISABLE_EXCEPTION_CATCHING --bind -s ALLOW_MEMORY_GROWTH=1 -s STACK_OVERFLOW_CHECK=1 -s MODULARIZE=1 -s EXPORT_NAME='CoarseGraining' -s EXPORTED_RUNTIME_METHODS=[\"FS\",\"WORKERFS\"]"
+    "-O3 -lnodefs.js -lworkerfs.js -sNO_DISABLE_EXCEPTION_CATCHING --bind -sUSE_ZLIB=1 -s ALLOW_MEMORY_GROWTH=1 -s STACK_OVERFLOW_CHECK=1 -s MODULARIZE=1 -s EXPORT_NAME='CoarseGraining' -s EXPORTED_RUNTIME_METHODS=[\"FS\",\"WORKERFS\"]"
  )
 else()
  target_compile_options(CoarseGraining PUBLIC -Wall -g -DNRRDIO ${Matlab_Macro})

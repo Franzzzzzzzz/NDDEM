@@ -133,7 +133,7 @@ int LiggghtsReader::read_timestep(int ts)
   else
   {
       while (ts-1>curts)
-          read_timestep_impl(ts, true) ;
+          read_timestep_impl(ts, true) ; 
       read_timestep_impl(ts,false) ;
   }
 
@@ -215,7 +215,9 @@ int LiggghtsReader::read_timestep_impl(int ts, bool skip)
 
   for (int i=0 ; i<Nitem; i++)
     for (int j=0 ; j<nid ; j++)
+    {
       *in>>tdata[i][j] ;
+    }
   *in>>blank ; // Get rid of the last newline
 
   do_post_read() ; 

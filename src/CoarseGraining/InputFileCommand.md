@@ -40,7 +40,7 @@ The actual coarse-graining is performed in 5 pass, refered as below. Each pass h
         - Other: `dzeta`, with $$\dzeta = \sqrt{0.5 \left ( (ev1-ev2)^2 + (ev2-ev3)^2 + (ev3-ev1)^2 \right ) } $$.
 - `boxes`: array. Number of boxes in each dimension. `[[x0min, x1min, x2min ...], [x0max, x1max, x2max ...]]`
 - `boundaries`: volume that is coarse-grained. Do not specify in order to process the whole simulation (if the simulation bounds are saved in the input file).
-- `window: [Rect3D | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3DFancyInt | LucyND | LucyND_Periodic]`: shape of the averaging window. `Rect3D` is a misnommer, as it is actually a sphere 3D.
+- `window: [Rect3D | Ellipsoid | Sphere3DIntersect | SphereNDIntersect | RectND | Hann3D | Lucy3D | Lucy3D_half | Lucy3D_scale | Lucy3DFancyInt | LucyND | LucyND_Periodic]`: shape of the averaging window. `Rect3D` is a misnommer, as it is actually a sphere 3D.
 - `window size`: size of the averaging window.
 - `save window`: integer. for debugging mostly, export a vtk file of the window corresponding to the coarse graining point indicated. 
 - `extra fields`: array of extrafield objects, to allow for computation of arbitrary fields. 
@@ -49,9 +49,12 @@ The actual coarse-graining is performed in 5 pass, refered as below. Each pass h
     - `tensor order: [0|1|2]` -- 0 is scalar, 1 is vector, 2 is second order tensor. 
     
 ##### Advanced features
-- `windowconvolution`: the window used will be convolved with the actual particle shape. Currently the integral is performed through Monte-Carlo integration. 
-- `euler angle boxes`: allow for coarse-graining along different window orientation. Three integer representing the number of angles along the roll, pitch, yaw, in that order. 
-- `euler angle boundaries`: ranges to use for the euler angles, in degrees. The full range is used (ie. there are boxes with center at the min and max). 
+- `particle shape: [Dirac | Sphere | Ellipsoid]`: Dirac, the default, perform the usual coarse-graining. For other shapes, the window used will be convolved with the indicated particle shape. Currently the integral is performed through Monte-Carlo integration, except for 
+- `force mc`: force the monte-carlo spatial integration
+- `monte-carlo samples`: number of sample for the monte-carlo spatial integration
+- `window scaling: [sx, sy, sz]`: scaling in x, y, z, of the window. The scaling is applied before the potential rotation of the window.
+- `euler angles boxes`: allow for coarse-graining along different window orientation. Three integer representing the number of angles along the roll, pitch, yaw, in that order. 
+- `euler angles boundaries`: ranges to use for the euler angles, in degrees. The full range is used (ie. there are boxes with center at the min and max). 
 
 #### Time handling
 - `skip`: number of timestep to skip

@@ -42,7 +42,9 @@ public:
         reader->set_num_particles (S.N) ;
         reader->set_data (DataValue::radius, S.P.r) ;
         reader->set_data (DataValue::mass, S.P.m) ;
-        reader->set_data (DataValue::Imom, S.P.I) ;
+        std::vector<double> I = S.P.Iinv ;
+        for (auto &v: I) v=1./v ; 
+        reader->set_data (DataValue::Imom, I) ;
     }
     int cg_process_timestep (int ts, bool allow_avg_fluct=false) {return CG.process_timestep(ts, allow_avg_fluct) ; }
     Vector1Djs cg_get_result (int ts, std::string field, int component) {return CG.get_result(ts, field, component) ; }
@@ -322,6 +324,6 @@ private:
 
 } ;*/
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     #include "em_bindings.h"
 #endif

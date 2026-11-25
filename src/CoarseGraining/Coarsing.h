@@ -80,7 +80,7 @@ public :
     v2d fields ;    ///< 1st dimension is time, second are fields
     v2d subfields ; ///< 1st dimension is time, second are subfields (ie. "TC.ev1")
     v1d location ;  ///< Location of the coarse graining point
-    Eigen::Quaternion<double> orientation={1,0,0,0}; 
+    Eigen::Quaternion<double> orientation={1.,0.,0.,0.}; 
     //Useful things
     vector <int> neighbors ; ///< All the neighbors of the point given the window. 1st index is the point itself
     int d ; ///< Dimension
@@ -209,7 +209,7 @@ public :
     // Grid functions
     int set_field_struct() ; ///< Set the FIELDS structure, with all the different CG properties that can be computed.
     int add_extra_field(string name, TensorOrder order, FieldType type) ; ///< Used to add extra user-defined fields
-    int setWindow (Windows win, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}, vector<vector<double>> bounds={{}}, bool convolutionwindow=false) ; ///< Set the windowing function, calling the templated version
+    int setWindow (Windows win, Shapes shape, double w, vector <bool> per ={}, vector<int> boxes = {}, vector<double> deltas = {}, vector<vector<double>> bounds={{}}, bool forcemc=false, int n_mc=100, vector<double> scaling={1.,1.,1.}, AngularWindows angularwindow = AngularWindows::World, double angularwindowsize=M_PI/4.) ; ///< Set the windowing function, calling the templated version
     template <Windows W> int setWindow () ; ///< Set the windowing function
     template <Windows W> int setWindow (double w, LibBase ** winptr) ; ///< Set the windowing function
     template <Windows W> int setWindow (vector<vector<double>> &) ; ///< Set the windowing function for LibRVE
@@ -219,7 +219,6 @@ public :
     int grid_neighbour() ; ///< Generated neighbors in the coarse-graining grid
     std::map<std::string, size_t> grid_setfields() ; ///< Set the fields at each CG point
     int grid_getfields() ; ///< Build the array of fields for the CG points.
-    v2d get_bounds() ; ///< Extract the simulation boundaries
     CGPoint * reverseloop (string type) ; ///< go through the table in reverse order of the dimensions (for the writing phase essentially)
     int find_closest (int id) ; ///< Find the closest CG point to a particle
     int find_closest_pq (int id) ; ///< Find the closest CG point to a contact
@@ -278,12 +277,24 @@ template <Windows W>
 int Coarsing::setWindow (double w, LibBase ** winptr)
 {
   if (winptr==nullptr)
-    winptr = &Window ; 
+  {
+    printf("Error: winptr should be set!") ; 
+    fflush(stdout) ; 
+  } 
   
   static_assert(W != Windows::LucyND_Periodic) ;
   switch (W) {
       case Windows::Rect3D :
          *winptr=new LibRect3D (&data, w, d) ;
+        break ;
+      case Windows::Rect3D_half :
+        *winptr=new LibRect3D_half (&data, w, d) ;
+        break ;
+      case Windows::Rect3D_halfinterface :
+        *winptr=new LibRect3D_halfinterface (&data, w, d) ;
+        break ;
+      case Windows::Rect3D_scale :
+         *winptr=new LibRect3D_scale (&data, w, d) ;
         break ;
       case Windows::Sphere3DIntersect :
         *winptr=new LibSphere3DIntersect (&data, w, d) ;
@@ -296,6 +307,9 @@ int Coarsing::setWindow (double w, LibBase ** winptr)
         break ;
       case Windows::Lucy3D_half :
         *winptr=new LibLucy3D_half (&data, w, d) ;
+        break ;
+      case Windows::Lucy3D_halfinterface :
+        *winptr=new LibLucy3D_halfinterface (&data, w, d) ;
         break ;
       case Windows::Lucy3D_scale :
         *winptr=new LibLucy3D_scale (&data, w, d) ;
@@ -321,8 +335,6 @@ int Coarsing::setWindow (double w, LibBase ** winptr)
       default:
         printf("Unknown window, check Coarsing::setWindow #2 %d\n", static_cast<int>(W)) ;
   }
-  cutoff = (*winptr)->cutoff() ;
-  printf("Window and cutoff: %g %g \n", w, cutoff) ;
   return 0 ;
 }
 //-------------------------------------------------------

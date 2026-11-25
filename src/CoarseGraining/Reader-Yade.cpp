@@ -11,7 +11,7 @@ int YadeReader::read_timestep(int ts)
   pugi::xml_parse_result result = doc.load_file(filepath.c_str());
   if (!result) { printf("ERR: error reading Yade XML %s. File may be not found.\n", filepath.c_str()) ; N=0 ; data.clear() ; return 0; }
   
-  N = atoi(doc.child("VTKFile").child("UnstructuredGrid").child("Piece").attribute("NumberOfPoints").value()) ; 
+  N = std::stoi(doc.child("VTKFile").child("UnstructuredGrid").child("Piece").attribute("NumberOfPoints").value()) ; 
     
   std::vector<std::string> variables ; 
   std::vector<size_t> var_offsets ; 
@@ -21,7 +21,7 @@ int YadeReader::read_timestep(int ts)
     for (auto w: v)
     {
       variables.push_back(w.attribute("Name").value()) ; 
-      var_offsets.push_back(atoi(w.attribute("offset").value())) ; 
+      var_offsets.push_back(std::stoi(w.attribute("offset").value())) ; 
     }
   
   raw64 = doc.child("VTKFile").child("AppendedData").child_value() ; 
@@ -90,23 +90,25 @@ int YadeReader::getfield_from_data (std::string name, std::vector<std::string> &
   for (int i=0 ; i<datalength ; i++) data64.push_back(raw64[i+offset+headerlength]) ;  
   
   std::vector<uint8_t> datacompress = base64decode(data64) ; 
-  uint8_t * buffer ; size_t data_offset=0 ; 
+  //uint8_t * buffer ; 
+  std::vector <uint8_t> buffer ; 
+  size_t data_offset=0 ; 
   unsigned long int us=header[1]; 
-  buffer=(uint8_t*) malloc(header[1]) ;
+  buffer.resize(header[1]) ;
   int jlast = 0 ;
   for (uint32_t i=0; i<header[0] ; data_offset+=header[3+i], i++, us=header[1])
   { 
-    int error = uncompress(buffer, &us, datacompress.data()+data_offset, header[3+i]) ; 
+    int error = uncompress(buffer.data(), &us, datacompress.data()+data_offset, header[3+i]) ; 
     //printf("%d %ld\n", error, us) ; 
     if (error!=0 || us != ((i+1==header[0])?header[2]:header[1])) printf("Decompression error\n") ; 
                                        
     for (size_t j=jlast ; j<jlast+us/bytepervalue ; j++)
     {
-      data[idx+j%ncomponents][j/ncomponents] = byte2double(buffer+(j-jlast)*bytepervalue, bytepervalue) ;
+      data[idx+j%ncomponents][j/ncomponents] = byte2double(buffer.data()+(j-jlast)*bytepervalue, bytepervalue) ;
     }
     jlast += us/bytepervalue ; 
   }  
-  free (buffer) ; 
+  //free (buffer) ; 
   return 0;
 }
 //==============================================================================

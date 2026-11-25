@@ -31,7 +31,7 @@
 #include "Cells.h"
 #include "Octree.h"
 #include "Boundaries.h"
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     #include <emscripten.h>
     #include <emscripten/bind.h>
 
@@ -72,7 +72,7 @@
         vec.push_back(jsArray[i].as<double>());
     }
     return vec;
-}   
+    }   
     #endif
 #else
     using Vector2Djs = std::vector<std::vector<double>> ; 
@@ -1030,7 +1030,7 @@ public:
 
 } ;
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #ifdef USEBINDINGS
 #include "emscripten_specific.h"
 #endif

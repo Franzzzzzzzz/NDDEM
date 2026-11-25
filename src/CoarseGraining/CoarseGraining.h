@@ -8,7 +8,7 @@
 #include <sstream>
 #include <optional>
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     #include <emscripten.h>
     #include <emscripten/bind.h>
     using namespace emscripten ;
@@ -119,10 +119,13 @@ void CoarseGraining::setup_CG ()
     
     for (auto i : P.extrafields)
         C->add_extra_field(i.name, i.order, i.type) ;
-    //if (P.window == Windows::LucyND_Periodic)
-        C->setWindow(P.window, P.windowsize, P.periodicity, P.boxes, P.delta, P.boundaries, P.convolvingwindow) ;
-    //else
-    //    C->setWindow(P.window,P.windowsize) ;
+    
+    // Read the first timestep to process. Needed for some of the window cutoff calculation
+    P.read_timestep(P.skipT) ;
+    P.set_data (C->data) ;
+    
+    C->setWindow(P.window, P.shape, P.windowsize, P.periodicity, P.boxes, P.delta, P.boundaries, P.forcemc, P.n_mc, P.window_scaling, P.angularwindow, P.angularwindowsize) ;
+    C->Window->disp_name() ; 
     pipeline = C->set_flags(P.flags) ;
     auto extrafieldmap = C->grid_setfields() ;
     C->grid_neighbour() ;
@@ -263,7 +266,7 @@ Vector2Djs CoarseGraining::get_spheres(int ts_abs)
     return to_js_array(res) ;
 }
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #ifdef USEBINDINGS
     #include "em_bindings.h"
 #endif
