@@ -21,8 +21,10 @@ module.exports = [{
         'rotation-matrix': ['./live/src/rotation-matrix.js'],
         'simple-shear': ['./live/src/simple-shear.js'],
         'hopper': ['./live/src/hopper.js'],
+        'earth-pressure-2d': ['./live/src/earth-pressure-2d.js'],
         'intruder': ['./live/src/intruder.js'],
         'anisotropy': ['./live/src/anisotropy.js'],
+        'tilt': ['./live/src/tilt.js'],
         'dam-break': ['./live/src/dam-break.js'],
         'dam-break-2d': ['./live/src/dam-break-2d.js'],
         'effective-stress': ['./live/src/effective-stress.js'],
@@ -76,6 +78,13 @@ module.exports = [{
             template: "live/template.html",
             filename: "hopper-2d.html",
             chunks: ['hopper']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM Active and Passive Earth Pressure',
+            favicon: './visualise/resources/favicon.ico',
+            template: 'live/template.html',
+            filename: 'earth-pressure-2d.html',
+            chunks: ['earth-pressure-2d']
         }),
         new HtmlWebpackPlugin({
             title: "NDDEM Inclined plane",
@@ -146,6 +155,13 @@ module.exports = [{
             template: "live/plotly-template.html",
             filename: "anisotropy.html",
             chunks: ['anisotropy']
+        }),
+        new HtmlWebpackPlugin({
+            title: 'NDDEM The Tilt of the Stress',
+            favicon: "./visualise/resources/favicon.ico",
+            template: "live/plotly-template.html",
+            filename: "tilt.html",
+            chunks: ['tilt']
         }),
         new HtmlWebpackPlugin({
             title: 'NDDEM Dam Break',

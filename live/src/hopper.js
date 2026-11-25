@@ -67,6 +67,9 @@ let rainbow = new Lut("rainbow", 512); // options are rainbow, cooltowarm and bl
 let cooltowarm = new Lut("cooltowarm", 512); // options are rainbow, cooltowarm and blackbody
 let blackbody = new Lut("blackbody", 512); // options are rainbow, cooltowarm and blackbody
 
+if (urlParams.has('r_min')) { params.r_min = parseFloat(urlParams.get('r_min')); }
+if (urlParams.has('r_max')) { params.r_max = parseFloat(urlParams.get('r_max')); }
+
 params.average_radius = (params.r_min + params.r_max) / 2.;
 params.thickness = params.average_radius;
 
@@ -93,7 +96,7 @@ if (urlParams.has('cg_width')) { params.cg_width = parseInt(urlParams.get('cg_wi
 if (urlParams.has('cg_height')) { params.cg_height = parseInt(urlParams.get('cg_height')); }
 if (urlParams.has('cg_opacity')) { params.cg_opacity = parseFloat(urlParams.get('cg_opacity')); }
 if (urlParams.has('particle_opacity')) { params.particle_opacity = parseFloat(urlParams.get('particle_opacity')); }
-
+if (urlParams.has('N')) { params.N = parseInt(urlParams.get('N')); }
 if (urlParams.has('quality')) { params.quality = parseInt(urlParams.get('quality')); }
 
 SPHERES.createNDParticleShader(params).then(init);
